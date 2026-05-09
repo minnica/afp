@@ -19,6 +19,22 @@ export default function GastosContent() {
         return;
       }
 
+      const response = await fetch("/api/setup-user", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: session.user.id,
+          email: session.user.email,
+        }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        console.error("Error setup-user:", data);
+      }
+
       setIsCheckingSession(false);
     }
 

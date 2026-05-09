@@ -1,13 +1,278 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+}
+
+enum CardCycleStatus {
+  OPEN
+  CUT
+  PAYMENT_PENDING
+  PAID
+  OVERDUE
+}
+
+enum InstallmentPurchaseStatus {
+  ACTIVE
+  PAID_OFF
+  CANCELLED
+  ADJUSTED
+}
+
+enum ReceivableAccountStatus {
+  ACTIVE
+  PAID_OFF
+  CANCELLED
+}
+
+enum ReceivableOriginType {
+  MANUAL
+  DAILY_EXPENSE
+  INSTALLMENT_PURCHASE
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String?
+  email     String   @unique
+  createdAt DateTime @default(now())
+
+  cards                Card[]
+  cardCycles           CardCycle[]
+  categories           Category[]
+  people               Person[]
+  incomeTypes          IncomeType[]
+  dailyExpenses        DailyExpense[]
+  installmentPurchases InstallmentPurchase[]
+  subscriptions        Subscription[]
+  incomes              Income[]
+  receivableAccounts   ReceivableAccount[]
+
+  @@map("users")
+}
+
+model Card {
+  id          String   @id @default(uuid())
+  userId      String
+  name        String
+  usualCutDay Int
+  usualDueDay Int
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user                 User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cycles               CardCycle[]
+  dailyExpenses        DailyExpense[]
+  installmentPurchases InstallmentPurchase[]
+  subscriptions        Subscription[]
+
+  @@unique([userId, name])
+  @@map("cards")
+}
+
+model CardCycle {
+  id              String          @id @default(uuid())
+  userId          String
+  cardId          String
+  month           Int
+  year            Int
+  startDate       DateTime
+  cutDate         DateTime
+  dueDate         DateTime
+  statementAmount Decimal?
+  status          CardCycleStatus @default(OPEN)
+  paidAt          DateTime?
+  paidAmount      Decimal?
+  notes           String?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  card Card @relation(fields: [cardId], references: [id], onDelete: Cascade)
+
+  @@unique([cardId, month, year])
+  @@index([userId])
+  @@index([cardId])
+  @@map("card_cycles")
+}
+
+model Category {
+  id        String   @id @default(uuid())
+  userId    String
+  name      String
+  createdAt DateTime @default(now())
+
+  user                 User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dailyExpenses        DailyExpense[]
+  installmentPurchases InstallmentPurchase[]
+  subscriptions        Subscription[]
+
+  @@unique([userId, name])
+  @@map("categories")
+}
+
+model Person {
+  id        String   @id @default(uuid())
+  userId    String
+  name      String
+  notes     String?
+  createdAt DateTime @default(now())
+
+  user                 User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dailyExpenses        DailyExpense[]
+  installmentPurchases InstallmentPurchase[]
+  receivableAccounts   ReceivableAccount[]
+
+  @@unique([userId, name])
+  @@map("people")
+}
+
+model IncomeType {
+  id        String   @id @default(uuid())
+  userId    String
+  name      String
+  createdAt DateTime @default(now())
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  incomes Income[]
+
+  @@unique([userId, name])
+  @@map("income_types")
+}
+
+model DailyExpense {
+  id                  String        @id @default(uuid())
+  userId              String
+  date                DateTime
+  paymentMethod       PaymentMethod
+  cardId              String?
+  concept             String
+  amount              Decimal
+  categoryId          String
+  notes               String?
+  personId            String?
+  receivableAccountId String?
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+
+  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  card              Card?              @relation(fields: [cardId], references: [id], onDelete: SetNull)
+  category          Category           @relation(fields: [categoryId], references: [id])
+  person            Person?            @relation(fields: [personId], references: [id], onDelete: SetNull)
+  receivableAccount ReceivableAccount? @relation(fields: [receivableAccountId], references: [id], onDelete: SetNull)
+
+  @@index([userId, date])
+  @@index([cardId])
+  @@index([categoryId])
+  @@map("daily_expenses")
+}
+
+model InstallmentPurchase {
+  id                   String                    @id @default(uuid())
+  userId               String
+  cardId               String
+  purchaseDate         DateTime
+  concept              String
+  totalAmount          Decimal
+  months               Int
+  manualMonthlyPayment Decimal?
+  initialPaymentsMade  Int                       @default(0)
+  personId             String?
+  receivableAccountId  String?
+  categoryId           String
+  notes                String?
+  status               InstallmentPurchaseStatus @default(ACTIVE)
+  createdAt            DateTime                  @default(now())
+  updatedAt            DateTime                  @updatedAt
+
+  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  card              Card               @relation(fields: [cardId], references: [id])
+  person            Person?            @relation(fields: [personId], references: [id], onDelete: SetNull)
+  receivableAccount ReceivableAccount? @relation(fields: [receivableAccountId], references: [id], onDelete: SetNull)
+  category          Category           @relation(fields: [categoryId], references: [id])
+
+  @@index([userId, purchaseDate])
+  @@index([cardId])
+  @@index([categoryId])
+  @@map("installment_purchases")
+}
+
+model Subscription {
+  id            String        @id @default(uuid())
+  userId        String
+  name          String
+  amount        Decimal
+  paymentMethod PaymentMethod
+  cardId        String?
+  categoryId    String
+  chargeDay     Int
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  card     Card?    @relation(fields: [cardId], references: [id], onDelete: SetNull)
+  category Category @relation(fields: [categoryId], references: [id])
+
+  @@index([userId])
+  @@index([cardId])
+  @@index([categoryId])
+  @@map("subscriptions")
+}
+
+model ReceivableAccount {
+  id                     String                  @id @default(uuid())
+  userId                 String
+  personId               String
+  concept                String
+  originalAmount         Decimal
+  originDate             DateTime
+  expectedMonthlyPayment Decimal?
+  expectedDate           DateTime?
+  notes                  String?
+  status                 ReceivableAccountStatus @default(ACTIVE)
+  originType             ReceivableOriginType
+  originId               String?
+  createdAt              DateTime                @default(now())
+  updatedAt              DateTime                @updatedAt
+
+  user                 User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  person               Person                @relation(fields: [personId], references: [id])
+  incomes              Income[]
+  dailyExpenses        DailyExpense[]
+  installmentPurchases InstallmentPurchase[]
+
+  @@index([userId])
+  @@index([personId])
+  @@map("receivable_accounts")
+}
+
+model Income {
+  id                  String   @id @default(uuid())
+  userId              String
+  date                DateTime
+  incomeTypeId        String
+  source              String
+  concept             String
+  amount              Decimal
+  receivableAccountId String?
+  notes               String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  incomeType        IncomeType         @relation(fields: [incomeTypeId], references: [id])
+  receivableAccount ReceivableAccount? @relation(fields: [receivableAccountId], references: [id], onDelete: SetNull)
+
+  @@index([userId, date])
+  @@index([incomeTypeId])
+  @@index([receivableAccountId])
+  @@map("incomes")
 }
