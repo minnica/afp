@@ -270,8 +270,7 @@ export async function GET(request) {
         .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
 
       const currentIndex = cyclesForCard.findIndex(
-        (cycle) =>
-          new Date(cycle.dueDate) >= now && cycle.displayStatus !== "PAID",
+        (cycle) => new Date(cycle.dueDate) >= now,
       );
 
       const safeCurrentIndex =

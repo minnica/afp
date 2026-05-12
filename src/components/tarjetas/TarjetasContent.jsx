@@ -2,7 +2,14 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CreditCard, Plus, RefreshCcw, Trash2 } from "lucide-react";
+import {
+  CheckCircle2,
+  CreditCard,
+  FileText,
+  Plus,
+  RefreshCcw,
+  Trash2,
+} from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { supabase } from "@/lib/supabase";
@@ -56,6 +63,30 @@ function formatCompactDate(dateString) {
   return `${dateText} [${badge}]`;
 }
 
+function formatMoney(value) {
+  const numberValue = Number(value || 0);
+
+  return new Intl.NumberFormat("es-MX", {
+    style: "currency",
+    currency: "MXN",
+  }).format(numberValue);
+}
+
+function formatShortDate(dateString) {
+  if (!dateString) return "-";
+
+  return format(new Date(dateString), "d MMM", { locale: es });
+}
+
+function getTodayInputValue() {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
 function getStatusLabel(status) {
   const labels = {
     OPEN: "Abierto",
@@ -66,6 +97,49 @@ function getStatusLabel(status) {
   };
 
   return labels[status] || status;
+}
+
+function BreakdownSection({
+  title,
+  items,
+  emptyText,
+  getPrimary,
+  getSecondary,
+  getAmount,
+}) {
+  return (
+    <div className="rounded-xl border border-border bg-card p-3">
+      <h5 className="mb-3 text-sm font-medium">{title}</h5>
+
+      {items.length === 0 ? (
+        <p className="text-sm text-muted-foreground">{emptyText}</p>
+      ) : (
+        <div className="space-y-2">
+          {items.map((item) => (
+            <div
+              key={item.id}
+              className="rounded-lg border border-border bg-background/60 px-3 py-2"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium">
+                    {getPrimary(item)}
+                  </p>
+                  <p className="mt-1 truncate text-xs text-muted-foreground">
+                    {getSecondary(item)}
+                  </p>
+                </div>
+
+                <p className="shrink-0 text-sm font-semibold">
+                  {formatMoney(getAmount(item))}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function TarjetasContent() {
@@ -84,6 +158,15 @@ export default function TarjetasContent() {
   const [isSaving, setIsSaving] = useState(false);
   const [isGeneratingCycles, setIsGeneratingCycles] = useState(false);
   const [error, setError] = useState("");
+
+  const [editingStatementCycleId, setEditingStatementCycleId] = useState("");
+  const [statementAmount, setStatementAmount] = useState("");
+
+  const [payingCycleId, setPayingCycleId] = useState("");
+  const [paidAt, setPaidAt] = useState(getTodayInputValue());
+  const [paidAmount, setPaidAmount] = useState("");
+
+  const [expandedCycleId, setExpandedCycleId] = useState("");
 
   async function loadCards(userId) {
     const response = await fetch(`/api/cards?userId=${userId}`);
@@ -211,6 +294,76 @@ export default function TarjetasContent() {
       await Promise.all([loadCards(user.id), loadCycles(user.id)]);
     } catch (err) {
       setError(err.message || "No se pudo eliminar la tarjeta.");
+    }
+  }
+
+  async function updateStatementAmount(cycleId) {
+    if (!user) return;
+
+    setError("");
+
+    try {
+      const response = await fetch("/api/card-cycles", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: cycleId,
+          action: "UPDATE_STATEMENT",
+          statementAmount,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.error || "No se pudo guardar el estado de cuenta.",
+        );
+      }
+
+      setEditingStatementCycleId("");
+      setStatementAmount("");
+
+      await loadCycles(user.id);
+    } catch (err) {
+      setError(err.message || "No se pudo guardar el estado de cuenta.");
+    }
+  }
+
+  async function markCycleAsPaid(cycleId) {
+    if (!user) return;
+
+    setError("");
+
+    try {
+      const response = await fetch("/api/card-cycles", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: cycleId,
+          action: "MARK_AS_PAID",
+          paidAt,
+          paidAmount,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "No se pudo marcar como pagado.");
+      }
+
+      setPayingCycleId("");
+      setPaidAt(getTodayInputValue());
+      setPaidAmount("");
+
+      await loadCycles(user.id);
+    } catch (err) {
+      setError(err.message || "No se pudo marcar como pagado.");
     }
   }
 
@@ -477,33 +630,279 @@ export default function TarjetasContent() {
                           </h3>
 
                           <div className="overflow-hidden rounded-xl border border-border">
-                            <div className="hidden grid-cols-[1.2fr_1fr_1fr_1fr_1fr] gap-4 border-b border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground md:grid">
+                            <div className="hidden grid-cols-[1.1fr_1fr_1fr_1fr_1fr_1fr_1fr_1.4fr] gap-4 border-b border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground md:grid">
                               <div>Tarjeta</div>
-                              <div>Inicio</div>
                               <div>Corte</div>
-                              <div>Límite pago</div>
+                              <div>Límite</div>
+                              <div>Calculado</div>
+                              <div>Estado cuenta</div>
+                              <div>Diferencia</div>
                               <div>Estado</div>
+                              <div>Acciones</div>
                             </div>
 
                             <div className="divide-y divide-border">
                               {monthCycles.map((cycle) => (
                                 <div
                                   key={cycle.id}
-                                  className="grid gap-2 px-4 py-4 text-sm md:grid-cols-[1.2fr_1fr_1fr_1fr_1fr] md:gap-4"
+                                  className="grid gap-3 px-4 py-4 text-sm md:grid-cols-[1.1fr_1fr_1fr_1fr_1fr_1fr_1fr_1.4fr] md:gap-4"
                                 >
                                   <div className="font-medium">
                                     {cycle.card.name}
                                   </div>
-                                  <div className="text-muted-foreground">
-                                    {formatDate(cycle.startDate)}
-                                  </div>
+
                                   <div>{formatCompactDate(cycle.cutDate)}</div>
+
                                   <div>{formatCompactDate(cycle.dueDate)}</div>
+
+                                  <div className="font-medium">
+                                    {formatMoney(cycle.calculatedAmount)}
+                                    <p className="mt-1 text-xs text-muted-foreground">
+                                      G: {formatMoney(cycle.expensesAmount)} ·
+                                      S:{" "}
+                                      {formatMoney(cycle.subscriptionsAmount)} ·
+                                      MSI: {formatMoney(cycle.purchasesAmount)}
+                                    </p>
+                                  </div>
+
+                                  <div>
+                                    {cycle.statementAmount
+                                      ? formatMoney(cycle.statementAmount)
+                                      : "-"}
+                                  </div>
+
+                                  <div
+                                    className={
+                                      Number(cycle.difference || 0) === 0
+                                        ? "text-muted-foreground"
+                                        : Number(cycle.difference || 0) > 0
+                                          ? "text-red-400"
+                                          : "text-emerald-400"
+                                    }
+                                  >
+                                    {cycle.difference === null ||
+                                    cycle.difference === undefined
+                                      ? "-"
+                                      : formatMoney(cycle.difference)}
+                                  </div>
+
                                   <div>
                                     <Badge variant="secondary">
                                       {getStatusLabel(cycle.status)}
                                     </Badge>
                                   </div>
+                                  <div className="space-y-3">
+                                    <div className="flex flex-wrap gap-2">
+                                      <Button
+                                        type="button"
+                                        variant="secondary"
+                                        size="sm"
+                                        onClick={() => {
+                                          setEditingStatementCycleId(cycle.id);
+                                          setStatementAmount(
+                                            cycle.statementAmount
+                                              ? String(cycle.statementAmount)
+                                              : "",
+                                          );
+                                        }}
+                                      >
+                                        <FileText className="mr-2 h-4 w-4" />
+                                        Estado cuenta
+                                      </Button>
+
+                                      <Button
+                                        type="button"
+                                        variant="secondary"
+                                        size="sm"
+                                        onClick={() => {
+                                          setPayingCycleId(cycle.id);
+                                          setPaidAt(getTodayInputValue());
+                                          setPaidAmount(
+                                            cycle.statementAmount
+                                              ? String(cycle.statementAmount)
+                                              : "",
+                                          );
+                                        }}
+                                      >
+                                        <CheckCircle2 className="mr-2 h-4 w-4" />
+                                        Pagado
+                                      </Button>
+
+                                      <Button
+                                        type="button"
+                                        variant="secondary"
+                                        size="sm"
+                                        onClick={() => {
+                                          setExpandedCycleId((current) =>
+                                            current === cycle.id
+                                              ? ""
+                                              : cycle.id,
+                                          );
+                                        }}
+                                      >
+                                        {expandedCycleId === cycle.id
+                                          ? "Ocultar desglose"
+                                          : "Ver desglose"}
+                                      </Button>
+                                    </div>
+
+                                    {editingStatementCycleId === cycle.id ? (
+                                      <div className="rounded-xl border border-border bg-background/70 p-3">
+                                        <Label>Monto estado de cuenta</Label>
+                                        <div className="mt-2 flex gap-2">
+                                          <Input
+                                            type="number"
+                                            min="0"
+                                            step="0.01"
+                                            value={statementAmount}
+                                            placeholder="0.00"
+                                            onChange={(event) =>
+                                              setStatementAmount(
+                                                event.target.value,
+                                              )
+                                            }
+                                          />
+                                          <Button
+                                            type="button"
+                                            size="sm"
+                                            onClick={() =>
+                                              updateStatementAmount(cycle.id)
+                                            }
+                                          >
+                                            Guardar
+                                          </Button>
+                                        </div>
+                                      </div>
+                                    ) : null}
+
+                                    {payingCycleId === cycle.id ? (
+                                      <div className="rounded-xl border border-border bg-background/70 p-3">
+                                        <div className="grid gap-3">
+                                          <div className="space-y-2">
+                                            <Label>Fecha de pago</Label>
+                                            <Input
+                                              type="date"
+                                              value={paidAt}
+                                              onChange={(event) =>
+                                                setPaidAt(event.target.value)
+                                              }
+                                            />
+                                          </div>
+
+                                          <div className="space-y-2">
+                                            <Label>Monto pagado</Label>
+                                            <Input
+                                              type="number"
+                                              min="0"
+                                              step="0.01"
+                                              value={paidAmount}
+                                              placeholder="0.00"
+                                              onChange={(event) =>
+                                                setPaidAmount(
+                                                  event.target.value,
+                                                )
+                                              }
+                                            />
+                                          </div>
+
+                                          <Button
+                                            type="button"
+                                            size="sm"
+                                            onClick={() =>
+                                              markCycleAsPaid(cycle.id)
+                                            }
+                                          >
+                                            Confirmar pago
+                                          </Button>
+                                        </div>
+                                      </div>
+                                    ) : null}
+
+                                    {cycle.statementAmount ? (
+                                      <p className="text-xs text-muted-foreground">
+                                        Estado cuenta:{" "}
+                                        {Number(
+                                          cycle.statementAmount,
+                                        ).toLocaleString("es-MX", {
+                                          style: "currency",
+                                          currency: "MXN",
+                                        })}
+                                      </p>
+                                    ) : null}
+
+                                    {cycle.paidAmount ? (
+                                      <p className="text-xs text-muted-foreground">
+                                        Pagado:{" "}
+                                        {Number(
+                                          cycle.paidAmount,
+                                        ).toLocaleString("es-MX", {
+                                          style: "currency",
+                                          currency: "MXN",
+                                        })}
+                                      </p>
+                                    ) : null}
+                                  </div>
+
+                                  {expandedCycleId === cycle.id ? (
+                                    <div className="md:col-span-8">
+                                      <div className="mt-4 rounded-xl border border-border bg-background/70 p-4">
+                                        <h4 className="mb-4 text-sm font-medium">
+                                          Desglose del cálculo
+                                        </h4>
+
+                                        <div className="grid gap-4 lg:grid-cols-3">
+                                          <BreakdownSection
+                                            title={`Gastos (${formatMoney(cycle.expensesAmount)})`}
+                                            items={cycle.includedExpenses || []}
+                                            emptyText="No hay gastos diarios en este ciclo."
+                                            getPrimary={(item) => item.concept}
+                                            getSecondary={(item) =>
+                                              `${formatShortDate(item.date)}${
+                                                item.categoryName
+                                                  ? ` · ${item.categoryName}`
+                                                  : ""
+                                              }`
+                                            }
+                                            getAmount={(item) => item.amount}
+                                          />
+
+                                          <BreakdownSection
+                                            title={`Suscripciones (${formatMoney(cycle.subscriptionsAmount)})`}
+                                            items={
+                                              cycle.includedSubscriptions || []
+                                            }
+                                            emptyText="No hay suscripciones en este ciclo."
+                                            getPrimary={(item) => item.name}
+                                            getSecondary={(item) =>
+                                              `${formatShortDate(item.chargeDate)}${
+                                                item.categoryName
+                                                  ? ` · ${item.categoryName}`
+                                                  : ""
+                                              }`
+                                            }
+                                            getAmount={(item) => item.amount}
+                                          />
+
+                                          <BreakdownSection
+                                            title={`Compras a meses (${formatMoney(cycle.purchasesAmount)})`}
+                                            items={
+                                              cycle.includedPurchases || []
+                                            }
+                                            emptyText="No hay mensualidades en este ciclo."
+                                            getPrimary={(item) => item.concept}
+                                            getSecondary={(item) =>
+                                              `${formatShortDate(item.purchaseDate)} · ${item.months} meses${
+                                                item.categoryName
+                                                  ? ` · ${item.categoryName}`
+                                                  : ""
+                                              }`
+                                            }
+                                            getAmount={(item) => item.amount}
+                                          />
+                                        </div>
+                                      </div>
+                                    </div>
+                                  ) : null}
                                 </div>
                               ))}
                             </div>
