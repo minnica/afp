@@ -194,3 +194,109 @@ export async function DELETE(request) {
     );
   }
 }
+
+export async function PATCH(request) {
+  try {
+    const body = await request.json();
+
+    const {
+      id,
+      date,
+      incomeTypeId,
+      source,
+      concept,
+      amount,
+      receivableAccountId,
+      notes,
+    } = body;
+
+    if (!id) {
+      return NextResponse.json({ error: "Falta id." }, { status: 400 });
+    }
+
+    if (!date || !incomeTypeId || !source || !concept || !amount) {
+      return NextResponse.json(
+        { error: "Faltan datos obligatorios." },
+        { status: 400 },
+      );
+    }
+
+    const existingIncome = await prisma.income.findUnique({
+      where: { id },
+    });
+
+    if (!existingIncome) {
+      return NextResponse.json(
+        { error: "Ingreso no encontrado." },
+        { status: 404 },
+      );
+    }
+
+    const previousReceivableAccountId = existingIncome.receivableAccountId;
+
+    const numericAmount = Number(amount);
+
+    if (!Number.isFinite(numericAmount) || numericAmount <= 0) {
+      return NextResponse.json(
+        { error: "El monto debe ser mayor a 0." },
+        { status: 400 },
+      );
+    }
+
+    const parsedDate = parseDateInput(date);
+
+    if (!parsedDate || Number.isNaN(parsedDate.getTime())) {
+      return NextResponse.json({ error: "Fecha no válida." }, { status: 400 });
+    }
+
+    const nextReceivableAccountId = receivableAccountId || null;
+
+    const income = await prisma.income.update({
+      where: { id },
+      data: {
+        date: parsedDate,
+        incomeTypeId,
+        source: source.trim(),
+        concept: concept.trim(),
+        amount: numericAmount,
+        receivableAccountId: nextReceivableAccountId,
+        notes: notes?.trim() || null,
+      },
+      include: {
+        incomeType: true,
+        receivableAccount: {
+          include: {
+            person: true,
+          },
+        },
+      },
+    });
+
+    if (previousReceivableAccountId) {
+      await updateReceivableStatusIfNeeded(previousReceivableAccountId);
+    }
+
+    if (
+      nextReceivableAccountId &&
+      nextReceivableAccountId !== previousReceivableAccountId
+    ) {
+      await updateReceivableStatusIfNeeded(nextReceivableAccountId);
+    }
+
+    if (
+      nextReceivableAccountId &&
+      nextReceivableAccountId === previousReceivableAccountId
+    ) {
+      await updateReceivableStatusIfNeeded(nextReceivableAccountId);
+    }
+
+    return NextResponse.json({ income });
+  } catch (error) {
+    console.error("Error updating income:", error);
+
+    return NextResponse.json(
+      { error: "No se pudo actualizar el ingreso." },
+      { status: 500 },
+    );
+  }
+}

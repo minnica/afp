@@ -4,8 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { Plus, Trash2 } from "lucide-react";
-
+import { Pencil, Plus, Trash2, X } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 import { Button } from "@/components/ui/button";
@@ -71,6 +70,17 @@ export default function IngresosContent() {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
 
+  const [editingIncomeId, setEditingIncomeId] = useState("");
+  const [editDate, setEditDate] = useState("");
+  const [editIncomeTypeId, setEditIncomeTypeId] = useState("");
+  const [editSource, setEditSource] = useState("");
+  const [editConcept, setEditConcept] = useState("");
+  const [editAmount, setEditAmount] = useState("");
+  const [editReceivableAccountId, setEditReceivableAccountId] =
+    useState("NONE");
+  const [editNotes, setEditNotes] = useState("");
+  const [isUpdating, setIsUpdating] = useState(false);
+
   async function loadSettings(userId) {
     const response = await fetch(`/api/settings?userId=${userId}`);
     const data = await response.json();
@@ -96,7 +106,7 @@ export default function IngresosContent() {
       (item) => item.status === "ACTIVE",
     );
 
-    setReceivables(activeReceivables);
+    setReceivables(data.receivables || []);
   }
 
   async function loadIncomes(userId) {
@@ -194,6 +204,78 @@ export default function IngresosContent() {
       setError(err.message || "No se pudo guardar el ingreso.");
     } finally {
       setIsSaving(false);
+    }
+  }
+
+  function toDateInputValue(dateString) {
+    const date = new Date(dateString);
+    const year = date.getUTCFullYear();
+    const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+    const day = String(date.getUTCDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+  }
+
+  function startEditingIncome(income) {
+    setEditingIncomeId(income.id);
+    setEditDate(toDateInputValue(income.date));
+    setEditIncomeTypeId(income.incomeTypeId || "");
+    setEditSource(income.source || "");
+    setEditConcept(income.concept || "");
+    setEditAmount(String(income.amount || ""));
+    setEditReceivableAccountId(income.receivableAccountId || "NONE");
+    setEditNotes(income.notes || "");
+  }
+
+  function cancelEditingIncome() {
+    setEditingIncomeId("");
+    setEditDate("");
+    setEditIncomeTypeId("");
+    setEditSource("");
+    setEditConcept("");
+    setEditAmount("");
+    setEditReceivableAccountId("NONE");
+    setEditNotes("");
+  }
+
+  async function updateIncome() {
+    if (!user || !editingIncomeId) return;
+
+    setError("");
+    setIsUpdating(true);
+
+    try {
+      const response = await fetch("/api/incomes", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: editingIncomeId,
+          date: editDate,
+          incomeTypeId: editIncomeTypeId,
+          source: editSource,
+          concept: editConcept,
+          amount: editAmount,
+          receivableAccountId:
+            editReceivableAccountId === "NONE" ? null : editReceivableAccountId,
+          notes: editNotes,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "No se pudo actualizar el ingreso.");
+      }
+
+      cancelEditingIncome();
+
+      await Promise.all([loadIncomes(user.id), loadReceivables(user.id)]);
+    } catch (err) {
+      setError(err.message || "No se pudo actualizar el ingreso.");
+    } finally {
+      setIsUpdating(false);
     }
   }
 
@@ -446,12 +528,160 @@ export default function IngresosContent() {
                             type="button"
                             variant="ghost"
                             size="icon"
+                            onClick={() => startEditingIncome(income)}
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
                             onClick={() => deleteIncome(income.id)}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
                       </div>
+
+                      {editingIncomeId === income.id ? (
+                        <div className="mt-4 rounded-xl border border-border bg-background/70 p-4">
+                          <div className="mb-4 flex items-center justify-between gap-4">
+                            <p className="text-sm font-medium">
+                              Editar ingreso
+                            </p>
+
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              onClick={cancelEditingIncome}
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+
+                          <div className="grid gap-4 md:grid-cols-2">
+                            <div className="space-y-2">
+                              <Label>Fecha</Label>
+                              <Input
+                                type="date"
+                                value={editDate}
+                                onChange={(event) =>
+                                  setEditDate(event.target.value)
+                                }
+                              />
+                            </div>
+
+                            <div className="space-y-2">
+                              <Label>Tipo de ingreso</Label>
+                              <Select
+                                value={editIncomeTypeId}
+                                onValueChange={setEditIncomeTypeId}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Selecciona tipo" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {incomeTypes.map((type) => (
+                                    <SelectItem key={type.id} value={type.id}>
+                                      {type.name}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+
+                            <div className="space-y-2">
+                              <Label>Fuente</Label>
+                              <Input
+                                value={editSource}
+                                onChange={(event) =>
+                                  setEditSource(event.target.value)
+                                }
+                              />
+                            </div>
+
+                            <div className="space-y-2">
+                              <Label>Concepto</Label>
+                              <Input
+                                value={editConcept}
+                                onChange={(event) =>
+                                  setEditConcept(event.target.value)
+                                }
+                              />
+                            </div>
+
+                            <div className="space-y-2">
+                              <Label>Monto</Label>
+                              <Input
+                                value={editAmount}
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                onChange={(event) =>
+                                  setEditAmount(event.target.value)
+                                }
+                              />
+                            </div>
+
+                            <div className="space-y-2">
+                              <Label>Cuenta por cobrar relacionada</Label>
+                              <Select
+                                value={editReceivableAccountId}
+                                onValueChange={setEditReceivableAccountId}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Sin cuenta por cobrar" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="NONE">
+                                    Sin cuenta por cobrar
+                                  </SelectItem>
+                                  {receivables.map((item) => (
+                                    <SelectItem key={item.id} value={item.id}>
+                                      {item.person?.name} · {item.concept} ·
+                                      pendiente{" "}
+                                      {formatMoney(item.pendingBalance)} ·{" "}
+                                      {item.status === "PAID_OFF"
+                                        ? "Liquidada"
+                                        : "Activa"}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+
+                            <div className="space-y-2 md:col-span-2">
+                              <Label>Notas</Label>
+                              <Textarea
+                                value={editNotes}
+                                onChange={(event) =>
+                                  setEditNotes(event.target.value)
+                                }
+                              />
+                            </div>
+                          </div>
+
+                          <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+                            <Button
+                              type="button"
+                              onClick={updateIncome}
+                              disabled={isUpdating}
+                            >
+                              {isUpdating ? "Guardando..." : "Guardar cambios"}
+                            </Button>
+
+                            <Button
+                              type="button"
+                              variant="secondary"
+                              onClick={cancelEditingIncome}
+                            >
+                              Cancelar
+                            </Button>
+                          </div>
+                        </div>
+                      ) : null}
                     </div>
                   ))}
                 </div>
