@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { Filter, Plus, RotateCcw, Trash2 } from "lucide-react";
+import { Filter, Pencil, Plus, RotateCcw, Trash2, X } from "lucide-react";
 
 import { supabase } from "@/lib/supabase";
 
@@ -101,6 +101,16 @@ export default function GastosContent() {
   const [personId, setPersonId] = useState("");
   const [receivableMode, setReceivableMode] = useState("CREATE");
   const [receivableAccountId, setReceivableAccountId] = useState("");
+
+  const [editingExpenseId, setEditingExpenseId] = useState("");
+  const [editDate, setEditDate] = useState("");
+  const [editPaymentMethod, setEditPaymentMethod] = useState("CASH");
+  const [editCardId, setEditCardId] = useState("");
+  const [editConcept, setEditConcept] = useState("");
+  const [editAmount, setEditAmount] = useState("");
+  const [editCategoryId, setEditCategoryId] = useState("");
+  const [editNotes, setEditNotes] = useState("");
+  const [isUpdating, setIsUpdating] = useState(false);
 
   async function loadInitialData(userId) {
     const [settingsResponse, cardsResponse, expensesResponse] =
@@ -303,6 +313,76 @@ export default function GastosContent() {
         setError(err.message || "No se pudieron limpiar filtros.");
       });
     }, 0);
+  }
+
+  function toDateInputValue(dateString) {
+    const date = new Date(dateString);
+    const year = date.getUTCFullYear();
+    const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+    const day = String(date.getUTCDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+  }
+
+  function startEditingExpense(expense) {
+    setEditingExpenseId(expense.id);
+    setEditDate(toDateInputValue(expense.date));
+    setEditPaymentMethod(expense.paymentMethod);
+    setEditCardId(expense.cardId || "");
+    setEditConcept(expense.concept || "");
+    setEditAmount(String(expense.amount || ""));
+    setEditCategoryId(expense.categoryId || "");
+    setEditNotes(expense.notes || "");
+  }
+
+  function cancelEditingExpense() {
+    setEditingExpenseId("");
+    setEditDate("");
+    setEditPaymentMethod("CASH");
+    setEditCardId("");
+    setEditConcept("");
+    setEditAmount("");
+    setEditCategoryId("");
+    setEditNotes("");
+  }
+
+  async function updateExpense() {
+    if (!user || !editingExpenseId) return;
+
+    setError("");
+    setIsUpdating(true);
+
+    try {
+      const response = await fetch("/api/expenses", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: editingExpenseId,
+          date: editDate,
+          paymentMethod: editPaymentMethod,
+          cardId: editCardId,
+          concept: editConcept,
+          amount: editAmount,
+          categoryId: editCategoryId,
+          notes: editNotes,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "No se pudo actualizar el gasto.");
+      }
+
+      cancelEditingExpense();
+      await loadExpenses(user.id);
+    } catch (err) {
+      setError(err.message || "No se pudo actualizar el gasto.");
+    } finally {
+      setIsUpdating(false);
+    }
   }
 
   async function deleteExpense(id) {
@@ -758,52 +838,220 @@ export default function GastosContent() {
                     {expenses.map((expense) => (
                       <div
                         key={expense.id}
-                        className="flex items-start justify-between gap-4 rounded-xl border border-border bg-background/60 px-4 py-4"
+                        className="rounded-xl border border-border bg-background/60 px-4 py-4"
                       >
-                        <div className="min-w-0">
-                          <div className="flex flex-wrap items-center gap-2">
-                            <p className="font-medium">{expense.concept}</p>
-                            <Badge variant="secondary">
-                              {expense.category?.name}
-                            </Badge>
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="min-w-0">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <p className="font-medium">{expense.concept}</p>
+                              <Badge variant="secondary">
+                                {expense.category?.name}
+                              </Badge>
+                            </div>
+
+                            <p className="mt-1 text-sm text-muted-foreground">
+                              {formatExpenseDate(expense.date)} ·{" "}
+                              {getPaymentMethodLabel(expense.paymentMethod)}
+                              {expense.card ? ` · ${expense.card.name}` : ""}
+                            </p>
+
+                            {expense.person ? (
+                              <p className="mt-1 text-sm text-muted-foreground">
+                                Persona: {expense.person.name}
+                                {expense.receivableAccount
+                                  ? ` · Por cobrar: ${expense.receivableAccount.concept}`
+                                  : ""}
+                              </p>
+                            ) : null}
+
+                            {expense.notes ? (
+                              <p className="mt-1 text-sm text-muted-foreground">
+                                {expense.notes}
+                              </p>
+                            ) : null}
                           </div>
 
-                          <p className="mt-1 text-sm text-muted-foreground">
-                            {formatExpenseDate(expense.date)} ·{" "}
-                            {getPaymentMethodLabel(expense.paymentMethod)}
-                            {expense.card ? ` · ${expense.card.name}` : ""}
-                          </p>
-
-                          {expense.person ? (
-                            <p className="mt-1 text-sm text-muted-foreground">
-                              Persona: {expense.person.name}
-                              {expense.receivableAccount
-                                ? ` · Por cobrar: ${expense.receivableAccount.concept}`
-                                : ""}
+                          <div className="flex shrink-0 items-center gap-2">
+                            <p className="font-semibold">
+                              {formatMoney(expense.amount)}
                             </p>
-                          ) : null}
 
-                          {expense.notes ? (
-                            <p className="mt-1 text-sm text-muted-foreground">
-                              {expense.notes}
-                            </p>
-                          ) : null}
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => startEditingExpense(expense)}
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => deleteExpense(expense.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </div>
 
-                        <div className="flex shrink-0 items-center gap-2">
-                          <p className="font-semibold">
-                            {formatMoney(expense.amount)}
-                          </p>
+                        {editingExpenseId === expense.id ? (
+                          <div className="mt-4 rounded-xl border border-border bg-background/70 p-4">
+                            <div className="mb-4 flex items-center justify-between gap-4">
+                              <p className="text-sm font-medium">
+                                Editar gasto
+                              </p>
 
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => deleteExpense(expense.id)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                onClick={cancelEditingExpense}
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </div>
+
+                            <div className="grid gap-4 md:grid-cols-2">
+                              <div className="space-y-2">
+                                <Label>Fecha</Label>
+                                <Input
+                                  type="date"
+                                  value={editDate}
+                                  onChange={(event) =>
+                                    setEditDate(event.target.value)
+                                  }
+                                />
+                              </div>
+
+                              <div className="space-y-2">
+                                <Label>Método</Label>
+                                <Select
+                                  value={editPaymentMethod}
+                                  onValueChange={(value) => {
+                                    setEditPaymentMethod(value);
+
+                                    if (value === "CASH") {
+                                      setEditCardId("");
+                                    }
+                                  }}
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Selecciona método" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="CASH">
+                                      Efectivo
+                                    </SelectItem>
+                                    <SelectItem value="CARD">
+                                      Tarjeta
+                                    </SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+
+                              {editPaymentMethod === "CARD" ? (
+                                <div className="space-y-2">
+                                  <Label>Tarjeta</Label>
+                                  <Select
+                                    value={editCardId}
+                                    onValueChange={setEditCardId}
+                                  >
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Selecciona tarjeta" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {cards.map((card) => (
+                                        <SelectItem
+                                          key={card.id}
+                                          value={card.id}
+                                        >
+                                          {card.name}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                              ) : null}
+
+                              <div className="space-y-2">
+                                <Label>Concepto</Label>
+                                <Input
+                                  value={editConcept}
+                                  onChange={(event) =>
+                                    setEditConcept(event.target.value)
+                                  }
+                                />
+                              </div>
+
+                              <div className="space-y-2">
+                                <Label>Monto</Label>
+                                <Input
+                                  type="number"
+                                  min="0"
+                                  step="0.01"
+                                  value={editAmount}
+                                  onChange={(event) =>
+                                    setEditAmount(event.target.value)
+                                  }
+                                />
+                              </div>
+
+                              <div className="space-y-2">
+                                <Label>Categoría</Label>
+                                <Select
+                                  value={editCategoryId}
+                                  onValueChange={setEditCategoryId}
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Selecciona categoría" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {categories.map((category) => (
+                                      <SelectItem
+                                        key={category.id}
+                                        value={category.id}
+                                      >
+                                        {category.name}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+
+                              <div className="space-y-2 md:col-span-2">
+                                <Label>Notas</Label>
+                                <Textarea
+                                  value={editNotes}
+                                  onChange={(event) =>
+                                    setEditNotes(event.target.value)
+                                  }
+                                />
+                              </div>
+                            </div>
+
+                            <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+                              <Button
+                                type="button"
+                                onClick={updateExpense}
+                                disabled={isUpdating}
+                              >
+                                {isUpdating
+                                  ? "Guardando..."
+                                  : "Guardar cambios"}
+                              </Button>
+
+                              <Button
+                                type="button"
+                                variant="secondary"
+                                onClick={cancelEditingExpense}
+                              >
+                                Cancelar
+                              </Button>
+                            </div>
+                          </div>
+                        ) : null}
                       </div>
                     ))}
                   </div>

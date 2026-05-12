@@ -226,3 +226,88 @@ export async function DELETE(request) {
     );
   }
 }
+
+export async function PATCH(request) {
+  try {
+    const body = await request.json();
+
+    const {
+      id,
+      date,
+      paymentMethod,
+      cardId,
+      concept,
+      amount,
+      categoryId,
+      notes,
+    } = body;
+
+    if (!id) {
+      return NextResponse.json({ error: "Falta id." }, { status: 400 });
+    }
+
+    if (!date || !paymentMethod || !concept || !amount || !categoryId) {
+      return NextResponse.json(
+        { error: "Faltan datos obligatorios." },
+        { status: 400 },
+      );
+    }
+
+    if (!["CASH", "CARD"].includes(paymentMethod)) {
+      return NextResponse.json(
+        { error: "Método de pago no válido." },
+        { status: 400 },
+      );
+    }
+
+    if (paymentMethod === "CARD" && !cardId) {
+      return NextResponse.json(
+        { error: "Debes seleccionar una tarjeta." },
+        { status: 400 },
+      );
+    }
+
+    const numericAmount = Number(amount);
+
+    if (!Number.isFinite(numericAmount) || numericAmount <= 0) {
+      return NextResponse.json(
+        { error: "El monto debe ser mayor a 0." },
+        { status: 400 },
+      );
+    }
+
+    const parsedDate = parseDateInput(date);
+
+    if (!parsedDate || Number.isNaN(parsedDate.getTime())) {
+      return NextResponse.json({ error: "Fecha no válida." }, { status: 400 });
+    }
+
+    const expense = await prisma.dailyExpense.update({
+      where: { id },
+      data: {
+        date: parsedDate,
+        paymentMethod,
+        cardId: paymentMethod === "CARD" ? cardId : null,
+        concept: concept.trim(),
+        amount: numericAmount,
+        categoryId,
+        notes: notes?.trim() || null,
+      },
+      include: {
+        card: true,
+        category: true,
+        person: true,
+        receivableAccount: true,
+      },
+    });
+
+    return NextResponse.json({ expense });
+  } catch (error) {
+    console.error("Error updating expense:", error);
+
+    return NextResponse.json(
+      { error: "No se pudo actualizar el gasto." },
+      { status: 500 },
+    );
+  }
+}
