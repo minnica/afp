@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
+  CalendarClock,
   CheckCircle2,
   CreditCard,
   FileText,
@@ -85,6 +86,17 @@ function getTodayInputValue() {
   const year = today.getFullYear();
   const month = String(today.getMonth() + 1).padStart(2, "0");
   const day = String(today.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
+function toDateInputValue(dateString) {
+  if (!dateString) return "";
+
+  const date = new Date(dateString);
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(date.getUTCDate()).padStart(2, "0");
 
   return `${year}-${month}-${day}`;
 }
@@ -176,6 +188,12 @@ export default function TarjetasContent() {
   const [editUsualDueDay, setEditUsualDueDay] = useState("");
   const [editCardNotes, setEditCardNotes] = useState("");
   const [isUpdatingCard, setIsUpdatingCard] = useState(false);
+
+  const [editingCycleDatesId, setEditingCycleDatesId] = useState("");
+  const [editCycleStartDate, setEditCycleStartDate] = useState("");
+  const [editCycleCutDate, setEditCycleCutDate] = useState("");
+  const [editCycleDueDate, setEditCycleDueDate] = useState("");
+  const [isUpdatingCycleDates, setIsUpdatingCycleDates] = useState(false);
 
   async function loadCards(userId) {
     const response = await fetch(`/api/cards?userId=${userId}`);
@@ -356,6 +374,56 @@ export default function TarjetasContent() {
       await Promise.all([loadCards(user.id), loadCycles(user.id)]);
     } catch (err) {
       setError(err.message || "No se pudo eliminar la tarjeta.");
+    }
+  }
+
+  function startEditingCycleDates(cycle) {
+    setEditingCycleDatesId(cycle.id);
+    setEditCycleStartDate(toDateInputValue(cycle.startDate));
+    setEditCycleCutDate(toDateInputValue(cycle.cutDate));
+    setEditCycleDueDate(toDateInputValue(cycle.dueDate));
+  }
+
+  function cancelEditingCycleDates() {
+    setEditingCycleDatesId("");
+    setEditCycleStartDate("");
+    setEditCycleCutDate("");
+    setEditCycleDueDate("");
+  }
+
+  async function updateCycleDates(cycleId) {
+    if (!user) return;
+
+    setError("");
+    setIsUpdatingCycleDates(true);
+
+    try {
+      const response = await fetch("/api/card-cycles", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: cycleId,
+          action: "UPDATE_DATES",
+          startDate: editCycleStartDate,
+          cutDate: editCycleCutDate,
+          dueDate: editCycleDueDate,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "No se pudieron actualizar las fechas.");
+      }
+
+      cancelEditingCycleDates();
+      await loadCycles(user.id);
+    } catch (err) {
+      setError(err.message || "No se pudieron actualizar las fechas.");
+    } finally {
+      setIsUpdatingCycleDates(false);
     }
   }
 
@@ -859,6 +927,18 @@ export default function TarjetasContent() {
                                         type="button"
                                         variant="secondary"
                                         size="sm"
+                                        onClick={() =>
+                                          startEditingCycleDates(cycle)
+                                        }
+                                      >
+                                        <CalendarClock className="mr-2 h-4 w-4" />
+                                        Fechas
+                                      </Button>
+
+                                      <Button
+                                        type="button"
+                                        variant="secondary"
+                                        size="sm"
                                         onClick={() => {
                                           setEditingStatementCycleId(cycle.id);
                                           setStatementAmount(
@@ -907,6 +987,79 @@ export default function TarjetasContent() {
                                           : "Ver desglose"}
                                       </Button>
                                     </div>
+
+                                    {editingCycleDatesId === cycle.id ? (
+                                      <div className="rounded-xl border border-border bg-background/70 p-3">
+                                        <div className="mb-3 flex items-center justify-between gap-4">
+                                          <p className="text-xs font-medium">
+                                            Editar fechas reales
+                                          </p>
+
+                                          <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={cancelEditingCycleDates}
+                                          >
+                                            <X className="h-4 w-4" />
+                                          </Button>
+                                        </div>
+
+                                        <div className="grid gap-3">
+                                          <div className="space-y-2">
+                                            <Label>Inicio</Label>
+                                            <Input
+                                              type="date"
+                                              value={editCycleStartDate}
+                                              onChange={(event) =>
+                                                setEditCycleStartDate(
+                                                  event.target.value,
+                                                )
+                                              }
+                                            />
+                                          </div>
+
+                                          <div className="space-y-2">
+                                            <Label>Corte</Label>
+                                            <Input
+                                              type="date"
+                                              value={editCycleCutDate}
+                                              onChange={(event) =>
+                                                setEditCycleCutDate(
+                                                  event.target.value,
+                                                )
+                                              }
+                                            />
+                                          </div>
+
+                                          <div className="space-y-2">
+                                            <Label>Límite pago</Label>
+                                            <Input
+                                              type="date"
+                                              value={editCycleDueDate}
+                                              onChange={(event) =>
+                                                setEditCycleDueDate(
+                                                  event.target.value,
+                                                )
+                                              }
+                                            />
+                                          </div>
+
+                                          <Button
+                                            type="button"
+                                            size="sm"
+                                            onClick={() =>
+                                              updateCycleDates(cycle.id)
+                                            }
+                                            disabled={isUpdatingCycleDates}
+                                          >
+                                            {isUpdatingCycleDates
+                                              ? "Guardando..."
+                                              : "Guardar fechas"}
+                                          </Button>
+                                        </div>
+                                      </div>
+                                    ) : null}
 
                                     {editingStatementCycleId === cycle.id ? (
                                       <div className="rounded-xl border border-border bg-background/70 p-3">

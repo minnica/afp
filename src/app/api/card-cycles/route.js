@@ -429,6 +429,60 @@ export async function PATCH(request) {
       );
     }
 
+    if (action === "UPDATE_DATES") {
+      const { startDate, cutDate, dueDate } = body;
+
+      if (!startDate || !cutDate || !dueDate) {
+        return NextResponse.json(
+          { error: "Faltan fechas del ciclo." },
+          { status: 400 },
+        );
+      }
+
+      const parsedStartDate = new Date(`${startDate}T12:00:00.000Z`);
+      const parsedCutDate = new Date(`${cutDate}T12:00:00.000Z`);
+      const parsedDueDate = new Date(`${dueDate}T12:00:00.000Z`);
+
+      if (
+        Number.isNaN(parsedStartDate.getTime()) ||
+        Number.isNaN(parsedCutDate.getTime()) ||
+        Number.isNaN(parsedDueDate.getTime())
+      ) {
+        return NextResponse.json(
+          { error: "Alguna fecha no es válida." },
+          { status: 400 },
+        );
+      }
+
+      if (parsedStartDate >= parsedCutDate) {
+        return NextResponse.json(
+          { error: "La fecha de inicio debe ser menor a la fecha de corte." },
+          { status: 400 },
+        );
+      }
+
+      if (parsedCutDate >= parsedDueDate) {
+        return NextResponse.json(
+          { error: "La fecha límite debe ser posterior al corte." },
+          { status: 400 },
+        );
+      }
+
+      const cycle = await prisma.cardCycle.update({
+        where: { id },
+        data: {
+          startDate: parsedStartDate,
+          cutDate: parsedCutDate,
+          dueDate: parsedDueDate,
+        },
+        include: {
+          card: true,
+        },
+      });
+
+      return NextResponse.json({ cycle });
+    }
+
     if (action === "UPDATE_STATEMENT") {
       if (!statementAmount) {
         return NextResponse.json(
