@@ -2,8 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CalendarDays, Plus, Trash2 } from "lucide-react";
-
+import { CalendarDays, Pencil, Plus, Trash2, X } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 import { Button } from "@/components/ui/button";
@@ -58,6 +57,15 @@ export default function SuscripcionesContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
+
+  const [editingSubscriptionId, setEditingSubscriptionId] = useState("");
+  const [editName, setEditName] = useState("");
+  const [editAmount, setEditAmount] = useState("");
+  const [editPaymentMethod, setEditPaymentMethod] = useState("CARD");
+  const [editCardId, setEditCardId] = useState("");
+  const [editCategoryId, setEditCategoryId] = useState("");
+  const [editChargeDay, setEditChargeDay] = useState("");
+  const [isUpdating, setIsUpdating] = useState(false);
 
   async function loadInitialData(userId) {
     const [settingsResponse, cardsResponse, subscriptionsResponse] =
@@ -180,6 +188,64 @@ export default function SuscripcionesContent() {
       setError(err.message || "No se pudo guardar la suscripción.");
     } finally {
       setIsSaving(false);
+    }
+  }
+
+  function startEditingSubscription(subscription) {
+    setEditingSubscriptionId(subscription.id);
+    setEditName(subscription.name || "");
+    setEditAmount(String(subscription.amount || ""));
+    setEditPaymentMethod(subscription.paymentMethod || "CARD");
+    setEditCardId(subscription.cardId || "");
+    setEditCategoryId(subscription.categoryId || "");
+    setEditChargeDay(String(subscription.chargeDay || ""));
+  }
+
+  function cancelEditingSubscription() {
+    setEditingSubscriptionId("");
+    setEditName("");
+    setEditAmount("");
+    setEditPaymentMethod("CARD");
+    setEditCardId("");
+    setEditCategoryId("");
+    setEditChargeDay("");
+  }
+
+  async function updateSubscription() {
+    if (!user || !editingSubscriptionId) return;
+
+    setError("");
+    setIsUpdating(true);
+
+    try {
+      const response = await fetch("/api/subscriptions", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: editingSubscriptionId,
+          name: editName,
+          amount: editAmount,
+          paymentMethod: editPaymentMethod,
+          cardId: editCardId,
+          categoryId: editCategoryId,
+          chargeDay: editChargeDay,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "No se pudo actualizar la suscripción.");
+      }
+
+      cancelEditingSubscription();
+      await loadSubscriptions(user.id);
+    } catch (err) {
+      setError(err.message || "No se pudo actualizar la suscripción.");
+    } finally {
+      setIsUpdating(false);
     }
   }
 
@@ -435,12 +501,163 @@ export default function SuscripcionesContent() {
                             type="button"
                             variant="ghost"
                             size="icon"
+                            onClick={() =>
+                              startEditingSubscription(subscription)
+                            }
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
                             onClick={() => deleteSubscription(subscription.id)}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
                       </div>
+
+                      {editingSubscriptionId === subscription.id ? (
+                        <div className="mt-4 rounded-xl border border-border bg-background/70 p-4">
+                          <div className="mb-4 flex items-center justify-between gap-4">
+                            <p className="text-sm font-medium">
+                              Editar suscripción
+                            </p>
+
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              onClick={cancelEditingSubscription}
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+
+                          <div className="grid gap-4 md:grid-cols-2">
+                            <div className="space-y-2">
+                              <Label>Nombre</Label>
+                              <Input
+                                value={editName}
+                                onChange={(event) =>
+                                  setEditName(event.target.value)
+                                }
+                              />
+                            </div>
+
+                            <div className="space-y-2">
+                              <Label>Monto</Label>
+                              <Input
+                                value={editAmount}
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                onChange={(event) =>
+                                  setEditAmount(event.target.value)
+                                }
+                              />
+                            </div>
+
+                            <div className="space-y-2">
+                              <Label>Método de pago</Label>
+                              <Select
+                                value={editPaymentMethod}
+                                onValueChange={(value) => {
+                                  setEditPaymentMethod(value);
+
+                                  if (value === "CASH") {
+                                    setEditCardId("");
+                                  }
+                                }}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Selecciona método" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="CARD">Tarjeta</SelectItem>
+                                  <SelectItem value="CASH">Efectivo</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+
+                            {editPaymentMethod === "CARD" ? (
+                              <div className="space-y-2">
+                                <Label>Tarjeta</Label>
+                                <Select
+                                  value={editCardId}
+                                  onValueChange={setEditCardId}
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Selecciona tarjeta" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {cards.map((card) => (
+                                      <SelectItem key={card.id} value={card.id}>
+                                        {card.name}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            ) : null}
+
+                            <div className="space-y-2">
+                              <Label>Categoría</Label>
+                              <Select
+                                value={editCategoryId}
+                                onValueChange={setEditCategoryId}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Selecciona categoría" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {categories.map((category) => (
+                                    <SelectItem
+                                      key={category.id}
+                                      value={category.id}
+                                    >
+                                      {category.name}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+
+                            <div className="space-y-2">
+                              <Label>Día de cobro</Label>
+                              <Input
+                                value={editChargeDay}
+                                type="number"
+                                min="1"
+                                max="31"
+                                onChange={(event) =>
+                                  setEditChargeDay(event.target.value)
+                                }
+                              />
+                            </div>
+                          </div>
+
+                          <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+                            <Button
+                              type="button"
+                              onClick={updateSubscription}
+                              disabled={isUpdating}
+                            >
+                              {isUpdating ? "Guardando..." : "Guardar cambios"}
+                            </Button>
+
+                            <Button
+                              type="button"
+                              variant="secondary"
+                              onClick={cancelEditingSubscription}
+                            >
+                              Cancelar
+                            </Button>
+                          </div>
+                        </div>
+                      ) : null}
                     </div>
                   ))}
                 </div>

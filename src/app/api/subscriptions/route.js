@@ -147,3 +147,83 @@ export async function DELETE(request) {
     );
   }
 }
+
+export async function PATCH(request) {
+  try {
+    const body = await request.json();
+
+    const { id, name, amount, paymentMethod, cardId, categoryId, chargeDay } =
+      body;
+
+    if (!id) {
+      return NextResponse.json({ error: "Falta id." }, { status: 400 });
+    }
+
+    if (!name || !amount || !paymentMethod || !categoryId || !chargeDay) {
+      return NextResponse.json(
+        { error: "Faltan datos obligatorios." },
+        { status: 400 },
+      );
+    }
+
+    if (!["CASH", "CARD"].includes(paymentMethod)) {
+      return NextResponse.json(
+        { error: "Método de pago no válido." },
+        { status: 400 },
+      );
+    }
+
+    if (paymentMethod === "CARD" && !cardId) {
+      return NextResponse.json(
+        { error: "Debes seleccionar una tarjeta." },
+        { status: 400 },
+      );
+    }
+
+    const numericAmount = Number(amount);
+    const numericChargeDay = Number(chargeDay);
+
+    if (!Number.isFinite(numericAmount) || numericAmount <= 0) {
+      return NextResponse.json(
+        { error: "El monto debe ser mayor a 0." },
+        { status: 400 },
+      );
+    }
+
+    if (
+      !Number.isInteger(numericChargeDay) ||
+      numericChargeDay < 1 ||
+      numericChargeDay > 31
+    ) {
+      return NextResponse.json(
+        { error: "El día de cobro debe estar entre 1 y 31." },
+        { status: 400 },
+      );
+    }
+
+    const subscription = await prisma.subscription.update({
+      where: { id },
+      data: {
+        name: name.trim(),
+        amount: numericAmount,
+        paymentMethod,
+        cardId: paymentMethod === "CARD" ? cardId : null,
+        categoryId,
+        chargeDay: numericChargeDay,
+      },
+      include: {
+        card: true,
+        category: true,
+      },
+    });
+
+    return NextResponse.json({ subscription });
+  } catch (error) {
+    console.error("Error updating subscription:", error);
+
+    return NextResponse.json(
+      { error: "No se pudo actualizar la suscripción." },
+      { status: 500 },
+    );
+  }
+}

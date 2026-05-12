@@ -111,3 +111,66 @@ export async function DELETE(request) {
     );
   }
 }
+
+export async function PATCH(request) {
+  try {
+    const body = await request.json();
+
+    const { id, name, usualCutDay, usualDueDay, notes } = body;
+
+    if (!id) {
+      return NextResponse.json({ error: "Falta id." }, { status: 400 });
+    }
+
+    if (!name || !usualCutDay || !usualDueDay) {
+      return NextResponse.json(
+        { error: "Faltan datos obligatorios." },
+        { status: 400 },
+      );
+    }
+
+    const cleanName = name.trim();
+    const cutDay = Number(usualCutDay);
+    const dueDay = Number(usualDueDay);
+
+    if (!cleanName) {
+      return NextResponse.json(
+        { error: "El nombre de la tarjeta no puede estar vacío." },
+        { status: 400 },
+      );
+    }
+
+    if (cutDay < 1 || cutDay > 31 || dueDay < 1 || dueDay > 31) {
+      return NextResponse.json(
+        { error: "Los días deben estar entre 1 y 31." },
+        { status: 400 },
+      );
+    }
+
+    const card = await prisma.card.update({
+      where: { id },
+      data: {
+        name: cleanName,
+        usualCutDay: cutDay,
+        usualDueDay: dueDay,
+        notes: notes?.trim() || null,
+      },
+    });
+
+    return NextResponse.json({ card });
+  } catch (error) {
+    console.error("Error updating card:", error);
+
+    if (error.code === "P2002") {
+      return NextResponse.json(
+        { error: "Ya existe una tarjeta con ese nombre." },
+        { status: 409 },
+      );
+    }
+
+    return NextResponse.json(
+      { error: "No se pudo actualizar la tarjeta." },
+      { status: 500 },
+    );
+  }
+}

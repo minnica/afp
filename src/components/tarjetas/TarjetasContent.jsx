@@ -6,9 +6,11 @@ import {
   CheckCircle2,
   CreditCard,
   FileText,
+  Pencil,
   Plus,
   RefreshCcw,
   Trash2,
+  X,
 } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -168,6 +170,13 @@ export default function TarjetasContent() {
 
   const [expandedCycleId, setExpandedCycleId] = useState("");
 
+  const [editingCardId, setEditingCardId] = useState("");
+  const [editCardName, setEditCardName] = useState("");
+  const [editUsualCutDay, setEditUsualCutDay] = useState("");
+  const [editUsualDueDay, setEditUsualDueDay] = useState("");
+  const [editCardNotes, setEditCardNotes] = useState("");
+  const [isUpdatingCard, setIsUpdatingCard] = useState(false);
+
   async function loadCards(userId) {
     const response = await fetch(`/api/cards?userId=${userId}`);
     const data = await response.json();
@@ -266,6 +275,59 @@ export default function TarjetasContent() {
       setError(err.message || "No se pudo crear la tarjeta.");
     } finally {
       setIsSaving(false);
+    }
+  }
+
+  function startEditingCard(card) {
+    setEditingCardId(card.id);
+    setEditCardName(card.name || "");
+    setEditUsualCutDay(String(card.usualCutDay || ""));
+    setEditUsualDueDay(String(card.usualDueDay || ""));
+    setEditCardNotes(card.notes || "");
+  }
+
+  function cancelEditingCard() {
+    setEditingCardId("");
+    setEditCardName("");
+    setEditUsualCutDay("");
+    setEditUsualDueDay("");
+    setEditCardNotes("");
+  }
+
+  async function updateCard() {
+    if (!user || !editingCardId) return;
+
+    setError("");
+    setIsUpdatingCard(true);
+
+    try {
+      const response = await fetch("/api/cards", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: editingCardId,
+          name: editCardName,
+          usualCutDay: editUsualCutDay,
+          usualDueDay: editUsualDueDay,
+          notes: editCardNotes,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "No se pudo actualizar la tarjeta.");
+      }
+
+      cancelEditingCard();
+
+      await Promise.all([loadCards(user.id), loadCycles(user.id)]);
+    } catch (err) {
+      setError(err.message || "No se pudo actualizar la tarjeta.");
+    } finally {
+      setIsUpdatingCard(false);
     }
   }
 
@@ -550,40 +612,140 @@ export default function TarjetasContent() {
                       {cards.map((card) => (
                         <div
                           key={card.id}
-                          className="flex items-center justify-between gap-4 rounded-xl border border-border bg-background/60 px-4 py-4"
+                          className="rounded-xl border border-border bg-background/60 px-4 py-4"
                         >
-                          <div className="flex min-w-0 items-start gap-3">
-                            <div className="mt-1 rounded-lg border border-border bg-muted p-2">
-                              <CreditCard className="h-4 w-4 text-muted-foreground" />
-                            </div>
-
-                            <div className="min-w-0">
-                              <div className="flex flex-wrap items-center gap-2">
-                                <p className="font-medium">{card.name}</p>
-                                <Badge variant="secondary">Activa</Badge>
+                          <div className="flex items-center justify-between gap-4">
+                            <div className="flex min-w-0 items-start gap-3">
+                              <div className="mt-1 rounded-lg border border-border bg-muted p-2">
+                                <CreditCard className="h-4 w-4 text-muted-foreground" />
                               </div>
 
-                              <p className="mt-1 text-sm text-muted-foreground">
-                                Corte día {card.usualCutDay} · Límite día{" "}
-                                {card.usualDueDay}
-                              </p>
+                              <div className="min-w-0">
+                                <div className="flex flex-wrap items-center gap-2">
+                                  <p className="font-medium">{card.name}</p>
+                                  <Badge variant="secondary">Activa</Badge>
+                                </div>
 
-                              {card.notes ? (
                                 <p className="mt-1 text-sm text-muted-foreground">
-                                  {card.notes}
+                                  Corte día {card.usualCutDay} · Límite día{" "}
+                                  {card.usualDueDay}
                                 </p>
-                              ) : null}
+
+                                {card.notes ? (
+                                  <p className="mt-1 text-sm text-muted-foreground">
+                                    {card.notes}
+                                  </p>
+                                ) : null}
+                              </div>
+                            </div>
+
+                            <div className="flex shrink-0 items-center gap-2">
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => startEditingCard(card)}
+                              >
+                                <Pencil className="h-4 w-4" />
+                              </Button>
+
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => deleteCard(card.id)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
                             </div>
                           </div>
 
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => deleteCard(card.id)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                          {editingCardId === card.id ? (
+                            <div className="mt-4 rounded-xl border border-border bg-background/70 p-4">
+                              <div className="mb-4 flex items-center justify-between gap-4">
+                                <p className="text-sm font-medium">
+                                  Editar tarjeta
+                                </p>
+
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={cancelEditingCard}
+                                >
+                                  <X className="h-4 w-4" />
+                                </Button>
+                              </div>
+
+                              <div className="grid gap-4 md:grid-cols-2">
+                                <div className="space-y-2 md:col-span-2">
+                                  <Label>Nombre</Label>
+                                  <Input
+                                    value={editCardName}
+                                    onChange={(event) =>
+                                      setEditCardName(event.target.value)
+                                    }
+                                  />
+                                </div>
+
+                                <div className="space-y-2">
+                                  <Label>Día de corte habitual</Label>
+                                  <Input
+                                    type="number"
+                                    min="1"
+                                    max="31"
+                                    value={editUsualCutDay}
+                                    onChange={(event) =>
+                                      setEditUsualCutDay(event.target.value)
+                                    }
+                                  />
+                                </div>
+
+                                <div className="space-y-2">
+                                  <Label>Día límite habitual</Label>
+                                  <Input
+                                    type="number"
+                                    min="1"
+                                    max="31"
+                                    value={editUsualDueDay}
+                                    onChange={(event) =>
+                                      setEditUsualDueDay(event.target.value)
+                                    }
+                                  />
+                                </div>
+
+                                <div className="space-y-2 md:col-span-2">
+                                  <Label>Notas</Label>
+                                  <Input
+                                    value={editCardNotes}
+                                    onChange={(event) =>
+                                      setEditCardNotes(event.target.value)
+                                    }
+                                  />
+                                </div>
+                              </div>
+
+                              <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+                                <Button
+                                  type="button"
+                                  onClick={updateCard}
+                                  disabled={isUpdatingCard}
+                                >
+                                  {isUpdatingCard
+                                    ? "Guardando..."
+                                    : "Guardar cambios"}
+                                </Button>
+
+                                <Button
+                                  type="button"
+                                  variant="secondary"
+                                  onClick={cancelEditingCard}
+                                >
+                                  Cancelar
+                                </Button>
+                              </div>
+                            </div>
+                          ) : null}
                         </div>
                       ))}
                     </div>
