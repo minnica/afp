@@ -1,6 +1,10 @@
-import { redirect } from "next/navigation";
+import AppShell from "@/components/layout/AppShell";
 import GastosContent from "@/components/gastos/GastosContent";
 
 export default function GastosPage() {
-  return <GastosContent />;
+  return (
+    <AppShell>
+      <GastosContent />
+    </AppShell>
+  );
 }

@@ -240,7 +240,7 @@ export default function IngresosContent() {
   }
 
   return (
-    <main className="min-h-screen bg-background text-foreground">
+    <main>
       <section className="mx-auto flex w-full max-w-6xl flex-col px-4 py-8">
         <div className="mb-8">
           <p className="text-sm text-muted-foreground">AFP</p>
