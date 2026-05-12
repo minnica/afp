@@ -4,8 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { CreditCard, Plus, Trash2 } from "lucide-react";
-
+import { CreditCard, Pencil, Plus, Trash2, X } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 import { Button } from "@/components/ui/button";
@@ -86,6 +85,18 @@ export default function ComprasAMesesContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
+
+  const [editingPurchaseId, setEditingPurchaseId] = useState("");
+  const [editCardId, setEditCardId] = useState("");
+  const [editPurchaseDate, setEditPurchaseDate] = useState("");
+  const [editConcept, setEditConcept] = useState("");
+  const [editTotalAmount, setEditTotalAmount] = useState("");
+  const [editMonths, setEditMonths] = useState("");
+  const [editManualMonthlyPayment, setEditManualMonthlyPayment] = useState("");
+  const [editInitialPaymentsMade, setEditInitialPaymentsMade] = useState("");
+  const [editCategoryId, setEditCategoryId] = useState("");
+  const [editNotes, setEditNotes] = useState("");
+  const [isUpdating, setIsUpdating] = useState(false);
 
   async function loadInitialData(userId) {
     const [settingsResponse, cardsResponse, purchasesResponse] =
@@ -215,6 +226,86 @@ export default function ComprasAMesesContent() {
       setError(err.message || "No se pudo guardar la compra.");
     } finally {
       setIsSaving(false);
+    }
+  }
+
+  function toDateInputValue(dateString) {
+    const date = new Date(dateString);
+    const year = date.getUTCFullYear();
+    const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+    const day = String(date.getUTCDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+  }
+
+  function startEditingPurchase(purchase) {
+    setEditingPurchaseId(purchase.id);
+    setEditCardId(purchase.cardId || "");
+    setEditPurchaseDate(toDateInputValue(purchase.purchaseDate));
+    setEditConcept(purchase.concept || "");
+    setEditTotalAmount(String(purchase.totalAmount || ""));
+    setEditMonths(String(purchase.months || ""));
+    setEditManualMonthlyPayment(
+      purchase.manualMonthlyPayment
+        ? String(purchase.manualMonthlyPayment)
+        : "",
+    );
+    setEditInitialPaymentsMade(String(purchase.initialPaymentsMade || 0));
+    setEditCategoryId(purchase.categoryId || "");
+    setEditNotes(purchase.notes || "");
+  }
+
+  function cancelEditingPurchase() {
+    setEditingPurchaseId("");
+    setEditCardId("");
+    setEditPurchaseDate("");
+    setEditConcept("");
+    setEditTotalAmount("");
+    setEditMonths("");
+    setEditManualMonthlyPayment("");
+    setEditInitialPaymentsMade("");
+    setEditCategoryId("");
+    setEditNotes("");
+  }
+
+  async function updatePurchase() {
+    if (!user || !editingPurchaseId) return;
+
+    setError("");
+    setIsUpdating(true);
+
+    try {
+      const response = await fetch("/api/installment-purchases", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: editingPurchaseId,
+          cardId: editCardId,
+          purchaseDate: editPurchaseDate,
+          concept: editConcept,
+          totalAmount: editTotalAmount,
+          months: editMonths,
+          manualMonthlyPayment: editManualMonthlyPayment,
+          initialPaymentsMade: editInitialPaymentsMade,
+          categoryId: editCategoryId,
+          notes: editNotes,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "No se pudo actualizar la compra.");
+      }
+
+      cancelEditingPurchase();
+      await loadPurchases(user.id);
+    } catch (err) {
+      setError(err.message || "No se pudo actualizar la compra.");
+    } finally {
+      setIsUpdating(false);
     }
   }
 
@@ -508,6 +599,31 @@ export default function ComprasAMesesContent() {
                   <PurchasesList
                     items={activePurchases}
                     onDelete={deletePurchase}
+                    onEdit={startEditingPurchase}
+                    editingPurchaseId={editingPurchaseId}
+                    cards={cards}
+                    categories={categories}
+                    editCardId={editCardId}
+                    setEditCardId={setEditCardId}
+                    editPurchaseDate={editPurchaseDate}
+                    setEditPurchaseDate={setEditPurchaseDate}
+                    editConcept={editConcept}
+                    setEditConcept={setEditConcept}
+                    editTotalAmount={editTotalAmount}
+                    setEditTotalAmount={setEditTotalAmount}
+                    editMonths={editMonths}
+                    setEditMonths={setEditMonths}
+                    editManualMonthlyPayment={editManualMonthlyPayment}
+                    setEditManualMonthlyPayment={setEditManualMonthlyPayment}
+                    editInitialPaymentsMade={editInitialPaymentsMade}
+                    setEditInitialPaymentsMade={setEditInitialPaymentsMade}
+                    editCategoryId={editCategoryId}
+                    setEditCategoryId={setEditCategoryId}
+                    editNotes={editNotes}
+                    setEditNotes={setEditNotes}
+                    updatePurchase={updatePurchase}
+                    cancelEditingPurchase={cancelEditingPurchase}
+                    isUpdating={isUpdating}
                   />
                 </TabsContent>
 
@@ -515,11 +631,64 @@ export default function ComprasAMesesContent() {
                   <PurchasesList
                     items={paidOffPurchases}
                     onDelete={deletePurchase}
+                    onEdit={startEditingPurchase}
+                    editingPurchaseId={editingPurchaseId}
+                    cards={cards}
+                    categories={categories}
+                    editCardId={editCardId}
+                    setEditCardId={setEditCardId}
+                    editPurchaseDate={editPurchaseDate}
+                    setEditPurchaseDate={setEditPurchaseDate}
+                    editConcept={editConcept}
+                    setEditConcept={setEditConcept}
+                    editTotalAmount={editTotalAmount}
+                    setEditTotalAmount={setEditTotalAmount}
+                    editMonths={editMonths}
+                    setEditMonths={setEditMonths}
+                    editManualMonthlyPayment={editManualMonthlyPayment}
+                    setEditManualMonthlyPayment={setEditManualMonthlyPayment}
+                    editInitialPaymentsMade={editInitialPaymentsMade}
+                    setEditInitialPaymentsMade={setEditInitialPaymentsMade}
+                    editCategoryId={editCategoryId}
+                    setEditCategoryId={setEditCategoryId}
+                    editNotes={editNotes}
+                    setEditNotes={setEditNotes}
+                    updatePurchase={updatePurchase}
+                    cancelEditingPurchase={cancelEditingPurchase}
+                    isUpdating={isUpdating}
                   />
                 </TabsContent>
 
                 <TabsContent value="all">
-                  <PurchasesList items={purchases} onDelete={deletePurchase} />
+                  <PurchasesList
+                    items={purchases}
+                    onDelete={deletePurchase}
+                    onEdit={startEditingPurchase}
+                    editingPurchaseId={editingPurchaseId}
+                    cards={cards}
+                    categories={categories}
+                    editCardId={editCardId}
+                    setEditCardId={setEditCardId}
+                    editPurchaseDate={editPurchaseDate}
+                    setEditPurchaseDate={setEditPurchaseDate}
+                    editConcept={editConcept}
+                    setEditConcept={setEditConcept}
+                    editTotalAmount={editTotalAmount}
+                    setEditTotalAmount={setEditTotalAmount}
+                    editMonths={editMonths}
+                    setEditMonths={setEditMonths}
+                    editManualMonthlyPayment={editManualMonthlyPayment}
+                    setEditManualMonthlyPayment={setEditManualMonthlyPayment}
+                    editInitialPaymentsMade={editInitialPaymentsMade}
+                    setEditInitialPaymentsMade={setEditInitialPaymentsMade}
+                    editCategoryId={editCategoryId}
+                    setEditCategoryId={setEditCategoryId}
+                    editNotes={editNotes}
+                    setEditNotes={setEditNotes}
+                    updatePurchase={updatePurchase}
+                    cancelEditingPurchase={cancelEditingPurchase}
+                    isUpdating={isUpdating}
+                  />
                 </TabsContent>
               </Tabs>
 
@@ -548,7 +717,35 @@ function SummaryCard({ title, value }) {
   );
 }
 
-function PurchasesList({ items, onDelete }) {
+function PurchasesList({
+  items,
+  onDelete,
+  onEdit,
+  editingPurchaseId,
+  cards,
+  categories,
+  editCardId,
+  setEditCardId,
+  editPurchaseDate,
+  setEditPurchaseDate,
+  editConcept,
+  setEditConcept,
+  editTotalAmount,
+  setEditTotalAmount,
+  editMonths,
+  setEditMonths,
+  editManualMonthlyPayment,
+  setEditManualMonthlyPayment,
+  editInitialPaymentsMade,
+  setEditInitialPaymentsMade,
+  editCategoryId,
+  setEditCategoryId,
+  editNotes,
+  setEditNotes,
+  updatePurchase,
+  cancelEditingPurchase,
+  isUpdating,
+}) {
   if (items.length === 0) {
     return (
       <p className="rounded-xl border border-border bg-muted/30 px-4 py-6 text-sm text-muted-foreground">
@@ -595,6 +792,15 @@ function PurchasesList({ items, onDelete }) {
               type="button"
               variant="ghost"
               size="icon"
+              onClick={() => onEdit(purchase)}
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
               onClick={() => onDelete(purchase.id)}
             >
               <Trash2 className="h-4 w-4" />
@@ -630,6 +836,151 @@ function PurchasesList({ items, onDelete }) {
               </p>
             </div>
           </div>
+
+          {editingPurchaseId === purchase.id ? (
+            <div className="mt-4 rounded-xl border border-border bg-background/70 p-4">
+              <div className="mb-4 flex items-center justify-between gap-4">
+                <p className="text-sm font-medium">Editar compra a meses</p>
+
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={cancelEditingPurchase}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label>Tarjeta</Label>
+                  <Select value={editCardId} onValueChange={setEditCardId}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecciona tarjeta" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {cards.map((card) => (
+                        <SelectItem key={card.id} value={card.id}>
+                          {card.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Fecha de compra</Label>
+                  <Input
+                    type="date"
+                    value={editPurchaseDate}
+                    onChange={(event) =>
+                      setEditPurchaseDate(event.target.value)
+                    }
+                  />
+                </div>
+
+                <div className="space-y-2 md:col-span-2">
+                  <Label>Concepto</Label>
+                  <Input
+                    value={editConcept}
+                    onChange={(event) => setEditConcept(event.target.value)}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Monto total</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={editTotalAmount}
+                    onChange={(event) => setEditTotalAmount(event.target.value)}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Número de meses</Label>
+                  <Input
+                    type="number"
+                    min="1"
+                    value={editMonths}
+                    onChange={(event) => setEditMonths(event.target.value)}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Pago mensual manual opcional</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={editManualMonthlyPayment}
+                    onChange={(event) =>
+                      setEditManualMonthlyPayment(event.target.value)
+                    }
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Pagos ya realizados</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    value={editInitialPaymentsMade}
+                    onChange={(event) =>
+                      setEditInitialPaymentsMade(event.target.value)
+                    }
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Categoría</Label>
+                  <Select
+                    value={editCategoryId}
+                    onValueChange={setEditCategoryId}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecciona categoría" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categories.map((category) => (
+                        <SelectItem key={category.id} value={category.id}>
+                          {category.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2 md:col-span-2">
+                  <Label>Notas</Label>
+                  <Textarea
+                    value={editNotes}
+                    onChange={(event) => setEditNotes(event.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+                <Button
+                  type="button"
+                  onClick={updatePurchase}
+                  disabled={isUpdating}
+                >
+                  {isUpdating ? "Guardando..." : "Guardar cambios"}
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={cancelEditingPurchase}
+                >
+                  Cancelar
+                </Button>
+              </div>
+            </div>
+          ) : null}
         </div>
       ))}
     </div>

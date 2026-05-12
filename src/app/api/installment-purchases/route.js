@@ -247,3 +247,131 @@ export async function DELETE(request) {
     );
   }
 }
+
+export async function PATCH(request) {
+  try {
+    const body = await request.json();
+
+    const {
+      id,
+      cardId,
+      purchaseDate,
+      concept,
+      totalAmount,
+      months,
+      manualMonthlyPayment,
+      initialPaymentsMade,
+      categoryId,
+      notes,
+    } = body;
+
+    if (!id) {
+      return NextResponse.json({ error: "Falta id." }, { status: 400 });
+    }
+
+    if (
+      !cardId ||
+      !purchaseDate ||
+      !concept ||
+      !totalAmount ||
+      !months ||
+      !categoryId
+    ) {
+      return NextResponse.json(
+        { error: "Faltan datos obligatorios." },
+        { status: 400 },
+      );
+    }
+
+    const numericTotalAmount = Number(totalAmount);
+    const numericMonths = Number(months);
+    const numericInitialPaymentsMade = Number(initialPaymentsMade || 0);
+
+    if (!Number.isFinite(numericTotalAmount) || numericTotalAmount <= 0) {
+      return NextResponse.json(
+        { error: "El monto total debe ser mayor a 0." },
+        { status: 400 },
+      );
+    }
+
+    if (!Number.isInteger(numericMonths) || numericMonths <= 0) {
+      return NextResponse.json(
+        { error: "El número de meses debe ser mayor a 0." },
+        { status: 400 },
+      );
+    }
+
+    if (
+      !Number.isInteger(numericInitialPaymentsMade) ||
+      numericInitialPaymentsMade < 0 ||
+      numericInitialPaymentsMade > numericMonths
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            "Los pagos ya realizados no pueden ser negativos ni mayores al número de meses.",
+        },
+        { status: 400 },
+      );
+    }
+
+    let numericManualMonthlyPayment = null;
+
+    if (manualMonthlyPayment) {
+      numericManualMonthlyPayment = Number(manualMonthlyPayment);
+
+      if (
+        !Number.isFinite(numericManualMonthlyPayment) ||
+        numericManualMonthlyPayment <= 0
+      ) {
+        return NextResponse.json(
+          { error: "El pago mensual manual debe ser mayor a 0." },
+          { status: 400 },
+        );
+      }
+    }
+
+    const parsedPurchaseDate = parseDateInput(purchaseDate);
+
+    if (!parsedPurchaseDate || Number.isNaN(parsedPurchaseDate.getTime())) {
+      return NextResponse.json(
+        { error: "Fecha de compra no válida." },
+        { status: 400 },
+      );
+    }
+
+    const status =
+      numericInitialPaymentsMade >= numericMonths ? "PAID_OFF" : "ACTIVE";
+
+    const purchase = await prisma.installmentPurchase.update({
+      where: { id },
+      data: {
+        cardId,
+        purchaseDate: parsedPurchaseDate,
+        concept: concept.trim(),
+        totalAmount: numericTotalAmount,
+        months: numericMonths,
+        manualMonthlyPayment: numericManualMonthlyPayment,
+        initialPaymentsMade: numericInitialPaymentsMade,
+        categoryId,
+        notes: notes?.trim() || null,
+        status,
+      },
+      include: {
+        card: true,
+        category: true,
+        person: true,
+        receivableAccount: true,
+      },
+    });
+
+    return NextResponse.json({ purchase: formatPurchase(purchase) });
+  } catch (error) {
+    console.error("Error updating installment purchase:", error);
+
+    return NextResponse.json(
+      { error: "No se pudo actualizar la compra a meses." },
+      { status: 500 },
+    );
+  }
+}
