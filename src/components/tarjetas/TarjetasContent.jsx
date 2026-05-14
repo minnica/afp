@@ -718,6 +718,41 @@ export default function TarjetasContent() {
     }
   }
 
+  async function unmarkCycleAsPaid(cycleId) {
+    if (!user) return;
+
+    const confirmed = window.confirm(
+      "¿Seguro que quieres deshacer el pago de este ciclo?",
+    );
+
+    if (!confirmed) return;
+
+    setError("");
+
+    try {
+      const response = await fetch("/api/card-cycles", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: cycleId,
+          action: "UNMARK_AS_PAID",
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "No se pudo deshacer el pago.");
+      }
+
+      await loadCycles(user.id);
+    } catch (err) {
+      setError(err.message || "No se pudo deshacer el pago.");
+    }
+  }
+
   const totalCards = useMemo(() => cards.length, [cards]);
 
   const cyclesByMonth = useMemo(() => {
@@ -1175,7 +1210,7 @@ export default function TarjetasContent() {
                                         }}
                                       >
                                         <CheckCircle2 className="mr-2 h-4 w-4" />
-                                        Pagado
+                                        Pagar
                                       </Button>
 
                                       <Button
@@ -1368,8 +1403,21 @@ export default function TarjetasContent() {
                                           }}
                                         >
                                           <CheckCircle2 className="mr-2 h-4 w-4" />
-                                          Pagado
+                                          Pagar
                                         </Button>
+
+                                        {cycle.status === "PAID" ? (
+                                          <Button
+                                            type="button"
+                                            variant="secondary"
+                                            size="sm"
+                                            onClick={() =>
+                                              unmarkCycleAsPaid(cycle.id)
+                                            }
+                                          >
+                                            Deshacer pago
+                                          </Button>
+                                        ) : null}
 
                                         <Button
                                           type="button"

@@ -558,6 +558,37 @@ export async function PATCH(request) {
       return NextResponse.json({ cycle });
     }
 
+    if (action === "UNMARK_AS_PAID") {
+      const currentCycle = await prisma.cardCycle.findUnique({
+        where: { id },
+      });
+
+      if (!currentCycle) {
+        return NextResponse.json(
+          { error: "Ciclo no encontrado." },
+          { status: 404 },
+        );
+      }
+
+      const nextStatus = currentCycle.statementAmount
+        ? "PAYMENT_PENDING"
+        : "OPEN";
+
+      const cycle = await prisma.cardCycle.update({
+        where: { id },
+        data: {
+          paidAt: null,
+          paidAmount: null,
+          status: nextStatus,
+        },
+        include: {
+          card: true,
+        },
+      });
+
+      return NextResponse.json({ cycle });
+    }
+
     return NextResponse.json(
       { error: "Acción no permitida." },
       { status: 400 },
