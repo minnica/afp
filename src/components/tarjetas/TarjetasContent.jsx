@@ -810,7 +810,11 @@ export default function TarjetasContent() {
 
         return {
           monthKey,
-          monthCycles,
+          monthCycles: [...monthCycles].sort((a, b) => {
+            return (
+              new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
+            );
+          }),
           label,
           title,
           diffMonths,
