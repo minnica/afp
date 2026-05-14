@@ -556,7 +556,7 @@ export default function TarjetasContent() {
 
   return (
     <main>
-      <section className="mx-auto flex w-full max-w-6xl flex-col px-4 py-8">
+      <section className="mx-auto flex w-full max-w-6xl flex-col px-4 py-5 md:py-8">
         <div className="mb-8 flex flex-col gap-2">
           <p className="text-sm text-muted-foreground">AFP</p>
           <h1 className="text-3xl font-semibold tracking-tight">Tarjetas</h1>

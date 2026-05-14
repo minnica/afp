@@ -346,34 +346,70 @@ function PaymentsTable({ items }) {
   }
 
   return (
-    <div className="overflow-hidden rounded-xl border border-border">
-      <div className="hidden grid-cols-[1fr_1fr_1fr_1fr_1fr] gap-4 border-b border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground md:grid">
-        <div>Tarjeta</div>
-        <div>Corte</div>
-        <div>Límite pago</div>
-        <div>Pago calculado</div>
-        <div>Estado</div>
-      </div>
-
-      <div className="divide-y divide-border">
+    <div>
+      {/* Vista móvil */}
+      <div className="grid gap-3 md:hidden">
         {items.map((item) => (
           <div
             key={item.cycle.id}
-            className="grid gap-2 px-4 py-4 text-sm md:grid-cols-[1fr_1fr_1fr_1fr_1fr] md:gap-4"
+            className="rounded-xl border border-border bg-background/60 px-4 py-4"
           >
-            <div className="font-medium">{item.card.name}</div>
-            <div>{formatCompactDate(item.cycle.cutDate)}</div>
-            <div>{formatCompactDate(item.cycle.dueDate)}</div>
-            <div className="font-semibold">
-              {formatMoney(item.cycle.calculatedAmount)}
-            </div>
-            <div>
+            <div className="mb-3 flex items-start justify-between gap-3">
+              <div>
+                <p className="font-medium">{item.card.name}</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Corte: {formatCompactDate(item.cycle.cutDate)}
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Límite: {formatCompactDate(item.cycle.dueDate)}
+                </p>
+              </div>
+
               <Badge variant={getStatusVariant(item.cycle.displayStatus)}>
                 {getStatusLabel(item.cycle.displayStatus)}
               </Badge>
             </div>
+
+            <div className="rounded-lg border border-border bg-muted/30 px-3 py-3">
+              <p className="text-xs text-muted-foreground">Pago calculado</p>
+              <p className="text-xl font-semibold">
+                {formatMoney(item.cycle.calculatedAmount)}
+              </p>
+            </div>
           </div>
         ))}
+      </div>
+
+      {/* Vista escritorio */}
+      <div className="hidden overflow-hidden rounded-xl border border-border md:block">
+        <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr] gap-4 border-b border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
+          <div>Tarjeta</div>
+          <div>Corte</div>
+          <div>Límite pago</div>
+          <div>Pago calculado</div>
+          <div>Estado</div>
+        </div>
+
+        <div className="divide-y divide-border">
+          {items.map((item) => (
+            <div
+              key={item.cycle.id}
+              className="grid gap-4 px-4 py-4 text-sm md:grid-cols-[1fr_1fr_1fr_1fr_1fr]"
+            >
+              <div className="font-medium">{item.card.name}</div>
+              <div>{formatCompactDate(item.cycle.cutDate)}</div>
+              <div>{formatCompactDate(item.cycle.dueDate)}</div>
+              <div className="font-semibold">
+                {formatMoney(item.cycle.calculatedAmount)}
+              </div>
+              <div>
+                <Badge variant={getStatusVariant(item.cycle.displayStatus)}>
+                  {getStatusLabel(item.cycle.displayStatus)}
+                </Badge>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

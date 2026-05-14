@@ -135,7 +135,7 @@ export default function AppShell({ children }) {
             </Button>
           </div>
 
-          <nav className="flex gap-2 overflow-x-auto px-4 pb-3">
+          <nav className="flex gap-2 overflow-x-auto px-4 pb-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.href;
@@ -145,7 +145,7 @@ export default function AppShell({ children }) {
                   key={item.href}
                   href={item.href}
                   className={[
-                    "flex shrink-0 items-center gap-2 rounded-full border px-3 py-2 text-xs",
+                    "flex shrink-0 items-center gap-2 rounded-full border px-3 py-2 text-xs whitespace-nowrap",
                     isActive
                       ? "border-foreground bg-foreground text-background"
                       : "border-border bg-card text-muted-foreground",
