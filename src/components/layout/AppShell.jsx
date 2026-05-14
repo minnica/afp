@@ -76,7 +76,6 @@ export default function AppShell({ children }) {
           <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
             AFP
           </p>
-          <h1 className="mt-2 text-lg font-semibold">Control de gastos</h1>
         </div>
 
         <nav className="flex-1 space-y-1 px-3 py-4">
@@ -122,7 +121,6 @@ export default function AppShell({ children }) {
               <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground">
                 AFP
               </p>
-              <p className="text-sm font-medium">Control de gastos</p>
             </div>
 
             <Button

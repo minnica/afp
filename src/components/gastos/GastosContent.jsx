@@ -430,14 +430,6 @@ export default function GastosContent() {
   return (
     <main>
       <section className="mx-auto flex w-full max-w-6xl flex-col px-4 py-5 md:py-8">
-        <div className="mb-8">
-          <p className="text-sm text-muted-foreground">AFP</p>
-          <h1 className="text-3xl font-semibold tracking-tight">Gastos</h1>
-          <p className="mt-2 text-muted-foreground">
-            Registra tus gastos diarios rápidamente.
-          </p>
-        </div>
-
         {error ? (
           <div className="mb-6 rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
             {error}
@@ -447,10 +439,9 @@ export default function GastosContent() {
         <div className="grid gap-5 xl:grid-cols-[420px_1fr]">
           <Card className="rounded-2xl border-border bg-card">
             <CardHeader>
-              <CardTitle>Nuevo gasto</CardTitle>
-              <CardDescription>
-                Captura rápida para gastos del día a día.
-              </CardDescription>
+              <CardTitle className="text-lg font-semibold uppercase text-center">
+                Nuevo gasto
+              </CardTitle>
             </CardHeader>
 
             <CardContent className="space-y-4 md:space-y-5">
@@ -689,11 +680,9 @@ export default function GastosContent() {
           <div className="space-y-6">
             <Card className="rounded-2xl border-border bg-card">
               <CardHeader>
-                <CardTitle>Filtros</CardTitle>
-                <CardDescription>
-                  Consulta gastos por fecha, categoría, método, tarjeta o
-                  concepto.
-                </CardDescription>
+                <CardTitle className="text-lg font-semibold uppercase text-center">
+                  Filtros
+                </CardTitle>
               </CardHeader>
 
               <CardContent className="space-y-5">
@@ -815,18 +804,17 @@ export default function GastosContent() {
 
             <Card className="rounded-2xl border-border bg-card">
               <CardHeader>
-                <CardTitle>Gastos filtrados</CardTitle>
-                <CardDescription>
-                  Se muestran hasta 100 registros.
-                </CardDescription>
+                <CardTitle className="text-lg font-semibold uppercase text-center">
+                  Gastos filtrados
+                </CardTitle>
               </CardHeader>
 
               <CardContent>
                 <div className="mb-4 rounded-xl border border-border bg-background/60 px-4 py-3">
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-muted-foreground text-center">
                     Total filtrado
                   </p>
-                  <p className="text-2xl font-semibold">
+                  <p className="text-2xl font-semibold text-center">
                     {formatMoney(totalShown)}
                   </p>
                 </div>
@@ -845,7 +833,7 @@ export default function GastosContent() {
                         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                           <div className="min-w-0">
                             <div className="flex flex-wrap items-center gap-2">
-                              <p className="font-medium">{expense.concept}</p>
+                              <p className="text-lg font-semibold">{expense.concept}</p>
                               <Badge variant="secondary">
                                 {expense.category?.name}
                               </Badge>
@@ -874,7 +862,7 @@ export default function GastosContent() {
                           </div>
 
                           <div className="flex shrink-0 items-center justify-between gap-2 sm:justify-end">
-                            <p className="font-semibold">
+                            <p className="text-lg font-semibold">
                               {formatMoney(expense.amount)}
                             </p>
 
@@ -1060,12 +1048,6 @@ export default function GastosContent() {
                     ))}
                   </div>
                 )}
-
-                <Separator className="my-6" />
-
-                <p className="text-sm text-muted-foreground">
-                  Próximo paso: agregar “Más opciones” para gastos por cobrar.
-                </p>
               </CardContent>
             </Card>
           </div>
