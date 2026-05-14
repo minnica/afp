@@ -363,7 +363,7 @@ export default function IngresosContent() {
           </Card>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-[420px_1fr]">
+        <div className="grid gap-5 xl:grid-cols-[420px_1fr]">
           <Card className="rounded-2xl border-border bg-card">
             <CardHeader>
               <CardTitle>Nuevo ingreso</CardTitle>
@@ -491,7 +491,7 @@ export default function IngresosContent() {
                       key={income.id}
                       className="rounded-xl border border-border bg-background/60 px-4 py-4"
                     >
-                      <div className="flex items-start justify-between gap-4">
+                      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                         <div className="min-w-0">
                           <div className="flex flex-wrap items-center gap-2">
                             <p className="font-medium">{income.concept}</p>
@@ -519,7 +519,7 @@ export default function IngresosContent() {
                           ) : null}
                         </div>
 
-                        <div className="flex shrink-0 items-center gap-2">
+                        <div className="flex shrink-0 items-center justify-between gap-2 sm:justify-end">
                           <p className="font-semibold">
                             {formatMoney(income.amount)}
                           </p>
@@ -666,6 +666,7 @@ export default function IngresosContent() {
                           <div className="mt-4 flex flex-col gap-3 sm:flex-row">
                             <Button
                               type="button"
+                              className="w-full sm:w-auto"
                               onClick={updateIncome}
                               disabled={isUpdating}
                             >
@@ -675,6 +676,7 @@ export default function IngresosContent() {
                             <Button
                               type="button"
                               variant="secondary"
+                              className="w-full sm:w-auto"
                               onClick={cancelEditingIncome}
                             >
                               Cancelar
