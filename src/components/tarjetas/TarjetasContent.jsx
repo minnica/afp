@@ -771,6 +771,73 @@ export default function TarjetasContent() {
     return grouped;
   }, [cycles]);
 
+  const currentCycleMonthKey = useMemo(() => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+
+    return `${year}-${month}`;
+  }, []);
+
+  const cycleMonthTabs = useMemo(() => {
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const currentMonthIndex = currentDate.getMonth();
+
+    return Object.entries(cyclesByMonth)
+      .map(([monthKey, monthCycles]) => {
+        const [year, month] = monthKey.split("-").map(Number);
+        const monthIndex = month - 1;
+
+        const diffMonths =
+          (year - currentYear) * 12 + (monthIndex - currentMonthIndex);
+
+        let label = format(
+          new Date(Date.UTC(year, monthIndex, 1)),
+          "MMMM yyyy",
+          { locale: es },
+        );
+
+        if (diffMonths === 0) label = "Mes actual";
+        if (diffMonths === -1) label = "Mes anterior";
+        if (diffMonths === 1) label = "Mes siguiente";
+
+        const title = format(
+          new Date(Date.UTC(year, monthIndex, 1)),
+          "MMMM yyyy",
+          { locale: es },
+        );
+
+        return {
+          monthKey,
+          monthCycles,
+          label,
+          title,
+          diffMonths,
+        };
+      })
+      .sort((a, b) => {
+        const priority = {
+          "-1": 0,
+          0: 1,
+          1: 2,
+        };
+
+        const aPriority = priority[a.diffMonths] ?? 99;
+        const bPriority = priority[b.diffMonths] ?? 99;
+
+        if (aPriority !== bPriority) return aPriority - bPriority;
+
+        return a.monthKey.localeCompare(b.monthKey);
+      });
+  }, [cyclesByMonth]);
+
+  const defaultCycleMonthTab =
+    cycleMonthTabs.find((item) => item.monthKey === currentCycleMonthKey)
+      ?.monthKey ||
+    cycleMonthTabs[0]?.monthKey ||
+    "";
+
   if (isLoading) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-background text-foreground">
@@ -1076,95 +1143,96 @@ export default function TarjetasContent() {
                     “Generar ciclos”.
                   </p>
                 ) : (
-                  <div className="space-y-8">
-                    {Object.entries(cyclesByMonth).map(
-                      ([monthKey, monthCycles]) => (
-                        <div key={monthKey}>
-                          <h3 className="mb-3 text-sm font-medium text-muted-foreground">
-                            {monthKey}
+                  <Tabs defaultValue={defaultCycleMonthTab} className="w-full">
+                    <TabsList className="mb-6 flex w-full justify-start overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                      {cycleMonthTabs.map((monthGroup) => (
+                        <TabsTrigger
+                          key={monthGroup.monthKey}
+                          value={monthGroup.monthKey}
+                          className="shrink-0 whitespace-nowrap"
+                        >
+                          {monthGroup.label}
+                        </TabsTrigger>
+                      ))}
+                    </TabsList>
+
+                    {cycleMonthTabs.map((monthGroup) => (
+                      <TabsContent
+                        key={monthGroup.monthKey}
+                        value={monthGroup.monthKey}
+                      >
+                        <div>
+                          <h3 className="mb-3 text-sm font-medium capitalize text-muted-foreground">
+                            {monthGroup.title}
                           </h3>
 
-                          <div>
-                            {/* Vista móvil */}
-                            <div className="grid gap-3 md:hidden">
-                              {monthCycles.map((cycle) => (
+                          <div className="overflow-hidden rounded-xl border border-border">
+                            <div className="hidden grid-cols-[1.1fr_1fr_1fr_1fr_1fr_1fr_1fr_1.4fr] gap-4 border-b border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground md:grid">
+                              <div>Tarjeta</div>
+                              <div>Corte</div>
+                              <div>Límite</div>
+                              <div>Calculado</div>
+                              <div>Estado cuenta</div>
+                              <div>Diferencia</div>
+                              <div>Estado</div>
+                              <div>Acciones</div>
+                            </div>
+
+                            <div className="divide-y divide-border">
+                              {monthGroup.monthCycles.map((cycle) => (
                                 <div
                                   key={cycle.id}
-                                  className="rounded-xl border border-border bg-background/60 px-4 py-4"
+                                  className="grid gap-3 px-4 py-4 text-sm md:grid-cols-[1.1fr_1fr_1fr_1fr_1fr_1fr_1fr_1.4fr] md:gap-4"
                                 >
-                                  <div className="mb-3 flex items-start justify-between gap-3">
-                                    <div>
-                                      <p className="font-medium">
-                                        {cycle.card.name}
-                                      </p>
-                                      <p className="mt-1 text-xs text-muted-foreground">
-                                        Corte:{" "}
-                                        {formatCompactDate(cycle.cutDate)}
-                                      </p>
-                                      <p className="mt-1 text-xs text-muted-foreground">
-                                        Límite:{" "}
-                                        {formatCompactDate(cycle.dueDate)}
-                                      </p>
-                                    </div>
+                                  <div className="font-medium">
+                                    {cycle.card.name}
+                                  </div>
 
+                                  <div>{formatCompactDate(cycle.cutDate)}</div>
+
+                                  <div>{formatCompactDate(cycle.dueDate)}</div>
+
+                                  <div className="font-medium">
+                                    {formatMoney(cycle.calculatedAmount)}
+                                    <p className="mt-1 text-xs text-muted-foreground">
+                                      G: {formatMoney(cycle.expensesAmount)} ·
+                                      S:{" "}
+                                      {formatMoney(cycle.subscriptionsAmount)} ·
+                                      MSI: {formatMoney(cycle.purchasesAmount)}
+                                    </p>
+                                  </div>
+
+                                  <div>
+                                    {cycle.statementAmount
+                                      ? formatMoney(cycle.statementAmount)
+                                      : "-"}
+                                  </div>
+
+                                  <div
+                                    className={
+                                      cycle.difference === null ||
+                                      cycle.difference === undefined
+                                        ? "text-muted-foreground"
+                                        : Math.abs(
+                                              Number(cycle.difference || 0),
+                                            ) > 10
+                                          ? "text-red-400"
+                                          : "text-emerald-400"
+                                    }
+                                  >
+                                    {cycle.difference === null ||
+                                    cycle.difference === undefined
+                                      ? "-"
+                                      : formatMoney(cycle.difference)}
+                                  </div>
+
+                                  <div>
                                     <Badge variant="secondary">
                                       {getStatusLabel(cycle.status)}
                                     </Badge>
                                   </div>
 
-                                  <div className="grid gap-3">
-                                    <div className="rounded-lg border border-border bg-muted/30 px-3 py-3">
-                                      <p className="text-xs text-muted-foreground">
-                                        Calculado app
-                                      </p>
-                                      <p className="text-xl font-semibold">
-                                        {formatMoney(cycle.calculatedAmount)}
-                                      </p>
-                                      <p className="mt-1 text-xs text-muted-foreground">
-                                        G: {formatMoney(cycle.expensesAmount)} ·
-                                        S:{" "}
-                                        {formatMoney(cycle.subscriptionsAmount)}{" "}
-                                        · MSI:{" "}
-                                        {formatMoney(cycle.purchasesAmount)}
-                                      </p>
-                                    </div>
-
-                                    <div className="grid grid-cols-2 gap-3">
-                                      <div className="rounded-lg border border-border bg-muted/30 px-3 py-3">
-                                        <p className="text-xs text-muted-foreground">
-                                          Estado cuenta
-                                        </p>
-                                        <p className="font-medium">
-                                          {cycle.statementAmount
-                                            ? formatMoney(cycle.statementAmount)
-                                            : "-"}
-                                        </p>
-                                      </div>
-
-                                      <div className="rounded-lg border border-border bg-muted/30 px-3 py-3">
-                                        <p className="text-xs text-muted-foreground">
-                                          Diferencia
-                                        </p>
-                                        <p
-                                          className={
-                                            Number(cycle.difference || 0) === 0
-                                              ? "font-medium text-muted-foreground"
-                                              : Number(cycle.difference || 0) >
-                                                  0
-                                                ? "font-medium text-red-400"
-                                                : "font-medium text-emerald-400"
-                                          }
-                                        >
-                                          {cycle.difference === null ||
-                                          cycle.difference === undefined
-                                            ? "-"
-                                            : formatMoney(cycle.difference)}
-                                        </p>
-                                      </div>
-                                    </div>
-                                  </div>
-
-                                  <div className="mt-4 space-y-3">
+                                  <div className="space-y-3">
                                     <div className="flex flex-wrap gap-2">
                                       <Button
                                         type="button"
@@ -1213,6 +1281,19 @@ export default function TarjetasContent() {
                                         Pagar
                                       </Button>
 
+                                      {cycle.status === "PAID" ? (
+                                        <Button
+                                          type="button"
+                                          variant="secondary"
+                                          size="sm"
+                                          onClick={() =>
+                                            unmarkCycleAsPaid(cycle.id)
+                                          }
+                                        >
+                                          Deshacer pago
+                                        </Button>
+                                      ) : null}
+
                                       <Button
                                         type="button"
                                         variant="secondary"
@@ -1226,8 +1307,8 @@ export default function TarjetasContent() {
                                         }}
                                       >
                                         {expandedCycleId === cycle.id
-                                          ? "Ocultar"
-                                          : "Desglose"}
+                                          ? "Ocultar desglose"
+                                          : "Ver desglose"}
                                       </Button>
                                     </div>
 
@@ -1280,235 +1361,18 @@ export default function TarjetasContent() {
                                   </div>
 
                                   {expandedCycleId === cycle.id ? (
-                                    <CycleBreakdown cycle={cycle} />
+                                    <div className="md:col-span-8">
+                                      <CycleBreakdown cycle={cycle} />
+                                    </div>
                                   ) : null}
                                 </div>
                               ))}
                             </div>
-
-                            {/* Vista escritorio */}
-                            <div className="hidden overflow-hidden rounded-xl border border-border md:block">
-                              <div className="grid grid-cols-[1.1fr_1fr_1fr_1fr_1fr_1fr_1fr_1.4fr] gap-4 border-b border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
-                                <div>Tarjeta</div>
-                                <div>Corte</div>
-                                <div>Límite</div>
-                                <div>Calculado</div>
-                                <div>Estado cuenta</div>
-                                <div>Diferencia</div>
-                                <div>Estado</div>
-                                <div>Acciones</div>
-                              </div>
-
-                              <div className="divide-y divide-border">
-                                {monthCycles.map((cycle) => (
-                                  <div
-                                    key={cycle.id}
-                                    className="grid gap-3 px-4 py-4 text-sm md:grid-cols-[1.1fr_1fr_1fr_1fr_1fr_1fr_1fr_1.4fr] md:gap-4"
-                                  >
-                                    <div className="font-medium">
-                                      {cycle.card.name}
-                                    </div>
-
-                                    <div>
-                                      {formatCompactDate(cycle.cutDate)}
-                                    </div>
-
-                                    <div>
-                                      {formatCompactDate(cycle.dueDate)}
-                                    </div>
-
-                                    <div className="font-medium">
-                                      {formatMoney(cycle.calculatedAmount)}
-                                      <p className="mt-1 text-xs text-muted-foreground">
-                                        G: {formatMoney(cycle.expensesAmount)} ·
-                                        S:{" "}
-                                        {formatMoney(cycle.subscriptionsAmount)}{" "}
-                                        · MSI:{" "}
-                                        {formatMoney(cycle.purchasesAmount)}
-                                      </p>
-                                    </div>
-
-                                    <div>
-                                      {cycle.statementAmount
-                                        ? formatMoney(cycle.statementAmount)
-                                        : "-"}
-                                    </div>
-
-                                    <div
-                                      className={
-                                        cycle.difference === null ||
-                                        cycle.difference === undefined
-                                          ? "text-muted-foreground"
-                                          : Math.abs(
-                                                Number(cycle.difference || 0),
-                                              ) > 10
-                                            ? "text-red-400"
-                                            : "text-emerald-400"
-                                      }
-                                    >
-                                      {cycle.difference === null ||
-                                      cycle.difference === undefined
-                                        ? "-"
-                                        : formatMoney(cycle.difference)}
-                                    </div>
-
-                                    <div>
-                                      <Badge variant="secondary">
-                                        {getStatusLabel(cycle.status)}
-                                      </Badge>
-                                    </div>
-
-                                    <div className="space-y-3">
-                                      <div className="flex flex-wrap gap-2">
-                                        <Button
-                                          type="button"
-                                          variant="secondary"
-                                          size="sm"
-                                          onClick={() =>
-                                            startEditingCycleDates(cycle)
-                                          }
-                                        >
-                                          <CalendarClock className="mr-2 h-4 w-4" />
-                                          Fechas
-                                        </Button>
-
-                                        <Button
-                                          type="button"
-                                          variant="secondary"
-                                          size="sm"
-                                          onClick={() => {
-                                            setEditingStatementCycleId(
-                                              cycle.id,
-                                            );
-                                            setStatementAmount(
-                                              cycle.statementAmount
-                                                ? String(cycle.statementAmount)
-                                                : "",
-                                            );
-                                          }}
-                                        >
-                                          <FileText className="mr-2 h-4 w-4" />
-                                          Estado cuenta
-                                        </Button>
-
-                                        <Button
-                                          type="button"
-                                          variant="secondary"
-                                          size="sm"
-                                          onClick={() => {
-                                            setPayingCycleId(cycle.id);
-                                            setPaidAt(getTodayInputValue());
-                                            setPaidAmount(
-                                              cycle.statementAmount
-                                                ? String(cycle.statementAmount)
-                                                : "",
-                                            );
-                                          }}
-                                        >
-                                          <CheckCircle2 className="mr-2 h-4 w-4" />
-                                          Pagar
-                                        </Button>
-
-                                        {cycle.status === "PAID" ? (
-                                          <Button
-                                            type="button"
-                                            variant="secondary"
-                                            size="sm"
-                                            onClick={() =>
-                                              unmarkCycleAsPaid(cycle.id)
-                                            }
-                                          >
-                                            Deshacer pago
-                                          </Button>
-                                        ) : null}
-
-                                        <Button
-                                          type="button"
-                                          variant="secondary"
-                                          size="sm"
-                                          onClick={() => {
-                                            setExpandedCycleId((current) =>
-                                              current === cycle.id
-                                                ? ""
-                                                : cycle.id,
-                                            );
-                                          }}
-                                        >
-                                          {expandedCycleId === cycle.id
-                                            ? "Ocultar desglose"
-                                            : "Ver desglose"}
-                                        </Button>
-                                      </div>
-
-                                      <CycleActionForms
-                                        cycle={cycle}
-                                        editingCycleDatesId={
-                                          editingCycleDatesId
-                                        }
-                                        editCycleStartDate={editCycleStartDate}
-                                        setEditCycleStartDate={
-                                          setEditCycleStartDate
-                                        }
-                                        editCycleCutDate={editCycleCutDate}
-                                        setEditCycleCutDate={
-                                          setEditCycleCutDate
-                                        }
-                                        editCycleDueDate={editCycleDueDate}
-                                        setEditCycleDueDate={
-                                          setEditCycleDueDate
-                                        }
-                                        cancelEditingCycleDates={
-                                          cancelEditingCycleDates
-                                        }
-                                        updateCycleDates={updateCycleDates}
-                                        isUpdatingCycleDates={
-                                          isUpdatingCycleDates
-                                        }
-                                        editingStatementCycleId={
-                                          editingStatementCycleId
-                                        }
-                                        statementAmount={statementAmount}
-                                        setStatementAmount={setStatementAmount}
-                                        updateStatementAmount={
-                                          updateStatementAmount
-                                        }
-                                        payingCycleId={payingCycleId}
-                                        paidAt={paidAt}
-                                        setPaidAt={setPaidAt}
-                                        paidAmount={paidAmount}
-                                        setPaidAmount={setPaidAmount}
-                                        markCycleAsPaid={markCycleAsPaid}
-                                      />
-
-                                      {cycle.statementAmount ? (
-                                        <p className="text-xs text-muted-foreground">
-                                          Estado cuenta:{" "}
-                                          {formatMoney(cycle.statementAmount)}
-                                        </p>
-                                      ) : null}
-
-                                      {cycle.paidAmount ? (
-                                        <p className="text-xs text-muted-foreground">
-                                          Pagado:{" "}
-                                          {formatMoney(cycle.paidAmount)}
-                                        </p>
-                                      ) : null}
-                                    </div>
-
-                                    {expandedCycleId === cycle.id ? (
-                                      <div className="md:col-span-8">
-                                        <CycleBreakdown cycle={cycle} />
-                                      </div>
-                                    ) : null}
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
                           </div>
                         </div>
-                      ),
-                    )}
-                  </div>
+                      </TabsContent>
+                    ))}
+                  </Tabs>
                 )}
 
                 <Separator className="my-6" />
