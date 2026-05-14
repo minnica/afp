@@ -62,16 +62,24 @@ function getPurchaseCycleNumber(purchase, targetCycle, cardCycles) {
 function shouldIncludePurchaseInCycle(purchase, targetCycle, cardCycles) {
   if (purchase.status !== "ACTIVE") return false;
 
+  if (purchase.cardId !== targetCycle.cardId) return false;
+
+  const months = Number(purchase.months || 0);
+  const paymentsAlreadyMade = Number(purchase.initialPaymentsMade || 0);
+  const remainingMonths = months - paymentsAlreadyMade;
+
+  if (remainingMonths <= 0) return false;
+
+  const purchaseDate = new Date(purchase.purchaseDate).getTime();
+  const cycleCutDate = new Date(targetCycle.cutDate).getTime();
+
+  if (purchaseDate > cycleCutDate) return false;
+
   const cycleNumber = getPurchaseCycleNumber(purchase, targetCycle, cardCycles);
 
-  if (!cycleNumber) return false;
-
-  const paymentsAlreadyMade = Number(purchase.initialPaymentsMade || 0);
-
-  return (
-    cycleNumber > paymentsAlreadyMade &&
-    cycleNumber <= Number(purchase.months || 0)
-  );
+  if (!cycleNumber) return true;
+  
+  return cycleNumber > paymentsAlreadyMade && cycleNumber <= months;
 }
 
 function getSubscriptionChargeDatesInsideCycle(subscription, cycle) {

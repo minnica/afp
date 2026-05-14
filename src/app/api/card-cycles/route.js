@@ -48,12 +48,20 @@ function shouldIncludePurchaseInCycle(purchase, targetCycle, cardCycles) {
 
   const months = Number(purchase.months || 0);
   const paymentsAlreadyMade = Number(purchase.initialPaymentsMade || 0);
-
   const remainingMonths = months - paymentsAlreadyMade;
 
   if (remainingMonths <= 0) return false;
 
-  return true;
+  const purchaseDate = new Date(purchase.purchaseDate).getTime();
+  const cycleCutDate = new Date(targetCycle.cutDate).getTime();
+
+  if (purchaseDate > cycleCutDate) return false;
+
+  const cycleNumber = getPurchaseCycleNumber(purchase, targetCycle, cardCycles);
+
+  if (!cycleNumber) return true;
+
+  return cycleNumber > paymentsAlreadyMade && cycleNumber <= months;
 }
 
 function getDaysInMonthForCharge(year, monthIndex) {

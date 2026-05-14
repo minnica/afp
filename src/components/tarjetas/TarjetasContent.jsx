@@ -1336,9 +1336,12 @@ export default function TarjetasContent() {
 
                                     <div
                                       className={
-                                        Number(cycle.difference || 0) === 0
+                                        cycle.difference === null ||
+                                        cycle.difference === undefined
                                           ? "text-muted-foreground"
-                                          : Number(cycle.difference || 0) > 0
+                                          : Math.abs(
+                                                Number(cycle.difference || 0),
+                                              ) > 10
                                             ? "text-red-400"
                                             : "text-emerald-400"
                                       }
