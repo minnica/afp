@@ -156,6 +156,196 @@ function BreakdownSection({
   );
 }
 
+function CycleActionForms({
+  cycle,
+  editingCycleDatesId,
+  editCycleStartDate,
+  setEditCycleStartDate,
+  editCycleCutDate,
+  setEditCycleCutDate,
+  editCycleDueDate,
+  setEditCycleDueDate,
+  cancelEditingCycleDates,
+  updateCycleDates,
+  isUpdatingCycleDates,
+  editingStatementCycleId,
+  statementAmount,
+  setStatementAmount,
+  updateStatementAmount,
+  payingCycleId,
+  paidAt,
+  setPaidAt,
+  paidAmount,
+  setPaidAmount,
+  markCycleAsPaid,
+}) {
+  return (
+    <>
+      {editingCycleDatesId === cycle.id ? (
+        <div className="rounded-xl border border-border bg-background/70 p-3">
+          <div className="mb-3 flex items-center justify-between gap-4">
+            <p className="text-xs font-medium">Editar fechas reales</p>
+
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={cancelEditingCycleDates}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+
+          <div className="grid gap-3">
+            <div className="space-y-2">
+              <Label>Inicio</Label>
+              <Input
+                type="date"
+                value={editCycleStartDate}
+                onChange={(event) => setEditCycleStartDate(event.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Corte</Label>
+              <Input
+                type="date"
+                value={editCycleCutDate}
+                onChange={(event) => setEditCycleCutDate(event.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Límite pago</Label>
+              <Input
+                type="date"
+                value={editCycleDueDate}
+                onChange={(event) => setEditCycleDueDate(event.target.value)}
+              />
+            </div>
+
+            <Button
+              type="button"
+              size="sm"
+              onClick={() => updateCycleDates(cycle.id)}
+              disabled={isUpdatingCycleDates}
+            >
+              {isUpdatingCycleDates ? "Guardando..." : "Guardar fechas"}
+            </Button>
+          </div>
+        </div>
+      ) : null}
+
+      {editingStatementCycleId === cycle.id ? (
+        <div className="rounded-xl border border-border bg-background/70 p-3">
+          <Label>Monto estado de cuenta</Label>
+          <div className="mt-2 flex gap-2">
+            <Input
+              type="number"
+              min="0"
+              step="0.01"
+              value={statementAmount}
+              placeholder="0.00"
+              onChange={(event) => setStatementAmount(event.target.value)}
+            />
+            <Button
+              type="button"
+              size="sm"
+              onClick={() => updateStatementAmount(cycle.id)}
+            >
+              Guardar
+            </Button>
+          </div>
+        </div>
+      ) : null}
+
+      {payingCycleId === cycle.id ? (
+        <div className="rounded-xl border border-border bg-background/70 p-3">
+          <div className="grid gap-3">
+            <div className="space-y-2">
+              <Label>Fecha de pago</Label>
+              <Input
+                type="date"
+                value={paidAt}
+                onChange={(event) => setPaidAt(event.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Monto pagado</Label>
+              <Input
+                type="number"
+                min="0"
+                step="0.01"
+                value={paidAmount}
+                placeholder="0.00"
+                onChange={(event) => setPaidAmount(event.target.value)}
+              />
+            </div>
+
+            <Button
+              type="button"
+              size="sm"
+              onClick={() => markCycleAsPaid(cycle.id)}
+            >
+              Confirmar pago
+            </Button>
+          </div>
+        </div>
+      ) : null}
+    </>
+  );
+}
+
+function CycleBreakdown({ cycle }) {
+  return (
+    <div className="mt-4 rounded-xl border border-border bg-background/70 p-4">
+      <h4 className="mb-4 text-sm font-medium">Desglose del cálculo</h4>
+
+      <div className="grid gap-4 lg:grid-cols-3">
+        <BreakdownSection
+          title={`Gastos (${formatMoney(cycle.expensesAmount)})`}
+          items={cycle.includedExpenses || []}
+          emptyText="No hay gastos diarios en este ciclo."
+          getPrimary={(item) => item.concept}
+          getSecondary={(item) =>
+            `${formatShortDate(item.date)}${
+              item.categoryName ? ` · ${item.categoryName}` : ""
+            }`
+          }
+          getAmount={(item) => item.amount}
+        />
+
+        <BreakdownSection
+          title={`Suscripciones (${formatMoney(cycle.subscriptionsAmount)})`}
+          items={cycle.includedSubscriptions || []}
+          emptyText="No hay suscripciones en este ciclo."
+          getPrimary={(item) => item.name}
+          getSecondary={(item) =>
+            `${formatShortDate(item.chargeDate)}${
+              item.categoryName ? ` · ${item.categoryName}` : ""
+            }`
+          }
+          getAmount={(item) => item.amount}
+        />
+
+        <BreakdownSection
+          title={`Compras a meses (${formatMoney(cycle.purchasesAmount)})`}
+          items={cycle.includedPurchases || []}
+          emptyText="No hay mensualidades en este ciclo."
+          getPrimary={(item) => item.concept}
+          getSecondary={(item) =>
+            `${formatShortDate(item.purchaseDate)} · ${item.months} meses${
+              item.categoryName ? ` · ${item.categoryName}` : ""
+            }`
+          }
+          getAmount={(item) => item.amount}
+        />
+      </div>
+    </div>
+  );
+}
+
 export default function TarjetasContent() {
   const router = useRouter();
 
@@ -859,69 +1049,87 @@ export default function TarjetasContent() {
                             {monthKey}
                           </h3>
 
-                          <div className="overflow-hidden rounded-xl border border-border">
-                            <div className="hidden grid-cols-[1.1fr_1fr_1fr_1fr_1fr_1fr_1fr_1.4fr] gap-4 border-b border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground md:grid">
-                              <div>Tarjeta</div>
-                              <div>Corte</div>
-                              <div>Límite</div>
-                              <div>Calculado</div>
-                              <div>Estado cuenta</div>
-                              <div>Diferencia</div>
-                              <div>Estado</div>
-                              <div>Acciones</div>
-                            </div>
-
-                            <div className="divide-y divide-border">
+                          <div>
+                            {/* Vista móvil */}
+                            <div className="grid gap-3 md:hidden">
                               {monthCycles.map((cycle) => (
                                 <div
                                   key={cycle.id}
-                                  className="grid gap-3 px-4 py-4 text-sm md:grid-cols-[1.1fr_1fr_1fr_1fr_1fr_1fr_1fr_1.4fr] md:gap-4"
+                                  className="rounded-xl border border-border bg-background/60 px-4 py-4"
                                 >
-                                  <div className="font-medium">
-                                    {cycle.card.name}
-                                  </div>
+                                  <div className="mb-3 flex items-start justify-between gap-3">
+                                    <div>
+                                      <p className="font-medium">
+                                        {cycle.card.name}
+                                      </p>
+                                      <p className="mt-1 text-xs text-muted-foreground">
+                                        Corte:{" "}
+                                        {formatCompactDate(cycle.cutDate)}
+                                      </p>
+                                      <p className="mt-1 text-xs text-muted-foreground">
+                                        Límite:{" "}
+                                        {formatCompactDate(cycle.dueDate)}
+                                      </p>
+                                    </div>
 
-                                  <div>{formatCompactDate(cycle.cutDate)}</div>
-
-                                  <div>{formatCompactDate(cycle.dueDate)}</div>
-
-                                  <div className="font-medium">
-                                    {formatMoney(cycle.calculatedAmount)}
-                                    <p className="mt-1 text-xs text-muted-foreground">
-                                      G: {formatMoney(cycle.expensesAmount)} ·
-                                      S:{" "}
-                                      {formatMoney(cycle.subscriptionsAmount)} ·
-                                      MSI: {formatMoney(cycle.purchasesAmount)}
-                                    </p>
-                                  </div>
-
-                                  <div>
-                                    {cycle.statementAmount
-                                      ? formatMoney(cycle.statementAmount)
-                                      : "-"}
-                                  </div>
-
-                                  <div
-                                    className={
-                                      Number(cycle.difference || 0) === 0
-                                        ? "text-muted-foreground"
-                                        : Number(cycle.difference || 0) > 0
-                                          ? "text-red-400"
-                                          : "text-emerald-400"
-                                    }
-                                  >
-                                    {cycle.difference === null ||
-                                    cycle.difference === undefined
-                                      ? "-"
-                                      : formatMoney(cycle.difference)}
-                                  </div>
-
-                                  <div>
                                     <Badge variant="secondary">
                                       {getStatusLabel(cycle.status)}
                                     </Badge>
                                   </div>
-                                  <div className="space-y-3">
+
+                                  <div className="grid gap-3">
+                                    <div className="rounded-lg border border-border bg-muted/30 px-3 py-3">
+                                      <p className="text-xs text-muted-foreground">
+                                        Calculado app
+                                      </p>
+                                      <p className="text-xl font-semibold">
+                                        {formatMoney(cycle.calculatedAmount)}
+                                      </p>
+                                      <p className="mt-1 text-xs text-muted-foreground">
+                                        G: {formatMoney(cycle.expensesAmount)} ·
+                                        S:{" "}
+                                        {formatMoney(cycle.subscriptionsAmount)}{" "}
+                                        · MSI:{" "}
+                                        {formatMoney(cycle.purchasesAmount)}
+                                      </p>
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-3">
+                                      <div className="rounded-lg border border-border bg-muted/30 px-3 py-3">
+                                        <p className="text-xs text-muted-foreground">
+                                          Estado cuenta
+                                        </p>
+                                        <p className="font-medium">
+                                          {cycle.statementAmount
+                                            ? formatMoney(cycle.statementAmount)
+                                            : "-"}
+                                        </p>
+                                      </div>
+
+                                      <div className="rounded-lg border border-border bg-muted/30 px-3 py-3">
+                                        <p className="text-xs text-muted-foreground">
+                                          Diferencia
+                                        </p>
+                                        <p
+                                          className={
+                                            Number(cycle.difference || 0) === 0
+                                              ? "font-medium text-muted-foreground"
+                                              : Number(cycle.difference || 0) >
+                                                  0
+                                                ? "font-medium text-red-400"
+                                                : "font-medium text-emerald-400"
+                                          }
+                                        >
+                                          {cycle.difference === null ||
+                                          cycle.difference === undefined
+                                            ? "-"
+                                            : formatMoney(cycle.difference)}
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  <div className="mt-4 space-y-3">
                                     <div className="flex flex-wrap gap-2">
                                       <Button
                                         type="button"
@@ -983,243 +1191,267 @@ export default function TarjetasContent() {
                                         }}
                                       >
                                         {expandedCycleId === cycle.id
-                                          ? "Ocultar desglose"
-                                          : "Ver desglose"}
+                                          ? "Ocultar"
+                                          : "Desglose"}
                                       </Button>
                                     </div>
 
-                                    {editingCycleDatesId === cycle.id ? (
-                                      <div className="rounded-xl border border-border bg-background/70 p-3">
-                                        <div className="mb-3 flex items-center justify-between gap-4">
-                                          <p className="text-xs font-medium">
-                                            Editar fechas reales
-                                          </p>
-
-                                          <Button
-                                            type="button"
-                                            variant="ghost"
-                                            size="icon"
-                                            onClick={cancelEditingCycleDates}
-                                          >
-                                            <X className="h-4 w-4" />
-                                          </Button>
-                                        </div>
-
-                                        <div className="grid gap-3">
-                                          <div className="space-y-2">
-                                            <Label>Inicio</Label>
-                                            <Input
-                                              type="date"
-                                              value={editCycleStartDate}
-                                              onChange={(event) =>
-                                                setEditCycleStartDate(
-                                                  event.target.value,
-                                                )
-                                              }
-                                            />
-                                          </div>
-
-                                          <div className="space-y-2">
-                                            <Label>Corte</Label>
-                                            <Input
-                                              type="date"
-                                              value={editCycleCutDate}
-                                              onChange={(event) =>
-                                                setEditCycleCutDate(
-                                                  event.target.value,
-                                                )
-                                              }
-                                            />
-                                          </div>
-
-                                          <div className="space-y-2">
-                                            <Label>Límite pago</Label>
-                                            <Input
-                                              type="date"
-                                              value={editCycleDueDate}
-                                              onChange={(event) =>
-                                                setEditCycleDueDate(
-                                                  event.target.value,
-                                                )
-                                              }
-                                            />
-                                          </div>
-
-                                          <Button
-                                            type="button"
-                                            size="sm"
-                                            onClick={() =>
-                                              updateCycleDates(cycle.id)
-                                            }
-                                            disabled={isUpdatingCycleDates}
-                                          >
-                                            {isUpdatingCycleDates
-                                              ? "Guardando..."
-                                              : "Guardar fechas"}
-                                          </Button>
-                                        </div>
-                                      </div>
-                                    ) : null}
-
-                                    {editingStatementCycleId === cycle.id ? (
-                                      <div className="rounded-xl border border-border bg-background/70 p-3">
-                                        <Label>Monto estado de cuenta</Label>
-                                        <div className="mt-2 flex gap-2">
-                                          <Input
-                                            type="number"
-                                            min="0"
-                                            step="0.01"
-                                            value={statementAmount}
-                                            placeholder="0.00"
-                                            onChange={(event) =>
-                                              setStatementAmount(
-                                                event.target.value,
-                                              )
-                                            }
-                                          />
-                                          <Button
-                                            type="button"
-                                            size="sm"
-                                            onClick={() =>
-                                              updateStatementAmount(cycle.id)
-                                            }
-                                          >
-                                            Guardar
-                                          </Button>
-                                        </div>
-                                      </div>
-                                    ) : null}
-
-                                    {payingCycleId === cycle.id ? (
-                                      <div className="rounded-xl border border-border bg-background/70 p-3">
-                                        <div className="grid gap-3">
-                                          <div className="space-y-2">
-                                            <Label>Fecha de pago</Label>
-                                            <Input
-                                              type="date"
-                                              value={paidAt}
-                                              onChange={(event) =>
-                                                setPaidAt(event.target.value)
-                                              }
-                                            />
-                                          </div>
-
-                                          <div className="space-y-2">
-                                            <Label>Monto pagado</Label>
-                                            <Input
-                                              type="number"
-                                              min="0"
-                                              step="0.01"
-                                              value={paidAmount}
-                                              placeholder="0.00"
-                                              onChange={(event) =>
-                                                setPaidAmount(
-                                                  event.target.value,
-                                                )
-                                              }
-                                            />
-                                          </div>
-
-                                          <Button
-                                            type="button"
-                                            size="sm"
-                                            onClick={() =>
-                                              markCycleAsPaid(cycle.id)
-                                            }
-                                          >
-                                            Confirmar pago
-                                          </Button>
-                                        </div>
-                                      </div>
-                                    ) : null}
+                                    <CycleActionForms
+                                      cycle={cycle}
+                                      editingCycleDatesId={editingCycleDatesId}
+                                      editCycleStartDate={editCycleStartDate}
+                                      setEditCycleStartDate={
+                                        setEditCycleStartDate
+                                      }
+                                      editCycleCutDate={editCycleCutDate}
+                                      setEditCycleCutDate={setEditCycleCutDate}
+                                      editCycleDueDate={editCycleDueDate}
+                                      setEditCycleDueDate={setEditCycleDueDate}
+                                      cancelEditingCycleDates={
+                                        cancelEditingCycleDates
+                                      }
+                                      updateCycleDates={updateCycleDates}
+                                      isUpdatingCycleDates={
+                                        isUpdatingCycleDates
+                                      }
+                                      editingStatementCycleId={
+                                        editingStatementCycleId
+                                      }
+                                      statementAmount={statementAmount}
+                                      setStatementAmount={setStatementAmount}
+                                      updateStatementAmount={
+                                        updateStatementAmount
+                                      }
+                                      payingCycleId={payingCycleId}
+                                      paidAt={paidAt}
+                                      setPaidAt={setPaidAt}
+                                      paidAmount={paidAmount}
+                                      setPaidAmount={setPaidAmount}
+                                      markCycleAsPaid={markCycleAsPaid}
+                                    />
 
                                     {cycle.statementAmount ? (
                                       <p className="text-xs text-muted-foreground">
                                         Estado cuenta:{" "}
-                                        {Number(
-                                          cycle.statementAmount,
-                                        ).toLocaleString("es-MX", {
-                                          style: "currency",
-                                          currency: "MXN",
-                                        })}
+                                        {formatMoney(cycle.statementAmount)}
                                       </p>
                                     ) : null}
 
                                     {cycle.paidAmount ? (
                                       <p className="text-xs text-muted-foreground">
-                                        Pagado:{" "}
-                                        {Number(
-                                          cycle.paidAmount,
-                                        ).toLocaleString("es-MX", {
-                                          style: "currency",
-                                          currency: "MXN",
-                                        })}
+                                        Pagado: {formatMoney(cycle.paidAmount)}
                                       </p>
                                     ) : null}
                                   </div>
 
                                   {expandedCycleId === cycle.id ? (
-                                    <div className="md:col-span-8">
-                                      <div className="mt-4 rounded-xl border border-border bg-background/70 p-4">
-                                        <h4 className="mb-4 text-sm font-medium">
-                                          Desglose del cálculo
-                                        </h4>
-
-                                        <div className="grid gap-4 lg:grid-cols-3">
-                                          <BreakdownSection
-                                            title={`Gastos (${formatMoney(cycle.expensesAmount)})`}
-                                            items={cycle.includedExpenses || []}
-                                            emptyText="No hay gastos diarios en este ciclo."
-                                            getPrimary={(item) => item.concept}
-                                            getSecondary={(item) =>
-                                              `${formatShortDate(item.date)}${
-                                                item.categoryName
-                                                  ? ` · ${item.categoryName}`
-                                                  : ""
-                                              }`
-                                            }
-                                            getAmount={(item) => item.amount}
-                                          />
-
-                                          <BreakdownSection
-                                            title={`Suscripciones (${formatMoney(cycle.subscriptionsAmount)})`}
-                                            items={
-                                              cycle.includedSubscriptions || []
-                                            }
-                                            emptyText="No hay suscripciones en este ciclo."
-                                            getPrimary={(item) => item.name}
-                                            getSecondary={(item) =>
-                                              `${formatShortDate(item.chargeDate)}${
-                                                item.categoryName
-                                                  ? ` · ${item.categoryName}`
-                                                  : ""
-                                              }`
-                                            }
-                                            getAmount={(item) => item.amount}
-                                          />
-
-                                          <BreakdownSection
-                                            title={`Compras a meses (${formatMoney(cycle.purchasesAmount)})`}
-                                            items={
-                                              cycle.includedPurchases || []
-                                            }
-                                            emptyText="No hay mensualidades en este ciclo."
-                                            getPrimary={(item) => item.concept}
-                                            getSecondary={(item) =>
-                                              `${formatShortDate(item.purchaseDate)} · ${item.months} meses${
-                                                item.categoryName
-                                                  ? ` · ${item.categoryName}`
-                                                  : ""
-                                              }`
-                                            }
-                                            getAmount={(item) => item.amount}
-                                          />
-                                        </div>
-                                      </div>
-                                    </div>
+                                    <CycleBreakdown cycle={cycle} />
                                   ) : null}
                                 </div>
                               ))}
+                            </div>
+
+                            {/* Vista escritorio */}
+                            <div className="hidden overflow-hidden rounded-xl border border-border md:block">
+                              <div className="grid grid-cols-[1.1fr_1fr_1fr_1fr_1fr_1fr_1fr_1.4fr] gap-4 border-b border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
+                                <div>Tarjeta</div>
+                                <div>Corte</div>
+                                <div>Límite</div>
+                                <div>Calculado</div>
+                                <div>Estado cuenta</div>
+                                <div>Diferencia</div>
+                                <div>Estado</div>
+                                <div>Acciones</div>
+                              </div>
+
+                              <div className="divide-y divide-border">
+                                {monthCycles.map((cycle) => (
+                                  <div
+                                    key={cycle.id}
+                                    className="grid gap-3 px-4 py-4 text-sm md:grid-cols-[1.1fr_1fr_1fr_1fr_1fr_1fr_1fr_1.4fr] md:gap-4"
+                                  >
+                                    <div className="font-medium">
+                                      {cycle.card.name}
+                                    </div>
+
+                                    <div>
+                                      {formatCompactDate(cycle.cutDate)}
+                                    </div>
+
+                                    <div>
+                                      {formatCompactDate(cycle.dueDate)}
+                                    </div>
+
+                                    <div className="font-medium">
+                                      {formatMoney(cycle.calculatedAmount)}
+                                      <p className="mt-1 text-xs text-muted-foreground">
+                                        G: {formatMoney(cycle.expensesAmount)} ·
+                                        S:{" "}
+                                        {formatMoney(cycle.subscriptionsAmount)}{" "}
+                                        · MSI:{" "}
+                                        {formatMoney(cycle.purchasesAmount)}
+                                      </p>
+                                    </div>
+
+                                    <div>
+                                      {cycle.statementAmount
+                                        ? formatMoney(cycle.statementAmount)
+                                        : "-"}
+                                    </div>
+
+                                    <div
+                                      className={
+                                        Number(cycle.difference || 0) === 0
+                                          ? "text-muted-foreground"
+                                          : Number(cycle.difference || 0) > 0
+                                            ? "text-red-400"
+                                            : "text-emerald-400"
+                                      }
+                                    >
+                                      {cycle.difference === null ||
+                                      cycle.difference === undefined
+                                        ? "-"
+                                        : formatMoney(cycle.difference)}
+                                    </div>
+
+                                    <div>
+                                      <Badge variant="secondary">
+                                        {getStatusLabel(cycle.status)}
+                                      </Badge>
+                                    </div>
+
+                                    <div className="space-y-3">
+                                      <div className="flex flex-wrap gap-2">
+                                        <Button
+                                          type="button"
+                                          variant="secondary"
+                                          size="sm"
+                                          onClick={() =>
+                                            startEditingCycleDates(cycle)
+                                          }
+                                        >
+                                          <CalendarClock className="mr-2 h-4 w-4" />
+                                          Fechas
+                                        </Button>
+
+                                        <Button
+                                          type="button"
+                                          variant="secondary"
+                                          size="sm"
+                                          onClick={() => {
+                                            setEditingStatementCycleId(
+                                              cycle.id,
+                                            );
+                                            setStatementAmount(
+                                              cycle.statementAmount
+                                                ? String(cycle.statementAmount)
+                                                : "",
+                                            );
+                                          }}
+                                        >
+                                          <FileText className="mr-2 h-4 w-4" />
+                                          Estado cuenta
+                                        </Button>
+
+                                        <Button
+                                          type="button"
+                                          variant="secondary"
+                                          size="sm"
+                                          onClick={() => {
+                                            setPayingCycleId(cycle.id);
+                                            setPaidAt(getTodayInputValue());
+                                            setPaidAmount(
+                                              cycle.statementAmount
+                                                ? String(cycle.statementAmount)
+                                                : "",
+                                            );
+                                          }}
+                                        >
+                                          <CheckCircle2 className="mr-2 h-4 w-4" />
+                                          Pagado
+                                        </Button>
+
+                                        <Button
+                                          type="button"
+                                          variant="secondary"
+                                          size="sm"
+                                          onClick={() => {
+                                            setExpandedCycleId((current) =>
+                                              current === cycle.id
+                                                ? ""
+                                                : cycle.id,
+                                            );
+                                          }}
+                                        >
+                                          {expandedCycleId === cycle.id
+                                            ? "Ocultar desglose"
+                                            : "Ver desglose"}
+                                        </Button>
+                                      </div>
+
+                                      <CycleActionForms
+                                        cycle={cycle}
+                                        editingCycleDatesId={
+                                          editingCycleDatesId
+                                        }
+                                        editCycleStartDate={editCycleStartDate}
+                                        setEditCycleStartDate={
+                                          setEditCycleStartDate
+                                        }
+                                        editCycleCutDate={editCycleCutDate}
+                                        setEditCycleCutDate={
+                                          setEditCycleCutDate
+                                        }
+                                        editCycleDueDate={editCycleDueDate}
+                                        setEditCycleDueDate={
+                                          setEditCycleDueDate
+                                        }
+                                        cancelEditingCycleDates={
+                                          cancelEditingCycleDates
+                                        }
+                                        updateCycleDates={updateCycleDates}
+                                        isUpdatingCycleDates={
+                                          isUpdatingCycleDates
+                                        }
+                                        editingStatementCycleId={
+                                          editingStatementCycleId
+                                        }
+                                        statementAmount={statementAmount}
+                                        setStatementAmount={setStatementAmount}
+                                        updateStatementAmount={
+                                          updateStatementAmount
+                                        }
+                                        payingCycleId={payingCycleId}
+                                        paidAt={paidAt}
+                                        setPaidAt={setPaidAt}
+                                        paidAmount={paidAmount}
+                                        setPaidAmount={setPaidAmount}
+                                        markCycleAsPaid={markCycleAsPaid}
+                                      />
+
+                                      {cycle.statementAmount ? (
+                                        <p className="text-xs text-muted-foreground">
+                                          Estado cuenta:{" "}
+                                          {formatMoney(cycle.statementAmount)}
+                                        </p>
+                                      ) : null}
+
+                                      {cycle.paidAmount ? (
+                                        <p className="text-xs text-muted-foreground">
+                                          Pagado:{" "}
+                                          {formatMoney(cycle.paidAmount)}
+                                        </p>
+                                      ) : null}
+                                    </div>
+
+                                    {expandedCycleId === cycle.id ? (
+                                      <div className="md:col-span-8">
+                                        <CycleBreakdown cycle={cycle} />
+                                      </div>
+                                    ) : null}
+                                  </div>
+                                ))}
+                              </div>
                             </div>
                           </div>
                         </div>
