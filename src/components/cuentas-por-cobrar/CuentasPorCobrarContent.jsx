@@ -4,8 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { Plus, Trash2 } from "lucide-react";
-
+import { Pencil, Plus, Trash2, X } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 import { Button } from "@/components/ui/button";
@@ -91,6 +90,17 @@ export default function CuentasPorCobrarContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
+
+  const [editingReceivableId, setEditingReceivableId] = useState("");
+  const [editPersonId, setEditPersonId] = useState("");
+  const [editConcept, setEditConcept] = useState("");
+  const [editOriginalAmount, setEditOriginalAmount] = useState("");
+  const [editOriginDate, setEditOriginDate] = useState("");
+  const [editExpectedMonthlyPayment, setEditExpectedMonthlyPayment] =
+    useState("");
+  const [editExpectedDate, setEditExpectedDate] = useState("");
+  const [editNotes, setEditNotes] = useState("");
+  const [isUpdating, setIsUpdating] = useState(false);
 
   async function loadSettings(userId) {
     const response = await fetch(`/api/settings?userId=${userId}`);
@@ -198,6 +208,84 @@ export default function CuentasPorCobrarContent() {
       setError(err.message || "No se pudo crear la cuenta por cobrar.");
     } finally {
       setIsSaving(false);
+    }
+  }
+
+  function toDateInputValue(dateString) {
+    if (!dateString) return "";
+
+    const date = new Date(dateString);
+    const year = date.getUTCFullYear();
+    const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+    const day = String(date.getUTCDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+  }
+
+  function startEditingReceivable(receivable) {
+    setEditingReceivableId(receivable.id);
+    setEditPersonId(receivable.personId || "");
+    setEditConcept(receivable.concept || "");
+    setEditOriginalAmount(String(receivable.originalAmount || ""));
+    setEditOriginDate(toDateInputValue(receivable.originDate));
+    setEditExpectedMonthlyPayment(
+      receivable.expectedMonthlyPayment
+        ? String(receivable.expectedMonthlyPayment)
+        : "",
+    );
+    setEditExpectedDate(toDateInputValue(receivable.expectedDate));
+    setEditNotes(receivable.notes || "");
+  }
+
+  function cancelEditingReceivable() {
+    setEditingReceivableId("");
+    setEditPersonId("");
+    setEditConcept("");
+    setEditOriginalAmount("");
+    setEditOriginDate("");
+    setEditExpectedMonthlyPayment("");
+    setEditExpectedDate("");
+    setEditNotes("");
+  }
+
+  async function updateReceivable() {
+    if (!user || !editingReceivableId) return;
+
+    setError("");
+    setIsUpdating(true);
+
+    try {
+      const response = await fetch("/api/receivables", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: editingReceivableId,
+          personId: editPersonId,
+          concept: editConcept,
+          originalAmount: editOriginalAmount,
+          originDate: editOriginDate,
+          expectedMonthlyPayment: editExpectedMonthlyPayment,
+          expectedDate: editExpectedDate,
+          notes: editNotes,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.error || "No se pudo actualizar la cuenta por cobrar.",
+        );
+      }
+
+      cancelEditingReceivable();
+      await loadReceivables(user.id);
+    } catch (err) {
+      setError(err.message || "No se pudo actualizar la cuenta por cobrar.");
+    } finally {
+      setIsUpdating(false);
     }
   }
 
@@ -430,14 +518,58 @@ export default function CuentasPorCobrarContent() {
                     items={activeReceivables}
                     emptyText="No tienes cuentas por cobrar activas."
                     onDelete={deleteReceivable}
+                    onEdit={startEditingReceivable}
+                    editingReceivableId={editingReceivableId}
+                    people={people}
+                    editPersonId={editPersonId}
+                    setEditPersonId={setEditPersonId}
+                    editConcept={editConcept}
+                    setEditConcept={setEditConcept}
+                    editOriginalAmount={editOriginalAmount}
+                    setEditOriginalAmount={setEditOriginalAmount}
+                    editOriginDate={editOriginDate}
+                    setEditOriginDate={setEditOriginDate}
+                    editExpectedMonthlyPayment={editExpectedMonthlyPayment}
+                    setEditExpectedMonthlyPayment={
+                      setEditExpectedMonthlyPayment
+                    }
+                    editExpectedDate={editExpectedDate}
+                    setEditExpectedDate={setEditExpectedDate}
+                    editNotes={editNotes}
+                    setEditNotes={setEditNotes}
+                    updateReceivable={updateReceivable}
+                    cancelEditingReceivable={cancelEditingReceivable}
+                    isUpdating={isUpdating}
                   />
                 </TabsContent>
 
                 <TabsContent value="paid">
                   <ReceivablesList
                     items={paidOffReceivables}
-                    emptyText="Aún no tienes cuentas liquidadas."
+                    emptyText="No tienes cuentas por cobrar liquidadas."
                     onDelete={deleteReceivable}
+                    onEdit={startEditingReceivable}
+                    editingReceivableId={editingReceivableId}
+                    people={people}
+                    editPersonId={editPersonId}
+                    setEditPersonId={setEditPersonId}
+                    editConcept={editConcept}
+                    setEditConcept={setEditConcept}
+                    editOriginalAmount={editOriginalAmount}
+                    setEditOriginalAmount={setEditOriginalAmount}
+                    editOriginDate={editOriginDate}
+                    setEditOriginDate={setEditOriginDate}
+                    editExpectedMonthlyPayment={editExpectedMonthlyPayment}
+                    setEditExpectedMonthlyPayment={
+                      setEditExpectedMonthlyPayment
+                    }
+                    editExpectedDate={editExpectedDate}
+                    setEditExpectedDate={setEditExpectedDate}
+                    editNotes={editNotes}
+                    setEditNotes={setEditNotes}
+                    updateReceivable={updateReceivable}
+                    cancelEditingReceivable={cancelEditingReceivable}
+                    isUpdating={isUpdating}
                   />
                 </TabsContent>
 
@@ -446,6 +578,28 @@ export default function CuentasPorCobrarContent() {
                     items={allReceivables}
                     emptyText="Aún no tienes cuentas por cobrar registradas."
                     onDelete={deleteReceivable}
+                    onEdit={startEditingReceivable}
+                    editingReceivableId={editingReceivableId}
+                    people={people}
+                    editPersonId={editPersonId}
+                    setEditPersonId={setEditPersonId}
+                    editConcept={editConcept}
+                    setEditConcept={setEditConcept}
+                    editOriginalAmount={editOriginalAmount}
+                    setEditOriginalAmount={setEditOriginalAmount}
+                    editOriginDate={editOriginDate}
+                    setEditOriginDate={setEditOriginDate}
+                    editExpectedMonthlyPayment={editExpectedMonthlyPayment}
+                    setEditExpectedMonthlyPayment={
+                      setEditExpectedMonthlyPayment
+                    }
+                    editExpectedDate={editExpectedDate}
+                    setEditExpectedDate={setEditExpectedDate}
+                    editNotes={editNotes}
+                    setEditNotes={setEditNotes}
+                    updateReceivable={updateReceivable}
+                    cancelEditingReceivable={cancelEditingReceivable}
+                    isUpdating={isUpdating}
                   />
                 </TabsContent>
               </Tabs>
@@ -475,7 +629,31 @@ function SummaryCard({ title, value }) {
   );
 }
 
-function ReceivablesList({ items, emptyText, onDelete }) {
+function ReceivablesList({
+  items,
+  emptyText,
+  onDelete,
+  onEdit,
+  editingReceivableId,
+  people,
+  editPersonId,
+  setEditPersonId,
+  editConcept,
+  setEditConcept,
+  editOriginalAmount,
+  setEditOriginalAmount,
+  editOriginDate,
+  setEditOriginDate,
+  editExpectedMonthlyPayment,
+  setEditExpectedMonthlyPayment,
+  editExpectedDate,
+  setEditExpectedDate,
+  editNotes,
+  setEditNotes,
+  updateReceivable,
+  cancelEditingReceivable,
+  isUpdating,
+}) {
   if (items.length === 0) {
     return (
       <p className="rounded-xl border border-border bg-muted/30 px-4 py-6 text-sm text-muted-foreground">
@@ -523,6 +701,15 @@ function ReceivablesList({ items, emptyText, onDelete }) {
               type="button"
               variant="ghost"
               size="icon"
+              onClick={() => onEdit(item)}
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
               onClick={() => onDelete(item.id)}
             >
               <Trash2 className="h-4 w-4" />
@@ -547,6 +734,121 @@ function ReceivablesList({ items, emptyText, onDelete }) {
               <p className="font-medium">{formatMoney(item.pendingBalance)}</p>
             </div>
           </div>
+
+          {editingReceivableId === item.id ? (
+            <div className="mt-4 rounded-xl border border-border bg-background/70 p-4">
+              <div className="mb-4 flex items-center justify-between gap-4">
+                <p className="text-sm font-medium">Editar cuenta por cobrar</p>
+
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={cancelEditingReceivable}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label>Persona</Label>
+                  <Select value={editPersonId} onValueChange={setEditPersonId}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecciona persona" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {people.map((person) => (
+                        <SelectItem key={person.id} value={person.id}>
+                          {person.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Fecha de origen</Label>
+                  <Input
+                    type="date"
+                    value={editOriginDate}
+                    onChange={(event) => setEditOriginDate(event.target.value)}
+                  />
+                </div>
+
+                <div className="space-y-2 md:col-span-2">
+                  <Label>Concepto</Label>
+                  <Input
+                    value={editConcept}
+                    onChange={(event) => setEditConcept(event.target.value)}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Monto original</Label>
+                  <Input
+                    value={editOriginalAmount}
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    onChange={(event) =>
+                      setEditOriginalAmount(event.target.value)
+                    }
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Pago mensual esperado opcional</Label>
+                  <Input
+                    value={editExpectedMonthlyPayment}
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    onChange={(event) =>
+                      setEditExpectedMonthlyPayment(event.target.value)
+                    }
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Fecha esperada opcional</Label>
+                  <Input
+                    type="date"
+                    value={editExpectedDate}
+                    onChange={(event) =>
+                      setEditExpectedDate(event.target.value)
+                    }
+                  />
+                </div>
+
+                <div className="space-y-2 md:col-span-2">
+                  <Label>Notas</Label>
+                  <Textarea
+                    value={editNotes}
+                    onChange={(event) => setEditNotes(event.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+                <Button
+                  type="button"
+                  onClick={updateReceivable}
+                  disabled={isUpdating}
+                >
+                  {isUpdating ? "Guardando..." : "Guardar cambios"}
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={cancelEditingReceivable}
+                >
+                  Cancelar
+                </Button>
+              </div>
+            </div>
+          ) : null}
         </div>
       ))}
     </div>
