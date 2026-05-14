@@ -444,7 +444,7 @@ export default function GastosContent() {
           </div>
         ) : null}
 
-        <div className="grid gap-6 lg:grid-cols-[420px_1fr]">
+        <div className="grid gap-5 xl:grid-cols-[420px_1fr]">
           <Card className="rounded-2xl border-border bg-card">
             <CardHeader>
               <CardTitle>Nuevo gasto</CardTitle>
@@ -453,7 +453,7 @@ export default function GastosContent() {
               </CardDescription>
             </CardHeader>
 
-            <CardContent className="space-y-5">
+            <CardContent className="space-y-4 md:space-y-5">
               <div className="space-y-2">
                 <Label>Fecha</Label>
                 <Input
@@ -792,6 +792,7 @@ export default function GastosContent() {
                 <div className="flex flex-col gap-3 sm:flex-row">
                   <Button
                     type="button"
+                    className="w-full sm:w-auto"
                     onClick={applyFilters}
                     disabled={isFiltering}
                   >
@@ -802,6 +803,7 @@ export default function GastosContent() {
                   <Button
                     type="button"
                     variant="secondary"
+                    className="w-full sm:w-auto"
                     onClick={resetFilters}
                   >
                     <RotateCcw className="mr-2 h-4 w-4" />
@@ -840,7 +842,7 @@ export default function GastosContent() {
                         key={expense.id}
                         className="rounded-xl border border-border bg-background/60 px-4 py-4"
                       >
-                        <div className="flex items-start justify-between gap-4">
+                        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                           <div className="min-w-0">
                             <div className="flex flex-wrap items-center gap-2">
                               <p className="font-medium">{expense.concept}</p>
@@ -871,7 +873,7 @@ export default function GastosContent() {
                             ) : null}
                           </div>
 
-                          <div className="flex shrink-0 items-center gap-2">
+                          <div className="flex shrink-0 items-center justify-between gap-2 sm:justify-end">
                             <p className="font-semibold">
                               {formatMoney(expense.amount)}
                             </p>
@@ -1034,6 +1036,7 @@ export default function GastosContent() {
                             <div className="mt-4 flex flex-col gap-3 sm:flex-row">
                               <Button
                                 type="button"
+                                className="w-full sm:w-auto"
                                 onClick={updateExpense}
                                 disabled={isUpdating}
                               >
@@ -1045,6 +1048,7 @@ export default function GastosContent() {
                               <Button
                                 type="button"
                                 variant="secondary"
+                                className="w-full sm:w-auto"
                                 onClick={cancelEditingExpense}
                               >
                                 Cancelar

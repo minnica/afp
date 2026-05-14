@@ -409,7 +409,7 @@ export default function ComprasAMesesContent() {
           <SummaryCard title="Compras activas" value={activePurchases.length} />
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-[420px_1fr]">
+        <div className="grid gap-5 xl:grid-cols-[420px_1fr]">
           <Card className="rounded-2xl border-border bg-card">
             <CardHeader>
               <CardTitle>Nueva compra</CardTitle>
@@ -761,7 +761,7 @@ function PurchasesList({
           key={purchase.id}
           className="rounded-xl border border-border bg-background/60 px-4 py-4"
         >
-          <div className="flex items-start justify-between gap-4">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
                 <p className="font-medium">{purchase.concept}</p>
@@ -788,50 +788,54 @@ function PurchasesList({
               ) : null}
             </div>
 
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              onClick={() => onEdit(purchase)}
-            >
-              <Pencil className="h-4 w-4" />
-            </Button>
+            <div className="flex shrink-0 items-center justify-end gap-2">
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={() => onEdit(purchase)}
+              >
+                <Pencil className="h-4 w-4" />
+              </Button>
 
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              onClick={() => onDelete(purchase.id)}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={() => onDelete(purchase.id)}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
 
           <Separator className="my-4" />
 
-          <div className="grid gap-3 text-sm sm:grid-cols-4">
-            <div>
-              <p className="text-muted-foreground">Total</p>
-              <p className="font-medium">{formatMoney(purchase.totalAmount)}</p>
+          <div className="grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
+            <div className="rounded-lg border border-border bg-muted/30 px-3 py-3">
+              <p className="text-xs text-muted-foreground">Total</p>
+              <p className="mt-1 font-medium">
+                {formatMoney(purchase.totalAmount)}
+              </p>
             </div>
 
-            <div>
-              <p className="text-muted-foreground">Mensualidad</p>
-              <p className="font-medium">
+            <div className="rounded-lg border border-border bg-muted/30 px-3 py-3">
+              <p className="text-xs text-muted-foreground">Mensualidad</p>
+              <p className="mt-1 font-medium">
                 {formatMoney(purchase.monthlyPaymentUsed)}
               </p>
             </div>
 
-            <div>
-              <p className="text-muted-foreground">Mes actual</p>
-              <p className="font-medium">
+            <div className="rounded-lg border border-border bg-muted/30 px-3 py-3">
+              <p className="text-xs text-muted-foreground">Mes actual</p>
+              <p className="mt-1 font-medium">
                 {purchase.currentMonth}/{purchase.months}
               </p>
             </div>
 
-            <div>
-              <p className="text-muted-foreground">Pendiente</p>
-              <p className="font-medium">
+            <div className="rounded-lg border border-border bg-muted/30 px-3 py-3">
+              <p className="text-xs text-muted-foreground">Pendiente</p>
+              <p className="mt-1 font-medium">
                 {formatMoney(purchase.remainingBalance)}
               </p>
             </div>
@@ -965,6 +969,7 @@ function PurchasesList({
               <div className="mt-4 flex flex-col gap-3 sm:flex-row">
                 <Button
                   type="button"
+                  className="w-full sm:w-auto"
                   onClick={updatePurchase}
                   disabled={isUpdating}
                 >
@@ -974,6 +979,7 @@ function PurchasesList({
                 <Button
                   type="button"
                   variant="secondary"
+                  className="w-full sm:w-auto"
                   onClick={cancelEditingPurchase}
                 >
                   Cancelar
