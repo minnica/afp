@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Spinner } from "@/components/ui/spinner";
 
 function getTodayInputValue() {
   const today = new Date();
@@ -315,8 +316,8 @@ export default function IngresosContent() {
 
   if (isLoading) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-background text-foreground">
-        <p className="text-sm text-muted-foreground">Cargando ingresos...</p>
+      <main className="flex min-h-dvh items-center justify-center bg-background text-foreground">
+        <Spinner className="size-8" />
       </main>
     );
   }
@@ -324,14 +325,6 @@ export default function IngresosContent() {
   return (
     <main>
       <section className="mx-auto flex w-full max-w-6xl flex-col px-4 py-5 md:py-8">
-        <div className="mb-8">
-          <p className="text-sm text-muted-foreground">AFP</p>
-          <h1 className="text-3xl font-semibold tracking-tight">Ingresos</h1>
-          <p className="mt-2 text-muted-foreground">
-            Registra nómina, ingresos extra y pagos recibidos.
-          </p>
-        </div>
-
         {error ? (
           <div className="mb-6 rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
             {error}
@@ -366,11 +359,9 @@ export default function IngresosContent() {
         <div className="grid gap-5 xl:grid-cols-[420px_1fr]">
           <Card className="rounded-2xl border-border bg-card">
             <CardHeader>
-              <CardTitle>Nuevo ingreso</CardTitle>
-              <CardDescription>
-                Vincula una cuenta por cobrar si el ingreso corresponde a un
-                pago recibido.
-              </CardDescription>
+              <CardTitle className="text-lg font-semibold uppercase text-center">
+                Nuevo ingreso
+              </CardTitle>
             </CardHeader>
 
             <CardContent className="space-y-5">
@@ -473,10 +464,9 @@ export default function IngresosContent() {
 
           <Card className="rounded-2xl border-border bg-card">
             <CardHeader>
-              <CardTitle>Ingresos registrados</CardTitle>
-              <CardDescription>
-                Últimos 100 ingresos capturados.
-              </CardDescription>
+              <CardTitle className="text-lg font-semibold uppercase text-center">
+                Ingresos registrados
+              </CardTitle>
             </CardHeader>
 
             <CardContent>
@@ -688,13 +678,6 @@ export default function IngresosContent() {
                   ))}
                 </div>
               )}
-
-              <Separator className="my-6" />
-
-              <p className="text-sm text-muted-foreground">
-                Los ingresos vinculados a cuentas por cobrar reducen
-                automáticamente el saldo pendiente.
-              </p>
             </CardContent>
           </Card>
         </div>

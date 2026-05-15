@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Spinner } from "@/components/ui/spinner";
 
 function formatMoney(value) {
   const numberValue = Number(value || 0);
@@ -297,10 +298,8 @@ export default function SuscripcionesContent() {
 
   if (isLoading) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-background text-foreground">
-        <p className="text-sm text-muted-foreground">
-          Cargando suscripciones...
-        </p>
+      <main className="flex min-h-dvh items-center justify-center bg-background text-foreground">
+        <Spinner className="size-8" />
       </main>
     );
   }
@@ -308,16 +307,6 @@ export default function SuscripcionesContent() {
   return (
     <main>
       <section className="mx-auto flex w-full max-w-6xl flex-col px-4 py-5 md:py-8">
-        <div className="mb-8">
-          <p className="text-sm text-muted-foreground">AFP</p>
-          <h1 className="text-3xl font-semibold tracking-tight">
-            Suscripciones
-          </h1>
-          <p className="mt-2 text-muted-foreground">
-            Registra cargos mensuales fijos.
-          </p>
-        </div>
-
         {error ? (
           <div className="mb-6 rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
             {error}
@@ -336,10 +325,9 @@ export default function SuscripcionesContent() {
         <div className="grid gap-6 lg:grid-cols-[420px_1fr]">
           <Card className="rounded-2xl border-border bg-card">
             <CardHeader>
-              <CardTitle>Nueva suscripción</CardTitle>
-              <CardDescription>
-                Todas las suscripciones se consideran mensuales y activas.
-              </CardDescription>
+              <CardTitle className="text-lg font-semibold uppercase text-center">
+                Nueva suscripción
+              </CardTitle>
             </CardHeader>
 
             <CardContent className="space-y-5">
@@ -452,10 +440,9 @@ export default function SuscripcionesContent() {
 
           <Card className="rounded-2xl border-border bg-card">
             <CardHeader>
-              <CardTitle>Suscripciones registradas</CardTitle>
-              <CardDescription>
-                Cargos mensuales fijos que se sumarán al gasto mensual.
-              </CardDescription>
+              <CardTitle className="text-lg font-semibold uppercase text-center">
+                Suscripciones registradas
+              </CardTitle>
             </CardHeader>
 
             <CardContent>
@@ -662,13 +649,6 @@ export default function SuscripcionesContent() {
                   ))}
                 </div>
               )}
-
-              <Separator className="my-6" />
-
-              <p className="text-sm text-muted-foreground">
-                Más adelante estas suscripciones se integrarán al Dashboard y a
-                los ciclos de tarjeta.
-              </p>
             </CardContent>
           </Card>
         </div>

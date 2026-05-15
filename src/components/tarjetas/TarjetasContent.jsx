@@ -30,6 +30,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Spinner } from "@/components/ui/spinner";
 
 function formatDate(dateString) {
   return format(new Date(dateString), "d MMMM yyyy", { locale: es });
@@ -844,8 +845,8 @@ export default function TarjetasContent() {
 
   if (isLoading) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-background text-foreground">
-        <p className="text-sm text-muted-foreground">Cargando tarjetas...</p>
+      <main className="flex min-h-dvh items-center justify-center bg-background text-foreground">
+        <Spinner className="size-8" />
       </main>
     );
   }
@@ -853,14 +854,6 @@ export default function TarjetasContent() {
   return (
     <main>
       <section className="mx-auto flex w-full max-w-6xl flex-col px-4 py-5 md:py-8">
-        <div className="mb-8 flex flex-col gap-2">
-          <p className="text-sm text-muted-foreground">AFP</p>
-          <h1 className="text-3xl font-semibold tracking-tight">Tarjetas</h1>
-          <p className="text-muted-foreground">
-            Registra tus tarjetas y controla sus ciclos reales de corte y pago.
-          </p>
-        </div>
-
         {error ? (
           <div className="mb-6 rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
             {error}
@@ -893,11 +886,9 @@ export default function TarjetasContent() {
             <div className="grid gap-6 lg:grid-cols-[420px_1fr]">
               <Card className="rounded-2xl border-border bg-card">
                 <CardHeader>
-                  <CardTitle>Nueva tarjeta</CardTitle>
-                  <CardDescription>
-                    Usa nombres simples como BBVA, HSBC 1, HSBC 2, Nu o
-                    Santander.
-                  </CardDescription>
+                  <CardTitle className="text-lg font-semibold uppercase text-center">
+                    Nueva tarjeta
+                  </CardTitle>
                 </CardHeader>
 
                 <CardContent className="space-y-5">
@@ -959,11 +950,9 @@ export default function TarjetasContent() {
 
               <Card className="rounded-2xl border-border bg-card">
                 <CardHeader>
-                  <CardTitle>Tarjetas registradas</CardTitle>
-                  <CardDescription>
-                    Después generaremos ciclos mensuales para calcular pagos por
-                    corte.
-                  </CardDescription>
+                  <CardTitle className="text-lg font-semibold uppercase text-center">
+                    Tarjetas registradas
+                  </CardTitle>
                 </CardHeader>
 
                 <CardContent>
@@ -1123,11 +1112,9 @@ export default function TarjetasContent() {
             <Card className="rounded-2xl border-border bg-card">
               <CardHeader className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div>
-                  <CardTitle>Ciclos mensuales</CardTitle>
-                  <CardDescription>
-                    Genera ciclos del mes anterior, actual y siguiente usando
-                    los días habituales.
-                  </CardDescription>
+                  <CardTitle className="text-lg font-semibold uppercase text-center">
+                    Ciclos mensuales
+                  </CardTitle>
                 </div>
 
                 <Button
@@ -1378,13 +1365,6 @@ export default function TarjetasContent() {
                     ))}
                   </Tabs>
                 )}
-
-                <Separator className="my-6" />
-
-                <p className="text-sm text-muted-foreground">
-                  Más adelante podrás editar fechas reales si el banco mueve el
-                  corte o límite por 1 o 2 días.
-                </p>
               </CardContent>
             </Card>
           </TabsContent>

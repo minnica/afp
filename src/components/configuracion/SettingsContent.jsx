@@ -18,6 +18,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function SettingsContent() {
   const router = useRouter();
@@ -180,10 +181,8 @@ export default function SettingsContent() {
 
   if (isLoading) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-background text-foreground">
-        <p className="text-sm text-muted-foreground">
-          Cargando configuración...
-        </p>
+      <main className="flex min-h-dvh items-center justify-center bg-background text-foreground">
+        <Spinner className="size-8" />
       </main>
     );
   }
@@ -191,17 +190,6 @@ export default function SettingsContent() {
   return (
     <main>
       <section className="mx-auto flex w-full max-w-6xl flex-col px-4 py-5 md:py-8">
-        <div className="mb-8 flex flex-col gap-2">
-          <p className="text-sm text-muted-foreground">AFP</p>
-          <h1 className="text-3xl font-semibold tracking-tight">
-            Configuración
-          </h1>
-          <p className="text-muted-foreground">
-            Administra catálogos simples para gastos, ingresos y cuentas por
-            cobrar.
-          </p>
-        </div>
-
         {error ? (
           <div className="mb-6 rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
             {error}
@@ -224,7 +212,6 @@ export default function SettingsContent() {
           <TabsContent value="categories">
             <CatalogCard
               title="Categorías"
-              description="Se usan en gastos diarios, compras a meses y suscripciones."
               inputLabel="Nueva categoría"
               inputValue={categoryName}
               inputPlaceholder="Ej. Gasolina"
@@ -239,11 +226,9 @@ export default function SettingsContent() {
           <TabsContent value="people">
             <Card className="rounded-2xl border-border bg-card">
               <CardHeader>
-                <CardTitle>Personas</CardTitle>
-                <CardDescription>
-                  Se usan para cuentas por cobrar, compras a meses por otra
-                  persona y pagos recibidos.
-                </CardDescription>
+                <CardTitle className="text-lg font-semibold uppercase text-center">
+                  Personas
+                </CardTitle>
               </CardHeader>
 
               <CardContent className="space-y-6">
@@ -321,7 +306,6 @@ function SummaryCard({ title, value }) {
 
 function CatalogCard({
   title,
-  description,
   inputLabel,
   inputValue,
   inputPlaceholder,
@@ -334,8 +318,7 @@ function CatalogCard({
   return (
     <Card className="rounded-2xl border-border bg-card">
       <CardHeader>
-        <CardTitle>{title}</CardTitle>
-        <CardDescription>{description}</CardDescription>
+        <CardTitle className="text-lg font-semibold uppercase text-center">{title}</CardTitle>
       </CardHeader>
 
       <CardContent className="space-y-6">

@@ -171,7 +171,7 @@ export default function DashboardContent() {
   if (isLoading) {
     return (
       <main className="flex min-h-dvh items-center justify-center bg-background text-foreground">
-        <Spinner />
+        <Spinner className="size-8"/>
       </main>
     );
   }

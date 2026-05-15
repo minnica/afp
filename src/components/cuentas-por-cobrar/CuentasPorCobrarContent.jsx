@@ -28,6 +28,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Spinner } from "@/components/ui/spinner";
 
 function getTodayInputValue() {
   const today = new Date();
@@ -348,10 +349,8 @@ export default function CuentasPorCobrarContent() {
 
   if (isLoading) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-background text-foreground">
-        <p className="text-sm text-muted-foreground">
-          Cargando cuentas por cobrar...
-        </p>
+      <main className="flex min-h-dvh items-center justify-center bg-background text-foreground">
+        <Spinner className="size-8" />
       </main>
     );
   }
@@ -359,16 +358,6 @@ export default function CuentasPorCobrarContent() {
   return (
     <main>
       <section className="mx-auto flex w-full max-w-6xl flex-col px-4 py-5 md:py-8">
-        <div className="mb-8">
-          <p className="text-sm text-muted-foreground">AFP</p>
-          <h1 className="text-3xl font-semibold tracking-tight">
-            Cuentas por cobrar
-          </h1>
-          <p className="mt-2 text-muted-foreground">
-            Controla dinero que otras personas te deben.
-          </p>
-        </div>
-
         {error ? (
           <div className="mb-6 rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
             {error}
@@ -387,11 +376,9 @@ export default function CuentasPorCobrarContent() {
         <div className="grid gap-5 xl:grid-cols-[420px_1fr]">
           <Card className="rounded-2xl border-border bg-card">
             <CardHeader>
-              <CardTitle>Nueva cuenta por cobrar</CardTitle>
-              <CardDescription>
-                Registra una deuda inicial manual, como venta de moto o préstamo
-                a una persona.
-              </CardDescription>
+              <CardTitle className="text-lg font-semibold uppercase text-center">
+                Nueva cuenta por cobrar
+              </CardTitle>
             </CardHeader>
 
             <CardContent className="space-y-5">
@@ -493,10 +480,9 @@ export default function CuentasPorCobrarContent() {
 
           <Card className="rounded-2xl border-border bg-card">
             <CardHeader>
-              <CardTitle>Cuentas por cobrar</CardTitle>
-              <CardDescription>
-                Consulta cuentas activas, liquidadas o todo el historial.
-              </CardDescription>
+              <CardTitle className="text-lg font-semibold uppercase text-center">
+                Cuentas por cobrar
+              </CardTitle>
             </CardHeader>
 
             <CardContent>
@@ -603,13 +589,6 @@ export default function CuentasPorCobrarContent() {
                   />
                 </TabsContent>
               </Tabs>
-
-              <Separator className="my-6" />
-
-              <p className="text-sm text-muted-foreground">
-                Los pagos recibidos se registran desde Ingresos y reducen
-                automáticamente el saldo pendiente.
-              </p>
             </CardContent>
           </Card>
         </div>

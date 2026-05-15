@@ -40,6 +40,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
+import { Spinner } from "@/components/ui/spinner";
+
 function getTodayInputValue() {
   const today = new Date();
   const year = today.getFullYear();
@@ -386,10 +388,8 @@ export default function ComprasAMesesContent() {
 
   if (isLoading) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-background text-foreground">
-        <p className="text-sm text-muted-foreground">
-          Cargando compras a meses...
-        </p>
+      <main className="flex min-h-dvh items-center justify-center bg-background text-foreground">
+        <Spinner className="size-8"/>
       </main>
     );
   }
@@ -398,16 +398,6 @@ export default function ComprasAMesesContent() {
     <>
       <main>
         <section className="mx-auto flex w-full max-w-6xl flex-col px-4 py-5 md:py-8">
-          <div className="mb-8">
-            <p className="text-sm text-muted-foreground">AFP</p>
-            <h1 className="text-3xl font-semibold tracking-tight">
-              Compras a meses
-            </h1>
-            <p className="mt-2 text-muted-foreground">
-              Controla compras diferidas, mensualidades y saldos pendientes.
-            </p>
-          </div>
-
           {error ? (
             <div className="mb-6 rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
               {error}
@@ -432,11 +422,9 @@ export default function ComprasAMesesContent() {
           <div className="grid gap-5 xl:grid-cols-[420px_1fr]">
             <Card className="rounded-2xl border-border bg-card">
               <CardHeader>
-                <CardTitle>Nueva compra</CardTitle>
-                <CardDescription>
-                  Si seleccionas persona, se creará una cuenta por cobrar
-                  automática.
-                </CardDescription>
+                <CardTitle className="text-lg font-semibold uppercase text-center">
+                  Nueva compra
+                </CardTitle>
               </CardHeader>
 
               <CardContent className="space-y-5">
@@ -595,10 +583,9 @@ export default function ComprasAMesesContent() {
 
             <Card className="rounded-2xl border-border bg-card">
               <CardHeader>
-                <CardTitle>Compras registradas</CardTitle>
-                <CardDescription>
-                  Consulta compras activas, liquidadas y saldos pendientes.
-                </CardDescription>
+                <CardTitle className="text-lg font-semibold uppercase text-center">
+                  Compras registradas
+                </CardTitle>
               </CardHeader>
 
               <CardContent>
@@ -714,13 +701,6 @@ export default function ComprasAMesesContent() {
                     />
                   </TabsContent>
                 </Tabs>
-
-                <Separator className="my-6" />
-
-                <p className="text-sm text-muted-foreground">
-                  Estas mensualidades se integrarán después al cálculo de
-                  tarjetas y Dashboard.
-                </p>
               </CardContent>
             </Card>
           </div>
