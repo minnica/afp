@@ -74,6 +74,19 @@ function getStatusVariant(status) {
   return "outline";
 }
 
+function getStatusBadgeClass(status) {
+  const classes = {
+    PAID: "bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300",
+    OVERDUE: "bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-300",
+    OPEN: "bg-sky-50 text-sky-700 dark:bg-sky-950 dark:text-sky-300",
+    CUT: "bg-orange-50 text-orange-700 dark:bg-orange-950 dark:text-orange-300",
+    PAYMENT_PENDING:
+      "bg-yellow-50 text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300",
+  };
+
+  return classes[status] || "border-border bg-muted text-muted-foreground";
+}
+
 export default function DashboardContent() {
   const router = useRouter();
 
@@ -171,7 +184,7 @@ export default function DashboardContent() {
   if (isLoading) {
     return (
       <main className="flex min-h-dvh items-center justify-center bg-background text-foreground">
-        <Spinner className="size-8"/>
+        <Spinner className="size-8" />
       </main>
     );
   }
@@ -362,16 +375,30 @@ function PaymentsTable({ items }) {
                 </p>
               </div>
 
-              <Badge variant={getStatusVariant(item.cycle.displayStatus)}>
+              <Badge
+                variant="outline"
+                className={getStatusBadgeClass(item.cycle.displayStatus)}
+              >
                 {getStatusLabel(item.cycle.displayStatus)}
               </Badge>
             </div>
 
-            <div className="rounded-lg border border-border bg-muted/30 px-3 py-3">
-              <p className="text-xs text-muted-foreground">Pago calculado</p>
-              <p className="text-xl font-semibold">
-                {formatMoney(item.cycle.calculatedAmount)}
-              </p>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="rounded-lg border border-border bg-muted/30 px-3 py-3">
+                <p className="text-xs text-muted-foreground">Pago calculado</p>
+                <p className="text-lg font-semibold">
+                  {formatMoney(item.cycle.calculatedAmount)}
+                </p>
+              </div>
+
+              <div className="rounded-lg border border-border bg-muted/30 px-3 py-3">
+                <p className="text-xs text-muted-foreground">Estado cuenta</p>
+                <p className="text-lg font-semibold">
+                  {item.cycle.statementAmount
+                    ? formatMoney(item.cycle.statementAmount)
+                    : "-"}
+                </p>
+              </div>
             </div>
           </div>
         ))}
@@ -379,11 +406,12 @@ function PaymentsTable({ items }) {
 
       {/* Vista escritorio */}
       <div className="hidden overflow-hidden rounded-xl border border-border md:block">
-        <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr] gap-4 border-b border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
+        <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr] gap-4 border-b border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
           <div>Tarjeta</div>
           <div>Corte</div>
           <div>Límite pago</div>
           <div>Pago calculado</div>
+          <div>Estado cuenta</div>
           <div>Estado</div>
         </div>
 
@@ -391,16 +419,29 @@ function PaymentsTable({ items }) {
           {items.map((item) => (
             <div
               key={item.cycle.id}
-              className="grid gap-4 px-4 py-4 text-sm md:grid-cols-[1fr_1fr_1fr_1fr_1fr]"
+              className="grid gap-4 px-4 py-4 text-sm md:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr]"
             >
               <div className="font-medium">{item.card.name}</div>
+
               <div>{formatCompactDate(item.cycle.cutDate)}</div>
+
               <div>{formatCompactDate(item.cycle.dueDate)}</div>
+
               <div className="font-semibold">
                 {formatMoney(item.cycle.calculatedAmount)}
               </div>
+
+              <div className="font-semibold">
+                {item.cycle.statementAmount
+                  ? formatMoney(item.cycle.statementAmount)
+                  : "-"}
+              </div>
+
               <div>
-                <Badge variant={getStatusVariant(item.cycle.displayStatus)}>
+                <Badge
+                  variant="outline"
+                  className={getStatusBadgeClass(item.cycle.displayStatus)}
+                >
                   {getStatusLabel(item.cycle.displayStatus)}
                 </Badge>
               </div>
