@@ -85,8 +85,8 @@ export default function AppSidebar() {
     <Sidebar collapsible="icon">
       <SidebarHeader>
         <div className="px-2 py-2">
-          <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-            AFP
+          <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground font-uppercase">
+            garatachia
           </p>
         </div>
       </SidebarHeader>
