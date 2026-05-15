@@ -210,8 +210,6 @@ export default function ComprasAMesesContent() {
         throw new Error(data.error || "No se pudo guardar la compra.");
       }
 
-      setCardId("");
-      setPurchaseDate(getTodayInputValue());
       setConcept("");
       setTotalAmount("");
       setMonths("");
@@ -485,8 +483,8 @@ export default function ComprasAMesesContent() {
                   {formatMoney(calculatedMonthlyPayment)}
                 </p>
               </div>
-
-              <div className="space-y-2">
+              {/* pendiente eliminar probablemente */}
+              {/* <div className="space-y-2">
                 <Label>Pago mensual manual opcional</Label>
                 <Input
                   value={manualMonthlyPayment}
@@ -498,7 +496,7 @@ export default function ComprasAMesesContent() {
                     setManualMonthlyPayment(event.target.value)
                   }
                 />
-              </div>
+              </div> */}
 
               <div className="space-y-2">
                 <Label>Pagos ya realizados</Label>
@@ -511,6 +509,22 @@ export default function ComprasAMesesContent() {
                     setInitialPaymentsMade(event.target.value)
                   }
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Categoría</Label>
+                <Select value={categoryId} onValueChange={setCategoryId}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecciona categoría" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map((category) => (
+                      <SelectItem key={category.id} value={category.id}>
+                        {category.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-2">
@@ -534,22 +548,6 @@ export default function ComprasAMesesContent() {
                     Se creará una cuenta por cobrar por el monto total.
                   </p>
                 ) : null}
-              </div>
-
-              <div className="space-y-2">
-                <Label>Categoría</Label>
-                <Select value={categoryId} onValueChange={setCategoryId}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecciona categoría" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map((category) => (
-                      <SelectItem key={category.id} value={category.id}>
-                        {category.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
               </div>
 
               <div className="space-y-2">
