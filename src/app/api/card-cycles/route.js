@@ -57,11 +57,7 @@ function shouldIncludePurchaseInCycle(purchase, targetCycle, cardCycles) {
 
   if (purchaseDate > cycleCutDate) return false;
 
-  const cycleNumber = getPurchaseCycleNumber(purchase, targetCycle, cardCycles);
-
-  if (!cycleNumber) return true;
-
-  return cycleNumber > paymentsAlreadyMade && cycleNumber <= months;
+  return true;
 }
 
 function getDaysInMonthForCharge(year, monthIndex) {
