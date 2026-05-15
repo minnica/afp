@@ -151,6 +151,21 @@ export default function DashboardContent() {
   const categoryBreakdown = dashboard?.categoryBreakdown || [];
   const activeReceivables = dashboard?.activeReceivables || [];
 
+  const previousPayments = useMemo(() => {
+    return payments
+      .map((item) => ({
+        card: item.card,
+        cycle: item.previousPayment,
+      }))
+      .filter((item) => item.cycle)
+      .sort((a, b) => {
+        return (
+          new Date(a.cycle.dueDate).getTime() -
+          new Date(b.cycle.dueDate).getTime()
+        );
+      });
+  }, [payments]);
+
   const currentPayments = useMemo(() => {
     return payments
       .map((item) => ({
@@ -209,13 +224,14 @@ export default function DashboardContent() {
             <CardContent>
               <Tabs defaultValue="current">
                 <TabsList className="mb-6">
-                  <TabsTrigger value="current">
-                    Este pago ({currentPayments.length})
-                  </TabsTrigger>
-                  <TabsTrigger value="next">
-                    Siguiente pago ({nextPayments.length})
-                  </TabsTrigger>
+                  <TabsTrigger value="previous">Pago anterior</TabsTrigger>
+                  <TabsTrigger value="current">Este pago</TabsTrigger>
+                  <TabsTrigger value="next">Siguiente pago</TabsTrigger>
                 </TabsList>
+
+                <TabsContent value="previous">
+                  <PaymentsTable items={previousPayments} />
+                </TabsContent>
 
                 <TabsContent value="current">
                   <PaymentsTable items={currentPayments} />
@@ -347,6 +363,13 @@ function SummaryCard({ title, value }) {
 }
 
 function PaymentsTable({ items }) {
+  const totalCalculatedAmount = items.reduce((total, item) => {
+    return total + Number(item.cycle.calculatedAmount || 0);
+  }, 0);
+
+  const totalStatementAmount = items.reduce((total, item) => {
+    return total + Number(item.cycle.statementAmount || 0);
+  }, 0);
   if (items.length === 0) {
     return (
       <p className="rounded-xl border border-border bg-muted/30 px-4 py-6 text-sm text-muted-foreground">
@@ -357,6 +380,23 @@ function PaymentsTable({ items }) {
 
   return (
     <div>
+      <div className="mb-4 grid gap-3 sm:grid-cols-2">
+        <div className="rounded-xl border border-border bg-muted/30 px-4 py-3">
+          <p className="text-xs text-muted-foreground">Total pago calculado</p>
+          <p className="mt-1 text-xl font-semibold">
+            {formatMoney(totalCalculatedAmount)}
+          </p>
+        </div>
+
+        <div className="rounded-xl border border-border bg-muted/30 px-4 py-3">
+          <p className="text-xs text-muted-foreground">
+            Total estado de cuenta
+          </p>
+          <p className="mt-1 text-xl font-semibold">
+            {formatMoney(totalStatementAmount)}
+          </p>
+        </div>
+      </div>
       {/* Vista móvil */}
       <div className="grid gap-3 md:hidden">
         {items.map((item) => (

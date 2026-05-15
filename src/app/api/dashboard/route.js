@@ -282,8 +282,12 @@ export async function GET(request) {
           ? currentIndex
           : Math.max(cyclesForCard.length - 1, 0);
 
+      const previousPayment =
+        safeCurrentIndex > 0 ? cyclesForCard[safeCurrentIndex - 1] : null;
+
       return {
         card,
+        previousPayment,
         currentPayment: cyclesForCard[safeCurrentIndex] || null,
         nextPayment: cyclesForCard[safeCurrentIndex + 1] || null,
       };
