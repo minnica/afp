@@ -6,6 +6,7 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Filter, Pencil, Plus, RotateCcw, Trash2, X } from "lucide-react";
 
+import { Spinner } from "@/components/ui/spinner";
 import { supabase } from "@/lib/supabase";
 
 import { Button } from "@/components/ui/button";
@@ -436,8 +437,8 @@ export default function GastosContent() {
 
   if (isCheckingSession) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-background text-foreground">
-        <p className="text-sm text-muted-foreground">Validando sesión...</p>
+      <main className="flex min-h-dvh items-center justify-center bg-background text-foreground">
+        <Spinner />
       </main>
     );
   }

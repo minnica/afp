@@ -17,6 +17,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Spinner } from "@/components/ui/spinner";
 
 function formatMoney(value) {
   const numberValue = Number(value || 0);
@@ -129,7 +130,10 @@ export default function DashboardContent() {
     init();
   }, [router]);
 
-  const payments = dashboard?.payments || [];
+  const payments = useMemo(
+    () => dashboard?.payments || [],
+    [dashboard?.payments],
+  );
   const monthlySummary = dashboard?.monthlySummary || {};
   const categoryBreakdown = dashboard?.categoryBreakdown || [];
   const activeReceivables = dashboard?.activeReceivables || [];
@@ -140,7 +144,13 @@ export default function DashboardContent() {
         card: item.card,
         cycle: item.currentPayment,
       }))
-      .filter((item) => item.cycle);
+      .filter((item) => item.cycle)
+      .sort((a, b) => {
+        return (
+          new Date(a.cycle.dueDate).getTime() -
+          new Date(b.cycle.dueDate).getTime()
+        );
+      });
   }, [payments]);
 
   const nextPayments = useMemo(() => {
@@ -149,13 +159,19 @@ export default function DashboardContent() {
         card: item.card,
         cycle: item.nextPayment,
       }))
-      .filter((item) => item.cycle);
+      .filter((item) => item.cycle)
+      .sort((a, b) => {
+        return (
+          new Date(a.cycle.dueDate).getTime() -
+          new Date(b.cycle.dueDate).getTime()
+        );
+      });
   }, [payments]);
 
   if (isLoading) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-background text-foreground">
-        <p className="text-sm text-muted-foreground">Cargando dashboard...</p>
+      <main className="flex min-h-dvh items-center justify-center bg-background text-foreground">
+        <Spinner />
       </main>
     );
   }
@@ -163,15 +179,6 @@ export default function DashboardContent() {
   return (
     <main>
       <section className="mx-auto flex w-full max-w-7xl flex-col px-4 py-8">
-        <div className="mb-8">
-          <p className="text-sm text-muted-foreground">AFP</p>
-          <h1 className="text-3xl font-semibold tracking-tight">Dashboard</h1>
-          <p className="mt-2 text-muted-foreground">
-            Revisión de pagos de tarjetas, gastos mensuales y cuentas por
-            cobrar.
-          </p>
-        </div>
-
         {error ? (
           <div className="mb-6 rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
             {error}
@@ -181,11 +188,9 @@ export default function DashboardContent() {
         <div className="space-y-6">
           <Card className="rounded-2xl border-border bg-card">
             <CardHeader>
-              <CardTitle>Pagos de tarjetas</CardTitle>
-              <CardDescription>
-                Primero lo urgente: este pago y el siguiente pago por ciclo
-                real.
-              </CardDescription>
+              <CardTitle className="text-lg font-semibold uppercase text-center">
+                Pagos de tarjetas
+              </CardTitle>
             </CardHeader>
 
             <CardContent>
@@ -228,10 +233,9 @@ export default function DashboardContent() {
           <div className="grid gap-6 lg:grid-cols-[1fr_420px]">
             <Card className="rounded-2xl border-border bg-card">
               <CardHeader>
-                <CardTitle>Gasto por categoría</CardTitle>
-                <CardDescription>
-                  Incluye gastos diarios, mensualidades activas y suscripciones.
-                </CardDescription>
+                <CardTitle className="text-lg font-semibold uppercase text-center">
+                  Gasto por categoría
+                </CardTitle>
               </CardHeader>
 
               <CardContent>
@@ -276,10 +280,9 @@ export default function DashboardContent() {
 
             <Card className="rounded-2xl border-border bg-card">
               <CardHeader>
-                <CardTitle>Cuentas por cobrar</CardTitle>
-                <CardDescription>
-                  Cuentas activas pendientes de pago.
-                </CardDescription>
+                <CardTitle className="text-lg font-semibold uppercase text-center">
+                  Cuentas por cobrar
+                </CardTitle>
               </CardHeader>
 
               <CardContent>
@@ -310,12 +313,6 @@ export default function DashboardContent() {
                     ))}
                   </div>
                 )}
-
-                <Separator className="my-6" />
-
-                <p className="text-sm text-muted-foreground">
-                  Para registrar pagos recibidos, usa la pantalla Ingresos.
-                </p>
               </CardContent>
             </Card>
           </div>
