@@ -82,6 +82,16 @@ export default function IngresosContent() {
   const [editNotes, setEditNotes] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
 
+  const selectableReceivables = receivables.filter((item) => {
+    const pendingBalance = Number(item.pendingBalance || 0);
+
+    if (pendingBalance > 0 && item.status === "ACTIVE") {
+      return true;
+    }
+
+    return item.id === editReceivableAccountId;
+  });
+
   async function loadSettings(userId) {
     const response = await fetch(`/api/settings?userId=${userId}`);
     const data = await response.json();
@@ -431,12 +441,19 @@ export default function IngresosContent() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="NONE">Sin cuenta por cobrar</SelectItem>
-                    {receivables.map((item) => (
-                      <SelectItem key={item.id} value={item.id}>
-                        {item.person?.name} · {item.concept} · pendiente{" "}
-                        {formatMoney(item.pendingBalance)}
-                      </SelectItem>
-                    ))}
+                    {selectableReceivables.map((item) => {
+                      const pendingBalance = Number(item.pendingBalance || 0);
+                      const isPaidOff =
+                        item.status === "PAID_OFF" || pendingBalance <= 0;
+
+                      return (
+                        <SelectItem key={item.id} value={item.id}>
+                          {item.person?.name} · {item.concept} ·{" "}
+                          {isPaidOff ? "liquidada" : "pendiente"}{" "}
+                          {formatMoney(pendingBalance)}
+                        </SelectItem>
+                      );
+                    })}
                   </SelectContent>
                 </Select>
               </div>
