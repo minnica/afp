@@ -566,6 +566,16 @@ export default function SuscripcionesContent() {
                           </div>
 
                           <p className="mt-1 text-sm text-muted-foreground">
+                            Método:{" "}
+                            {subscription.paymentMethod === "CARD"
+                              ? "Tarjeta"
+                              : "Efectivo"}
+                            {subscription.card
+                              ? ` · ${subscription.card.name}`
+                              : ""}
+                          </p>
+
+                          <p className="mt-1 text-sm text-muted-foreground">
                             Día {subscription.chargeDay} ·{" "}
                             {getFrequencyLabel(subscription.frequencyMonths)}
                             {subscription.startMonth && subscription.startYear
