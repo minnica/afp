@@ -126,6 +126,7 @@ export default function CuentasPorPagarContent() {
   const [isUpdating, setIsUpdating] = useState(false);
 
   const [payableToDelete, setPayableToDelete] = useState(null);
+  const [expandedPayableId, setExpandedPayableId] = useState("");
 
   async function loadSettings(userId) {
     const response = await fetch(`/api/settings?userId=${userId}`);
@@ -574,6 +575,8 @@ export default function CuentasPorPagarContent() {
                       updatePayable={updatePayable}
                       cancelEditingPayable={cancelEditingPayable}
                       isUpdating={isUpdating}
+                      expandedPayableId={expandedPayableId}
+                      setExpandedPayableId={setExpandedPayableId}
                     />
                   </TabsContent>
 
@@ -604,6 +607,8 @@ export default function CuentasPorPagarContent() {
                       updatePayable={updatePayable}
                       cancelEditingPayable={cancelEditingPayable}
                       isUpdating={isUpdating}
+                      expandedPayableId={expandedPayableId}
+                      setExpandedPayableId={setExpandedPayableId}
                     />
                   </TabsContent>
 
@@ -634,6 +639,8 @@ export default function CuentasPorPagarContent() {
                       updatePayable={updatePayable}
                       cancelEditingPayable={cancelEditingPayable}
                       isUpdating={isUpdating}
+                      expandedPayableId={expandedPayableId}
+                      setExpandedPayableId={setExpandedPayableId}
                     />
                   </TabsContent>
                 </Tabs>
@@ -681,6 +688,8 @@ function PayablesList({
   updatePayable,
   cancelEditingPayable,
   isUpdating,
+  expandedPayableId,
+  setExpandedPayableId,
 }) {
   if (items.length === 0) {
     return (
@@ -731,7 +740,20 @@ function PayablesList({
               ) : null}
             </div>
 
-            <div className="flex shrink-0 items-center justify-end gap-2">
+            <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                onClick={() =>
+                  setExpandedPayableId((current) =>
+                    current === item.id ? "" : item.id,
+                  )
+                }
+              >
+                {expandedPayableId === item.id ? "Ocultar pagos" : "Ver pagos"}
+              </Button>
+
               <Button
                 type="button"
                 variant="ghost"
@@ -774,6 +796,10 @@ function PayablesList({
               </p>
             </div>
           </div>
+
+          {expandedPayableId === item.id ? (
+            <PayablePaymentsBreakdown payable={item} />
+          ) : null}
 
           {editingPayableId === item.id ? (
             <div className="mt-4 rounded-xl border border-border bg-background/70 p-4">
@@ -893,6 +919,42 @@ function PayablesList({
           ) : null}
         </div>
       ))}
+    </div>
+  );
+}
+
+function PayablePaymentsBreakdown({ payable }) {
+  const payments = [...(payable.dailyExpenses || [])].sort((a, b) => {
+    return new Date(b.date).getTime() - new Date(a.date).getTime();
+  });
+
+  return (
+    <div className="mt-4 rounded-xl border border-border bg-background/70 p-4">
+      <h4 className="mb-4 text-sm font-medium">Desglose de pagos</h4>
+
+      {payments.length === 0 ? (
+        <p className="rounded-lg border border-border bg-muted/30 px-3 py-3 text-sm text-muted-foreground">
+          Todavía no hay pagos vinculados a esta cuenta por pagar.
+        </p>
+      ) : (
+        <div className="grid gap-2">
+          {payments.map((payment) => (
+            <div
+              key={payment.id}
+              className="flex flex-col gap-2 rounded-lg border border-border bg-muted/30 px-3 py-3 sm:flex-row sm:items-center sm:justify-between"
+            >
+              <div className="min-w-0">
+                <p className="font-medium">{payment.concept}</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {formatDate(payment.date)}
+                </p>
+              </div>
+
+              <p className="font-semibold">{formatMoney(payment.amount)}</p>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
