@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   BarChart3,
+  CircleDollarSign,
   CreditCard,
   HandCoins,
   Home,
@@ -59,6 +60,11 @@ const navItems = [
     label: "Cuentas por cobrar",
     href: "/cuentas-por-cobrar",
     icon: Home,
+  },
+  {
+    label: "Cuentas por pagar",
+    href: "/cuentas-por-pagar",
+    icon: CircleDollarSign,
   },
   {
     label: "Tarjetas",

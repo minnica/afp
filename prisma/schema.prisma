@@ -32,10 +32,21 @@ enum ReceivableAccountStatus {
   CANCELLED
 }
 
+enum PayableAccountStatus {
+  ACTIVE
+  PAID_OFF
+  CANCELLED
+}
+
 enum ReceivableOriginType {
   MANUAL
   DAILY_EXPENSE
   INSTALLMENT_PURCHASE
+}
+
+enum PayableOriginType {
+  MANUAL
+  DAILY_EXPENSE
 }
 
 model User {
@@ -54,6 +65,7 @@ model User {
   subscriptions        Subscription[]
   incomes              Income[]
   receivableAccounts   ReceivableAccount[]
+  payableAccounts      PayableAccount[]
 
   @@map("users")
 }
@@ -130,6 +142,7 @@ model Person {
   dailyExpenses        DailyExpense[]
   installmentPurchases InstallmentPurchase[]
   receivableAccounts   ReceivableAccount[]
+  payableAccounts      PayableAccount[]
 
   @@unique([userId, name])
   @@map("people")
@@ -160,6 +173,7 @@ model DailyExpense {
   notes               String?
   personId            String?
   receivableAccountId String?
+  payableAccountId    String?
   createdAt           DateTime      @default(now())
   updatedAt           DateTime      @updatedAt
 
@@ -168,11 +182,13 @@ model DailyExpense {
   category          Category           @relation(fields: [categoryId], references: [id])
   person            Person?            @relation(fields: [personId], references: [id], onDelete: SetNull)
   receivableAccount ReceivableAccount? @relation(fields: [receivableAccountId], references: [id], onDelete: SetNull)
+  payableAccount    PayableAccount?    @relation(fields: [payableAccountId], references: [id], onDelete: SetNull)
 
   @@index([userId, date])
   @@index([cardId])
   @@index([categoryId])
   @@map("daily_expenses")
+  @@index([payableAccountId])
 }
 
 model InstallmentPurchase {
@@ -252,6 +268,31 @@ model ReceivableAccount {
   @@index([userId])
   @@index([personId])
   @@map("receivable_accounts")
+}
+
+model PayableAccount {
+  id                     String               @id @default(uuid())
+  userId                 String
+  personId               String
+  concept                String
+  originalAmount         Decimal
+  originDate             DateTime
+  expectedMonthlyPayment Decimal?
+  expectedDate           DateTime?
+  notes                  String?
+  status                 PayableAccountStatus @default(ACTIVE)
+  originType             PayableOriginType
+  originId               String?
+  createdAt              DateTime             @default(now())
+  updatedAt              DateTime             @updatedAt
+
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  person        Person         @relation(fields: [personId], references: [id])
+  dailyExpenses DailyExpense[]
+
+  @@index([userId])
+  @@index([personId])
+  @@map("payable_accounts")
 }
 
 model Income {
