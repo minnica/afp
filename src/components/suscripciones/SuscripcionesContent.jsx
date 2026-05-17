@@ -40,6 +40,28 @@ function getPaymentMethodLabel(paymentMethod) {
   return "Efectivo";
 }
 
+function getCurrentMonthValue() {
+  const today = new Date();
+  return String(today.getMonth() + 1);
+}
+
+function getCurrentYearValue() {
+  const today = new Date();
+  return String(today.getFullYear());
+}
+
+function getFrequencyLabel(value) {
+  const labels = {
+    1: "Mensual",
+    2: "Cada 2 meses",
+    3: "Cada 3 meses",
+    6: "Cada 6 meses",
+    12: "Anual",
+  };
+
+  return labels[Number(value)] || "Mensual";
+}
+
 export default function SuscripcionesContent() {
   const router = useRouter();
 
@@ -67,6 +89,14 @@ export default function SuscripcionesContent() {
   const [editCategoryId, setEditCategoryId] = useState("");
   const [editChargeDay, setEditChargeDay] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
+
+  const [frequencyMonths, setFrequencyMonths] = useState("1");
+  const [startMonth, setStartMonth] = useState(getCurrentMonthValue());
+  const [startYear, setStartYear] = useState(getCurrentYearValue());
+
+  const [editFrequencyMonths, setEditFrequencyMonths] = useState("1");
+  const [editStartMonth, setEditStartMonth] = useState("");
+  const [editStartYear, setEditStartYear] = useState("");
 
   async function loadInitialData(userId) {
     const [settingsResponse, cardsResponse, subscriptionsResponse] =
@@ -168,6 +198,9 @@ export default function SuscripcionesContent() {
           cardId,
           categoryId,
           chargeDay,
+          frequencyMonths,
+          startMonth,
+          startYear,
         }),
       });
 
@@ -183,6 +216,9 @@ export default function SuscripcionesContent() {
       setCardId("");
       setCategoryId("");
       setChargeDay("");
+      setFrequencyMonths("1");
+      setStartMonth(getCurrentMonthValue());
+      setStartYear(getCurrentYearValue());
 
       await loadSubscriptions(user.id);
     } catch (err) {
@@ -200,6 +236,11 @@ export default function SuscripcionesContent() {
     setEditCardId(subscription.cardId || "");
     setEditCategoryId(subscription.categoryId || "");
     setEditChargeDay(String(subscription.chargeDay || ""));
+    setEditFrequencyMonths(String(subscription.frequencyMonths || 1));
+    setEditStartMonth(
+      String(subscription.startMonth || getCurrentMonthValue()),
+    );
+    setEditStartYear(String(subscription.startYear || getCurrentYearValue()));
   }
 
   function cancelEditingSubscription() {
@@ -232,6 +273,9 @@ export default function SuscripcionesContent() {
           cardId: editCardId,
           categoryId: editCategoryId,
           chargeDay: editChargeDay,
+          frequencyMonths: editFrequencyMonths,
+          startMonth: editStartMonth,
+          startYear: editStartYear,
         }),
       });
 
@@ -426,6 +470,61 @@ export default function SuscripcionesContent() {
                 />
               </div>
 
+              <div className="space-y-2">
+                <Label>Frecuencia</Label>
+                <Select
+                  value={frequencyMonths}
+                  onValueChange={setFrequencyMonths}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecciona frecuencia" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1">Mensual</SelectItem>
+                    <SelectItem value="2">Cada 2 meses</SelectItem>
+                    <SelectItem value="3">Cada 3 meses</SelectItem>
+                    <SelectItem value="6">Cada 6 meses</SelectItem>
+                    <SelectItem value="12">Anual</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label>Mes de inicio</Label>
+                  <Select value={startMonth} onValueChange={setStartMonth}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Mes" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">Enero</SelectItem>
+                      <SelectItem value="2">Febrero</SelectItem>
+                      <SelectItem value="3">Marzo</SelectItem>
+                      <SelectItem value="4">Abril</SelectItem>
+                      <SelectItem value="5">Mayo</SelectItem>
+                      <SelectItem value="6">Junio</SelectItem>
+                      <SelectItem value="7">Julio</SelectItem>
+                      <SelectItem value="8">Agosto</SelectItem>
+                      <SelectItem value="9">Septiembre</SelectItem>
+                      <SelectItem value="10">Octubre</SelectItem>
+                      <SelectItem value="11">Noviembre</SelectItem>
+                      <SelectItem value="12">Diciembre</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Año de inicio</Label>
+                  <Input
+                    type="number"
+                    min="2000"
+                    max="2100"
+                    value={startYear}
+                    onChange={(event) => setStartYear(event.target.value)}
+                  />
+                </div>
+              </div>
+
               <Button
                 type="button"
                 className="w-full"
@@ -467,9 +566,10 @@ export default function SuscripcionesContent() {
                           </div>
 
                           <p className="mt-1 text-sm text-muted-foreground">
-                            {getPaymentMethodLabel(subscription.paymentMethod)}
-                            {subscription.card
-                              ? ` · ${subscription.card.name}`
+                            Día {subscription.chargeDay} ·{" "}
+                            {getFrequencyLabel(subscription.frequencyMonths)}
+                            {subscription.startMonth && subscription.startYear
+                              ? ` · desde ${subscription.startMonth}/${subscription.startYear}`
                               : ""}
                           </p>
 
@@ -623,6 +723,78 @@ export default function SuscripcionesContent() {
                                   setEditChargeDay(event.target.value)
                                 }
                               />
+                            </div>
+
+                            <div className="space-y-2">
+                              <Label>Frecuencia</Label>
+                              <Select
+                                value={editFrequencyMonths}
+                                onValueChange={setEditFrequencyMonths}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Selecciona frecuencia" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="1">Mensual</SelectItem>
+                                  <SelectItem value="2">
+                                    Cada 2 meses
+                                  </SelectItem>
+                                  <SelectItem value="3">
+                                    Cada 3 meses
+                                  </SelectItem>
+                                  <SelectItem value="6">
+                                    Cada 6 meses
+                                  </SelectItem>
+                                  <SelectItem value="12">Anual</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+
+                            <div className="grid gap-4 sm:grid-cols-2">
+                              <div className="space-y-2">
+                                <Label>Mes de inicio</Label>
+                                <Select
+                                  value={editStartMonth}
+                                  onValueChange={setEditStartMonth}
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Mes" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="1">Enero</SelectItem>
+                                    <SelectItem value="2">Febrero</SelectItem>
+                                    <SelectItem value="3">Marzo</SelectItem>
+                                    <SelectItem value="4">Abril</SelectItem>
+                                    <SelectItem value="5">Mayo</SelectItem>
+                                    <SelectItem value="6">Junio</SelectItem>
+                                    <SelectItem value="7">Julio</SelectItem>
+                                    <SelectItem value="8">Agosto</SelectItem>
+                                    <SelectItem value="9">
+                                      Septiembre
+                                    </SelectItem>
+                                    <SelectItem value="10">Octubre</SelectItem>
+                                    <SelectItem value="11">
+                                      Noviembre
+                                    </SelectItem>
+                                    <SelectItem value="12">
+                                      Diciembre
+                                    </SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+
+                              <div className="space-y-2">
+                                <Label>Año de inicio</Label>
+                                <Input
+                                  type="number"
+                                  min="2000"
+                                  max="2100"
+                                  value={editStartYear}
+                                  onChange={(event) =>
+                                    setEditStartYear(event.target.value)
+                                  }
+                                />
+                              </div>
                             </div>
                           </div>
 

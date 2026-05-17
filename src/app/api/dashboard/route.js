@@ -78,6 +78,36 @@ function shouldIncludePurchaseInCycle(purchase, targetCycle, cardCycles) {
   return true;
 }
 
+function shouldIncludeSubscriptionInCycle(subscription, cycle) {
+  const frequencyMonths = Number(subscription.frequencyMonths || 1);
+  const startMonth = Number(subscription.startMonth || cycle.month);
+  const startYear = Number(subscription.startYear || cycle.year);
+
+  const cycleIndex = cycle.year * 12 + (cycle.month - 1);
+  const startIndex = startYear * 12 + (startMonth - 1);
+
+  if (cycleIndex < startIndex) return false;
+
+  const diffMonths = cycleIndex - startIndex;
+
+  return diffMonths % frequencyMonths === 0;
+}
+
+function shouldIncludeSubscriptionInMonth(subscription, year, month) {
+  const frequencyMonths = Number(subscription.frequencyMonths || 1);
+  const startMonth = Number(subscription.startMonth || month);
+  const startYear = Number(subscription.startYear || year);
+
+  const targetIndex = year * 12 + (month - 1);
+  const startIndex = startYear * 12 + (startMonth - 1);
+
+  if (targetIndex < startIndex) return false;
+
+  const diffMonths = targetIndex - startIndex;
+
+  return diffMonths % frequencyMonths === 0;
+}
+
 function getSubscriptionChargeDatesInsideCycle(subscription, cycle) {
   const start = new Date(cycle.startDate);
   const end = new Date(cycle.cutDate);
@@ -125,6 +155,9 @@ function calculateCycleAmount({
   const subscriptionsAmount = subscriptions
     .filter((subscription) => subscription.paymentMethod === "CARD")
     .filter((subscription) => subscription.cardId === cycle.cardId)
+    .filter((subscription) =>
+      shouldIncludeSubscriptionInCycle(subscription, cycle),
+    )
     .reduce((sum, subscription) => {
       const charges = getSubscriptionChargeDatesInsideCycle(
         subscription,
@@ -196,6 +229,8 @@ export async function GET(request) {
     const now = new Date();
     const monthStart = getMonthStart(now);
     const monthEnd = getMonthEnd(now);
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth() + 1;
 
     const [
       cards,
@@ -301,9 +336,17 @@ export async function GET(request) {
       return sum + Number(expense.amount || 0);
     }, 0);
 
-    const subscriptionsTotal = subscriptions.reduce((sum, subscription) => {
-      return sum + Number(subscription.amount || 0);
-    }, 0);
+    const subscriptionsTotal = subscriptions
+      .filter((subscription) =>
+        shouldIncludeSubscriptionInMonth(
+          subscription,
+          currentYear,
+          currentMonth,
+        ),
+      )
+      .reduce((sum, subscription) => {
+        return sum + Number(subscription.amount || 0);
+      }, 0);
 
     const installmentPurchasesTotal = purchases
       .filter((purchase) => purchase.status === "ACTIVE")
@@ -328,6 +371,13 @@ export async function GET(request) {
 
         const categorySubscriptions = subscriptions
           .filter((subscription) => subscription.categoryId === category.id)
+          .filter((subscription) =>
+            shouldIncludeSubscriptionInMonth(
+              subscription,
+              currentYear,
+              currentMonth,
+            ),
+          )
           .reduce(
             (sum, subscription) => sum + Number(subscription.amount || 0),
             0,

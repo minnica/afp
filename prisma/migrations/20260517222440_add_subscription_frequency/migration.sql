@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "subscriptions" ADD COLUMN     "frequencyMonths" INTEGER NOT NULL DEFAULT 1,
+ADD COLUMN     "startMonth" INTEGER NOT NULL DEFAULT 1,
+ADD COLUMN     "startYear" INTEGER NOT NULL DEFAULT 2026;

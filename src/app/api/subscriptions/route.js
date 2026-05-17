@@ -46,6 +46,9 @@ export async function POST(request) {
       cardId,
       categoryId,
       chargeDay,
+      frequencyMonths,
+      startMonth,
+      startYear,
     } = body;
 
     if (
@@ -97,6 +100,39 @@ export async function POST(request) {
       );
     }
 
+    const numericFrequencyMonths = Number(frequencyMonths || 1);
+    const numericStartMonth = Number(startMonth);
+    const numericStartYear = Number(startYear);
+
+    if (![1, 2, 3, 6, 12].includes(numericFrequencyMonths)) {
+      return NextResponse.json(
+        { error: "Frecuencia no válida." },
+        { status: 400 },
+      );
+    }
+
+    if (
+      !Number.isInteger(numericStartMonth) ||
+      numericStartMonth < 1 ||
+      numericStartMonth > 12
+    ) {
+      return NextResponse.json(
+        { error: "Mes de inicio no válido." },
+        { status: 400 },
+      );
+    }
+
+    if (
+      !Number.isInteger(numericStartYear) ||
+      numericStartYear < 2000 ||
+      numericStartYear > 2100
+    ) {
+      return NextResponse.json(
+        { error: "Año de inicio no válido." },
+        { status: 400 },
+      );
+    }
+
     const subscription = await prisma.subscription.create({
       data: {
         userId,
@@ -106,6 +142,9 @@ export async function POST(request) {
         cardId: paymentMethod === "CARD" ? cardId : null,
         categoryId,
         chargeDay: numericChargeDay,
+        frequencyMonths: numericFrequencyMonths,
+        startMonth: numericStartMonth,
+        startYear: numericStartYear,
       },
       include: {
         card: true,
@@ -152,8 +191,18 @@ export async function PATCH(request) {
   try {
     const body = await request.json();
 
-    const { id, name, amount, paymentMethod, cardId, categoryId, chargeDay } =
-      body;
+    const {
+      id,
+      name,
+      amount,
+      paymentMethod,
+      cardId,
+      categoryId,
+      chargeDay,
+      frequencyMonths,
+      startMonth,
+      startYear,
+    } = body;
 
     if (!id) {
       return NextResponse.json({ error: "Falta id." }, { status: 400 });
@@ -201,6 +250,39 @@ export async function PATCH(request) {
       );
     }
 
+    const numericFrequencyMonths = Number(frequencyMonths || 1);
+    const numericStartMonth = Number(startMonth);
+    const numericStartYear = Number(startYear);
+
+    if (![1, 2, 3, 6, 12].includes(numericFrequencyMonths)) {
+      return NextResponse.json(
+        { error: "Frecuencia no válida." },
+        { status: 400 },
+      );
+    }
+
+    if (
+      !Number.isInteger(numericStartMonth) ||
+      numericStartMonth < 1 ||
+      numericStartMonth > 12
+    ) {
+      return NextResponse.json(
+        { error: "Mes de inicio no válido." },
+        { status: 400 },
+      );
+    }
+
+    if (
+      !Number.isInteger(numericStartYear) ||
+      numericStartYear < 2000 ||
+      numericStartYear > 2100
+    ) {
+      return NextResponse.json(
+        { error: "Año de inicio no válido." },
+        { status: 400 },
+      );
+    }
+
     const subscription = await prisma.subscription.update({
       where: { id },
       data: {
@@ -210,6 +292,9 @@ export async function PATCH(request) {
         cardId: paymentMethod === "CARD" ? cardId : null,
         categoryId,
         chargeDay: numericChargeDay,
+        frequencyMonths: numericFrequencyMonths,
+        startMonth: numericStartMonth,
+        startYear: numericStartYear,
       },
       include: {
         card: true,

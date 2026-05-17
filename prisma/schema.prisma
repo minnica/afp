@@ -187,8 +187,8 @@ model DailyExpense {
   @@index([userId, date])
   @@index([cardId])
   @@index([categoryId])
-  @@map("daily_expenses")
   @@index([payableAccountId])
+  @@map("daily_expenses")
 }
 
 model InstallmentPurchase {
@@ -222,16 +222,19 @@ model InstallmentPurchase {
 }
 
 model Subscription {
-  id            String        @id @default(uuid())
-  userId        String
-  name          String
-  amount        Decimal
-  paymentMethod PaymentMethod
-  cardId        String?
-  categoryId    String
-  chargeDay     Int
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  id              String        @id @default(uuid())
+  userId          String
+  name            String
+  amount          Decimal
+  paymentMethod   PaymentMethod
+  cardId          String?
+  categoryId      String
+  chargeDay       Int
+  frequencyMonths Int           @default(1)
+  startMonth      Int           @default(1)
+  startYear       Int           @default(2026)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 
   user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   card     Card?    @relation(fields: [cardId], references: [id], onDelete: SetNull)

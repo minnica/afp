@@ -100,6 +100,21 @@ function getSubscriptionChargeDatesInsideCycle(subscription, cycle) {
   return Array.from(uniqueDates.values());
 }
 
+function shouldIncludeSubscriptionInCycle(subscription, cycle) {
+  const frequencyMonths = Number(subscription.frequencyMonths || 1);
+  const startMonth = Number(subscription.startMonth || cycle.month);
+  const startYear = Number(subscription.startYear || cycle.year);
+
+  const cycleIndex = cycle.year * 12 + (cycle.month - 1);
+  const startIndex = startYear * 12 + (startMonth - 1);
+
+  if (cycleIndex < startIndex) return false;
+
+  const diffMonths = cycleIndex - startIndex;
+
+  return diffMonths % frequencyMonths === 0;
+}
+
 function calculateCycleAmount({
   cycle,
   expenses,
@@ -127,6 +142,7 @@ function calculateCycleAmount({
   const includedSubscriptions = subscriptions
     .filter((subscription) => subscription.paymentMethod === "CARD")
     .filter((subscription) => subscription.cardId === cycle.cardId)
+    .filter((subscription) => shouldIncludeSubscriptionInCycle(subscription, cycle))
     .flatMap((subscription) => {
       const charges = getSubscriptionChargeDatesInsideCycle(
         subscription,
