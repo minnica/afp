@@ -103,6 +103,8 @@ export default function CuentasPorCobrarContent() {
   const [editNotes, setEditNotes] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
 
+  const [expandedReceivableId, setExpandedReceivableId] = useState("");
+
   async function loadSettings(userId) {
     const response = await fetch(`/api/settings?userId=${userId}`);
     const data = await response.json();
@@ -526,6 +528,8 @@ export default function CuentasPorCobrarContent() {
                     updateReceivable={updateReceivable}
                     cancelEditingReceivable={cancelEditingReceivable}
                     isUpdating={isUpdating}
+                    expandedReceivableId={expandedReceivableId}
+                    setExpandedReceivableId={setExpandedReceivableId}
                   />
                 </TabsContent>
 
@@ -556,6 +560,8 @@ export default function CuentasPorCobrarContent() {
                     updateReceivable={updateReceivable}
                     cancelEditingReceivable={cancelEditingReceivable}
                     isUpdating={isUpdating}
+                    expandedReceivableId={expandedReceivableId}
+                    setExpandedReceivableId={setExpandedReceivableId}
                   />
                 </TabsContent>
 
@@ -586,6 +592,8 @@ export default function CuentasPorCobrarContent() {
                     updateReceivable={updateReceivable}
                     cancelEditingReceivable={cancelEditingReceivable}
                     isUpdating={isUpdating}
+                    expandedReceivableId={expandedReceivableId}
+                    setExpandedReceivableId={setExpandedReceivableId}
                   />
                 </TabsContent>
               </Tabs>
@@ -632,6 +640,8 @@ function ReceivablesList({
   updateReceivable,
   cancelEditingReceivable,
   isUpdating,
+  expandedReceivableId,
+  setExpandedReceivableId,
 }) {
   if (items.length === 0) {
     return (
@@ -676,23 +686,40 @@ function ReceivablesList({
               ) : null}
             </div>
 
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              onClick={() => onEdit(item)}
-            >
-              <Pencil className="h-4 w-4" />
-            </Button>
+            <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                onClick={() =>
+                  setExpandedReceivableId((current) =>
+                    current === item.id ? "" : item.id,
+                  )
+                }
+              >
+                {expandedReceivableId === item.id
+                  ? "Ocultar pagos"
+                  : "Ver pagos"}
+              </Button>
 
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              onClick={() => onDelete(item.id)}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={() => onEdit(item)}
+              >
+                <Pencil className="h-4 w-4" />
+              </Button>
+
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={() => onDelete(item.id)}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
 
           <Separator className="my-4" />
@@ -717,6 +744,10 @@ function ReceivablesList({
               </p>
             </div>
           </div>
+
+          {expandedReceivableId === item.id ? (
+            <ReceivablePaymentsBreakdown receivable={item} />
+          ) : null}
 
           {editingReceivableId === item.id ? (
             <div className="mt-4 rounded-xl border border-border bg-background/70 p-4">
@@ -836,6 +867,43 @@ function ReceivablesList({
           ) : null}
         </div>
       ))}
+    </div>
+  );
+}
+
+function ReceivablePaymentsBreakdown({ receivable }) {
+  const payments = [...(receivable.incomes || [])].sort((a, b) => {
+    return new Date(b.date).getTime() - new Date(a.date).getTime();
+  });
+
+  return (
+    <div className="mt-4 rounded-xl border border-border bg-background/70 p-4">
+      <h4 className="mb-4 text-sm font-medium">Desglose de pagos</h4>
+
+      {payments.length === 0 ? (
+        <p className="rounded-lg border border-border bg-muted/30 px-3 py-3 text-sm text-muted-foreground">
+          Todavía no hay pagos vinculados a esta cuenta por cobrar.
+        </p>
+      ) : (
+        <div className="grid gap-2">
+          {payments.map((payment) => (
+            <div
+              key={payment.id}
+              className="flex flex-col gap-2 rounded-lg border border-border bg-muted/30 px-3 py-3 sm:flex-row sm:items-center sm:justify-between"
+            >
+              <div className="min-w-0">
+                <p className="font-medium">{payment.concept}</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {formatDate(payment.date)}
+                  {payment.source ? ` · ${payment.source}` : ""}
+                </p>
+              </div>
+
+              <p className="font-semibold">{formatMoney(payment.amount)}</p>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
