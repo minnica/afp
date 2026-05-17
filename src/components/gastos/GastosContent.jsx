@@ -294,10 +294,16 @@ export default function GastosContent() {
           notes,
           personId,
           receivableAccountId:
-            receivableMode === "EXISTING" ? receivableAccountId : null,
+            payableAccountId === "NONE" && receivableMode === "EXISTING"
+              ? receivableAccountId
+              : null,
           payableAccountId:
             payableAccountId === "NONE" ? null : payableAccountId,
-          createReceivable: Boolean(personId && receivableMode === "CREATE"),
+          createReceivable: Boolean(
+            personId &&
+            receivableMode === "CREATE" &&
+            payableAccountId === "NONE",
+          ),
         }),
       });
 
@@ -671,11 +677,6 @@ export default function GastosContent() {
 
                       {personId ? (
                         <>
-                          <div className="rounded-lg border border-border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
-                            Al seleccionar persona, este gasto se tratará como
-                            reembolsable / por cobrar.
-                          </div>
-
                           <div className="space-y-2">
                             <Label>Cuenta por cobrar</Label>
                             <Select
@@ -700,45 +701,6 @@ export default function GastosContent() {
                                 </SelectItem>
                               </SelectContent>
                             </Select>
-                          </div>
-
-                          <div className="space-y-2">
-                            <Label>Cuenta por pagar relacionada</Label>
-                            <Select
-                              value={payableAccountId}
-                              onValueChange={setPayableAccountId}
-                            >
-                              <SelectTrigger>
-                                <SelectValue placeholder="Selecciona cuenta por pagar" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="NONE">
-                                  Sin cuenta por pagar
-                                </SelectItem>
-                                {payables
-                                  .filter((item) => {
-                                    const pendingBalance = Number(
-                                      item.pendingBalance || 0,
-                                    );
-                                    return (
-                                      item.status === "ACTIVE" &&
-                                      pendingBalance > 0
-                                    );
-                                  })
-                                  .map((item) => (
-                                    <SelectItem key={item.id} value={item.id}>
-                                      {item.person?.name} · {item.concept} ·
-                                      pendiente{" "}
-                                      {formatMoney(item.pendingBalance)}
-                                    </SelectItem>
-                                  ))}
-                              </SelectContent>
-                            </Select>
-
-                            <p className="text-xs text-muted-foreground">
-                              Si vinculas este gasto a una cuenta por pagar, se
-                              descontará de su saldo pendiente.
-                            </p>
                           </div>
 
                           {receivableMode === "EXISTING" ? (
@@ -775,6 +737,40 @@ export default function GastosContent() {
                               ) : null}
                             </div>
                           ) : null}
+
+                          <div className="space-y-2">
+                            <Label>Cuenta por pagar relacionada</Label>
+                            <Select
+                              value={payableAccountId}
+                              onValueChange={setPayableAccountId}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Selecciona cuenta por pagar" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="NONE">
+                                  Sin cuenta por pagar
+                                </SelectItem>
+                                {payables
+                                  .filter((item) => {
+                                    const pendingBalance = Number(
+                                      item.pendingBalance || 0,
+                                    );
+                                    return (
+                                      item.status === "ACTIVE" &&
+                                      pendingBalance > 0
+                                    );
+                                  })
+                                  .map((item) => (
+                                    <SelectItem key={item.id} value={item.id}>
+                                      {item.person?.name} · {item.concept} ·
+                                      pendiente{" "}
+                                      {formatMoney(item.pendingBalance)}
+                                    </SelectItem>
+                                  ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
                         </>
                       ) : null}
                     </div>
