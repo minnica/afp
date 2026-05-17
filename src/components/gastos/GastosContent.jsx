@@ -108,11 +108,13 @@ export default function GastosContent() {
 
   const [people, setPeople] = useState([]);
   const [receivables, setReceivables] = useState([]);
+  const [payables, setPayables] = useState([]);
 
   const [showMoreOptions, setShowMoreOptions] = useState(false);
   const [personId, setPersonId] = useState("");
   const [receivableMode, setReceivableMode] = useState("CREATE");
   const [receivableAccountId, setReceivableAccountId] = useState("");
+  const [payableAccountId, setPayableAccountId] = useState("NONE");
 
   const [editingExpenseId, setEditingExpenseId] = useState("");
   const [editDate, setEditDate] = useState("");
@@ -169,6 +171,17 @@ export default function GastosContent() {
     }
 
     setReceivables(receivablesData.receivables || []);
+
+    const payablesResponse = await fetch(`/api/payables?userId=${userId}`);
+    const payablesData = await payablesResponse.json();
+
+    if (!payablesResponse.ok) {
+      throw new Error(
+        payablesData.error || "No se pudieron cargar cuentas por pagar.",
+      );
+    }
+
+    setPayables(payablesData.payables || []);
   }
 
   function buildExpensesUrl(userId) {
@@ -209,6 +222,17 @@ export default function GastosContent() {
     }
 
     setReceivables(data.receivables || []);
+  }
+
+  async function loadPayables(userId) {
+    const response = await fetch(`/api/payables?userId=${userId}`);
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "No se pudieron cargar cuentas por pagar.");
+    }
+
+    setPayables(data.payables || []);
   }
 
   useEffect(() => {
@@ -271,6 +295,8 @@ export default function GastosContent() {
           personId,
           receivableAccountId:
             receivableMode === "EXISTING" ? receivableAccountId : null,
+          payableAccountId:
+            payableAccountId === "NONE" ? null : payableAccountId,
           createReceivable: Boolean(personId && receivableMode === "CREATE"),
         }),
       });
@@ -288,9 +314,11 @@ export default function GastosContent() {
       setPersonId("");
       setReceivableMode("CREATE");
       setReceivableAccountId("");
+      setPayableAccountId("NONE");
       await loadExpenses(user.id);
-      toast.success("Gasto guardado exitosamente.");
       await loadReceivables(user.id);
+      await loadPayables(user.id);
+      toast.success("Gasto guardado exitosamente.");
     } catch (err) {
       setError(err.message || "No se pudo guardar el gasto.");
       toast.error(err.message || "No se pudo guardar el gasto.");
@@ -438,7 +466,7 @@ export default function GastosContent() {
   if (isCheckingSession) {
     return (
       <main className="flex min-h-dvh items-center justify-center bg-background text-foreground">
-        <Spinner className="size-8"/>
+        <Spinner className="size-8" />
       </main>
     );
   }
@@ -674,6 +702,45 @@ export default function GastosContent() {
                             </Select>
                           </div>
 
+                          <div className="space-y-2">
+                            <Label>Cuenta por pagar relacionada</Label>
+                            <Select
+                              value={payableAccountId}
+                              onValueChange={setPayableAccountId}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Selecciona cuenta por pagar" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="NONE">
+                                  Sin cuenta por pagar
+                                </SelectItem>
+                                {payables
+                                  .filter((item) => {
+                                    const pendingBalance = Number(
+                                      item.pendingBalance || 0,
+                                    );
+                                    return (
+                                      item.status === "ACTIVE" &&
+                                      pendingBalance > 0
+                                    );
+                                  })
+                                  .map((item) => (
+                                    <SelectItem key={item.id} value={item.id}>
+                                      {item.person?.name} · {item.concept} ·
+                                      pendiente{" "}
+                                      {formatMoney(item.pendingBalance)}
+                                    </SelectItem>
+                                  ))}
+                              </SelectContent>
+                            </Select>
+
+                            <p className="text-xs text-muted-foreground">
+                              Si vinculas este gasto a una cuenta por pagar, se
+                              descontará de su saldo pendiente.
+                            </p>
+                          </div>
+
                           {receivableMode === "EXISTING" ? (
                             <div className="space-y-2">
                               <Label>Cuenta existente</Label>
@@ -906,6 +973,13 @@ export default function GastosContent() {
                                   {expense.receivableAccount
                                     ? ` · Por cobrar: ${expense.receivableAccount.concept}`
                                     : ""}
+                                </p>
+                              ) : null}
+
+                              {expense.payableAccount ? (
+                                <p className="mt-1 text-sm text-muted-foreground">
+                                  Cuenta por pagar:{" "}
+                                  {expense.payableAccount.concept}
                                 </p>
                               ) : null}
 

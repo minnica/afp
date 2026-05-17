@@ -1,6 +1,36 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+async function updatePayableStatusIfNeeded(payableAccountId) {
+  if (!payableAccountId) return;
+
+  const payable = await prisma.payableAccount.findUnique({
+    where: { id: payableAccountId },
+    include: {
+      dailyExpenses: true,
+    },
+  });
+
+  if (!payable) return;
+
+  const paidAmount = payable.dailyExpenses.reduce((sum, expense) => {
+    return sum + Number(expense.amount || 0);
+  }, 0);
+
+  const pendingBalance = Number(payable.originalAmount || 0) - paidAmount;
+
+  const nextStatus = pendingBalance <= 0 ? "PAID_OFF" : "ACTIVE";
+
+  if (payable.status !== nextStatus) {
+    await prisma.payableAccount.update({
+      where: { id: payableAccountId },
+      data: {
+        status: nextStatus,
+      },
+    });
+  }
+}
+
 function parseDateInput(dateValue) {
   if (!dateValue) return null;
   return new Date(`${dateValue}T12:00:00.000Z`);
@@ -72,6 +102,7 @@ export async function GET(request) {
         category: true,
         person: true,
         receivableAccount: true,
+        payableAccount: true,
       },
       orderBy: [{ date: "desc" }, { createdAt: "desc" }],
       take: 100,
@@ -107,6 +138,7 @@ export async function POST(request) {
       notes,
       personId,
       receivableAccountId,
+      payableAccountId,
       createReceivable,
     } = body;
 
@@ -183,14 +215,20 @@ export async function POST(request) {
         notes: notes?.trim() || null,
         personId: personId || null,
         receivableAccountId: finalReceivableAccountId,
+        payableAccountId: payableAccountId || null,
       },
       include: {
         card: true,
         category: true,
         person: true,
         receivableAccount: true,
+        payableAccount: true,
       },
     });
+
+    if (payableAccountId) {
+      await updatePayableStatusIfNeeded(payableAccountId);
+    }
 
     return NextResponse.json({ expense });
   } catch (error) {
@@ -212,9 +250,26 @@ export async function DELETE(request) {
       return NextResponse.json({ error: "Falta id." }, { status: 400 });
     }
 
+    const existingExpense = await prisma.dailyExpense.findUnique({
+      where: { id },
+    });
+
+    if (!existingExpense) {
+      return NextResponse.json(
+        { error: "Gasto no encontrado." },
+        { status: 404 },
+      );
+    }
+
+    const previousPayableAccountId = existingExpense.payableAccountId;
+
     await prisma.dailyExpense.delete({
       where: { id },
     });
+
+    if (previousPayableAccountId) {
+      await updatePayableStatusIfNeeded(previousPayableAccountId);
+    }
 
     return NextResponse.json({ ok: true });
   } catch (error) {
@@ -298,6 +353,7 @@ export async function PATCH(request) {
         category: true,
         person: true,
         receivableAccount: true,
+        payableAccount: true,
       },
     });
 
