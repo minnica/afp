@@ -155,16 +155,28 @@ function calculateCycleAmount({
     .filter((purchase) =>
       shouldIncludePurchaseInCycle(purchase, cycle, cardCycles),
     )
-    .map((purchase) => ({
-      id: purchase.id,
-      concept: purchase.concept,
-      amount: getMonthlyPaymentUsed(purchase),
-      totalAmount: Number(purchase.totalAmount || 0),
-      purchaseDate: purchase.purchaseDate,
-      months: purchase.months,
-      initialPaymentsMade: purchase.initialPaymentsMade,
-      categoryName: purchase.category?.name || null,
-    }));
+    .map((purchase) => {
+      const cycleNumber = getPurchaseCycleNumber(purchase, cycle, cardCycles);
+      const paymentsAlreadyMade = Number(purchase.initialPaymentsMade || 0);
+      const months = Number(purchase.months || 0);
+
+      const currentMonth = Math.min(
+        months,
+        Math.max(cycleNumber || 1, paymentsAlreadyMade + 1),
+      );
+
+      return {
+        id: purchase.id,
+        concept: purchase.concept,
+        amount: getMonthlyPaymentUsed(purchase),
+        totalAmount: Number(purchase.totalAmount || 0),
+        purchaseDate: purchase.purchaseDate,
+        months: purchase.months,
+        currentMonth,
+        initialPaymentsMade: purchase.initialPaymentsMade,
+        categoryName: purchase.category?.name || null,
+      };
+    });
 
   const purchasesAmount = includedPurchases.reduce((sum, purchase) => {
     return sum + purchase.amount;

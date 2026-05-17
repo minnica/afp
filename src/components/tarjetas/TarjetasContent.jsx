@@ -336,9 +336,9 @@ function CycleBreakdown({ cycle }) {
           emptyText="No hay mensualidades en este ciclo."
           getPrimary={(item) => item.concept}
           getSecondary={(item) =>
-            `${formatShortDate(item.purchaseDate)} · ${item.months} meses${
-              item.categoryName ? ` · ${item.categoryName}` : ""
-            }`
+            `${formatShortDate(item.purchaseDate)} · mes ${
+              item.currentMonth || "-"
+            }/${item.months}${item.categoryName ? ` · ${item.categoryName}` : ""}`
           }
           getAmount={(item) => item.amount}
         />
