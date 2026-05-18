@@ -29,6 +29,96 @@ function formatMoney(value) {
   }).format(numberValue);
 }
 
+function getLastDayOfMonthUtc(year, monthIndex) {
+  return new Date(Date.UTC(year, monthIndex + 1, 0)).getUTCDate();
+}
+
+function createUtcDate(year, monthIndex, day) {
+  return new Date(Date.UTC(year, monthIndex, day, 12, 0, 0));
+}
+
+function adjustPayrollDateIfWeekend(date) {
+  const adjustedDate = new Date(date);
+  const dayOfWeek = adjustedDate.getUTCDay();
+
+  // Domingo → viernes anterior
+  if (dayOfWeek === 0) {
+    adjustedDate.setUTCDate(adjustedDate.getUTCDate() - 2);
+  }
+
+  // Sábado → viernes anterior
+  if (dayOfWeek === 6) {
+    adjustedDate.setUTCDate(adjustedDate.getUTCDate() - 1);
+  }
+
+  return adjustedDate;
+}
+
+function getPayrollCandidatesAroundDueDate(dueDate) {
+  const year = dueDate.getUTCFullYear();
+  const monthIndex = dueDate.getUTCMonth();
+
+  const monthsToCheck = [
+    new Date(Date.UTC(year, monthIndex - 1, 1, 12)),
+    new Date(Date.UTC(year, monthIndex, 1, 12)),
+  ];
+
+  return monthsToCheck.flatMap((monthDate) => {
+    const candidateYear = monthDate.getUTCFullYear();
+    const candidateMonthIndex = monthDate.getUTCMonth();
+
+    const lastDay = getLastDayOfMonthUtc(candidateYear, candidateMonthIndex);
+
+    const payroll15 = adjustPayrollDateIfWeekend(
+      createUtcDate(candidateYear, candidateMonthIndex, 15),
+    );
+
+    const payroll30 = adjustPayrollDateIfWeekend(
+      createUtcDate(candidateYear, candidateMonthIndex, Math.min(30, lastDay)),
+    );
+
+    return [
+      {
+        group: "Q15",
+        payrollDate: payroll15,
+      },
+      {
+        group: "Q30",
+        payrollDate: payroll30,
+      },
+    ];
+  });
+}
+
+function getPayrollGroupForDueDate(dueDateString) {
+  const dueDate = new Date(dueDateString);
+
+  const candidates = getPayrollCandidatesAroundDueDate(dueDate)
+    .filter((candidate) => {
+      return candidate.payrollDate.getTime() <= dueDate.getTime();
+    })
+    .sort((a, b) => {
+      return b.payrollDate.getTime() - a.payrollDate.getTime();
+    });
+
+  return (
+    candidates[0] || {
+      group: "Q30",
+      payrollDate: dueDate,
+    }
+  );
+}
+
+function getPayrollAccentClass(dueDateString) {
+  const { group } = getPayrollGroupForDueDate(dueDateString);
+
+  if (group === "Q15") {
+    return "border-l-4 border-l-cyan-400/70";
+  }
+
+  return "border-l-4 border-l-pink-400/70";
+}
+
 function formatCompactDate(dateString) {
   if (!dateString) return "-";
 
@@ -440,6 +530,24 @@ function PaymentsTable({ items }) {
   const totalStatementAmount = items.reduce((total, item) => {
     return total + Number(item.cycle.statementAmount || 0);
   }, 0);
+
+  const payrollTotals = items.reduce(
+    (totals, item) => {
+      const { group } = getPayrollGroupForDueDate(item.cycle.dueDate);
+      const amount = Number(
+        item.cycle.statementAmount ?? item.cycle.calculatedAmount ?? 0,
+      );
+
+      totals[group] += amount;
+
+      return totals;
+    },
+    {
+      Q15: 0,
+      Q30: 0,
+    },
+  );
+
   if (items.length === 0) {
     return (
       <p className="rounded-xl border border-border bg-muted/30 px-4 py-6 text-sm text-muted-foreground">
@@ -450,7 +558,7 @@ function PaymentsTable({ items }) {
 
   return (
     <div>
-      <div className="mb-4 grid gap-3 sm:grid-cols-2">
+      <div className="mb-4 grid gap-3 md:grid-cols-3">
         <div className="rounded-xl border border-border bg-muted/30 px-4 py-3">
           <p className="text-xs text-muted-foreground">Total pago calculado</p>
           <p className="mt-1 text-xl font-semibold">
@@ -466,13 +574,41 @@ function PaymentsTable({ items }) {
             {formatMoney(totalStatementAmount)}
           </p>
         </div>
+
+        <div className="rounded-xl border border-border bg-muted/30 px-4 py-3">
+          <p className="text-xs text-muted-foreground">Carga por nómina</p>
+
+          <div className="mt-2 grid grid-cols-2 gap-3">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="h-2.5 w-2.5 rounded-full bg-cyan-400/70" />
+                <p className="text-xs text-muted-foreground">Q15</p>
+              </div>
+              <p className="mt-1 text-sm font-semibold">
+                {formatMoney(payrollTotals.Q15)}
+              </p>
+            </div>
+
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="h-2.5 w-2.5 rounded-full bg-pink-400/70" />
+                <p className="text-xs text-muted-foreground">Q30</p>
+              </div>
+              <p className="mt-1 text-sm font-semibold">
+                {formatMoney(payrollTotals.Q30)}
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
       {/* Vista móvil */}
       <div className="grid gap-3 md:hidden">
         {items.map((item) => (
           <div
             key={item.cycle.id}
-            className="rounded-xl border border-border bg-background/60 px-4 py-4"
+            className={`rounded-xl border border-border bg-background/60 px-4 py-4 ${getPayrollAccentClass(
+              item.cycle.dueDate,
+            )}`}
           >
             <div className="mb-3 flex items-start justify-between gap-3">
               <div>
@@ -529,7 +665,9 @@ function PaymentsTable({ items }) {
           {items.map((item) => (
             <div
               key={item.cycle.id}
-              className="grid gap-4 px-4 py-4 text-sm md:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr]"
+              className={`grid gap-4 px-4 py-4 text-sm md:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr] ${getPayrollAccentClass(
+                item.cycle.dueDate,
+              )}`}
             >
               <div className="font-medium">{item.card.name}</div>
 
