@@ -6,6 +6,35 @@ function parseDateInput(dateValue) {
   return new Date(`${dateValue}T12:00:00.000Z`);
 }
 
+function parseExpectedChargeDays(value) {
+  if (!value) return { days: [], error: "" };
+
+  const rawDays = Array.isArray(value) ? value : String(value).split(",");
+
+  const days = rawDays
+    .map((day) => String(day).trim())
+    .filter(Boolean)
+    .map(Number);
+
+  const hasInvalidDay = days.some((day) => {
+    return !Number.isInteger(day) || day < 1 || day > 31;
+  });
+
+  if (hasInvalidDay) {
+    return {
+      days: [],
+      error: "Los días de cobro deben ser números entre 1 y 31.",
+    };
+  }
+
+  const uniqueDays = [...new Set(days)].sort((a, b) => a - b);
+
+  return {
+    days: uniqueDays,
+    error: "",
+  };
+}
+
 function formatReceivable(item) {
   const paidAmount = item.incomes.reduce((sum, income) => {
     return sum + Number(income.amount || 0);
@@ -68,7 +97,7 @@ export async function POST(request) {
       originalAmount,
       originDate,
       expectedMonthlyPayment,
-      expectedChargeDay,
+      expectedChargeDays,
       notes,
     } = body;
 
@@ -113,21 +142,14 @@ export async function POST(request) {
       );
     }
 
-    let numericExpectedChargeDay = null;
+    const parsedExpectedChargeDays =
+      parseExpectedChargeDays(expectedChargeDays);
 
-    if (expectedChargeDay) {
-      numericExpectedChargeDay = Number(expectedChargeDay);
-
-      if (
-        !Number.isInteger(numericExpectedChargeDay) ||
-        numericExpectedChargeDay < 1 ||
-        numericExpectedChargeDay > 31
-      ) {
-        return NextResponse.json(
-          { error: "El día de cobro debe estar entre 1 y 31." },
-          { status: 400 },
-        );
-      }
+    if (parsedExpectedChargeDays.error) {
+      return NextResponse.json(
+        { error: parsedExpectedChargeDays.error },
+        { status: 400 },
+      );
     }
 
     const receivable = await prisma.receivableAccount.create({
@@ -138,7 +160,7 @@ export async function POST(request) {
         originalAmount: numericOriginalAmount,
         originDate: parsedOriginDate,
         expectedMonthlyPayment: numericExpectedMonthlyPayment,
-        expectedChargeDay: numericExpectedChargeDay,
+        expectedChargeDays: parsedExpectedChargeDays.days,
         notes: notes?.trim() || null,
         status: "ACTIVE",
         originType: "MANUAL",
@@ -200,7 +222,7 @@ export async function PATCH(request) {
       originalAmount,
       originDate,
       expectedMonthlyPayment,
-      expectedChargeDay,
+      expectedChargeDays,
       notes,
     } = body;
 
@@ -249,21 +271,14 @@ export async function PATCH(request) {
       );
     }
 
-    let numericExpectedChargeDay = null;
+    const parsedExpectedChargeDays =
+      parseExpectedChargeDays(expectedChargeDays);
 
-    if (expectedChargeDay) {
-      numericExpectedChargeDay = Number(expectedChargeDay);
-
-      if (
-        !Number.isInteger(numericExpectedChargeDay) ||
-        numericExpectedChargeDay < 1 ||
-        numericExpectedChargeDay > 31
-      ) {
-        return NextResponse.json(
-          { error: "El día de cobro debe estar entre 1 y 31." },
-          { status: 400 },
-        );
-      }
+    if (parsedExpectedChargeDays.error) {
+      return NextResponse.json(
+        { error: parsedExpectedChargeDays.error },
+        { status: 400 },
+      );
     }
 
     const receivable = await prisma.receivableAccount.update({
@@ -274,7 +289,7 @@ export async function PATCH(request) {
         originalAmount: numericOriginalAmount,
         originDate: parsedOriginDate,
         expectedMonthlyPayment: numericExpectedMonthlyPayment,
-        expectedChargeDay: numericExpectedChargeDay,
+        expectedChargeDays: parsedExpectedChargeDays.days,
         notes: notes?.trim() || null,
       },
       include: {

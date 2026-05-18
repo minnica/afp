@@ -73,6 +73,12 @@ function getOriginLabel(originType) {
   return labels[originType] || originType;
 }
 
+function formatChargeDaysInput(days) {
+  if (!Array.isArray(days) || days.length === 0) return "";
+
+  return days.join(", ");
+}
+
 export default function CuentasPorCobrarContent() {
   const router = useRouter();
 
@@ -85,7 +91,7 @@ export default function CuentasPorCobrarContent() {
   const [originalAmount, setOriginalAmount] = useState("");
   const [originDate, setOriginDate] = useState(getTodayInputValue());
   const [expectedMonthlyPayment, setExpectedMonthlyPayment] = useState("");
-  const [expectedChargeDay, setExpectedChargeDay] = useState("");
+  const [expectedChargeDays, setExpectedChargeDays] = useState("");
   const [notes, setNotes] = useState("");
 
   const [isLoading, setIsLoading] = useState(true);
@@ -99,7 +105,7 @@ export default function CuentasPorCobrarContent() {
   const [editOriginDate, setEditOriginDate] = useState("");
   const [editExpectedMonthlyPayment, setEditExpectedMonthlyPayment] =
     useState("");
-  const [editExpectedChargeDay, setEditExpectedChargeDay] = useState("");
+  const [editExpectedChargeDays, setEditExpectedChargeDays] = useState("");
   const [editNotes, setEditNotes] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
 
@@ -187,7 +193,7 @@ export default function CuentasPorCobrarContent() {
           originalAmount,
           originDate,
           expectedMonthlyPayment,
-          expectedChargeDay,
+          expectedChargeDays,
           notes,
         }),
       });
@@ -203,7 +209,7 @@ export default function CuentasPorCobrarContent() {
       setOriginalAmount("");
       setOriginDate(getTodayInputValue());
       setExpectedMonthlyPayment("");
-      setExpectedChargeDay("");
+      setExpectedChargeDays("");
       setNotes("");
 
       await loadReceivables(user.id);
@@ -236,8 +242,8 @@ export default function CuentasPorCobrarContent() {
         ? String(receivable.expectedMonthlyPayment)
         : "",
     );
-    setEditExpectedChargeDay(
-      receivable.expectedChargeDay ? String(receivable.expectedChargeDay) : "",
+    setEditExpectedChargeDays(
+      formatChargeDaysInput(receivable.expectedChargeDays),
     );
     setEditNotes(receivable.notes || "");
   }
@@ -249,7 +255,7 @@ export default function CuentasPorCobrarContent() {
     setEditOriginalAmount("");
     setEditOriginDate("");
     setEditExpectedMonthlyPayment("");
-    setEditExpectedChargeDay("");
+    setEditExpectedChargeDays("");
     setEditNotes("");
   }
 
@@ -272,7 +278,7 @@ export default function CuentasPorCobrarContent() {
           originalAmount: editOriginalAmount,
           originDate: editOriginDate,
           expectedMonthlyPayment: editExpectedMonthlyPayment,
-          expectedChargeDay: editExpectedChargeDay,
+          expectedChargeDays: editExpectedChargeDays,
           notes: editNotes,
         }),
       });
@@ -453,15 +459,17 @@ export default function CuentasPorCobrarContent() {
               </div>
 
               <div className="space-y-2">
-                <Label>Día de cobro opcional</Label>
+                <Label>Días de cobro opcionales</Label>
                 <Input
-                  type="number"
-                  min="1"
-                  max="31"
-                  value={expectedChargeDay}
-                  placeholder="Ej. 15"
-                  onChange={(event) => setExpectedChargeDay(event.target.value)}
+                  value={expectedChargeDays}
+                  placeholder="Ej. 15, 30"
+                  onChange={(event) =>
+                    setExpectedChargeDays(event.target.value)
+                  }
                 />
+                <p className="text-xs text-muted-foreground">
+                  Puedes capturar uno o varios días separados por coma.
+                </p>
               </div>
 
               <div className="space-y-2">
@@ -526,8 +534,8 @@ export default function CuentasPorCobrarContent() {
                     setEditExpectedMonthlyPayment={
                       setEditExpectedMonthlyPayment
                     }
-                    editExpectedChargeDay={editExpectedChargeDay}
-                    setEditExpectedChargeDay={setEditExpectedChargeDay}
+                    editExpectedChargeDays={editExpectedChargeDays}
+                    setEditExpectedChargeDays={setEditExpectedChargeDays}
                     editNotes={editNotes}
                     setEditNotes={setEditNotes}
                     updateReceivable={updateReceivable}
@@ -558,8 +566,8 @@ export default function CuentasPorCobrarContent() {
                     setEditExpectedMonthlyPayment={
                       setEditExpectedMonthlyPayment
                     }
-                    editExpectedChargeDay={editExpectedChargeDay}
-                    setEditExpectedChargeDay={setEditExpectedChargeDay}
+                    editExpectedChargeDays={editExpectedChargeDays}
+                    setEditExpectedChargeDays={setEditExpectedChargeDays}
                     editNotes={editNotes}
                     setEditNotes={setEditNotes}
                     updateReceivable={updateReceivable}
@@ -590,8 +598,8 @@ export default function CuentasPorCobrarContent() {
                     setEditExpectedMonthlyPayment={
                       setEditExpectedMonthlyPayment
                     }
-                    editExpectedChargeDay={editExpectedChargeDay}
-                    setEditExpectedChargeDay={setEditExpectedChargeDay}
+                    editExpectedChargeDays={editExpectedChargeDays}
+                    setEditExpectedChargeDays={setEditExpectedChargeDays}
                     editNotes={editNotes}
                     setEditNotes={setEditNotes}
                     updateReceivable={updateReceivable}
@@ -638,8 +646,8 @@ function ReceivablesList({
   setEditOriginDate,
   editExpectedMonthlyPayment,
   setEditExpectedMonthlyPayment,
-  editExpectedChargeDay,
-  setEditExpectedChargeDay,
+  editExpectedChargeDays,
+  setEditExpectedChargeDays,
   editNotes,
   setEditNotes,
   updateReceivable,
@@ -684,9 +692,9 @@ function ReceivablesList({
                 </p>
               ) : null}
 
-              {item.expectedChargeDay ? (
+              {item.expectedChargeDays?.length > 0 ? (
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Día de cobro: {item.expectedChargeDay}
+                  Días de cobro: {item.expectedChargeDays.join(", ")}
                 </p>
               ) : null}
 
@@ -836,17 +844,17 @@ function ReceivablesList({
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Día de cobro opcional</Label>
+                  <Label>Días de cobro opcionales</Label>
                   <Input
-                    type="number"
-                    min="1"
-                    max="31"
-                    value={editExpectedChargeDay}
-                    placeholder="Ej. 15"
+                    value={editExpectedChargeDays}
+                    placeholder="Ej. 15, 30"
                     onChange={(event) =>
-                      setEditExpectedChargeDay(event.target.value)
+                      setEditExpectedChargeDays(event.target.value)
                     }
                   />
+                  <p className="text-xs text-muted-foreground">
+                    Puedes capturar uno o varios días separados por coma.
+                  </p>
                 </div>
 
                 <div className="space-y-2 md:col-span-2">
