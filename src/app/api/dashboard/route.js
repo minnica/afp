@@ -337,6 +337,14 @@ function buildCashSubscriptionNotices(subscriptions, now) {
 
     if (diffDays > 2) continue;
 
+    const alreadyPaid = hasExpenseForSubscriptionFromDate(
+      subscription,
+      dueDate,
+      now,
+    );
+
+    if (alreadyPaid) continue;
+
     const timing = getNoticeTiming(diffDays);
 
     notices.push({
@@ -349,7 +357,7 @@ function buildCashSubscriptionNotices(subscriptions, now) {
           : `Suscripción en efectivo: ${subscription.name}`,
       description: `${timing.label}. Pago estimado: ${formatMoneyForNotice(
         subscription.amount,
-      )}. Revisa si ya registraste el gasto.`,
+      )}. No hay gasto registrado vinculado a esta suscripción.`,
       date: dueDate,
       amount: Number(subscription.amount || 0),
     });
@@ -365,6 +373,16 @@ function hasIncomeForReceivableFromDate(receivable, chargeDate, now) {
   return (receivable.incomes || []).some((income) => {
     const incomeDate = new Date(income.date);
     return incomeDate >= start && incomeDate <= end;
+  });
+}
+
+function hasExpenseForSubscriptionFromDate(subscription, chargeDate, now) {
+  const start = startOfLocalDay(chargeDate);
+  const end = new Date(now);
+
+  return (subscription.dailyExpenses || []).some((expense) => {
+    const expenseDate = new Date(expense.date);
+    return expenseDate >= start && expenseDate <= end;
   });
 }
 
@@ -465,7 +483,11 @@ export async function GET(request) {
       }),
       prisma.subscription.findMany({
         where: { userId },
-        include: { category: true, card: true },
+        include: {
+          category: true,
+          card: true,
+          dailyExpenses: true,
+        },
       }),
       prisma.installmentPurchase.findMany({
         where: { userId },

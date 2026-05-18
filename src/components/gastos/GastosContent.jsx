@@ -109,12 +109,14 @@ export default function GastosContent() {
   const [people, setPeople] = useState([]);
   const [receivables, setReceivables] = useState([]);
   const [payables, setPayables] = useState([]);
+  const [subscriptions, setSubscriptions] = useState([]);
 
   const [showMoreOptions, setShowMoreOptions] = useState(false);
   const [personId, setPersonId] = useState("");
   const [receivableMode, setReceivableMode] = useState("CREATE");
   const [receivableAccountId, setReceivableAccountId] = useState("");
   const [payableAccountId, setPayableAccountId] = useState("NONE");
+  const [subscriptionId, setSubscriptionId] = useState("NONE");
 
   const [editingExpenseId, setEditingExpenseId] = useState("");
   const [editDate, setEditDate] = useState("");
@@ -124,6 +126,8 @@ export default function GastosContent() {
   const [editAmount, setEditAmount] = useState("");
   const [editCategoryId, setEditCategoryId] = useState("");
   const [editNotes, setEditNotes] = useState("");
+  const [editSubscriptionId, setEditSubscriptionId] = useState("NONE");
+
   const [isUpdating, setIsUpdating] = useState(false);
 
   const [expenseToDelete, setExpenseToDelete] = useState(null);
@@ -182,6 +186,19 @@ export default function GastosContent() {
     }
 
     setPayables(payablesData.payables || []);
+
+    const subscriptionsResponse = await fetch(
+      `/api/subscriptions?userId=${userId}`,
+    );
+    const subscriptionsData = await subscriptionsResponse.json();
+
+    if (!subscriptionsResponse.ok) {
+      throw new Error(
+        subscriptionsData.error || "No se pudieron cargar suscripciones.",
+      );
+    }
+
+    setSubscriptions(subscriptionsData.subscriptions || []);
   }
 
   function buildExpensesUrl(userId) {
@@ -233,6 +250,17 @@ export default function GastosContent() {
     }
 
     setPayables(data.payables || []);
+  }
+
+  async function loadSubscriptions(userId) {
+    const response = await fetch(`/api/subscriptions?userId=${userId}`);
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "No se pudieron cargar suscripciones.");
+    }
+
+    setSubscriptions(data.subscriptions || []);
   }
 
   useEffect(() => {
@@ -299,6 +327,7 @@ export default function GastosContent() {
               : null,
           payableAccountId:
             payableAccountId === "NONE" ? null : payableAccountId,
+          subscriptionId: subscriptionId === "NONE" ? null : subscriptionId,
           createReceivable: Boolean(
             personId &&
             receivableMode === "CREATE" &&
@@ -321,6 +350,7 @@ export default function GastosContent() {
       setReceivableMode("CREATE");
       setReceivableAccountId("");
       setPayableAccountId("NONE");
+      setSubscriptionId("NONE");
       await loadExpenses(user.id);
       await loadReceivables(user.id);
       await loadPayables(user.id);
@@ -383,6 +413,7 @@ export default function GastosContent() {
     setEditAmount(String(expense.amount || ""));
     setEditCategoryId(expense.categoryId || "");
     setEditNotes(expense.notes || "");
+    setEditSubscriptionId(expense.subscriptionId || "NONE");
   }
 
   function cancelEditingExpense() {
@@ -394,6 +425,7 @@ export default function GastosContent() {
     setEditAmount("");
     setEditCategoryId("");
     setEditNotes("");
+    setEditSubscriptionId("NONE");
   }
 
   async function updateExpense() {
@@ -417,6 +449,8 @@ export default function GastosContent() {
           amount: editAmount,
           categoryId: editCategoryId,
           notes: editNotes,
+          subscriptionId:
+            editSubscriptionId === "NONE" ? null : editSubscriptionId,
         }),
       });
 
@@ -773,6 +807,39 @@ export default function GastosContent() {
                           </div>
                         </>
                       ) : null}
+
+                      <Separator />
+
+                      <div className="space-y-2">
+                        <Label>Suscripción relacionada</Label>
+                        <Select
+                          value={subscriptionId}
+                          onValueChange={setSubscriptionId}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecciona suscripción" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="NONE">
+                              Sin suscripción
+                            </SelectItem>
+                            {subscriptions
+                              .filter(
+                                (subscription) =>
+                                  subscription.paymentMethod === "CASH",
+                              )
+                              .map((subscription) => (
+                                <SelectItem
+                                  key={subscription.id}
+                                  value={subscription.id}
+                                >
+                                  {subscription.name} ·{" "}
+                                  {formatMoney(subscription.amount)}
+                                </SelectItem>
+                              ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
                     </div>
                   ) : null}
                 </div>
@@ -979,6 +1046,12 @@ export default function GastosContent() {
                                 </p>
                               ) : null}
 
+                              {expense.subscription ? (
+                                <p className="mt-1 text-sm text-muted-foreground">
+                                  Suscripción: {expense.subscription.name}
+                                </p>
+                              ) : null}
+
                               {expense.notes ? (
                                 <p className="mt-1 text-sm text-muted-foreground">
                                   {expense.notes}
@@ -1131,6 +1204,38 @@ export default function GastosContent() {
                                           {category.name}
                                         </SelectItem>
                                       ))}
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+
+                                <div className="space-y-2">
+                                  <Label>Suscripción relacionada</Label>
+                                  <Select
+                                    value={editSubscriptionId}
+                                    onValueChange={setEditSubscriptionId}
+                                  >
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Selecciona suscripción" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="NONE">
+                                        Sin suscripción
+                                      </SelectItem>
+                                      {subscriptions
+                                        .filter(
+                                          (subscription) =>
+                                            subscription.paymentMethod ===
+                                            "CASH",
+                                        )
+                                        .map((subscription) => (
+                                          <SelectItem
+                                            key={subscription.id}
+                                            value={subscription.id}
+                                          >
+                                            {subscription.name} ·{" "}
+                                            {formatMoney(subscription.amount)}
+                                          </SelectItem>
+                                        ))}
                                     </SelectContent>
                                   </Select>
                                 </div>

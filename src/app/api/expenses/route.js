@@ -103,6 +103,7 @@ export async function GET(request) {
         person: true,
         receivableAccount: true,
         payableAccount: true,
+        subscription: true,
       },
       orderBy: [{ date: "desc" }, { createdAt: "desc" }],
       take: 100,
@@ -139,6 +140,7 @@ export async function POST(request) {
       personId,
       receivableAccountId,
       payableAccountId,
+      subscriptionId,
       createReceivable,
     } = body;
 
@@ -216,6 +218,7 @@ export async function POST(request) {
         personId: personId || null,
         receivableAccountId: finalReceivableAccountId,
         payableAccountId: payableAccountId || null,
+        subscriptionId: subscriptionId || null,
       },
       include: {
         card: true,
@@ -223,6 +226,7 @@ export async function POST(request) {
         person: true,
         receivableAccount: true,
         payableAccount: true,
+        subscription: true,
       },
     });
 
@@ -295,6 +299,7 @@ export async function PATCH(request) {
       amount,
       categoryId,
       notes,
+      subscriptionId,
     } = body;
 
     if (!id) {
@@ -347,6 +352,7 @@ export async function PATCH(request) {
         amount: numericAmount,
         categoryId,
         notes: notes?.trim() || null,
+        subscriptionId: subscriptionId || null,
       },
       include: {
         card: true,
@@ -354,6 +360,7 @@ export async function PATCH(request) {
         person: true,
         receivableAccount: true,
         payableAccount: true,
+        subscription: true,
       },
     });
 
