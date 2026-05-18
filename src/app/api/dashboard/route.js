@@ -217,6 +217,214 @@ function getReceivableAmounts(receivable) {
   };
 }
 
+function startOfLocalDay(date) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+function getDaysDifference(targetDate, baseDate) {
+  const target = startOfLocalDay(new Date(targetDate));
+  const base = startOfLocalDay(new Date(baseDate));
+
+  return Math.round((target.getTime() - base.getTime()) / 86400000);
+}
+
+function getNoticeTiming(diffDays) {
+  if (diffDays < 0) {
+    return {
+      group: "overdue",
+      label:
+        Math.abs(diffDays) === 1
+          ? "Vencido desde hace 1 día"
+          : `Vencido desde hace ${Math.abs(diffDays)} días`,
+    };
+  }
+
+  if (diffDays === 0) {
+    return {
+      group: "today",
+      label: "Vence hoy",
+    };
+  }
+
+  if (diffDays === 1) {
+    return {
+      group: "upcoming",
+      label: "Vence mañana",
+    };
+  }
+
+  return {
+    group: "upcoming",
+    label: `Vence en ${diffDays} días`,
+  };
+}
+
+function buildDateFromDay(year, month, day) {
+  const maxDay = new Date(year, month, 0).getDate();
+  const safeDay = Math.min(day, maxDay);
+
+  return new Date(year, month - 1, safeDay, 12, 0, 0);
+}
+
+function buildCardPaymentNotices(payments, now) {
+  const notices = [];
+
+  for (const item of payments) {
+    const card = item.card;
+    const cycle = item.currentPayment;
+
+    if (!cycle) continue;
+    if (cycle.status === "PAID" || cycle.displayStatus === "PAID") continue;
+
+    const diffDays = getDaysDifference(cycle.dueDate, now);
+
+    if (diffDays > 2) continue;
+
+    const timing = getNoticeTiming(diffDays);
+
+    notices.push({
+      id: `card-${cycle.id}`,
+      type: "CARD_PAYMENT",
+      group: timing.group,
+      title:
+        timing.group === "overdue"
+          ? `Pago vencido de ${card.name}`
+          : `Pago de tarjeta: ${card.name}`,
+      description: `${timing.label}. ${
+        cycle.statementAmount
+          ? `Estado de cuenta: ${formatMoneyForNotice(cycle.statementAmount)}.`
+          : `Pago calculado: ${formatMoneyForNotice(cycle.calculatedAmount)}.`
+      } No está marcado como pagado.`,
+      date: cycle.dueDate,
+      amount: Number(cycle.statementAmount || cycle.calculatedAmount || 0),
+    });
+  }
+
+  return notices;
+}
+
+function formatMoneyForNotice(value) {
+  const numberValue = Number(value || 0);
+
+  return new Intl.NumberFormat("es-MX", {
+    style: "currency",
+    currency: "MXN",
+  }).format(numberValue);
+}
+
+function buildCashSubscriptionNotices(subscriptions, now) {
+  const notices = [];
+
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1;
+
+  for (const subscription of subscriptions) {
+    if (subscription.paymentMethod !== "CASH") continue;
+
+    if (
+      !shouldIncludeSubscriptionInMonth(subscription, currentYear, currentMonth)
+    ) {
+      continue;
+    }
+
+    const dueDate = buildDateFromDay(
+      currentYear,
+      currentMonth,
+      Number(subscription.chargeDay),
+    );
+
+    const diffDays = getDaysDifference(dueDate, now);
+
+    if (diffDays > 2) continue;
+
+    const timing = getNoticeTiming(diffDays);
+
+    notices.push({
+      id: `subscription-${subscription.id}-${currentYear}-${currentMonth}`,
+      type: "CASH_SUBSCRIPTION",
+      group: timing.group,
+      title:
+        timing.group === "overdue"
+          ? `Suscripción pendiente: ${subscription.name}`
+          : `Suscripción en efectivo: ${subscription.name}`,
+      description: `${timing.label}. Pago estimado: ${formatMoneyForNotice(
+        subscription.amount,
+      )}. Revisa si ya registraste el gasto.`,
+      date: dueDate,
+      amount: Number(subscription.amount || 0),
+    });
+  }
+
+  return notices;
+}
+
+function hasIncomeForReceivableFromDate(receivable, chargeDate, now) {
+  const start = startOfLocalDay(chargeDate);
+  const end = new Date(now);
+
+  return (receivable.incomes || []).some((income) => {
+    const incomeDate = new Date(income.date);
+    return incomeDate >= start && incomeDate <= end;
+  });
+}
+
+function buildReceivableNotices(receivables, now) {
+  const notices = [];
+
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1;
+
+  for (const receivable of receivables) {
+    if (receivable.status !== "ACTIVE") continue;
+
+    const expectedChargeDays = receivable.expectedChargeDays || [];
+
+    if (expectedChargeDays.length === 0) continue;
+
+    for (const day of expectedChargeDays) {
+      const chargeDate = buildDateFromDay(
+        currentYear,
+        currentMonth,
+        Number(day),
+      );
+      const diffDays = getDaysDifference(chargeDate, now);
+
+      if (diffDays > 2) continue;
+
+      const alreadyPaid = hasIncomeForReceivableFromDate(
+        receivable,
+        chargeDate,
+        now,
+      );
+
+      if (alreadyPaid) continue;
+
+      const timing = getNoticeTiming(diffDays);
+
+      notices.push({
+        id: `receivable-${receivable.id}-${currentYear}-${currentMonth}-${day}`,
+        type: "RECEIVABLE",
+        group: timing.group,
+        title:
+          timing.group === "overdue"
+            ? `Cobro pendiente: ${receivable.person?.name || "Persona"}`
+            : `Cobro programado: ${receivable.person?.name || "Persona"}`,
+        description: `${timing.label}. ${
+          receivable.expectedMonthlyPayment
+            ? `Pago esperado: ${formatMoneyForNotice(
+                receivable.expectedMonthlyPayment,
+              )}.`
+            : `Cuenta: ${receivable.concept}.`
+        } No hay ingreso registrado para este cobro.`,
+        date: chargeDate,
+        amount: Number(receivable.expectedMonthlyPayment || 0),
+      });
+    }
+  }
+
+  return notices;
+}
+
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -415,6 +623,31 @@ export async function GET(request) {
       })
       .filter((receivable) => receivable.status === "ACTIVE");
 
+    const cardPaymentNotices = buildCardPaymentNotices(payments, now);
+    const cashSubscriptionNotices = buildCashSubscriptionNotices(
+      subscriptions,
+      now,
+    );
+    const receivableNotices = buildReceivableNotices(activeReceivables, now);
+
+    const importantNotices = [
+      ...cardPaymentNotices,
+      ...cashSubscriptionNotices,
+      ...receivableNotices,
+    ].sort((a, b) => {
+      const priority = {
+        overdue: 0,
+        today: 1,
+        upcoming: 2,
+      };
+
+      const priorityDiff = priority[a.group] - priority[b.group];
+
+      if (priorityDiff !== 0) return priorityDiff;
+
+      return new Date(a.date).getTime() - new Date(b.date).getTime();
+    });
+
     return NextResponse.json({
       payments,
       monthlySummary: {
@@ -427,6 +660,7 @@ export async function GET(request) {
       },
       categoryBreakdown,
       activeReceivables,
+      importantNotices,
     });
   } catch (error) {
     console.error("Error loading dashboard:", error);

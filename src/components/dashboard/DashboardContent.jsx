@@ -16,8 +16,9 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
+import { AlertTriangle, Bell, CalendarClock } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 function formatMoney(value) {
   const numberValue = Number(value || 0);
@@ -87,6 +88,23 @@ function getStatusBadgeClass(status) {
   return classes[status] || "border-border bg-muted text-muted-foreground";
 }
 
+function getNoticeAlertClass(group) {
+  const classes = {
+    overdue: "border-red-500/30 bg-red-500/10 text-red-500 dark:text-red-400",
+    today:
+      "border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400",
+    upcoming: "border-sky-500/30 bg-sky-500/10 text-sky-600 dark:text-sky-400",
+  };
+
+  return classes[group] || "border-border bg-muted/30";
+}
+
+function getNoticeIcon(group) {
+  if (group === "overdue") return AlertTriangle;
+  if (group === "today") return CalendarClock;
+  return Bell;
+}
+
 export default function DashboardContent() {
   const router = useRouter();
 
@@ -150,6 +168,7 @@ export default function DashboardContent() {
   const monthlySummary = dashboard?.monthlySummary || {};
   const categoryBreakdown = dashboard?.categoryBreakdown || [];
   const activeReceivables = dashboard?.activeReceivables || [];
+  const importantNotices = dashboard?.importantNotices || [];
 
   const previousPayments = useMemo(() => {
     return payments
@@ -214,6 +233,8 @@ export default function DashboardContent() {
         ) : null}
 
         <div className="space-y-6">
+          <ImportantNoticesCard notices={importantNotices} />
+
           <Card className="rounded-2xl border-border bg-card">
             <CardHeader>
               <CardTitle className="text-lg font-semibold uppercase text-center">
@@ -358,6 +379,55 @@ function SummaryCard({ title, value }) {
         <CardDescription>{title}</CardDescription>
         <CardTitle className="text-2xl">{value}</CardTitle>
       </CardHeader>
+    </Card>
+  );
+}
+
+function ImportantNoticesCard({ notices }) {
+  if (notices.length === 0) {
+    return (
+      <Card className="rounded-2xl border-border bg-card">
+        <CardHeader>
+          <CardTitle className="text-lg font-semibold uppercase text-center">
+            Avisos importantes
+          </CardTitle>
+        </CardHeader>
+
+        <CardContent>
+          <p className="rounded-xl border border-border bg-muted/30 px-4 py-6 text-sm text-muted-foreground">
+            No tienes avisos importantes por ahora.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card className="rounded-2xl border-border bg-card">
+      <CardHeader>
+        <CardTitle className="text-lg font-semibold uppercase text-center">
+          Avisos importantes
+        </CardTitle>
+      </CardHeader>
+
+      <CardContent>
+        <div className="grid gap-3">
+          {notices.map((notice) => {
+            const Icon = getNoticeIcon(notice.group);
+
+            return (
+              <Alert
+                key={notice.id}
+                className={getNoticeAlertClass(notice.group)}
+              >
+                <Icon className="h-4 w-4" />
+                <AlertTitle>{notice.title}</AlertTitle>
+                <AlertDescription>{notice.description}</AlertDescription>
+              </Alert>
+            );
+          })}
+        </div>
+      </CardContent>
     </Card>
   );
 }
