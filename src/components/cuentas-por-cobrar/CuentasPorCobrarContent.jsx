@@ -85,7 +85,7 @@ export default function CuentasPorCobrarContent() {
   const [originalAmount, setOriginalAmount] = useState("");
   const [originDate, setOriginDate] = useState(getTodayInputValue());
   const [expectedMonthlyPayment, setExpectedMonthlyPayment] = useState("");
-  const [expectedDate, setExpectedDate] = useState("");
+  const [expectedChargeDay, setExpectedChargeDay] = useState("");
   const [notes, setNotes] = useState("");
 
   const [isLoading, setIsLoading] = useState(true);
@@ -99,7 +99,7 @@ export default function CuentasPorCobrarContent() {
   const [editOriginDate, setEditOriginDate] = useState("");
   const [editExpectedMonthlyPayment, setEditExpectedMonthlyPayment] =
     useState("");
-  const [editExpectedDate, setEditExpectedDate] = useState("");
+  const [editExpectedChargeDay, setEditExpectedChargeDay] = useState("");
   const [editNotes, setEditNotes] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
 
@@ -187,7 +187,7 @@ export default function CuentasPorCobrarContent() {
           originalAmount,
           originDate,
           expectedMonthlyPayment,
-          expectedDate,
+          expectedChargeDay,
           notes,
         }),
       });
@@ -203,7 +203,7 @@ export default function CuentasPorCobrarContent() {
       setOriginalAmount("");
       setOriginDate(getTodayInputValue());
       setExpectedMonthlyPayment("");
-      setExpectedDate("");
+      setExpectedChargeDay("");
       setNotes("");
 
       await loadReceivables(user.id);
@@ -236,7 +236,9 @@ export default function CuentasPorCobrarContent() {
         ? String(receivable.expectedMonthlyPayment)
         : "",
     );
-    setEditExpectedDate(toDateInputValue(receivable.expectedDate));
+    setEditExpectedChargeDay(
+      receivable.expectedChargeDay ? String(receivable.expectedChargeDay) : "",
+    );
     setEditNotes(receivable.notes || "");
   }
 
@@ -247,7 +249,7 @@ export default function CuentasPorCobrarContent() {
     setEditOriginalAmount("");
     setEditOriginDate("");
     setEditExpectedMonthlyPayment("");
-    setEditExpectedDate("");
+    setEditExpectedChargeDay("");
     setEditNotes("");
   }
 
@@ -270,7 +272,7 @@ export default function CuentasPorCobrarContent() {
           originalAmount: editOriginalAmount,
           originDate: editOriginDate,
           expectedMonthlyPayment: editExpectedMonthlyPayment,
-          expectedDate: editExpectedDate,
+          expectedChargeDay: editExpectedChargeDay,
           notes: editNotes,
         }),
       });
@@ -451,11 +453,14 @@ export default function CuentasPorCobrarContent() {
               </div>
 
               <div className="space-y-2">
-                <Label>Fecha esperada opcional</Label>
+                <Label>Día de cobro opcional</Label>
                 <Input
-                  type="date"
-                  value={expectedDate}
-                  onChange={(event) => setExpectedDate(event.target.value)}
+                  type="number"
+                  min="1"
+                  max="31"
+                  value={expectedChargeDay}
+                  placeholder="Ej. 15"
+                  onChange={(event) => setExpectedChargeDay(event.target.value)}
                 />
               </div>
 
@@ -521,8 +526,8 @@ export default function CuentasPorCobrarContent() {
                     setEditExpectedMonthlyPayment={
                       setEditExpectedMonthlyPayment
                     }
-                    editExpectedDate={editExpectedDate}
-                    setEditExpectedDate={setEditExpectedDate}
+                    editExpectedChargeDay={editExpectedChargeDay}
+                    setEditExpectedChargeDay={setEditExpectedChargeDay}
                     editNotes={editNotes}
                     setEditNotes={setEditNotes}
                     updateReceivable={updateReceivable}
@@ -553,8 +558,8 @@ export default function CuentasPorCobrarContent() {
                     setEditExpectedMonthlyPayment={
                       setEditExpectedMonthlyPayment
                     }
-                    editExpectedDate={editExpectedDate}
-                    setEditExpectedDate={setEditExpectedDate}
+                    editExpectedChargeDay={editExpectedChargeDay}
+                    setEditExpectedChargeDay={setEditExpectedChargeDay}
                     editNotes={editNotes}
                     setEditNotes={setEditNotes}
                     updateReceivable={updateReceivable}
@@ -585,8 +590,8 @@ export default function CuentasPorCobrarContent() {
                     setEditExpectedMonthlyPayment={
                       setEditExpectedMonthlyPayment
                     }
-                    editExpectedDate={editExpectedDate}
-                    setEditExpectedDate={setEditExpectedDate}
+                    editExpectedChargeDay={editExpectedChargeDay}
+                    setEditExpectedChargeDay={setEditExpectedChargeDay}
                     editNotes={editNotes}
                     setEditNotes={setEditNotes}
                     updateReceivable={updateReceivable}
@@ -633,8 +638,8 @@ function ReceivablesList({
   setEditOriginDate,
   editExpectedMonthlyPayment,
   setEditExpectedMonthlyPayment,
-  editExpectedDate,
-  setEditExpectedDate,
+  editExpectedChargeDay,
+  setEditExpectedChargeDay,
   editNotes,
   setEditNotes,
   updateReceivable,
@@ -676,6 +681,12 @@ function ReceivablesList({
               {item.expectedMonthlyPayment ? (
                 <p className="mt-1 text-sm text-muted-foreground">
                   Pago esperado: {formatMoney(item.expectedMonthlyPayment)}
+                </p>
+              ) : null}
+
+              {item.expectedChargeDay ? (
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Día de cobro: {item.expectedChargeDay}
                 </p>
               ) : null}
 
@@ -825,12 +836,15 @@ function ReceivablesList({
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Fecha esperada opcional</Label>
+                  <Label>Día de cobro opcional</Label>
                   <Input
-                    type="date"
-                    value={editExpectedDate}
+                    type="number"
+                    min="1"
+                    max="31"
+                    value={editExpectedChargeDay}
+                    placeholder="Ej. 15"
                     onChange={(event) =>
-                      setEditExpectedDate(event.target.value)
+                      setEditExpectedChargeDay(event.target.value)
                     }
                   />
                 </div>

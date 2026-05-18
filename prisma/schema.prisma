@@ -254,7 +254,7 @@ model ReceivableAccount {
   originalAmount         Decimal
   originDate             DateTime
   expectedMonthlyPayment Decimal?
-  expectedDate           DateTime?
+  expectedChargeDay      Int?
   notes                  String?
   status                 ReceivableAccountStatus @default(ACTIVE)
   originType             ReceivableOriginType
