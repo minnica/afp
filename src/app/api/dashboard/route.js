@@ -538,14 +538,21 @@ export async function GET(request) {
         .filter((cycle) => cycle.cardId === card.id)
         .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
 
-      const currentIndex = cyclesForCard.findIndex(
-        (cycle) => new Date(cycle.dueDate) >= now,
-      );
+      // Current cycle = most recently cut (cutDate <= now).
+      // Once cut, the cycle is in its payment window — that's what the user owes next.
+      // If no cycle has cut yet, take the earliest upcoming one.
+      let currentIndex = -1;
+      for (let i = cyclesForCard.length - 1; i >= 0; i--) {
+        if (new Date(cyclesForCard[i].cutDate) <= now) {
+          currentIndex = i;
+          break;
+        }
+      }
+      if (currentIndex === -1) {
+        currentIndex = 0;
+      }
 
-      const safeCurrentIndex =
-        currentIndex >= 0
-          ? currentIndex
-          : Math.max(cyclesForCard.length - 1, 0);
+      const safeCurrentIndex = currentIndex;
 
       const previousPayment =
         safeCurrentIndex > 0 ? cyclesForCard[safeCurrentIndex - 1] : null;
