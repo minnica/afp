@@ -366,23 +366,29 @@ function buildCashSubscriptionNotices(subscriptions, now) {
   return notices;
 }
 
+function toUtcDateStr(d) {
+  return new Date(d).toISOString().slice(0, 10);
+}
+
 function hasIncomeForReceivableFromDate(receivable, chargeDate, now) {
-  const start = startOfLocalDay(chargeDate);
-  const end = new Date(now);
+  const startStr = toUtcDateStr(chargeDate);
+  const endStr = toUtcDateStr(now);
 
   return (receivable.incomes || []).some((income) => {
-    const incomeDate = new Date(income.date);
-    return incomeDate >= start && incomeDate <= end;
+    const incomeStr = toUtcDateStr(income.date);
+    return incomeStr >= startStr && incomeStr <= endStr;
   });
 }
 
 function hasExpenseForSubscriptionFromDate(subscription, chargeDate, now) {
-  const start = startOfLocalDay(chargeDate);
-  const end = new Date(now);
+  // Start from the 1st of the charge month to catch payments made before the charge day.
+  const n = new Date(now);
+  const monthStartStr = `${n.getUTCFullYear()}-${String(n.getUTCMonth() + 1).padStart(2, "0")}-01`;
+  const endStr = toUtcDateStr(now);
 
   return (subscription.dailyExpenses || []).some((expense) => {
-    const expenseDate = new Date(expense.date);
-    return expenseDate >= start && expenseDate <= end;
+    const expenseStr = toUtcDateStr(expense.date);
+    return expenseStr >= monthStartStr && expenseStr <= endStr;
   });
 }
 
