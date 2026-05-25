@@ -106,7 +106,6 @@ export async function GET(request) {
         subscription: true,
       },
       orderBy: [{ date: "desc" }, { createdAt: "desc" }],
-      take: 100,
     });
 
     const total = expenses.reduce((sum, expense) => {
