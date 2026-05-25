@@ -114,6 +114,19 @@ function getStatusLabel(status) {
   return labels[status] || status;
 }
 
+function getStatusBadgeClass(status) {
+  const classes = {
+    PAID: "bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300",
+    OVERDUE: "bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-300",
+    OPEN: "bg-sky-50 text-sky-700 dark:bg-sky-950 dark:text-sky-300",
+    CUT: "bg-orange-50 text-orange-700 dark:bg-orange-950 dark:text-orange-300",
+    PAYMENT_PENDING:
+      "bg-yellow-50 text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300",
+  };
+
+  return classes[status] || "border-border bg-muted text-muted-foreground";
+}
+
 function BreakdownSection({
   title,
   items,
@@ -173,12 +186,15 @@ function CycleActionForms({
   statementAmount,
   setStatementAmount,
   updateStatementAmount,
+  cancelEditingStatement,
   payingCycleId,
   paidAt,
   setPaidAt,
   paidAmount,
   setPaidAmount,
   markCycleAsPaid,
+  cancelPaying,
+  unmarkCycleAsPaid,
 }) {
   return (
     <>
@@ -239,8 +255,18 @@ function CycleActionForms({
 
       {editingStatementCycleId === cycle.id ? (
         <div className="rounded-xl border border-border bg-background/70 p-3">
-          <Label>Monto estado de cuenta</Label>
-          <div className="mt-2 flex gap-2">
+          <div className="mb-2 flex items-center justify-between gap-4">
+            <Label>Monto estado de cuenta</Label>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={cancelEditingStatement}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+          <div className="flex gap-2">
             <Input
               type="number"
               min="0"
@@ -262,6 +288,17 @@ function CycleActionForms({
 
       {payingCycleId === cycle.id ? (
         <div className="rounded-xl border border-border bg-background/70 p-3">
+          <div className="mb-3 flex items-center justify-between gap-4">
+            <p className="text-xs font-medium">Registrar pago</p>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={cancelPaying}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
           <div className="grid gap-3">
             <div className="space-y-2">
               <Label>Fecha de pago</Label>
@@ -291,6 +328,17 @@ function CycleActionForms({
             >
               Confirmar pago
             </Button>
+
+            {cycle.status === "PAID" ? (
+              <Button
+                type="button"
+                variant="destructive"
+                size="sm"
+                onClick={() => unmarkCycleAsPaid(cycle.id)}
+              >
+                Deshacer pago
+              </Button>
+            ) : null}
           </div>
         </div>
       ) : null}
@@ -853,7 +901,7 @@ export default function TarjetasContent() {
 
   return (
     <main>
-      <section className="mx-auto flex w-full max-w-6xl flex-col px-4 py-5 md:py-8">
+      <section className="mx-auto flex w-full flex-col px-4 py-5 md:py-8">
         {error ? (
           <div className="mb-6 rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
             {error}
@@ -876,7 +924,7 @@ export default function TarjetasContent() {
           </Card>
         </div>
 
-        <Tabs defaultValue="cards" className="w-full">
+        <Tabs defaultValue="cycles" className="w-full">
           <TabsList className="mb-6">
             <TabsTrigger value="cards">Tarjetas</TabsTrigger>
             <TabsTrigger value="cycles">Ciclos mensuales</TabsTrigger>
@@ -1158,7 +1206,7 @@ export default function TarjetasContent() {
                           </h3>
 
                           <div className="overflow-hidden rounded-xl border border-border">
-                            <div className="hidden grid-cols-[1.1fr_1fr_1fr_1fr_1fr_1fr_1fr_1.4fr] gap-4 border-b border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground md:grid">
+                            <div className="hidden grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_auto] gap-4 border-b border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground md:grid">
                               <div>Tarjeta</div>
                               <div>Corte</div>
                               <div>Límite</div>
@@ -1173,7 +1221,7 @@ export default function TarjetasContent() {
                               {monthGroup.monthCycles.map((cycle) => (
                                 <div
                                   key={cycle.id}
-                                  className="grid gap-3 px-4 py-4 text-sm md:grid-cols-[1.1fr_1fr_1fr_1fr_1fr_1fr_1fr_1.4fr] md:gap-4"
+                                  className="grid gap-3 px-4 py-4 text-sm md:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_auto] md:gap-4"
                                 >
                                   <div className="font-medium">
                                     {cycle.card.name}
@@ -1185,12 +1233,6 @@ export default function TarjetasContent() {
 
                                   <div className="font-medium">
                                     {formatMoney(cycle.calculatedAmount)}
-                                    <p className="mt-1 text-xs text-muted-foreground">
-                                      G: {formatMoney(cycle.expensesAmount)} ·
-                                      S:{" "}
-                                      {formatMoney(cycle.subscriptionsAmount)} ·
-                                      MSI: {formatMoney(cycle.purchasesAmount)}
-                                    </p>
                                   </div>
 
                                   <div>
@@ -1218,22 +1260,26 @@ export default function TarjetasContent() {
                                   </div>
 
                                   <div>
-                                    <Badge variant="secondary">
+                                    <Badge
+                                      variant="outline"
+                                      className={getStatusBadgeClass(cycle.status)}
+                                    >
                                       {getStatusLabel(cycle.status)}
                                     </Badge>
                                   </div>
 
                                   <div className="space-y-3">
-                                    <div className="flex flex-wrap gap-2">
+                                    <div className="flex flex-wrap gap-0.5 md:flex-nowrap">
                                       <Button
                                         type="button"
                                         variant="secondary"
                                         size="sm"
                                         onClick={() =>
-                                          startEditingCycleDates(cycle)
+                                          editingCycleDatesId === cycle.id
+                                            ? cancelEditingCycleDates()
+                                            : startEditingCycleDates(cycle)
                                         }
                                       >
-                                        <CalendarClock className="mr-2 h-4 w-4" />
                                         Fechas
                                       </Button>
 
@@ -1242,16 +1288,20 @@ export default function TarjetasContent() {
                                         variant="secondary"
                                         size="sm"
                                         onClick={() => {
-                                          setEditingStatementCycleId(cycle.id);
-                                          setStatementAmount(
-                                            cycle.statementAmount
-                                              ? String(cycle.statementAmount)
-                                              : "",
-                                          );
+                                          if (editingStatementCycleId === cycle.id) {
+                                            setEditingStatementCycleId("");
+                                            setStatementAmount("");
+                                          } else {
+                                            setEditingStatementCycleId(cycle.id);
+                                            setStatementAmount(
+                                              cycle.statementAmount
+                                                ? String(cycle.statementAmount)
+                                                : "",
+                                            );
+                                          }
                                         }}
                                       >
-                                        <FileText className="mr-2 h-4 w-4" />
-                                        Estado cuenta
+                                        Cuenta
                                       </Button>
 
                                       <Button
@@ -1259,31 +1309,23 @@ export default function TarjetasContent() {
                                         variant="secondary"
                                         size="sm"
                                         onClick={() => {
-                                          setPayingCycleId(cycle.id);
-                                          setPaidAt(getTodayInputValue());
-                                          setPaidAmount(
-                                            cycle.statementAmount
-                                              ? String(cycle.statementAmount)
-                                              : "",
-                                          );
+                                          if (payingCycleId === cycle.id) {
+                                            setPayingCycleId("");
+                                            setPaidAt(getTodayInputValue());
+                                            setPaidAmount("");
+                                          } else {
+                                            setPayingCycleId(cycle.id);
+                                            setPaidAt(getTodayInputValue());
+                                            setPaidAmount(
+                                              cycle.statementAmount
+                                                ? String(cycle.statementAmount)
+                                                : "",
+                                            );
+                                          }
                                         }}
                                       >
-                                        <CheckCircle2 className="mr-2 h-4 w-4" />
                                         Pagar
                                       </Button>
-
-                                      {cycle.status === "PAID" ? (
-                                        <Button
-                                          type="button"
-                                          variant="secondary"
-                                          size="sm"
-                                          onClick={() =>
-                                            unmarkCycleAsPaid(cycle.id)
-                                          }
-                                        >
-                                          Deshacer pago
-                                        </Button>
-                                      ) : null}
 
                                       <Button
                                         type="button"
@@ -1298,8 +1340,8 @@ export default function TarjetasContent() {
                                         }}
                                       >
                                         {expandedCycleId === cycle.id
-                                          ? "Ocultar desglose"
-                                          : "Ver desglose"}
+                                          ? "Ocultar"
+                                          : "Desglose"}
                                       </Button>
                                     </div>
 
@@ -1329,26 +1371,24 @@ export default function TarjetasContent() {
                                       updateStatementAmount={
                                         updateStatementAmount
                                       }
+                                      cancelEditingStatement={() => {
+                                        setEditingStatementCycleId("");
+                                        setStatementAmount("");
+                                      }}
                                       payingCycleId={payingCycleId}
                                       paidAt={paidAt}
                                       setPaidAt={setPaidAt}
                                       paidAmount={paidAmount}
                                       setPaidAmount={setPaidAmount}
                                       markCycleAsPaid={markCycleAsPaid}
+                                      cancelPaying={() => {
+                                        setPayingCycleId("");
+                                        setPaidAt(getTodayInputValue());
+                                        setPaidAmount("");
+                                      }}
+                                      unmarkCycleAsPaid={unmarkCycleAsPaid}
                                     />
 
-                                    {cycle.statementAmount ? (
-                                      <p className="text-xs text-muted-foreground">
-                                        Estado cuenta:{" "}
-                                        {formatMoney(cycle.statementAmount)}
-                                      </p>
-                                    ) : null}
-
-                                    {cycle.paidAmount ? (
-                                      <p className="text-xs text-muted-foreground">
-                                        Pagado: {formatMoney(cycle.paidAmount)}
-                                      </p>
-                                    ) : null}
                                   </div>
 
                                   {expandedCycleId === cycle.id ? (
