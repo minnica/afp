@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { Filter, Pencil, Plus, RotateCcw, Trash2, X } from "lucide-react";
+import { Pencil, Plus, Trash2 } from "lucide-react";
 
 import { Spinner } from "@/components/ui/spinner";
 import { supabase } from "@/lib/supabase";
@@ -16,7 +16,6 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -40,6 +39,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { DataTable } from "@/components/ui/data-table";
+import { TableCell, TableRow } from "@/components/ui/table";
 
 function getTodayInputValue() {
   const today = new Date();
@@ -50,13 +58,6 @@ function getTodayInputValue() {
   return `${year}-${month}-${day}`;
 }
 
-function getMonthStartInputValue() {
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, "0");
-
-  return `${year}-${month}-01`;
-}
 
 function formatMoney(value) {
   const numberValue = Number(value || 0);
@@ -68,7 +69,9 @@ function formatMoney(value) {
 }
 
 function formatExpenseDate(dateString) {
-  return format(new Date(dateString), "d MMM yyyy", { locale: es });
+  const datePart = String(dateString).split("T")[0];
+  const [year, month, day] = datePart.split("-").map(Number);
+  return format(new Date(year, month - 1, day), "d MMM yyyy", { locale: es });
 }
 
 function getPaymentMethodLabel(paymentMethod) {
@@ -92,18 +95,8 @@ export default function GastosContent() {
   const [categoryId, setCategoryId] = useState("");
   const [notes, setNotes] = useState("");
 
-  const [filterStartDate, setFilterStartDate] = useState(
-    getMonthStartInputValue(),
-  );
-  const [filterEndDate, setFilterEndDate] = useState(getTodayInputValue());
-  const [filterCategoryId, setFilterCategoryId] = useState("ALL");
-  const [filterPaymentMethod, setFilterPaymentMethod] = useState("ALL");
-  const [filterCardId, setFilterCardId] = useState("ALL");
-  const [filterConcept, setFilterConcept] = useState("");
-
   const [isCheckingSession, setIsCheckingSession] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [isFiltering, setIsFiltering] = useState(false);
   const [error, setError] = useState("");
 
   const [people, setPeople] = useState([]);
@@ -118,6 +111,7 @@ export default function GastosContent() {
   const [payableAccountId, setPayableAccountId] = useState("NONE");
   const [subscriptionId, setSubscriptionId] = useState("NONE");
 
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingExpenseId, setEditingExpenseId] = useState("");
   const [editDate, setEditDate] = useState("");
   const [editPaymentMethod, setEditPaymentMethod] = useState("CASH");
@@ -202,19 +196,7 @@ export default function GastosContent() {
   }
 
   function buildExpensesUrl(userId) {
-    const params = new URLSearchParams();
-
-    params.set("userId", userId);
-
-    if (filterStartDate) params.set("startDate", filterStartDate);
-    if (filterEndDate) params.set("endDate", filterEndDate);
-    if (filterCategoryId !== "ALL") params.set("categoryId", filterCategoryId);
-    if (filterPaymentMethod !== "ALL")
-      params.set("paymentMethod", filterPaymentMethod);
-    if (filterCardId !== "ALL") params.set("cardId", filterCardId);
-    if (filterConcept.trim()) params.set("concept", filterConcept.trim());
-
-    return `/api/expenses?${params.toString()}`;
+    return `/api/expenses?userId=${userId}`;
   }
 
   async function loadExpenses(userId) {
@@ -363,38 +345,6 @@ export default function GastosContent() {
     }
   }
 
-  async function applyFilters() {
-    if (!user) return;
-
-    setError("");
-    setIsFiltering(true);
-
-    try {
-      await loadExpenses(user.id);
-    } catch (err) {
-      setError(err.message || "No se pudieron aplicar filtros.");
-    } finally {
-      setIsFiltering(false);
-    }
-  }
-
-  async function resetFilters() {
-    if (!user) return;
-
-    setFilterStartDate(getMonthStartInputValue());
-    setFilterEndDate(getTodayInputValue());
-    setFilterCategoryId("ALL");
-    setFilterPaymentMethod("ALL");
-    setFilterCardId("ALL");
-    setFilterConcept("");
-
-    setTimeout(() => {
-      loadExpenses(user.id).catch((err) => {
-        setError(err.message || "No se pudieron limpiar filtros.");
-      });
-    }, 0);
-  }
-
   function toDateInputValue(dateString) {
     const date = new Date(dateString);
     const year = date.getUTCFullYear();
@@ -414,9 +364,11 @@ export default function GastosContent() {
     setEditCategoryId(expense.categoryId || "");
     setEditNotes(expense.notes || "");
     setEditSubscriptionId(expense.subscriptionId || "NONE");
+    setEditDialogOpen(true);
   }
 
   function cancelEditingExpense() {
+    setEditDialogOpen(false);
     setEditingExpenseId("");
     setEditDate("");
     setEditPaymentMethod("CASH");
@@ -497,11 +449,119 @@ export default function GastosContent() {
     }
   }
 
-  const totalShown = useMemo(() => {
-    return expenses.reduce((sum, expense) => {
-      return sum + Number(expense.amount || 0);
-    }, 0);
-  }, [expenses]);
+  const expenseColumns = useMemo(
+    () => [
+      {
+        id: "date",
+        accessorFn: (row) => formatExpenseDate(row.date),
+        sortingFn: (rowA, rowB) =>
+          new Date(rowA.original.date) - new Date(rowB.original.date),
+        header: "Fecha",
+        cell: ({ row }) => (
+          <span className="whitespace-nowrap text-sm">
+            {formatExpenseDate(row.original.date)}
+          </span>
+        ),
+      },
+      {
+        accessorKey: "concept",
+        header: "Concepto",
+        cell: ({ row }) => {
+          const expense = row.original;
+          return (
+            <div className="min-w-0">
+              <p className="font-medium">{expense.concept}</p>
+              {expense.notes ? (
+                <p className="text-xs text-muted-foreground">{expense.notes}</p>
+              ) : null}
+              {expense.person ? (
+                <p className="text-xs text-muted-foreground">
+                  {expense.person.name}
+                  {expense.receivableAccount
+                    ? ` · ${expense.receivableAccount.concept}`
+                    : ""}
+                </p>
+              ) : null}
+              {expense.payableAccount ? (
+                <p className="text-xs text-muted-foreground">
+                  Pagar: {expense.payableAccount.concept}
+                </p>
+              ) : null}
+              {expense.subscription ? (
+                <p className="text-xs text-muted-foreground">
+                  {expense.subscription.name}
+                </p>
+              ) : null}
+            </div>
+          );
+        },
+      },
+      {
+        id: "category",
+        accessorFn: (row) => row.category?.name ?? "",
+        header: "Categoría",
+        cell: ({ row }) =>
+          row.original.category?.name ? (
+            <Badge variant="secondary">{row.original.category.name}</Badge>
+          ) : (
+            <span className="text-muted-foreground">—</span>
+          ),
+      },
+      {
+        id: "paymentMethod",
+        accessorFn: (row) =>
+          getPaymentMethodLabel(row.paymentMethod) +
+          (row.card ? ` · ${row.card.name}` : ""),
+        header: "Método",
+        cell: ({ row }) => (
+          <span className="text-sm">
+            {getPaymentMethodLabel(row.original.paymentMethod)}
+            {row.original.card ? (
+              <span className="text-muted-foreground">
+                {" "}· {row.original.card.name}
+              </span>
+            ) : null}
+          </span>
+        ),
+      },
+      {
+        accessorKey: "amount",
+        header: "Monto",
+        cell: ({ row }) => (
+          <span className="whitespace-nowrap font-semibold tabular-nums">
+            {formatMoney(row.original.amount)}
+          </span>
+        ),
+      },
+      {
+        id: "actions",
+        header: "",
+        enableSorting: false,
+        cell: ({ row }) => (
+          <div className="flex items-center gap-1">
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => startEditingExpense(row.original)}
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => setExpenseToDelete(row.original)}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        ),
+      },
+    ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
 
   if (isCheckingSession) {
     return (
@@ -542,6 +602,150 @@ export default function GastosContent() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Dialog open={editDialogOpen} onOpenChange={(open) => { if (!open) cancelEditingExpense(); }}>
+        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Editar gasto</DialogTitle>
+          </DialogHeader>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label>Fecha</Label>
+              <Input
+                type="date"
+                value={editDate}
+                onChange={(event) => setEditDate(event.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Método</Label>
+              <Select
+                value={editPaymentMethod}
+                onValueChange={(value) => {
+                  setEditPaymentMethod(value);
+
+                  if (value === "CASH") {
+                    setEditCardId("");
+                  }
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecciona método" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="CASH">Efectivo</SelectItem>
+                  <SelectItem value="CARD">Tarjeta</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {editPaymentMethod === "CARD" ? (
+              <div className="space-y-2">
+                <Label>Tarjeta</Label>
+                <Select value={editCardId} onValueChange={setEditCardId}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecciona tarjeta" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {cards.map((card) => (
+                      <SelectItem key={card.id} value={card.id}>
+                        {card.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            ) : null}
+
+            <div className="space-y-2">
+              <Label>Concepto</Label>
+              <Input
+                value={editConcept}
+                onChange={(event) => setEditConcept(event.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Monto</Label>
+              <Input
+                type="number"
+                min="0"
+                step="0.01"
+                value={editAmount}
+                onChange={(event) => setEditAmount(event.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Categoría</Label>
+              <Select value={editCategoryId} onValueChange={setEditCategoryId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecciona categoría" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map((category) => (
+                    <SelectItem key={category.id} value={category.id}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Suscripción relacionada</Label>
+              <Select
+                value={editSubscriptionId}
+                onValueChange={setEditSubscriptionId}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecciona suscripción" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="NONE">Sin suscripción</SelectItem>
+                  {subscriptions
+                    .filter(
+                      (subscription) => subscription.paymentMethod === "CASH",
+                    )
+                    .map((subscription) => (
+                      <SelectItem key={subscription.id} value={subscription.id}>
+                        {subscription.name} · {formatMoney(subscription.amount)}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2 md:col-span-2">
+              <Label>Notas</Label>
+              <Textarea
+                value={editNotes}
+                onChange={(event) => setEditNotes(event.target.value)}
+              />
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={cancelEditingExpense}
+            >
+              Cancelar
+            </Button>
+            <Button
+              type="button"
+              onClick={updateExpense}
+              disabled={isUpdating}
+            >
+              {isUpdating ? "Guardando..." : "Guardar cambios"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <main>
         <section className="mx-auto flex w-full max-w-6xl flex-col px-4 py-5 md:py-8">
           {error ? (
@@ -550,7 +754,7 @@ export default function GastosContent() {
             </div>
           ) : null}
 
-          <div className="grid gap-5 xl:grid-cols-[420px_1fr]">
+          <div className="grid min-w-0 gap-5 xl:grid-cols-[360px_1fr]">
             <Card className="rounded-2xl border-border bg-card">
               <CardHeader>
                 <CardTitle className="text-lg font-semibold uppercase text-center">
@@ -856,135 +1060,7 @@ export default function GastosContent() {
               </CardContent>
             </Card>
 
-            <div className="space-y-6">
-              <Card className="rounded-2xl border-border bg-card">
-                <CardHeader>
-                  <CardTitle className="text-lg font-semibold uppercase text-center">
-                    Filtros
-                  </CardTitle>
-                </CardHeader>
-
-                <CardContent className="space-y-5">
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-2">
-                      <Label>Desde</Label>
-                      <Input
-                        type="date"
-                        value={filterStartDate}
-                        onChange={(event) =>
-                          setFilterStartDate(event.target.value)
-                        }
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label>Hasta</Label>
-                      <Input
-                        type="date"
-                        value={filterEndDate}
-                        onChange={(event) =>
-                          setFilterEndDate(event.target.value)
-                        }
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-2">
-                      <Label>Categoría</Label>
-                      <Select
-                        value={filterCategoryId}
-                        onValueChange={setFilterCategoryId}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Todas" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="ALL">Todas</SelectItem>
-                          {categories.map((category) => (
-                            <SelectItem key={category.id} value={category.id}>
-                              {category.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label>Método</Label>
-                      <Select
-                        value={filterPaymentMethod}
-                        onValueChange={setFilterPaymentMethod}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Todos" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="ALL">Todos</SelectItem>
-                          <SelectItem value="CASH">Efectivo</SelectItem>
-                          <SelectItem value="CARD">Tarjeta</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-2">
-                      <Label>Tarjeta</Label>
-                      <Select
-                        value={filterCardId}
-                        onValueChange={setFilterCardId}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Todas" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="ALL">Todas</SelectItem>
-                          {cards.map((card) => (
-                            <SelectItem key={card.id} value={card.id}>
-                              {card.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label>Concepto</Label>
-                      <Input
-                        value={filterConcept}
-                        placeholder="Buscar texto..."
-                        onChange={(event) =>
-                          setFilterConcept(event.target.value)
-                        }
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col gap-3 sm:flex-row">
-                    <Button
-                      type="button"
-                      className="w-full sm:w-auto"
-                      onClick={applyFilters}
-                      disabled={isFiltering}
-                    >
-                      <Filter className="mr-2 h-4 w-4" />
-                      {isFiltering ? "Filtrando..." : "Aplicar filtros"}
-                    </Button>
-
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      className="w-full sm:w-auto"
-                      onClick={resetFilters}
-                    >
-                      <RotateCcw className="mr-2 h-4 w-4" />
-                      Limpiar
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-
+            <div className="min-w-0 space-y-6">
               <Card className="rounded-2xl border-border bg-card">
                 <CardHeader>
                   <CardTitle className="text-lg font-semibold uppercase text-center">
@@ -993,291 +1069,30 @@ export default function GastosContent() {
                 </CardHeader>
 
                 <CardContent>
-                  <div className="mb-4 rounded-xl border border-border bg-background/60 px-4 py-3">
-                    <p className="text-sm text-muted-foreground text-center">
-                      Total filtrado
-                    </p>
-                    <p className="text-2xl font-semibold text-center">
-                      {formatMoney(totalShown)}
-                    </p>
-                  </div>
-
-                  {expenses.length === 0 ? (
-                    <p className="rounded-xl border border-border bg-muted/30 px-4 py-6 text-sm text-muted-foreground">
-                      No hay gastos para estos filtros.
-                    </p>
-                  ) : (
-                    <div className="grid gap-3">
-                      {expenses.map((expense) => (
-                        <div
-                          key={expense.id}
-                          className="rounded-xl border border-border bg-background/60 px-4 py-4"
-                        >
-                          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                            <div className="min-w-0">
-                              <div className="flex flex-wrap items-center gap-2">
-                                <p className="text-lg font-semibold">
-                                  {expense.concept}
-                                </p>
-                                <Badge variant="secondary">
-                                  {expense.category?.name}
-                                </Badge>
-                              </div>
-
-                              <p className="mt-1 text-sm text-muted-foreground">
-                                {formatExpenseDate(expense.date)} ·{" "}
-                                {getPaymentMethodLabel(expense.paymentMethod)}
-                                {expense.card ? ` · ${expense.card.name}` : ""}
-                              </p>
-
-                              {expense.person ? (
-                                <p className="mt-1 text-sm text-muted-foreground">
-                                  Persona: {expense.person.name}
-                                  {expense.receivableAccount
-                                    ? ` · Por cobrar: ${expense.receivableAccount.concept}`
-                                    : ""}
-                                </p>
-                              ) : null}
-
-                              {expense.payableAccount ? (
-                                <p className="mt-1 text-sm text-muted-foreground">
-                                  Cuenta por pagar:{" "}
-                                  {expense.payableAccount.concept}
-                                </p>
-                              ) : null}
-
-                              {expense.subscription ? (
-                                <p className="mt-1 text-sm text-muted-foreground">
-                                  Suscripción: {expense.subscription.name}
-                                </p>
-                              ) : null}
-
-                              {expense.notes ? (
-                                <p className="mt-1 text-sm text-muted-foreground">
-                                  {expense.notes}
-                                </p>
-                              ) : null}
-                            </div>
-
-                            <div className="flex shrink-0 items-center justify-between gap-2 sm:justify-end">
-                              <p className="text-lg font-semibold">
-                                {formatMoney(expense.amount)}
-                              </p>
-
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => startEditingExpense(expense)}
-                              >
-                                <Pencil className="h-4 w-4" />
-                              </Button>
-
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => setExpenseToDelete(expense)}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </div>
-
-                          {editingExpenseId === expense.id ? (
-                            <div className="mt-4 rounded-xl border border-border bg-background/70 p-4">
-                              <div className="mb-4 flex items-center justify-between gap-4">
-                                <p className="text-sm font-medium">
-                                  Editar gasto
-                                </p>
-
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={cancelEditingExpense}
-                                >
-                                  <X className="h-4 w-4" />
-                                </Button>
-                              </div>
-
-                              <div className="grid gap-4 md:grid-cols-2">
-                                <div className="space-y-2">
-                                  <Label>Fecha</Label>
-                                  <Input
-                                    type="date"
-                                    value={editDate}
-                                    onChange={(event) =>
-                                      setEditDate(event.target.value)
-                                    }
-                                  />
-                                </div>
-
-                                <div className="space-y-2">
-                                  <Label>Método</Label>
-                                  <Select
-                                    value={editPaymentMethod}
-                                    onValueChange={(value) => {
-                                      setEditPaymentMethod(value);
-
-                                      if (value === "CASH") {
-                                        setEditCardId("");
-                                      }
-                                    }}
-                                  >
-                                    <SelectTrigger>
-                                      <SelectValue placeholder="Selecciona método" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="CASH">
-                                        Efectivo
-                                      </SelectItem>
-                                      <SelectItem value="CARD">
-                                        Tarjeta
-                                      </SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                </div>
-
-                                {editPaymentMethod === "CARD" ? (
-                                  <div className="space-y-2">
-                                    <Label>Tarjeta</Label>
-                                    <Select
-                                      value={editCardId}
-                                      onValueChange={setEditCardId}
-                                    >
-                                      <SelectTrigger>
-                                        <SelectValue placeholder="Selecciona tarjeta" />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        {cards.map((card) => (
-                                          <SelectItem
-                                            key={card.id}
-                                            value={card.id}
-                                          >
-                                            {card.name}
-                                          </SelectItem>
-                                        ))}
-                                      </SelectContent>
-                                    </Select>
-                                  </div>
-                                ) : null}
-
-                                <div className="space-y-2">
-                                  <Label>Concepto</Label>
-                                  <Input
-                                    value={editConcept}
-                                    onChange={(event) =>
-                                      setEditConcept(event.target.value)
-                                    }
-                                  />
-                                </div>
-
-                                <div className="space-y-2">
-                                  <Label>Monto</Label>
-                                  <Input
-                                    type="number"
-                                    min="0"
-                                    step="0.01"
-                                    value={editAmount}
-                                    onChange={(event) =>
-                                      setEditAmount(event.target.value)
-                                    }
-                                  />
-                                </div>
-
-                                <div className="space-y-2">
-                                  <Label>Categoría</Label>
-                                  <Select
-                                    value={editCategoryId}
-                                    onValueChange={setEditCategoryId}
-                                  >
-                                    <SelectTrigger>
-                                      <SelectValue placeholder="Selecciona categoría" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      {categories.map((category) => (
-                                        <SelectItem
-                                          key={category.id}
-                                          value={category.id}
-                                        >
-                                          {category.name}
-                                        </SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
-                                </div>
-
-                                <div className="space-y-2">
-                                  <Label>Suscripción relacionada</Label>
-                                  <Select
-                                    value={editSubscriptionId}
-                                    onValueChange={setEditSubscriptionId}
-                                  >
-                                    <SelectTrigger>
-                                      <SelectValue placeholder="Selecciona suscripción" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="NONE">
-                                        Sin suscripción
-                                      </SelectItem>
-                                      {subscriptions
-                                        .filter(
-                                          (subscription) =>
-                                            subscription.paymentMethod ===
-                                            "CASH",
-                                        )
-                                        .map((subscription) => (
-                                          <SelectItem
-                                            key={subscription.id}
-                                            value={subscription.id}
-                                          >
-                                            {subscription.name} ·{" "}
-                                            {formatMoney(subscription.amount)}
-                                          </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                  </Select>
-                                </div>
-
-                                <div className="space-y-2 md:col-span-2">
-                                  <Label>Notas</Label>
-                                  <Textarea
-                                    value={editNotes}
-                                    onChange={(event) =>
-                                      setEditNotes(event.target.value)
-                                    }
-                                  />
-                                </div>
-                              </div>
-
-                              <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-                                <Button
-                                  type="button"
-                                  className="w-full sm:w-auto"
-                                  onClick={updateExpense}
-                                  disabled={isUpdating}
-                                >
-                                  {isUpdating
-                                    ? "Guardando..."
-                                    : "Guardar cambios"}
-                                </Button>
-
-                                <Button
-                                  type="button"
-                                  variant="secondary"
-                                  className="w-full sm:w-auto"
-                                  onClick={cancelEditingExpense}
-                                >
-                                  Cancelar
-                                </Button>
-                              </div>
-                            </div>
-                          ) : null}
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                  <DataTable
+                    columns={expenseColumns}
+                    data={expenses}
+                    filterGlobal
+                    filterPlaceholder="Buscar en tabla..."
+                    pageSize={15}
+                    footerRow={(table) => {
+                      const total = table.getFilteredRowModel().rows.reduce(
+                        (sum, row) => sum + Number(row.original.amount || 0),
+                        0,
+                      );
+                      return (
+                        <TableRow>
+                          <TableCell colSpan={4} className="text-right text-sm font-medium text-muted-foreground">
+                            Total
+                          </TableCell>
+                          <TableCell className="font-semibold tabular-nums">
+                            {formatMoney(total)}
+                          </TableCell>
+                          <TableCell />
+                        </TableRow>
+                      );
+                    }}
+                  />
                 </CardContent>
               </Card>
             </div>

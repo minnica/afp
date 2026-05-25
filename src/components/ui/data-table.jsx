@@ -15,6 +15,7 @@ import {
   Table,
   TableBody,
   TableCell,
+  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
@@ -32,44 +33,55 @@ export function DataTable({
   columns,
   data,
   filterColumn,
+  filterGlobal = false,
   filterPlaceholder = "Filtrar...",
   pageSize = 10,
+  footerRow,
 }) {
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
+  const [globalFilter, setGlobalFilter] = useState("");
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize });
 
   const table = useReactTable({
     data,
     columns,
-    state: { sorting, columnFilters, pagination },
+    state: { sorting, columnFilters, globalFilter, pagination },
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
+    onGlobalFilterChange: setGlobalFilter,
     onPaginationChange: setPagination,
+    globalFilterFn: "includesString",
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
   });
 
-  const filterValue = filterColumn
+  const columnFilterValue = filterColumn
     ? (table.getColumn(filterColumn)?.getFilterValue() ?? "")
     : "";
 
+  const showFilter = filterGlobal || filterColumn;
+
   return (
     <div className="space-y-3">
-      {filterColumn ? (
+      {showFilter ? (
         <Input
           placeholder={filterPlaceholder}
-          value={filterValue}
-          onChange={(e) =>
-            table.getColumn(filterColumn)?.setFilterValue(e.target.value)
-          }
+          value={filterGlobal ? globalFilter : columnFilterValue}
+          onChange={(e) => {
+            if (filterGlobal) {
+              setGlobalFilter(e.target.value);
+            } else {
+              table.getColumn(filterColumn)?.setFilterValue(e.target.value);
+            }
+          }}
           className="max-w-sm"
         />
       ) : null}
 
-      <div className="overflow-hidden rounded-xl border border-border">
+      <div className="overflow-x-auto rounded-xl border border-border">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -115,6 +127,12 @@ export function DataTable({
               </TableRow>
             )}
           </TableBody>
+
+          {footerRow ? (
+            <TableFooter>
+              {footerRow(table)}
+            </TableFooter>
+          ) : null}
         </Table>
       </div>
 
