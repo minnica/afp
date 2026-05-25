@@ -747,7 +747,7 @@ export default function GastosContent() {
       </Dialog>
 
       <main>
-        <section className="mx-auto flex w-full max-w-6xl flex-col px-4 py-5 md:py-8">
+        <section className="mx-auto flex w-full max-w-full flex-col px-4 py-5 md:py-8">
           {error ? (
             <div className="mb-6 rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
               {error}

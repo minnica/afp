@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { CreditCard, Pencil, Plus, Trash2, X } from "lucide-react";
+import { Pencil, Plus, Trash2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,6 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -26,7 +25,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import {
@@ -39,7 +37,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { DataTable } from "@/components/ui/data-table";
+import { TableCell, TableRow } from "@/components/ui/table";
 import { Spinner } from "@/components/ui/spinner";
 
 function getTodayInputValue() {
@@ -99,6 +105,7 @@ export default function ComprasAMesesContent() {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
 
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingPurchaseId, setEditingPurchaseId] = useState("");
   const [editCardId, setEditCardId] = useState("");
   const [editPurchaseDate, setEditPurchaseDate] = useState("");
@@ -268,9 +275,11 @@ export default function ComprasAMesesContent() {
     setEditInitialPaymentsMade(String(purchase.initialPaymentsMade || 0));
     setEditCategoryId(purchase.categoryId || "");
     setEditNotes(purchase.notes || "");
+    setEditDialogOpen(true);
   }
 
   function cancelEditingPurchase() {
+    setEditDialogOpen(false);
     setEditingPurchaseId("");
     setEditCardId("");
     setEditPurchaseDate("");
@@ -363,20 +372,6 @@ export default function ComprasAMesesContent() {
     return purchases.filter((purchase) => purchase.status === "PAID_OFF");
   }, [purchases]);
 
-  const summary = useMemo(() => {
-    return activePurchases.reduce(
-      (acc, purchase) => {
-        acc.monthly += Number(purchase.monthlyPaymentUsed || 0);
-        acc.pending += Number(purchase.remainingBalance || 0);
-        return acc;
-      },
-      {
-        monthly: 0,
-        pending: 0,
-      },
-    );
-  }, [activePurchases]);
-
   const calculatedMonthlyPayment = useMemo(() => {
     const numericTotal = Number(totalAmount || 0);
     const numericMonths = Number(months || 0);
@@ -386,38 +381,340 @@ export default function ComprasAMesesContent() {
     return numericTotal / numericMonths;
   }, [totalAmount, months]);
 
+  const purchaseColumns = useMemo(
+    () => [
+      {
+        id: "purchaseDate",
+        accessorFn: (row) => formatDate(row.purchaseDate),
+        sortingFn: (rowA, rowB) =>
+          new Date(rowA.original.purchaseDate) -
+          new Date(rowB.original.purchaseDate),
+        header: "Fecha",
+        cell: ({ row }) => (
+          <span className="whitespace-nowrap text-sm">
+            {formatDate(row.original.purchaseDate)}
+          </span>
+        ),
+      },
+      {
+        accessorKey: "concept",
+        header: "Concepto",
+        cell: ({ row }) => {
+          const purchase = row.original;
+          return (
+            <div className="min-w-0">
+              <p className="font-medium">{purchase.concept}</p>
+              {purchase.notes ? (
+                <p className="text-xs text-muted-foreground">{purchase.notes}</p>
+              ) : null}
+              {purchase.person ? (
+                <p className="text-xs text-muted-foreground">
+                  {purchase.person.name}
+                </p>
+              ) : null}
+            </div>
+          );
+        },
+      },
+      {
+        id: "card",
+        accessorFn: (row) =>
+          (row.card?.name ?? "") + " " + (row.category?.name ?? ""),
+        header: "Tarjeta",
+        cell: ({ row }) => (
+          <div>
+            <p className="text-sm">{row.original.card?.name ?? "—"}</p>
+            {row.original.category?.name ? (
+              <Badge variant="outline" className="mt-1">
+                {row.original.category.name}
+              </Badge>
+            ) : null}
+          </div>
+        ),
+      },
+      {
+        id: "status",
+        accessorFn: (row) => getStatusLabel(row.status),
+        header: "Estatus",
+        cell: ({ row }) => (
+          <Badge variant="secondary">
+            {getStatusLabel(row.original.status)}
+          </Badge>
+        ),
+      },
+      {
+        id: "progress",
+        accessorFn: (row) => `${row.currentMonth}/${row.months}`,
+        header: "Progreso",
+        enableSorting: false,
+        cell: ({ row }) => (
+          <span className="whitespace-nowrap text-sm text-muted-foreground">
+            {row.original.currentMonth}/{row.original.months} meses
+          </span>
+        ),
+      },
+      {
+        accessorKey: "monthlyPaymentUsed",
+        header: "Mensualidad",
+        cell: ({ row }) => (
+          <span className="whitespace-nowrap font-semibold tabular-nums">
+            {formatMoney(row.original.monthlyPaymentUsed)}
+          </span>
+        ),
+      },
+      {
+        accessorKey: "remainingBalance",
+        header: "Pendiente",
+        cell: ({ row }) => (
+          <span className="whitespace-nowrap font-semibold tabular-nums">
+            {formatMoney(row.original.remainingBalance)}
+          </span>
+        ),
+      },
+      {
+        id: "actions",
+        header: "",
+        enableSorting: false,
+        cell: ({ row }) => (
+          <div className="flex items-center gap-1">
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => startEditingPurchase(row.original)}
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => setPurchaseToDelete(row.original)}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        ),
+      },
+    ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
+
+  function purchasesFooterRow(table) {
+    const rows = table.getFilteredRowModel().rows;
+    const totalMonthly = rows.reduce(
+      (sum, row) => sum + Number(row.original.monthlyPaymentUsed || 0),
+      0,
+    );
+    const totalPending = rows.reduce(
+      (sum, row) => sum + Number(row.original.remainingBalance || 0),
+      0,
+    );
+    return (
+      <TableRow>
+        <TableCell
+          colSpan={5}
+          className="text-right text-sm font-medium text-muted-foreground"
+        >
+          Total
+        </TableCell>
+        <TableCell className="font-semibold tabular-nums">
+          {formatMoney(totalMonthly)}
+        </TableCell>
+        <TableCell className="font-semibold tabular-nums">
+          {formatMoney(totalPending)}
+        </TableCell>
+        <TableCell />
+      </TableRow>
+    );
+  }
+
   if (isLoading) {
     return (
       <main className="flex min-h-dvh items-center justify-center bg-background text-foreground">
-        <Spinner className="size-8"/>
+        <Spinner className="size-8" />
       </main>
     );
   }
 
   return (
     <>
+      <AlertDialog
+        open={Boolean(purchaseToDelete)}
+        onOpenChange={(open) => {
+          if (!open) setPurchaseToDelete(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Eliminar esta compra a meses?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción no se puede deshacer. Se eliminará la compra{" "}
+              {purchaseToDelete?.concept
+                ? `"${purchaseToDelete.concept}"`
+                : "seleccionada"}{" "}
+              por {formatMoney(purchaseToDelete?.totalAmount || 0)}.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => deletePurchase(purchaseToDelete.id)}
+            >
+              Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <Dialog
+        open={editDialogOpen}
+        onOpenChange={(open) => {
+          if (!open) cancelEditingPurchase();
+        }}
+      >
+        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Editar compra a meses</DialogTitle>
+          </DialogHeader>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label>Tarjeta</Label>
+              <Select value={editCardId} onValueChange={setEditCardId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecciona tarjeta" />
+                </SelectTrigger>
+                <SelectContent>
+                  {cards.map((card) => (
+                    <SelectItem key={card.id} value={card.id}>
+                      {card.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Fecha de compra</Label>
+              <Input
+                type="date"
+                value={editPurchaseDate}
+                onChange={(event) => setEditPurchaseDate(event.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2 md:col-span-2">
+              <Label>Concepto</Label>
+              <Input
+                value={editConcept}
+                onChange={(event) => setEditConcept(event.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Monto total</Label>
+              <Input
+                type="number"
+                min="0"
+                step="0.01"
+                value={editTotalAmount}
+                onChange={(event) => setEditTotalAmount(event.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Número de meses</Label>
+              <Input
+                type="number"
+                min="1"
+                value={editMonths}
+                onChange={(event) => setEditMonths(event.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Pago mensual manual (opcional)</Label>
+              <Input
+                type="number"
+                min="0"
+                step="0.01"
+                value={editManualMonthlyPayment}
+                onChange={(event) =>
+                  setEditManualMonthlyPayment(event.target.value)
+                }
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Pagos ya realizados</Label>
+              <Input
+                type="number"
+                min="0"
+                value={editInitialPaymentsMade}
+                onChange={(event) =>
+                  setEditInitialPaymentsMade(event.target.value)
+                }
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Categoría</Label>
+              <Select
+                value={editCategoryId}
+                onValueChange={setEditCategoryId}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecciona categoría" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map((category) => (
+                    <SelectItem key={category.id} value={category.id}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2 md:col-span-2">
+              <Label>Notas</Label>
+              <Textarea
+                value={editNotes}
+                onChange={(event) => setEditNotes(event.target.value)}
+              />
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={cancelEditingPurchase}
+            >
+              Cancelar
+            </Button>
+            <Button
+              type="button"
+              onClick={updatePurchase}
+              disabled={isUpdating}
+            >
+              {isUpdating ? "Guardando..." : "Guardar cambios"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <main>
-        <section className="mx-auto flex w-full max-w-6xl flex-col px-4 py-5 md:py-8">
+        <section className="mx-auto flex w-full max-w-full flex-col px-4 py-5 md:py-8">
           {error ? (
             <div className="mb-6 rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
               {error}
             </div>
           ) : null}
-
-          <div className="mb-6 grid gap-4 md:grid-cols-3">
-            <SummaryCard
-              title="Mensualidades activas"
-              value={formatMoney(summary.monthly)}
-            />
-            <SummaryCard
-              title="Saldo pendiente"
-              value={formatMoney(summary.pending)}
-            />
-            <SummaryCard
-              title="Compras activas"
-              value={activePurchases.length}
-            />
-          </div>
 
           <div className="grid gap-5 xl:grid-cols-[420px_1fr]">
             <Card className="rounded-2xl border-border bg-card">
@@ -493,20 +790,6 @@ export default function ComprasAMesesContent() {
                     {formatMoney(calculatedMonthlyPayment)}
                   </p>
                 </div>
-                {/* pendiente eliminar probablemente */}
-                {/* <div className="space-y-2">
-                <Label>Pago mensual manual opcional</Label>
-                <Input
-                  value={manualMonthlyPayment}
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  placeholder="Opcional"
-                  onChange={(event) =>
-                    setManualMonthlyPayment(event.target.value)
-                  }
-                />
-              </div> */}
 
                 <div className="space-y-2">
                   <Label>Pagos ya realizados</Label>
@@ -561,7 +844,7 @@ export default function ComprasAMesesContent() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Notas opcional</Label>
+                  <Label>Notas (opcional)</Label>
                   <Textarea
                     value={notes}
                     placeholder="Detalles adicionales..."
@@ -603,101 +886,35 @@ export default function ComprasAMesesContent() {
                   </TabsList>
 
                   <TabsContent value="active">
-                    <PurchasesList
-                      items={activePurchases}
-                      onRequestDelete={setPurchaseToDelete}
-                      onDelete={deletePurchase}
-                      onEdit={startEditingPurchase}
-                      editingPurchaseId={editingPurchaseId}
-                      cards={cards}
-                      categories={categories}
-                      editCardId={editCardId}
-                      setEditCardId={setEditCardId}
-                      editPurchaseDate={editPurchaseDate}
-                      setEditPurchaseDate={setEditPurchaseDate}
-                      editConcept={editConcept}
-                      setEditConcept={setEditConcept}
-                      editTotalAmount={editTotalAmount}
-                      setEditTotalAmount={setEditTotalAmount}
-                      editMonths={editMonths}
-                      setEditMonths={setEditMonths}
-                      editManualMonthlyPayment={editManualMonthlyPayment}
-                      setEditManualMonthlyPayment={setEditManualMonthlyPayment}
-                      editInitialPaymentsMade={editInitialPaymentsMade}
-                      setEditInitialPaymentsMade={setEditInitialPaymentsMade}
-                      editCategoryId={editCategoryId}
-                      setEditCategoryId={setEditCategoryId}
-                      editNotes={editNotes}
-                      setEditNotes={setEditNotes}
-                      updatePurchase={updatePurchase}
-                      cancelEditingPurchase={cancelEditingPurchase}
-                      isUpdating={isUpdating}
+                    <DataTable
+                      columns={purchaseColumns}
+                      data={activePurchases}
+                      filterGlobal
+                      filterPlaceholder="Buscar en tabla..."
+                      pageSize={15}
+                      footerRow={purchasesFooterRow}
                     />
                   </TabsContent>
 
                   <TabsContent value="paid">
-                    <PurchasesList
-                      items={paidOffPurchases}
-                      onRequestDelete={setPurchaseToDelete}
-                      onDelete={deletePurchase}
-                      onEdit={startEditingPurchase}
-                      editingPurchaseId={editingPurchaseId}
-                      cards={cards}
-                      categories={categories}
-                      editCardId={editCardId}
-                      setEditCardId={setEditCardId}
-                      editPurchaseDate={editPurchaseDate}
-                      setEditPurchaseDate={setEditPurchaseDate}
-                      editConcept={editConcept}
-                      setEditConcept={setEditConcept}
-                      editTotalAmount={editTotalAmount}
-                      setEditTotalAmount={setEditTotalAmount}
-                      editMonths={editMonths}
-                      setEditMonths={setEditMonths}
-                      editManualMonthlyPayment={editManualMonthlyPayment}
-                      setEditManualMonthlyPayment={setEditManualMonthlyPayment}
-                      editInitialPaymentsMade={editInitialPaymentsMade}
-                      setEditInitialPaymentsMade={setEditInitialPaymentsMade}
-                      editCategoryId={editCategoryId}
-                      setEditCategoryId={setEditCategoryId}
-                      editNotes={editNotes}
-                      setEditNotes={setEditNotes}
-                      updatePurchase={updatePurchase}
-                      cancelEditingPurchase={cancelEditingPurchase}
-                      isUpdating={isUpdating}
+                    <DataTable
+                      columns={purchaseColumns}
+                      data={paidOffPurchases}
+                      filterGlobal
+                      filterPlaceholder="Buscar en tabla..."
+                      pageSize={15}
+                      footerRow={purchasesFooterRow}
                     />
                   </TabsContent>
 
                   <TabsContent value="all">
-                    <PurchasesList
-                      items={purchases}
-                      onRequestDelete={setPurchaseToDelete}
-                      onDelete={deletePurchase}
-                      onEdit={startEditingPurchase}
-                      editingPurchaseId={editingPurchaseId}
-                      cards={cards}
-                      categories={categories}
-                      editCardId={editCardId}
-                      setEditCardId={setEditCardId}
-                      editPurchaseDate={editPurchaseDate}
-                      setEditPurchaseDate={setEditPurchaseDate}
-                      editConcept={editConcept}
-                      setEditConcept={setEditConcept}
-                      editTotalAmount={editTotalAmount}
-                      setEditTotalAmount={setEditTotalAmount}
-                      editMonths={editMonths}
-                      setEditMonths={setEditMonths}
-                      editManualMonthlyPayment={editManualMonthlyPayment}
-                      setEditManualMonthlyPayment={setEditManualMonthlyPayment}
-                      editInitialPaymentsMade={editInitialPaymentsMade}
-                      setEditInitialPaymentsMade={setEditInitialPaymentsMade}
-                      editCategoryId={editCategoryId}
-                      setEditCategoryId={setEditCategoryId}
-                      editNotes={editNotes}
-                      setEditNotes={setEditNotes}
-                      updatePurchase={updatePurchase}
-                      cancelEditingPurchase={cancelEditingPurchase}
-                      isUpdating={isUpdating}
+                    <DataTable
+                      columns={purchaseColumns}
+                      data={purchases}
+                      filterGlobal
+                      filterPlaceholder="Buscar en tabla..."
+                      pageSize={15}
+                      footerRow={purchasesFooterRow}
                     />
                   </TabsContent>
                 </Tabs>
@@ -706,323 +923,7 @@ export default function ComprasAMesesContent() {
           </div>
         </section>
       </main>
-      <AlertDialog
-        open={Boolean(purchaseToDelete)}
-        onOpenChange={(open) => {
-          if (!open) setPurchaseToDelete(null);
-        }}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>¿Eliminar esta compra a meses?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Esta acción no se puede deshacer. Se eliminará la compra{" "}
-              {purchaseToDelete?.concept
-                ? `"${purchaseToDelete.concept}"`
-                : "seleccionada"}{" "}
-              por {formatMoney(purchaseToDelete?.totalAmount || 0)}.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              onClick={() => deletePurchase(purchaseToDelete.id)}
-            >
-              Eliminar
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </>
   );
 }
 
-function SummaryCard({ title, value }) {
-  return (
-    <Card className="rounded-2xl border-border bg-card">
-      <CardHeader className="pb-2">
-        <CardDescription>{title}</CardDescription>
-        <CardTitle className="text-2xl">{value}</CardTitle>
-      </CardHeader>
-    </Card>
-  );
-}
-
-function PurchasesList({
-  items,
-  onRequestDelete,
-  onDelete,
-  onEdit,
-  editingPurchaseId,
-  cards,
-  categories,
-  editCardId,
-  setEditCardId,
-  editPurchaseDate,
-  setEditPurchaseDate,
-  editConcept,
-  setEditConcept,
-  editTotalAmount,
-  setEditTotalAmount,
-  editMonths,
-  setEditMonths,
-  editManualMonthlyPayment,
-  setEditManualMonthlyPayment,
-  editInitialPaymentsMade,
-  setEditInitialPaymentsMade,
-  editCategoryId,
-  setEditCategoryId,
-  editNotes,
-  setEditNotes,
-  updatePurchase,
-  cancelEditingPurchase,
-  isUpdating,
-}) {
-  if (items.length === 0) {
-    return (
-      <p className="rounded-xl border border-border bg-muted/30 px-4 py-6 text-sm text-muted-foreground">
-        No hay compras para mostrar.
-      </p>
-    );
-  }
-
-  return (
-    <div className="grid gap-3">
-      {items.map((purchase) => (
-        <div
-          key={purchase.id}
-          className="rounded-xl border border-border bg-background/60 px-4 py-4"
-        >
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-            <div className="min-w-0">
-              <div className="flex flex-wrap items-center gap-2">
-                <p className="font-medium">{purchase.concept}</p>
-                <Badge variant="secondary">
-                  {getStatusLabel(purchase.status)}
-                </Badge>
-                <Badge variant="outline">{purchase.category?.name}</Badge>
-              </div>
-
-              <p className="mt-1 text-sm text-muted-foreground">
-                {formatDate(purchase.purchaseDate)} · {purchase.card?.name}
-              </p>
-
-              {purchase.person ? (
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Persona: {purchase.person.name}
-                </p>
-              ) : null}
-
-              {purchase.notes ? (
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {purchase.notes}
-                </p>
-              ) : null}
-            </div>
-
-            <div className="flex shrink-0 items-center justify-end gap-2">
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                onClick={() => onEdit(purchase)}
-              >
-                <Pencil className="h-4 w-4" />
-              </Button>
-
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                onClick={() => onRequestDelete(purchase)}
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-
-          <Separator className="my-4" />
-
-          <div className="grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
-            <div className="rounded-lg border border-border bg-muted/30 px-3 py-3">
-              <p className="text-xs text-muted-foreground">Total</p>
-              <p className="mt-1 font-medium">
-                {formatMoney(purchase.totalAmount)}
-              </p>
-            </div>
-
-            <div className="rounded-lg border border-border bg-muted/30 px-3 py-3">
-              <p className="text-xs text-muted-foreground">Mensualidad</p>
-              <p className="mt-1 font-medium">
-                {formatMoney(purchase.monthlyPaymentUsed)}
-              </p>
-            </div>
-
-            <div className="rounded-lg border border-border bg-muted/30 px-3 py-3">
-              <p className="text-xs text-muted-foreground">Mes actual</p>
-              <p className="mt-1 font-medium">
-                {purchase.currentMonth}/{purchase.months}
-              </p>
-            </div>
-
-            <div className="rounded-lg border border-border bg-muted/30 px-3 py-3">
-              <p className="text-xs text-muted-foreground">Pendiente</p>
-              <p className="mt-1 font-medium">
-                {formatMoney(purchase.remainingBalance)}
-              </p>
-            </div>
-          </div>
-
-          {editingPurchaseId === purchase.id ? (
-            <div className="mt-4 rounded-xl border border-border bg-background/70 p-4">
-              <div className="mb-4 flex items-center justify-between gap-4">
-                <p className="text-sm font-medium">Editar compra a meses</p>
-
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  onClick={cancelEditingPurchase}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label>Tarjeta</Label>
-                  <Select value={editCardId} onValueChange={setEditCardId}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecciona tarjeta" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {cards.map((card) => (
-                        <SelectItem key={card.id} value={card.id}>
-                          {card.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Fecha de compra</Label>
-                  <Input
-                    type="date"
-                    value={editPurchaseDate}
-                    onChange={(event) =>
-                      setEditPurchaseDate(event.target.value)
-                    }
-                  />
-                </div>
-
-                <div className="space-y-2 md:col-span-2">
-                  <Label>Concepto</Label>
-                  <Input
-                    value={editConcept}
-                    onChange={(event) => setEditConcept(event.target.value)}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Monto total</Label>
-                  <Input
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={editTotalAmount}
-                    onChange={(event) => setEditTotalAmount(event.target.value)}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Número de meses</Label>
-                  <Input
-                    type="number"
-                    min="1"
-                    value={editMonths}
-                    onChange={(event) => setEditMonths(event.target.value)}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Pago mensual manual opcional</Label>
-                  <Input
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={editManualMonthlyPayment}
-                    onChange={(event) =>
-                      setEditManualMonthlyPayment(event.target.value)
-                    }
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Pagos ya realizados</Label>
-                  <Input
-                    type="number"
-                    min="0"
-                    value={editInitialPaymentsMade}
-                    onChange={(event) =>
-                      setEditInitialPaymentsMade(event.target.value)
-                    }
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Categoría</Label>
-                  <Select
-                    value={editCategoryId}
-                    onValueChange={setEditCategoryId}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecciona categoría" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categories.map((category) => (
-                        <SelectItem key={category.id} value={category.id}>
-                          {category.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2 md:col-span-2">
-                  <Label>Notas</Label>
-                  <Textarea
-                    value={editNotes}
-                    onChange={(event) => setEditNotes(event.target.value)}
-                  />
-                </div>
-              </div>
-
-              <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-                <Button
-                  type="button"
-                  className="w-full sm:w-auto"
-                  onClick={updatePurchase}
-                  disabled={isUpdating}
-                >
-                  {isUpdating ? "Guardando..." : "Guardar cambios"}
-                </Button>
-
-                <Button
-                  type="button"
-                  variant="secondary"
-                  className="w-full sm:w-auto"
-                  onClick={cancelEditingPurchase}
-                >
-                  Cancelar
-                </Button>
-              </div>
-            </div>
-          ) : null}
-        </div>
-      ))}
-    </div>
-  );
-}

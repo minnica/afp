@@ -2,8 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CalendarDays, Pencil, Plus, Trash2, X } from "lucide-react";
+import { Pencil, Plus, Trash2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,7 +12,6 @@ import { Label } from "@/components/ui/label";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -23,8 +23,26 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { DataTable } from "@/components/ui/data-table";
+import { TableCell, TableRow } from "@/components/ui/table";
 
 function formatMoney(value) {
   const numberValue = Number(value || 0);
@@ -76,11 +94,15 @@ export default function SuscripcionesContent() {
   const [cardId, setCardId] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [chargeDay, setChargeDay] = useState("");
+  const [frequencyMonths, setFrequencyMonths] = useState("1");
+  const [startMonth, setStartMonth] = useState(getCurrentMonthValue());
+  const [startYear, setStartYear] = useState(getCurrentYearValue());
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
 
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingSubscriptionId, setEditingSubscriptionId] = useState("");
   const [editName, setEditName] = useState("");
   const [editAmount, setEditAmount] = useState("");
@@ -88,15 +110,12 @@ export default function SuscripcionesContent() {
   const [editCardId, setEditCardId] = useState("");
   const [editCategoryId, setEditCategoryId] = useState("");
   const [editChargeDay, setEditChargeDay] = useState("");
-  const [isUpdating, setIsUpdating] = useState(false);
-
-  const [frequencyMonths, setFrequencyMonths] = useState("1");
-  const [startMonth, setStartMonth] = useState(getCurrentMonthValue());
-  const [startYear, setStartYear] = useState(getCurrentYearValue());
-
   const [editFrequencyMonths, setEditFrequencyMonths] = useState("1");
   const [editStartMonth, setEditStartMonth] = useState("");
   const [editStartYear, setEditStartYear] = useState("");
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  const [subscriptionToDelete, setSubscriptionToDelete] = useState(null);
 
   async function loadInitialData(userId) {
     const [settingsResponse, cardsResponse, subscriptionsResponse] =
@@ -221,8 +240,10 @@ export default function SuscripcionesContent() {
       setStartYear(getCurrentYearValue());
 
       await loadSubscriptions(user.id);
+      toast.success("Suscripción guardada exitosamente.");
     } catch (err) {
       setError(err.message || "No se pudo guardar la suscripción.");
+      toast.error(err.message || "No se pudo guardar la suscripción.");
     } finally {
       setIsSaving(false);
     }
@@ -241,9 +262,11 @@ export default function SuscripcionesContent() {
       String(subscription.startMonth || getCurrentMonthValue()),
     );
     setEditStartYear(String(subscription.startYear || getCurrentYearValue()));
+    setEditDialogOpen(true);
   }
 
   function cancelEditingSubscription() {
+    setEditDialogOpen(false);
     setEditingSubscriptionId("");
     setEditName("");
     setEditAmount("");
@@ -251,6 +274,9 @@ export default function SuscripcionesContent() {
     setEditCardId("");
     setEditCategoryId("");
     setEditChargeDay("");
+    setEditFrequencyMonths("1");
+    setEditStartMonth("");
+    setEditStartYear("");
   }
 
   async function updateSubscription() {
@@ -287,8 +313,10 @@ export default function SuscripcionesContent() {
 
       cancelEditingSubscription();
       await loadSubscriptions(user.id);
+      toast.success("Cambios guardados exitosamente.");
     } catch (err) {
       setError(err.message || "No se pudo actualizar la suscripción.");
+      toast.error(err.message || "No se pudo actualizar la suscripción.");
     } finally {
       setIsUpdating(false);
     }
@@ -296,12 +324,6 @@ export default function SuscripcionesContent() {
 
   async function deleteSubscription(id) {
     if (!user) return;
-
-    const confirmed = window.confirm(
-      "¿Seguro que quieres eliminar esta suscripción?",
-    );
-
-    if (!confirmed) return;
 
     setError("");
 
@@ -316,29 +338,108 @@ export default function SuscripcionesContent() {
         throw new Error(data.error || "No se pudo eliminar.");
       }
 
+      setSubscriptionToDelete(null);
       await loadSubscriptions(user.id);
+      toast.success("Suscripción eliminada exitosamente.");
     } catch (err) {
       setError(err.message || "No se pudo eliminar la suscripción.");
+      toast.error(err.message || "No se pudo eliminar la suscripción.");
     }
   }
 
-  const totalMonthly = useMemo(() => {
-    return subscriptions.reduce((sum, subscription) => {
-      return sum + Number(subscription.amount || 0);
-    }, 0);
-  }, [subscriptions]);
-
-  const cardSubscriptions = useMemo(() => {
-    return subscriptions.filter(
-      (subscription) => subscription.paymentMethod === "CARD",
-    );
-  }, [subscriptions]);
-
-  const cashSubscriptions = useMemo(() => {
-    return subscriptions.filter(
-      (subscription) => subscription.paymentMethod === "CASH",
-    );
-  }, [subscriptions]);
+  const subscriptionColumns = useMemo(
+    () => [
+      {
+        accessorKey: "name",
+        header: "Nombre",
+        cell: ({ row }) => (
+          <span className="font-medium">{row.original.name}</span>
+        ),
+      },
+      {
+        id: "category",
+        accessorFn: (row) => row.category?.name ?? "",
+        header: "Categoría",
+        cell: ({ row }) =>
+          row.original.category?.name ? (
+            <Badge variant="secondary">{row.original.category.name}</Badge>
+          ) : (
+            <span className="text-muted-foreground">—</span>
+          ),
+      },
+      {
+        id: "paymentMethod",
+        accessorFn: (row) =>
+          getPaymentMethodLabel(row.paymentMethod) +
+          (row.card ? ` · ${row.card.name}` : ""),
+        header: "Método",
+        cell: ({ row }) => (
+          <span className="text-sm">
+            {getPaymentMethodLabel(row.original.paymentMethod)}
+            {row.original.card ? (
+              <span className="text-muted-foreground">
+                {" "}· {row.original.card.name}
+              </span>
+            ) : null}
+          </span>
+        ),
+      },
+      {
+        id: "chargeDay",
+        accessorFn: (row) => Number(row.chargeDay),
+        header: "Día",
+        cell: ({ row }) => (
+          <span className="text-sm">{row.original.chargeDay}</span>
+        ),
+      },
+      {
+        id: "frequency",
+        accessorFn: (row) => getFrequencyLabel(row.frequencyMonths),
+        header: "Frecuencia",
+        cell: ({ row }) => (
+          <span className="text-sm">
+            {getFrequencyLabel(row.original.frequencyMonths)}
+          </span>
+        ),
+      },
+      {
+        accessorKey: "amount",
+        header: "Monto",
+        cell: ({ row }) => (
+          <span className="whitespace-nowrap font-semibold tabular-nums">
+            {formatMoney(row.original.amount)}
+          </span>
+        ),
+      },
+      {
+        id: "actions",
+        header: "",
+        enableSorting: false,
+        cell: ({ row }) => (
+          <div className="flex items-center gap-1">
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => startEditingSubscription(row.original)}
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => setSubscriptionToDelete(row.original)}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        ),
+      },
+    ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
 
   if (isLoading) {
     return (
@@ -349,503 +450,433 @@ export default function SuscripcionesContent() {
   }
 
   return (
-    <main>
-      <section className="mx-auto flex w-full max-w-6xl flex-col px-4 py-5 md:py-8">
-        {error ? (
-          <div className="mb-6 rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-            {error}
-          </div>
-        ) : null}
+    <>
+      <AlertDialog
+        open={Boolean(subscriptionToDelete)}
+        onOpenChange={(open) => {
+          if (!open) setSubscriptionToDelete(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Eliminar esta suscripción?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción no se puede deshacer. Se eliminará la suscripción{" "}
+              {subscriptionToDelete?.name
+                ? `"${subscriptionToDelete.name}"`
+                : "seleccionada"}{" "}
+              por {formatMoney(subscriptionToDelete?.amount || 0)}.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
 
-        <div className="mb-6 grid gap-4 md:grid-cols-3">
-          <SummaryCard
-            title="Total mensual"
-            value={formatMoney(totalMonthly)}
-          />
-          <SummaryCard title="Con tarjeta" value={cardSubscriptions.length} />
-          <SummaryCard title="En efectivo" value={cashSubscriptions.length} />
-        </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-800 text-white hover:bg-red-900 focus:ring-red-300"
+              onClick={() => deleteSubscription(subscriptionToDelete.id)}
+            >
+              Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
-        <div className="grid gap-6 lg:grid-cols-[420px_1fr]">
-          <Card className="rounded-2xl border-border bg-card">
-            <CardHeader>
-              <CardTitle className="text-lg font-semibold uppercase text-center">
-                Nueva suscripción
-              </CardTitle>
-            </CardHeader>
+      <Dialog
+        open={editDialogOpen}
+        onOpenChange={(open) => {
+          if (!open) cancelEditingSubscription();
+        }}
+      >
+        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Editar suscripción</DialogTitle>
+          </DialogHeader>
 
-            <CardContent className="space-y-5">
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label>Nombre</Label>
+              <Input
+                value={editName}
+                onChange={(event) => setEditName(event.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Monto</Label>
+              <Input
+                value={editAmount}
+                type="number"
+                min="0"
+                step="0.01"
+                onChange={(event) => setEditAmount(event.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Método de pago</Label>
+              <Select
+                value={editPaymentMethod}
+                onValueChange={(value) => {
+                  setEditPaymentMethod(value);
+
+                  if (value === "CASH") {
+                    setEditCardId("");
+                  }
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecciona método" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="CARD">Tarjeta</SelectItem>
+                  <SelectItem value="CASH">Efectivo</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {editPaymentMethod === "CARD" ? (
               <div className="space-y-2">
-                <Label>Nombre</Label>
-                <Input
-                  value={name}
-                  placeholder="Ej. Netflix, Spotify, iCloud..."
-                  onChange={(event) => setName(event.target.value)}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Monto</Label>
-                <Input
-                  value={amount}
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  placeholder="0.00"
-                  onChange={(event) => setAmount(event.target.value)}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Método de pago</Label>
-                <Select
-                  value={paymentMethod}
-                  onValueChange={(value) => {
-                    setPaymentMethod(value);
-
-                    if (value === "CASH") {
-                      setCardId("");
-                    }
-                  }}
-                >
+                <Label>Tarjeta</Label>
+                <Select value={editCardId} onValueChange={setEditCardId}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Selecciona método" />
+                    <SelectValue placeholder="Selecciona tarjeta" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="CARD">Tarjeta</SelectItem>
-                    <SelectItem value="CASH">Efectivo</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {paymentMethod === "CARD" ? (
-                <div className="space-y-2">
-                  <Label>Tarjeta</Label>
-                  <Select value={cardId} onValueChange={setCardId}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecciona tarjeta" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {cards.map((card) => (
-                        <SelectItem key={card.id} value={card.id}>
-                          {card.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-
-                  {cards.length === 0 ? (
-                    <p className="text-xs text-muted-foreground">
-                      Aún no tienes tarjetas. Agrégalas en Tarjetas.
-                    </p>
-                  ) : null}
-                </div>
-              ) : null}
-
-              <div className="space-y-2">
-                <Label>Categoría</Label>
-                <Select value={categoryId} onValueChange={setCategoryId}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecciona categoría" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map((category) => (
-                      <SelectItem key={category.id} value={category.id}>
-                        {category.name}
+                    {cards.map((card) => (
+                      <SelectItem key={card.id} value={card.id}>
+                        {card.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
+            ) : null}
 
-              <div className="space-y-2">
-                <Label>Día de cobro</Label>
-                <Input
-                  value={chargeDay}
-                  type="number"
-                  min="1"
-                  max="31"
-                  placeholder="Ej. 15"
-                  onChange={(event) => setChargeDay(event.target.value)}
-                />
-              </div>
+            <div className="space-y-2">
+              <Label>Categoría</Label>
+              <Select value={editCategoryId} onValueChange={setEditCategoryId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecciona categoría" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map((category) => (
+                    <SelectItem key={category.id} value={category.id}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-              <div className="space-y-2">
-                <Label>Frecuencia</Label>
-                <Select
-                  value={frequencyMonths}
-                  onValueChange={setFrequencyMonths}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecciona frecuencia" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="1">Mensual</SelectItem>
-                    <SelectItem value="2">Cada 2 meses</SelectItem>
-                    <SelectItem value="3">Cada 3 meses</SelectItem>
-                    <SelectItem value="6">Cada 6 meses</SelectItem>
-                    <SelectItem value="12">Anual</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            <div className="space-y-2">
+              <Label>Día de cobro</Label>
+              <Input
+                value={editChargeDay}
+                type="number"
+                min="1"
+                max="31"
+                onChange={(event) => setEditChargeDay(event.target.value)}
+              />
+            </div>
 
-              <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label>Frecuencia</Label>
+              <Select
+                value={editFrequencyMonths}
+                onValueChange={setEditFrequencyMonths}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecciona frecuencia" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1">Mensual</SelectItem>
+                  <SelectItem value="2">Cada 2 meses</SelectItem>
+                  <SelectItem value="3">Cada 3 meses</SelectItem>
+                  <SelectItem value="6">Cada 6 meses</SelectItem>
+                  <SelectItem value="12">Anual</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Mes de inicio</Label>
+              <Select value={editStartMonth} onValueChange={setEditStartMonth}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Mes" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1">Enero</SelectItem>
+                  <SelectItem value="2">Febrero</SelectItem>
+                  <SelectItem value="3">Marzo</SelectItem>
+                  <SelectItem value="4">Abril</SelectItem>
+                  <SelectItem value="5">Mayo</SelectItem>
+                  <SelectItem value="6">Junio</SelectItem>
+                  <SelectItem value="7">Julio</SelectItem>
+                  <SelectItem value="8">Agosto</SelectItem>
+                  <SelectItem value="9">Septiembre</SelectItem>
+                  <SelectItem value="10">Octubre</SelectItem>
+                  <SelectItem value="11">Noviembre</SelectItem>
+                  <SelectItem value="12">Diciembre</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Año de inicio</Label>
+              <Input
+                type="number"
+                min="2000"
+                max="2100"
+                value={editStartYear}
+                onChange={(event) => setEditStartYear(event.target.value)}
+              />
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={cancelEditingSubscription}
+            >
+              Cancelar
+            </Button>
+            <Button
+              type="button"
+              onClick={updateSubscription}
+              disabled={isUpdating}
+            >
+              {isUpdating ? "Guardando..." : "Guardar cambios"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <main>
+        <section className="mx-auto flex w-full max-w-full flex-col px-4 py-5 md:py-8">
+          {error ? (
+            <div className="mb-6 rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+              {error}
+            </div>
+          ) : null}
+
+          <div className="grid min-w-0 gap-5 xl:grid-cols-[420px_1fr]">
+            <Card className="rounded-2xl border-border bg-card">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold uppercase text-center">
+                  Nueva suscripción
+                </CardTitle>
+              </CardHeader>
+
+              <CardContent className="space-y-5">
                 <div className="space-y-2">
-                  <Label>Mes de inicio</Label>
-                  <Select value={startMonth} onValueChange={setStartMonth}>
+                  <Label>Nombre</Label>
+                  <Input
+                    value={name}
+                    placeholder="Ej. Netflix, Spotify, iCloud..."
+                    onChange={(event) => setName(event.target.value)}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Monto</Label>
+                  <Input
+                    value={amount}
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    placeholder="0.00"
+                    onChange={(event) => setAmount(event.target.value)}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Método de pago</Label>
+                  <Select
+                    value={paymentMethod}
+                    onValueChange={(value) => {
+                      setPaymentMethod(value);
+
+                      if (value === "CASH") {
+                        setCardId("");
+                      }
+                    }}
+                  >
                     <SelectTrigger>
-                      <SelectValue placeholder="Mes" />
+                      <SelectValue placeholder="Selecciona método" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="1">Enero</SelectItem>
-                      <SelectItem value="2">Febrero</SelectItem>
-                      <SelectItem value="3">Marzo</SelectItem>
-                      <SelectItem value="4">Abril</SelectItem>
-                      <SelectItem value="5">Mayo</SelectItem>
-                      <SelectItem value="6">Junio</SelectItem>
-                      <SelectItem value="7">Julio</SelectItem>
-                      <SelectItem value="8">Agosto</SelectItem>
-                      <SelectItem value="9">Septiembre</SelectItem>
-                      <SelectItem value="10">Octubre</SelectItem>
-                      <SelectItem value="11">Noviembre</SelectItem>
-                      <SelectItem value="12">Diciembre</SelectItem>
+                      <SelectItem value="CARD">Tarjeta</SelectItem>
+                      <SelectItem value="CASH">Efectivo</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {paymentMethod === "CARD" ? (
+                  <div className="space-y-2">
+                    <Label>Tarjeta</Label>
+                    <Select value={cardId} onValueChange={setCardId}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecciona tarjeta" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {cards.map((card) => (
+                          <SelectItem key={card.id} value={card.id}>
+                            {card.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+
+                    {cards.length === 0 ? (
+                      <p className="text-xs text-muted-foreground">
+                        Aún no tienes tarjetas. Agrégalas en Tarjetas.
+                      </p>
+                    ) : null}
+                  </div>
+                ) : null}
+
+                <div className="space-y-2">
+                  <Label>Categoría</Label>
+                  <Select value={categoryId} onValueChange={setCategoryId}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecciona categoría" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categories.map((category) => (
+                        <SelectItem key={category.id} value={category.id}>
+                          {category.name}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Año de inicio</Label>
+                  <Label>Día de cobro</Label>
                   <Input
+                    value={chargeDay}
                     type="number"
-                    min="2000"
-                    max="2100"
-                    value={startYear}
-                    onChange={(event) => setStartYear(event.target.value)}
+                    min="1"
+                    max="31"
+                    placeholder="Ej. 15"
+                    onChange={(event) => setChargeDay(event.target.value)}
                   />
                 </div>
-              </div>
 
-              <Button
-                type="button"
-                className="w-full"
-                onClick={createSubscription}
-                disabled={isSaving}
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                {isSaving ? "Guardando..." : "Guardar suscripción"}
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card className="rounded-2xl border-border bg-card">
-            <CardHeader>
-              <CardTitle className="text-lg font-semibold uppercase text-center">
-                Suscripciones registradas
-              </CardTitle>
-            </CardHeader>
-
-            <CardContent>
-              {subscriptions.length === 0 ? (
-                <p className="rounded-xl border border-border bg-muted/30 px-4 py-6 text-sm text-muted-foreground">
-                  Aún no hay suscripciones registradas.
-                </p>
-              ) : (
-                <div className="grid gap-3">
-                  {subscriptions.map((subscription) => (
-                    <div
-                      key={subscription.id}
-                      className="rounded-xl border border-border bg-background/60 px-4 py-4"
-                    >
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="min-w-0">
-                          <div className="flex flex-wrap items-center gap-2">
-                            <p className="font-medium">{subscription.name}</p>
-                            <Badge variant="secondary">
-                              {subscription.category?.name}
-                            </Badge>
-                          </div>
-
-                          <p className="mt-1 text-sm text-muted-foreground">
-                            Método:{" "}
-                            {subscription.paymentMethod === "CARD"
-                              ? "Tarjeta"
-                              : "Efectivo"}
-                            {subscription.card
-                              ? ` · ${subscription.card.name}`
-                              : ""}
-                          </p>
-
-                          <p className="mt-1 text-sm text-muted-foreground">
-                            Día {subscription.chargeDay} ·{" "}
-                            {getFrequencyLabel(subscription.frequencyMonths)}
-                            {subscription.startMonth && subscription.startYear
-                              ? ` · desde ${subscription.startMonth}/${subscription.startYear}`
-                              : ""}
-                          </p>
-
-                          <p className="mt-1 flex items-center gap-1 text-sm text-muted-foreground">
-                            <CalendarDays className="h-3.5 w-3.5" />
-                            Día de cobro: {subscription.chargeDay}
-                          </p>
-                        </div>
-
-                        <div className="flex shrink-0 items-center gap-2">
-                          <p className="font-semibold">
-                            {formatMoney(subscription.amount)}
-                          </p>
-
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            onClick={() =>
-                              startEditingSubscription(subscription)
-                            }
-                          >
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => deleteSubscription(subscription.id)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-
-                      {editingSubscriptionId === subscription.id ? (
-                        <div className="mt-4 rounded-xl border border-border bg-background/70 p-4">
-                          <div className="mb-4 flex items-center justify-between gap-4">
-                            <p className="text-sm font-medium">
-                              Editar suscripción
-                            </p>
-
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="icon"
-                              onClick={cancelEditingSubscription}
-                            >
-                              <X className="h-4 w-4" />
-                            </Button>
-                          </div>
-
-                          <div className="grid gap-4 md:grid-cols-2">
-                            <div className="space-y-2">
-                              <Label>Nombre</Label>
-                              <Input
-                                value={editName}
-                                onChange={(event) =>
-                                  setEditName(event.target.value)
-                                }
-                              />
-                            </div>
-
-                            <div className="space-y-2">
-                              <Label>Monto</Label>
-                              <Input
-                                value={editAmount}
-                                type="number"
-                                min="0"
-                                step="0.01"
-                                onChange={(event) =>
-                                  setEditAmount(event.target.value)
-                                }
-                              />
-                            </div>
-
-                            <div className="space-y-2">
-                              <Label>Método de pago</Label>
-                              <Select
-                                value={editPaymentMethod}
-                                onValueChange={(value) => {
-                                  setEditPaymentMethod(value);
-
-                                  if (value === "CASH") {
-                                    setEditCardId("");
-                                  }
-                                }}
-                              >
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Selecciona método" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="CARD">Tarjeta</SelectItem>
-                                  <SelectItem value="CASH">Efectivo</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </div>
-
-                            {editPaymentMethod === "CARD" ? (
-                              <div className="space-y-2">
-                                <Label>Tarjeta</Label>
-                                <Select
-                                  value={editCardId}
-                                  onValueChange={setEditCardId}
-                                >
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Selecciona tarjeta" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {cards.map((card) => (
-                                      <SelectItem key={card.id} value={card.id}>
-                                        {card.name}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              </div>
-                            ) : null}
-
-                            <div className="space-y-2">
-                              <Label>Categoría</Label>
-                              <Select
-                                value={editCategoryId}
-                                onValueChange={setEditCategoryId}
-                              >
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Selecciona categoría" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {categories.map((category) => (
-                                    <SelectItem
-                                      key={category.id}
-                                      value={category.id}
-                                    >
-                                      {category.name}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </div>
-
-                            <div className="space-y-2">
-                              <Label>Día de cobro</Label>
-                              <Input
-                                value={editChargeDay}
-                                type="number"
-                                min="1"
-                                max="31"
-                                onChange={(event) =>
-                                  setEditChargeDay(event.target.value)
-                                }
-                              />
-                            </div>
-
-                            <div className="space-y-2">
-                              <Label>Frecuencia</Label>
-                              <Select
-                                value={editFrequencyMonths}
-                                onValueChange={setEditFrequencyMonths}
-                              >
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Selecciona frecuencia" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="1">Mensual</SelectItem>
-                                  <SelectItem value="2">
-                                    Cada 2 meses
-                                  </SelectItem>
-                                  <SelectItem value="3">
-                                    Cada 3 meses
-                                  </SelectItem>
-                                  <SelectItem value="6">
-                                    Cada 6 meses
-                                  </SelectItem>
-                                  <SelectItem value="12">Anual</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </div>
-
-                            <div className="grid gap-4 sm:grid-cols-2">
-                              <div className="space-y-2">
-                                <Label>Mes de inicio</Label>
-                                <Select
-                                  value={editStartMonth}
-                                  onValueChange={setEditStartMonth}
-                                >
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Mes" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="1">Enero</SelectItem>
-                                    <SelectItem value="2">Febrero</SelectItem>
-                                    <SelectItem value="3">Marzo</SelectItem>
-                                    <SelectItem value="4">Abril</SelectItem>
-                                    <SelectItem value="5">Mayo</SelectItem>
-                                    <SelectItem value="6">Junio</SelectItem>
-                                    <SelectItem value="7">Julio</SelectItem>
-                                    <SelectItem value="8">Agosto</SelectItem>
-                                    <SelectItem value="9">
-                                      Septiembre
-                                    </SelectItem>
-                                    <SelectItem value="10">Octubre</SelectItem>
-                                    <SelectItem value="11">
-                                      Noviembre
-                                    </SelectItem>
-                                    <SelectItem value="12">
-                                      Diciembre
-                                    </SelectItem>
-                                  </SelectContent>
-                                </Select>
-                              </div>
-
-                              <div className="space-y-2">
-                                <Label>Año de inicio</Label>
-                                <Input
-                                  type="number"
-                                  min="2000"
-                                  max="2100"
-                                  value={editStartYear}
-                                  onChange={(event) =>
-                                    setEditStartYear(event.target.value)
-                                  }
-                                />
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-                            <Button
-                              type="button"
-                              onClick={updateSubscription}
-                              disabled={isUpdating}
-                            >
-                              {isUpdating ? "Guardando..." : "Guardar cambios"}
-                            </Button>
-
-                            <Button
-                              type="button"
-                              variant="secondary"
-                              onClick={cancelEditingSubscription}
-                            >
-                              Cancelar
-                            </Button>
-                          </div>
-                        </div>
-                      ) : null}
-                    </div>
-                  ))}
+                <div className="space-y-2">
+                  <Label>Frecuencia</Label>
+                  <Select
+                    value={frequencyMonths}
+                    onValueChange={setFrequencyMonths}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecciona frecuencia" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">Mensual</SelectItem>
+                      <SelectItem value="2">Cada 2 meses</SelectItem>
+                      <SelectItem value="3">Cada 3 meses</SelectItem>
+                      <SelectItem value="6">Cada 6 meses</SelectItem>
+                      <SelectItem value="12">Anual</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-    </main>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label>Mes de inicio</Label>
+                    <Select value={startMonth} onValueChange={setStartMonth}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Mes" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1">Enero</SelectItem>
+                        <SelectItem value="2">Febrero</SelectItem>
+                        <SelectItem value="3">Marzo</SelectItem>
+                        <SelectItem value="4">Abril</SelectItem>
+                        <SelectItem value="5">Mayo</SelectItem>
+                        <SelectItem value="6">Junio</SelectItem>
+                        <SelectItem value="7">Julio</SelectItem>
+                        <SelectItem value="8">Agosto</SelectItem>
+                        <SelectItem value="9">Septiembre</SelectItem>
+                        <SelectItem value="10">Octubre</SelectItem>
+                        <SelectItem value="11">Noviembre</SelectItem>
+                        <SelectItem value="12">Diciembre</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Año de inicio</Label>
+                    <Input
+                      type="number"
+                      min="2000"
+                      max="2100"
+                      value={startYear}
+                      onChange={(event) => setStartYear(event.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <Button
+                  type="button"
+                  className="w-full"
+                  onClick={createSubscription}
+                  disabled={isSaving}
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  {isSaving ? "Guardando..." : "Guardar suscripción"}
+                </Button>
+              </CardContent>
+            </Card>
+
+            <div className="min-w-0">
+              <Card className="rounded-2xl border-border bg-card">
+                <CardHeader>
+                  <CardTitle className="text-lg font-semibold uppercase text-center">
+                    Suscripciones registradas
+                  </CardTitle>
+                </CardHeader>
+
+                <CardContent>
+                  <DataTable
+                    columns={subscriptionColumns}
+                    data={subscriptions}
+                    filterGlobal
+                    filterPlaceholder="Buscar suscripción..."
+                    pageSize={10}
+                    footerRow={(table) => {
+                      const total = table
+                        .getFilteredRowModel()
+                        .rows.reduce(
+                          (sum, row) =>
+                            sum + Number(row.original.amount || 0),
+                          0,
+                        );
+                      return (
+                        <TableRow>
+                          <TableCell
+                            colSpan={5}
+                            className="text-right text-sm font-medium text-muted-foreground"
+                          >
+                            Total
+                          </TableCell>
+                          <TableCell className="font-semibold tabular-nums">
+                            {formatMoney(total)}
+                          </TableCell>
+                          <TableCell />
+                        </TableRow>
+                      );
+                    }}
+                  />
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
+      </main>
+    </>
   );
 }
 
-function SummaryCard({ title, value }) {
-  return (
-    <Card className="rounded-2xl border-border bg-card">
-      <CardHeader className="pb-2">
-        <CardDescription>{title}</CardDescription>
-        <CardTitle className="text-2xl">{value}</CardTitle>
-      </CardHeader>
-    </Card>
-  );
-}
