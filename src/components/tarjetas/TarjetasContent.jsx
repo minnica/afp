@@ -3,10 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  CalendarClock,
-  CheckCircle2,
   CreditCard,
-  FileText,
   Pencil,
   Plus,
   RefreshCcw,
@@ -28,372 +25,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Spinner } from "@/components/ui/spinner";
-
-function formatDate(dateString) {
-  return format(new Date(dateString), "d MMMM yyyy", { locale: es });
-}
-
-function getRelativeBadge(dateString) {
-  const today = new Date();
-  const target = new Date(dateString);
-
-  const todayUtc = Date.UTC(
-    today.getFullYear(),
-    today.getMonth(),
-    today.getDate(),
-  );
-
-  const targetUtc = Date.UTC(
-    target.getUTCFullYear(),
-    target.getUTCMonth(),
-    target.getUTCDate(),
-  );
-
-  const diffDays = Math.round((targetUtc - todayUtc) / 86400000);
-
-  if (diffDays === 0) return "Hoy";
-  if (diffDays > 0) return `+${diffDays}`;
-  return `${diffDays}`;
-}
-
-function formatCompactDate(dateString) {
-  const date = new Date(dateString);
-  const dateText = format(date, "d MMMM", { locale: es });
-  const badge = getRelativeBadge(dateString);
-
-  return `${dateText} [${badge}]`;
-}
-
-function formatMoney(value) {
-  const numberValue = Number(value || 0);
-
-  return new Intl.NumberFormat("es-MX", {
-    style: "currency",
-    currency: "MXN",
-  }).format(numberValue);
-}
-
-function formatShortDate(dateString) {
-  if (!dateString) return "-";
-
-  return format(new Date(dateString), "d MMM", { locale: es });
-}
-
-function getTodayInputValue() {
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, "0");
-  const day = String(today.getDate()).padStart(2, "0");
-
-  return `${year}-${month}-${day}`;
-}
-
-function toDateInputValue(dateString) {
-  if (!dateString) return "";
-
-  const date = new Date(dateString);
-  const year = date.getUTCFullYear();
-  const month = String(date.getUTCMonth() + 1).padStart(2, "0");
-  const day = String(date.getUTCDate()).padStart(2, "0");
-
-  return `${year}-${month}-${day}`;
-}
-
-function getStatusLabel(status) {
-  const labels = {
-    OPEN: "Abierto",
-    CUT: "Cortado",
-    PAYMENT_PENDING: "Pendiente",
-    PAID: "Pagado",
-    OVERDUE: "Vencido",
-  };
-
-  return labels[status] || status;
-}
-
-function getStatusBadgeClass(status) {
-  const classes = {
-    PAID: "bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300",
-    OVERDUE: "bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-300",
-    OPEN: "bg-sky-50 text-sky-700 dark:bg-sky-950 dark:text-sky-300",
-    CUT: "bg-orange-50 text-orange-700 dark:bg-orange-950 dark:text-orange-300",
-    PAYMENT_PENDING:
-      "bg-yellow-50 text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300",
-  };
-
-  return classes[status] || "border-border bg-muted text-muted-foreground";
-}
-
-function BreakdownSection({
-  title,
-  items,
-  emptyText,
-  getPrimary,
-  getSecondary,
-  getAmount,
-}) {
-  return (
-    <div className="rounded-xl border border-border bg-card p-3">
-      <h5 className="mb-3 text-sm font-medium">{title}</h5>
-
-      {items.length === 0 ? (
-        <p className="text-sm text-muted-foreground">{emptyText}</p>
-      ) : (
-        <div className="space-y-2">
-          {items.map((item) => (
-            <div
-              key={item.id}
-              className="rounded-lg border border-border bg-background/60 px-3 py-2"
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-medium">
-                    {getPrimary(item)}
-                  </p>
-                  <p className="mt-1 truncate text-xs text-muted-foreground">
-                    {getSecondary(item)}
-                  </p>
-                </div>
-
-                <p className="shrink-0 text-sm font-semibold">
-                  {formatMoney(getAmount(item))}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function CycleActionForms({
-  cycle,
-  editingCycleDatesId,
-  editCycleStartDate,
-  setEditCycleStartDate,
-  editCycleCutDate,
-  setEditCycleCutDate,
-  editCycleDueDate,
-  setEditCycleDueDate,
-  cancelEditingCycleDates,
-  updateCycleDates,
-  isUpdatingCycleDates,
-  editingStatementCycleId,
-  statementAmount,
-  setStatementAmount,
-  updateStatementAmount,
-  cancelEditingStatement,
-  payingCycleId,
-  paidAt,
-  setPaidAt,
-  paidAmount,
-  setPaidAmount,
-  markCycleAsPaid,
-  cancelPaying,
-  unmarkCycleAsPaid,
-}) {
-  return (
-    <>
-      {editingCycleDatesId === cycle.id ? (
-        <div className="rounded-xl border border-border bg-background/70 p-3">
-          <div className="mb-3 flex items-center justify-between gap-4">
-            <p className="text-xs font-medium">Editar fechas reales</p>
-
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              onClick={cancelEditingCycleDates}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-
-          <div className="grid gap-3">
-            <div className="space-y-2">
-              <Label>Inicio</Label>
-              <Input
-                type="date"
-                value={editCycleStartDate}
-                onChange={(event) => setEditCycleStartDate(event.target.value)}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label>Corte</Label>
-              <Input
-                type="date"
-                value={editCycleCutDate}
-                onChange={(event) => setEditCycleCutDate(event.target.value)}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label>Límite pago</Label>
-              <Input
-                type="date"
-                value={editCycleDueDate}
-                onChange={(event) => setEditCycleDueDate(event.target.value)}
-              />
-            </div>
-
-            <Button
-              type="button"
-              size="sm"
-              onClick={() => updateCycleDates(cycle.id)}
-              disabled={isUpdatingCycleDates}
-            >
-              {isUpdatingCycleDates ? "Guardando..." : "Guardar fechas"}
-            </Button>
-          </div>
-        </div>
-      ) : null}
-
-      {editingStatementCycleId === cycle.id ? (
-        <div className="rounded-xl border border-border bg-background/70 p-3">
-          <div className="mb-2 flex items-center justify-between gap-4">
-            <Label>Monto estado de cuenta</Label>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              onClick={cancelEditingStatement}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-          <div className="flex gap-2">
-            <Input
-              type="number"
-              min="0"
-              step="0.01"
-              value={statementAmount}
-              placeholder="0.00"
-              onChange={(event) => setStatementAmount(event.target.value)}
-            />
-            <Button
-              type="button"
-              size="sm"
-              onClick={() => updateStatementAmount(cycle.id)}
-            >
-              Guardar
-            </Button>
-          </div>
-        </div>
-      ) : null}
-
-      {payingCycleId === cycle.id ? (
-        <div className="rounded-xl border border-border bg-background/70 p-3">
-          <div className="mb-3 flex items-center justify-between gap-4">
-            <p className="text-xs font-medium">Registrar pago</p>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              onClick={cancelPaying}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-          <div className="grid gap-3">
-            <div className="space-y-2">
-              <Label>Fecha de pago</Label>
-              <Input
-                type="date"
-                value={paidAt}
-                onChange={(event) => setPaidAt(event.target.value)}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label>Monto pagado</Label>
-              <Input
-                type="number"
-                min="0"
-                step="0.01"
-                value={paidAmount}
-                placeholder="0.00"
-                onChange={(event) => setPaidAmount(event.target.value)}
-              />
-            </div>
-
-            <Button
-              type="button"
-              size="sm"
-              onClick={() => markCycleAsPaid(cycle.id)}
-            >
-              Confirmar pago
-            </Button>
-
-            {cycle.status === "PAID" ? (
-              <Button
-                type="button"
-                variant="destructive"
-                size="sm"
-                onClick={() => unmarkCycleAsPaid(cycle.id)}
-              >
-                Deshacer pago
-              </Button>
-            ) : null}
-          </div>
-        </div>
-      ) : null}
-    </>
-  );
-}
-
-function CycleBreakdown({ cycle }) {
-  return (
-    <div className="mt-4 rounded-xl border border-border bg-background/70 p-4">
-      <h4 className="mb-4 text-sm font-medium">Desglose del cálculo</h4>
-
-      <div className="grid gap-4 lg:grid-cols-3">
-        <BreakdownSection
-          title={`Gastos (${formatMoney(cycle.expensesAmount)})`}
-          items={cycle.includedExpenses || []}
-          emptyText="No hay gastos diarios en este ciclo."
-          getPrimary={(item) => item.concept}
-          getSecondary={(item) =>
-            `${formatShortDate(item.date)}${
-              item.categoryName ? ` · ${item.categoryName}` : ""
-            }`
-          }
-          getAmount={(item) => item.amount}
-        />
-
-        <BreakdownSection
-          title={`Suscripciones (${formatMoney(cycle.subscriptionsAmount)})`}
-          items={cycle.includedSubscriptions || []}
-          emptyText="No hay suscripciones en este ciclo."
-          getPrimary={(item) => item.name}
-          getSecondary={(item) =>
-            `${formatShortDate(item.chargeDate)}${
-              item.categoryName ? ` · ${item.categoryName}` : ""
-            }`
-          }
-          getAmount={(item) => item.amount}
-        />
-
-        <BreakdownSection
-          title={`Compras a meses (${formatMoney(cycle.purchasesAmount)})`}
-          items={cycle.includedPurchases || []}
-          emptyText="No hay mensualidades en este ciclo."
-          getPrimary={(item) => item.concept}
-          getSecondary={(item) =>
-            `${formatShortDate(item.purchaseDate)} · mes ${
-              item.currentMonth || "-"
-            }/${item.months}${item.categoryName ? ` · ${item.categoryName}` : ""}`
-          }
-          getAmount={(item) => item.amount}
-        />
-      </div>
-    </div>
-  );
-}
+import CyclesDataTable from "@/components/tarjetas/CyclesDataTable";
 
 export default function TarjetasContent() {
   const router = useRouter();
@@ -412,15 +46,6 @@ export default function TarjetasContent() {
   const [isGeneratingCycles, setIsGeneratingCycles] = useState(false);
   const [error, setError] = useState("");
 
-  const [editingStatementCycleId, setEditingStatementCycleId] = useState("");
-  const [statementAmount, setStatementAmount] = useState("");
-
-  const [payingCycleId, setPayingCycleId] = useState("");
-  const [paidAt, setPaidAt] = useState(getTodayInputValue());
-  const [paidAmount, setPaidAmount] = useState("");
-
-  const [expandedCycleId, setExpandedCycleId] = useState("");
-
   const [editingCardId, setEditingCardId] = useState("");
   const [editCardName, setEditCardName] = useState("");
   const [editUsualCutDay, setEditUsualCutDay] = useState("");
@@ -428,31 +53,17 @@ export default function TarjetasContent() {
   const [editCardNotes, setEditCardNotes] = useState("");
   const [isUpdatingCard, setIsUpdatingCard] = useState(false);
 
-  const [editingCycleDatesId, setEditingCycleDatesId] = useState("");
-  const [editCycleStartDate, setEditCycleStartDate] = useState("");
-  const [editCycleCutDate, setEditCycleCutDate] = useState("");
-  const [editCycleDueDate, setEditCycleDueDate] = useState("");
-  const [isUpdatingCycleDates, setIsUpdatingCycleDates] = useState(false);
-
   async function loadCards(userId) {
     const response = await fetch(`/api/cards?userId=${userId}`);
     const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.error || "No se pudieron cargar las tarjetas.");
-    }
-
+    if (!response.ok) throw new Error(data.error || "No se pudieron cargar las tarjetas.");
     setCards(data.cards || []);
   }
 
   async function loadCycles(userId) {
     const response = await fetch(`/api/card-cycles?userId=${userId}`);
     const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.error || "No se pudieron cargar los ciclos.");
-    }
-
+    if (!response.ok) throw new Error(data.error || "No se pudieron cargar los ciclos.");
     setCycles(data.cycles || []);
   }
 
@@ -472,19 +83,11 @@ export default function TarjetasContent() {
 
         await fetch("/api/setup-user", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            userId: session.user.id,
-            email: session.user.email,
-          }),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userId: session.user.id, email: session.user.email }),
         });
 
-        await Promise.all([
-          loadCards(session.user.id),
-          loadCycles(session.user.id),
-        ]);
+        await Promise.all([loadCards(session.user.id), loadCycles(session.user.id)]);
       } catch (err) {
         setError(err.message || "Ocurrió un error.");
       } finally {
@@ -497,36 +100,20 @@ export default function TarjetasContent() {
 
   async function createCard() {
     if (!user) return;
-
     setError("");
     setIsSaving(true);
-
     try {
       const response = await fetch("/api/cards", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userId: user.id,
-          name,
-          usualCutDay,
-          usualDueDay,
-          notes,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: user.id, name, usualCutDay, usualDueDay, notes }),
       });
-
       const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "No se pudo crear la tarjeta.");
-      }
-
+      if (!response.ok) throw new Error(data.error || "No se pudo crear la tarjeta.");
       setName("");
       setUsualCutDay("");
       setUsualDueDay("");
       setNotes("");
-
       await Promise.all([loadCards(user.id), loadCycles(user.id)]);
     } catch (err) {
       setError(err.message || "No se pudo crear la tarjeta.");
@@ -553,16 +140,12 @@ export default function TarjetasContent() {
 
   async function updateCard() {
     if (!user || !editingCardId) return;
-
     setError("");
     setIsUpdatingCard(true);
-
     try {
       const response = await fetch("/api/cards", {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           id: editingCardId,
           name: editCardName,
@@ -571,15 +154,9 @@ export default function TarjetasContent() {
           notes: editCardNotes,
         }),
       });
-
       const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "No se pudo actualizar la tarjeta.");
-      }
-
+      if (!response.ok) throw new Error(data.error || "No se pudo actualizar la tarjeta.");
       cancelEditingCard();
-
       await Promise.all([loadCards(user.id), loadCycles(user.id)]);
     } catch (err) {
       setError(err.message || "No se pudo actualizar la tarjeta.");
@@ -590,146 +167,71 @@ export default function TarjetasContent() {
 
   async function deleteCard(id) {
     if (!user) return;
-
-    const confirmed = window.confirm(
-      "¿Seguro que quieres eliminar esta tarjeta?",
-    );
-
+    const confirmed = window.confirm("¿Seguro que quieres eliminar esta tarjeta?");
     if (!confirmed) return;
-
     setError("");
-
     try {
-      const response = await fetch(`/api/cards?id=${id}`, {
-        method: "DELETE",
-      });
-
+      const response = await fetch(`/api/cards?id=${id}`, { method: "DELETE" });
       const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "No se pudo eliminar la tarjeta.");
-      }
-
+      if (!response.ok) throw new Error(data.error || "No se pudo eliminar la tarjeta.");
       await Promise.all([loadCards(user.id), loadCycles(user.id)]);
     } catch (err) {
       setError(err.message || "No se pudo eliminar la tarjeta.");
     }
   }
 
-  function startEditingCycleDates(cycle) {
-    setEditingCycleDatesId(cycle.id);
-    setEditCycleStartDate(toDateInputValue(cycle.startDate));
-    setEditCycleCutDate(toDateInputValue(cycle.cutDate));
-    setEditCycleDueDate(toDateInputValue(cycle.dueDate));
-  }
-
-  function cancelEditingCycleDates() {
-    setEditingCycleDatesId("");
-    setEditCycleStartDate("");
-    setEditCycleCutDate("");
-    setEditCycleDueDate("");
-  }
-
-  async function updateCycleDates(cycleId) {
+  async function updateCycleDates(cycleId, { startDate, cutDate, dueDate }) {
     if (!user) return;
-
     setError("");
-    setIsUpdatingCycleDates(true);
-
     try {
       const response = await fetch("/api/card-cycles", {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           id: cycleId,
           action: "UPDATE_DATES",
-          startDate: editCycleStartDate,
-          cutDate: editCycleCutDate,
-          dueDate: editCycleDueDate,
+          startDate,
+          cutDate,
+          dueDate,
         }),
       });
-
       const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "No se pudieron actualizar las fechas.");
-      }
-
-      cancelEditingCycleDates();
+      if (!response.ok) throw new Error(data.error || "No se pudieron actualizar las fechas.");
       await loadCycles(user.id);
     } catch (err) {
       setError(err.message || "No se pudieron actualizar las fechas.");
-    } finally {
-      setIsUpdatingCycleDates(false);
     }
   }
 
-  async function updateStatementAmount(cycleId) {
+  async function updateStatementAmount(cycleId, amount) {
     if (!user) return;
-
     setError("");
-
     try {
       const response = await fetch("/api/card-cycles", {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          id: cycleId,
-          action: "UPDATE_STATEMENT",
-          statementAmount,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: cycleId, action: "UPDATE_STATEMENT", statementAmount: amount }),
       });
-
       const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          data.error || "No se pudo guardar el estado de cuenta.",
-        );
-      }
-
-      setEditingStatementCycleId("");
-      setStatementAmount("");
-
+      if (!response.ok)
+        throw new Error(data.error || "No se pudo guardar el estado de cuenta.");
       await loadCycles(user.id);
     } catch (err) {
       setError(err.message || "No se pudo guardar el estado de cuenta.");
     }
   }
 
-  async function markCycleAsPaid(cycleId) {
+  async function markCycleAsPaid(cycleId, { paidAt, paidAmount }) {
     if (!user) return;
-
     setError("");
-
     try {
       const response = await fetch("/api/card-cycles", {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          id: cycleId,
-          action: "MARK_AS_PAID",
-          paidAt,
-          paidAmount,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: cycleId, action: "MARK_AS_PAID", paidAt, paidAmount }),
       });
-
       const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "No se pudo marcar como pagado.");
-      }
-
-      setPayingCycleId("");
-      setPaidAt(getTodayInputValue());
-      setPaidAmount("");
-
+      if (!response.ok) throw new Error(data.error || "No se pudo marcar como pagado.");
       await loadCycles(user.id);
     } catch (err) {
       setError(err.message || "No se pudo marcar como pagado.");
@@ -738,27 +240,16 @@ export default function TarjetasContent() {
 
   async function generateCycles() {
     if (!user) return;
-
     setError("");
     setIsGeneratingCycles(true);
-
     try {
       const response = await fetch("/api/card-cycles", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userId: user.id,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: user.id }),
       });
-
       const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "No se pudieron generar los ciclos.");
-      }
-
+      if (!response.ok) throw new Error(data.error || "No se pudieron generar los ciclos.");
       setCycles(data.cycles || []);
     } catch (err) {
       setError(err.message || "No se pudieron generar los ciclos.");
@@ -769,33 +260,17 @@ export default function TarjetasContent() {
 
   async function unmarkCycleAsPaid(cycleId) {
     if (!user) return;
-
-    const confirmed = window.confirm(
-      "¿Seguro que quieres deshacer el pago de este ciclo?",
-    );
-
+    const confirmed = window.confirm("¿Seguro que quieres deshacer el pago de este ciclo?");
     if (!confirmed) return;
-
     setError("");
-
     try {
       const response = await fetch("/api/card-cycles", {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          id: cycleId,
-          action: "UNMARK_AS_PAID",
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: cycleId, action: "UNMARK_AS_PAID" }),
       });
-
       const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "No se pudo deshacer el pago.");
-      }
-
+      if (!response.ok) throw new Error(data.error || "No se pudo deshacer el pago.");
       await loadCycles(user.id);
     } catch (err) {
       setError(err.message || "No se pudo deshacer el pago.");
@@ -806,26 +281,17 @@ export default function TarjetasContent() {
 
   const cyclesByMonth = useMemo(() => {
     const grouped = {};
-
     for (const cycle of cycles) {
       const key = `${cycle.year}-${String(cycle.month).padStart(2, "0")}`;
-
-      if (!grouped[key]) {
-        grouped[key] = [];
-      }
-
+      if (!grouped[key]) grouped[key] = [];
       grouped[key].push(cycle);
     }
-
     return grouped;
   }, [cycles]);
 
   const currentCycleMonthKey = useMemo(() => {
     const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, "0");
-
-    return `${year}-${month}`;
+    return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}`;
   }, []);
 
   const cycleMonthTabs = useMemo(() => {
@@ -837,57 +303,38 @@ export default function TarjetasContent() {
       .map(([monthKey, monthCycles]) => {
         const [year, month] = monthKey.split("-").map(Number);
         const monthIndex = month - 1;
+        const diffMonths = (year - currentYear) * 12 + (monthIndex - currentMonthIndex);
 
-        const diffMonths =
-          (year - currentYear) * 12 + (monthIndex - currentMonthIndex);
-
-        let label = format(
-          new Date(Date.UTC(year, monthIndex, 1)),
-          "MMMM yyyy",
-          { locale: es },
-        );
-
+        let label = format(new Date(Date.UTC(year, monthIndex, 1)), "MMMM yyyy", { locale: es });
         if (diffMonths === 0) label = "Mes actual";
         if (diffMonths === -1) label = "Mes anterior";
         if (diffMonths === 1) label = "Mes siguiente";
 
-        const title = format(
-          new Date(Date.UTC(year, monthIndex, 1)),
-          "MMMM yyyy",
-          { locale: es },
-        );
+        const title = format(new Date(Date.UTC(year, monthIndex, 1)), "MMMM yyyy", {
+          locale: es,
+        });
 
         return {
           monthKey,
-          monthCycles: [...monthCycles].sort((a, b) => {
-            return (
-              new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
-            );
-          }),
+          monthCycles: [...monthCycles].sort(
+            (a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
+          ),
           label,
           title,
           diffMonths,
         };
       })
       .sort((a, b) => {
-        const priority = {
-          "-1": 0,
-          0: 1,
-          1: 2,
-        };
-
+        const priority = { "-1": 0, 0: 1, 1: 2 };
         const aPriority = priority[a.diffMonths] ?? 99;
         const bPriority = priority[b.diffMonths] ?? 99;
-
         if (aPriority !== bPriority) return aPriority - bPriority;
-
         return a.monthKey.localeCompare(b.monthKey);
       });
   }, [cyclesByMonth]);
 
   const defaultCycleMonthTab =
-    cycleMonthTabs.find((item) => item.monthKey === currentCycleMonthKey)
-      ?.monthKey ||
+    cycleMonthTabs.find((item) => item.monthKey === currentCycleMonthKey)?.monthKey ||
     cycleMonthTabs[0]?.monthKey ||
     "";
 
@@ -901,7 +348,7 @@ export default function TarjetasContent() {
 
   return (
     <main>
-      <section className="mx-auto flex w-full flex-col px-4 py-5 md:py-8">
+      <section className="mx-auto flex w-full max-w-7xl flex-col px-4 py-5 md:py-8">
         {error ? (
           <div className="mb-6 rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
             {error}
@@ -934,7 +381,7 @@ export default function TarjetasContent() {
             <div className="grid gap-6 lg:grid-cols-[420px_1fr]">
               <Card className="rounded-2xl border-border bg-card">
                 <CardHeader>
-                  <CardTitle className="text-lg font-semibold uppercase text-center">
+                  <CardTitle className="text-center text-lg font-semibold uppercase">
                     Nueva tarjeta
                   </CardTitle>
                 </CardHeader>
@@ -945,7 +392,7 @@ export default function TarjetasContent() {
                     <Input
                       value={name}
                       placeholder="Ej. HSBC 1"
-                      onChange={(event) => setName(event.target.value)}
+                      onChange={(e) => setName(e.target.value)}
                     />
                   </div>
 
@@ -958,7 +405,7 @@ export default function TarjetasContent() {
                         min="1"
                         max="31"
                         placeholder="Ej. 12"
-                        onChange={(event) => setUsualCutDay(event.target.value)}
+                        onChange={(e) => setUsualCutDay(e.target.value)}
                       />
                     </div>
 
@@ -970,7 +417,7 @@ export default function TarjetasContent() {
                         min="1"
                         max="31"
                         placeholder="Ej. 2"
-                        onChange={(event) => setUsualDueDay(event.target.value)}
+                        onChange={(e) => setUsualDueDay(e.target.value)}
                       />
                     </div>
                   </div>
@@ -980,7 +427,7 @@ export default function TarjetasContent() {
                     <Input
                       value={notes}
                       placeholder="Ej. Se usa para compras grandes"
-                      onChange={(event) => setNotes(event.target.value)}
+                      onChange={(e) => setNotes(e.target.value)}
                     />
                   </div>
 
@@ -998,7 +445,7 @@ export default function TarjetasContent() {
 
               <Card className="rounded-2xl border-border bg-card">
                 <CardHeader>
-                  <CardTitle className="text-lg font-semibold uppercase text-center">
+                  <CardTitle className="text-center text-lg font-semibold uppercase">
                     Tarjetas registradas
                   </CardTitle>
                 </CardHeader>
@@ -1028,8 +475,7 @@ export default function TarjetasContent() {
                                 </div>
 
                                 <p className="mt-1 text-sm text-muted-foreground">
-                                  Corte día {card.usualCutDay} · Límite día{" "}
-                                  {card.usualDueDay}
+                                  Corte día {card.usualCutDay} · Límite día {card.usualDueDay}
                                 </p>
 
                                 {card.notes ? (
@@ -1064,9 +510,7 @@ export default function TarjetasContent() {
                           {editingCardId === card.id ? (
                             <div className="mt-4 rounded-xl border border-border bg-background/70 p-4">
                               <div className="mb-4 flex items-center justify-between gap-4">
-                                <p className="text-sm font-medium">
-                                  Editar tarjeta
-                                </p>
+                                <p className="text-sm font-medium">Editar tarjeta</p>
 
                                 <Button
                                   type="button"
@@ -1083,9 +527,7 @@ export default function TarjetasContent() {
                                   <Label>Nombre</Label>
                                   <Input
                                     value={editCardName}
-                                    onChange={(event) =>
-                                      setEditCardName(event.target.value)
-                                    }
+                                    onChange={(e) => setEditCardName(e.target.value)}
                                   />
                                 </div>
 
@@ -1096,9 +538,7 @@ export default function TarjetasContent() {
                                     min="1"
                                     max="31"
                                     value={editUsualCutDay}
-                                    onChange={(event) =>
-                                      setEditUsualCutDay(event.target.value)
-                                    }
+                                    onChange={(e) => setEditUsualCutDay(e.target.value)}
                                   />
                                 </div>
 
@@ -1109,9 +549,7 @@ export default function TarjetasContent() {
                                     min="1"
                                     max="31"
                                     value={editUsualDueDay}
-                                    onChange={(event) =>
-                                      setEditUsualDueDay(event.target.value)
-                                    }
+                                    onChange={(e) => setEditUsualDueDay(e.target.value)}
                                   />
                                 </div>
 
@@ -1119,9 +557,7 @@ export default function TarjetasContent() {
                                   <Label>Notas</Label>
                                   <Input
                                     value={editCardNotes}
-                                    onChange={(event) =>
-                                      setEditCardNotes(event.target.value)
-                                    }
+                                    onChange={(e) => setEditCardNotes(e.target.value)}
                                   />
                                 </div>
                               </div>
@@ -1132,9 +568,7 @@ export default function TarjetasContent() {
                                   onClick={updateCard}
                                   disabled={isUpdatingCard}
                                 >
-                                  {isUpdatingCard
-                                    ? "Guardando..."
-                                    : "Guardar cambios"}
+                                  {isUpdatingCard ? "Guardando..." : "Guardar cambios"}
                                 </Button>
 
                                 <Button
@@ -1160,7 +594,7 @@ export default function TarjetasContent() {
             <Card className="rounded-2xl border-border bg-card">
               <CardHeader className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div>
-                  <CardTitle className="text-lg font-semibold uppercase text-center">
+                  <CardTitle className="text-center text-lg font-semibold uppercase">
                     Ciclos mensuales
                   </CardTitle>
                 </div>
@@ -1178,8 +612,7 @@ export default function TarjetasContent() {
               <CardContent>
                 {cycles.length === 0 ? (
                   <p className="rounded-xl border border-border bg-muted/30 px-4 py-6 text-sm text-muted-foreground">
-                    Aún no hay ciclos generados. Agrega tarjetas y presiona
-                    “Generar ciclos”.
+                    Aún no hay ciclos generados. Agrega tarjetas y presiona "Generar ciclos".
                   </p>
                 ) : (
                   <Tabs defaultValue={defaultCycleMonthTab} className="w-full">
@@ -1196,211 +629,18 @@ export default function TarjetasContent() {
                     </TabsList>
 
                     {cycleMonthTabs.map((monthGroup) => (
-                      <TabsContent
-                        key={monthGroup.monthKey}
-                        value={monthGroup.monthKey}
-                      >
-                        <div>
-                          <h3 className="mb-3 text-sm font-medium capitalize text-muted-foreground">
-                            {monthGroup.title}
-                          </h3>
+                      <TabsContent key={monthGroup.monthKey} value={monthGroup.monthKey}>
+                        <h3 className="mb-4 text-sm font-medium capitalize text-muted-foreground">
+                          {monthGroup.title}
+                        </h3>
 
-                          <div className="overflow-hidden rounded-xl border border-border">
-                            <div className="hidden grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_auto] gap-4 border-b border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground md:grid">
-                              <div>Tarjeta</div>
-                              <div>Corte</div>
-                              <div>Límite</div>
-                              <div>Calculado</div>
-                              <div>Estado cuenta</div>
-                              <div>Diferencia</div>
-                              <div>Estado</div>
-                              <div>Acciones</div>
-                            </div>
-
-                            <div className="divide-y divide-border">
-                              {monthGroup.monthCycles.map((cycle) => (
-                                <div
-                                  key={cycle.id}
-                                  className="grid gap-3 px-4 py-4 text-sm md:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_auto] md:gap-4"
-                                >
-                                  <div className="font-medium">
-                                    {cycle.card.name}
-                                  </div>
-
-                                  <div>{formatCompactDate(cycle.cutDate)}</div>
-
-                                  <div>{formatCompactDate(cycle.dueDate)}</div>
-
-                                  <div className="font-medium">
-                                    {formatMoney(cycle.calculatedAmount)}
-                                  </div>
-
-                                  <div>
-                                    {cycle.statementAmount
-                                      ? formatMoney(cycle.statementAmount)
-                                      : "-"}
-                                  </div>
-
-                                  <div
-                                    className={
-                                      cycle.difference === null ||
-                                      cycle.difference === undefined
-                                        ? "text-muted-foreground"
-                                        : Math.abs(
-                                              Number(cycle.difference || 0),
-                                            ) > 10
-                                          ? "text-red-400"
-                                          : "text-emerald-400"
-                                    }
-                                  >
-                                    {cycle.difference === null ||
-                                    cycle.difference === undefined
-                                      ? "-"
-                                      : formatMoney(cycle.difference)}
-                                  </div>
-
-                                  <div>
-                                    <Badge
-                                      variant="outline"
-                                      className={getStatusBadgeClass(cycle.status)}
-                                    >
-                                      {getStatusLabel(cycle.status)}
-                                    </Badge>
-                                  </div>
-
-                                  <div className="space-y-3">
-                                    <div className="flex flex-wrap gap-0.5 md:flex-nowrap">
-                                      <Button
-                                        type="button"
-                                        variant="secondary"
-                                        size="sm"
-                                        onClick={() =>
-                                          editingCycleDatesId === cycle.id
-                                            ? cancelEditingCycleDates()
-                                            : startEditingCycleDates(cycle)
-                                        }
-                                      >
-                                        Fechas
-                                      </Button>
-
-                                      <Button
-                                        type="button"
-                                        variant="secondary"
-                                        size="sm"
-                                        onClick={() => {
-                                          if (editingStatementCycleId === cycle.id) {
-                                            setEditingStatementCycleId("");
-                                            setStatementAmount("");
-                                          } else {
-                                            setEditingStatementCycleId(cycle.id);
-                                            setStatementAmount(
-                                              cycle.statementAmount
-                                                ? String(cycle.statementAmount)
-                                                : "",
-                                            );
-                                          }
-                                        }}
-                                      >
-                                        Cuenta
-                                      </Button>
-
-                                      <Button
-                                        type="button"
-                                        variant="secondary"
-                                        size="sm"
-                                        onClick={() => {
-                                          if (payingCycleId === cycle.id) {
-                                            setPayingCycleId("");
-                                            setPaidAt(getTodayInputValue());
-                                            setPaidAmount("");
-                                          } else {
-                                            setPayingCycleId(cycle.id);
-                                            setPaidAt(getTodayInputValue());
-                                            setPaidAmount(
-                                              cycle.statementAmount
-                                                ? String(cycle.statementAmount)
-                                                : "",
-                                            );
-                                          }
-                                        }}
-                                      >
-                                        Pagar
-                                      </Button>
-
-                                      <Button
-                                        type="button"
-                                        variant="secondary"
-                                        size="sm"
-                                        onClick={() => {
-                                          setExpandedCycleId((current) =>
-                                            current === cycle.id
-                                              ? ""
-                                              : cycle.id,
-                                          );
-                                        }}
-                                      >
-                                        {expandedCycleId === cycle.id
-                                          ? "Ocultar"
-                                          : "Desglose"}
-                                      </Button>
-                                    </div>
-
-                                    <CycleActionForms
-                                      cycle={cycle}
-                                      editingCycleDatesId={editingCycleDatesId}
-                                      editCycleStartDate={editCycleStartDate}
-                                      setEditCycleStartDate={
-                                        setEditCycleStartDate
-                                      }
-                                      editCycleCutDate={editCycleCutDate}
-                                      setEditCycleCutDate={setEditCycleCutDate}
-                                      editCycleDueDate={editCycleDueDate}
-                                      setEditCycleDueDate={setEditCycleDueDate}
-                                      cancelEditingCycleDates={
-                                        cancelEditingCycleDates
-                                      }
-                                      updateCycleDates={updateCycleDates}
-                                      isUpdatingCycleDates={
-                                        isUpdatingCycleDates
-                                      }
-                                      editingStatementCycleId={
-                                        editingStatementCycleId
-                                      }
-                                      statementAmount={statementAmount}
-                                      setStatementAmount={setStatementAmount}
-                                      updateStatementAmount={
-                                        updateStatementAmount
-                                      }
-                                      cancelEditingStatement={() => {
-                                        setEditingStatementCycleId("");
-                                        setStatementAmount("");
-                                      }}
-                                      payingCycleId={payingCycleId}
-                                      paidAt={paidAt}
-                                      setPaidAt={setPaidAt}
-                                      paidAmount={paidAmount}
-                                      setPaidAmount={setPaidAmount}
-                                      markCycleAsPaid={markCycleAsPaid}
-                                      cancelPaying={() => {
-                                        setPayingCycleId("");
-                                        setPaidAt(getTodayInputValue());
-                                        setPaidAmount("");
-                                      }}
-                                      unmarkCycleAsPaid={unmarkCycleAsPaid}
-                                    />
-
-                                  </div>
-
-                                  {expandedCycleId === cycle.id ? (
-                                    <div className="md:col-span-8">
-                                      <CycleBreakdown cycle={cycle} />
-                                    </div>
-                                  ) : null}
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        </div>
+                        <CyclesDataTable
+                          cycles={monthGroup.monthCycles}
+                          updateCycleDates={updateCycleDates}
+                          updateStatementAmount={updateStatementAmount}
+                          markCycleAsPaid={markCycleAsPaid}
+                          unmarkCycleAsPaid={unmarkCycleAsPaid}
+                        />
                       </TabsContent>
                     ))}
                   </Tabs>

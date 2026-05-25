@@ -35,6 +35,7 @@ Auth por Supabase. DB PostgreSQL vía Prisma + Supabase. Modo oscuro forzado.
 - **Lenguaje**: JavaScript (jsconfig.json, no TypeScript)
 - **UI**: shadcn/ui (componentes locales en `src/components/ui/`) + Radix UI + Tailwind CSS v4
 - **Íconos**: lucide-react + @hugeicons/react
+- **Tablas**: @tanstack/react-table 8.x (vía `src/components/ui/data-table.jsx`)
 - **Formularios**: React Hook Form + Zod
 - **Auth**: Supabase (`@supabase/supabase-js`)
 - **BD**: PostgreSQL en Supabase, ORM Prisma 7.x con adapter pg
@@ -89,7 +90,6 @@ Archivo: [`prisma/schema.prisma`](prisma/schema.prisma)
 - `ReceivableAccountStatus` / `PayableAccountStatus`: `ACTIVE` | `PAID_OFF` | `CANCELLED`
 - `ReceivableOriginType`: `MANUAL` | `DAILY_EXPENSE` | `INSTALLMENT_PURCHASE`
 - `PayableOriginType`: `MANUAL` | `DAILY_EXPENSE`
-- `PayableAccountType`: `SIMPLE` | `LOAN`
 
 ### Reglas de BD
 
@@ -147,7 +147,7 @@ afp/
 │   │   ├── layout/
 │   │   │   ├── AppSidebar.jsx     → sidebar con nav + logout (Supabase)
 │   │   │   └── AppShell.jsx       → shell que envuelve contenido con sidebar
-│   │   ├── ui/                    → componentes shadcn locales
+│   │   ├── ui/                    → componentes shadcn locales (incl. data-table.jsx)
 │   │   ├── gastos/GastosContent.jsx
 │   │   ├── dashboard/DashboardContent.jsx
 │   │   ├── compras-a-meses/ComprasAMesesContent.jsx
@@ -156,6 +156,8 @@ afp/
 │   │   ├── cuentas-por-cobrar/CuentasPorCobrarContent.jsx
 │   │   ├── cuentas-por-pagar/CuentasPorPagarContent.jsx
 │   │   ├── tarjetas/TarjetasContent.jsx
+│   │   ├── tarjetas/CyclesDataTable.jsx  → Data Table de ciclos + Dialogs de acciones
+│   │   ├── tarjetas/CycleBreakdown.jsx   → desglose de cálculo por ciclo
 │   │   └── configuracion/SettingsContent.jsx
 │   ├── hooks/
 │   │   └── use-mobile.js
@@ -179,7 +181,7 @@ afp/
 
 Todos en `src/components/ui/`. No importar desde paquete externo — son locales.
 
-Disponibles: `button`, `input`, `label`, `select`, `textarea`, `card`, `tabs`, `badge`, `table`, `dropdown-menu`, `separator`, `dialog`, `alert-dialog`, `sonner`, `spinner`, `tooltip`, `skeleton`, `sheet`, `sidebar`, `alert`.
+Disponibles: `button`, `input`, `label`, `select`, `textarea`, `card`, `tabs`, `badge`, `table`, `data-table`, `dropdown-menu`, `separator`, `dialog`, `alert-dialog`, `sonner`, `spinner`, `tooltip`, `skeleton`, `sheet`, `sidebar`, `alert`.
 
 **Reglas:**
 - `toast` siempre desde `@/components/ui/sonner` (o re-export de `sonner`). No importar `sonner` directamente si ya hay wrapper local.
