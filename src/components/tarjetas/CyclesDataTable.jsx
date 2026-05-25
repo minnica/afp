@@ -371,11 +371,13 @@ export default function CyclesDataTable({
         )}
 
         {activeDialog?.type === "breakdown" && (
-          <DialogContent className="sm:max-w-4xl">
+          <DialogContent className="flex max-h-[90svh] flex-col sm:max-w-4xl">
             <DialogHeader>
               <DialogTitle>Desglose — {activeDialog.cycle.card.name}</DialogTitle>
             </DialogHeader>
-            <CycleBreakdown cycle={activeDialog.cycle} />
+            <div className="overflow-y-auto">
+              <CycleBreakdown cycle={activeDialog.cycle} />
+            </div>
           </DialogContent>
         )}
       </Dialog>

@@ -48,47 +48,43 @@ function BreakdownSection({ title, items, emptyText, getPrimary, getSecondary, g
 
 export default function CycleBreakdown({ cycle }) {
   return (
-    <div className="mt-4 rounded-xl border border-border bg-background/70 p-4">
-      <h4 className="mb-4 text-sm font-medium">Desglose del cálculo</h4>
+    <div className="grid gap-4 lg:grid-cols-3">
+      <BreakdownSection
+        title={`Gastos (${formatMoney(cycle.expensesAmount)})`}
+        items={cycle.includedExpenses || []}
+        emptyText="No hay gastos diarios en este ciclo."
+        getPrimary={(item) => item.concept}
+        getSecondary={(item) =>
+          `${formatShortDate(item.date)}${item.categoryName ? ` · ${item.categoryName}` : ""}`
+        }
+        getAmount={(item) => item.amount}
+      />
 
-      <div className="grid gap-4 lg:grid-cols-3">
-        <BreakdownSection
-          title={`Gastos (${formatMoney(cycle.expensesAmount)})`}
-          items={cycle.includedExpenses || []}
-          emptyText="No hay gastos diarios en este ciclo."
-          getPrimary={(item) => item.concept}
-          getSecondary={(item) =>
-            `${formatShortDate(item.date)}${item.categoryName ? ` · ${item.categoryName}` : ""}`
-          }
-          getAmount={(item) => item.amount}
-        />
+      <BreakdownSection
+        title={`Suscripciones (${formatMoney(cycle.subscriptionsAmount)})`}
+        items={cycle.includedSubscriptions || []}
+        emptyText="No hay suscripciones en este ciclo."
+        getPrimary={(item) => item.name}
+        getSecondary={(item) =>
+          `${formatShortDate(item.chargeDate)}${
+            item.categoryName ? ` · ${item.categoryName}` : ""
+          }`
+        }
+        getAmount={(item) => item.amount}
+      />
 
-        <BreakdownSection
-          title={`Suscripciones (${formatMoney(cycle.subscriptionsAmount)})`}
-          items={cycle.includedSubscriptions || []}
-          emptyText="No hay suscripciones en este ciclo."
-          getPrimary={(item) => item.name}
-          getSecondary={(item) =>
-            `${formatShortDate(item.chargeDate)}${
-              item.categoryName ? ` · ${item.categoryName}` : ""
-            }`
-          }
-          getAmount={(item) => item.amount}
-        />
-
-        <BreakdownSection
-          title={`Compras a meses (${formatMoney(cycle.purchasesAmount)})`}
-          items={cycle.includedPurchases || []}
-          emptyText="No hay mensualidades en este ciclo."
-          getPrimary={(item) => item.concept}
-          getSecondary={(item) =>
-            `${formatShortDate(item.purchaseDate)} · mes ${item.currentMonth || "-"}/${
-              item.months
-            }${item.categoryName ? ` · ${item.categoryName}` : ""}`
-          }
-          getAmount={(item) => item.amount}
-        />
-      </div>
+      <BreakdownSection
+        title={`Compras a meses (${formatMoney(cycle.purchasesAmount)})`}
+        items={cycle.includedPurchases || []}
+        emptyText="No hay mensualidades en este ciclo."
+        getPrimary={(item) => item.concept}
+        getSecondary={(item) =>
+          `${formatShortDate(item.purchaseDate)} · mes ${item.currentMonth || "-"}/${
+            item.months
+          }${item.categoryName ? ` · ${item.categoryName}` : ""}`
+        }
+        getAmount={(item) => item.amount}
+      />
     </div>
   );
 }
