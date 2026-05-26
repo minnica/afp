@@ -179,7 +179,7 @@ export default function CyclesDataTable({
             return <span className="text-muted-foreground">-</span>;
           const abs = Math.abs(Number(v || 0));
           return (
-            <span className={abs > 10 ? "text-red-400" : "text-emerald-400"}>
+            <span className={abs > 35 ? "text-red-400" : "text-emerald-400"}>
               {formatMoney(v)}
             </span>
           );
