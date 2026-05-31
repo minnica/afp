@@ -405,12 +405,20 @@ function buildReceivableNotices(receivables, now) {
 
     if (expectedChargeDays.length === 0) continue;
 
+    const originDate = receivable.originDate
+      ? startOfLocalDay(new Date(receivable.originDate))
+      : null;
+
     for (const day of expectedChargeDays) {
       const chargeDate = buildDateFromDay(
         currentYear,
         currentMonth,
         Number(day),
       );
+
+      // No generar aviso para fechas anteriores al inicio de la cuenta
+      if (originDate && chargeDate < originDate) continue;
+
       const diffDays = getDaysDifference(chargeDate, now);
 
       if (diffDays > 2) continue;
