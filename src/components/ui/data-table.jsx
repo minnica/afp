@@ -22,6 +22,13 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 function SortIcon({ isSorted }) {
   if (isSorted === "asc") return <ChevronUp className="ml-1 inline h-3.5 w-3.5" />;
@@ -36,6 +43,7 @@ export function DataTable({
   filterGlobal = false,
   filterPlaceholder = "Filtrar...",
   pageSize = 10,
+  pageSizeOptions,
   footerRow,
 }) {
   const [sorting, setSorting] = useState([]);
@@ -66,19 +74,47 @@ export function DataTable({
 
   return (
     <div className="space-y-3">
-      {showFilter ? (
-        <Input
-          placeholder={filterPlaceholder}
-          value={filterGlobal ? globalFilter : columnFilterValue}
-          onChange={(e) => {
-            if (filterGlobal) {
-              setGlobalFilter(e.target.value);
-            } else {
-              table.getColumn(filterColumn)?.setFilterValue(e.target.value);
-            }
-          }}
-          className="max-w-sm"
-        />
+      {showFilter || pageSizeOptions ? (
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          {showFilter ? (
+            <Input
+              placeholder={filterPlaceholder}
+              value={filterGlobal ? globalFilter : columnFilterValue}
+              onChange={(e) => {
+                if (filterGlobal) {
+                  setGlobalFilter(e.target.value);
+                } else {
+                  table.getColumn(filterColumn)?.setFilterValue(e.target.value);
+                }
+              }}
+              className="max-w-sm"
+            />
+          ) : <div />}
+
+          {pageSizeOptions ? (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span className="text-xs">Mostrar</span>
+              <Select
+                value={String(table.getState().pagination.pageSize)}
+                onValueChange={(value) => {
+                  table.setPageSize(Number(value));
+                  table.setPageIndex(0);
+                }}
+              >
+                <SelectTrigger className="h-9 w-[70px] text-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {pageSizeOptions.map((size) => (
+                    <SelectItem key={size} value={String(size)} className="text-xs">
+                      {size}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          ) : null}
+        </div>
       ) : null}
 
       <div className="overflow-x-auto rounded-xl border border-border">
@@ -136,7 +172,7 @@ export function DataTable({
         </Table>
       </div>
 
-      <div className="flex items-center justify-between gap-4 text-sm text-muted-foreground">
+      <div className="flex flex-wrap items-center justify-between gap-4 text-sm text-muted-foreground">
         <span>
           {table.getFilteredRowModel().rows.length} registro(s)
           {table.getPageCount() > 1
