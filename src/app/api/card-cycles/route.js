@@ -144,12 +144,15 @@ function calculateCycleAmount({
     .filter((subscription) => subscription.cardId === cycle.cardId)
     .filter((subscription) => shouldIncludeSubscriptionInCycle(subscription, cycle))
     .flatMap((subscription) => {
-      const charges = getSubscriptionChargeDatesInsideCycle(
-        subscription,
-        cycle,
-      );
+      const charges = getSubscriptionChargeDatesInsideCycle(subscription, cycle);
 
-      return charges.map((chargeDate) => ({
+      const validCharges = charges.filter((chargeDate) => {
+        if (subscription.isActive) return true;
+        if (!subscription.deactivatedAt) return false;
+        return new Date(chargeDate) <= new Date(subscription.deactivatedAt);
+      });
+
+      return validCharges.map((chargeDate) => ({
         id: `${subscription.id}-${chargeDate.toISOString()}`,
         subscriptionId: subscription.id,
         name: subscription.name,

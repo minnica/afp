@@ -202,10 +202,35 @@ export async function PATCH(request) {
       frequencyMonths,
       startMonth,
       startYear,
+      toggleActive,
+      isActive,
     } = body;
 
     if (!id) {
       return NextResponse.json({ error: "Falta id." }, { status: 400 });
+    }
+
+    if (toggleActive) {
+      let data;
+
+      if (isActive) {
+        data = { isActive: true, deactivatedAt: null };
+      } else {
+        const { deactivatedAt } = body;
+        const parsedDate = deactivatedAt ? new Date(deactivatedAt) : new Date();
+        data = {
+          isActive: false,
+          deactivatedAt: Number.isNaN(parsedDate.getTime()) ? new Date() : parsedDate,
+        };
+      }
+
+      const subscription = await prisma.subscription.update({
+        where: { id },
+        data,
+        include: { card: true, category: true },
+      });
+
+      return NextResponse.json({ subscription });
     }
 
     if (!name || !amount || !paymentMethod || !categoryId || !chargeDay) {

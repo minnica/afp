@@ -91,6 +91,15 @@ Archivo: [`prisma/schema.prisma`](prisma/schema.prisma)
 - `ReceivableOriginType`: `MANUAL` | `DAILY_EXPENSE` | `INSTALLMENT_PURCHASE`
 - `PayableOriginType`: `MANUAL` | `DAILY_EXPENSE`
 
+### Suscripciones — campos de estado
+
+`Subscription` tiene `isActive Boolean @default(true)` y `deactivatedAt DateTime?`.
+
+Reglas de cálculo:
+- Suscripción activa (`isActive = true`): se incluye en ciclos/meses según frecuencia normal.
+- Suscripción inactiva (`isActive = false`): solo se incluye en un ciclo/mes si la fecha de cobro dentro de ese período cae **antes o igual** que `deactivatedAt`. Si el cobro cae después de la desactivación, no se suma ni aparece en el desglose.
+- Avisos de cobro en efectivo (dashboard): suscripciones inactivas se omiten por completo.
+
 ### Reglas de BD
 
 - No ejecutar `migrate reset` ni `db push` en ambiente compartido/productivo.

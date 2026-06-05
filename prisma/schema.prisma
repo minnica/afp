@@ -235,6 +235,8 @@ model Subscription {
   frequencyMonths Int           @default(1)
   startMonth      Int           @default(1)
   startYear       Int           @default(2026)
+  isActive        Boolean       @default(true)
+  deactivatedAt   DateTime?
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 

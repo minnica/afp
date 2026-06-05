@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { Pencil, Plus, PowerOff, RotateCcw, Trash2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 
@@ -116,6 +116,10 @@ export default function SuscripcionesContent() {
   const [isUpdating, setIsUpdating] = useState(false);
 
   const [subscriptionToDelete, setSubscriptionToDelete] = useState(null);
+  const [isToggling, setIsToggling] = useState(false);
+  const [deactivateDialogOpen, setDeactivateDialogOpen] = useState(false);
+  const [subscriptionToDeactivate, setSubscriptionToDeactivate] = useState(null);
+  const [deactivatedAtInput, setDeactivatedAtInput] = useState("");
 
   async function loadInitialData(userId) {
     const [settingsResponse, cardsResponse, subscriptionsResponse] =
@@ -322,6 +326,87 @@ export default function SuscripcionesContent() {
     }
   }
 
+  function getTodayInputValue() {
+    const today = new Date();
+    const y = today.getFullYear();
+    const m = String(today.getMonth() + 1).padStart(2, "0");
+    const d = String(today.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+  }
+
+  function openDeactivateDialog(subscription) {
+    setSubscriptionToDeactivate(subscription);
+    setDeactivatedAtInput(getTodayInputValue());
+    setDeactivateDialogOpen(true);
+  }
+
+  async function confirmDeactivate() {
+    if (!user || !subscriptionToDeactivate || isToggling) return;
+
+    setIsToggling(true);
+
+    try {
+      const response = await fetch("/api/subscriptions", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: subscriptionToDeactivate.id,
+          toggleActive: true,
+          isActive: false,
+          deactivatedAt: deactivatedAtInput
+            ? new Date(`${deactivatedAtInput}T12:00:00.000Z`).toISOString()
+            : null,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "No se pudo desactivar la suscripción.");
+      }
+
+      setDeactivateDialogOpen(false);
+      setSubscriptionToDeactivate(null);
+      await loadSubscriptions(user.id);
+      toast.success("Suscripción desactivada.");
+    } catch (err) {
+      toast.error(err.message || "No se pudo desactivar la suscripción.");
+    } finally {
+      setIsToggling(false);
+    }
+  }
+
+  async function reactivateSubscription(subscription) {
+    if (!user || isToggling) return;
+
+    setIsToggling(true);
+
+    try {
+      const response = await fetch("/api/subscriptions", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: subscription.id,
+          toggleActive: true,
+          isActive: true,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "No se pudo reactivar la suscripción.");
+      }
+
+      await loadSubscriptions(user.id);
+      toast.success("Suscripción reactivada.");
+    } catch (err) {
+      toast.error(err.message || "No se pudo reactivar la suscripción.");
+    } finally {
+      setIsToggling(false);
+    }
+  }
+
   async function deleteSubscription(id) {
     if (!user) return;
 
@@ -353,8 +438,37 @@ export default function SuscripcionesContent() {
         accessorKey: "name",
         header: "Nombre",
         cell: ({ row }) => (
-          <span className="font-medium">{row.original.name}</span>
+          <span
+            className={
+              row.original.isActive === false
+                ? "text-muted-foreground line-through"
+                : "font-medium"
+            }
+          >
+            {row.original.name}
+          </span>
         ),
+      },
+      {
+        id: "status",
+        accessorFn: (row) => (row.isActive === false ? "Inactiva" : "Activa"),
+        header: "Estado",
+        cell: ({ row }) =>
+          row.original.isActive === false ? (
+            <Badge
+              variant="outline"
+              className="border-destructive/40 text-destructive"
+            >
+              Inactiva
+            </Badge>
+          ) : (
+            <Badge
+              variant="outline"
+              className="border-emerald-500/40 text-emerald-500"
+            >
+              Activa
+            </Badge>
+          ),
       },
       {
         id: "category",
@@ -406,7 +520,9 @@ export default function SuscripcionesContent() {
         accessorKey: "amount",
         header: "Monto",
         cell: ({ row }) => (
-          <span className="whitespace-nowrap font-semibold tabular-nums">
+          <span
+            className={`whitespace-nowrap font-semibold tabular-nums${row.original.isActive === false ? " text-muted-foreground line-through" : ""}`}
+          >
             {formatMoney(row.original.amount)}
           </span>
         ),
@@ -422,8 +538,31 @@ export default function SuscripcionesContent() {
               variant="ghost"
               size="icon"
               onClick={() => startEditingSubscription(row.original)}
+              disabled={row.original.isActive === false}
             >
               <Pencil className="h-4 w-4" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              title={
+                row.original.isActive === false
+                  ? "Reactivar suscripción"
+                  : "Desactivar suscripción"
+              }
+              onClick={() =>
+                row.original.isActive === false
+                  ? reactivateSubscription(row.original)
+                  : openDeactivateDialog(row.original)
+              }
+              disabled={isToggling}
+            >
+              {row.original.isActive === false ? (
+                <RotateCcw className="h-4 w-4 text-emerald-500" />
+              ) : (
+                <PowerOff className="h-4 w-4 text-destructive" />
+              )}
             </Button>
             <Button
               type="button"
@@ -438,7 +577,7 @@ export default function SuscripcionesContent() {
       },
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
+    [isToggling],
   );
 
   if (isLoading) {
@@ -480,6 +619,60 @@ export default function SuscripcionesContent() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Dialog
+        open={deactivateDialogOpen}
+        onOpenChange={(open) => {
+          if (!open) {
+            setDeactivateDialogOpen(false);
+            setSubscriptionToDeactivate(null);
+          }
+        }}
+      >
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Desactivar suscripción</DialogTitle>
+          </DialogHeader>
+
+          <p className="text-sm text-muted-foreground">
+            ¿Desde cuándo se desactivó{" "}
+            <span className="font-medium text-foreground">
+              {subscriptionToDeactivate?.name}
+            </span>
+            ? Los cobros con fecha posterior a este día no se contabilizarán.
+          </p>
+
+          <div className="space-y-2">
+            <Label>Fecha de desactivación</Label>
+            <Input
+              type="date"
+              value={deactivatedAtInput}
+              onChange={(e) => setDeactivatedAtInput(e.target.value)}
+            />
+          </div>
+
+          <DialogFooter className="gap-2">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => {
+                setDeactivateDialogOpen(false);
+                setSubscriptionToDeactivate(null);
+              }}
+            >
+              Cancelar
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={confirmDeactivate}
+              disabled={isToggling || !deactivatedAtInput}
+            >
+              {isToggling ? "Desactivando..." : "Desactivar"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog
         open={editDialogOpen}
@@ -848,9 +1041,10 @@ export default function SuscripcionesContent() {
                     pageSize={10}
                     pageSizeOptions={[5, 10, 25, 50]}
                     footerRow={(table) => {
-                      const total = table
-                        .getFilteredRowModel()
-                        .rows.reduce(
+                      const rows = table.getFilteredRowModel().rows;
+                      const total = rows
+                        .filter((row) => row.original.isActive !== false)
+                        .reduce(
                           (sum, row) =>
                             sum + Number(row.original.amount || 0),
                           0,
@@ -858,14 +1052,15 @@ export default function SuscripcionesContent() {
                       return (
                         <TableRow>
                           <TableCell
-                            colSpan={5}
+                            colSpan={6}
                             className="text-right text-sm font-medium text-muted-foreground"
                           >
-                            Total
+                            Total activas
                           </TableCell>
                           <TableCell className="font-semibold tabular-nums">
                             {formatMoney(total)}
                           </TableCell>
+                          <TableCell />
                           <TableCell />
                         </TableRow>
                       );

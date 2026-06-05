@@ -108,6 +108,14 @@ function shouldIncludeSubscriptionInMonth(subscription, year, month) {
   return diffMonths % frequencyMonths === 0;
 }
 
+function isSubscriptionChargeableInMonth(subscription, year, month) {
+  if (!shouldIncludeSubscriptionInMonth(subscription, year, month)) return false;
+  if (subscription.isActive) return true;
+  if (!subscription.deactivatedAt) return false;
+  const chargeDate = buildDateFromDay(year, month, Number(subscription.chargeDay));
+  return chargeDate <= new Date(subscription.deactivatedAt);
+}
+
 function getSubscriptionChargeDatesInsideCycle(subscription, cycle) {
   const start = new Date(cycle.startDate);
   const end = new Date(cycle.cutDate);
@@ -159,11 +167,13 @@ function calculateCycleAmount({
       shouldIncludeSubscriptionInCycle(subscription, cycle),
     )
     .reduce((sum, subscription) => {
-      const charges = getSubscriptionChargeDatesInsideCycle(
-        subscription,
-        cycle,
-      );
-      return sum + charges.length * Number(subscription.amount || 0);
+      const charges = getSubscriptionChargeDatesInsideCycle(subscription, cycle);
+      const validCharges = charges.filter((chargeDate) => {
+        if (subscription.isActive) return true;
+        if (!subscription.deactivatedAt) return false;
+        return new Date(chargeDate) <= new Date(subscription.deactivatedAt);
+      });
+      return sum + validCharges.length * Number(subscription.amount || 0);
     }, 0);
 
   const purchasesAmount = purchases
@@ -320,6 +330,7 @@ function buildCashSubscriptionNotices(subscriptions, now) {
 
   for (const subscription of subscriptions) {
     if (subscription.paymentMethod !== "CASH") continue;
+    if (!subscription.isActive) continue;
 
     if (
       !shouldIncludeSubscriptionInMonth(subscription, currentYear, currentMonth)
@@ -631,11 +642,7 @@ export async function GET(request) {
 
     const subscriptionsTotal = subscriptions
       .filter((subscription) =>
-        shouldIncludeSubscriptionInMonth(
-          subscription,
-          currentYear,
-          currentMonth,
-        ),
+        isSubscriptionChargeableInMonth(subscription, currentYear, currentMonth),
       )
       .reduce((sum, subscription) => {
         return sum + Number(subscription.amount || 0);
@@ -665,11 +672,7 @@ export async function GET(request) {
         const categorySubscriptions = subscriptions
           .filter((subscription) => subscription.categoryId === category.id)
           .filter((subscription) =>
-            shouldIncludeSubscriptionInMonth(
-              subscription,
-              currentYear,
-              currentMonth,
-            ),
+            isSubscriptionChargeableInMonth(subscription, currentYear, currentMonth),
           )
           .reduce(
             (sum, subscription) => sum + Number(subscription.amount || 0),
