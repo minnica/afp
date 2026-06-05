@@ -70,15 +70,46 @@ function formatDate(dateString) {
   return format(new Date(dateString), "d MMM yyyy", { locale: es });
 }
 
-function getStatusLabel(status) {
-  const labels = {
-    ACTIVE: "Activa",
-    PAID_OFF: "Liquidada",
-    CANCELLED: "Cancelada",
-    ADJUSTED: "Ajustada",
-  };
+function safeDay(year, monthIndex, day) {
+  const max = new Date(year, monthIndex + 1, 0).getDate();
+  return Math.min(day, max);
+}
 
-  return labels[status] || status;
+function getNextPaymentDueDate(purchase) {
+  if (purchase.status !== "ACTIVE") return null;
+  const card = purchase.card;
+  if (!card) return null;
+
+  const { usualCutDay, usualDueDay } = card;
+  const pd = new Date(purchase.purchaseDate);
+  const pdYear = pd.getUTCFullYear();
+  const pdMonthIdx = pd.getUTCMonth();
+  const pdDay = pd.getUTCDate();
+
+  // Determine which cycle month the purchase fell into
+  let baseCycleYear = pdYear;
+  let baseCycleMonthIdx = pdMonthIdx;
+  if (pdDay > safeDay(pdYear, pdMonthIdx, usualCutDay)) {
+    const next = new Date(Date.UTC(pdYear, pdMonthIdx + 1, 1));
+    baseCycleYear = next.getUTCFullYear();
+    baseCycleMonthIdx = next.getUTCMonth();
+  }
+
+  // Target cycle = base + payments already made
+  const paymentsMade = Number(purchase.initialPaymentsMade || 0);
+  const target = new Date(Date.UTC(baseCycleYear, baseCycleMonthIdx + paymentsMade, 1));
+  const tYear = target.getUTCFullYear();
+  const tMonthIdx = target.getUTCMonth();
+
+  // Replicate getCycleDates: if dueDay falls on or before cutDay in same month → next month
+  const cutDate = new Date(Date.UTC(tYear, tMonthIdx, safeDay(tYear, tMonthIdx, usualCutDay), 12));
+  let dueDate = new Date(Date.UTC(tYear, tMonthIdx, safeDay(tYear, tMonthIdx, usualDueDay), 12));
+  if (dueDate <= cutDate) {
+    const nm = new Date(Date.UTC(tYear, tMonthIdx + 1, 1));
+    dueDate = new Date(Date.UTC(nm.getUTCFullYear(), nm.getUTCMonth(), safeDay(nm.getUTCFullYear(), nm.getUTCMonth(), usualDueDay), 12));
+  }
+
+  return dueDate;
 }
 
 export default function ComprasAMesesContent() {
@@ -433,14 +464,32 @@ export default function ComprasAMesesContent() {
         ),
       },
       {
-        id: "status",
-        accessorFn: (row) => getStatusLabel(row.status),
-        header: "Estatus",
-        cell: ({ row }) => (
-          <Badge variant="secondary">
-            {getStatusLabel(row.original.status)}
-          </Badge>
-        ),
+        id: "nextPayment",
+        accessorFn: (row) => {
+          const d = getNextPaymentDueDate(row);
+          return d ? format(d, "yyyy-MM-dd") : "";
+        },
+        sortingFn: (rowA, rowB) => {
+          const a = getNextPaymentDueDate(rowA.original);
+          const b = getNextPaymentDueDate(rowB.original);
+          if (!a && !b) return 0;
+          if (!a) return 1;
+          if (!b) return -1;
+          return a - b;
+        },
+        header: "Próximo pago",
+        cell: ({ row }) => {
+          const d = getNextPaymentDueDate(row.original);
+          if (!d)
+            return (
+              <span className="text-sm text-muted-foreground">—</span>
+            );
+          return (
+            <span className="whitespace-nowrap text-sm">
+              {format(d, "d MMM yyyy", { locale: es })}
+            </span>
+          );
+        },
       },
       {
         id: "progress",

@@ -294,49 +294,72 @@ export default function TarjetasContent() {
     return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}`;
   }, []);
 
-  const cycleMonthTabs = useMemo(() => {
-    const currentDate = new Date();
-    const currentYear = currentDate.getFullYear();
-    const currentMonthIndex = currentDate.getMonth();
+  // Mes más antiguo con ciclos ya cortados y sin pagar → mismo batch activo que dashboard.
+  const activeBatchMonthKey = useMemo(() => {
+    const today = new Date();
+    let oldestCutDate = null;
 
-    return Object.entries(cyclesByMonth)
-      .map(([monthKey, monthCycles]) => {
-        const [year, month] = monthKey.split("-").map(Number);
-        const monthIndex = month - 1;
-        const diffMonths = (year - currentYear) * 12 + (monthIndex - currentMonthIndex);
+    for (const cycle of cycles) {
+      const cutDate = new Date(cycle.cutDate);
+      if (cutDate > today) continue;
+      if (cycle.paidAt || cycle.paidAmount) continue;
 
-        let label = format(new Date(Date.UTC(year, monthIndex, 1)), "MMMM yyyy", { locale: es });
-        if (diffMonths === 0) label = "Mes actual";
-        if (diffMonths === -1) label = "Mes anterior";
-        if (diffMonths === 1) label = "Mes siguiente";
+      if (!oldestCutDate || cutDate < oldestCutDate) {
+        oldestCutDate = cutDate;
+      }
+    }
 
-        const title = format(new Date(Date.UTC(year, monthIndex, 1)), "MMMM yyyy", {
-          locale: es,
-        });
+    if (!oldestCutDate) return null;
 
-        return {
-          monthKey,
-          monthCycles: [...monthCycles].sort(
-            (a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
-          ),
-          label,
-          title,
-          diffMonths,
-        };
-      })
-      .sort((a, b) => {
-        const priority = { "-1": 0, 0: 1, 1: 2 };
-        const aPriority = priority[a.diffMonths] ?? 99;
-        const bPriority = priority[b.diffMonths] ?? 99;
-        if (aPriority !== bPriority) return aPriority - bPriority;
-        return a.monthKey.localeCompare(b.monthKey);
-      });
-  }, [cyclesByMonth]);
+    const year = oldestCutDate.getUTCFullYear();
+    const month = oldestCutDate.getUTCMonth() + 1;
+    return `${year}-${String(month).padStart(2, "0")}`;
+  }, [cycles]);
 
-  const defaultCycleMonthTab =
-    cycleMonthTabs.find((item) => item.monthKey === currentCycleMonthKey)?.monthKey ||
-    cycleMonthTabs[0]?.monthKey ||
-    "";
+  const activeBatchKeyFinal = activeBatchMonthKey ?? currentCycleMonthKey;
+
+  const previousBatchMonthKey = useMemo(() => {
+    const [year, month] = activeBatchKeyFinal.split("-").map(Number);
+    const prevMonth = month === 1 ? 12 : month - 1;
+    const prevYear = month === 1 ? year - 1 : year;
+    return `${prevYear}-${String(prevMonth).padStart(2, "0")}`;
+  }, [activeBatchKeyFinal]);
+
+  const nextBatchMonthKey = useMemo(() => {
+    const [year, month] = activeBatchKeyFinal.split("-").map(Number);
+    const nextMonth = month === 12 ? 1 : month + 1;
+    const nextYear = month === 12 ? year + 1 : year;
+    return `${nextYear}-${String(nextMonth).padStart(2, "0")}`;
+  }, [activeBatchKeyFinal]);
+
+  const previousBatchCycles = useMemo(
+    () =>
+      [...(cyclesByMonth[previousBatchMonthKey] || [])].sort(
+        (a, b) => new Date(a.dueDate) - new Date(b.dueDate),
+      ),
+    [cyclesByMonth, previousBatchMonthKey],
+  );
+
+  const currentBatchCycles = useMemo(
+    () =>
+      [...(cyclesByMonth[activeBatchKeyFinal] || [])].sort(
+        (a, b) => new Date(a.dueDate) - new Date(b.dueDate),
+      ),
+    [cyclesByMonth, activeBatchKeyFinal],
+  );
+
+  const nextBatchCycles = useMemo(
+    () =>
+      [...(cyclesByMonth[nextBatchMonthKey] || [])].sort(
+        (a, b) => new Date(a.dueDate) - new Date(b.dueDate),
+      ),
+    [cyclesByMonth, nextBatchMonthKey],
+  );
+
+  function batchTitle(monthKey) {
+    const [year, month] = monthKey.split("-").map(Number);
+    return format(new Date(Date.UTC(year, month - 1, 1)), "MMMM yyyy", { locale: es });
+  }
 
   if (isLoading) {
     return (
@@ -615,34 +638,51 @@ export default function TarjetasContent() {
                     Aún no hay ciclos generados. Agrega tarjetas y presiona "Generar ciclos".
                   </p>
                 ) : (
-                  <Tabs defaultValue={defaultCycleMonthTab} className="w-full">
-                    <TabsList className="mb-6 flex w-full justify-start overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                      {cycleMonthTabs.map((monthGroup) => (
-                        <TabsTrigger
-                          key={monthGroup.monthKey}
-                          value={monthGroup.monthKey}
-                          className="shrink-0 whitespace-nowrap"
-                        >
-                          {monthGroup.label}
-                        </TabsTrigger>
-                      ))}
+                  <Tabs defaultValue="current" className="w-full">
+                    <TabsList className="mb-6">
+                      <TabsTrigger value="previous">Pago anterior</TabsTrigger>
+                      <TabsTrigger value="current">Este pago</TabsTrigger>
+                      <TabsTrigger value="next">Siguiente pago</TabsTrigger>
                     </TabsList>
 
-                    {cycleMonthTabs.map((monthGroup) => (
-                      <TabsContent key={monthGroup.monthKey} value={monthGroup.monthKey}>
-                        <h3 className="mb-4 text-sm font-medium capitalize text-muted-foreground">
-                          {monthGroup.title}
-                        </h3>
+                    <TabsContent value="previous">
+                      <h3 className="mb-4 text-sm font-medium capitalize text-muted-foreground">
+                        {batchTitle(previousBatchMonthKey)}
+                      </h3>
+                      <CyclesDataTable
+                        cycles={previousBatchCycles}
+                        updateCycleDates={updateCycleDates}
+                        updateStatementAmount={updateStatementAmount}
+                        markCycleAsPaid={markCycleAsPaid}
+                        unmarkCycleAsPaid={unmarkCycleAsPaid}
+                      />
+                    </TabsContent>
 
-                        <CyclesDataTable
-                          cycles={monthGroup.monthCycles}
-                          updateCycleDates={updateCycleDates}
-                          updateStatementAmount={updateStatementAmount}
-                          markCycleAsPaid={markCycleAsPaid}
-                          unmarkCycleAsPaid={unmarkCycleAsPaid}
-                        />
-                      </TabsContent>
-                    ))}
+                    <TabsContent value="current">
+                      <h3 className="mb-4 text-sm font-medium capitalize text-muted-foreground">
+                        {batchTitle(activeBatchKeyFinal)}
+                      </h3>
+                      <CyclesDataTable
+                        cycles={currentBatchCycles}
+                        updateCycleDates={updateCycleDates}
+                        updateStatementAmount={updateStatementAmount}
+                        markCycleAsPaid={markCycleAsPaid}
+                        unmarkCycleAsPaid={unmarkCycleAsPaid}
+                      />
+                    </TabsContent>
+
+                    <TabsContent value="next">
+                      <h3 className="mb-4 text-sm font-medium capitalize text-muted-foreground">
+                        {batchTitle(nextBatchMonthKey)}
+                      </h3>
+                      <CyclesDataTable
+                        cycles={nextBatchCycles}
+                        updateCycleDates={updateCycleDates}
+                        updateStatementAmount={updateStatementAmount}
+                        markCycleAsPaid={markCycleAsPaid}
+                        unmarkCycleAsPaid={unmarkCycleAsPaid}
+                      />
+                    </TabsContent>
                   </Tabs>
                 )}
               </CardContent>

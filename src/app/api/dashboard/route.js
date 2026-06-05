@@ -547,35 +547,77 @@ export async function GET(request) {
       };
     });
 
+    // Batch activo: mes más antiguo (por cutDate) que tenga al menos un ciclo sin pagar.
+    // Todos los ciclos sin pagar de ese mes se muestran en "Este pago".
+    // Solo se avanza al mes actual cuando todos los ciclos del batch anterior están pagados.
+    let activeBatchYear = null;
+    let activeBatchMonth = null;
+
+    for (const cycle of cyclesWithAmounts) {
+      const cutDate = new Date(cycle.cutDate);
+      if (cutDate > now) continue;
+      if (cycle.displayStatus === "PAID") continue;
+
+      if (
+        activeBatchYear === null ||
+        cutDate.getUTCFullYear() < activeBatchYear ||
+        (cutDate.getUTCFullYear() === activeBatchYear &&
+          cutDate.getUTCMonth() < activeBatchMonth)
+      ) {
+        activeBatchYear = cutDate.getUTCFullYear();
+        activeBatchMonth = cutDate.getUTCMonth();
+      }
+    }
+
+    const hasBatch = activeBatchYear !== null;
+
     const payments = cards.map((card) => {
       const cyclesForCard = cyclesWithAmounts
         .filter((cycle) => cycle.cardId === card.id)
         .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
 
-      // Current cycle = most recently cut (cutDate <= now).
-      // Once cut, the cycle is in its payment window — that's what the user owes next.
-      // If no cycle has cut yet, take the earliest upcoming one.
-      let currentIndex = -1;
-      for (let i = cyclesForCard.length - 1; i >= 0; i--) {
-        if (new Date(cyclesForCard[i].cutDate) <= now) {
-          currentIndex = i;
-          break;
+      let currentPayment = null;
+      let anchorIndex = -1;
+
+      if (hasBatch) {
+        // Buscar ciclo de esta tarjeta en el batch activo (pagado o no)
+        const batchIndex = cyclesForCard.findIndex((cycle) => {
+          const cutDate = new Date(cycle.cutDate);
+          return (
+            cutDate.getUTCFullYear() === activeBatchYear &&
+            cutDate.getUTCMonth() === activeBatchMonth &&
+            cutDate <= now
+          );
+        });
+
+        if (batchIndex !== -1) {
+          currentPayment = cyclesForCard[batchIndex];
+          anchorIndex = batchIndex;
         }
       }
-      if (currentIndex === -1) {
-        currentIndex = 0;
+
+      // Si no hay ciclo del batch activo para esta tarjeta, calcular ancla para
+      // previousPayment / nextPayment usando el ciclo más reciente cortado.
+      if (anchorIndex === -1) {
+        for (let i = cyclesForCard.length - 1; i >= 0; i--) {
+          if (new Date(cyclesForCard[i].cutDate) <= now) {
+            anchorIndex = i;
+            break;
+          }
+        }
+        if (anchorIndex === -1) anchorIndex = 0;
+
+        // Solo asignar currentPayment si no hay batch activo (todo pagado o sin cortes)
+        if (!hasBatch) {
+          currentPayment = cyclesForCard[anchorIndex] || null;
+        }
       }
-
-      const safeCurrentIndex = currentIndex;
-
-      const previousPayment =
-        safeCurrentIndex > 0 ? cyclesForCard[safeCurrentIndex - 1] : null;
 
       return {
         card,
-        previousPayment,
-        currentPayment: cyclesForCard[safeCurrentIndex] || null,
-        nextPayment: cyclesForCard[safeCurrentIndex + 1] || null,
+        previousPayment: anchorIndex > 0 ? cyclesForCard[anchorIndex - 1] : null,
+        currentPayment,
+        nextPayment: cyclesForCard[anchorIndex + 1] || null,
       };
     });
 
