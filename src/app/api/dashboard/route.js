@@ -468,6 +468,75 @@ function buildReceivableNotices(receivables, now) {
   return notices;
 }
 
+function shouldIncludePurchaseInMonth(purchase, targetYear, targetMonth) {
+  if (purchase.status !== "ACTIVE") return false;
+
+  const purchaseDate = new Date(purchase.purchaseDate);
+  const purchaseMonthIndex =
+    purchaseDate.getUTCFullYear() * 12 + purchaseDate.getUTCMonth();
+
+  const targetMonthIndex = targetYear * 12 + (targetMonth - 1);
+
+  const months = Number(purchase.months || 0);
+  const initialPaymentsMade = Number(purchase.initialPaymentsMade || 0);
+  const remainingMonths = months - initialPaymentsMade;
+
+  if (remainingMonths <= 0) return false;
+
+  return (
+    targetMonthIndex >= purchaseMonthIndex &&
+    targetMonthIndex < purchaseMonthIndex + remainingMonths
+  );
+}
+
+function buildCategoryBreakdown({ categories, expenses, subscriptions, purchases, year, month }) {
+  const monthStart = new Date(Date.UTC(year, month - 1, 1, 0, 0, 0));
+  const monthEnd = new Date(Date.UTC(year, month, 0, 23, 59, 59));
+
+  const monthlyExpenses = expenses.filter((expense) =>
+    isDateInsideRange(expense.date, monthStart, monthEnd),
+  );
+
+  const activePurchasesForMonth = purchases.filter((p) =>
+    shouldIncludePurchaseInMonth(p, year, month),
+  );
+
+  const subscriptionsTotal = subscriptions
+    .filter((s) => isSubscriptionChargeableInMonth(s, year, month))
+    .reduce((sum, s) => sum + Number(s.amount || 0), 0);
+
+  const installmentPurchasesTotal = activePurchasesForMonth.reduce(
+    (sum, p) => sum + getMonthlyPaymentUsed(p),
+    0,
+  );
+
+  const dailyExpensesTotal = monthlyExpenses.reduce((sum, e) => sum + Number(e.amount || 0), 0);
+  const monthlyExpenseTotal = dailyExpensesTotal + subscriptionsTotal + installmentPurchasesTotal;
+
+  return categories
+    .map((category) => {
+      const catDaily = monthlyExpenses
+        .filter((e) => e.categoryId === category.id)
+        .reduce((sum, e) => sum + Number(e.amount || 0), 0);
+
+      const catSubs = subscriptions
+        .filter((s) => s.categoryId === category.id)
+        .filter((s) => isSubscriptionChargeableInMonth(s, year, month))
+        .reduce((sum, s) => sum + Number(s.amount || 0), 0);
+
+      const catPurchases = activePurchasesForMonth
+        .filter((p) => p.categoryId === category.id)
+        .reduce((sum, p) => sum + getMonthlyPaymentUsed(p), 0);
+
+      const total = catDaily + catSubs + catPurchases;
+      const percentage = monthlyExpenseTotal > 0 ? (total / monthlyExpenseTotal) * 100 : 0;
+
+      return { id: category.id, name: category.name, total, percentage };
+    })
+    .filter((c) => c.total > 0)
+    .sort((a, b) => b.total - a.total);
+}
+
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -663,42 +732,26 @@ export async function GET(request) {
 
     const monthlyDifference = incomeTotal - monthlyExpenseTotal;
 
-    const categoryBreakdown = categories
-      .map((category) => {
-        const categoryDailyExpenses = monthlyExpenses
-          .filter((expense) => expense.categoryId === category.id)
-          .reduce((sum, expense) => sum + Number(expense.amount || 0), 0);
+    const prevDate = new Date(Date.UTC(currentYear, currentMonth - 2, 1));
+    const nextDate = new Date(Date.UTC(currentYear, currentMonth, 1));
 
-        const categorySubscriptions = subscriptions
-          .filter((subscription) => subscription.categoryId === category.id)
-          .filter((subscription) =>
-            isSubscriptionChargeableInMonth(subscription, currentYear, currentMonth),
-          )
-          .reduce(
-            (sum, subscription) => sum + Number(subscription.amount || 0),
-            0,
-          );
+    const categoryBreakdownPrev = buildCategoryBreakdown({
+      categories, expenses, subscriptions, purchases,
+      year: prevDate.getUTCFullYear(),
+      month: prevDate.getUTCMonth() + 1,
+    });
 
-        const categoryPurchases = purchases
-          .filter((purchase) => purchase.status === "ACTIVE")
-          .filter((purchase) => purchase.categoryId === category.id)
-          .reduce((sum, purchase) => sum + getMonthlyPaymentUsed(purchase), 0);
+    const categoryBreakdownCurrent = buildCategoryBreakdown({
+      categories, expenses, subscriptions, purchases,
+      year: currentYear,
+      month: currentMonth,
+    });
 
-        const total =
-          categoryDailyExpenses + categorySubscriptions + categoryPurchases;
-
-        const percentage =
-          monthlyExpenseTotal > 0 ? (total / monthlyExpenseTotal) * 100 : 0;
-
-        return {
-          id: category.id,
-          name: category.name,
-          total,
-          percentage,
-        };
-      })
-      .filter((category) => category.total > 0)
-      .sort((a, b) => b.total - a.total);
+    const categoryBreakdownNext = buildCategoryBreakdown({
+      categories, expenses, subscriptions, purchases,
+      year: nextDate.getUTCFullYear(),
+      month: nextDate.getUTCMonth() + 1,
+    });
 
     const activeReceivables = receivables
       .map((receivable) => {
@@ -746,7 +799,9 @@ export async function GET(request) {
         monthlyExpenseTotal,
         monthlyDifference,
       },
-      categoryBreakdown,
+      categoryBreakdownPrev,
+      categoryBreakdownCurrent,
+      categoryBreakdownNext,
       activeReceivables,
       importantNotices,
     });

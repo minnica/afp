@@ -258,11 +258,24 @@ export default function DashboardContent() {
     init();
   }, [router]);
 
+  const [activeTab, setActiveTab] = useState("current");
+
   const payments = useMemo(
     () => dashboard?.payments || [],
     [dashboard?.payments],
   );
-  const categoryBreakdown = dashboard?.categoryBreakdown || [];
+
+  const categoryBreakdownPrev = dashboard?.categoryBreakdownPrev || [];
+  const categoryBreakdownCurrent = dashboard?.categoryBreakdownCurrent || [];
+  const categoryBreakdownNext = dashboard?.categoryBreakdownNext || [];
+
+  const categoryBreakdown =
+    activeTab === "previous"
+      ? categoryBreakdownPrev
+      : activeTab === "next"
+        ? categoryBreakdownNext
+        : categoryBreakdownCurrent;
+
   const importantNotices = dashboard?.importantNotices || [];
 
   const previousPayments = useMemo(() => {
@@ -338,7 +351,7 @@ export default function DashboardContent() {
             </CardHeader>
 
             <CardContent>
-              <Tabs defaultValue="current">
+              <Tabs value={activeTab} onValueChange={setActiveTab}>
                 <TabsList className="mb-6">
                   <TabsTrigger value="previous">Pago anterior</TabsTrigger>
                   <TabsTrigger value="current">Este pago</TabsTrigger>
