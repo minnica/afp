@@ -4,16 +4,23 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  Legend,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  ResponsiveContainer,
+} from "recharts";
 
 import { supabase } from "@/lib/supabase";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Spinner } from "@/components/ui/spinner";
@@ -255,9 +262,7 @@ export default function DashboardContent() {
     () => dashboard?.payments || [],
     [dashboard?.payments],
   );
-  const monthlySummary = dashboard?.monthlySummary || {};
   const categoryBreakdown = dashboard?.categoryBreakdown || [];
-  const activeReceivables = dashboard?.activeReceivables || [];
   const importantNotices = dashboard?.importantNotices || [];
 
   const previousPayments = useMemo(() => {
@@ -355,106 +360,9 @@ export default function DashboardContent() {
             </CardContent>
           </Card>
 
-          <div className="grid gap-4 md:grid-cols-3">
-            <SummaryCard
-              title="Ingresos del mes"
-              value={formatMoney(monthlySummary.incomeTotal)}
-            />
-            <SummaryCard
-              title="Gastos del mes"
-              value={formatMoney(monthlySummary.monthlyExpenseTotal)}
-            />
-            <SummaryCard
-              title="Diferencia"
-              value={formatMoney(monthlySummary.monthlyDifference)}
-            />
-          </div>
-
-          <div className="grid gap-6 lg:grid-cols-[1fr_420px]">
-            <Card className="rounded-2xl border-border bg-card">
-              <CardHeader>
-                <CardTitle className="text-lg font-semibold uppercase text-center">
-                  Gasto por categoría
-                </CardTitle>
-              </CardHeader>
-
-              <CardContent>
-                {categoryBreakdown.length === 0 ? (
-                  <p className="rounded-xl border border-border bg-muted/30 px-4 py-6 text-sm text-muted-foreground">
-                    Aún no hay gastos para este mes.
-                  </p>
-                ) : (
-                  <div className="grid gap-3">
-                    {categoryBreakdown.map((category) => (
-                      <div
-                        key={category.id}
-                        className="rounded-xl border border-border bg-background/60 px-4 py-4"
-                      >
-                        <div className="mb-2 flex items-center justify-between gap-4">
-                          <p className="font-medium">{category.name}</p>
-                          <p className="font-semibold">
-                            {formatMoney(category.total)}
-                          </p>
-                        </div>
-
-                        <div className="flex items-center gap-3">
-                          <div className="h-2 flex-1 overflow-hidden rounded-full bg-muted">
-                            <div
-                              className="h-full rounded-full bg-foreground"
-                              style={{
-                                width: `${Math.min(category.percentage, 100)}%`,
-                              }}
-                            />
-                          </div>
-
-                          <p className="w-14 text-right text-sm text-muted-foreground">
-                            {category.percentage.toFixed(0)}%
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            <Card className="rounded-2xl border-border bg-card">
-              <CardHeader>
-                <CardTitle className="text-lg font-semibold uppercase text-center">
-                  Cuentas por cobrar
-                </CardTitle>
-              </CardHeader>
-
-              <CardContent>
-                {activeReceivables.length === 0 ? (
-                  <p className="rounded-xl border border-border bg-muted/30 px-4 py-6 text-sm text-muted-foreground">
-                    No tienes cuentas por cobrar activas.
-                  </p>
-                ) : (
-                  <div className="grid gap-3">
-                    {activeReceivables.slice(0, 5).map((item) => (
-                      <div
-                        key={item.id}
-                        className="rounded-xl border border-border bg-background/60 px-4 py-4"
-                      >
-                        <div className="flex items-start justify-between gap-4">
-                          <div>
-                            <p className="font-medium">{item.concept}</p>
-                            <p className="mt-1 text-sm text-muted-foreground">
-                              {item.person?.name}
-                            </p>
-                          </div>
-
-                          <p className="font-semibold">
-                            {formatMoney(item.pendingBalance)}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+          <div className="grid gap-6 lg:grid-cols-2">
+            <CategoryExpenseChart categoryBreakdown={categoryBreakdown} />
+            <CategoryBarChart categoryBreakdown={categoryBreakdown} />
           </div>
         </div>
       </section>
@@ -462,13 +370,170 @@ export default function DashboardContent() {
   );
 }
 
-function SummaryCard({ title, value }) {
+const CHART_COLORS = [
+  "#3b82f6",
+  "#10b981",
+  "#f59e0b",
+  "#a855f7",
+  "#ef4444",
+  "#06b6d4",
+  "#f97316",
+  "#84cc16",
+  "#ec4899",
+  "#14b8a6",
+];
+
+const TOOLTIP_STYLE = {
+  contentStyle: {
+    backgroundColor: "#1c1c1c",
+    border: "1px solid #333",
+    borderRadius: "8px",
+    color: "#f5f5f5",
+    fontSize: "12px",
+  },
+  itemStyle: { color: "#f5f5f5" },
+  labelStyle: { color: "#a1a1aa" },
+};
+
+function CategoryExpenseChart({ categoryBreakdown }) {
+  const dataWithFill = categoryBreakdown.map((cat, i) => ({
+    ...cat,
+    fill: CHART_COLORS[i % CHART_COLORS.length],
+  }));
+
   return (
     <Card className="rounded-2xl border-border bg-card">
-      <CardHeader className="pb-2">
-        <CardDescription>{title}</CardDescription>
-        <CardTitle className="text-2xl">{value}</CardTitle>
+      <CardHeader>
+        <CardTitle className="text-lg font-semibold uppercase text-center">
+          Gastos del mes por categoría
+        </CardTitle>
       </CardHeader>
+
+      <CardContent>
+        {categoryBreakdown.length === 0 ? (
+          <p className="rounded-xl border border-border bg-muted/30 px-4 py-6 text-sm text-muted-foreground">
+            Aún no hay gastos para este mes.
+          </p>
+        ) : (
+          <div style={{ width: "100%", height: "360px" }}>
+            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+              <PieChart>
+                <Pie
+                  data={dataWithFill}
+                  dataKey="total"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={120}
+                  innerRadius={60}
+                  paddingAngle={2}
+                >
+                  {dataWithFill.map((entry, i) => (
+                    <Cell
+                      key={entry.id}
+                      fill={CHART_COLORS[i % CHART_COLORS.length]}
+                    />
+                  ))}
+                </Pie>
+                <Tooltip
+                  {...TOOLTIP_STYLE}
+                  formatter={(value, name) => [
+                    new Intl.NumberFormat("es-MX", {
+                      style: "currency",
+                      currency: "MXN",
+                    }).format(value),
+                    name,
+                  ]}
+                />
+                <Legend
+                  formatter={(value) => (
+                    <span style={{ color: "#a1a1aa", fontSize: "12px" }}>
+                      {value}
+                    </span>
+                  )}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function CategoryBarChart({ categoryBreakdown }) {
+
+  return (
+    <Card className="rounded-2xl border-border bg-card">
+      <CardHeader>
+        <CardTitle className="text-lg font-semibold uppercase text-center">
+          Gastos por categoría
+        </CardTitle>
+      </CardHeader>
+
+      <CardContent>
+        {categoryBreakdown.length === 0 ? (
+          <p className="rounded-xl border border-border bg-muted/30 px-4 py-6 text-sm text-muted-foreground">
+            Aún no hay gastos para este mes.
+          </p>
+        ) : (
+          <div
+            style={{
+              width: "100%",
+              height: `${Math.max(categoryBreakdown.length * 52 + 40, 200)}px`,
+            }}
+          >
+            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+              <BarChart
+                layout="vertical"
+                data={categoryBreakdown}
+                margin={{ top: 0, right: 16, bottom: 0, left: 0 }}
+              >
+                <CartesianGrid horizontal={false} stroke="#333" />
+                <YAxis
+                  dataKey="name"
+                  type="category"
+                  tickLine={false}
+                  axisLine={false}
+                  width={120}
+                  tick={{ fontSize: 12, fill: "#a1a1aa" }}
+                />
+                <XAxis
+                  type="number"
+                  tickLine={false}
+                  axisLine={false}
+                  tickFormatter={(v) =>
+                    new Intl.NumberFormat("es-MX", {
+                      style: "currency",
+                      currency: "MXN",
+                      maximumFractionDigits: 0,
+                    }).format(v)
+                  }
+                  tick={{ fontSize: 10, fill: "#a1a1aa" }}
+                />
+                <Tooltip
+                  {...TOOLTIP_STYLE}
+                  formatter={(value, name) => [
+                    new Intl.NumberFormat("es-MX", {
+                      style: "currency",
+                      currency: "MXN",
+                    }).format(value),
+                    name,
+                  ]}
+                />
+                <Bar dataKey="total" radius={[0, 4, 4, 0]}>
+                  {categoryBreakdown.map((entry, i) => (
+                    <Cell
+                      key={entry.id}
+                      fill={CHART_COLORS[i % CHART_COLORS.length]}
+                    />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        )}
+      </CardContent>
     </Card>
   );
 }

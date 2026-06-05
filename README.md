@@ -36,6 +36,7 @@ Auth por Supabase. DB PostgreSQL vía Prisma + Supabase. Modo oscuro forzado.
 - **UI**: shadcn/ui (componentes locales en `src/components/ui/`) + Radix UI + Tailwind CSS v4
 - **Íconos**: lucide-react + @hugeicons/react
 - **Tablas**: @tanstack/react-table 8.x (vía `src/components/ui/data-table.jsx`)
+- **Gráficas**: recharts 3.x (vía `src/components/ui/chart.jsx`, wrapper shadcn canónico)
 - **Formularios**: React Hook Form + Zod
 - **Auth**: Supabase (`@supabase/supabase-js`)
 - **BD**: PostgreSQL en Supabase, ORM Prisma 7.x con adapter pg
@@ -190,7 +191,7 @@ afp/
 
 Todos en `src/components/ui/`. No importar desde paquete externo — son locales.
 
-Disponibles: `button`, `input`, `label`, `select`, `textarea`, `card`, `tabs`, `badge`, `table`, `data-table`, `dropdown-menu`, `separator`, `dialog`, `alert-dialog`, `sonner`, `spinner`, `tooltip`, `skeleton`, `sheet`, `sidebar`, `alert`.
+Disponibles: `button`, `input`, `label`, `select`, `textarea`, `card`, `tabs`, `badge`, `table`, `data-table`, `dropdown-menu`, `separator`, `dialog`, `alert-dialog`, `sonner`, `spinner`, `tooltip`, `skeleton`, `sheet`, `sidebar`, `alert`, `chart`.
 
 **Reglas:**
 - `toast` siempre desde `@/components/ui/sonner` (o re-export de `sonner`). No importar `sonner` directamente si ya hay wrapper local.
