@@ -60,20 +60,31 @@ function getPurchaseCycleNumber(purchase, targetCycle, cardCycles) {
 }
 
 function shouldIncludePurchaseInCycle(purchase, targetCycle, cardCycles) {
-  if (purchase.status !== "ACTIVE") return false;
-
   if (purchase.cardId !== targetCycle.cardId) return false;
+
+  const purchaseDate = new Date(purchase.purchaseDate).getTime();
+  const cycleCutDate = new Date(targetCycle.cutDate).getTime();
+
+  if (purchaseDate > cycleCutDate) return false;
+
+  if (purchase.status === "PAID_OFF") {
+    // Mostrar en ciclos ya cortados dentro del rango de meses de la compra
+    // para preservar el desglose histórico del último pago.
+    if (cycleCutDate >= Date.now()) return false;
+    const purchaseDateObj = new Date(purchase.purchaseDate);
+    const purchaseMonthIdx =
+      purchaseDateObj.getUTCFullYear() * 12 + purchaseDateObj.getUTCMonth();
+    const cycleMonthIdx = targetCycle.year * 12 + (targetCycle.month - 1);
+    return cycleMonthIdx <= purchaseMonthIdx + Number(purchase.months || 0);
+  }
+
+  if (purchase.status !== "ACTIVE") return false;
 
   const months = Number(purchase.months || 0);
   const paymentsAlreadyMade = Number(purchase.initialPaymentsMade || 0);
   const remainingMonths = months - paymentsAlreadyMade;
 
   if (remainingMonths <= 0) return false;
-
-  const purchaseDate = new Date(purchase.purchaseDate).getTime();
-  const cycleCutDate = new Date(targetCycle.cutDate).getTime();
-
-  if (purchaseDate > cycleCutDate) return false;
 
   return true;
 }
@@ -537,6 +548,54 @@ function buildCategoryBreakdown({ categories, expenses, subscriptions, purchases
     .sort((a, b) => b.total - a.total);
 }
 
+function buildCutCycleNotices(cyclesWithAmounts, cards, now) {
+  const notices = [];
+  const cardMap = new Map(cards.map((c) => [c.id, c]));
+
+  for (const cycle of cyclesWithAmounts) {
+    if (cycle.displayStatus === "PAID") continue;
+    if (cycle.displayStatus === "PAYMENT_PENDING") continue;
+    if (cycle.displayStatus === "OVERDUE") continue;
+
+    const card = cardMap.get(cycle.cardId);
+    if (!card) continue;
+
+    const diffDaysToCut = getDaysDifference(cycle.cutDate, now);
+
+    if (cycle.displayStatus === "CUT") {
+      const daysSinceCut = getDaysDifference(now, cycle.cutDate);
+      const cutAgoLabel =
+        daysSinceCut === 0
+          ? "Cortada hoy"
+          : daysSinceCut === 1
+            ? "Cortada hace 1 día"
+            : `Cortada hace ${daysSinceCut} días`;
+
+      notices.push({
+        id: `cut-cycle-${cycle.id}`,
+        type: "CUT_CYCLE",
+        group: "cut",
+        title: `Tarjeta cortada: ${card.name}`,
+        description: `${cutAgoLabel}. Actualiza la fecha y el monto del estado de cuenta para que el aviso desaparezca.`,
+        date: cycle.cutDate,
+        amount: Number(cycle.calculatedAmount || 0),
+      });
+    } else if (cycle.displayStatus === "OPEN" && diffDaysToCut === 1) {
+      notices.push({
+        id: `cut-cycle-upcoming-${cycle.id}`,
+        type: "CUT_CYCLE_UPCOMING",
+        group: "cut",
+        title: `Corte mañana: ${card.name}`,
+        description: `La tarjeta se corta mañana. Recuerda actualizar la fecha y el monto del estado de cuenta una vez cortado.`,
+        date: cycle.cutDate,
+        amount: Number(cycle.calculatedAmount || 0),
+      });
+    }
+  }
+
+  return notices;
+}
+
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -770,11 +829,13 @@ export async function GET(request) {
       now,
     );
     const receivableNotices = buildReceivableNotices(activeReceivables, now);
+    const cutCycleNotices = buildCutCycleNotices(cyclesWithAmounts, cards, now);
 
     const importantNotices = [
       ...cardPaymentNotices,
       ...cashSubscriptionNotices,
       ...receivableNotices,
+      ...cutCycleNotices,
     ].sort((a, b) => {
       const priority = {
         overdue: 0,

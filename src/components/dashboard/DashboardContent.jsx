@@ -24,7 +24,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Spinner } from "@/components/ui/spinner";
-import { AlertTriangle, Bell, CalendarClock } from "lucide-react";
+import { AlertTriangle, Bell, CalendarClock, Scissors } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 function formatMoney(value) {
@@ -191,6 +191,7 @@ function getNoticeAlertClass(group) {
     today:
       "border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400",
     upcoming: "border-sky-500/30 bg-sky-500/10 text-sky-600 dark:text-sky-400",
+    cut: "border-orange-500/30 bg-orange-500/10 text-orange-600 dark:text-orange-400",
   };
 
   return classes[group] || "border-border bg-muted/30";
@@ -199,6 +200,7 @@ function getNoticeAlertClass(group) {
 function getNoticeIcon(group) {
   if (group === "overdue") return AlertTriangle;
   if (group === "today") return CalendarClock;
+  if (group === "cut") return Scissors;
   return Bell;
 }
 

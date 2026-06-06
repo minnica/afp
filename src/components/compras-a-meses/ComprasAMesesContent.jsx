@@ -512,6 +512,15 @@ export default function ComprasAMesesContent() {
         ),
       },
       {
+        accessorKey: "totalAmount",
+        header: "Total compra",
+        cell: ({ row }) => (
+          <span className="whitespace-nowrap tabular-nums text-muted-foreground">
+            {formatMoney(row.original.totalAmount)}
+          </span>
+        ),
+      },
+      {
         accessorKey: "remainingBalance",
         header: "Pendiente",
         cell: ({ row }) => (
@@ -556,6 +565,10 @@ export default function ComprasAMesesContent() {
       (sum, row) => sum + Number(row.original.monthlyPaymentUsed || 0),
       0,
     );
+    const totalAmount = rows.reduce(
+      (sum, row) => sum + Number(row.original.totalAmount || 0),
+      0,
+    );
     const totalPending = rows.reduce(
       (sum, row) => sum + Number(row.original.remainingBalance || 0),
       0,
@@ -570,6 +583,9 @@ export default function ComprasAMesesContent() {
         </TableCell>
         <TableCell className="font-semibold tabular-nums">
           {formatMoney(totalMonthly)}
+        </TableCell>
+        <TableCell className="font-semibold tabular-nums">
+          {formatMoney(totalAmount)}
         </TableCell>
         <TableCell className="font-semibold tabular-nums">
           {formatMoney(totalPending)}

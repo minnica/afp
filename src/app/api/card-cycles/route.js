@@ -42,20 +42,31 @@ function getPurchaseCycleNumber(purchase, targetCycle, cardCycles) {
 }
 
 function shouldIncludePurchaseInCycle(purchase, targetCycle, cardCycles) {
-  if (purchase.status !== "ACTIVE") return false;
-
   if (purchase.cardId !== targetCycle.cardId) return false;
+
+  const purchaseDate = new Date(purchase.purchaseDate).getTime();
+  const cycleCutDate = new Date(targetCycle.cutDate).getTime();
+
+  if (purchaseDate > cycleCutDate) return false;
+
+  if (purchase.status === "PAID_OFF") {
+    // Mostrar en ciclos ya cortados dentro del rango de meses de la compra
+    // para preservar el desglose histórico del último pago.
+    if (cycleCutDate >= Date.now()) return false;
+    const purchaseDateObj = new Date(purchase.purchaseDate);
+    const purchaseMonthIdx =
+      purchaseDateObj.getUTCFullYear() * 12 + purchaseDateObj.getUTCMonth();
+    const cycleMonthIdx = targetCycle.year * 12 + (targetCycle.month - 1);
+    return cycleMonthIdx <= purchaseMonthIdx + Number(purchase.months || 0);
+  }
+
+  if (purchase.status !== "ACTIVE") return false;
 
   const months = Number(purchase.months || 0);
   const paymentsAlreadyMade = Number(purchase.initialPaymentsMade || 0);
   const remainingMonths = months - paymentsAlreadyMade;
 
   if (remainingMonths <= 0) return false;
-
-  const purchaseDate = new Date(purchase.purchaseDate).getTime();
-  const cycleCutDate = new Date(targetCycle.cutDate).getTime();
-
-  if (purchaseDate > cycleCutDate) return false;
 
   return true;
 }
@@ -224,6 +235,19 @@ function calculateCycleAmount({
   };
 }
 
+function getDisplayStatus(cycle) {
+  const today = new Date();
+  const cutDate = new Date(cycle.cutDate);
+  const dueDate = new Date(cycle.dueDate);
+
+  if (cycle.paidAt || cycle.paidAmount) return "PAID";
+  if (today > dueDate) return "OVERDUE";
+  if (today >= cutDate && cycle.statementAmount) return "PAYMENT_PENDING";
+  if (today >= cutDate) return "CUT";
+
+  return "OPEN";
+}
+
 function getDaysInMonth(year, monthIndex) {
   return new Date(year, monthIndex + 1, 0).getDate();
 }
@@ -333,6 +357,7 @@ export async function GET(request) {
 
       return {
         ...cycle,
+        displayStatus: getDisplayStatus(cycle),
         ...amounts,
       };
     });
@@ -433,6 +458,7 @@ export async function POST(request) {
 
       return {
         ...cycle,
+        displayStatus: getDisplayStatus(cycle),
         ...amounts,
       };
     });

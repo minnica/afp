@@ -187,7 +187,7 @@ export default function CyclesDataTable({
         sortingFn: "basic",
       },
       {
-        accessorKey: "status",
+        accessorKey: "displayStatus",
         header: "Estado",
         cell: ({ getValue }) => {
           const status = getValue();
@@ -354,7 +354,7 @@ export default function CyclesDataTable({
               <Button type="button" onClick={handleMarkAsPaid}>
                 Confirmar pago
               </Button>
-              {activeDialog.cycle.status === "PAID" && (
+              {activeDialog.cycle.displayStatus === "PAID" && (
                 <Button
                   type="button"
                   variant="destructive"
