@@ -68,6 +68,12 @@ function formatMoney(value) {
   }).format(numberValue);
 }
 
+function formatMonthLabel(yearMonth) {
+  const [year, month] = yearMonth.split("-").map(Number);
+  const label = format(new Date(year, month - 1, 1), "MMMM yyyy", { locale: es });
+  return label.charAt(0).toUpperCase() + label.slice(1);
+}
+
 function formatExpenseDate(dateString) {
   const datePart = String(dateString).split("T")[0];
   const [year, month, day] = datePart.split("-").map(Number);
@@ -125,6 +131,10 @@ export default function GastosContent() {
   const [isUpdating, setIsUpdating] = useState(false);
 
   const [expenseToDelete, setExpenseToDelete] = useState(null);
+
+  const [filterMonth, setFilterMonth] = useState("");
+  const [filterCategoryId, setFilterCategoryId] = useState("");
+  const [filterConcept, setFilterConcept] = useState("");
 
   async function loadInitialData(userId) {
     const [settingsResponse, cardsResponse, expensesResponse] =
@@ -448,6 +458,34 @@ export default function GastosContent() {
       toast.error(err.message || "No se pudo eliminar el gasto.");
     }
   }
+
+  const availableMonths = useMemo(() => {
+    const months = new Set();
+    expenses.forEach((expense) => {
+      const datePart = String(expense.date).split("T")[0];
+      const [year, month] = datePart.split("-");
+      months.add(`${year}-${month}`);
+    });
+    return Array.from(months).sort().reverse();
+  }, [expenses]);
+
+  const filteredExpenses = useMemo(() => {
+    return expenses.filter((expense) => {
+      if (filterMonth) {
+        const datePart = String(expense.date).split("T")[0];
+        const [year, month] = datePart.split("-");
+        if (`${year}-${month}` !== filterMonth) return false;
+      }
+      if (filterCategoryId) {
+        if (expense.categoryId !== filterCategoryId) return false;
+      }
+      if (filterConcept) {
+        const search = filterConcept.toLowerCase();
+        if (!expense.concept?.toLowerCase().includes(search)) return false;
+      }
+      return true;
+    });
+  }, [expenses, filterMonth, filterCategoryId, filterConcept]);
 
   const expenseColumns = useMemo(
     () => [
@@ -1068,12 +1106,53 @@ export default function GastosContent() {
                   </CardTitle>
                 </CardHeader>
 
-                <CardContent>
+                <CardContent className="space-y-4">
+                  <div className="flex flex-wrap gap-3">
+                    <Select
+                      value={filterMonth || "ALL"}
+                      onValueChange={(value) => setFilterMonth(value === "ALL" ? "" : value)}
+                    >
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Todos los meses" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="ALL">Todos los meses</SelectItem>
+                        {availableMonths.map((m) => (
+                          <SelectItem key={m} value={m}>
+                            {formatMonthLabel(m)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+
+                    <Select
+                      value={filterCategoryId || "ALL"}
+                      onValueChange={(value) => setFilterCategoryId(value === "ALL" ? "" : value)}
+                    >
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Todas las categorías" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="ALL">Todas las categorías</SelectItem>
+                        {categories.map((cat) => (
+                          <SelectItem key={cat.id} value={cat.id}>
+                            {cat.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+
+                    <Input
+                      placeholder="Buscar concepto..."
+                      value={filterConcept}
+                      onChange={(e) => setFilterConcept(e.target.value)}
+                      className="w-[200px]"
+                    />
+                  </div>
+
                   <DataTable
                     columns={expenseColumns}
-                    data={expenses}
-                    filterGlobal
-                    filterPlaceholder="Buscar en tabla..."
+                    data={filteredExpenses}
                     pageSize={15}
                     footerRow={(table) => {
                       const total = table.getFilteredRowModel().rows.reduce(
