@@ -10,8 +10,6 @@ import {
   Trash2,
   X,
 } from "lucide-react";
-import { format } from "date-fns";
-import { es } from "date-fns/locale";
 import { supabase } from "@/lib/supabase";
 
 import { Button } from "@/components/ui/button";
@@ -28,6 +26,11 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Spinner } from "@/components/ui/spinner";
 import CyclesDataTable from "@/components/tarjetas/CyclesDataTable";
+
+const MONTH_NAMES = [
+  "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+  "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre",
+];
 
 export default function TarjetasContent() {
   const router = useRouter();
@@ -279,87 +282,25 @@ export default function TarjetasContent() {
 
   const totalCards = useMemo(() => cards.length, [cards]);
 
-  const cyclesByMonth = useMemo(() => {
+  const currentYear = useMemo(() => new Date().getFullYear(), []);
+
+  const [activeMonthTab, setActiveMonthTab] = useState(
+    String(new Date().getMonth()),
+  );
+
+  const cyclesByMonthIndex = useMemo(() => {
     const grouped = {};
     for (const cycle of cycles) {
-      const key = `${cycle.year}-${String(cycle.month).padStart(2, "0")}`;
-      if (!grouped[key]) grouped[key] = [];
-      grouped[key].push(cycle);
+      if (cycle.year !== currentYear) continue;
+      const monthIndex = cycle.month - 1;
+      if (!grouped[monthIndex]) grouped[monthIndex] = [];
+      grouped[monthIndex].push(cycle);
+    }
+    for (const monthIndex of Object.keys(grouped)) {
+      grouped[monthIndex].sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
     }
     return grouped;
-  }, [cycles]);
-
-  const currentCycleMonthKey = useMemo(() => {
-    const today = new Date();
-    return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}`;
-  }, []);
-
-  // Mes más antiguo con ciclos ya cortados y sin pagar → mismo batch activo que dashboard.
-  const activeBatchMonthKey = useMemo(() => {
-    const today = new Date();
-    let oldestCutDate = null;
-
-    for (const cycle of cycles) {
-      const cutDate = new Date(cycle.cutDate);
-      if (cutDate > today) continue;
-      if (cycle.paidAt || cycle.paidAmount) continue;
-
-      if (!oldestCutDate || cutDate < oldestCutDate) {
-        oldestCutDate = cutDate;
-      }
-    }
-
-    if (!oldestCutDate) return null;
-
-    const year = oldestCutDate.getUTCFullYear();
-    const month = oldestCutDate.getUTCMonth() + 1;
-    return `${year}-${String(month).padStart(2, "0")}`;
-  }, [cycles]);
-
-  const activeBatchKeyFinal = activeBatchMonthKey ?? currentCycleMonthKey;
-
-  const previousBatchMonthKey = useMemo(() => {
-    const [year, month] = activeBatchKeyFinal.split("-").map(Number);
-    const prevMonth = month === 1 ? 12 : month - 1;
-    const prevYear = month === 1 ? year - 1 : year;
-    return `${prevYear}-${String(prevMonth).padStart(2, "0")}`;
-  }, [activeBatchKeyFinal]);
-
-  const nextBatchMonthKey = useMemo(() => {
-    const [year, month] = activeBatchKeyFinal.split("-").map(Number);
-    const nextMonth = month === 12 ? 1 : month + 1;
-    const nextYear = month === 12 ? year + 1 : year;
-    return `${nextYear}-${String(nextMonth).padStart(2, "0")}`;
-  }, [activeBatchKeyFinal]);
-
-  const previousBatchCycles = useMemo(
-    () =>
-      [...(cyclesByMonth[previousBatchMonthKey] || [])].sort(
-        (a, b) => new Date(a.dueDate) - new Date(b.dueDate),
-      ),
-    [cyclesByMonth, previousBatchMonthKey],
-  );
-
-  const currentBatchCycles = useMemo(
-    () =>
-      [...(cyclesByMonth[activeBatchKeyFinal] || [])].sort(
-        (a, b) => new Date(a.dueDate) - new Date(b.dueDate),
-      ),
-    [cyclesByMonth, activeBatchKeyFinal],
-  );
-
-  const nextBatchCycles = useMemo(
-    () =>
-      [...(cyclesByMonth[nextBatchMonthKey] || [])].sort(
-        (a, b) => new Date(a.dueDate) - new Date(b.dueDate),
-      ),
-    [cyclesByMonth, nextBatchMonthKey],
-  );
-
-  function batchTitle(monthKey) {
-    const [year, month] = monthKey.split("-").map(Number);
-    return format(new Date(Date.UTC(year, month - 1, 1)), "MMMM yyyy", { locale: es });
-  }
+  }, [cycles, currentYear]);
 
   if (isLoading) {
     return (
@@ -638,51 +579,29 @@ export default function TarjetasContent() {
                     Aún no hay ciclos generados. Agrega tarjetas y presiona "Generar ciclos".
                   </p>
                 ) : (
-                  <Tabs defaultValue="current" className="w-full">
-                    <TabsList className="mb-6">
-                      <TabsTrigger value="previous">Pago anterior</TabsTrigger>
-                      <TabsTrigger value="current">Este pago</TabsTrigger>
-                      <TabsTrigger value="next">Siguiente pago</TabsTrigger>
+                  <Tabs value={activeMonthTab} onValueChange={setActiveMonthTab}>
+                    <TabsList className="mb-6 h-auto flex-wrap">
+                      {MONTH_NAMES.map((name, monthIndex) => (
+                        <TabsTrigger key={monthIndex} value={String(monthIndex)}>
+                          {name}
+                        </TabsTrigger>
+                      ))}
                     </TabsList>
 
-                    <TabsContent value="previous">
-                      <h3 className="mb-4 text-sm font-medium capitalize text-muted-foreground">
-                        {batchTitle(previousBatchMonthKey)}
-                      </h3>
-                      <CyclesDataTable
-                        cycles={previousBatchCycles}
-                        updateCycleDates={updateCycleDates}
-                        updateStatementAmount={updateStatementAmount}
-                        markCycleAsPaid={markCycleAsPaid}
-                        unmarkCycleAsPaid={unmarkCycleAsPaid}
-                      />
-                    </TabsContent>
-
-                    <TabsContent value="current">
-                      <h3 className="mb-4 text-sm font-medium capitalize text-muted-foreground">
-                        {batchTitle(activeBatchKeyFinal)}
-                      </h3>
-                      <CyclesDataTable
-                        cycles={currentBatchCycles}
-                        updateCycleDates={updateCycleDates}
-                        updateStatementAmount={updateStatementAmount}
-                        markCycleAsPaid={markCycleAsPaid}
-                        unmarkCycleAsPaid={unmarkCycleAsPaid}
-                      />
-                    </TabsContent>
-
-                    <TabsContent value="next">
-                      <h3 className="mb-4 text-sm font-medium capitalize text-muted-foreground">
-                        {batchTitle(nextBatchMonthKey)}
-                      </h3>
-                      <CyclesDataTable
-                        cycles={nextBatchCycles}
-                        updateCycleDates={updateCycleDates}
-                        updateStatementAmount={updateStatementAmount}
-                        markCycleAsPaid={markCycleAsPaid}
-                        unmarkCycleAsPaid={unmarkCycleAsPaid}
-                      />
-                    </TabsContent>
+                    {MONTH_NAMES.map((name, monthIndex) => (
+                      <TabsContent key={monthIndex} value={String(monthIndex)}>
+                        <h3 className="mb-4 text-sm font-medium capitalize text-muted-foreground">
+                          {name} {currentYear}
+                        </h3>
+                        <CyclesDataTable
+                          cycles={cyclesByMonthIndex[monthIndex] || []}
+                          updateCycleDates={updateCycleDates}
+                          updateStatementAmount={updateStatementAmount}
+                          markCycleAsPaid={markCycleAsPaid}
+                          unmarkCycleAsPaid={unmarkCycleAsPaid}
+                        />
+                      </TabsContent>
+                    ))}
                   </Tabs>
                 )}
               </CardContent>

@@ -22,26 +22,36 @@ function getMonthlyPaymentUsed(purchase) {
   return manual && manual > 0 ? manual : totalAmount / months;
 }
 
-function getPurchaseCycleNumber(purchase, targetCycle, cardCycles) {
-  const cyclesForCard = cardCycles
-    .filter((cycle) => cycle.cardId === purchase.cardId)
-    .sort((a, b) => new Date(a.cutDate) - new Date(b.cutDate));
+// Primer ciclo donde cae la compra: si el día de compra es posterior al corte
+// usual de la tarjeta, el primer pago corresponde al ciclo del mes siguiente.
+function getPurchaseFirstCycleIndex(purchase, card) {
+  const purchaseDate = new Date(purchase.purchaseDate);
+  const cutDay = Number(card?.usualCutDay) || purchaseDate.getUTCDate();
 
-  const firstCycleIndex = cyclesForCard.findIndex((cycle) =>
-    isDateInsideRange(purchase.purchaseDate, cycle.startDate, cycle.cutDate),
-  );
+  let year = purchaseDate.getUTCFullYear();
+  let monthIndex = purchaseDate.getUTCMonth();
 
-  const targetCycleIndex = cyclesForCard.findIndex(
-    (cycle) => cycle.id === targetCycle.id,
-  );
+  const cutDateSameMonth = createChargeDate(year, monthIndex, cutDay);
 
-  if (firstCycleIndex === -1 || targetCycleIndex === -1) return null;
-  if (targetCycleIndex < firstCycleIndex) return null;
+  if (purchaseDate.getTime() > cutDateSameMonth.getTime()) {
+    monthIndex += 1;
+    if (monthIndex > 11) {
+      monthIndex = 0;
+      year += 1;
+    }
+  }
+
+  return year * 12 + monthIndex;
+}
+
+function getPurchaseCycleNumber(purchase, targetCycle) {
+  const firstCycleIndex = getPurchaseFirstCycleIndex(purchase, targetCycle.card);
+  const targetCycleIndex = targetCycle.year * 12 + (targetCycle.month - 1);
 
   return targetCycleIndex - firstCycleIndex + 1;
 }
 
-function shouldIncludePurchaseInCycle(purchase, targetCycle, cardCycles) {
+function shouldIncludePurchaseInCycle(purchase, targetCycle) {
   if (purchase.cardId !== targetCycle.cardId) return false;
 
   const purchaseDate = new Date(purchase.purchaseDate).getTime();
@@ -63,12 +73,9 @@ function shouldIncludePurchaseInCycle(purchase, targetCycle, cardCycles) {
   if (purchase.status !== "ACTIVE") return false;
 
   const months = Number(purchase.months || 0);
-  const paymentsAlreadyMade = Number(purchase.initialPaymentsMade || 0);
-  const remainingMonths = months - paymentsAlreadyMade;
+  const cycleNumber = getPurchaseCycleNumber(purchase, targetCycle);
 
-  if (remainingMonths <= 0) return false;
-
-  return true;
+  return cycleNumber >= 1 && cycleNumber <= months;
 }
 
 function getDaysInMonthForCharge(year, monthIndex) {
@@ -131,7 +138,6 @@ function calculateCycleAmount({
   expenses,
   subscriptions,
   purchases,
-  cardCycles,
 }) {
   const includedExpenses = expenses
     .filter((expense) => expense.cardId === cycle.cardId)
@@ -183,17 +189,10 @@ function calculateCycleAmount({
   const includedPurchases = purchases
     .filter((purchase) => purchase.cardId === cycle.cardId)
     .filter((purchase) =>
-      shouldIncludePurchaseInCycle(purchase, cycle, cardCycles),
+      shouldIncludePurchaseInCycle(purchase, cycle),
     )
     .map((purchase) => {
-      const cycleNumber = getPurchaseCycleNumber(purchase, cycle, cardCycles);
-      const paymentsAlreadyMade = Number(purchase.initialPaymentsMade || 0);
-      const months = Number(purchase.months || 0);
-
-      const currentMonth = Math.min(
-        months,
-        Math.max(cycleNumber || 1, paymentsAlreadyMade + 1),
-      );
+      const currentMonth = getPurchaseCycleNumber(purchase, cycle);
 
       return {
         id: purchase.id,
@@ -295,18 +294,13 @@ function getCycleDates(year, monthIndex, cutDay, dueDay) {
 
 function getTargetMonths() {
   const now = new Date();
+  const year = now.getFullYear();
 
-  return [-1, 0, 1].map((offset) => {
-    const date = new Date(
-      Date.UTC(now.getFullYear(), now.getMonth() + offset, 1, 12, 0, 0),
-    );
-
-    return {
-      month: date.getUTCMonth() + 1,
-      year: date.getUTCFullYear(),
-      monthIndex: date.getUTCMonth(),
-    };
-  });
+  return Array.from({ length: 12 }, (_, monthIndex) => ({
+    month: monthIndex + 1,
+    year,
+    monthIndex,
+  }));
 }
 
 export async function GET(request) {
@@ -352,7 +346,6 @@ export async function GET(request) {
         expenses,
         subscriptions,
         purchases,
-        cardCycles: cycles,
       });
 
       return {
@@ -453,7 +446,6 @@ export async function POST(request) {
         expenses,
         subscriptions,
         purchases,
-        cardCycles: cycles,
       });
 
       return {

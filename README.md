@@ -101,6 +101,15 @@ Reglas de cálculo:
 - Suscripción inactiva (`isActive = false`): solo se incluye en un ciclo/mes si la fecha de cobro dentro de ese período cae **antes o igual** que `deactivatedAt`. Si el cobro cae después de la desactivación, no se suma ni aparece en el desglose.
 - Avisos de cobro en efectivo (dashboard): suscripciones inactivas se omiten por completo.
 
+### Compras a meses (MSI) — cálculo de cuota actual
+
+`InstallmentPurchase` no guarda la cuota actual; se calcula dinámicamente en cada ciclo a partir de `purchaseDate` y el `usualCutDay` de la tarjeta (lógica duplicada en `card-cycles/route.js` y `dashboard/route.js`, funciones `getPurchaseFirstCycleIndex` / `getPurchaseCycleNumber` / `shouldIncludePurchaseInCycle`):
+
+- `firstCycleIndex`: ciclo (año*12+mes) donde cae la primera cuota — el mismo mes de `purchaseDate` si la fecha es **antes o igual** al `usualCutDay`, o el mes siguiente si es posterior.
+- `currentMonth` de un ciclo objetivo = `(targetCycleIndex - firstCycleIndex) + 1`.
+- Se incluye en el ciclo solo si `1 <= currentMonth <= months` (y, para `ACTIVE`, si `purchaseDate` no es posterior al `cutDate` del ciclo).
+- `initialPaymentsMade` **no** se usa para este cálculo — solo sirve como ancla en `getNextPaymentDueDate` (`ComprasAMesesContent.jsx`). Antes el cálculo mezclaba un valor dinámico con un fallback estático `initialPaymentsMade + 1`, lo que dejaba la cuota "congelada" en vez de avanzar mes a mes (y de excluirse al completarse).
+
 ### Reglas de BD
 
 - No ejecutar `migrate reset` ni `db push` en ambiente compartido/productivo.
