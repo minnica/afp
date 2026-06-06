@@ -27,6 +27,11 @@ import { Spinner } from "@/components/ui/spinner";
 import { AlertTriangle, Bell, CalendarClock, Scissors } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
+const MONTH_NAMES = [
+  "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+  "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre",
+];
+
 function formatMoney(value) {
   const numberValue = Number(value || 0);
 
@@ -260,70 +265,52 @@ export default function DashboardContent() {
     init();
   }, [router]);
 
-  const [activeTab, setActiveTab] = useState("current");
+  const now = useMemo(() => new Date(), []);
+  const currentYear = now.getFullYear();
+  const currentMonthIndex = now.getMonth(); // 0-11
 
-  const payments = useMemo(
-    () => dashboard?.payments || [],
-    [dashboard?.payments],
-  );
+  const [activeMonthTab, setActiveMonthTab] = useState(String(currentMonthIndex));
+
+  const cycles = useMemo(() => dashboard?.cycles || [], [dashboard?.cycles]);
 
   const categoryBreakdownPrev = dashboard?.categoryBreakdownPrev || [];
   const categoryBreakdownCurrent = dashboard?.categoryBreakdownCurrent || [];
   const categoryBreakdownNext = dashboard?.categoryBreakdownNext || [];
 
+  const prevMonthIndex = (currentMonthIndex - 1 + 12) % 12;
+  const nextMonthIndex = (currentMonthIndex + 1) % 12;
+  const activeMonthIndex = Number(activeMonthTab);
+
   const categoryBreakdown =
-    activeTab === "previous"
+    activeMonthIndex === prevMonthIndex
       ? categoryBreakdownPrev
-      : activeTab === "next"
+      : activeMonthIndex === nextMonthIndex
         ? categoryBreakdownNext
-        : categoryBreakdownCurrent;
+        : activeMonthIndex === currentMonthIndex
+          ? categoryBreakdownCurrent
+          : [];
 
   const importantNotices = dashboard?.importantNotices || [];
 
-  const previousPayments = useMemo(() => {
-    return payments
-      .map((item) => ({
-        card: item.card,
-        cycle: item.previousPayment,
-      }))
-      .filter((item) => item.cycle)
-      .sort((a, b) => {
-        return (
-          new Date(a.cycle.dueDate).getTime() -
-          new Date(b.cycle.dueDate).getTime()
-        );
-      });
-  }, [payments]);
+  const paymentsByMonth = useMemo(() => {
+    const map = {};
 
-  const currentPayments = useMemo(() => {
-    return payments
-      .map((item) => ({
-        card: item.card,
-        cycle: item.currentPayment,
-      }))
-      .filter((item) => item.cycle)
-      .sort((a, b) => {
-        return (
-          new Date(a.cycle.dueDate).getTime() -
-          new Date(b.cycle.dueDate).getTime()
-        );
-      });
-  }, [payments]);
+    for (let monthIndex = 0; monthIndex < 12; monthIndex++) {
+      map[monthIndex] = cycles
+        .filter((cycle) => {
+          return cycle.year === currentYear && cycle.month - 1 === monthIndex;
+        })
+        .map((cycle) => ({ card: cycle.card, cycle }))
+        .sort((a, b) => {
+          return (
+            new Date(a.cycle.dueDate).getTime() -
+            new Date(b.cycle.dueDate).getTime()
+          );
+        });
+    }
 
-  const nextPayments = useMemo(() => {
-    return payments
-      .map((item) => ({
-        card: item.card,
-        cycle: item.nextPayment,
-      }))
-      .filter((item) => item.cycle)
-      .sort((a, b) => {
-        return (
-          new Date(a.cycle.dueDate).getTime() -
-          new Date(b.cycle.dueDate).getTime()
-        );
-      });
-  }, [payments]);
+    return map;
+  }, [cycles, currentYear]);
 
   if (isLoading) {
     return (
@@ -353,24 +340,20 @@ export default function DashboardContent() {
             </CardHeader>
 
             <CardContent>
-              <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="mb-6">
-                  <TabsTrigger value="previous">Pago anterior</TabsTrigger>
-                  <TabsTrigger value="current">Este pago</TabsTrigger>
-                  <TabsTrigger value="next">Siguiente pago</TabsTrigger>
+              <Tabs value={activeMonthTab} onValueChange={setActiveMonthTab}>
+                <TabsList className="mb-6 h-auto flex-wrap">
+                  {MONTH_NAMES.map((name, monthIndex) => (
+                    <TabsTrigger key={monthIndex} value={String(monthIndex)}>
+                      {name}
+                    </TabsTrigger>
+                  ))}
                 </TabsList>
 
-                <TabsContent value="previous">
-                  <PaymentsTable items={previousPayments} />
-                </TabsContent>
-
-                <TabsContent value="current">
-                  <PaymentsTable items={currentPayments} />
-                </TabsContent>
-
-                <TabsContent value="next">
-                  <PaymentsTable items={nextPayments} />
-                </TabsContent>
+                {MONTH_NAMES.map((name, monthIndex) => (
+                  <TabsContent key={monthIndex} value={String(monthIndex)}>
+                    <PaymentsTable items={paymentsByMonth[monthIndex] || []} />
+                  </TabsContent>
+                ))}
               </Tabs>
             </CardContent>
           </Card>

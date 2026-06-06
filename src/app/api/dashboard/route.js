@@ -852,6 +852,7 @@ export async function GET(request) {
 
     return NextResponse.json({
       payments,
+      cycles: cyclesWithAmounts,
       monthlySummary: {
         incomeTotal,
         dailyExpensesTotal,
