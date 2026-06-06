@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { Pencil, Plus, Trash2, X } from "lucide-react";
+import { Pencil, Plus, Trash2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 import { Button } from "@/components/ui/button";
@@ -28,6 +28,15 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { DataTable } from "@/components/ui/data-table";
+import { TableCell, TableRow } from "@/components/ui/table";
 
 function getTodayInputValue() {
   const today = new Date();
@@ -71,6 +80,7 @@ export default function IngresosContent() {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
 
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingIncomeId, setEditingIncomeId] = useState("");
   const [editDate, setEditDate] = useState("");
   const [editIncomeTypeId, setEditIncomeTypeId] = useState("");
@@ -236,9 +246,11 @@ export default function IngresosContent() {
     setEditAmount(String(income.amount || ""));
     setEditReceivableAccountId(income.receivableAccountId || "NONE");
     setEditNotes(income.notes || "");
+    setEditDialogOpen(true);
   }
 
   function cancelEditingIncome() {
+    setEditDialogOpen(false);
     setEditingIncomeId("");
     setEditDate("");
     setEditIncomeTypeId("");
@@ -324,6 +336,101 @@ export default function IngresosContent() {
     }, 0);
   }, [incomes]);
 
+  const incomeColumns = useMemo(
+    () => [
+      {
+        id: "date",
+        accessorFn: (row) => row.date,
+        header: "Fecha",
+        cell: ({ row }) => (
+          <span className="text-sm">{formatDate(row.original.date)}</span>
+        ),
+      },
+      {
+        id: "incomeType",
+        accessorFn: (row) => row.incomeType?.name ?? "",
+        header: "Tipo",
+        cell: ({ row }) =>
+          row.original.incomeType?.name ? (
+            <Badge variant="secondary">{row.original.incomeType.name}</Badge>
+          ) : (
+            <span className="text-muted-foreground">—</span>
+          ),
+      },
+      {
+        accessorKey: "concept",
+        header: "Concepto",
+        cell: ({ row }) => (
+          <div className="min-w-0">
+            <p className="font-medium">{row.original.concept}</p>
+            <p className="text-sm text-muted-foreground">
+              Fuente: {row.original.source}
+            </p>
+            {row.original.notes ? (
+              <p className="mt-1 text-sm text-muted-foreground">
+                {row.original.notes}
+              </p>
+            ) : null}
+          </div>
+        ),
+      },
+      {
+        id: "receivableAccount",
+        accessorFn: (row) =>
+          row.receivableAccount
+            ? `${row.receivableAccount.person?.name ?? ""} ${row.receivableAccount.concept ?? ""}`
+            : "",
+        header: "Cuenta por cobrar",
+        cell: ({ row }) =>
+          row.original.receivableAccount ? (
+            <span className="text-sm">
+              {row.original.receivableAccount.person?.name} ·{" "}
+              {row.original.receivableAccount.concept}
+            </span>
+          ) : (
+            <span className="text-muted-foreground">—</span>
+          ),
+      },
+      {
+        accessorKey: "amount",
+        header: "Monto",
+        cell: ({ row }) => (
+          <span className="whitespace-nowrap font-semibold tabular-nums">
+            {formatMoney(row.original.amount)}
+          </span>
+        ),
+      },
+      {
+        id: "actions",
+        header: "",
+        enableSorting: false,
+        cell: ({ row }) => (
+          <div className="flex items-center justify-end gap-1">
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => startEditingIncome(row.original)}
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => deleteIncome(row.original.id)}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        ),
+      },
+    ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
+
   if (isLoading) {
     return (
       <main className="flex min-h-dvh items-center justify-center bg-background text-foreground">
@@ -334,7 +441,7 @@ export default function IngresosContent() {
 
   return (
     <main>
-      <section className="mx-auto flex w-full max-w-6xl flex-col px-4 py-5 md:py-8">
+      <section className="mx-auto flex w-full max-w-full flex-col px-4 py-5 md:py-8">
         {error ? (
           <div className="mb-6 rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
             {error}
@@ -366,7 +473,7 @@ export default function IngresosContent() {
           </Card>
         </div>
 
-        <div className="grid gap-5 xl:grid-cols-[420px_1fr]">
+        <div className="grid min-w-0 gap-5 xl:grid-cols-[360px_1fr]">
           <Card className="rounded-2xl border-border bg-card">
             <CardHeader>
               <CardTitle className="text-lg font-semibold uppercase text-center">
@@ -479,225 +586,161 @@ export default function IngresosContent() {
             </CardContent>
           </Card>
 
-          <Card className="rounded-2xl border-border bg-card">
-            <CardHeader>
-              <CardTitle className="text-lg font-semibold uppercase text-center">
-                Ingresos registrados
-              </CardTitle>
-            </CardHeader>
+          <div className="min-w-0">
+            <Card className="rounded-2xl border-border bg-card">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold uppercase text-center">
+                  Ingresos registrados
+                </CardTitle>
+              </CardHeader>
 
-            <CardContent>
-              {incomes.length === 0 ? (
-                <p className="rounded-xl border border-border bg-muted/30 px-4 py-6 text-sm text-muted-foreground">
-                  Aún no hay ingresos registrados.
-                </p>
-              ) : (
-                <div className="grid gap-3">
-                  {incomes.map((income) => (
-                    <div
-                      key={income.id}
-                      className="rounded-xl border border-border bg-background/60 px-4 py-4"
-                    >
-                      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                        <div className="min-w-0">
-                          <div className="flex flex-wrap items-center gap-2">
-                            <p className="font-medium">{income.concept}</p>
-                            <Badge variant="secondary">
-                              {income.incomeType?.name}
-                            </Badge>
-                          </div>
+              <CardContent>
+                <DataTable
+                  columns={incomeColumns}
+                  data={incomes}
+                  filterGlobal
+                  filterPlaceholder="Buscar ingreso..."
+                  pageSize={10}
+                  pageSizeOptions={[5, 10, 25, 50]}
+                  footerRow={(table) => {
+                    const rows = table.getFilteredRowModel().rows;
+                    const total = rows.reduce(
+                      (sum, row) => sum + Number(row.original.amount || 0),
+                      0,
+                    );
 
-                          <p className="mt-1 text-sm text-muted-foreground">
-                            {formatDate(income.date)} · Fuente: {income.source}
-                          </p>
-
-                          {income.receivableAccount ? (
-                            <p className="mt-1 text-sm text-muted-foreground">
-                              Cuenta por cobrar:{" "}
-                              {income.receivableAccount.person?.name} ·{" "}
-                              {income.receivableAccount.concept}
-                            </p>
-                          ) : null}
-
-                          {income.notes ? (
-                            <p className="mt-1 text-sm text-muted-foreground">
-                              {income.notes}
-                            </p>
-                          ) : null}
-                        </div>
-
-                        <div className="flex shrink-0 items-center justify-between gap-2 sm:justify-end">
-                          <p className="font-semibold">
-                            {formatMoney(income.amount)}
-                          </p>
-
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => startEditingIncome(income)}
-                          >
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => deleteIncome(income.id)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-
-                      {editingIncomeId === income.id ? (
-                        <div className="mt-4 rounded-xl border border-border bg-background/70 p-4">
-                          <div className="mb-4 flex items-center justify-between gap-4">
-                            <p className="text-sm font-medium">
-                              Editar ingreso
-                            </p>
-
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="icon"
-                              onClick={cancelEditingIncome}
-                            >
-                              <X className="h-4 w-4" />
-                            </Button>
-                          </div>
-
-                          <div className="grid gap-4 md:grid-cols-2">
-                            <div className="space-y-2">
-                              <Label>Fecha</Label>
-                              <Input
-                                type="date"
-                                value={editDate}
-                                onChange={(event) =>
-                                  setEditDate(event.target.value)
-                                }
-                              />
-                            </div>
-
-                            <div className="space-y-2">
-                              <Label>Tipo de ingreso</Label>
-                              <Select
-                                value={editIncomeTypeId}
-                                onValueChange={setEditIncomeTypeId}
-                              >
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Selecciona tipo" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {incomeTypes.map((type) => (
-                                    <SelectItem key={type.id} value={type.id}>
-                                      {type.name}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </div>
-
-                            <div className="space-y-2">
-                              <Label>Fuente</Label>
-                              <Input
-                                value={editSource}
-                                onChange={(event) =>
-                                  setEditSource(event.target.value)
-                                }
-                              />
-                            </div>
-
-                            <div className="space-y-2">
-                              <Label>Concepto</Label>
-                              <Input
-                                value={editConcept}
-                                onChange={(event) =>
-                                  setEditConcept(event.target.value)
-                                }
-                              />
-                            </div>
-
-                            <div className="space-y-2">
-                              <Label>Monto</Label>
-                              <Input
-                                value={editAmount}
-                                type="number"
-                                min="0"
-                                step="0.01"
-                                onChange={(event) =>
-                                  setEditAmount(event.target.value)
-                                }
-                              />
-                            </div>
-
-                            <div className="space-y-2">
-                              <Label>Cuenta por cobrar relacionada</Label>
-                              <Select
-                                value={editReceivableAccountId}
-                                onValueChange={setEditReceivableAccountId}
-                              >
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Sin cuenta por cobrar" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="NONE">
-                                    Sin cuenta por cobrar
-                                  </SelectItem>
-                                  {receivables.map((item) => (
-                                    <SelectItem key={item.id} value={item.id}>
-                                      {item.person?.name} · {item.concept} ·
-                                      pendiente{" "}
-                                      {formatMoney(item.pendingBalance)} ·{" "}
-                                      {item.status === "PAID_OFF"
-                                        ? "Liquidada"
-                                        : "Activa"}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </div>
-
-                            <div className="space-y-2 md:col-span-2">
-                              <Label>Notas</Label>
-                              <Textarea
-                                value={editNotes}
-                                onChange={(event) =>
-                                  setEditNotes(event.target.value)
-                                }
-                              />
-                            </div>
-                          </div>
-
-                          <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-                            <Button
-                              type="button"
-                              className="w-full sm:w-auto"
-                              onClick={updateIncome}
-                              disabled={isUpdating}
-                            >
-                              {isUpdating ? "Guardando..." : "Guardar cambios"}
-                            </Button>
-
-                            <Button
-                              type="button"
-                              variant="secondary"
-                              className="w-full sm:w-auto"
-                              onClick={cancelEditingIncome}
-                            >
-                              Cancelar
-                            </Button>
-                          </div>
-                        </div>
-                      ) : null}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                    return (
+                      <TableRow>
+                        <TableCell colSpan={4}>Total filtrado</TableCell>
+                        <TableCell className="font-semibold tabular-nums">
+                          {formatMoney(total)}
+                        </TableCell>
+                        <TableCell />
+                      </TableRow>
+                    );
+                  }}
+                />
+              </CardContent>
+            </Card>
+          </div>
         </div>
+
+        <Dialog
+          open={editDialogOpen}
+          onOpenChange={(open) => {
+            if (!open) cancelEditingIncome();
+          }}
+        >
+          <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Editar ingreso</DialogTitle>
+            </DialogHeader>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label>Fecha</Label>
+                <Input
+                  type="date"
+                  value={editDate}
+                  onChange={(event) => setEditDate(event.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Tipo de ingreso</Label>
+                <Select
+                  value={editIncomeTypeId}
+                  onValueChange={setEditIncomeTypeId}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecciona tipo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {incomeTypes.map((type) => (
+                      <SelectItem key={type.id} value={type.id}>
+                        {type.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Fuente</Label>
+                <Input
+                  value={editSource}
+                  onChange={(event) => setEditSource(event.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Concepto</Label>
+                <Input
+                  value={editConcept}
+                  onChange={(event) => setEditConcept(event.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Monto</Label>
+                <Input
+                  value={editAmount}
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  onChange={(event) => setEditAmount(event.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Cuenta por cobrar relacionada</Label>
+                <Select
+                  value={editReceivableAccountId}
+                  onValueChange={setEditReceivableAccountId}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Sin cuenta por cobrar" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="NONE">Sin cuenta por cobrar</SelectItem>
+                    {receivables.map((item) => (
+                      <SelectItem key={item.id} value={item.id}>
+                        {item.person?.name} · {item.concept} · pendiente{" "}
+                        {formatMoney(item.pendingBalance)} ·{" "}
+                        {item.status === "PAID_OFF" ? "Liquidada" : "Activa"}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2 md:col-span-2">
+                <Label>Notas</Label>
+                <Textarea
+                  value={editNotes}
+                  onChange={(event) => setEditNotes(event.target.value)}
+                />
+              </div>
+            </div>
+
+            <DialogFooter className="gap-2">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={cancelEditingIncome}
+              >
+                Cancelar
+              </Button>
+              <Button
+                type="button"
+                onClick={updateIncome}
+                disabled={isUpdating}
+              >
+                {isUpdating ? "Guardando..." : "Guardar cambios"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </section>
     </main>
   );

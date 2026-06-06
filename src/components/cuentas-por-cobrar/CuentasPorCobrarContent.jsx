@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { Pencil, Plus, Trash2, X } from "lucide-react";
+import { Pencil, Plus, Trash2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 import { Button } from "@/components/ui/button";
@@ -26,9 +26,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Spinner } from "@/components/ui/spinner";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { DataTable } from "@/components/ui/data-table";
+import { TableCell, TableRow } from "@/components/ui/table";
 
 function getTodayInputValue() {
   const today = new Date();
@@ -98,6 +105,7 @@ export default function CuentasPorCobrarContent() {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
 
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingReceivableId, setEditingReceivableId] = useState("");
   const [editPersonId, setEditPersonId] = useState("");
   const [editConcept, setEditConcept] = useState("");
@@ -109,7 +117,13 @@ export default function CuentasPorCobrarContent() {
   const [editNotes, setEditNotes] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
 
-  const [expandedReceivableId, setExpandedReceivableId] = useState("");
+  const [paymentsDialogReceivable, setPaymentsDialogReceivable] =
+    useState(null);
+
+  const [filterPersonId, setFilterPersonId] = useState("");
+  const [filterOriginType, setFilterOriginType] = useState("");
+  const [filterStatus, setFilterStatus] = useState("");
+  const [filterConcept, setFilterConcept] = useState("");
 
   async function loadSettings(userId) {
     const response = await fetch(`/api/settings?userId=${userId}`);
@@ -246,9 +260,11 @@ export default function CuentasPorCobrarContent() {
       formatChargeDaysInput(receivable.expectedChargeDays),
     );
     setEditNotes(receivable.notes || "");
+    setEditDialogOpen(true);
   }
 
   function cancelEditingReceivable() {
+    setEditDialogOpen(false);
     setEditingReceivableId("");
     setEditPersonId("");
     setEditConcept("");
@@ -328,6 +344,10 @@ export default function CuentasPorCobrarContent() {
     }
   }
 
+  function openPaymentsDialog(receivable) {
+    setPaymentsDialogReceivable(receivable);
+  }
+
   const summary = useMemo(() => {
     return receivables.reduce(
       (acc, item) => {
@@ -345,17 +365,173 @@ export default function CuentasPorCobrarContent() {
     );
   }, [receivables]);
 
-  const activeReceivables = useMemo(() => {
-    return receivables.filter((item) => item.status === "ACTIVE");
-  }, [receivables]);
+  const filteredReceivables = useMemo(() => {
+    return receivables.filter((item) => {
+      if (filterPersonId && item.personId !== filterPersonId) return false;
+      if (filterOriginType && item.originType !== filterOriginType)
+        return false;
+      if (filterStatus && item.status !== filterStatus) return false;
 
-  const paidOffReceivables = useMemo(() => {
-    return receivables.filter((item) => item.status === "PAID_OFF");
-  }, [receivables]);
+      if (filterConcept) {
+        const search = filterConcept.toLowerCase();
 
-  const allReceivables = useMemo(() => {
-    return receivables;
-  }, [receivables]);
+        if (!item.concept?.toLowerCase().includes(search)) return false;
+      }
+
+      return true;
+    });
+  }, [
+    receivables,
+    filterPersonId,
+    filterOriginType,
+    filterStatus,
+    filterConcept,
+  ]);
+
+  const receivableColumns = useMemo(
+    () => [
+      {
+        id: "concept",
+        accessorFn: (row) => row.concept,
+        header: "Concepto",
+        cell: ({ row }) => {
+          const item = row.original;
+
+          return (
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <p className="font-medium">{item.concept}</p>
+                <Badge variant="secondary">{getStatusLabel(item.status)}</Badge>
+                <Badge variant="outline">
+                  {getOriginLabel(item.originType)}
+                </Badge>
+              </div>
+
+              <p className="mt-1 text-sm text-muted-foreground">
+                Persona: {item.person?.name} · Origen:{" "}
+                {formatDate(item.originDate)}
+              </p>
+
+              {item.expectedMonthlyPayment ? (
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Pago esperado: {formatMoney(item.expectedMonthlyPayment)}
+                </p>
+              ) : null}
+
+              {item.expectedChargeDays?.length > 0 ? (
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Días de cobro: {item.expectedChargeDays.join(", ")}
+                </p>
+              ) : null}
+
+              {item.notes ? (
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {item.notes}
+                </p>
+              ) : null}
+            </div>
+          );
+        },
+      },
+      {
+        id: "originalAmount",
+        accessorFn: (row) => Number(row.originalAmount || 0),
+        header: "Original",
+        cell: ({ row }) => (
+          <span className="whitespace-nowrap font-medium tabular-nums">
+            {formatMoney(row.original.originalAmount)}
+          </span>
+        ),
+      },
+      {
+        id: "paidAmount",
+        accessorFn: (row) => Number(row.paidAmount || 0),
+        header: "Pagado",
+        cell: ({ row }) => (
+          <span className="whitespace-nowrap font-medium tabular-nums">
+            {formatMoney(row.original.paidAmount)}
+          </span>
+        ),
+      },
+      {
+        id: "pendingBalance",
+        accessorFn: (row) => Number(row.pendingBalance || 0),
+        header: "Pendiente",
+        cell: ({ row }) => (
+          <span className="whitespace-nowrap font-semibold tabular-nums">
+            {formatMoney(row.original.pendingBalance)}
+          </span>
+        ),
+      },
+      {
+        id: "actions",
+        header: "",
+        enableSorting: false,
+        cell: ({ row }) => (
+          <div className="flex items-center justify-end gap-1">
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={() => openPaymentsDialog(row.original)}
+            >
+              Ver pagos
+            </Button>
+
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => startEditingReceivable(row.original)}
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => deleteReceivable(row.original.id)}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        ),
+      },
+    ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
+
+  function renderReceivablesTotalsFooter(table) {
+    const rows = table.getFilteredRowModel().rows;
+    const totals = rows.reduce(
+      (acc, row) => {
+        acc.original += Number(row.original.originalAmount || 0);
+        acc.paid += Number(row.original.paidAmount || 0);
+        acc.pending += Number(row.original.pendingBalance || 0);
+
+        return acc;
+      },
+      { original: 0, paid: 0, pending: 0 },
+    );
+
+    return (
+      <TableRow>
+        <TableCell>Total filtrado</TableCell>
+        <TableCell className="font-medium tabular-nums">
+          {formatMoney(totals.original)}
+        </TableCell>
+        <TableCell className="font-medium tabular-nums">
+          {formatMoney(totals.paid)}
+        </TableCell>
+        <TableCell className="font-semibold tabular-nums">
+          {formatMoney(totals.pending)}
+        </TableCell>
+        <TableCell />
+      </TableRow>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -367,7 +543,7 @@ export default function CuentasPorCobrarContent() {
 
   return (
     <main>
-      <section className="mx-auto flex w-full max-w-6xl flex-col px-4 py-5 md:py-8">
+      <section className="mx-auto flex w-full max-w-full flex-col px-4 py-5 md:py-8">
         {error ? (
           <div className="mb-6 rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
             {error}
@@ -383,7 +559,7 @@ export default function CuentasPorCobrarContent() {
           <SummaryCard title="Pendiente" value={formatMoney(summary.pending)} />
         </div>
 
-        <div className="grid gap-5 xl:grid-cols-[420px_1fr]">
+        <div className="grid min-w-0 gap-5 xl:grid-cols-[360px_1fr]">
           <Card className="rounded-2xl border-border bg-card">
             <CardHeader>
               <CardTitle className="text-lg font-semibold uppercase text-center">
@@ -493,126 +669,236 @@ export default function CuentasPorCobrarContent() {
             </CardContent>
           </Card>
 
-          <Card className="rounded-2xl border-border bg-card">
-            <CardHeader>
-              <CardTitle className="text-lg font-semibold uppercase text-center">
-                Cuentas por cobrar
-              </CardTitle>
-            </CardHeader>
+          <div className="min-w-0">
+            <Card className="rounded-2xl border-border bg-card">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold uppercase text-center">
+                  Cuentas por cobrar
+                </CardTitle>
+              </CardHeader>
 
-            <CardContent>
-              <Tabs defaultValue="active" className="w-full">
-                <TabsList className="mb-6">
-                  <TabsTrigger value="active">
-                    Activas ({activeReceivables.length})
-                  </TabsTrigger>
-                  <TabsTrigger value="paid">
-                    Liquidadas ({paidOffReceivables.length})
-                  </TabsTrigger>
-                  <TabsTrigger value="all">
-                    Todas ({allReceivables.length})
-                  </TabsTrigger>
-                </TabsList>
+              <CardContent>
+                <DataTable
+                  columns={receivableColumns}
+                  data={filteredReceivables}
+                  pageSize={10}
+                  pageSizeOptions={[5, 10, 25, 50]}
+                  footerRow={renderReceivablesTotalsFooter}
+                  toolbarStart={
+                    <>
+                      <Select
+                        value={filterPersonId || "ALL"}
+                        onValueChange={(value) =>
+                          setFilterPersonId(value === "ALL" ? "" : value)
+                        }
+                      >
+                        <SelectTrigger className="w-[180px]">
+                          <SelectValue placeholder="Todas las personas" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="ALL">
+                            Todas las personas
+                          </SelectItem>
+                          {people.map((person) => (
+                            <SelectItem key={person.id} value={person.id}>
+                              {person.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
 
-                <TabsContent value="active">
-                  <ReceivablesList
-                    items={activeReceivables}
-                    emptyText="No tienes cuentas por cobrar activas."
-                    onDelete={deleteReceivable}
-                    onEdit={startEditingReceivable}
-                    editingReceivableId={editingReceivableId}
-                    people={people}
-                    editPersonId={editPersonId}
-                    setEditPersonId={setEditPersonId}
-                    editConcept={editConcept}
-                    setEditConcept={setEditConcept}
-                    editOriginalAmount={editOriginalAmount}
-                    setEditOriginalAmount={setEditOriginalAmount}
-                    editOriginDate={editOriginDate}
-                    setEditOriginDate={setEditOriginDate}
-                    editExpectedMonthlyPayment={editExpectedMonthlyPayment}
-                    setEditExpectedMonthlyPayment={
-                      setEditExpectedMonthlyPayment
-                    }
-                    editExpectedChargeDays={editExpectedChargeDays}
-                    setEditExpectedChargeDays={setEditExpectedChargeDays}
-                    editNotes={editNotes}
-                    setEditNotes={setEditNotes}
-                    updateReceivable={updateReceivable}
-                    cancelEditingReceivable={cancelEditingReceivable}
-                    isUpdating={isUpdating}
-                    expandedReceivableId={expandedReceivableId}
-                    setExpandedReceivableId={setExpandedReceivableId}
-                  />
-                </TabsContent>
+                      <Select
+                        value={filterOriginType || "ALL"}
+                        onValueChange={(value) =>
+                          setFilterOriginType(value === "ALL" ? "" : value)
+                        }
+                      >
+                        <SelectTrigger className="w-[180px]">
+                          <SelectValue placeholder="Todos los orígenes" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="ALL">
+                            Todos los orígenes
+                          </SelectItem>
+                          <SelectItem value="MANUAL">Manual</SelectItem>
+                          <SelectItem value="DAILY_EXPENSE">
+                            Gasto diario
+                          </SelectItem>
+                          <SelectItem value="INSTALLMENT_PURCHASE">
+                            Compra a meses
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
 
-                <TabsContent value="paid">
-                  <ReceivablesList
-                    items={paidOffReceivables}
-                    emptyText="No tienes cuentas por cobrar liquidadas."
-                    onDelete={deleteReceivable}
-                    onEdit={startEditingReceivable}
-                    editingReceivableId={editingReceivableId}
-                    people={people}
-                    editPersonId={editPersonId}
-                    setEditPersonId={setEditPersonId}
-                    editConcept={editConcept}
-                    setEditConcept={setEditConcept}
-                    editOriginalAmount={editOriginalAmount}
-                    setEditOriginalAmount={setEditOriginalAmount}
-                    editOriginDate={editOriginDate}
-                    setEditOriginDate={setEditOriginDate}
-                    editExpectedMonthlyPayment={editExpectedMonthlyPayment}
-                    setEditExpectedMonthlyPayment={
-                      setEditExpectedMonthlyPayment
-                    }
-                    editExpectedChargeDays={editExpectedChargeDays}
-                    setEditExpectedChargeDays={setEditExpectedChargeDays}
-                    editNotes={editNotes}
-                    setEditNotes={setEditNotes}
-                    updateReceivable={updateReceivable}
-                    cancelEditingReceivable={cancelEditingReceivable}
-                    isUpdating={isUpdating}
-                    expandedReceivableId={expandedReceivableId}
-                    setExpandedReceivableId={setExpandedReceivableId}
-                  />
-                </TabsContent>
+                      <Select
+                        value={filterStatus || "ALL"}
+                        onValueChange={(value) =>
+                          setFilterStatus(value === "ALL" ? "" : value)
+                        }
+                      >
+                        <SelectTrigger className="w-[180px]">
+                          <SelectValue placeholder="Todos los estados" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="ALL">Todos los estados</SelectItem>
+                          <SelectItem value="ACTIVE">Activa</SelectItem>
+                          <SelectItem value="PAID_OFF">Liquidada</SelectItem>
+                          <SelectItem value="CANCELLED">Cancelada</SelectItem>
+                        </SelectContent>
+                      </Select>
 
-                <TabsContent value="all">
-                  <ReceivablesList
-                    items={allReceivables}
-                    emptyText="Aún no tienes cuentas por cobrar registradas."
-                    onDelete={deleteReceivable}
-                    onEdit={startEditingReceivable}
-                    editingReceivableId={editingReceivableId}
-                    people={people}
-                    editPersonId={editPersonId}
-                    setEditPersonId={setEditPersonId}
-                    editConcept={editConcept}
-                    setEditConcept={setEditConcept}
-                    editOriginalAmount={editOriginalAmount}
-                    setEditOriginalAmount={setEditOriginalAmount}
-                    editOriginDate={editOriginDate}
-                    setEditOriginDate={setEditOriginDate}
-                    editExpectedMonthlyPayment={editExpectedMonthlyPayment}
-                    setEditExpectedMonthlyPayment={
-                      setEditExpectedMonthlyPayment
-                    }
-                    editExpectedChargeDays={editExpectedChargeDays}
-                    setEditExpectedChargeDays={setEditExpectedChargeDays}
-                    editNotes={editNotes}
-                    setEditNotes={setEditNotes}
-                    updateReceivable={updateReceivable}
-                    cancelEditingReceivable={cancelEditingReceivable}
-                    isUpdating={isUpdating}
-                    expandedReceivableId={expandedReceivableId}
-                    setExpandedReceivableId={setExpandedReceivableId}
-                  />
-                </TabsContent>
-              </Tabs>
-            </CardContent>
-          </Card>
+                      <Input
+                        placeholder="Buscar concepto..."
+                        value={filterConcept}
+                        onChange={(event) =>
+                          setFilterConcept(event.target.value)
+                        }
+                        className="w-[200px]"
+                      />
+                    </>
+                  }
+                />
+              </CardContent>
+            </Card>
+          </div>
         </div>
+
+        <Dialog
+          open={editDialogOpen}
+          onOpenChange={(open) => {
+            if (!open) cancelEditingReceivable();
+          }}
+        >
+          <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Editar cuenta por cobrar</DialogTitle>
+            </DialogHeader>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label>Persona</Label>
+                <Select value={editPersonId} onValueChange={setEditPersonId}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecciona persona" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {people.map((person) => (
+                      <SelectItem key={person.id} value={person.id}>
+                        {person.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Fecha de origen</Label>
+                <Input
+                  type="date"
+                  value={editOriginDate}
+                  onChange={(event) => setEditOriginDate(event.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2 md:col-span-2">
+                <Label>Concepto</Label>
+                <Input
+                  value={editConcept}
+                  onChange={(event) => setEditConcept(event.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Monto original</Label>
+                <Input
+                  value={editOriginalAmount}
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  onChange={(event) =>
+                    setEditOriginalAmount(event.target.value)
+                  }
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Pago mensual esperado opcional</Label>
+                <Input
+                  value={editExpectedMonthlyPayment}
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  onChange={(event) =>
+                    setEditExpectedMonthlyPayment(event.target.value)
+                  }
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Días de cobro opcionales</Label>
+                <Input
+                  value={editExpectedChargeDays}
+                  placeholder="Ej. 15, 30"
+                  onChange={(event) =>
+                    setEditExpectedChargeDays(event.target.value)
+                  }
+                />
+                <p className="text-xs text-muted-foreground">
+                  Puedes capturar uno o varios días separados por coma.
+                </p>
+              </div>
+
+              <div className="space-y-2 md:col-span-2">
+                <Label>Notas</Label>
+                <Textarea
+                  value={editNotes}
+                  onChange={(event) => setEditNotes(event.target.value)}
+                />
+              </div>
+            </div>
+
+            <DialogFooter className="gap-2">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={cancelEditingReceivable}
+              >
+                Cancelar
+              </Button>
+              <Button
+                type="button"
+                onClick={updateReceivable}
+                disabled={isUpdating}
+              >
+                {isUpdating ? "Guardando..." : "Guardar cambios"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog
+          open={Boolean(paymentsDialogReceivable)}
+          onOpenChange={(open) => {
+            if (!open) setPaymentsDialogReceivable(null);
+          }}
+        >
+          <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-xl">
+            <DialogHeader>
+              <DialogTitle>
+                Pagos vinculados
+                {paymentsDialogReceivable
+                  ? ` · ${paymentsDialogReceivable.concept}`
+                  : ""}
+              </DialogTitle>
+            </DialogHeader>
+
+            {paymentsDialogReceivable ? (
+              <ReceivablePaymentsBreakdown
+                receivable={paymentsDialogReceivable}
+              />
+            ) : null}
+          </DialogContent>
+        </Dialog>
       </section>
     </main>
   );
@@ -629,303 +915,37 @@ function SummaryCard({ title, value }) {
   );
 }
 
-function ReceivablesList({
-  items,
-  emptyText,
-  onDelete,
-  onEdit,
-  editingReceivableId,
-  people,
-  editPersonId,
-  setEditPersonId,
-  editConcept,
-  setEditConcept,
-  editOriginalAmount,
-  setEditOriginalAmount,
-  editOriginDate,
-  setEditOriginDate,
-  editExpectedMonthlyPayment,
-  setEditExpectedMonthlyPayment,
-  editExpectedChargeDays,
-  setEditExpectedChargeDays,
-  editNotes,
-  setEditNotes,
-  updateReceivable,
-  cancelEditingReceivable,
-  isUpdating,
-  expandedReceivableId,
-  setExpandedReceivableId,
-}) {
-  if (items.length === 0) {
-    return (
-      <p className="rounded-xl border border-border bg-muted/30 px-4 py-6 text-sm text-muted-foreground">
-        {emptyText}
-      </p>
-    );
-  }
-
-  return (
-    <div className="grid gap-3">
-      {items.map((item) => (
-        <div
-          key={item.id}
-          className="rounded-xl border border-border bg-background/60 px-4 py-4"
-        >
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-            <div className="min-w-0">
-              <div className="flex flex-wrap items-center gap-2">
-                <p className="font-medium">{item.concept}</p>
-                <Badge variant="secondary">{getStatusLabel(item.status)}</Badge>
-                <Badge variant="outline">
-                  {getOriginLabel(item.originType)}
-                </Badge>
-              </div>
-
-              <p className="mt-1 text-sm text-muted-foreground">
-                Persona: {item.person?.name} · Origen:{" "}
-                {formatDate(item.originDate)}
-              </p>
-
-              {item.expectedMonthlyPayment ? (
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Pago esperado: {formatMoney(item.expectedMonthlyPayment)}
-                </p>
-              ) : null}
-
-              {item.expectedChargeDays?.length > 0 ? (
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Días de cobro: {item.expectedChargeDays.join(", ")}
-                </p>
-              ) : null}
-
-              {item.notes ? (
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {item.notes}
-                </p>
-              ) : null}
-            </div>
-
-            <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
-              <Button
-                type="button"
-                variant="secondary"
-                size="sm"
-                onClick={() =>
-                  setExpandedReceivableId((current) =>
-                    current === item.id ? "" : item.id,
-                  )
-                }
-              >
-                {expandedReceivableId === item.id
-                  ? "Ocultar pagos"
-                  : "Ver pagos"}
-              </Button>
-
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                onClick={() => onEdit(item)}
-              >
-                <Pencil className="h-4 w-4" />
-              </Button>
-
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                onClick={() => onDelete(item.id)}
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-
-          <Separator className="my-4" />
-
-          <div className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-3">
-            <div className="rounded-lg border border-border bg-muted/30 px-3 py-3">
-              <p className="text-xs text-muted-foreground">Original</p>
-              <p className="mt-1 font-medium">
-                {formatMoney(item.originalAmount)}
-              </p>
-            </div>
-
-            <div className="rounded-lg border border-border bg-muted/30 px-3 py-3">
-              <p className="text-xs text-muted-foreground">Pagado</p>
-              <p className="mt-1 font-medium">{formatMoney(item.paidAmount)}</p>
-            </div>
-
-            <div className="rounded-lg border border-border bg-muted/30 px-3 py-3">
-              <p className="text-xs text-muted-foreground">Pendiente</p>
-              <p className="mt-1 font-medium">
-                {formatMoney(item.pendingBalance)}
-              </p>
-            </div>
-          </div>
-
-          {expandedReceivableId === item.id ? (
-            <ReceivablePaymentsBreakdown receivable={item} />
-          ) : null}
-
-          {editingReceivableId === item.id ? (
-            <div className="mt-4 rounded-xl border border-border bg-background/70 p-4">
-              <div className="mb-4 flex items-center justify-between gap-4">
-                <p className="text-sm font-medium">Editar cuenta por cobrar</p>
-
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  onClick={cancelEditingReceivable}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label>Persona</Label>
-                  <Select value={editPersonId} onValueChange={setEditPersonId}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecciona persona" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {people.map((person) => (
-                        <SelectItem key={person.id} value={person.id}>
-                          {person.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Fecha de origen</Label>
-                  <Input
-                    type="date"
-                    value={editOriginDate}
-                    onChange={(event) => setEditOriginDate(event.target.value)}
-                  />
-                </div>
-
-                <div className="space-y-2 md:col-span-2">
-                  <Label>Concepto</Label>
-                  <Input
-                    value={editConcept}
-                    onChange={(event) => setEditConcept(event.target.value)}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Monto original</Label>
-                  <Input
-                    value={editOriginalAmount}
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    onChange={(event) =>
-                      setEditOriginalAmount(event.target.value)
-                    }
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Pago mensual esperado opcional</Label>
-                  <Input
-                    value={editExpectedMonthlyPayment}
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    onChange={(event) =>
-                      setEditExpectedMonthlyPayment(event.target.value)
-                    }
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Días de cobro opcionales</Label>
-                  <Input
-                    value={editExpectedChargeDays}
-                    placeholder="Ej. 15, 30"
-                    onChange={(event) =>
-                      setEditExpectedChargeDays(event.target.value)
-                    }
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Puedes capturar uno o varios días separados por coma.
-                  </p>
-                </div>
-
-                <div className="space-y-2 md:col-span-2">
-                  <Label>Notas</Label>
-                  <Textarea
-                    value={editNotes}
-                    onChange={(event) => setEditNotes(event.target.value)}
-                  />
-                </div>
-              </div>
-
-              <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-                <Button
-                  type="button"
-                  className="w-full sm:w-auto"
-                  onClick={updateReceivable}
-                  disabled={isUpdating}
-                >
-                  {isUpdating ? "Guardando..." : "Guardar cambios"}
-                </Button>
-
-                <Button
-                  type="button"
-                  variant="secondary"
-                  className="w-full sm:w-auto"
-                  onClick={cancelEditingReceivable}
-                >
-                  Cancelar
-                </Button>
-              </div>
-            </div>
-          ) : null}
-        </div>
-      ))}
-    </div>
-  );
-}
-
 function ReceivablePaymentsBreakdown({ receivable }) {
   const payments = [...(receivable.incomes || [])].sort((a, b) => {
     return new Date(b.date).getTime() - new Date(a.date).getTime();
   });
 
+  if (payments.length === 0) {
+    return (
+      <p className="rounded-lg border border-border bg-muted/30 px-3 py-3 text-sm text-muted-foreground">
+        Todavía no hay pagos vinculados a esta cuenta por cobrar.
+      </p>
+    );
+  }
+
   return (
-    <div className="mt-4 rounded-xl border border-border bg-background/70 p-4">
-      <h4 className="mb-4 text-sm font-medium">Desglose de pagos</h4>
+    <div className="grid gap-2">
+      {payments.map((payment) => (
+        <div
+          key={payment.id}
+          className="flex flex-col gap-2 rounded-lg border border-border bg-muted/30 px-3 py-3 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <div className="min-w-0">
+            <p className="font-medium">{payment.concept}</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {formatDate(payment.date)}
+              {payment.source ? ` · ${payment.source}` : ""}
+            </p>
+          </div>
 
-      {payments.length === 0 ? (
-        <p className="rounded-lg border border-border bg-muted/30 px-3 py-3 text-sm text-muted-foreground">
-          Todavía no hay pagos vinculados a esta cuenta por cobrar.
-        </p>
-      ) : (
-        <div className="grid gap-2">
-          {payments.map((payment) => (
-            <div
-              key={payment.id}
-              className="flex flex-col gap-2 rounded-lg border border-border bg-muted/30 px-3 py-3 sm:flex-row sm:items-center sm:justify-between"
-            >
-              <div className="min-w-0">
-                <p className="font-medium">{payment.concept}</p>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  {formatDate(payment.date)}
-                  {payment.source ? ` · ${payment.source}` : ""}
-                </p>
-              </div>
-
-              <p className="font-semibold">{formatMoney(payment.amount)}</p>
-            </div>
-          ))}
+          <p className="font-semibold">{formatMoney(payment.amount)}</p>
         </div>
-      )}
+      ))}
     </div>
   );
 }

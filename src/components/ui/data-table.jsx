@@ -31,8 +31,10 @@ import {
 } from "@/components/ui/select";
 
 function SortIcon({ isSorted }) {
-  if (isSorted === "asc") return <ChevronUp className="ml-1 inline h-3.5 w-3.5" />;
-  if (isSorted === "desc") return <ChevronDown className="ml-1 inline h-3.5 w-3.5" />;
+  if (isSorted === "asc")
+    return <ChevronUp className="ml-1 inline h-3.5 w-3.5" />;
+  if (isSorted === "desc")
+    return <ChevronDown className="ml-1 inline h-3.5 w-3.5" />;
   return <ChevronsUpDown className="ml-1 inline h-3.5 w-3.5 opacity-40" />;
 }
 
@@ -44,6 +46,7 @@ export function DataTable({
   filterPlaceholder = "Filtrar...",
   pageSize = 10,
   pageSizeOptions,
+  toolbarStart,
   footerRow,
 }) {
   const [sorting, setSorting] = useState([]);
@@ -74,22 +77,28 @@ export function DataTable({
 
   return (
     <div className="space-y-3">
-      {showFilter || pageSizeOptions ? (
+      {showFilter || pageSizeOptions || toolbarStart ? (
         <div className="flex flex-wrap items-center justify-between gap-2">
-          {showFilter ? (
-            <Input
-              placeholder={filterPlaceholder}
-              value={filterGlobal ? globalFilter : columnFilterValue}
-              onChange={(e) => {
-                if (filterGlobal) {
-                  setGlobalFilter(e.target.value);
-                } else {
-                  table.getColumn(filterColumn)?.setFilterValue(e.target.value);
-                }
-              }}
-              className="max-w-sm"
-            />
-          ) : <div />}
+          <div className="flex flex-wrap items-center gap-2">
+            {toolbarStart}
+
+            {showFilter ? (
+              <Input
+                placeholder={filterPlaceholder}
+                value={filterGlobal ? globalFilter : columnFilterValue}
+                onChange={(e) => {
+                  if (filterGlobal) {
+                    setGlobalFilter(e.target.value);
+                  } else {
+                    table
+                      .getColumn(filterColumn)
+                      ?.setFilterValue(e.target.value);
+                  }
+                }}
+                className="max-w-sm"
+              />
+            ) : null}
+          </div>
 
           {pageSizeOptions ? (
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -106,7 +115,11 @@ export function DataTable({
                 </SelectTrigger>
                 <SelectContent>
                   {pageSizeOptions.map((size) => (
-                    <SelectItem key={size} value={String(size)} className="text-xs">
+                    <SelectItem
+                      key={size}
+                      value={String(size)}
+                      className="text-xs"
+                    >
                       {size}
                     </SelectItem>
                   ))}
@@ -121,16 +134,26 @@ export function DataTable({
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="bg-muted/40 hover:bg-muted/40">
+              <TableRow
+                key={headerGroup.id}
+                className="bg-muted/40 hover:bg-muted/40"
+              >
                 {headerGroup.headers.map((header) => (
                   <TableHead
                     key={header.id}
-                    className={header.column.getCanSort() ? "cursor-pointer select-none" : ""}
+                    className={
+                      header.column.getCanSort()
+                        ? "cursor-pointer select-none"
+                        : ""
+                    }
                     onClick={header.column.getToggleSortingHandler()}
                   >
                     {header.isPlaceholder ? null : (
                       <>
-                        {flexRender(header.column.columnDef.header, header.getContext())}
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
                         {header.column.getCanSort() ? (
                           <SortIcon isSorted={header.column.getIsSorted()} />
                         ) : (
@@ -150,25 +173,27 @@ export function DataTable({
                 <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="py-8 text-center text-muted-foreground">
+                <TableCell
+                  colSpan={columns.length}
+                  className="py-8 text-center text-muted-foreground"
+                >
                   Sin resultados.
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
 
-          {footerRow ? (
-            <TableFooter>
-              {footerRow(table)}
-            </TableFooter>
-          ) : null}
+          {footerRow ? <TableFooter>{footerRow(table)}</TableFooter> : null}
         </Table>
       </div>
 
