@@ -129,10 +129,12 @@ export default function GastosContent() {
   const [editSubscriptionId, setEditSubscriptionId] = useState("NONE");
 
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const [expenseToDelete, setExpenseToDelete] = useState(null);
 
   const [filterMonth, setFilterMonth] = useState("");
+  const [filterDate, setFilterDate] = useState("");
   const [filterCategoryId, setFilterCategoryId] = useState("");
   const [filterConcept, setFilterConcept] = useState("");
 
@@ -294,6 +296,15 @@ export default function GastosContent() {
   async function createExpense() {
     if (!user) return;
 
+    if (!concept.trim()) {
+      setError("El concepto es requerido.");
+      return;
+    }
+    if (!amount || Number(amount) <= 0) {
+      setError("El monto debe ser mayor a 0.");
+      return;
+    }
+
     setError("");
     setIsSaving(true);
 
@@ -349,7 +360,6 @@ export default function GastosContent() {
       toast.success("Gasto guardado exitosamente.");
     } catch (err) {
       setError(err.message || "No se pudo guardar el gasto.");
-      toast.error(err.message || "No se pudo guardar el gasto.");
     } finally {
       setIsSaving(false);
     }
@@ -427,7 +437,6 @@ export default function GastosContent() {
       toast.success("Cambios guardados exitosamente.");
     } catch (err) {
       setError(err.message || "No se pudo actualizar el gasto.");
-      toast.error(err.message || "No se pudo actualizar el gasto.");
     } finally {
       setIsUpdating(false);
     }
@@ -437,6 +446,7 @@ export default function GastosContent() {
     if (!user) return;
 
     setError("");
+    setIsDeleting(true);
 
     try {
       const response = await fetch(`/api/expenses?id=${expenseId}`, {
@@ -455,7 +465,8 @@ export default function GastosContent() {
       toast.success("Gasto eliminado exitosamente.");
     } catch (err) {
       setError(err.message || "No se pudo eliminar el gasto.");
-      toast.error(err.message || "No se pudo eliminar el gasto.");
+    } finally {
+      setIsDeleting(false);
     }
   }
 
@@ -471,8 +482,10 @@ export default function GastosContent() {
 
   const filteredExpenses = useMemo(() => {
     return expenses.filter((expense) => {
-      if (filterMonth) {
-        const datePart = String(expense.date).split("T")[0];
+      const datePart = String(expense.date).split("T")[0];
+      if (filterDate) {
+        if (datePart !== filterDate) return false;
+      } else if (filterMonth) {
         const [year, month] = datePart.split("-");
         if (`${year}-${month}` !== filterMonth) return false;
       }
@@ -485,7 +498,7 @@ export default function GastosContent() {
       }
       return true;
     });
-  }, [expenses, filterMonth, filterCategoryId, filterConcept]);
+  }, [expenses, filterMonth, filterDate, filterCategoryId, filterConcept]);
 
   const expenseColumns = useMemo(
     () => [
@@ -581,6 +594,7 @@ export default function GastosContent() {
               type="button"
               variant="ghost"
               size="icon"
+              aria-label="Editar gasto"
               onClick={() => startEditingExpense(row.original)}
             >
               <Pencil className="h-4 w-4" />
@@ -589,6 +603,7 @@ export default function GastosContent() {
               type="button"
               variant="ghost"
               size="icon"
+              aria-label="Eliminar gasto"
               onClick={() => setExpenseToDelete(row.original)}
             >
               <Trash2 className="h-4 w-4" />
@@ -630,12 +645,13 @@ export default function GastosContent() {
           </AlertDialogHeader>
 
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel disabled={isDeleting}>Cancelar</AlertDialogCancel>
             <AlertDialogAction
               className="bg-red-800 text-white hover:bg-red-900 focus:ring-red-300"
+              disabled={isDeleting}
               onClick={() => deleteExpense(expenseToDelete.id)}
             >
-              Eliminar
+              {isDeleting ? "Eliminando..." : "Eliminar"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -649,8 +665,9 @@ export default function GastosContent() {
 
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
-              <Label>Fecha</Label>
+              <Label htmlFor="edit-date">Fecha</Label>
               <Input
+                id="edit-date"
                 type="date"
                 value={editDate}
                 onChange={(event) => setEditDate(event.target.value)}
@@ -658,7 +675,7 @@ export default function GastosContent() {
             </div>
 
             <div className="space-y-2">
-              <Label>Método</Label>
+              <Label htmlFor="edit-paymentMethod">Método</Label>
               <Select
                 value={editPaymentMethod}
                 onValueChange={(value) => {
@@ -669,7 +686,7 @@ export default function GastosContent() {
                   }
                 }}
               >
-                <SelectTrigger>
+                <SelectTrigger id="edit-paymentMethod">
                   <SelectValue placeholder="Selecciona método" />
                 </SelectTrigger>
                 <SelectContent>
@@ -681,9 +698,9 @@ export default function GastosContent() {
 
             {editPaymentMethod === "CARD" ? (
               <div className="space-y-2">
-                <Label>Tarjeta</Label>
+                <Label htmlFor="edit-cardId">Tarjeta</Label>
                 <Select value={editCardId} onValueChange={setEditCardId}>
-                  <SelectTrigger>
+                  <SelectTrigger id="edit-cardId">
                     <SelectValue placeholder="Selecciona tarjeta" />
                   </SelectTrigger>
                   <SelectContent>
@@ -698,16 +715,18 @@ export default function GastosContent() {
             ) : null}
 
             <div className="space-y-2">
-              <Label>Concepto</Label>
+              <Label htmlFor="edit-concept">Concepto</Label>
               <Input
+                id="edit-concept"
                 value={editConcept}
                 onChange={(event) => setEditConcept(event.target.value)}
               />
             </div>
 
             <div className="space-y-2">
-              <Label>Monto</Label>
+              <Label htmlFor="edit-amount">Monto</Label>
               <Input
+                id="edit-amount"
                 type="number"
                 min="0"
                 step="0.01"
@@ -717,9 +736,9 @@ export default function GastosContent() {
             </div>
 
             <div className="space-y-2">
-              <Label>Categoría</Label>
+              <Label htmlFor="edit-categoryId">Categoría</Label>
               <Select value={editCategoryId} onValueChange={setEditCategoryId}>
-                <SelectTrigger>
+                <SelectTrigger id="edit-categoryId">
                   <SelectValue placeholder="Selecciona categoría" />
                 </SelectTrigger>
                 <SelectContent>
@@ -733,12 +752,12 @@ export default function GastosContent() {
             </div>
 
             <div className="space-y-2">
-              <Label>Suscripción relacionada</Label>
+              <Label htmlFor="edit-subscriptionId">Suscripción relacionada</Label>
               <Select
                 value={editSubscriptionId}
                 onValueChange={setEditSubscriptionId}
               >
-                <SelectTrigger>
+                <SelectTrigger id="edit-subscriptionId">
                   <SelectValue placeholder="Selecciona suscripción" />
                 </SelectTrigger>
                 <SelectContent>
@@ -757,8 +776,9 @@ export default function GastosContent() {
             </div>
 
             <div className="space-y-2 md:col-span-2">
-              <Label>Notas</Label>
+              <Label htmlFor="edit-notes">Notas</Label>
               <Textarea
+                id="edit-notes"
                 value={editNotes}
                 onChange={(event) => setEditNotes(event.target.value)}
               />
@@ -802,8 +822,9 @@ export default function GastosContent() {
 
               <CardContent className="space-y-4 md:space-y-5">
                 <div className="space-y-2">
-                  <Label>Fecha</Label>
+                  <Label htmlFor="date">Fecha</Label>
                   <Input
+                    id="date"
                     type="date"
                     value={date}
                     onChange={(event) => setDate(event.target.value)}
@@ -811,7 +832,7 @@ export default function GastosContent() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Método de pago</Label>
+                  <Label htmlFor="paymentMethod">Método de pago</Label>
                   <Select
                     value={paymentMethod}
                     onValueChange={(value) => {
@@ -822,7 +843,7 @@ export default function GastosContent() {
                       }
                     }}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger id="paymentMethod">
                       <SelectValue placeholder="Selecciona método" />
                     </SelectTrigger>
                     <SelectContent>
@@ -834,9 +855,9 @@ export default function GastosContent() {
 
                 {paymentMethod === "CARD" ? (
                   <div className="space-y-2">
-                    <Label>Tarjeta</Label>
+                    <Label htmlFor="cardId">Tarjeta</Label>
                     <Select value={cardId} onValueChange={setCardId}>
-                      <SelectTrigger>
+                      <SelectTrigger id="cardId">
                         <SelectValue placeholder="Selecciona tarjeta" />
                       </SelectTrigger>
                       <SelectContent>
@@ -858,8 +879,9 @@ export default function GastosContent() {
                 ) : null}
 
                 <div className="space-y-2">
-                  <Label>Concepto</Label>
+                  <Label htmlFor="concept">Concepto</Label>
                   <Input
+                    id="concept"
                     value={concept}
                     placeholder="Ej. Tacos, Uber, Cine..."
                     onChange={(event) => setConcept(event.target.value)}
@@ -867,8 +889,9 @@ export default function GastosContent() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Monto</Label>
+                  <Label htmlFor="amount">Monto</Label>
                   <Input
+                    id="amount"
                     value={amount}
                     type="number"
                     min="0"
@@ -879,9 +902,9 @@ export default function GastosContent() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Categoría</Label>
+                  <Label htmlFor="categoryId">Categoría</Label>
                   <Select value={categoryId} onValueChange={setCategoryId}>
-                    <SelectTrigger>
+                    <SelectTrigger id="categoryId">
                       <SelectValue placeholder="Selecciona categoría" />
                     </SelectTrigger>
                     <SelectContent>
@@ -895,8 +918,9 @@ export default function GastosContent() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Notas opcional</Label>
+                  <Label htmlFor="notes">Notas (opcional)</Label>
                   <Textarea
+                    id="notes"
                     value={notes}
                     placeholder="Algún detalle adicional..."
                     onChange={(event) => setNotes(event.target.value)}
@@ -906,7 +930,8 @@ export default function GastosContent() {
                 <div className="rounded-xl border border-border bg-background/50 p-4">
                   <button
                     type="button"
-                    className="flex w-full items-center justify-between text-left text-sm font-medium"
+                    className="flex w-full cursor-pointer items-center justify-between text-left text-sm font-medium"
+                    aria-expanded={showMoreOptions}
                     onClick={() => setShowMoreOptions((current) => !current)}
                   >
                     <span>Más opciones</span>
@@ -918,7 +943,7 @@ export default function GastosContent() {
                   {showMoreOptions ? (
                     <div className="mt-4 space-y-4">
                       <div className="space-y-2">
-                        <Label>Persona relacionada</Label>
+                        <Label htmlFor="personId">Persona relacionada</Label>
                         <Select
                           value={personId || "NONE"}
                           onValueChange={(value) => {
@@ -931,7 +956,7 @@ export default function GastosContent() {
                             }
                           }}
                         >
-                          <SelectTrigger>
+                          <SelectTrigger id="personId">
                             <SelectValue placeholder="Selecciona persona" />
                           </SelectTrigger>
                           <SelectContent>
@@ -954,7 +979,7 @@ export default function GastosContent() {
                       {personId ? (
                         <>
                           <div className="space-y-2">
-                            <Label>Cuenta por cobrar</Label>
+                            <Label htmlFor="receivableMode">Cuenta por cobrar</Label>
                             <Select
                               value={receivableMode}
                               onValueChange={(value) => {
@@ -965,7 +990,7 @@ export default function GastosContent() {
                                 }
                               }}
                             >
-                              <SelectTrigger>
+                              <SelectTrigger id="receivableMode">
                                 <SelectValue placeholder="Selecciona opción" />
                               </SelectTrigger>
                               <SelectContent>
@@ -981,12 +1006,12 @@ export default function GastosContent() {
 
                           {receivableMode === "EXISTING" ? (
                             <div className="space-y-2">
-                              <Label>Cuenta existente</Label>
+                              <Label htmlFor="receivableAccountId">Cuenta existente</Label>
                               <Select
                                 value={receivableAccountId}
                                 onValueChange={setReceivableAccountId}
                               >
-                                <SelectTrigger>
+                                <SelectTrigger id="receivableAccountId">
                                   <SelectValue placeholder="Selecciona cuenta por cobrar" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -1015,12 +1040,12 @@ export default function GastosContent() {
                           ) : null}
 
                           <div className="space-y-2">
-                            <Label>Cuenta por pagar relacionada</Label>
+                            <Label htmlFor="payableAccountId">Cuenta por pagar relacionada</Label>
                             <Select
                               value={payableAccountId}
                               onValueChange={setPayableAccountId}
                             >
-                              <SelectTrigger>
+                              <SelectTrigger id="payableAccountId">
                                 <SelectValue placeholder="Selecciona cuenta por pagar" />
                               </SelectTrigger>
                               <SelectContent>
@@ -1053,12 +1078,12 @@ export default function GastosContent() {
                       <Separator />
 
                       <div className="space-y-2">
-                        <Label>Suscripción relacionada</Label>
+                        <Label htmlFor="subscriptionId">Suscripción relacionada</Label>
                         <Select
                           value={subscriptionId}
                           onValueChange={setSubscriptionId}
                         >
-                          <SelectTrigger>
+                          <SelectTrigger id="subscriptionId">
                             <SelectValue placeholder="Selecciona suscripción" />
                           </SelectTrigger>
                           <SelectContent>
@@ -1107,12 +1132,15 @@ export default function GastosContent() {
                 </CardHeader>
 
                 <CardContent className="space-y-4">
-                  <div className="flex flex-wrap gap-3">
+                  <div className="grid grid-cols-1 gap-3 sm:flex sm:flex-wrap">
                     <Select
                       value={filterMonth || "ALL"}
-                      onValueChange={(value) => setFilterMonth(value === "ALL" ? "" : value)}
+                      onValueChange={(value) => {
+                        setFilterMonth(value === "ALL" ? "" : value);
+                        setFilterDate("");
+                      }}
                     >
-                      <SelectTrigger className="w-[180px]">
+                      <SelectTrigger className="w-full sm:w-[180px]">
                         <SelectValue placeholder="Todos los meses" />
                       </SelectTrigger>
                       <SelectContent>
@@ -1125,11 +1153,37 @@ export default function GastosContent() {
                       </SelectContent>
                     </Select>
 
+                    <div className="space-y-1">
+                      <Label htmlFor="filterDate" className="sr-only">Filtrar por día</Label>
+                      <Input
+                        id="filterDate"
+                        type="date"
+                        value={filterDate}
+                        onChange={(e) => {
+                          setFilterDate(e.target.value);
+                          setFilterMonth("");
+                        }}
+                        className="w-full sm:w-[160px]"
+                      />
+                    </div>
+
+                    {filterDate ? (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setFilterDate("")}
+                        className="text-muted-foreground"
+                      >
+                        Limpiar día
+                      </Button>
+                    ) : null}
+
                     <Select
                       value={filterCategoryId || "ALL"}
                       onValueChange={(value) => setFilterCategoryId(value === "ALL" ? "" : value)}
                     >
-                      <SelectTrigger className="w-[180px]">
+                      <SelectTrigger className="w-full sm:w-[180px]">
                         <SelectValue placeholder="Todas las categorías" />
                       </SelectTrigger>
                       <SelectContent>
@@ -1142,12 +1196,16 @@ export default function GastosContent() {
                       </SelectContent>
                     </Select>
 
-                    <Input
-                      placeholder="Buscar concepto..."
-                      value={filterConcept}
-                      onChange={(e) => setFilterConcept(e.target.value)}
-                      className="w-[200px]"
-                    />
+                    <div className="space-y-1">
+                      <Label htmlFor="filterConcept" className="sr-only">Buscar por concepto</Label>
+                      <Input
+                        id="filterConcept"
+                        placeholder="Buscar concepto..."
+                        value={filterConcept}
+                        onChange={(e) => setFilterConcept(e.target.value)}
+                        className="w-full sm:w-[200px]"
+                      />
+                    </div>
                   </div>
 
                   <DataTable
