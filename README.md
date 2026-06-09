@@ -58,7 +58,7 @@ Auth por Supabase. DB PostgreSQL vía Prisma + Supabase. Modo oscuro forzado.
 | `GET /api/subscriptions` | `src/app/api/subscriptions/route.js` |
 | `GET /api/receivables` | `src/app/api/receivables/route.js` |
 | `GET /api/payables` | `src/app/api/payables/route.js` |
-| `GET /api/dashboard` | `src/app/api/dashboard/route.js` | Incluye `weeklyComparison`: gastos días 1-7 mes anterior vs mes actual |
+| `GET /api/dashboard` | `src/app/api/dashboard/route.js` | Incluye `weeklyComparisonByMonth`, `weeklyComparisonByCategoryAndMonth` (filtrado por categoría) y `categories` para el comparativo mes vs mes |
 | `GET /api/settings` | `src/app/api/settings/route.js` |
 | `POST /api/setup-user` | `src/app/api/setup-user/route.js` |
 

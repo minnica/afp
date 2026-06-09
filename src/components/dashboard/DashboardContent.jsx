@@ -24,6 +24,13 @@ import { Badge } from "@/components/ui/badge";
 import { Spinner } from "@/components/ui/spinner";
 import { AlertTriangle, Bell, CalendarClock, Scissors } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const MONTH_NAMES = [
   "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
@@ -274,7 +281,10 @@ export default function DashboardContent() {
   const categoryBreakdownPrev = dashboard?.categoryBreakdownPrev || [];
   const categoryBreakdownCurrent = dashboard?.categoryBreakdownCurrent || [];
   const categoryBreakdownNext = dashboard?.categoryBreakdownNext || [];
+  const categoryBreakdownByMonth = dashboard?.categoryBreakdownByMonth || {};
   const weeklyComparisonByMonth = dashboard?.weeklyComparisonByMonth || {};
+  const weeklyComparisonByCategoryAndMonth = dashboard?.weeklyComparisonByCategoryAndMonth || {};
+  const dashboardCategories = dashboard?.categories || [];
 
   const prevMonthIndex = (currentMonthIndex - 1 + 12) % 12;
   const nextMonthIndex = (currentMonthIndex + 1) % 12;
@@ -360,8 +370,16 @@ export default function DashboardContent() {
           </Card>
 
           <div className="grid gap-6 lg:grid-cols-2">
-            <WeeklyComparisonChart weeklyComparison={weeklyComparison} />
-            <CategoryBarChart categoryBreakdown={categoryBreakdown} />
+            <WeeklyComparisonChart
+              weeklyComparison={weeklyComparison}
+              activeMonthIndex={activeMonthIndex}
+              weeklyComparisonByCategoryAndMonth={weeklyComparisonByCategoryAndMonth}
+              categories={dashboardCategories}
+            />
+            <CategoryBarChart
+              categoryBreakdownByMonth={categoryBreakdownByMonth}
+              activeMonthIndex={activeMonthIndex}
+            />
           </div>
         </div>
       </section>
@@ -394,13 +412,47 @@ const TOOLTIP_STYLE = {
   labelStyle: { color: "#a1a1aa" },
 };
 
-function WeeklyComparisonChart({ weeklyComparison }) {
-  if (!weeklyComparison) {
+const MXN = new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" });
+
+function ComparisonTooltip({ active, payload, label }) {
+  if (!active || !payload || !payload.length) return null;
+  return (
+    <div style={{ ...TOOLTIP_STYLE.contentStyle, padding: "10px 14px" }}>
+      <p style={{ color: "#a1a1aa", marginBottom: "8px", fontSize: "11px" }}>{label}</p>
+      {payload.map((entry, i) => (
+        <p key={i} style={{ color: entry.color, margin: "4px 0", fontSize: "12px" }}>
+          <span style={{ color: "#a1a1aa" }}>{entry.name}: </span>
+          {MXN.format(entry.value)}
+        </p>
+      ))}
+    </div>
+  );
+}
+
+function WeeklyComparisonChart({
+  weeklyComparison,
+  activeMonthIndex,
+  weeklyComparisonByCategoryAndMonth,
+  categories,
+}) {
+  const [selectedCategoryId, setSelectedCategoryId] = useState("all");
+
+  const activeComparison =
+    selectedCategoryId === "all"
+      ? weeklyComparison
+      : weeklyComparisonByCategoryAndMonth[selectedCategoryId]?.[activeMonthIndex] || null;
+
+  const selectedCategoryName =
+    selectedCategoryId !== "all"
+      ? categories.find((c) => c.id === selectedCategoryId)?.name
+      : null;
+
+  if (!activeComparison) {
     return (
       <Card className="rounded-2xl border-border bg-card">
         <CardHeader>
           <CardTitle className="text-lg font-semibold uppercase text-center">
-            Comparativo 1ª semana
+            Mes vs Mes
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -412,7 +464,7 @@ function WeeklyComparisonChart({ weeklyComparison }) {
     );
   }
 
-  const { prevMonthLabel, currMonthLabel, prevMonthTotal, currMonthTotal, weeks } = weeklyComparison;
+  const { prevMonthLabel, currMonthLabel, prevMonthTotal, currMonthTotal, weeks } = activeComparison;
 
   const chartData = weeks.map((w) => ({
     label: w.label,
@@ -428,9 +480,27 @@ function WeeklyComparisonChart({ weeklyComparison }) {
   return (
     <Card className="rounded-2xl border-border bg-card">
       <CardHeader>
-        <CardTitle className="text-lg font-semibold uppercase text-center">
-          {prevMonthLabel} vs {currMonthLabel}
-        </CardTitle>
+        <div className="flex flex-col items-center gap-3">
+          <CardTitle className="text-lg font-semibold uppercase text-center">
+            {prevMonthLabel} vs {currMonthLabel}
+            {selectedCategoryName ? ` — ${selectedCategoryName}` : ""}
+          </CardTitle>
+          {categories.length > 0 && (
+            <Select value={selectedCategoryId} onValueChange={setSelectedCategoryId}>
+              <SelectTrigger className="w-full max-w-[220px] h-8 text-xs">
+                <SelectValue placeholder="Filtrar por categoría" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todas las categorías</SelectItem>
+                {categories.map((cat) => (
+                  <SelectItem key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+        </div>
       </CardHeader>
 
       <CardContent>
@@ -495,22 +565,22 @@ function WeeklyComparisonChart({ weeklyComparison }) {
                   tick={{ fontSize: 10, fill: "#a1a1aa" }}
                   width={76}
                 />
-                <Tooltip
-                  {...TOOLTIP_STYLE}
-                  formatter={(value, name) => [
-                    new Intl.NumberFormat("es-MX", {
-                      style: "currency",
-                      currency: "MXN",
-                    }).format(value),
-                    name,
-                  ]}
-                />
+                <Tooltip content={ComparisonTooltip} />
                 <Legend
-                  formatter={(value) => (
-                    <span style={{ color: "#a1a1aa", fontSize: "12px" }}>
-                      {value}
-                    </span>
-                  )}
+                  content={({ payload }) => {
+                    if (!payload || payload.length === 0) return null;
+                    const ordered = [...payload].reverse();
+                    return (
+                      <div style={{ display: "flex", justifyContent: "center", gap: "16px", marginTop: "8px" }}>
+                        {ordered.map((entry, i) => (
+                          <div key={i} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                            <div style={{ width: "12px", height: "12px", backgroundColor: entry.color, borderRadius: "2px" }} />
+                            <span style={{ color: "#a1a1aa", fontSize: "12px" }}>{entry.value}</span>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  }}
                 />
                 <Bar
                   dataKey={prevMonthLabel}
@@ -533,33 +603,59 @@ function WeeklyComparisonChart({ weeklyComparison }) {
   );
 }
 
-function CategoryBarChart({ categoryBreakdown }) {
+function CategoryBarChart({ categoryBreakdownByMonth, activeMonthIndex }) {
+  const prevMonthIndex = (activeMonthIndex - 1 + 12) % 12;
+
+  const currBreakdown = categoryBreakdownByMonth[activeMonthIndex] || [];
+  const prevBreakdown = categoryBreakdownByMonth[prevMonthIndex] || [];
+
+  const currLabel = MONTH_NAMES[activeMonthIndex];
+  const prevLabel = MONTH_NAMES[prevMonthIndex];
+
+  const categoryIds = new Set([
+    ...currBreakdown.map((c) => c.id),
+    ...prevBreakdown.map((c) => c.id),
+  ]);
+
+  const nameById = {};
+  [...currBreakdown, ...prevBreakdown].forEach((c) => {
+    nameById[c.id] = c.name;
+  });
+
+  const chartData = Array.from(categoryIds)
+    .map((id) => ({
+      id,
+      name: nameById[id],
+      [prevLabel]: prevBreakdown.find((c) => c.id === id)?.total || 0,
+      [currLabel]: currBreakdown.find((c) => c.id === id)?.total || 0,
+    }))
+    .filter((c) => c[prevLabel] > 0 || c[currLabel] > 0)
+    .sort((a, b) => b[currLabel] - a[currLabel]);
+
+  const hasData = chartData.length > 0;
 
   return (
     <Card className="rounded-2xl border-border bg-card">
       <CardHeader>
         <CardTitle className="text-lg font-semibold uppercase text-center">
-          Gastos por categoría
+          {prevLabel} vs {currLabel} — por categoría
         </CardTitle>
       </CardHeader>
 
       <CardContent>
-        {categoryBreakdown.length === 0 ? (
+        {!hasData ? (
           <p className="rounded-xl border border-border bg-muted/30 px-4 py-6 text-sm text-muted-foreground">
-            Aún no hay gastos para este mes.
+            Aún no hay gastos para este período.
           </p>
         ) : (
-          <div
-            style={{
-              width: "100%",
-              height: `${Math.max(categoryBreakdown.length * 52 + 40, 200)}px`,
-            }}
-          >
+          <div style={{ width: "100%", height: `${Math.max(chartData.length * 68 + 40, 200)}px` }}>
             <ResponsiveContainer width="100%" height="100%" minWidth={0}>
               <BarChart
                 layout="vertical"
-                data={categoryBreakdown}
-                margin={{ top: 0, right: 16, bottom: 0, left: 0 }}
+                data={chartData}
+                margin={{ top: 0, right: 16, bottom: 8, left: 0 }}
+                barCategoryGap="20%"
+                barGap={2}
               >
                 <CartesianGrid horizontal={false} stroke="#333" />
                 <YAxis
@@ -583,24 +679,25 @@ function CategoryBarChart({ categoryBreakdown }) {
                   }
                   tick={{ fontSize: 10, fill: "#a1a1aa" }}
                 />
-                <Tooltip
-                  {...TOOLTIP_STYLE}
-                  formatter={(value, name) => [
-                    new Intl.NumberFormat("es-MX", {
-                      style: "currency",
-                      currency: "MXN",
-                    }).format(value),
-                    name,
-                  ]}
+                <Tooltip content={ComparisonTooltip} />
+                <Legend
+                  content={({ payload }) => {
+                    if (!payload || payload.length === 0) return null;
+                    const ordered = [...payload].reverse();
+                    return (
+                      <div style={{ display: "flex", justifyContent: "center", gap: "16px", marginTop: "8px" }}>
+                        {ordered.map((entry, i) => (
+                          <div key={i} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                            <div style={{ width: "12px", height: "12px", backgroundColor: entry.color, borderRadius: "2px" }} />
+                            <span style={{ color: "#a1a1aa", fontSize: "12px" }}>{entry.value}</span>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  }}
                 />
-                <Bar dataKey="total" radius={[0, 4, 4, 0]}>
-                  {categoryBreakdown.map((entry, i) => (
-                    <Cell
-                      key={entry.id}
-                      fill={CHART_COLORS[i % CHART_COLORS.length]}
-                    />
-                  ))}
-                </Bar>
+                <Bar dataKey={prevLabel} fill="#3b82f6" radius={[0, 4, 4, 0]} maxBarSize={14} />
+                <Bar dataKey={currLabel} fill="#10b981" radius={[0, 4, 4, 0]} maxBarSize={14} />
               </BarChart>
             </ResponsiveContainer>
           </div>

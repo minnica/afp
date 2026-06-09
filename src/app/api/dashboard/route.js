@@ -559,7 +559,11 @@ const MONTH_NAMES_FULL_ES = [
   "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre",
 ];
 
-function buildWeeklyComparison({ expenses, currentYear, currentMonth }) {
+function buildWeeklyComparison({ expenses, currentYear, currentMonth, categoryId = null }) {
+  const filteredExpenses = categoryId
+    ? expenses.filter((e) => e.categoryId === categoryId)
+    : expenses;
+
   const prevDate = new Date(Date.UTC(currentYear, currentMonth - 2, 1));
   const prevYear = prevDate.getUTCFullYear();
   const prevMonth = prevDate.getUTCMonth() + 1;
@@ -573,11 +577,11 @@ function buildWeeklyComparison({ expenses, currentYear, currentMonth }) {
   const currMonthStart = new Date(Date.UTC(currentYear, currentMonth - 1, 1, 0, 0, 0));
   const currMonthEnd = new Date(Date.UTC(currentYear, currentMonth - 1, currMonthDays, 23, 59, 59));
 
-  const prevMonthTotal = expenses
+  const prevMonthTotal = filteredExpenses
     .filter((e) => isDateInsideRange(e.date, prevMonthStart, prevMonthEnd))
     .reduce((sum, e) => sum + Number(e.amount || 0), 0);
 
-  const currMonthTotal = expenses
+  const currMonthTotal = filteredExpenses
     .filter((e) => isDateInsideRange(e.date, currMonthStart, currMonthEnd))
     .reduce((sum, e) => sum + Number(e.amount || 0), 0);
 
@@ -595,7 +599,7 @@ function buildWeeklyComparison({ expenses, currentYear, currentMonth }) {
 
     const prevTotal =
       startDay <= prevMonthDays
-        ? expenses
+        ? filteredExpenses
             .filter((e) =>
               isDateInsideRange(
                 e.date,
@@ -608,7 +612,7 @@ function buildWeeklyComparison({ expenses, currentYear, currentMonth }) {
 
     const currTotal =
       startDay <= currMonthDays
-        ? expenses
+        ? filteredExpenses
             .filter((e) =>
               isDateInsideRange(
                 e.date,
@@ -894,6 +898,15 @@ export async function GET(request) {
       month: nextDate.getUTCMonth() + 1,
     });
 
+    const categoryBreakdownByMonth = {};
+    for (let m = 0; m < 12; m++) {
+      categoryBreakdownByMonth[m] = buildCategoryBreakdown({
+        categories, expenses, subscriptions, purchases,
+        year: currentYear,
+        month: m + 1,
+      });
+    }
+
     const weeklyComparisonByMonth = {};
     for (let m = 0; m < 12; m++) {
       weeklyComparisonByMonth[m] = buildWeeklyComparison({
@@ -901,6 +914,19 @@ export async function GET(request) {
         currentYear,
         currentMonth: m + 1,
       });
+    }
+
+    const weeklyComparisonByCategoryAndMonth = {};
+    for (const category of categories) {
+      weeklyComparisonByCategoryAndMonth[category.id] = {};
+      for (let m = 0; m < 12; m++) {
+        weeklyComparisonByCategoryAndMonth[category.id][m] = buildWeeklyComparison({
+          expenses,
+          currentYear,
+          currentMonth: m + 1,
+          categoryId: category.id,
+        });
+      }
     }
 
     const activeReceivables = receivables
@@ -955,7 +981,10 @@ export async function GET(request) {
       categoryBreakdownPrev,
       categoryBreakdownCurrent,
       categoryBreakdownNext,
+      categoryBreakdownByMonth,
       weeklyComparisonByMonth,
+      weeklyComparisonByCategoryAndMonth,
+      categories: categories.map((c) => ({ id: c.id, name: c.name })),
       activeReceivables,
       importantNotices,
     });
