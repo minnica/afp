@@ -538,7 +538,7 @@ export default function SuscripcionesContent() {
               variant="ghost"
               size="icon"
               onClick={() => startEditingSubscription(row.original)}
-              disabled={row.original.isActive === false}
+              disabled={false}
             >
               <Pencil className="h-4 w-4" />
             </Button>

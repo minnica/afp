@@ -559,10 +559,18 @@ const MONTH_NAMES_FULL_ES = [
   "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre",
 ];
 
-function buildWeeklyComparison({ expenses, currentYear, currentMonth, categoryId = null }) {
+function buildWeeklyComparison({ expenses, subscriptions = [], purchases = [], currentYear, currentMonth, categoryId = null }) {
   const filteredExpenses = categoryId
     ? expenses.filter((e) => e.categoryId === categoryId)
     : expenses;
+
+  const filteredSubscriptions = categoryId
+    ? subscriptions.filter((s) => s.categoryId === categoryId)
+    : subscriptions;
+
+  const filteredPurchases = categoryId
+    ? purchases.filter((p) => p.categoryId === categoryId)
+    : purchases;
 
   const prevDate = new Date(Date.UTC(currentYear, currentMonth - 2, 1));
   const prevYear = prevDate.getUTCFullYear();
@@ -577,13 +585,35 @@ function buildWeeklyComparison({ expenses, currentYear, currentMonth, categoryId
   const currMonthStart = new Date(Date.UTC(currentYear, currentMonth - 1, 1, 0, 0, 0));
   const currMonthEnd = new Date(Date.UTC(currentYear, currentMonth - 1, currMonthDays, 23, 59, 59));
 
-  const prevMonthTotal = filteredExpenses
-    .filter((e) => isDateInsideRange(e.date, prevMonthStart, prevMonthEnd))
-    .reduce((sum, e) => sum + Number(e.amount || 0), 0);
+  const prevSubsTotal = filteredSubscriptions
+    .filter((s) => isSubscriptionChargeableInMonth(s, prevYear, prevMonth))
+    .reduce((sum, s) => sum + Number(s.amount || 0), 0);
 
-  const currMonthTotal = filteredExpenses
-    .filter((e) => isDateInsideRange(e.date, currMonthStart, currMonthEnd))
-    .reduce((sum, e) => sum + Number(e.amount || 0), 0);
+  const currSubsTotal = filteredSubscriptions
+    .filter((s) => isSubscriptionChargeableInMonth(s, currentYear, currentMonth))
+    .reduce((sum, s) => sum + Number(s.amount || 0), 0);
+
+  const prevPurchasesTotal = filteredPurchases
+    .filter((p) => shouldIncludePurchaseInMonth(p, prevYear, prevMonth))
+    .reduce((sum, p) => sum + getMonthlyPaymentUsed(p), 0);
+
+  const currPurchasesTotal = filteredPurchases
+    .filter((p) => shouldIncludePurchaseInMonth(p, currentYear, currentMonth))
+    .reduce((sum, p) => sum + getMonthlyPaymentUsed(p), 0);
+
+  const prevMonthTotal =
+    filteredExpenses
+      .filter((e) => isDateInsideRange(e.date, prevMonthStart, prevMonthEnd))
+      .reduce((sum, e) => sum + Number(e.amount || 0), 0) +
+    prevSubsTotal +
+    prevPurchasesTotal;
+
+  const currMonthTotal =
+    filteredExpenses
+      .filter((e) => isDateInsideRange(e.date, currMonthStart, currMonthEnd))
+      .reduce((sum, e) => sum + Number(e.amount || 0), 0) +
+    currSubsTotal +
+    currPurchasesTotal;
 
   const weekRanges = [
     { week: 1, startDay: 1, endDay: 7 },
@@ -597,7 +627,7 @@ function buildWeeklyComparison({ expenses, currentYear, currentMonth, categoryId
     const prevEnd = Math.min(endDay, prevMonthDays);
     const currEnd = Math.min(endDay, currMonthDays);
 
-    const prevTotal =
+    const prevDailyTotal =
       startDay <= prevMonthDays
         ? filteredExpenses
             .filter((e) =>
@@ -610,7 +640,7 @@ function buildWeeklyComparison({ expenses, currentYear, currentMonth, categoryId
             .reduce((sum, e) => sum + Number(e.amount || 0), 0)
         : 0;
 
-    const currTotal =
+    const currDailyTotal =
       startDay <= currMonthDays
         ? filteredExpenses
             .filter((e) =>
@@ -623,6 +653,40 @@ function buildWeeklyComparison({ expenses, currentYear, currentMonth, categoryId
             .reduce((sum, e) => sum + Number(e.amount || 0), 0)
         : 0;
 
+    const prevSubsWeekTotal = filteredSubscriptions
+      .filter((s) => isSubscriptionChargeableInMonth(s, prevYear, prevMonth))
+      .filter((s) => {
+        const day = Math.min(Number(s.chargeDay), prevMonthDays);
+        return day >= startDay && day <= prevEnd;
+      })
+      .reduce((sum, s) => sum + Number(s.amount || 0), 0);
+
+    const currSubsWeekTotal = filteredSubscriptions
+      .filter((s) => isSubscriptionChargeableInMonth(s, currentYear, currentMonth))
+      .filter((s) => {
+        const day = Math.min(Number(s.chargeDay), currMonthDays);
+        return day >= startDay && day <= currEnd;
+      })
+      .reduce((sum, s) => sum + Number(s.amount || 0), 0);
+
+    // Compras a meses no tienen día específico en el mes — se asignan a semana 1
+    const prevPurchasesWeekTotal =
+      week === 1
+        ? filteredPurchases
+            .filter((p) => shouldIncludePurchaseInMonth(p, prevYear, prevMonth))
+            .reduce((sum, p) => sum + getMonthlyPaymentUsed(p), 0)
+        : 0;
+
+    const currPurchasesWeekTotal =
+      week === 1
+        ? filteredPurchases
+            .filter((p) => shouldIncludePurchaseInMonth(p, currentYear, currentMonth))
+            .reduce((sum, p) => sum + getMonthlyPaymentUsed(p), 0)
+        : 0;
+
+    const prevTotal = prevDailyTotal + prevSubsWeekTotal + prevPurchasesWeekTotal;
+    const currTotal = currDailyTotal + currSubsWeekTotal + currPurchasesWeekTotal;
+
     return { week, label: `Sem ${week}`, startDay, endDay: Math.max(prevEnd, currEnd), prevTotal, currTotal };
   });
 
@@ -632,6 +696,50 @@ function buildWeeklyComparison({ expenses, currentYear, currentMonth, categoryId
     prevMonthTotal,
     currMonthTotal,
     weeks,
+  };
+}
+
+function buildCardMonthlyComparison({ cyclesWithAmounts, cards, currentYear, currentMonth }) {
+  const prevDate = new Date(Date.UTC(currentYear, currentMonth - 2, 1));
+  const prevYear = prevDate.getUTCFullYear();
+  const prevMonth = prevDate.getUTCMonth() + 1;
+
+  const data = cards
+    .map((card) => {
+      const cardCycles = cyclesWithAmounts.filter((c) => c.cardId === card.id);
+
+      const prevCycle = cardCycles.find((c) => {
+        const d = new Date(c.cutDate);
+        return d.getUTCFullYear() === prevYear && d.getUTCMonth() + 1 === prevMonth;
+      });
+
+      const currCycle = cardCycles.find((c) => {
+        const d = new Date(c.cutDate);
+        return d.getUTCFullYear() === currentYear && d.getUTCMonth() + 1 === currentMonth;
+      });
+
+      const prevAmount = prevCycle
+        ? Number(prevCycle.statementAmount || prevCycle.calculatedAmount || 0)
+        : 0;
+      const currAmount = currCycle
+        ? Number(currCycle.statementAmount || currCycle.calculatedAmount || 0)
+        : 0;
+
+      return {
+        cardId: card.id,
+        cardName: card.name,
+        prevAmount,
+        currAmount,
+        prevIsStatement: prevCycle ? !!prevCycle.statementAmount : false,
+        currIsStatement: currCycle ? !!currCycle.statementAmount : false,
+      };
+    })
+    .filter((c) => c.prevAmount > 0 || c.currAmount > 0);
+
+  return {
+    prevMonthLabel: MONTH_NAMES_FULL_ES[prevMonth - 1],
+    currMonthLabel: MONTH_NAMES_FULL_ES[currentMonth - 1],
+    data,
   };
 }
 
@@ -667,13 +775,19 @@ function buildCutCycleNotices(cyclesWithAmounts, cards, now) {
         date: cycle.cutDate,
         amount: Number(cycle.calculatedAmount || 0),
       });
-    } else if (cycle.displayStatus === "OPEN" && diffDaysToCut === 1) {
+    } else if (
+      cycle.displayStatus === "OPEN" &&
+      diffDaysToCut > 0 &&
+      diffDaysToCut <= 2
+    ) {
+      const cutLabel =
+        diffDaysToCut === 1 ? "mañana" : `en ${diffDaysToCut} días`;
       notices.push({
         id: `cut-cycle-upcoming-${cycle.id}`,
         type: "CUT_CYCLE_UPCOMING",
         group: "cut",
-        title: `Corte mañana: ${card.name}`,
-        description: `La tarjeta se corta mañana. Recuerda actualizar la fecha y el monto del estado de cuenta una vez cortado.`,
+        title: `Corte ${cutLabel}: ${card.name}`,
+        description: `La tarjeta se corta ${cutLabel}. Recuerda actualizar la fecha y el monto del estado de cuenta una vez cortado.`,
         date: cycle.cutDate,
         amount: Number(cycle.calculatedAmount || 0),
       });
@@ -692,7 +806,8 @@ export async function GET(request) {
       return NextResponse.json({ error: "Falta userId." }, { status: 400 });
     }
 
-    const now = new Date();
+    const clientDate = searchParams.get("clientDate");
+    const now = clientDate ? new Date(`${clientDate}T12:00:00Z`) : new Date();
     const monthStart = getMonthStart(now);
     const monthEnd = getMonthEnd(now);
     const currentYear = now.getFullYear();
@@ -911,6 +1026,8 @@ export async function GET(request) {
     for (let m = 0; m < 12; m++) {
       weeklyComparisonByMonth[m] = buildWeeklyComparison({
         expenses,
+        subscriptions,
+        purchases,
         currentYear,
         currentMonth: m + 1,
       });
@@ -922,6 +1039,8 @@ export async function GET(request) {
       for (let m = 0; m < 12; m++) {
         weeklyComparisonByCategoryAndMonth[category.id][m] = buildWeeklyComparison({
           expenses,
+          subscriptions,
+          purchases,
           currentYear,
           currentMonth: m + 1,
           categoryId: category.id,
@@ -939,6 +1058,16 @@ export async function GET(request) {
         };
       })
       .filter((receivable) => receivable.status === "ACTIVE");
+
+    const cardMonthlyComparisonByMonth = {};
+    for (let m = 0; m < 12; m++) {
+      cardMonthlyComparisonByMonth[m] = buildCardMonthlyComparison({
+        cyclesWithAmounts,
+        cards,
+        currentYear,
+        currentMonth: m + 1,
+      });
+    }
 
     const cardPaymentNotices = buildCardPaymentNotices(payments, now);
     const cashSubscriptionNotices = buildCashSubscriptionNotices(
@@ -984,6 +1113,7 @@ export async function GET(request) {
       categoryBreakdownByMonth,
       weeklyComparisonByMonth,
       weeklyComparisonByCategoryAndMonth,
+      cardMonthlyComparisonByMonth,
       categories: categories.map((c) => ({ id: c.id, name: c.name })),
       activeReceivables,
       importantNotices,
