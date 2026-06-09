@@ -554,6 +554,83 @@ function buildCategoryBreakdown({ categories, expenses, subscriptions, purchases
     .sort((a, b) => b.total - a.total);
 }
 
+const MONTH_NAMES_FULL_ES = [
+  "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+  "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre",
+];
+
+function buildWeeklyComparison({ expenses, currentYear, currentMonth }) {
+  const prevDate = new Date(Date.UTC(currentYear, currentMonth - 2, 1));
+  const prevYear = prevDate.getUTCFullYear();
+  const prevMonth = prevDate.getUTCMonth() + 1;
+
+  const prevMonthDays = new Date(Date.UTC(prevYear, prevMonth, 0)).getUTCDate();
+  const currMonthDays = new Date(Date.UTC(currentYear, currentMonth, 0)).getUTCDate();
+  const maxDays = Math.max(prevMonthDays, currMonthDays);
+
+  const prevMonthStart = new Date(Date.UTC(prevYear, prevMonth - 1, 1, 0, 0, 0));
+  const prevMonthEnd = new Date(Date.UTC(prevYear, prevMonth - 1, prevMonthDays, 23, 59, 59));
+  const currMonthStart = new Date(Date.UTC(currentYear, currentMonth - 1, 1, 0, 0, 0));
+  const currMonthEnd = new Date(Date.UTC(currentYear, currentMonth - 1, currMonthDays, 23, 59, 59));
+
+  const prevMonthTotal = expenses
+    .filter((e) => isDateInsideRange(e.date, prevMonthStart, prevMonthEnd))
+    .reduce((sum, e) => sum + Number(e.amount || 0), 0);
+
+  const currMonthTotal = expenses
+    .filter((e) => isDateInsideRange(e.date, currMonthStart, currMonthEnd))
+    .reduce((sum, e) => sum + Number(e.amount || 0), 0);
+
+  const weekRanges = [
+    { week: 1, startDay: 1, endDay: 7 },
+    { week: 2, startDay: 8, endDay: 14 },
+    { week: 3, startDay: 15, endDay: 21 },
+    { week: 4, startDay: 22, endDay: 28 },
+    { week: 5, startDay: 29, endDay: maxDays },
+  ].filter((w) => w.startDay <= maxDays);
+
+  const weeks = weekRanges.map(({ week, startDay, endDay }) => {
+    const prevEnd = Math.min(endDay, prevMonthDays);
+    const currEnd = Math.min(endDay, currMonthDays);
+
+    const prevTotal =
+      startDay <= prevMonthDays
+        ? expenses
+            .filter((e) =>
+              isDateInsideRange(
+                e.date,
+                new Date(Date.UTC(prevYear, prevMonth - 1, startDay, 0, 0, 0)),
+                new Date(Date.UTC(prevYear, prevMonth - 1, prevEnd, 23, 59, 59)),
+              ),
+            )
+            .reduce((sum, e) => sum + Number(e.amount || 0), 0)
+        : 0;
+
+    const currTotal =
+      startDay <= currMonthDays
+        ? expenses
+            .filter((e) =>
+              isDateInsideRange(
+                e.date,
+                new Date(Date.UTC(currentYear, currentMonth - 1, startDay, 0, 0, 0)),
+                new Date(Date.UTC(currentYear, currentMonth - 1, currEnd, 23, 59, 59)),
+              ),
+            )
+            .reduce((sum, e) => sum + Number(e.amount || 0), 0)
+        : 0;
+
+    return { week, label: `Sem ${week}`, startDay, endDay: Math.max(prevEnd, currEnd), prevTotal, currTotal };
+  });
+
+  return {
+    prevMonthLabel: MONTH_NAMES_FULL_ES[prevMonth - 1],
+    currMonthLabel: MONTH_NAMES_FULL_ES[currentMonth - 1],
+    prevMonthTotal,
+    currMonthTotal,
+    weeks,
+  };
+}
+
 function buildCutCycleNotices(cyclesWithAmounts, cards, now) {
   const notices = [];
   const cardMap = new Map(cards.map((c) => [c.id, c]));
@@ -817,6 +894,15 @@ export async function GET(request) {
       month: nextDate.getUTCMonth() + 1,
     });
 
+    const weeklyComparisonByMonth = {};
+    for (let m = 0; m < 12; m++) {
+      weeklyComparisonByMonth[m] = buildWeeklyComparison({
+        expenses,
+        currentYear,
+        currentMonth: m + 1,
+      });
+    }
+
     const activeReceivables = receivables
       .map((receivable) => {
         const amounts = getReceivableAmounts(receivable);
@@ -869,6 +955,7 @@ export async function GET(request) {
       categoryBreakdownPrev,
       categoryBreakdownCurrent,
       categoryBreakdownNext,
+      weeklyComparisonByMonth,
       activeReceivables,
       importantNotices,
     });

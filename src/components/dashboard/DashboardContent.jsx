@@ -5,8 +5,6 @@ import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import {
-  PieChart,
-  Pie,
   Cell,
   Tooltip,
   Legend,
@@ -276,10 +274,13 @@ export default function DashboardContent() {
   const categoryBreakdownPrev = dashboard?.categoryBreakdownPrev || [];
   const categoryBreakdownCurrent = dashboard?.categoryBreakdownCurrent || [];
   const categoryBreakdownNext = dashboard?.categoryBreakdownNext || [];
+  const weeklyComparisonByMonth = dashboard?.weeklyComparisonByMonth || {};
 
   const prevMonthIndex = (currentMonthIndex - 1 + 12) % 12;
   const nextMonthIndex = (currentMonthIndex + 1) % 12;
   const activeMonthIndex = Number(activeMonthTab);
+
+  const weeklyComparison = weeklyComparisonByMonth[activeMonthIndex] || null;
 
   const categoryBreakdown =
     activeMonthIndex === prevMonthIndex
@@ -341,9 +342,9 @@ export default function DashboardContent() {
 
             <CardContent>
               <Tabs value={activeMonthTab} onValueChange={setActiveMonthTab}>
-                <TabsList className="mb-6 h-auto flex-wrap">
+                <TabsList className="mb-6 h-auto w-full flex-nowrap justify-start overflow-x-auto md:w-fit md:flex-wrap md:justify-center md:overflow-x-visible">
                   {MONTH_NAMES.map((name, monthIndex) => (
-                    <TabsTrigger key={monthIndex} value={String(monthIndex)}>
+                    <TabsTrigger key={monthIndex} value={String(monthIndex)} className="flex-none">
                       {name}
                     </TabsTrigger>
                   ))}
@@ -359,7 +360,7 @@ export default function DashboardContent() {
           </Card>
 
           <div className="grid gap-6 lg:grid-cols-2">
-            <CategoryExpenseChart categoryBreakdown={categoryBreakdown} />
+            <WeeklyComparisonChart weeklyComparison={weeklyComparison} />
             <CategoryBarChart categoryBreakdown={categoryBreakdown} />
           </div>
         </div>
@@ -393,46 +394,107 @@ const TOOLTIP_STYLE = {
   labelStyle: { color: "#a1a1aa" },
 };
 
-function CategoryExpenseChart({ categoryBreakdown }) {
-  const dataWithFill = categoryBreakdown.map((cat, i) => ({
-    ...cat,
-    fill: CHART_COLORS[i % CHART_COLORS.length],
+function WeeklyComparisonChart({ weeklyComparison }) {
+  if (!weeklyComparison) {
+    return (
+      <Card className="rounded-2xl border-border bg-card">
+        <CardHeader>
+          <CardTitle className="text-lg font-semibold uppercase text-center">
+            Comparativo 1ª semana
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="rounded-xl border border-border bg-muted/30 px-4 py-6 text-sm text-muted-foreground">
+            Sin datos disponibles.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const { prevMonthLabel, currMonthLabel, prevMonthTotal, currMonthTotal, weeks } = weeklyComparison;
+
+  const chartData = weeks.map((w) => ({
+    label: w.label,
+    [prevMonthLabel]: w.prevTotal,
+    [currMonthLabel]: w.currTotal,
   }));
+
+  const hasData = weeks.some((w) => w.prevTotal > 0 || w.currTotal > 0);
+
+  const diff = currMonthTotal - prevMonthTotal;
+  const diffPct = prevMonthTotal > 0 ? ((diff / prevMonthTotal) * 100).toFixed(1) : null;
 
   return (
     <Card className="rounded-2xl border-border bg-card">
       <CardHeader>
         <CardTitle className="text-lg font-semibold uppercase text-center">
-          Gastos del mes por categoría
+          {prevMonthLabel} vs {currMonthLabel}
         </CardTitle>
       </CardHeader>
 
       <CardContent>
-        {categoryBreakdown.length === 0 ? (
+        <div className="mb-4 grid grid-cols-2 gap-3">
+          <div className="rounded-xl border border-border bg-muted/30 px-4 py-3">
+            <p className="text-xs text-muted-foreground">{prevMonthLabel}</p>
+            <p className="mt-1 text-lg font-semibold text-blue-400">
+              {formatMoney(prevMonthTotal)}
+            </p>
+          </div>
+
+          <div className="rounded-xl border border-border bg-muted/30 px-4 py-3">
+            <p className="text-xs text-muted-foreground">{currMonthLabel}</p>
+            <p className="mt-1 text-lg font-semibold text-emerald-400">
+              {formatMoney(currMonthTotal)}
+            </p>
+            {diffPct !== null && (
+              <p
+                className={`mt-1 text-xs ${
+                  diff > 0
+                    ? "text-red-400"
+                    : diff < 0
+                      ? "text-green-400"
+                      : "text-muted-foreground"
+                }`}
+              >
+                {diff > 0 ? "+" : ""}
+                {diffPct}% vs {prevMonthLabel}
+              </p>
+            )}
+          </div>
+        </div>
+
+        {!hasData ? (
           <p className="rounded-xl border border-border bg-muted/30 px-4 py-6 text-sm text-muted-foreground">
-            Aún no hay gastos para este mes.
+            Sin gastos registrados para comparar.
           </p>
         ) : (
-          <div style={{ width: "100%", height: "360px" }}>
+          <div style={{ width: "100%", height: "280px" }}>
             <ResponsiveContainer width="100%" height="100%" minWidth={0}>
-              <PieChart>
-                <Pie
-                  data={dataWithFill}
-                  dataKey="total"
-                  nameKey="name"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={120}
-                  innerRadius={60}
-                  paddingAngle={2}
-                >
-                  {dataWithFill.map((entry, i) => (
-                    <Cell
-                      key={entry.id}
-                      fill={CHART_COLORS[i % CHART_COLORS.length]}
-                    />
-                  ))}
-                </Pie>
+              <BarChart
+                data={chartData}
+                margin={{ top: 4, right: 8, bottom: 0, left: 0 }}
+              >
+                <CartesianGrid vertical={false} stroke="#333" />
+                <XAxis
+                  dataKey="label"
+                  tickLine={false}
+                  axisLine={false}
+                  tick={{ fontSize: 11, fill: "#a1a1aa" }}
+                />
+                <YAxis
+                  tickLine={false}
+                  axisLine={false}
+                  tickFormatter={(v) =>
+                    new Intl.NumberFormat("es-MX", {
+                      style: "currency",
+                      currency: "MXN",
+                      maximumFractionDigits: 0,
+                    }).format(v)
+                  }
+                  tick={{ fontSize: 10, fill: "#a1a1aa" }}
+                  width={76}
+                />
                 <Tooltip
                   {...TOOLTIP_STYLE}
                   formatter={(value, name) => [
@@ -450,7 +512,19 @@ function CategoryExpenseChart({ categoryBreakdown }) {
                     </span>
                   )}
                 />
-              </PieChart>
+                <Bar
+                  dataKey={prevMonthLabel}
+                  fill="#3b82f6"
+                  radius={[3, 3, 0, 0]}
+                  maxBarSize={36}
+                />
+                <Bar
+                  dataKey={currMonthLabel}
+                  fill="#10b981"
+                  radius={[3, 3, 0, 0]}
+                  maxBarSize={36}
+                />
+              </BarChart>
             </ResponsiveContainer>
           </div>
         )}
