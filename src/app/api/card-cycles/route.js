@@ -24,7 +24,10 @@ function getMonthlyPaymentUsed(purchase) {
 
 // Primer ciclo donde cae la compra: si el día de compra es posterior al corte
 // usual de la tarjeta, el primer pago corresponde al ciclo del mes siguiente.
-function getPurchaseFirstCycleIndex(purchase, card) {
+// earliestCardCycleIndex: si la compra cayó en el ciclo virtual inmediatamente
+// anterior al primer ciclo generado (ciclo que no existe en BD), se reasigna al
+// primer ciclo real para que el conteo de mensualidades sea correcto.
+function getPurchaseFirstCycleIndex(purchase, card, earliestCardCycleIndex) {
   const purchaseDate = new Date(purchase.purchaseDate);
   const cutDay = Number(card?.usualCutDay) || purchaseDate.getUTCDate();
 
@@ -41,17 +44,30 @@ function getPurchaseFirstCycleIndex(purchase, card) {
     }
   }
 
-  return year * 12 + monthIndex;
+  const computed = year * 12 + monthIndex;
+
+  // Si la compra es ACTIVE y cayó exactamente en el ciclo virtual que precede al
+  // primer ciclo generado (ese ciclo no existe en BD), usar el primer ciclo real.
+  // Para PAID_OFF se respeta el ciclo original para mantener historial correcto.
+  if (
+    purchase.status === "ACTIVE" &&
+    earliestCardCycleIndex !== undefined &&
+    computed === earliestCardCycleIndex - 1
+  ) {
+    return earliestCardCycleIndex;
+  }
+
+  return computed;
 }
 
-function getPurchaseCycleNumber(purchase, targetCycle) {
-  const firstCycleIndex = getPurchaseFirstCycleIndex(purchase, targetCycle.card);
+function getPurchaseCycleNumber(purchase, targetCycle, earliestCardCycleIndex) {
+  const firstCycleIndex = getPurchaseFirstCycleIndex(purchase, targetCycle.card, earliestCardCycleIndex);
   const targetCycleIndex = targetCycle.year * 12 + (targetCycle.month - 1);
 
   return targetCycleIndex - firstCycleIndex + 1;
 }
 
-function shouldIncludePurchaseInCycle(purchase, targetCycle) {
+function shouldIncludePurchaseInCycle(purchase, targetCycle, earliestCardCycleIndex) {
   if (purchase.cardId !== targetCycle.cardId) return false;
 
   const purchaseDate = new Date(purchase.purchaseDate).getTime();
@@ -60,22 +76,31 @@ function shouldIncludePurchaseInCycle(purchase, targetCycle) {
   if (purchaseDate > cycleCutDate) return false;
 
   if (purchase.status === "PAID_OFF") {
-    // Mostrar en ciclos ya cortados dentro del rango de meses de la compra
-    // para preservar el desglose histórico del último pago.
+    // Mostrar solo en ciclos pasados dentro del rango real de la compra.
     if (cycleCutDate >= Date.now()) return false;
-    const purchaseDateObj = new Date(purchase.purchaseDate);
-    const purchaseMonthIdx =
-      purchaseDateObj.getUTCFullYear() * 12 + purchaseDateObj.getUTCMonth();
-    const cycleMonthIdx = targetCycle.year * 12 + (targetCycle.month - 1);
-    return cycleMonthIdx <= purchaseMonthIdx + Number(purchase.months || 0);
+    const cycleNumber = getPurchaseCycleNumber(purchase, targetCycle, earliestCardCycleIndex);
+    return cycleNumber >= 1 && cycleNumber <= Number(purchase.months || 0);
   }
 
   if (purchase.status !== "ACTIVE") return false;
 
   const months = Number(purchase.months || 0);
-  const cycleNumber = getPurchaseCycleNumber(purchase, targetCycle);
+  const cycleNumber = getPurchaseCycleNumber(purchase, targetCycle, earliestCardCycleIndex);
 
   return cycleNumber >= 1 && cycleNumber <= months;
+}
+
+// Índice mínimo de ciclo generado por tarjeta: sirve para detectar compras que
+// cayeron en un ciclo virtual (no generado) inmediatamente anterior.
+function buildCardEarliestCycleIndexMap(cycles) {
+  const map = {};
+  for (const cycle of cycles) {
+    const idx = cycle.year * 12 + (cycle.month - 1);
+    if (!(cycle.cardId in map) || idx < map[cycle.cardId]) {
+      map[cycle.cardId] = idx;
+    }
+  }
+  return map;
 }
 
 function getDaysInMonthForCharge(year, monthIndex) {
@@ -138,7 +163,9 @@ function calculateCycleAmount({
   expenses,
   subscriptions,
   purchases,
+  cardEarliestCycleIndexMap,
 }) {
+  const earliestCardCycleIndex = cardEarliestCycleIndexMap?.[cycle.cardId];
   const includedExpenses = expenses
     .filter((expense) => expense.cardId === cycle.cardId)
     .filter((expense) =>
@@ -189,10 +216,13 @@ function calculateCycleAmount({
   const includedPurchases = purchases
     .filter((purchase) => purchase.cardId === cycle.cardId)
     .filter((purchase) =>
-      shouldIncludePurchaseInCycle(purchase, cycle),
+      shouldIncludePurchaseInCycle(purchase, cycle, earliestCardCycleIndex),
     )
     .map((purchase) => {
-      const currentMonth = getPurchaseCycleNumber(purchase, cycle);
+      const currentMonth = Math.min(
+        getPurchaseCycleNumber(purchase, cycle, earliestCardCycleIndex),
+        Number(purchase.months || 0),
+      );
 
       return {
         id: purchase.id,
@@ -340,12 +370,15 @@ export async function GET(request) {
       }),
     ]);
 
+    const cardEarliestCycleIndexMap = buildCardEarliestCycleIndexMap(cycles);
+
     const cyclesWithAmounts = cycles.map((cycle) => {
       const amounts = calculateCycleAmount({
         cycle,
         expenses,
         subscriptions,
         purchases,
+        cardEarliestCycleIndexMap,
       });
 
       return {
@@ -440,12 +473,15 @@ export async function POST(request) {
       }),
     ]);
 
+    const cardEarliestCycleIndexMap = buildCardEarliestCycleIndexMap(cycles);
+
     const cyclesWithAmounts = cycles.map((cycle) => {
       const amounts = calculateCycleAmount({
         cycle,
         expenses,
         subscriptions,
         purchases,
+        cardEarliestCycleIndexMap,
       });
 
       return {

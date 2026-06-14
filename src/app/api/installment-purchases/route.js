@@ -21,8 +21,8 @@ function formatPurchase(purchase) {
 
   const paymentsMade = Number(purchase.initialPaymentsMade || 0);
   const remainingMonths = Math.max(months - paymentsMade, 0);
-  const currentMonth = Math.min(paymentsMade + 1, months);
   const remainingBalance = remainingMonths * monthlyPaymentUsed;
+  const currentMonth = Math.min(paymentsMade + 1, months);
 
   return {
     ...purchase,

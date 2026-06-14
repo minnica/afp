@@ -258,6 +258,7 @@ export default function CyclesDataTable({
         filterColumn="cardName"
         filterPlaceholder="Filtrar por tarjeta o estado..."
         pageSize={10}
+        pageSizeOptions={[10, 25, 50, 100]}
       />
 
       <Dialog open={!!activeDialog} onOpenChange={(open) => { if (!open) closeDialog(); }}>

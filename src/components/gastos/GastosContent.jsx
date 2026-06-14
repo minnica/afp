@@ -137,6 +137,8 @@ export default function GastosContent() {
   const [filterDate, setFilterDate] = useState("");
   const [filterCategoryId, setFilterCategoryId] = useState("");
   const [filterConcept, setFilterConcept] = useState("");
+  const [filterCardId, setFilterCardId] = useState("");
+  const [filterAmount, setFilterAmount] = useState("");
 
   async function loadInitialData(userId) {
     const [settingsResponse, cardsResponse, expensesResponse] =
@@ -481,6 +483,8 @@ export default function GastosContent() {
   }, [expenses]);
 
   const filteredExpenses = useMemo(() => {
+    const amountExact = filterAmount.trim() !== "" ? filterAmount.trim() : null;
+
     return expenses.filter((expense) => {
       const datePart = String(expense.date).split("T")[0];
       if (filterDate) {
@@ -496,9 +500,15 @@ export default function GastosContent() {
         const search = filterConcept.toLowerCase();
         if (!expense.concept?.toLowerCase().includes(search)) return false;
       }
+      if (filterCardId === "CASH") {
+        if (expense.paymentMethod !== "CASH") return false;
+      } else if (filterCardId) {
+        if (expense.cardId !== filterCardId) return false;
+      }
+      if (amountExact !== null && !String(Number(expense.amount)).startsWith(amountExact)) return false;
       return true;
     });
-  }, [expenses, filterMonth, filterDate, filterCategoryId, filterConcept]);
+  }, [expenses, filterMonth, filterDate, filterCategoryId, filterConcept, filterCardId, filterAmount]);
 
   const expenseColumns = useMemo(
     () => [
@@ -1206,12 +1216,45 @@ export default function GastosContent() {
                         className="w-full sm:w-[200px]"
                       />
                     </div>
+
+                    <Select
+                      value={filterCardId || "ALL"}
+                      onValueChange={(value) => setFilterCardId(value === "ALL" ? "" : value)}
+                    >
+                      <SelectTrigger className="w-full sm:w-[180px]">
+                        <SelectValue placeholder="Todas las tarjetas" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="ALL">Todas las tarjetas</SelectItem>
+                        <SelectItem value="CASH">Efectivo</SelectItem>
+                        {cards.map((card) => (
+                          <SelectItem key={card.id} value={card.id}>
+                            {card.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+
+                    <div className="space-y-1">
+                      <Label htmlFor="filterAmount" className="sr-only">Filtrar por monto</Label>
+                      <Input
+                        id="filterAmount"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        placeholder="Monto exacto..."
+                        value={filterAmount}
+                        onChange={(e) => setFilterAmount(e.target.value)}
+                        className="w-full sm:w-[150px]"
+                      />
+                    </div>
                   </div>
 
                   <DataTable
                     columns={expenseColumns}
                     data={filteredExpenses}
                     pageSize={15}
+                    pageSizeOptions={[15, 25, 50, 100]}
                     footerRow={(table) => {
                       const total = table.getFilteredRowModel().rows.reduce(
                         (sum, row) => sum + Number(row.original.amount || 0),

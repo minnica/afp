@@ -493,9 +493,11 @@ export default function ComprasAMesesContent() {
       },
       {
         id: "progress",
-        accessorFn: (row) => `${row.currentMonth}/${row.months}`,
+        accessorFn: (row) => Number(row.months) - Number(row.currentMonth),
+        sortingFn: (rowA, rowB) =>
+          (Number(rowA.original.months) - Number(rowA.original.currentMonth)) -
+          (Number(rowB.original.months) - Number(rowB.original.currentMonth)),
         header: "Progreso",
-        enableSorting: false,
         cell: ({ row }) => (
           <span className="whitespace-nowrap text-sm text-muted-foreground">
             {row.original.currentMonth}/{row.original.months} meses
@@ -957,6 +959,7 @@ export default function ComprasAMesesContent() {
                       filterGlobal
                       filterPlaceholder="Buscar en tabla..."
                       pageSize={15}
+                      pageSizeOptions={[15, 25, 50, 100]}
                       footerRow={purchasesFooterRow}
                     />
                   </TabsContent>
@@ -968,6 +971,7 @@ export default function ComprasAMesesContent() {
                       filterGlobal
                       filterPlaceholder="Buscar en tabla..."
                       pageSize={15}
+                      pageSizeOptions={[15, 25, 50, 100]}
                       footerRow={purchasesFooterRow}
                     />
                   </TabsContent>
@@ -979,6 +983,7 @@ export default function ComprasAMesesContent() {
                       filterGlobal
                       filterPlaceholder="Buscar en tabla..."
                       pageSize={15}
+                      pageSizeOptions={[15, 25, 50, 100]}
                       footerRow={purchasesFooterRow}
                     />
                   </TabsContent>
