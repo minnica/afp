@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Trash2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { ensureUserSetup } from "@/lib/userSetup";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,7 +19,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Spinner } from "@/components/ui/spinner";
+import PageSkeleton from "@/components/layout/PageSkeleton";
 
 export default function SettingsContent() {
   const router = useRouter();
@@ -66,16 +67,7 @@ export default function SettingsContent() {
 
         setUser(session.user);
 
-        await fetch("/api/setup-user", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            userId: session.user.id,
-            email: session.user.email,
-          }),
-        });
+        await ensureUserSetup(session.user);
 
         await loadSettings(session.user.id);
       } catch (err) {
@@ -180,11 +172,7 @@ export default function SettingsContent() {
   );
 
   if (isLoading) {
-    return (
-      <main className="flex min-h-dvh items-center justify-center bg-background text-foreground">
-        <Spinner className="size-8" />
-      </main>
-    );
+    return <PageSkeleton variant="settings" />;
   }
 
   return (

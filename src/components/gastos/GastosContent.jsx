@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 
-import { Spinner } from "@/components/ui/spinner";
 import { supabase } from "@/lib/supabase";
+import { ensureUserSetup } from "@/lib/userSetup";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -47,6 +47,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { DataTable } from "@/components/ui/data-table";
+import { Skeleton } from "@/components/ui/skeleton";
 import { TableCell, TableRow } from "@/components/ui/table";
 
 function getTodayInputValue() {
@@ -70,8 +71,21 @@ function formatMoney(value) {
 
 function formatMonthLabel(yearMonth) {
   const [year, month] = yearMonth.split("-").map(Number);
-  const label = format(new Date(year, month - 1, 1), "MMMM yyyy", { locale: es });
+  const date = new Date(year, month - 1, 1);
+
+  if (!Number.isInteger(year) || !Number.isInteger(month) || Number.isNaN(date.getTime())) {
+    return yearMonth;
+  }
+
+  const label = format(date, "MMMM yyyy", { locale: es });
   return label.charAt(0).toUpperCase() + label.slice(1);
+}
+
+function isValidYearMonth(value) {
+  if (!/^\d{4}-\d{2}$/.test(value)) return false;
+
+  const [, month] = value.split("-").map(Number);
+  return month >= 1 && month <= 12;
 }
 
 function formatExpenseDate(dateString) {
@@ -85,6 +99,18 @@ function getPaymentMethodLabel(paymentMethod) {
   return "Efectivo";
 }
 
+function getMonthRange(yearMonth) {
+  if (!yearMonth) return { startDate: "", endDate: "" };
+
+  const [year, month] = yearMonth.split("-").map(Number);
+  const lastDay = new Date(year, month, 0).getDate();
+
+  return {
+    startDate: `${yearMonth}-01`,
+    endDate: `${yearMonth}-${String(lastDay).padStart(2, "0")}`,
+  };
+}
+
 export default function GastosContent() {
   const router = useRouter();
 
@@ -92,6 +118,7 @@ export default function GastosContent() {
   const [categories, setCategories] = useState([]);
   const [cards, setCards] = useState([]);
   const [expenses, setExpenses] = useState([]);
+  const [availableMonths, setAvailableMonths] = useState([]);
 
   const [date, setDate] = useState(getTodayInputValue());
   const [paymentMethod, setPaymentMethod] = useState("CASH");
@@ -102,6 +129,7 @@ export default function GastosContent() {
   const [notes, setNotes] = useState("");
 
   const [isCheckingSession, setIsCheckingSession] = useState(true);
+  const [isExpensesLoading, setIsExpensesLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
 
@@ -134,94 +162,93 @@ export default function GastosContent() {
   const [expenseToDelete, setExpenseToDelete] = useState(null);
 
   const [filterMonth, setFilterMonth] = useState("");
-  const [filterDate, setFilterDate] = useState("");
+  const [filterDate, setFilterDate] = useState(getTodayInputValue());
   const [filterCategoryId, setFilterCategoryId] = useState("");
   const [filterConcept, setFilterConcept] = useState("");
   const [filterCardId, setFilterCardId] = useState("");
   const [filterAmount, setFilterAmount] = useState("");
+  const didLoadInitialExpensesRef = useRef(false);
+  const lastExpensesUrlRef = useRef("");
 
   async function loadInitialData(userId) {
-    const [settingsResponse, cardsResponse, expensesResponse] =
-      await Promise.all([
-        fetch(`/api/settings?userId=${userId}`),
-        fetch(`/api/cards?userId=${userId}`),
-        fetch(buildExpensesUrl(userId)),
-      ]);
-
-    const settingsData = await settingsResponse.json();
-    const cardsData = await cardsResponse.json();
-    const expensesData = await expensesResponse.json();
-
-    if (!settingsResponse.ok) {
-      throw new Error(
-        settingsData.error || "No se pudieron cargar categorías.",
-      );
-    }
-
-    if (!cardsResponse.ok) {
-      throw new Error(cardsData.error || "No se pudieron cargar tarjetas.");
-    }
-
-    if (!expensesResponse.ok) {
-      throw new Error(expensesData.error || "No se pudieron cargar gastos.");
-    }
-
-    setCategories(settingsData.categories || []);
-    setPeople(settingsData.people || []);
-    setCards(cardsData.cards || []);
-    setExpenses(expensesData.expenses || []);
-
-    const receivablesResponse = await fetch(
-      `/api/receivables?userId=${userId}`,
-    );
-    const receivablesData = await receivablesResponse.json();
-
-    if (!receivablesResponse.ok) {
-      throw new Error(
-        receivablesData.error || "No se pudieron cargar cuentas por cobrar.",
-      );
-    }
-
-    setReceivables(receivablesData.receivables || []);
-
-    const payablesResponse = await fetch(`/api/payables?userId=${userId}`);
-    const payablesData = await payablesResponse.json();
-
-    if (!payablesResponse.ok) {
-      throw new Error(
-        payablesData.error || "No se pudieron cargar cuentas por pagar.",
-      );
-    }
-
-    setPayables(payablesData.payables || []);
-
-    const subscriptionsResponse = await fetch(
-      `/api/subscriptions?userId=${userId}`,
-    );
-    const subscriptionsData = await subscriptionsResponse.json();
-
-    if (!subscriptionsResponse.ok) {
-      throw new Error(
-        subscriptionsData.error || "No se pudieron cargar suscripciones.",
-      );
-    }
-
-    setSubscriptions(subscriptionsData.subscriptions || []);
-  }
-
-  function buildExpensesUrl(userId) {
-    return `/api/expenses?userId=${userId}`;
-  }
-
-  async function loadExpenses(userId) {
-    const response = await fetch(buildExpensesUrl(userId));
+    const today = getTodayInputValue();
+    const params = new URLSearchParams({
+      userId,
+      startDate: today,
+      endDate: today,
+    });
+    const response = await fetch(`/api/gastos/bootstrap?${params.toString()}`);
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.error || "No se pudieron cargar gastos.");
+      throw new Error(data.error || "No se pudieron cargar datos iniciales.");
     }
 
+    setCategories(data.categories || []);
+    setPeople(data.people || []);
+    setCards(data.cards || []);
     setExpenses(data.expenses || []);
+    setAvailableMonths(data.availableMonths || []);
+    setReceivables(data.receivables || []);
+    setPayables(data.payables || []);
+    setSubscriptions(data.subscriptions || []);
+    lastExpensesUrlRef.current = buildExpensesUrl(userId);
+    didLoadInitialExpensesRef.current = true;
+  }
+
+  function buildExpensesUrl(userId) {
+    const params = new URLSearchParams({ userId });
+
+    if (filterDate) {
+      params.set("startDate", filterDate);
+      params.set("endDate", filterDate);
+    } else if (filterMonth) {
+      const range = getMonthRange(filterMonth);
+      params.set("startDate", range.startDate);
+      params.set("endDate", range.endDate);
+    }
+
+    if (filterCategoryId) params.set("categoryId", filterCategoryId);
+
+    if (filterConcept.trim()) {
+      params.set("concept", filterConcept.trim());
+    }
+
+    if (filterCardId === "CASH") {
+      params.set("paymentMethod", "CASH");
+    } else if (filterCardId) {
+      params.set("paymentMethod", "CARD");
+      params.set("cardId", filterCardId);
+    }
+
+    if (filterAmount.trim()) {
+      params.set("amount", filterAmount.trim());
+    }
+
+    return `/api/expenses?${params.toString()}`;
+  }
+
+  async function loadExpenses(userId, { force = false } = {}) {
+    const url = buildExpensesUrl(userId);
+
+    if (!force && url === lastExpensesUrlRef.current) return;
+
+    setIsExpensesLoading(true);
+
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "No se pudieron cargar gastos.");
+      }
+
+      setExpenses(data.expenses || []);
+      setAvailableMonths(data.availableMonths || []);
+      lastExpensesUrlRef.current = url;
+    } finally {
+      setIsExpensesLoading(false);
+    }
   }
 
   async function loadReceivables(userId) {
@@ -273,16 +300,7 @@ export default function GastosContent() {
 
         setUser(session.user);
 
-        await fetch("/api/setup-user", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            userId: session.user.id,
-            email: session.user.email,
-          }),
-        });
+        await ensureUserSetup(session.user);
 
         await loadInitialData(session.user.id);
       } catch (err) {
@@ -293,7 +311,30 @@ export default function GastosContent() {
     }
 
     checkSession();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router]);
+
+  useEffect(() => {
+    if (!user || isCheckingSession || !didLoadInitialExpensesRef.current) return;
+
+    const timeoutId = window.setTimeout(() => {
+      loadExpenses(user.id).catch((err) => {
+        setError(err.message || "No se pudieron cargar gastos.");
+      });
+    }, 250);
+
+    return () => window.clearTimeout(timeoutId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    user,
+    isCheckingSession,
+    filterMonth,
+    filterDate,
+    filterCategoryId,
+    filterConcept,
+    filterCardId,
+    filterAmount,
+  ]);
 
   async function createExpense() {
     if (!user) return;
@@ -356,7 +397,7 @@ export default function GastosContent() {
       setReceivableAccountId("");
       setPayableAccountId("NONE");
       setSubscriptionId("NONE");
-      await loadExpenses(user.id);
+      await loadExpenses(user.id, { force: true });
       await loadReceivables(user.id);
       await loadPayables(user.id);
       toast.success("Gasto guardado exitosamente.");
@@ -435,7 +476,7 @@ export default function GastosContent() {
       }
 
       cancelEditingExpense();
-      await loadExpenses(user.id);
+      await loadExpenses(user.id, { force: true });
       toast.success("Cambios guardados exitosamente.");
     } catch (err) {
       setError(err.message || "No se pudo actualizar el gasto.");
@@ -462,7 +503,7 @@ export default function GastosContent() {
       }
 
       setExpenseToDelete(null);
-      await loadExpenses(user.id);
+      await loadExpenses(user.id, { force: true });
 
       toast.success("Gasto eliminado exitosamente.");
     } catch (err) {
@@ -472,43 +513,9 @@ export default function GastosContent() {
     }
   }
 
-  const availableMonths = useMemo(() => {
-    const months = new Set();
-    expenses.forEach((expense) => {
-      const datePart = String(expense.date).split("T")[0];
-      const [year, month] = datePart.split("-");
-      months.add(`${year}-${month}`);
-    });
-    return Array.from(months).sort().reverse();
-  }, [expenses]);
-
   const filteredExpenses = useMemo(() => {
-    const amountExact = filterAmount.trim() !== "" ? filterAmount.trim() : null;
-
-    return expenses.filter((expense) => {
-      const datePart = String(expense.date).split("T")[0];
-      if (filterDate) {
-        if (datePart !== filterDate) return false;
-      } else if (filterMonth) {
-        const [year, month] = datePart.split("-");
-        if (`${year}-${month}` !== filterMonth) return false;
-      }
-      if (filterCategoryId) {
-        if (expense.categoryId !== filterCategoryId) return false;
-      }
-      if (filterConcept) {
-        const search = filterConcept.toLowerCase();
-        if (!expense.concept?.toLowerCase().includes(search)) return false;
-      }
-      if (filterCardId === "CASH") {
-        if (expense.paymentMethod !== "CASH") return false;
-      } else if (filterCardId) {
-        if (expense.cardId !== filterCardId) return false;
-      }
-      if (amountExact !== null && !String(Number(expense.amount)).startsWith(amountExact)) return false;
-      return true;
-    });
-  }, [expenses, filterMonth, filterDate, filterCategoryId, filterConcept, filterCardId, filterAmount]);
+    return expenses;
+  }, [expenses]);
 
   const expenseColumns = useMemo(
     () => [
@@ -627,11 +634,7 @@ export default function GastosContent() {
   );
 
   if (isCheckingSession) {
-    return (
-      <main className="flex min-h-dvh items-center justify-center bg-background text-foreground">
-        <Spinner className="size-8" />
-      </main>
-    );
+    return <GastosPageSkeleton />;
   }
 
   return (
@@ -1155,7 +1158,7 @@ export default function GastosContent() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="ALL">Todos los meses</SelectItem>
-                        {availableMonths.map((m) => (
+                        {availableMonths.filter(isValidYearMonth).map((m) => (
                           <SelectItem key={m} value={m}>
                             {formatMonthLabel(m)}
                           </SelectItem>
@@ -1250,29 +1253,33 @@ export default function GastosContent() {
                     </div>
                   </div>
 
-                  <DataTable
-                    columns={expenseColumns}
-                    data={filteredExpenses}
-                    pageSize={15}
-                    pageSizeOptions={[15, 25, 50, 100]}
-                    footerRow={(table) => {
-                      const total = table.getFilteredRowModel().rows.reduce(
-                        (sum, row) => sum + Number(row.original.amount || 0),
-                        0,
-                      );
-                      return (
-                        <TableRow>
-                          <TableCell colSpan={4} className="text-right text-sm font-medium text-muted-foreground">
-                            Total
-                          </TableCell>
-                          <TableCell className="font-semibold tabular-nums">
-                            {formatMoney(total)}
-                          </TableCell>
-                          <TableCell />
-                        </TableRow>
-                      );
-                    }}
-                  />
+                  {isExpensesLoading ? (
+                    <ExpensesTableSkeleton />
+                  ) : (
+                    <DataTable
+                      columns={expenseColumns}
+                      data={filteredExpenses}
+                      pageSize={15}
+                      pageSizeOptions={[15, 25, 50, 100]}
+                      footerRow={(table) => {
+                        const total = table.getFilteredRowModel().rows.reduce(
+                          (sum, row) => sum + Number(row.original.amount || 0),
+                          0,
+                        );
+                        return (
+                          <TableRow>
+                            <TableCell colSpan={4} className="text-right text-sm font-medium text-muted-foreground">
+                              Total
+                            </TableCell>
+                            <TableCell className="font-semibold tabular-nums">
+                              {formatMoney(total)}
+                            </TableCell>
+                            <TableCell />
+                          </TableRow>
+                        );
+                      }}
+                    />
+                  )}
                 </CardContent>
               </Card>
             </div>
@@ -1280,5 +1287,88 @@ export default function GastosContent() {
         </section>
       </main>
     </>
+  );
+}
+
+function GastosPageSkeleton() {
+  return (
+    <main>
+      <section className="mx-auto flex w-full max-w-full flex-col px-4 py-5 md:py-8">
+        <div className="grid min-w-0 gap-5 xl:grid-cols-[360px_1fr]">
+          <Card className="rounded-2xl border-border bg-card">
+            <CardHeader>
+              <Skeleton className="mx-auto h-5 w-32" />
+            </CardHeader>
+
+            <CardContent className="space-y-5">
+              {Array.from({ length: 6 }).map((_, index) => (
+                <div key={index} className="space-y-2">
+                  <Skeleton className="h-3 w-24" />
+                  <Skeleton className="h-10 w-full" />
+                </div>
+              ))}
+
+              <Skeleton className="h-24 w-full rounded-xl" />
+              <Skeleton className="h-10 w-full" />
+            </CardContent>
+          </Card>
+
+          <div className="min-w-0 space-y-6">
+            <Card className="rounded-2xl border-border bg-card">
+              <CardHeader>
+                <Skeleton className="mx-auto h-5 w-40" />
+              </CardHeader>
+
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 gap-3 sm:flex sm:flex-wrap">
+                  <Skeleton className="h-10 w-full sm:w-[180px]" />
+                  <Skeleton className="h-10 w-full sm:w-[160px]" />
+                  <Skeleton className="h-10 w-full sm:w-[180px]" />
+                  <Skeleton className="h-10 w-full sm:w-[200px]" />
+                  <Skeleton className="h-10 w-full sm:w-[180px]" />
+                  <Skeleton className="h-10 w-full sm:w-[150px]" />
+                </div>
+
+                <ExpensesTableSkeleton />
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+    </main>
+  );
+}
+
+function ExpensesTableSkeleton() {
+  return (
+    <div className="overflow-hidden rounded-md border border-border">
+      <div className="grid gap-4 border-b border-border bg-muted/30 px-4 py-3 md:grid-cols-[1fr_1.4fr_1fr_1fr_1fr_72px]">
+        {Array.from({ length: 6 }).map((_, index) => (
+          <Skeleton key={index} className="h-4 w-full" />
+        ))}
+      </div>
+
+      <div className="divide-y divide-border">
+        {Array.from({ length: 8 }).map((_, index) => (
+          <div
+            key={index}
+            className="grid gap-4 px-4 py-4 md:grid-cols-[1fr_1.4fr_1fr_1fr_1fr_72px]"
+          >
+            <Skeleton className="h-4 w-20" />
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-3 w-2/3" />
+            </div>
+            <Skeleton className="h-6 w-24" />
+            <Skeleton className="h-4 w-28" />
+            <Skeleton className="h-4 w-20" />
+            <div className="flex gap-2">
+              <Skeleton className="h-8 w-8" />
+              <Skeleton className="h-8 w-8" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }

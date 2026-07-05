@@ -1,6 +1,37 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+const payableSelect = {
+  id: true,
+  userId: true,
+  personId: true,
+  concept: true,
+  originalAmount: true,
+  originDate: true,
+  expectedMonthlyPayment: true,
+  expectedDate: true,
+  notes: true,
+  status: true,
+  originType: true,
+  originId: true,
+  createdAt: true,
+  updatedAt: true,
+  person: {
+    select: {
+      id: true,
+      name: true,
+    },
+  },
+  dailyExpenses: {
+    select: {
+      id: true,
+      date: true,
+      concept: true,
+      amount: true,
+    },
+  },
+};
+
 function parseDateInput(dateValue) {
   if (!dateValue) return null;
   return new Date(`${dateValue}T12:00:00.000Z`);
@@ -33,10 +64,7 @@ export async function GET(request) {
       where: {
         userId,
       },
-      include: {
-        person: true,
-        dailyExpenses: true,
-      },
+      select: payableSelect,
       orderBy: [
         { status: "asc" },
         { expectedDate: "asc" },
@@ -140,10 +168,7 @@ export async function POST(request) {
         status: "ACTIVE",
         originType: "MANUAL",
       },
-      include: {
-        person: true,
-        dailyExpenses: true,
-      },
+      select: payableSelect,
     });
 
     return NextResponse.json({
@@ -243,10 +268,7 @@ export async function PATCH(request) {
         expectedDate: parsedExpectedDate,
         notes: notes?.trim() || null,
       },
-      include: {
-        person: true,
-        dailyExpenses: true,
-      },
+      select: payableSelect,
     });
 
     return NextResponse.json({

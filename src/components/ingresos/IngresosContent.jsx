@@ -6,6 +6,7 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { ensureUserSetup } from "@/lib/userSetup";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,7 +28,7 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Spinner } from "@/components/ui/spinner";
+import PageSkeleton from "@/components/layout/PageSkeleton";
 import {
   Dialog,
   DialogContent,
@@ -155,16 +156,7 @@ export default function IngresosContent() {
 
         setUser(session.user);
 
-        await fetch("/api/setup-user", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            userId: session.user.id,
-            email: session.user.email,
-          }),
-        });
+        await ensureUserSetup(session.user);
 
         await Promise.all([
           loadSettings(session.user.id),
@@ -432,11 +424,7 @@ export default function IngresosContent() {
   );
 
   if (isLoading) {
-    return (
-      <main className="flex min-h-dvh items-center justify-center bg-background text-foreground">
-        <Spinner className="size-8" />
-      </main>
-    );
+    return <PageSkeleton variant="form-table" />;
   }
 
   return (

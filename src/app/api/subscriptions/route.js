@@ -1,6 +1,36 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+const subscriptionSelect = {
+  id: true,
+  userId: true,
+  name: true,
+  amount: true,
+  paymentMethod: true,
+  cardId: true,
+  categoryId: true,
+  chargeDay: true,
+  frequencyMonths: true,
+  startMonth: true,
+  startYear: true,
+  isActive: true,
+  deactivatedAt: true,
+  createdAt: true,
+  updatedAt: true,
+  card: {
+    select: {
+      id: true,
+      name: true,
+    },
+  },
+  category: {
+    select: {
+      id: true,
+      name: true,
+    },
+  },
+};
+
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -12,10 +42,7 @@ export async function GET(request) {
 
     const subscriptions = await prisma.subscription.findMany({
       where: { userId },
-      include: {
-        card: true,
-        category: true,
-      },
+      select: subscriptionSelect,
       orderBy: [{ chargeDay: "asc" }, { name: "asc" }],
     });
 
@@ -146,10 +173,7 @@ export async function POST(request) {
         startMonth: numericStartMonth,
         startYear: numericStartYear,
       },
-      include: {
-        card: true,
-        category: true,
-      },
+      select: subscriptionSelect,
     });
 
     return NextResponse.json({ subscription });
@@ -227,7 +251,7 @@ export async function PATCH(request) {
       const subscription = await prisma.subscription.update({
         where: { id },
         data,
-        include: { card: true, category: true },
+        select: subscriptionSelect,
       });
 
       return NextResponse.json({ subscription });
@@ -321,10 +345,7 @@ export async function PATCH(request) {
         startMonth: numericStartMonth,
         startYear: numericStartYear,
       },
-      include: {
-        card: true,
-        category: true,
-      },
+      select: subscriptionSelect,
     });
 
     return NextResponse.json({ subscription });

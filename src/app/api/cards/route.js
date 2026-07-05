@@ -1,6 +1,17 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+const cardSelect = {
+  id: true,
+  userId: true,
+  name: true,
+  usualCutDay: true,
+  usualDueDay: true,
+  notes: true,
+  createdAt: true,
+  updatedAt: true,
+};
+
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -12,6 +23,7 @@ export async function GET(request) {
 
     const cards = await prisma.card.findMany({
       where: { userId },
+      select: cardSelect,
       orderBy: { name: "asc" },
     });
 
@@ -65,6 +77,7 @@ export async function POST(request) {
         usualDueDay: dueDay,
         notes: notes?.trim() || null,
       },
+      select: cardSelect,
     });
 
     return NextResponse.json({ card });
@@ -155,6 +168,7 @@ export async function PATCH(request) {
         usualDueDay: dueDay,
         notes: notes?.trim() || null,
       },
+      select: cardSelect,
     });
 
     return NextResponse.json({ card });

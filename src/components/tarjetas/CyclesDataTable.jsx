@@ -86,6 +86,7 @@ export default function CyclesDataTable({
   updateStatementAmount,
   markCycleAsPaid,
   unmarkCycleAsPaid,
+  loadCycleBreakdown,
 }) {
   const [activeDialog, setActiveDialog] = useState(null);
 
@@ -96,7 +97,7 @@ export default function CyclesDataTable({
   const [paidAt, setPaidAt] = useState("");
   const [paidAmount, setPaidAmount] = useState("");
 
-  const openDialog = useCallback((type, cycle) => {
+  const openDialog = useCallback(async (type, cycle) => {
     if (type === "dates") {
       setEditCycleStartDate(toDateInputValue(cycle.startDate));
       setEditCycleCutDate(toDateInputValue(cycle.cutDate));
@@ -107,8 +108,34 @@ export default function CyclesDataTable({
       setPaidAt(getTodayInputValue());
       setPaidAmount(cycle.statementAmount ? String(cycle.statementAmount) : "");
     }
-    setActiveDialog({ type, cycle });
-  }, []);
+
+    if (type !== "breakdown") {
+      setActiveDialog({ type, cycle });
+      return;
+    }
+
+    setActiveDialog({ type, cycle, isLoading: true, error: "" });
+
+    try {
+      const detailedCycle = loadCycleBreakdown
+        ? await loadCycleBreakdown(cycle.id)
+        : cycle;
+
+      setActiveDialog({
+        type,
+        cycle: detailedCycle || cycle,
+        isLoading: false,
+        error: "",
+      });
+    } catch (error) {
+      setActiveDialog({
+        type,
+        cycle,
+        isLoading: false,
+        error: error.message || "No se pudo cargar el desglose.",
+      });
+    }
+  }, [loadCycleBreakdown]);
 
   function closeDialog() {
     setActiveDialog(null);
@@ -377,7 +404,17 @@ export default function CyclesDataTable({
               <DialogTitle>Desglose — {activeDialog.cycle.card.name}</DialogTitle>
             </DialogHeader>
             <div className="overflow-y-auto">
-              <CycleBreakdown cycle={activeDialog.cycle} />
+              {activeDialog.isLoading ? (
+                <p className="rounded-xl border border-border bg-muted/30 px-4 py-6 text-sm text-muted-foreground">
+                  Cargando desglose...
+                </p>
+              ) : activeDialog.error ? (
+                <p className="rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-6 text-sm text-destructive">
+                  {activeDialog.error}
+                </p>
+              ) : (
+                <CycleBreakdown cycle={activeDialog.cycle} />
+              )}
             </div>
           </DialogContent>
         )}

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Pencil, Plus, PowerOff, RotateCcw, Trash2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { ensureUserSetup } from "@/lib/userSetup";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -23,7 +24,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Spinner } from "@/components/ui/spinner";
+import PageSkeleton from "@/components/layout/PageSkeleton";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -179,16 +180,7 @@ export default function SuscripcionesContent() {
 
         setUser(session.user);
 
-        await fetch("/api/setup-user", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            userId: session.user.id,
-            email: session.user.email,
-          }),
-        });
+        await ensureUserSetup(session.user);
 
         await loadInitialData(session.user.id);
       } catch (err) {
@@ -581,11 +573,7 @@ export default function SuscripcionesContent() {
   );
 
   if (isLoading) {
-    return (
-      <main className="flex min-h-dvh items-center justify-center bg-background text-foreground">
-        <Spinner className="size-8" />
-      </main>
-    );
+    return <PageSkeleton variant="form-table" />;
   }
 
   return (
@@ -1075,4 +1063,3 @@ export default function SuscripcionesContent() {
     </>
   );
 }
-

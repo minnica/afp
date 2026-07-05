@@ -6,6 +6,7 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { ensureUserSetup } from "@/lib/userSetup";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,7 +47,7 @@ import {
 } from "@/components/ui/dialog";
 import { DataTable } from "@/components/ui/data-table";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { Spinner } from "@/components/ui/spinner";
+import PageSkeleton from "@/components/layout/PageSkeleton";
 
 function getTodayInputValue() {
   const today = new Date();
@@ -208,16 +209,7 @@ export default function ComprasAMesesContent() {
 
         setUser(session.user);
 
-        await fetch("/api/setup-user", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            userId: session.user.id,
-            email: session.user.email,
-          }),
-        });
+        await ensureUserSetup(session.user);
 
         await loadInitialData(session.user.id);
       } catch (err) {
@@ -598,11 +590,7 @@ export default function ComprasAMesesContent() {
   }
 
   if (isLoading) {
-    return (
-      <main className="flex min-h-dvh items-center justify-center bg-background text-foreground">
-        <Spinner className="size-8" />
-      </main>
-    );
+    return <PageSkeleton variant="form-table" />;
   }
 
   return (
@@ -996,4 +984,3 @@ export default function ComprasAMesesContent() {
     </>
   );
 }
-

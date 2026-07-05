@@ -1,6 +1,51 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+const purchaseSelect = {
+  id: true,
+  userId: true,
+  cardId: true,
+  purchaseDate: true,
+  concept: true,
+  totalAmount: true,
+  months: true,
+  manualMonthlyPayment: true,
+  initialPaymentsMade: true,
+  personId: true,
+  receivableAccountId: true,
+  categoryId: true,
+  notes: true,
+  status: true,
+  createdAt: true,
+  updatedAt: true,
+  card: {
+    select: {
+      id: true,
+      name: true,
+      usualCutDay: true,
+      usualDueDay: true,
+    },
+  },
+  category: {
+    select: {
+      id: true,
+      name: true,
+    },
+  },
+  person: {
+    select: {
+      id: true,
+      name: true,
+    },
+  },
+  receivableAccount: {
+    select: {
+      id: true,
+      concept: true,
+    },
+  },
+};
+
 function parseDateInput(dateValue) {
   if (!dateValue) return null;
   return new Date(`${dateValue}T12:00:00.000Z`);
@@ -45,12 +90,7 @@ export async function GET(request) {
 
     const purchases = await prisma.installmentPurchase.findMany({
       where: { userId },
-      include: {
-        card: true,
-        category: true,
-        person: true,
-        receivableAccount: true,
-      },
+      select: purchaseSelect,
       orderBy: [{ status: "asc" }, { purchaseDate: "desc" }],
     });
 
@@ -196,12 +236,7 @@ export async function POST(request) {
         notes: notes?.trim() || null,
         status,
       },
-      include: {
-        card: true,
-        category: true,
-        person: true,
-        receivableAccount: true,
-      },
+      select: purchaseSelect,
     });
 
     if (createdReceivable) {
@@ -357,12 +392,7 @@ export async function PATCH(request) {
         notes: notes?.trim() || null,
         status,
       },
-      include: {
-        card: true,
-        category: true,
-        person: true,
-        receivableAccount: true,
-      },
+      select: purchaseSelect,
     });
 
     return NextResponse.json({ purchase: formatPurchase(purchase) });

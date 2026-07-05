@@ -1,6 +1,93 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+const cycleSelect = {
+  id: true,
+  userId: true,
+  cardId: true,
+  month: true,
+  year: true,
+  startDate: true,
+  cutDate: true,
+  dueDate: true,
+  statementAmount: true,
+  status: true,
+  paidAt: true,
+  paidAmount: true,
+  notes: true,
+  createdAt: true,
+  updatedAt: true,
+  card: {
+    select: {
+      id: true,
+      name: true,
+      usualCutDay: true,
+      usualDueDay: true,
+    },
+  },
+};
+
+const cycleExpenseSelect = {
+  id: true,
+  cardId: true,
+  concept: true,
+  amount: true,
+  date: true,
+  category: {
+    select: {
+      name: true,
+    },
+  },
+};
+
+const cycleSubscriptionSelect = {
+  id: true,
+  paymentMethod: true,
+  cardId: true,
+  name: true,
+  amount: true,
+  chargeDay: true,
+  frequencyMonths: true,
+  startMonth: true,
+  startYear: true,
+  isActive: true,
+  deactivatedAt: true,
+  category: {
+    select: {
+      name: true,
+    },
+  },
+};
+
+const cyclePurchaseSelect = {
+  id: true,
+  cardId: true,
+  concept: true,
+  totalAmount: true,
+  purchaseDate: true,
+  months: true,
+  manualMonthlyPayment: true,
+  initialPaymentsMade: true,
+  status: true,
+  category: {
+    select: {
+      name: true,
+    },
+  },
+};
+
+function groupBy(items, getKey) {
+  const map = new Map();
+
+  for (const item of items) {
+    const key = getKey(item);
+    if (!map.has(key)) map.set(key, []);
+    map.get(key).push(item);
+  }
+
+  return map;
+}
+
 function isDateInsideRange(date, startDate, endDate) {
   const value = new Date(date).getTime();
 
@@ -163,11 +250,25 @@ function calculateCycleAmount({
   expenses,
   subscriptions,
   purchases,
+  expensesByCardId,
+  subscriptionsByCardId,
+  purchasesByCardId,
   cardEarliestCycleIndexMap,
+  includeBreakdown = true,
 }) {
   const earliestCardCycleIndex = cardEarliestCycleIndexMap?.[cycle.cardId];
-  const includedExpenses = expenses
-    .filter((expense) => expense.cardId === cycle.cardId)
+  const cardExpenses = expensesByCardId
+    ? expensesByCardId.get(cycle.cardId) || []
+    : expenses;
+  const cardSubscriptions =
+    subscriptionsByCardId
+      ? subscriptionsByCardId.get(cycle.cardId) || []
+      : subscriptions;
+  const cardPurchases = purchasesByCardId
+    ? purchasesByCardId.get(cycle.cardId) || []
+    : purchases;
+
+  const includedExpenses = cardExpenses
     .filter((expense) =>
       isDateInsideRange(expense.date, cycle.startDate, cycle.cutDate),
     )
@@ -183,9 +284,8 @@ function calculateCycleAmount({
     return sum + expense.amount;
   }, 0);
 
-  const includedSubscriptions = subscriptions
+  const includedSubscriptions = cardSubscriptions
     .filter((subscription) => subscription.paymentMethod === "CARD")
-    .filter((subscription) => subscription.cardId === cycle.cardId)
     .filter((subscription) => shouldIncludeSubscriptionInCycle(subscription, cycle))
     .flatMap((subscription) => {
       const charges = getSubscriptionChargeDatesInsideCycle(subscription, cycle);
@@ -213,8 +313,7 @@ function calculateCycleAmount({
     0,
   );
 
-  const includedPurchases = purchases
-    .filter((purchase) => purchase.cardId === cycle.cardId)
+  const includedPurchases = cardPurchases
     .filter((purchase) =>
       shouldIncludePurchaseInCycle(purchase, cycle, earliestCardCycleIndex),
     )
@@ -258,9 +357,13 @@ function calculateCycleAmount({
     calculatedAmount,
     statementAmount,
     difference,
-    includedExpenses,
-    includedSubscriptions,
-    includedPurchases,
+    ...(includeBreakdown
+      ? {
+          includedExpenses,
+          includedSubscriptions,
+          includedPurchases,
+        }
+      : {}),
   };
 }
 
@@ -337,6 +440,9 @@ export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get("userId");
+    const cycleId = searchParams.get("cycleId");
+    const includeBreakdown =
+      Boolean(cycleId) || searchParams.get("includeBreakdown") === "true";
 
     if (!userId) {
       return NextResponse.json({ error: "Falta userId." }, { status: 400 });
@@ -344,33 +450,31 @@ export async function GET(request) {
 
     const [cycles, expenses, subscriptions, purchases] = await Promise.all([
       prisma.cardCycle.findMany({
-        where: { userId },
-        include: {
-          card: true,
-        },
+        where: cycleId ? { userId, id: cycleId } : { userId },
+        select: cycleSelect,
         orderBy: [{ year: "asc" }, { month: "asc" }, { card: { name: "asc" } }],
       }),
       prisma.dailyExpense.findMany({
         where: { userId },
-        include: {
-          category: true,
-        },
+        select: cycleExpenseSelect,
       }),
       prisma.subscription.findMany({
         where: { userId },
-        include: {
-          category: true,
-        },
+        select: cycleSubscriptionSelect,
       }),
       prisma.installmentPurchase.findMany({
         where: { userId },
-        include: {
-          category: true,
-        },
+        select: cyclePurchaseSelect,
       }),
     ]);
 
     const cardEarliestCycleIndexMap = buildCardEarliestCycleIndexMap(cycles);
+    const expensesByCardId = groupBy(expenses, (expense) => expense.cardId);
+    const subscriptionsByCardId = groupBy(
+      subscriptions.filter((subscription) => subscription.cardId),
+      (subscription) => subscription.cardId,
+    );
+    const purchasesByCardId = groupBy(purchases, (purchase) => purchase.cardId);
 
     const cyclesWithAmounts = cycles.map((cycle) => {
       const amounts = calculateCycleAmount({
@@ -378,7 +482,11 @@ export async function GET(request) {
         expenses,
         subscriptions,
         purchases,
+        expensesByCardId,
+        subscriptionsByCardId,
+        purchasesByCardId,
         cardEarliestCycleIndexMap,
+        includeBreakdown,
       });
 
       return {
@@ -387,6 +495,10 @@ export async function GET(request) {
         ...amounts,
       };
     });
+
+    if (cycleId) {
+      return NextResponse.json({ cycle: cyclesWithAmounts[0] || null });
+    }
 
     return NextResponse.json({ cycles: cyclesWithAmounts });
   } catch (error) {
@@ -448,32 +560,30 @@ export async function POST(request) {
     const [cycles, expenses, subscriptions, purchases] = await Promise.all([
       prisma.cardCycle.findMany({
         where: { userId },
-        include: {
-          card: true,
-        },
+        select: cycleSelect,
         orderBy: [{ year: "asc" }, { month: "asc" }, { card: { name: "asc" } }],
       }),
       prisma.dailyExpense.findMany({
         where: { userId },
-        include: {
-          category: true,
-        },
+        select: cycleExpenseSelect,
       }),
       prisma.subscription.findMany({
         where: { userId },
-        include: {
-          category: true,
-        },
+        select: cycleSubscriptionSelect,
       }),
       prisma.installmentPurchase.findMany({
         where: { userId },
-        include: {
-          category: true,
-        },
+        select: cyclePurchaseSelect,
       }),
     ]);
 
     const cardEarliestCycleIndexMap = buildCardEarliestCycleIndexMap(cycles);
+    const expensesByCardId = groupBy(expenses, (expense) => expense.cardId);
+    const subscriptionsByCardId = groupBy(
+      subscriptions.filter((subscription) => subscription.cardId),
+      (subscription) => subscription.cardId,
+    );
+    const purchasesByCardId = groupBy(purchases, (purchase) => purchase.cardId);
 
     const cyclesWithAmounts = cycles.map((cycle) => {
       const amounts = calculateCycleAmount({
@@ -481,7 +591,11 @@ export async function POST(request) {
         expenses,
         subscriptions,
         purchases,
+        expensesByCardId,
+        subscriptionsByCardId,
+        purchasesByCardId,
         cardEarliestCycleIndexMap,
+        includeBreakdown: false,
       });
 
       return {
@@ -564,9 +678,7 @@ export async function PATCH(request) {
           cutDate: parsedCutDate,
           dueDate: parsedDueDate,
         },
-        include: {
-          card: true,
-        },
+        select: cycleSelect,
       });
 
       return NextResponse.json({ cycle });
@@ -598,9 +710,7 @@ export async function PATCH(request) {
           statementAmount: numericStatementAmount,
           status: "PAYMENT_PENDING",
         },
-        include: {
-          card: true,
-        },
+        select: cycleSelect,
       });
 
       return NextResponse.json({ cycle });
@@ -639,9 +749,7 @@ export async function PATCH(request) {
           paidAmount: numericPaidAmount,
           status: "PAID",
         },
-        include: {
-          card: true,
-        },
+        select: cycleSelect,
       });
 
       return NextResponse.json({ cycle });
@@ -670,9 +778,7 @@ export async function PATCH(request) {
           paidAmount: null,
           status: nextStatus,
         },
-        include: {
-          card: true,
-        },
+        select: cycleSelect,
       });
 
       return NextResponse.json({ cycle });

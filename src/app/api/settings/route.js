@@ -3,6 +3,28 @@ import { prisma } from "@/lib/prisma";
 
 const allowedTypes = ["category", "person", "incomeType"];
 
+const categorySelect = {
+  id: true,
+  userId: true,
+  name: true,
+  createdAt: true,
+};
+
+const personSelect = {
+  id: true,
+  userId: true,
+  name: true,
+  notes: true,
+  createdAt: true,
+};
+
+const incomeTypeSelect = {
+  id: true,
+  userId: true,
+  name: true,
+  createdAt: true,
+};
+
 function getModel(type) {
   if (type === "category") return prisma.category;
   if (type === "person") return prisma.person;
@@ -23,14 +45,17 @@ export async function GET(request) {
     const [categories, people, incomeTypes] = await Promise.all([
       prisma.category.findMany({
         where: { userId },
+        select: categorySelect,
         orderBy: { name: "asc" },
       }),
       prisma.person.findMany({
         where: { userId },
+        select: personSelect,
         orderBy: { name: "asc" },
       }),
       prisma.incomeType.findMany({
         where: { userId },
+        select: incomeTypeSelect,
         orderBy: { name: "asc" },
       }),
     ]);
@@ -84,6 +109,7 @@ export async function POST(request) {
           userId,
           name: cleanName,
         },
+        select: categorySelect,
       });
 
       return NextResponse.json({ item: category });
@@ -95,6 +121,7 @@ export async function POST(request) {
           userId,
           name: cleanName,
         },
+        select: incomeTypeSelect,
       });
 
       return NextResponse.json({ item: incomeType });
@@ -107,6 +134,7 @@ export async function POST(request) {
           name: cleanName,
           notes: notes?.trim() || null,
         },
+        select: personSelect,
       });
 
       return NextResponse.json({ item: person });

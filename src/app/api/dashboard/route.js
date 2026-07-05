@@ -1,6 +1,96 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+const dashboardCardSelect = {
+  id: true,
+  name: true,
+  usualCutDay: true,
+  usualDueDay: true,
+};
+
+const dashboardCycleSelect = {
+  id: true,
+  userId: true,
+  cardId: true,
+  month: true,
+  year: true,
+  startDate: true,
+  cutDate: true,
+  dueDate: true,
+  statementAmount: true,
+  status: true,
+  paidAt: true,
+  paidAmount: true,
+  notes: true,
+  createdAt: true,
+  updatedAt: true,
+  card: {
+    select: dashboardCardSelect,
+  },
+};
+
+const dashboardExpenseSelect = {
+  id: true,
+  date: true,
+  amount: true,
+  cardId: true,
+  categoryId: true,
+};
+
+const dashboardSubscriptionSelect = {
+  id: true,
+  name: true,
+  amount: true,
+  paymentMethod: true,
+  cardId: true,
+  categoryId: true,
+  chargeDay: true,
+  frequencyMonths: true,
+  startMonth: true,
+  startYear: true,
+  isActive: true,
+  deactivatedAt: true,
+  dailyExpenses: {
+    select: {
+      id: true,
+      date: true,
+    },
+  },
+};
+
+const dashboardPurchaseSelect = {
+  id: true,
+  cardId: true,
+  categoryId: true,
+  purchaseDate: true,
+  totalAmount: true,
+  months: true,
+  manualMonthlyPayment: true,
+  initialPaymentsMade: true,
+  status: true,
+};
+
+function groupBy(items, getKey) {
+  const map = new Map();
+
+  for (const item of items) {
+    const key = getKey(item);
+    if (!map.has(key)) map.set(key, []);
+    map.get(key).push(item);
+  }
+
+  return map;
+}
+
+function getExpenseMonthKey(expense) {
+  const date = new Date(expense.date);
+  return `${date.getUTCFullYear()}-${date.getUTCMonth() + 1}`;
+}
+
+function getMonthKey(year, month) {
+  return `${year}-${month}`;
+}
+
 function getMonthStart(date) {
   return new Date(Date.UTC(date.getFullYear(), date.getMonth(), 1, 0, 0, 0));
 }
@@ -169,17 +259,29 @@ function calculateCycleAmount({
   expenses,
   subscriptions,
   purchases,
+  expensesByCardId,
+  subscriptionsByCardId,
+  purchasesByCardId,
 }) {
-  const expensesAmount = expenses
-    .filter((expense) => expense.cardId === cycle.cardId)
+  const cardExpenses = expensesByCardId
+    ? expensesByCardId.get(cycle.cardId) || []
+    : expenses;
+  const cardSubscriptions =
+    subscriptionsByCardId
+      ? subscriptionsByCardId.get(cycle.cardId) || []
+      : subscriptions;
+  const cardPurchases = purchasesByCardId
+    ? purchasesByCardId.get(cycle.cardId) || []
+    : purchases;
+
+  const expensesAmount = cardExpenses
     .filter((expense) =>
       isDateInsideRange(expense.date, cycle.startDate, cycle.cutDate),
     )
     .reduce((sum, expense) => sum + Number(expense.amount || 0), 0);
 
-  const subscriptionsAmount = subscriptions
+  const subscriptionsAmount = cardSubscriptions
     .filter((subscription) => subscription.paymentMethod === "CARD")
-    .filter((subscription) => subscription.cardId === cycle.cardId)
     .filter((subscription) =>
       shouldIncludeSubscriptionInCycle(subscription, cycle),
     )
@@ -193,8 +295,7 @@ function calculateCycleAmount({
       return sum + validCharges.length * Number(subscription.amount || 0);
     }, 0);
 
-  const purchasesAmount = purchases
-    .filter((purchase) => purchase.cardId === cycle.cardId)
+  const purchasesAmount = cardPurchases
     .filter((purchase) =>
       shouldIncludePurchaseInCycle(purchase, cycle),
     )
@@ -825,28 +926,25 @@ export async function GET(request) {
     ] = await Promise.all([
       prisma.card.findMany({
         where: { userId },
+        select: dashboardCardSelect,
         orderBy: { name: "asc" },
       }),
       prisma.cardCycle.findMany({
         where: { userId },
-        include: { card: true },
+        select: dashboardCycleSelect,
         orderBy: [{ year: "asc" }, { month: "asc" }],
       }),
       prisma.dailyExpense.findMany({
         where: { userId },
-        include: { category: true, card: true },
+        select: dashboardExpenseSelect,
       }),
       prisma.subscription.findMany({
         where: { userId },
-        include: {
-          category: true,
-          card: true,
-          dailyExpenses: true,
-        },
+        select: dashboardSubscriptionSelect,
       }),
       prisma.installmentPurchase.findMany({
         where: { userId },
-        include: { category: true, card: true },
+        select: dashboardPurchaseSelect,
       }),
       prisma.income.findMany({
         where: {
@@ -856,21 +954,71 @@ export async function GET(request) {
             lte: monthEnd,
           },
         },
-        include: { incomeType: true },
+        select: {
+          id: true,
+          amount: true,
+        },
       }),
       prisma.category.findMany({
         where: { userId },
+        select: {
+          id: true,
+          name: true,
+        },
         orderBy: { name: "asc" },
       }),
       prisma.receivableAccount.findMany({
         where: { userId },
-        include: {
-          person: true,
-          incomes: true,
+        select: {
+          id: true,
+          personId: true,
+          concept: true,
+          originalAmount: true,
+          originDate: true,
+          expectedMonthlyPayment: true,
+          expectedChargeDays: true,
+          status: true,
+          person: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          incomes: {
+            select: {
+              id: true,
+              date: true,
+              amount: true,
+            },
+          },
         },
         orderBy: [{ status: "asc" }, { originDate: "desc" }],
       }),
     ]);
+
+    const expensesByCardId = groupBy(
+      expenses.filter((expense) => expense.cardId),
+      (expense) => expense.cardId,
+    );
+    const subscriptionsByCardId = groupBy(
+      subscriptions.filter((subscription) => subscription.cardId),
+      (subscription) => subscription.cardId,
+    );
+    const purchasesByCardId = groupBy(purchases, (purchase) => purchase.cardId);
+    const expensesByMonth = groupBy(expenses, getExpenseMonthKey);
+    const getExpensesForMonth = (year, month) => {
+      return expensesByMonth.get(getMonthKey(year, month)) || [];
+    };
+    const getExpensesForComparison = (year, month) => {
+      const prevDateForComparison = new Date(Date.UTC(year, month - 2, 1));
+      return [
+        ...getExpensesForMonth(
+          prevDateForComparison.getUTCFullYear(),
+          prevDateForComparison.getUTCMonth() + 1,
+        ),
+        ...getExpensesForMonth(year, month),
+      ];
+    };
 
     const cyclesWithAmounts = cardCycles.map((cycle) => {
       const amounts = calculateCycleAmount({
@@ -878,6 +1026,9 @@ export async function GET(request) {
         expenses,
         subscriptions,
         purchases,
+        expensesByCardId,
+        subscriptionsByCardId,
+        purchasesByCardId,
       });
 
       return {
@@ -961,9 +1112,7 @@ export async function GET(request) {
       };
     });
 
-    const monthlyExpenses = expenses.filter((expense) =>
-      isDateInsideRange(expense.date, monthStart, monthEnd),
-    );
+    const monthlyExpenses = getExpensesForMonth(currentYear, currentMonth);
 
     const dailyExpensesTotal = monthlyExpenses.reduce((sum, expense) => {
       return sum + Number(expense.amount || 0);
@@ -996,19 +1145,34 @@ export async function GET(request) {
     const nextDate = new Date(Date.UTC(currentYear, currentMonth, 1));
 
     const categoryBreakdownPrev = buildCategoryBreakdown({
-      categories, expenses, subscriptions, purchases,
+      categories,
+      expenses: getExpensesForMonth(
+        prevDate.getUTCFullYear(),
+        prevDate.getUTCMonth() + 1,
+      ),
+      subscriptions,
+      purchases,
       year: prevDate.getUTCFullYear(),
       month: prevDate.getUTCMonth() + 1,
     });
 
     const categoryBreakdownCurrent = buildCategoryBreakdown({
-      categories, expenses, subscriptions, purchases,
+      categories,
+      expenses: getExpensesForMonth(currentYear, currentMonth),
+      subscriptions,
+      purchases,
       year: currentYear,
       month: currentMonth,
     });
 
     const categoryBreakdownNext = buildCategoryBreakdown({
-      categories, expenses, subscriptions, purchases,
+      categories,
+      expenses: getExpensesForMonth(
+        nextDate.getUTCFullYear(),
+        nextDate.getUTCMonth() + 1,
+      ),
+      subscriptions,
+      purchases,
       year: nextDate.getUTCFullYear(),
       month: nextDate.getUTCMonth() + 1,
     });
@@ -1016,7 +1180,10 @@ export async function GET(request) {
     const categoryBreakdownByMonth = {};
     for (let m = 0; m < 12; m++) {
       categoryBreakdownByMonth[m] = buildCategoryBreakdown({
-        categories, expenses, subscriptions, purchases,
+        categories,
+        expenses: getExpensesForMonth(currentYear, m + 1),
+        subscriptions,
+        purchases,
         year: currentYear,
         month: m + 1,
       });
@@ -1025,7 +1192,7 @@ export async function GET(request) {
     const weeklyComparisonByMonth = {};
     for (let m = 0; m < 12; m++) {
       weeklyComparisonByMonth[m] = buildWeeklyComparison({
-        expenses,
+        expenses: getExpensesForComparison(currentYear, m + 1),
         subscriptions,
         purchases,
         currentYear,
@@ -1038,7 +1205,7 @@ export async function GET(request) {
       weeklyComparisonByCategoryAndMonth[category.id] = {};
       for (let m = 0; m < 12; m++) {
         weeklyComparisonByCategoryAndMonth[category.id][m] = buildWeeklyComparison({
-          expenses,
+          expenses: getExpensesForComparison(currentYear, m + 1),
           subscriptions,
           purchases,
           currentYear,

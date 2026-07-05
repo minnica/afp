@@ -11,6 +11,7 @@ import {
   X,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { ensureUserSetup } from "@/lib/userSetup";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,8 +25,8 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Spinner } from "@/components/ui/spinner";
 import CyclesDataTable from "@/components/tarjetas/CyclesDataTable";
+import PageSkeleton from "@/components/layout/PageSkeleton";
 
 const MONTH_NAMES = [
   "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
@@ -70,6 +71,21 @@ export default function TarjetasContent() {
     setCycles(data.cycles || []);
   }
 
+  async function loadCycleBreakdown(cycleId) {
+    if (!user) return null;
+
+    const response = await fetch(
+      `/api/card-cycles?userId=${user.id}&cycleId=${cycleId}&includeBreakdown=true`,
+    );
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "No se pudo cargar el desglose.");
+    }
+
+    return data.cycle || null;
+  }
+
   useEffect(() => {
     async function init() {
       try {
@@ -84,11 +100,7 @@ export default function TarjetasContent() {
 
         setUser(session.user);
 
-        await fetch("/api/setup-user", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ userId: session.user.id, email: session.user.email }),
-        });
+        await ensureUserSetup(session.user);
 
         await Promise.all([loadCards(session.user.id), loadCycles(session.user.id)]);
       } catch (err) {
@@ -303,11 +315,7 @@ export default function TarjetasContent() {
   }, [cycles, currentYear]);
 
   if (isLoading) {
-    return (
-      <main className="flex min-h-dvh items-center justify-center bg-background text-foreground">
-        <Spinner className="size-8" />
-      </main>
-    );
+    return <PageSkeleton variant="form-table" />;
   }
 
   return (
@@ -576,7 +584,7 @@ export default function TarjetasContent() {
               <CardContent>
                 {cycles.length === 0 ? (
                   <p className="rounded-xl border border-border bg-muted/30 px-4 py-6 text-sm text-muted-foreground">
-                    Aún no hay ciclos generados. Agrega tarjetas y presiona "Generar ciclos".
+                    Aún no hay ciclos generados. Agrega tarjetas y presiona &quot;Generar ciclos&quot;.
                   </p>
                 ) : (
                   <Tabs value={activeMonthTab} onValueChange={setActiveMonthTab}>
@@ -599,6 +607,7 @@ export default function TarjetasContent() {
                           updateStatementAmount={updateStatementAmount}
                           markCycleAsPaid={markCycleAsPaid}
                           unmarkCycleAsPaid={unmarkCycleAsPaid}
+                          loadCycleBreakdown={loadCycleBreakdown}
                         />
                       </TabsContent>
                     ))}

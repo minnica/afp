@@ -1,6 +1,38 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+const incomeSelect = {
+  id: true,
+  userId: true,
+  date: true,
+  incomeTypeId: true,
+  source: true,
+  concept: true,
+  amount: true,
+  receivableAccountId: true,
+  notes: true,
+  createdAt: true,
+  updatedAt: true,
+  incomeType: {
+    select: {
+      id: true,
+      name: true,
+    },
+  },
+  receivableAccount: {
+    select: {
+      id: true,
+      concept: true,
+      person: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+  },
+};
+
 function parseDateInput(dateValue) {
   if (!dateValue) return null;
   return new Date(`${dateValue}T12:00:00.000Z`);
@@ -9,19 +41,25 @@ function parseDateInput(dateValue) {
 async function updateReceivableStatusIfNeeded(receivableAccountId) {
   if (!receivableAccountId) return;
 
-  const receivable = await prisma.receivableAccount.findUnique({
-    where: { id: receivableAccountId },
-    include: {
-      incomes: true,
-    },
-  });
+  const [receivable, paid] = await Promise.all([
+    prisma.receivableAccount.findUnique({
+      where: { id: receivableAccountId },
+      select: {
+        originalAmount: true,
+        status: true,
+      },
+    }),
+    prisma.income.aggregate({
+      where: { receivableAccountId },
+      _sum: {
+        amount: true,
+      },
+    }),
+  ]);
 
   if (!receivable) return;
 
-  const paidAmount = receivable.incomes.reduce((sum, income) => {
-    return sum + Number(income.amount || 0);
-  }, 0);
-
+  const paidAmount = Number(paid._sum.amount || 0);
   const pendingBalance = Number(receivable.originalAmount || 0) - paidAmount;
 
   if (pendingBalance <= 0 && receivable.status !== "PAID_OFF") {
@@ -54,14 +92,7 @@ export async function GET(request) {
 
     const incomes = await prisma.income.findMany({
       where: { userId },
-      include: {
-        incomeType: true,
-        receivableAccount: {
-          include: {
-            person: true,
-          },
-        },
-      },
+      select: incomeSelect,
       orderBy: [{ date: "desc" }, { createdAt: "desc" }],
       take: 100,
     });
@@ -129,14 +160,7 @@ export async function POST(request) {
         receivableAccountId: receivableAccountId || null,
         notes: notes?.trim() || null,
       },
-      include: {
-        incomeType: true,
-        receivableAccount: {
-          include: {
-            person: true,
-          },
-        },
-      },
+      select: incomeSelect,
     });
 
     if (receivableAccountId) {
@@ -262,14 +286,7 @@ export async function PATCH(request) {
         receivableAccountId: nextReceivableAccountId,
         notes: notes?.trim() || null,
       },
-      include: {
-        incomeType: true,
-        receivableAccount: {
-          include: {
-            person: true,
-          },
-        },
-      },
+      select: incomeSelect,
     });
 
     if (previousReceivableAccountId) {

@@ -1,22 +1,82 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+const expenseSelect = {
+  id: true,
+  userId: true,
+  date: true,
+  paymentMethod: true,
+  cardId: true,
+  concept: true,
+  amount: true,
+  categoryId: true,
+  notes: true,
+  personId: true,
+  receivableAccountId: true,
+  payableAccountId: true,
+  subscriptionId: true,
+  createdAt: true,
+  updatedAt: true,
+  card: {
+    select: {
+      id: true,
+      name: true,
+    },
+  },
+  category: {
+    select: {
+      id: true,
+      name: true,
+    },
+  },
+  person: {
+    select: {
+      id: true,
+      name: true,
+    },
+  },
+  receivableAccount: {
+    select: {
+      id: true,
+      concept: true,
+    },
+  },
+  payableAccount: {
+    select: {
+      id: true,
+      concept: true,
+    },
+  },
+  subscription: {
+    select: {
+      id: true,
+      name: true,
+    },
+  },
+};
+
 async function updatePayableStatusIfNeeded(payableAccountId) {
   if (!payableAccountId) return;
 
-  const payable = await prisma.payableAccount.findUnique({
-    where: { id: payableAccountId },
-    include: {
-      dailyExpenses: true,
-    },
-  });
+  const [payable, paid] = await Promise.all([
+    prisma.payableAccount.findUnique({
+      where: { id: payableAccountId },
+      select: {
+        originalAmount: true,
+        status: true,
+      },
+    }),
+    prisma.dailyExpense.aggregate({
+      where: { payableAccountId },
+      _sum: {
+        amount: true,
+      },
+    }),
+  ]);
 
   if (!payable) return;
 
-  const paidAmount = payable.dailyExpenses.reduce((sum, expense) => {
-    return sum + Number(expense.amount || 0);
-  }, 0);
-
+  const paidAmount = Number(paid._sum.amount || 0);
   const pendingBalance = Number(payable.originalAmount || 0) - paidAmount;
 
   const nextStatus = pendingBalance <= 0 ? "PAID_OFF" : "ACTIVE";
@@ -46,6 +106,22 @@ function parseEndDate(dateValue) {
   return new Date(`${dateValue}T23:59:59.999Z`);
 }
 
+function getAvailableMonths(expenseDates) {
+  const months = new Set();
+
+  expenseDates.forEach((expense) => {
+    const date = new Date(expense.date);
+
+    if (Number.isNaN(date.getTime())) return;
+
+    const year = date.getUTCFullYear();
+    const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+    months.add(`${year}-${month}`);
+  });
+
+  return Array.from(months).sort().reverse();
+}
+
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -57,6 +133,7 @@ export async function GET(request) {
     const paymentMethod = searchParams.get("paymentMethod");
     const cardId = searchParams.get("cardId");
     const concept = searchParams.get("concept");
+    const amount = searchParams.get("amount");
 
     if (!userId) {
       return NextResponse.json({ error: "Falta userId." }, { status: 400 });
@@ -95,24 +172,38 @@ export async function GET(request) {
       };
     }
 
-    const expenses = await prisma.dailyExpense.findMany({
-      where,
-      include: {
-        card: true,
-        category: true,
-        person: true,
-        receivableAccount: true,
-        payableAccount: true,
-        subscription: true,
-      },
-      orderBy: [{ date: "desc" }, { createdAt: "desc" }],
-    });
+    if (amount?.trim()) {
+      const numericAmount = Number(amount);
+
+      if (Number.isFinite(numericAmount) && numericAmount >= 0) {
+        where.amount = numericAmount;
+      }
+    }
+
+    const [expenses, expenseDates] = await Promise.all([
+      prisma.dailyExpense.findMany({
+        where,
+        select: expenseSelect,
+        orderBy: [{ date: "desc" }, { createdAt: "desc" }],
+      }),
+      prisma.dailyExpense.findMany({
+        where: { userId },
+        select: {
+          date: true,
+        },
+        orderBy: [{ date: "desc" }],
+      }),
+    ]);
 
     const total = expenses.reduce((sum, expense) => {
       return sum + Number(expense.amount || 0);
     }, 0);
 
-    return NextResponse.json({ expenses, total });
+    return NextResponse.json({
+      expenses,
+      total,
+      availableMonths: getAvailableMonths(expenseDates),
+    });
   } catch (error) {
     console.error("Error loading expenses:", error);
 
@@ -219,14 +310,7 @@ export async function POST(request) {
         payableAccountId: payableAccountId || null,
         subscriptionId: subscriptionId || null,
       },
-      include: {
-        card: true,
-        category: true,
-        person: true,
-        receivableAccount: true,
-        payableAccount: true,
-        subscription: true,
-      },
+      select: expenseSelect,
     });
 
     if (payableAccountId) {
@@ -353,14 +437,7 @@ export async function PATCH(request) {
         notes: notes?.trim() || null,
         subscriptionId: subscriptionId || null,
       },
-      include: {
-        card: true,
-        category: true,
-        person: true,
-        receivableAccount: true,
-        payableAccount: true,
-        subscription: true,
-      },
+      select: expenseSelect,
     });
 
     return NextResponse.json({ expense });

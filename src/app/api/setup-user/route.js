@@ -35,50 +35,34 @@ export async function POST(request) {
       );
     }
 
-    await prisma.user.upsert({
-      where: {
-        id: userId,
-      },
-      update: {
-        email,
-      },
-      create: {
-        id: userId,
-        email,
-      },
-    });
-
-    for (const categoryName of defaultCategories) {
-      await prisma.category.upsert({
+    await prisma.$transaction([
+      prisma.user.upsert({
         where: {
-          userId_name: {
-            userId,
-            name: categoryName,
-          },
+          id: userId,
         },
-        update: {},
+        update: {
+          email,
+        },
         create: {
+          id: userId,
+          email,
+        },
+      }),
+      prisma.category.createMany({
+        data: defaultCategories.map((name) => ({
           userId,
-          name: categoryName,
-        },
-      });
-    }
-
-    for (const incomeTypeName of defaultIncomeTypes) {
-      await prisma.incomeType.upsert({
-        where: {
-          userId_name: {
-            userId,
-            name: incomeTypeName,
-          },
-        },
-        update: {},
-        create: {
+          name,
+        })),
+        skipDuplicates: true,
+      }),
+      prisma.incomeType.createMany({
+        data: defaultIncomeTypes.map((name) => ({
           userId,
-          name: incomeTypeName,
-        },
-      });
-    }
+          name,
+        })),
+        skipDuplicates: true,
+      }),
+    ]);
 
     return NextResponse.json({
       ok: true,
