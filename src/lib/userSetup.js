@@ -8,12 +8,16 @@ export async function ensureUserSetup(user) {
   if (setupCache.has(cacheKey)) return;
 
   if (typeof window !== "undefined") {
-    const isSetupCached = window.sessionStorage.getItem(cacheKey) === "done";
+    const isSetupCached =
+      window.sessionStorage.getItem(cacheKey) === "done" ||
+      window.localStorage.getItem(cacheKey) === "done";
 
     if (isSetupCached) {
       setupCache.add(cacheKey);
       return;
     }
+
+    if (navigator.onLine === false) return;
   }
 
   const response = await fetch("/api/setup-user", {
@@ -36,5 +40,6 @@ export async function ensureUserSetup(user) {
 
   if (typeof window !== "undefined") {
     window.sessionStorage.setItem(cacheKey, "done");
+    window.localStorage.setItem(cacheKey, "done");
   }
 }

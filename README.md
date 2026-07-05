@@ -40,6 +40,7 @@ Auth por Supabase. DB PostgreSQL vía Prisma + Supabase. Modo oscuro forzado.
 - **Formularios**: React Hook Form + Zod
 - **Auth**: Supabase (`@supabase/supabase-js`)
 - **BD**: PostgreSQL en Supabase, ORM Prisma 7.x con adapter pg
+- **PWA / offline**: manifest + service worker propio; cola local de gastos en `localStorage`
 - **Toasts**: sonner (montado en root layout, `position="bottom-center"`)
 - **Tema**: dark mode forzado (`html class="dark"`)
 - **Fuente**: Geist Sans + Geist Mono
@@ -110,6 +111,29 @@ Reglas de cálculo:
 - Se incluye en el ciclo solo si `1 <= currentMonth <= months` (y, para `ACTIVE`, si `purchaseDate` no es posterior al `cutDate` del ciclo).
 - `initialPaymentsMade` **no** se usa para este cálculo — solo sirve como ancla en `getNextPaymentDueDate` (`ComprasAMesesContent.jsx`). Antes el cálculo mezclaba un valor dinámico con un fallback estático `initialPaymentsMade + 1`, lo que dejaba la cuota "congelada" en vez de avanzar mes a mes (y de excluirse al completarse).
 
+### PWA / modo offline
+
+La app puede instalarse como PWA y soporta captura offline de gastos diarios en `/gastos`.
+
+Archivos principales:
+- `public/manifest.webmanifest`: metadata de instalación (`start_url: /gastos`, `display: standalone`, icono).
+- `public/sw.js`: service worker propio. Cachea shell básico (`/`, `/gastos`, manifest, icono), assets estáticos de Next y respuestas GET relevantes (`/api/gastos/bootstrap`, `/api/expenses`) con estrategia network-first.
+- `src/components/pwa/ServiceWorkerRegistration.jsx`: registra `/sw.js` desde el layout raíz.
+- `src/lib/offlineExpenses.js`: cola local por usuario en `localStorage` (`afp:offline-expenses:{userId}`).
+- `src/components/gastos/GastosContent.jsx`: integra lectura de cache, alta offline, visualización de pendientes y sincronización.
+
+Flujo:
+- El usuario debe abrir `/gastos` con internet al menos una vez en el dispositivo para cachear shell y datos iniciales (categorías, tarjetas, personas, cuentas, suscripciones y gastos del día).
+- Si no hay conexión, los gastos nuevos se guardan en `localStorage` como pendientes y aparecen en la tabla con badge `Pendiente` / `En cola`.
+- Al recuperar conexión, la pantalla intenta sincronizar automáticamente la cola contra `POST /api/expenses`. También hay botón manual `Reintentar`.
+- Si un gasto falla por validación del servidor, permanece en la cola con `lastError`; no se descarta silenciosamente.
+- Los pendientes offline solo existen en ese navegador/dispositivo hasta sincronizarse con Supabase.
+
+Alcance actual:
+- Soportado offline: crear gastos diarios desde `/gastos`.
+- No soportado offline: editar/borrar gastos, alta/edición de catálogos, tarjetas, ingresos, suscripciones, cuentas por cobrar/pagar, dashboard. Esas operaciones requieren conexión.
+- La lógica offline no escribe directamente en Supabase ni cambia el schema; solo reintenta el mismo contrato de `POST /api/expenses`.
+
 ### Reglas de BD
 
 - No ejecutar `migrate reset` ni `db push` en ambiente compartido/productivo.
@@ -138,6 +162,10 @@ afp/
 ├── prisma/
 │   ├── schema.prisma              → modelos Prisma (fuente de verdad de BD)
 │   └── migrations/                → migraciones versionadas
+├── public/
+│   ├── manifest.webmanifest       → manifest PWA
+│   ├── sw.js                      → service worker PWA/offline
+│   └── icons/app-icon.svg         → icono instalable
 ├── src/
 │   ├── app/
 │   │   ├── layout.js              → layout raíz (Toaster, fuentes, dark mode)
@@ -166,6 +194,8 @@ afp/
 │   │   ├── layout/
 │   │   │   ├── AppSidebar.jsx     → sidebar con nav + logout (Supabase)
 │   │   │   └── AppShell.jsx       → shell que envuelve contenido con sidebar
+│   │   ├── pwa/
+│   │   │   └── ServiceWorkerRegistration.jsx → registro de service worker
 │   │   ├── ui/                    → componentes shadcn locales (incl. data-table.jsx)
 │   │   ├── gastos/GastosContent.jsx
 │   │   ├── dashboard/DashboardContent.jsx
@@ -186,6 +216,7 @@ afp/
 │       ├── utils.js               → cn() utility
 │       ├── dates.js               → utilidades de fecha
 │       ├── money.js               → utilidades de formato monetario
+│       ├── offlineExpenses.js     → cola local de gastos offline
 │       ├── validations.js         → validaciones Zod compartidas
 │       └── calculations/          → lógica de cálculo por módulo
 │           ├── cardCycles.js

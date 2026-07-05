@@ -1,5 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
+import { ServiceWorkerRegistration } from "@/components/pwa/ServiceWorkerRegistration";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -15,6 +16,12 @@ const geistMono = Geist_Mono({
 export const metadata = {
   title: "Control de Gastos",
   description: "App personal para gastos, tarjetas y cuentas por cobrar",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Gastos",
+  },
 };
 
 export default function RootLayout({ children }) {
@@ -25,6 +32,7 @@ export default function RootLayout({ children }) {
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">
+        <ServiceWorkerRegistration />
         {children}
         <Toaster richColors position="bottom-center" />
       </body>

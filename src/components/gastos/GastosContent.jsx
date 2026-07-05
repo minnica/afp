@@ -4,10 +4,15 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { Pencil, Plus, RefreshCw, Trash2, WifiOff } from "lucide-react";
 
 import { supabase } from "@/lib/supabase";
 import { ensureUserSetup } from "@/lib/userSetup";
+import {
+  addOfflineExpense,
+  readOfflineExpenses,
+  syncOfflineExpenses,
+} from "@/lib/offlineExpenses";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -59,6 +64,42 @@ function getTodayInputValue() {
   return `${year}-${month}-${day}`;
 }
 
+const GASTOS_BOOTSTRAP_CACHE_PREFIX = "afp:gastos-bootstrap:";
+
+function getBootstrapCacheKey(userId) {
+  return `${GASTOS_BOOTSTRAP_CACHE_PREFIX}${userId}`;
+}
+
+function readCachedBootstrap(userId) {
+  if (typeof window === "undefined" || !userId) return null;
+
+  try {
+    const rawValue = window.localStorage.getItem(getBootstrapCacheKey(userId));
+    return rawValue ? JSON.parse(rawValue) : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeCachedBootstrap(userId, data) {
+  if (typeof window === "undefined" || !userId) return;
+
+  window.localStorage.setItem(
+    getBootstrapCacheKey(userId),
+    JSON.stringify({
+      ...data,
+      cachedAt: new Date().toISOString(),
+    }),
+  );
+}
+
+function getExpenseMonth(expense) {
+  const dateValue = expense?.payload?.date || expense?.date;
+
+  if (!dateValue) return "";
+
+  return String(dateValue).slice(0, 7);
+}
 
 function formatMoney(value) {
   const numberValue = Number(value || 0);
@@ -131,6 +172,10 @@ export default function GastosContent() {
   const [isCheckingSession, setIsCheckingSession] = useState(true);
   const [isExpensesLoading, setIsExpensesLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isOnline, setIsOnline] = useState(true);
+  const [isSyncingOfflineExpenses, setIsSyncingOfflineExpenses] =
+    useState(false);
+  const [pendingOfflineExpenses, setPendingOfflineExpenses] = useState([]);
   const [error, setError] = useState("");
 
   const [people, setPeople] = useState([]);
@@ -177,21 +222,43 @@ export default function GastosContent() {
       startDate: today,
       endDate: today,
     });
-    const response = await fetch(`/api/gastos/bootstrap?${params.toString()}`);
-    const data = await response.json();
 
-    if (!response.ok) {
-      throw new Error(data.error || "No se pudieron cargar datos iniciales.");
+    try {
+      const response = await fetch(`/api/gastos/bootstrap?${params.toString()}`);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "No se pudieron cargar datos iniciales.");
+      }
+
+      writeCachedBootstrap(userId, data);
+
+      setCategories(data.categories || []);
+      setPeople(data.people || []);
+      setCards(data.cards || []);
+      setExpenses(data.expenses || []);
+      setAvailableMonths(data.availableMonths || []);
+      setReceivables(data.receivables || []);
+      setPayables(data.payables || []);
+      setSubscriptions(data.subscriptions || []);
+    } catch (err) {
+      const cachedData = readCachedBootstrap(userId);
+
+      if (!cachedData) {
+        throw err;
+      }
+
+      setCategories(cachedData.categories || []);
+      setPeople(cachedData.people || []);
+      setCards(cachedData.cards || []);
+      setExpenses(cachedData.expenses || []);
+      setAvailableMonths(cachedData.availableMonths || []);
+      setReceivables(cachedData.receivables || []);
+      setPayables(cachedData.payables || []);
+      setSubscriptions(cachedData.subscriptions || []);
+      toast.warning("Sin conexión. Usando datos guardados en este dispositivo.");
     }
 
-    setCategories(data.categories || []);
-    setPeople(data.people || []);
-    setCards(data.cards || []);
-    setExpenses(data.expenses || []);
-    setAvailableMonths(data.availableMonths || []);
-    setReceivables(data.receivables || []);
-    setPayables(data.payables || []);
-    setSubscriptions(data.subscriptions || []);
     lastExpensesUrlRef.current = buildExpensesUrl(userId);
     didLoadInitialExpensesRef.current = true;
   }
@@ -286,6 +353,88 @@ export default function GastosContent() {
     setSubscriptions(data.subscriptions || []);
   }
 
+  function getCreateExpensePayload() {
+    return {
+      userId: user.id,
+      date,
+      paymentMethod,
+      cardId,
+      concept,
+      amount,
+      categoryId,
+      notes,
+      personId,
+      receivableAccountId:
+        payableAccountId === "NONE" && receivableMode === "EXISTING"
+          ? receivableAccountId
+          : null,
+      payableAccountId: payableAccountId === "NONE" ? null : payableAccountId,
+      subscriptionId: subscriptionId === "NONE" ? null : subscriptionId,
+      createReceivable: Boolean(
+        personId && receivableMode === "CREATE" && payableAccountId === "NONE",
+      ),
+    };
+  }
+
+  function resetCreateExpenseForm() {
+    setConcept("");
+    setAmount("");
+    setNotes("");
+    setShowMoreOptions(false);
+    setPersonId("");
+    setReceivableMode("CREATE");
+    setReceivableAccountId("");
+    setPayableAccountId("NONE");
+    setSubscriptionId("NONE");
+  }
+
+  function refreshPendingOfflineExpenses(userId) {
+    setPendingOfflineExpenses(readOfflineExpenses(userId));
+  }
+
+  async function syncPendingExpenses({ silent = false } = {}) {
+    if (!user || isSyncingOfflineExpenses) return;
+
+    const queuedExpenses = readOfflineExpenses(user.id);
+
+    if (queuedExpenses.length === 0) {
+      setPendingOfflineExpenses([]);
+      return;
+    }
+
+    setIsSyncingOfflineExpenses(true);
+
+    try {
+      const { failedExpenses, syncedExpenses } = await syncOfflineExpenses(
+        user.id,
+      );
+
+      setPendingOfflineExpenses(failedExpenses);
+
+      if (syncedExpenses.length > 0) {
+        await loadExpenses(user.id, { force: true });
+        await loadReceivables(user.id);
+        await loadPayables(user.id);
+
+        toast.success(
+          syncedExpenses.length === 1
+            ? "Gasto pendiente sincronizado."
+            : `${syncedExpenses.length} gastos pendientes sincronizados.`,
+        );
+      }
+
+      if (!silent && failedExpenses.length > 0) {
+        toast.warning("Quedaron gastos pendientes por sincronizar.");
+      }
+    } catch (err) {
+      if (!silent) {
+        toast.error(err.message || "No se pudieron sincronizar pendientes.");
+      }
+    } finally {
+      setIsSyncingOfflineExpenses(false);
+    }
+  }
+
   useEffect(() => {
     async function checkSession() {
       try {
@@ -313,6 +462,42 @@ export default function GastosContent() {
     checkSession();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router]);
+
+  useEffect(() => {
+    function updateOnlineStatus() {
+      setIsOnline(navigator.onLine);
+    }
+
+    updateOnlineStatus();
+    window.addEventListener("online", updateOnlineStatus);
+    window.addEventListener("offline", updateOnlineStatus);
+
+    return () => {
+      window.removeEventListener("online", updateOnlineStatus);
+      window.removeEventListener("offline", updateOnlineStatus);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const timeoutId = window.setTimeout(() => {
+      refreshPendingOfflineExpenses(user.id);
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [user]);
+
+  useEffect(() => {
+    if (!user || !isOnline || pendingOfflineExpenses.length === 0) return;
+
+    const timeoutId = window.setTimeout(() => {
+      syncPendingExpenses({ silent: true });
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, isOnline, pendingOfflineExpenses.length]);
 
   useEffect(() => {
     if (!user || isCheckingSession || !didLoadInitialExpensesRef.current) return;
@@ -347,39 +532,38 @@ export default function GastosContent() {
       setError("El monto debe ser mayor a 0.");
       return;
     }
+    if (!categoryId) {
+      setError("La categoría es requerida.");
+      return;
+    }
+    if (paymentMethod === "CARD" && !cardId) {
+      setError("Debes seleccionar una tarjeta.");
+      return;
+    }
 
     setError("");
     setIsSaving(true);
 
+    const payload = getCreateExpensePayload();
+    const shouldQueueOffline =
+      typeof navigator !== "undefined" && navigator.onLine === false;
+
     try {
+      if (shouldQueueOffline) {
+        const offlineExpense = addOfflineExpense(user.id, payload);
+
+        setPendingOfflineExpenses((current) => [offlineExpense, ...current]);
+        resetCreateExpenseForm();
+        toast.info("Sin conexión. Gasto guardado como pendiente.");
+        return;
+      }
+
       const response = await fetch("/api/expenses", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          userId: user.id,
-          date,
-          paymentMethod,
-          cardId,
-          concept,
-          amount,
-          categoryId,
-          notes,
-          personId,
-          receivableAccountId:
-            payableAccountId === "NONE" && receivableMode === "EXISTING"
-              ? receivableAccountId
-              : null,
-          payableAccountId:
-            payableAccountId === "NONE" ? null : payableAccountId,
-          subscriptionId: subscriptionId === "NONE" ? null : subscriptionId,
-          createReceivable: Boolean(
-            personId &&
-            receivableMode === "CREATE" &&
-            payableAccountId === "NONE",
-          ),
-        }),
+        body: JSON.stringify(payload),
       });
 
       const data = await response.json();
@@ -388,20 +572,24 @@ export default function GastosContent() {
         throw new Error(data.error || "No se pudo guardar el gasto.");
       }
 
-      setConcept("");
-      setAmount("");
-      setNotes("");
-      setShowMoreOptions(false);
-      setPersonId("");
-      setReceivableMode("CREATE");
-      setReceivableAccountId("");
-      setPayableAccountId("NONE");
-      setSubscriptionId("NONE");
+      resetCreateExpenseForm();
       await loadExpenses(user.id, { force: true });
       await loadReceivables(user.id);
       await loadPayables(user.id);
       toast.success("Gasto guardado exitosamente.");
     } catch (err) {
+      const wentOffline =
+        typeof navigator !== "undefined" && navigator.onLine === false;
+
+      if (wentOffline || err instanceof TypeError) {
+        const offlineExpense = addOfflineExpense(user.id, payload);
+
+        setPendingOfflineExpenses((current) => [offlineExpense, ...current]);
+        resetCreateExpenseForm();
+        toast.info("Sin conexión. Gasto guardado como pendiente.");
+        return;
+      }
+
       setError(err.message || "No se pudo guardar el gasto.");
     } finally {
       setIsSaving(false);
@@ -513,9 +701,134 @@ export default function GastosContent() {
     }
   }
 
+  function buildOfflineExpenseRow(offlineExpense) {
+    const payload = offlineExpense.payload;
+    const relatedCategory = categories.find(
+      (category) => category.id === payload.categoryId,
+    );
+    const relatedCard = cards.find((card) => card.id === payload.cardId);
+    const relatedPerson = people.find((person) => person.id === payload.personId);
+    const relatedReceivable = receivables.find(
+      (receivable) => receivable.id === payload.receivableAccountId,
+    );
+    const relatedPayable = payables.find(
+      (payable) => payable.id === payload.payableAccountId,
+    );
+    const relatedSubscription = subscriptions.find(
+      (subscription) => subscription.id === payload.subscriptionId,
+    );
+
+    return {
+      id: offlineExpense.clientId,
+      userId: payload.userId,
+      date: `${payload.date}T12:00:00.000Z`,
+      paymentMethod: payload.paymentMethod,
+      cardId: payload.paymentMethod === "CARD" ? payload.cardId : null,
+      concept: payload.concept,
+      amount: Number(payload.amount || 0),
+      categoryId: payload.categoryId,
+      notes: payload.notes,
+      personId: payload.personId || null,
+      receivableAccountId: payload.receivableAccountId || null,
+      payableAccountId: payload.payableAccountId || null,
+      subscriptionId: payload.subscriptionId || null,
+      createdAt: offlineExpense.createdAt,
+      updatedAt: offlineExpense.createdAt,
+      card: relatedCard || null,
+      category: relatedCategory || null,
+      person: relatedPerson || null,
+      receivableAccount:
+        relatedReceivable ||
+        (payload.createReceivable
+          ? { id: offlineExpense.clientId, concept: payload.concept }
+          : null),
+      payableAccount: relatedPayable || null,
+      subscription: relatedSubscription || null,
+      _offlineStatus: "pending",
+      _offlineError: offlineExpense.lastError || "",
+    };
+  }
+
+  function doesExpenseMatchFilters(expense) {
+    const datePart = String(expense.date).split("T")[0];
+
+    if (filterDate && datePart !== filterDate) return false;
+
+    if (!filterDate && filterMonth && datePart.slice(0, 7) !== filterMonth) {
+      return false;
+    }
+
+    if (filterCategoryId && expense.categoryId !== filterCategoryId) {
+      return false;
+    }
+
+    if (
+      filterConcept.trim() &&
+      !String(expense.concept || "")
+        .toLowerCase()
+        .includes(filterConcept.trim().toLowerCase())
+    ) {
+      return false;
+    }
+
+    if (filterCardId === "CASH" && expense.paymentMethod !== "CASH") {
+      return false;
+    }
+
+    if (
+      filterCardId &&
+      filterCardId !== "CASH" &&
+      (expense.paymentMethod !== "CARD" || expense.cardId !== filterCardId)
+    ) {
+      return false;
+    }
+
+    if (filterAmount.trim()) {
+      const numericAmount = Number(filterAmount);
+
+      if (Number.isFinite(numericAmount) && Number(expense.amount) !== numericAmount) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   const filteredExpenses = useMemo(() => {
-    return expenses;
-  }, [expenses]);
+    const offlineRows = pendingOfflineExpenses
+      .map((offlineExpense) => buildOfflineExpenseRow(offlineExpense))
+      .filter(doesExpenseMatchFilters);
+
+    return [...offlineRows, ...expenses];
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    expenses,
+    pendingOfflineExpenses,
+    categories,
+    cards,
+    people,
+    receivables,
+    payables,
+    subscriptions,
+    filterMonth,
+    filterDate,
+    filterCategoryId,
+    filterConcept,
+    filterCardId,
+    filterAmount,
+  ]);
+
+  const availableMonthsWithPending = useMemo(() => {
+    const months = new Set(availableMonths);
+
+    pendingOfflineExpenses.forEach((expense) => {
+      const month = getExpenseMonth(expense);
+
+      if (isValidYearMonth(month)) months.add(month);
+    });
+
+    return Array.from(months).sort().reverse();
+  }, [availableMonths, pendingOfflineExpenses]);
 
   const expenseColumns = useMemo(
     () => [
@@ -538,7 +851,17 @@ export default function GastosContent() {
           const expense = row.original;
           return (
             <div className="min-w-0">
-              <p className="font-medium">{expense.concept}</p>
+              <div className="flex flex-wrap items-center gap-2">
+                <p className="font-medium">{expense.concept}</p>
+                {expense._offlineStatus === "pending" ? (
+                  <Badge
+                    variant="outline"
+                    title={expense._offlineError || "Pendiente de sincronizar"}
+                  >
+                    Pendiente
+                  </Badge>
+                ) : null}
+              </div>
               {expense.notes ? (
                 <p className="text-xs text-muted-foreground">{expense.notes}</p>
               ) : null}
@@ -605,32 +928,44 @@ export default function GastosContent() {
         id: "actions",
         header: "",
         enableSorting: false,
-        cell: ({ row }) => (
-          <div className="flex items-center gap-1">
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              aria-label="Editar gasto"
-              onClick={() => startEditingExpense(row.original)}
-            >
-              <Pencil className="h-4 w-4" />
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              aria-label="Eliminar gasto"
-              onClick={() => setExpenseToDelete(row.original)}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </div>
-        ),
+        cell: ({ row }) => {
+          if (row.original._offlineStatus === "pending") {
+            return (
+              <Badge variant="outline" className="whitespace-nowrap">
+                En cola
+              </Badge>
+            );
+          }
+
+          return (
+            <div className="flex items-center gap-1">
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                aria-label="Editar gasto"
+                disabled={!isOnline}
+                onClick={() => startEditingExpense(row.original)}
+              >
+                <Pencil className="h-4 w-4" />
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                aria-label="Eliminar gasto"
+                disabled={!isOnline}
+                onClick={() => setExpenseToDelete(row.original)}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+          );
+        },
       },
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
+    [isOnline],
   );
 
   if (isCheckingSession) {
@@ -822,6 +1157,46 @@ export default function GastosContent() {
           {error ? (
             <div className="mb-6 rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
               {error}
+            </div>
+          ) : null}
+
+          {!isOnline ? (
+            <div className="mb-6 flex items-center gap-3 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
+              <WifiOff className="h-4 w-4 shrink-0" />
+              <span>
+                Sin conexión. Los gastos nuevos se guardarán en este dispositivo
+                y se sincronizarán cuando vuelva internet.
+              </span>
+            </div>
+          ) : null}
+
+          {pendingOfflineExpenses.length > 0 ? (
+            <div className="mb-6 flex flex-col gap-3 rounded-xl border border-border bg-card px-4 py-3 text-sm sm:flex-row sm:items-center sm:justify-between">
+              <div className="space-y-1">
+                <p className="font-medium">
+                  {pendingOfflineExpenses.length === 1
+                    ? "1 gasto pendiente por sincronizar"
+                    : `${pendingOfflineExpenses.length} gastos pendientes por sincronizar`}
+                </p>
+                <p className="text-muted-foreground">
+                  Se enviarán automáticamente al recuperar conexión.
+                </p>
+              </div>
+
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={!isOnline || isSyncingOfflineExpenses}
+                onClick={() => syncPendingExpenses()}
+              >
+                <RefreshCw
+                  className={`mr-2 h-4 w-4 ${
+                    isSyncingOfflineExpenses ? "animate-spin" : ""
+                  }`}
+                />
+                {isSyncingOfflineExpenses ? "Sincronizando..." : "Reintentar"}
+              </Button>
             </div>
           ) : null}
 
@@ -1158,11 +1533,13 @@ export default function GastosContent() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="ALL">Todos los meses</SelectItem>
-                        {availableMonths.filter(isValidYearMonth).map((m) => (
-                          <SelectItem key={m} value={m}>
-                            {formatMonthLabel(m)}
-                          </SelectItem>
-                        ))}
+                        {availableMonthsWithPending
+                          .filter(isValidYearMonth)
+                          .map((m) => (
+                            <SelectItem key={m} value={m}>
+                              {formatMonthLabel(m)}
+                            </SelectItem>
+                          ))}
                       </SelectContent>
                     </Select>
 
