@@ -126,6 +126,8 @@ El consumo elegible se calcula sobre el ciclo vigente de cada tarjeta:
 - Suscripciones con tarjeta cuya fecha de cargo cae dentro del ciclo vigente.
 - Compras a meses solo si `purchaseDate` cae dentro del ciclo vigente; cuenta el `totalAmount` de la compra en ese corte, no la cuota mensual de ciclos posteriores.
 
+Cada tarjeta incluye un botón **Desglose** que muestra los movimientos elegibles por tipo y su importe, para verificar el avance del consumo mínimo.
+
 ### PWA / modo offline
 
 La app puede instalarse como PWA y soporta captura offline de gastos diarios en `/gastos`.

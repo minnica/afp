@@ -20,8 +20,15 @@ import { supabase } from "@/lib/supabase";
 import { ensureUserSetup } from "@/lib/userSetup";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import PageSkeleton from "@/components/layout/PageSkeleton";
 import {
   AlertTriangle,
@@ -915,6 +922,7 @@ function CardMonthlyComparisonChart({ cardMonthlyComparisonByMonth, currentMonth
 
 function CardUsageWaiverProgress({ cardUsageWaiversByMonth, currentMonthIndex }) {
   const [selectedMonthIndex, setSelectedMonthIndex] = useState(currentMonthIndex);
+  const [selectedItem, setSelectedItem] = useState(null);
   const items = useMemo(() => {
     const monthItems = cardUsageWaiversByMonth[selectedMonthIndex] || [];
 
@@ -950,7 +958,7 @@ function CardUsageWaiverProgress({ cardUsageWaiversByMonth, currentMonthIndex })
             return (
               <div
                 key={item.card.id}
-                className="grid gap-2 md:grid-cols-[230px_1fr_160px] md:items-center"
+                className="grid gap-2 md:grid-cols-[190px_1fr_160px_auto] md:items-center"
               >
                 <div className="min-w-0">
                   <p className="truncate text-sm font-medium">
@@ -983,12 +991,119 @@ function CardUsageWaiverProgress({ cardUsageWaiversByMonth, currentMonthIndex })
                     / {formatMoney(item.minimumAmount)}
                   </span>
                 </div>
+
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => setSelectedItem(item)}
+                >
+                  Desglose
+                </Button>
               </div>
             );
           })}
         </div>
       </CardContent>
+
+      <Dialog
+        open={Boolean(selectedItem)}
+        onOpenChange={(open) => {
+          if (!open) setSelectedItem(null);
+        }}
+      >
+        {selectedItem ? (
+          <DialogContent className="flex max-h-[90svh] flex-col sm:max-w-4xl">
+            <DialogHeader>
+              <DialogTitle>Desglose — {selectedItem.card.name}</DialogTitle>
+            </DialogHeader>
+            <div className="overflow-y-auto">
+              <CardUsageWaiverBreakdown item={selectedItem} />
+            </div>
+          </DialogContent>
+        ) : null}
+      </Dialog>
     </Card>
+  );
+}
+
+function formatBreakdownDate(dateString) {
+  if (!dateString) return "-";
+
+  return format(new Date(dateString), "d MMM", { locale: es });
+}
+
+function CardUsageWaiverBreakdown({ item }) {
+  const breakdown = item.breakdown || {};
+  const sections = [
+    {
+      title: "Gastos diarios",
+      amount: breakdown.dailyExpensesAmount,
+      items: breakdown.includedDailyExpenses || [],
+      emptyText: "No hay gastos diarios que cuenten en este ciclo.",
+      getName: (entry) => entry.concept,
+      getDescription: (entry) =>
+        `${formatBreakdownDate(entry.date)}${entry.categoryName ? ` · ${entry.categoryName}` : ""}`,
+    },
+    {
+      title: "Suscripciones",
+      amount: breakdown.subscriptionsAmount,
+      items: breakdown.includedSubscriptions || [],
+      emptyText: "No hay suscripciones que cuenten en este ciclo.",
+      getName: (entry) => entry.name,
+      getDescription: (entry) =>
+        `${formatBreakdownDate(entry.chargeDate)}${entry.categoryName ? ` · ${entry.categoryName}` : ""}`,
+    },
+    {
+      title: "Compras a meses",
+      amount: breakdown.installmentPurchasesAmount,
+      items: breakdown.includedInstallmentPurchases || [],
+      emptyText: "No hay compras a meses que cuenten en este ciclo.",
+      getName: (entry) => entry.concept,
+      getDescription: (entry) =>
+        `${formatBreakdownDate(entry.purchaseDate)} · compra total${entry.categoryName ? ` · ${entry.categoryName}` : ""}`,
+    },
+  ];
+
+  return (
+    <div className="space-y-4">
+      <p className="text-sm text-muted-foreground">
+        Ciclo del {formatBreakdownDate(item.selectedCycle?.startDate)} al {formatBreakdownDate(item.selectedCycle?.cutDate)}
+      </p>
+
+      <div className="grid gap-4 lg:grid-cols-3">
+        {sections.map((section) => (
+          <div key={section.title} className="rounded-xl border border-border bg-card p-3">
+            <h5 className="mb-3 text-sm font-medium">
+              {section.title} ({formatMoney(section.amount)})
+            </h5>
+
+            {section.items.length === 0 ? (
+              <p className="text-sm text-muted-foreground">{section.emptyText}</p>
+            ) : (
+              <div className="space-y-2">
+                {section.items.map((entry) => (
+                  <div
+                    key={entry.id}
+                    className="rounded-lg border border-border bg-background/60 px-3 py-2"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-medium">{section.getName(entry)}</p>
+                        <p className="mt-1 truncate text-xs text-muted-foreground">
+                          {section.getDescription(entry)}
+                        </p>
+                      </div>
+                      <p className="shrink-0 text-sm font-semibold">{formatMoney(entry.amount)}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 

@@ -31,10 +31,16 @@ const dashboardCycleSelect = {
 
 const dashboardExpenseSelect = {
   id: true,
+  concept: true,
   date: true,
   amount: true,
   cardId: true,
   categoryId: true,
+  category: {
+    select: {
+      name: true,
+    },
+  },
 };
 
 const dashboardSubscriptionSelect = {
@@ -50,6 +56,11 @@ const dashboardSubscriptionSelect = {
   startYear: true,
   isActive: true,
   deactivatedAt: true,
+  category: {
+    select: {
+      name: true,
+    },
+  },
   dailyExpenses: {
     select: {
       id: true,
@@ -62,12 +73,18 @@ const dashboardPurchaseSelect = {
   id: true,
   cardId: true,
   categoryId: true,
+  concept: true,
   purchaseDate: true,
   totalAmount: true,
   months: true,
   manualMonthlyPayment: true,
   initialPaymentsMade: true,
   status: true,
+  category: {
+    select: {
+      name: true,
+    },
+  },
 };
 
 const CARD_USAGE_MINIMUMS = [
@@ -349,22 +366,6 @@ function findCycleForCardByMonth(cyclesWithAmounts, cardId, year, month) {
   );
 }
 
-function calculateSubscriptionAmountInCycle(subscription, cycle) {
-  if (subscription.paymentMethod !== "CARD") return 0;
-  if (!shouldIncludeSubscriptionInCycle(subscription, cycle)) return 0;
-
-  const validCharges = getSubscriptionChargeDatesInsideCycle(
-    subscription,
-    cycle,
-  ).filter((chargeDate) => {
-    if (subscription.isActive) return true;
-    if (!subscription.deactivatedAt) return false;
-    return new Date(chargeDate) <= new Date(subscription.deactivatedAt);
-  });
-
-  return validCharges.length * Number(subscription.amount || 0);
-}
-
 function buildCardUsageWaivers({
   cards,
   cyclesWithAmounts,
@@ -416,13 +417,54 @@ function buildCardUsageWaivers({
       )
       .reduce((sum, expense) => sum + Number(expense.amount || 0), 0);
 
-    const subscriptionsAmount = subscriptions
-      .filter((subscription) => subscription.cardId === card.id)
-      .reduce((sum, subscription) => {
-        return sum + calculateSubscriptionAmountInCycle(subscription, selectedCycle);
-      }, 0);
+    const includedDailyExpenses = expenses
+      .filter((expense) => expense.cardId === card.id)
+      .filter((expense) =>
+        isDateInsideRange(
+          expense.date,
+          selectedCycle.startDate,
+          selectedCycle.cutDate,
+        ),
+      )
+      .map((expense) => ({
+        id: expense.id,
+        concept: expense.concept,
+        amount: Number(expense.amount || 0),
+        date: expense.date,
+        categoryName: expense.category?.name || null,
+      }));
 
-    const installmentPurchasesAmount = purchases
+    const includedSubscriptions = subscriptions
+      .filter((subscription) => subscription.cardId === card.id)
+      .filter((subscription) => subscription.paymentMethod === "CARD")
+      .filter((subscription) =>
+        shouldIncludeSubscriptionInCycle(subscription, selectedCycle),
+      )
+      .flatMap((subscription) => {
+        const charges = getSubscriptionChargeDatesInsideCycle(
+          subscription,
+          selectedCycle,
+        ).filter((chargeDate) => {
+          if (subscription.isActive) return true;
+          if (!subscription.deactivatedAt) return false;
+          return new Date(chargeDate) <= new Date(subscription.deactivatedAt);
+        });
+
+        return charges.map((chargeDate) => ({
+          id: `${subscription.id}-${chargeDate.toISOString()}`,
+          name: subscription.name,
+          amount: Number(subscription.amount || 0),
+          chargeDate,
+          categoryName: subscription.category?.name || null,
+        }));
+      });
+
+    const subscriptionsAmount = includedSubscriptions.reduce(
+      (sum, subscription) => sum + subscription.amount,
+      0,
+    );
+
+    const includedInstallmentPurchases = purchases
       .filter((purchase) => purchase.cardId === card.id)
       .filter((purchase) => purchase.status === "ACTIVE")
       .filter((purchase) =>
@@ -432,7 +474,19 @@ function buildCardUsageWaivers({
           selectedCycle.cutDate,
         ),
       )
-      .reduce((sum, purchase) => sum + Number(purchase.totalAmount || 0), 0);
+      .map((purchase) => ({
+        id: purchase.id,
+        concept: purchase.concept,
+        amount: Number(purchase.totalAmount || 0),
+        purchaseDate: purchase.purchaseDate,
+        months: purchase.months,
+        categoryName: purchase.category?.name || null,
+      }));
+
+    const installmentPurchasesAmount = includedInstallmentPurchases.reduce(
+      (sum, purchase) => sum + purchase.amount,
+      0,
+    );
 
     const eligibleSpend =
       dailyExpensesAmount + subscriptionsAmount + installmentPurchasesAmount;
@@ -466,6 +520,9 @@ function buildCardUsageWaivers({
         dailyExpensesAmount,
         subscriptionsAmount,
         installmentPurchasesAmount,
+        includedDailyExpenses,
+        includedSubscriptions,
+        includedInstallmentPurchases,
       },
     };
   });
