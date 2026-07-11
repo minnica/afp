@@ -59,7 +59,7 @@ Auth por Supabase. DB PostgreSQL vía Prisma + Supabase. Modo oscuro forzado.
 | `GET /api/subscriptions` | `src/app/api/subscriptions/route.js` |
 | `GET /api/receivables` | `src/app/api/receivables/route.js` |
 | `GET /api/payables` | `src/app/api/payables/route.js` |
-| `GET /api/dashboard` | `src/app/api/dashboard/route.js` | Incluye `weeklyComparisonByMonth`, `weeklyComparisonByCategoryAndMonth` (filtrado por categoría) y `categories` para el comparativo mes vs mes |
+| `GET /api/dashboard` | `src/app/api/dashboard/route.js` | Incluye `weeklyComparisonByMonth`, `weeklyComparisonByCategoryAndMonth` (filtrado por categoría), `categories` para el comparativo mes vs mes y `cardUsageWaivers` para progreso de consumo mínimo por tarjeta |
 | `GET /api/settings` | `src/app/api/settings/route.js` |
 | `POST /api/setup-user` | `src/app/api/setup-user/route.js` |
 
@@ -110,6 +110,21 @@ Reglas de cálculo:
 - `currentMonth` de un ciclo objetivo = `(targetCycleIndex - firstCycleIndex) + 1`.
 - Se incluye en el ciclo solo si `1 <= currentMonth <= months` (y, para `ACTIVE`, si `purchaseDate` no es posterior al `cutDate` del ciclo).
 - `initialPaymentsMade` **no** se usa para este cálculo — solo sirve como ancla en `getNextPaymentDueDate` (`ComprasAMesesContent.jsx`). Antes el cálculo mezclaba un valor dinámico con un fallback estático `initialPaymentsMade + 1`, lo que dejaba la cuota "congelada" en vez de avanzar mes a mes (y de excluirse al completarse).
+
+### Dashboard — consumo mínimo para exentar comisión de tarjeta
+
+`/dashboard` muestra una sección minimalista de consumo mínimo usando `cardUsageWaiversByMonth` de `GET /api/dashboard`; solo aparecen tarjetas con mínimo configurado y el selector de mes corresponde al mes de corte (`CardCycle.month`) del ciclo. Cada fila muestra la fecha de corte tomada y se ordena por proximidad del corte: primero las tarjetas que ya cortaron o están más cerca de cortar, al final las más lejanas.
+
+Reglas actuales:
+- HSBC: consumo mínimo de $300 por corte.
+- BANAMEX: consumo mínimo de $300 por corte.
+- SANTANDER: consumo mínimo de $200 por corte.
+- NU, DIDI, BBVA, Mercado Pago y cualquier otra tarjeta no tienen mínimo configurado para este concepto y no aparecen en esta sección.
+
+El consumo elegible se calcula sobre el ciclo vigente de cada tarjeta:
+- Gastos diarios con `cardId` dentro de `startDate` y `cutDate`.
+- Suscripciones con tarjeta cuya fecha de cargo cae dentro del ciclo vigente.
+- Compras a meses solo si `purchaseDate` cae dentro del ciclo vigente; cuenta el `totalAmount` de la compra en ese corte, no la cuota mensual de ciclos posteriores.
 
 ### PWA / modo offline
 

@@ -70,6 +70,12 @@ const dashboardPurchaseSelect = {
   status: true,
 };
 
+const CARD_USAGE_MINIMUMS = [
+  { key: "HSBC", label: "HSBC", minimumAmount: 300 },
+  { key: "BANAMEX", label: "BANAMEX", minimumAmount: 300 },
+  { key: "SANTANDER", label: "SANTANDER", minimumAmount: 200 },
+];
+
 function groupBy(items, getKey) {
   const map = new Map();
 
@@ -128,6 +134,22 @@ function getMonthlyPaymentUsed(purchase) {
   if (!months) return 0;
 
   return manual && manual > 0 ? manual : totalAmount / months;
+}
+
+function normalizeCardName(name) {
+  return String(name || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toUpperCase();
+}
+
+function getCardUsageRule(card) {
+  const normalizedName = normalizeCardName(card.name);
+
+  return (
+    CARD_USAGE_MINIMUMS.find((rule) => normalizedName.includes(rule.key)) ||
+    null
+  );
 }
 
 // Primer ciclo donde cae la compra: si el día de compra es posterior al corte
@@ -317,6 +339,136 @@ function calculateCycleAmount({
     statementAmount,
     difference,
   };
+}
+
+function findCycleForCardByMonth(cyclesWithAmounts, cardId, year, month) {
+  return (
+    cyclesWithAmounts
+      .filter((cycle) => cycle.cardId === cardId)
+      .find((cycle) => cycle.year === year && cycle.month === month) || null
+  );
+}
+
+function calculateSubscriptionAmountInCycle(subscription, cycle) {
+  if (subscription.paymentMethod !== "CARD") return 0;
+  if (!shouldIncludeSubscriptionInCycle(subscription, cycle)) return 0;
+
+  const validCharges = getSubscriptionChargeDatesInsideCycle(
+    subscription,
+    cycle,
+  ).filter((chargeDate) => {
+    if (subscription.isActive) return true;
+    if (!subscription.deactivatedAt) return false;
+    return new Date(chargeDate) <= new Date(subscription.deactivatedAt);
+  });
+
+  return validCharges.length * Number(subscription.amount || 0);
+}
+
+function buildCardUsageWaivers({
+  cards,
+  cyclesWithAmounts,
+  expenses,
+  subscriptions,
+  purchases,
+  year,
+  month,
+}) {
+  return cards.flatMap((card) => {
+    const rule = getCardUsageRule(card);
+
+    if (!rule) return [];
+
+    const selectedCycle = findCycleForCardByMonth(
+      cyclesWithAmounts,
+      card.id,
+      year,
+      month,
+    );
+
+    if (!selectedCycle) {
+      return {
+        card,
+        applies: true,
+        bank: rule.label,
+        minimumAmount: rule.minimumAmount,
+        eligibleSpend: 0,
+        remainingAmount: rule.minimumAmount,
+        progress: 0,
+        isExempt: false,
+        selectedCycle: null,
+        breakdown: {
+          dailyExpensesAmount: 0,
+          subscriptionsAmount: 0,
+          installmentPurchasesAmount: 0,
+        },
+      };
+    }
+
+    const dailyExpensesAmount = expenses
+      .filter((expense) => expense.cardId === card.id)
+      .filter((expense) =>
+        isDateInsideRange(
+          expense.date,
+          selectedCycle.startDate,
+          selectedCycle.cutDate,
+        ),
+      )
+      .reduce((sum, expense) => sum + Number(expense.amount || 0), 0);
+
+    const subscriptionsAmount = subscriptions
+      .filter((subscription) => subscription.cardId === card.id)
+      .reduce((sum, subscription) => {
+        return sum + calculateSubscriptionAmountInCycle(subscription, selectedCycle);
+      }, 0);
+
+    const installmentPurchasesAmount = purchases
+      .filter((purchase) => purchase.cardId === card.id)
+      .filter((purchase) => purchase.status === "ACTIVE")
+      .filter((purchase) =>
+        isDateInsideRange(
+          purchase.purchaseDate,
+          selectedCycle.startDate,
+          selectedCycle.cutDate,
+        ),
+      )
+      .reduce((sum, purchase) => sum + Number(purchase.totalAmount || 0), 0);
+
+    const eligibleSpend =
+      dailyExpensesAmount + subscriptionsAmount + installmentPurchasesAmount;
+    const minimumAmount = rule?.minimumAmount || null;
+    const remainingAmount = minimumAmount
+      ? Math.max(minimumAmount - eligibleSpend, 0)
+      : null;
+    const progress = minimumAmount
+      ? Math.min((eligibleSpend / minimumAmount) * 100, 100)
+      : 0;
+
+    return {
+      card,
+      applies: true,
+      bank: rule.label,
+      minimumAmount,
+      eligibleSpend,
+      remainingAmount,
+      progress,
+      isExempt: Boolean(minimumAmount && eligibleSpend >= minimumAmount),
+      selectedCycle: {
+        id: selectedCycle.id,
+        startDate: selectedCycle.startDate,
+        cutDate: selectedCycle.cutDate,
+        dueDate: selectedCycle.dueDate,
+        month: selectedCycle.month,
+        year: selectedCycle.year,
+        displayStatus: selectedCycle.displayStatus,
+      },
+      breakdown: {
+        dailyExpensesAmount,
+        subscriptionsAmount,
+        installmentPurchasesAmount,
+      },
+    };
+  });
 }
 
 function getDisplayStatus(cycle) {
@@ -1243,6 +1395,19 @@ export async function GET(request) {
     );
     const receivableNotices = buildReceivableNotices(activeReceivables, now);
     const cutCycleNotices = buildCutCycleNotices(cyclesWithAmounts, cards, now);
+    const cardUsageWaiversByMonth = {};
+    for (let m = 0; m < 12; m++) {
+      cardUsageWaiversByMonth[m] = buildCardUsageWaivers({
+        cards,
+        cyclesWithAmounts,
+        expenses,
+        subscriptions,
+        purchases,
+        year: currentYear,
+        month: m + 1,
+      });
+    }
+    const cardUsageWaivers = cardUsageWaiversByMonth[currentMonth - 1] || [];
 
     const importantNotices = [
       ...cardPaymentNotices,
@@ -1281,6 +1446,8 @@ export async function GET(request) {
       weeklyComparisonByMonth,
       weeklyComparisonByCategoryAndMonth,
       cardMonthlyComparisonByMonth,
+      cardUsageWaivers,
+      cardUsageWaiversByMonth,
       categories: categories.map((c) => ({ id: c.id, name: c.name })),
       activeReceivables,
       importantNotices,

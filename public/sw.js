@@ -1,4 +1,4 @@
-const CACHE_NAME = "afp-shell-v1";
+const CACHE_NAME = "afp-shell-v2";
 const APP_SHELL_URLS = ["/", "/gastos", "/manifest.webmanifest", "/icons/app-icon.svg"];
 
 self.addEventListener("install", (event) => {
@@ -38,7 +38,7 @@ self.addEventListener("fetch", (event) => {
   if (url.origin !== self.location.origin) return;
 
   if (url.pathname.startsWith("/_next/static/")) {
-    event.respondWith(cacheFirst(request));
+    event.respondWith(networkFirst(request));
     return;
   }
 

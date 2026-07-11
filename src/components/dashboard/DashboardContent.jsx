@@ -23,7 +23,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import PageSkeleton from "@/components/layout/PageSkeleton";
-import { AlertTriangle, Bell, CalendarClock, Scissors } from "lucide-react";
+import {
+  AlertTriangle,
+  Bell,
+  CalendarClock,
+  Scissors,
+} from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   Select,
@@ -165,6 +170,60 @@ function formatCompactDate(dateString) {
   return `${dateText} [${diffDays}]`;
 }
 
+function getCutDateSortValues(cutDateString) {
+  if (!cutDateString) {
+    return {
+      distance: Number.MAX_SAFE_INTEGER,
+      time: Number.MAX_SAFE_INTEGER,
+    };
+  }
+
+  const cutDate = new Date(cutDateString);
+
+  if (Number.isNaN(cutDate.getTime())) {
+    return {
+      distance: Number.MAX_SAFE_INTEGER,
+      time: Number.MAX_SAFE_INTEGER,
+    };
+  }
+
+  const today = new Date();
+  const todayUtc = Date.UTC(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate(),
+  );
+  const cutUtc = Date.UTC(
+    cutDate.getUTCFullYear(),
+    cutDate.getUTCMonth(),
+    cutDate.getUTCDate(),
+  );
+  const diffDays = Math.round((cutUtc - todayUtc) / 86400000);
+
+  return {
+    distance: Math.abs(diffDays),
+    time: cutUtc,
+  };
+}
+
+function compareByCutDateProximity(a, b) {
+  const aCut = getCutDateSortValues(a.selectedCycle?.cutDate);
+  const bCut = getCutDateSortValues(b.selectedCycle?.cutDate);
+
+  if (aCut.distance !== bCut.distance) {
+    return aCut.distance - bCut.distance;
+  }
+
+  if (aCut.time !== bCut.time) {
+    return aCut.time - bCut.time;
+  }
+
+  return String(a.card?.name || "").localeCompare(
+    String(b.card?.name || ""),
+    "es",
+  );
+}
+
 function getStatusLabel(status) {
   const labels = {
     OPEN: "Abierto",
@@ -282,6 +341,9 @@ export default function DashboardContent() {
   const weeklyComparisonByCategoryAndMonth = dashboard?.weeklyComparisonByCategoryAndMonth || {};
   const dashboardCategories = dashboard?.categories || [];
   const cardMonthlyComparisonByMonth = dashboard?.cardMonthlyComparisonByMonth || {};
+  const cardUsageWaiversByMonth = useMemo(() => {
+    return dashboard?.cardUsageWaiversByMonth || {};
+  }, [dashboard?.cardUsageWaiversByMonth]);
 
   const prevMonthIndex = (currentMonthIndex - 1 + 12) % 12;
   const nextMonthIndex = (currentMonthIndex + 1) % 12;
@@ -299,6 +361,12 @@ export default function DashboardContent() {
           : [];
 
   const importantNotices = dashboard?.importantNotices || [];
+
+  const hasCardUsageWaivers = useMemo(() => {
+    return Object.values(cardUsageWaiversByMonth).some((items) => {
+      return Array.isArray(items) && items.length > 0;
+    });
+  }, [cardUsageWaiversByMonth]);
 
   const paymentsByMonth = useMemo(() => {
     const map = {};
@@ -334,7 +402,17 @@ export default function DashboardContent() {
         ) : null}
 
         <div className="space-y-6">
-          <ImportantNoticesCard notices={importantNotices} />
+          {hasCardUsageWaivers ? (
+            <div className="grid gap-6 lg:grid-cols-2">
+              <ImportantNoticesCard notices={importantNotices} />
+              <CardUsageWaiverProgress
+                cardUsageWaiversByMonth={cardUsageWaiversByMonth}
+                currentMonthIndex={currentMonthIndex}
+              />
+            </div>
+          ) : (
+            <ImportantNoticesCard notices={importantNotices} />
+          )}
 
           <Card className="rounded-2xl border-border bg-card">
             <CardHeader>
@@ -830,6 +908,85 @@ function CardMonthlyComparisonChart({ cardMonthlyComparisonByMonth, currentMonth
         <p className="mt-3 text-center text-xs text-muted-foreground">
           * Monto estimado cuando no hay estado de cuenta registrado
         </p>
+      </CardContent>
+    </Card>
+  );
+}
+
+function CardUsageWaiverProgress({ cardUsageWaiversByMonth, currentMonthIndex }) {
+  const [selectedMonthIndex, setSelectedMonthIndex] = useState(currentMonthIndex);
+  const items = useMemo(() => {
+    const monthItems = cardUsageWaiversByMonth[selectedMonthIndex] || [];
+
+    return [...monthItems].sort(compareByCutDateProximity);
+  }, [cardUsageWaiversByMonth, selectedMonthIndex]);
+
+  if (!items.length) {
+    return null;
+  }
+
+  return (
+    <Card className="rounded-2xl border-border bg-card">
+      <CardHeader>
+        <div className="flex flex-col items-center gap-3">
+          <CardTitle className="text-lg font-semibold uppercase text-center">
+            Consumo mínimo
+          </CardTitle>
+          <MonthSelector
+            value={selectedMonthIndex}
+            onChange={setSelectedMonthIndex}
+          />
+        </div>
+      </CardHeader>
+
+      <CardContent>
+        <div className="space-y-4">
+          {items.map((item) => {
+            const progress = Math.max(0, Math.min(Number(item.progress || 0), 100));
+            const barClass = item.isExempt
+              ? "bg-emerald-400"
+              : "bg-blue-400";
+
+            return (
+              <div
+                key={item.card.id}
+                className="grid gap-2 md:grid-cols-[230px_1fr_160px] md:items-center"
+              >
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium">
+                    {item.card.name}
+                  </p>
+                  <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                    Corte: {formatCompactDate(item.selectedCycle?.cutDate)}
+                  </p>
+                </div>
+
+                <div
+                  className="h-2.5 overflow-hidden rounded-full bg-muted"
+                  role="progressbar"
+                  aria-label={`Progreso de consumo de ${item.card.name}`}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-valuenow={Math.round(progress)}
+                >
+                  <div
+                    className={`h-full rounded-full transition-[width] duration-300 ${barClass}`}
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
+
+                <div className="flex items-baseline justify-between gap-3 text-sm md:justify-end md:text-right">
+                  <span className="font-medium">
+                    {formatMoney(item.eligibleSpend)}
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    / {formatMoney(item.minimumAmount)}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </CardContent>
     </Card>
   );
