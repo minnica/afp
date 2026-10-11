@@ -57,6 +57,7 @@ model User {
 
   cards                Card[]
   cardCycles           CardCycle[]
+  cardCycleCredits     CardCycleCredit[]
   categories           Category[]
   people               Person[]
   incomeTypes          IncomeType[]
@@ -77,6 +78,7 @@ model Card {
   usualCutDay Int
   usualDueDay Int
   notes       String?
+  usagePolicy Json?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -104,16 +106,38 @@ model CardCycle {
   paidAt          DateTime?
   paidAmount      Decimal?
   notes           String?
+  usageReconciliation Json?
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   card Card @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  credits CardCycleCredit[]
 
   @@unique([cardId, month, year])
   @@index([userId])
   @@index([cardId])
   @@map("card_cycles")
+}
+
+model CardCycleCredit {
+  id          String   @id @default(uuid())
+  userId      String
+  cycleId     String
+  incomeId    String
+  amount      Decimal
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user   User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cycle  CardCycle @relation(fields: [cycleId], references: [id], onDelete: Cascade)
+  income Income    @relation(fields: [incomeId], references: [id], onDelete: Restrict)
+
+  @@unique([cycleId, incomeId])
+  @@index([userId])
+  @@index([incomeId])
+  @@map("card_cycle_credits")
 }
 
 model Category {
@@ -202,6 +226,7 @@ model InstallmentPurchase {
   totalAmount          Decimal
   months               Int
   manualMonthlyPayment Decimal?
+  statementReconciliations Json?
   initialPaymentsMade  Int                       @default(0)
   personId             String?
   receivableAccountId  String?
@@ -319,6 +344,7 @@ model Income {
   user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   incomeType        IncomeType         @relation(fields: [incomeTypeId], references: [id])
   receivableAccount ReceivableAccount? @relation(fields: [receivableAccountId], references: [id], onDelete: SetNull)
+  cardCycleCredits  CardCycleCredit[]
 
   @@index([userId, date])
   @@index([incomeTypeId])

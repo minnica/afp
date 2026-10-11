@@ -7,6 +7,7 @@ import { es } from "date-fns/locale";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { ensureUserSetup } from "@/lib/userSetup";
+import { getLatestInstallmentStatement } from "@/lib/calculations/installmentStatements";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -98,7 +99,11 @@ function getNextPaymentDueDate(purchase) {
 
   // Target cycle = base + payments already made
   const paymentsMade = Number(purchase.initialPaymentsMade || 0);
-  const target = new Date(Date.UTC(baseCycleYear, baseCycleMonthIdx + paymentsMade, 1));
+  const statement = getLatestInstallmentStatement(purchase);
+  if (statement && statement.paymentNumber >= Number(purchase.months)) return null;
+  const target = statement
+    ? new Date(Date.UTC(statement.year, statement.month, 1))
+    : new Date(Date.UTC(baseCycleYear, baseCycleMonthIdx + paymentsMade, 1));
   const tYear = target.getUTCFullYear();
   const tMonthIdx = target.getUTCMonth();
 
@@ -427,6 +432,15 @@ export default function ComprasAMesesContent() {
           return (
             <div className="min-w-0">
               <p className="font-medium">{purchase.concept}</p>
+              {purchase.verifiedStatementDate ? (
+                <p className="text-xs text-muted-foreground">
+                  Estado de cuenta: {format(
+                    new Date(purchase.verifiedStatementDate + "-01T12:00:00Z"),
+                    "MMM yyyy",
+                    { locale: es },
+                  )}
+                </p>
+              ) : null}
               {purchase.notes ? (
                 <p className="text-xs text-muted-foreground">{purchase.notes}</p>
               ) : null}

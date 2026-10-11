@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getLatestInstallmentStatement } from "@/lib/calculations/installmentStatements";
 
 const purchaseSelect = {
   id: true,
@@ -10,6 +11,7 @@ const purchaseSelect = {
   totalAmount: true,
   months: true,
   manualMonthlyPayment: true,
+  statementReconciliations: true,
   initialPaymentsMade: true,
   personId: true,
   receivableAccountId: true,
@@ -69,6 +71,8 @@ function formatPurchase(purchase) {
   const remainingBalance = remainingMonths * monthlyPaymentUsed;
   const currentMonth = Math.min(paymentsMade + 1, months);
 
+  const verifiedStatement = getLatestInstallmentStatement(purchase);
+
   return {
     ...purchase,
     calculatedMonthlyPayment,
@@ -76,6 +80,15 @@ function formatPurchase(purchase) {
     currentMonth,
     remainingMonths,
     remainingBalance,
+    ...(verifiedStatement
+      ? {
+          currentMonth: verifiedStatement.paymentNumber,
+          monthlyPaymentUsed: Number(verifiedStatement.amount),
+          remainingMonths: Math.max(months - verifiedStatement.paymentNumber, 0),
+          remainingBalance: Number(verifiedStatement.remainingBalance),
+          verifiedStatementDate: verifiedStatement.year + "-" + String(verifiedStatement.month).padStart(2, "0"),
+        }
+      : {}),
   };
 }
 

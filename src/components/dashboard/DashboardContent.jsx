@@ -944,6 +944,9 @@ function CardUsageWaiverProgress({ cardUsageWaiversByMonth, currentMonthIndex })
             value={selectedMonthIndex}
             onChange={setSelectedMonthIndex}
           />
+          <p className="text-center text-xs text-muted-foreground">
+            Compras del período para evitar la comisión por falta de uso.
+          </p>
         </div>
       </CardHeader>
 
@@ -965,7 +968,10 @@ function CardUsageWaiverProgress({ cardUsageWaiversByMonth, currentMonthIndex })
                     {item.card.name}
                   </p>
                   <p className="mt-0.5 truncate text-xs text-muted-foreground">
-                    Corte: {formatCompactDate(item.selectedCycle?.cutDate)}
+                    {item.product}
+                  </p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    Corte {item.periodVerified ? "verificado" : "previsto"}: {formatCompactDate(item.selectedCycle?.cutDate)}
                   </p>
                 </div>
 
@@ -983,13 +989,22 @@ function CardUsageWaiverProgress({ cardUsageWaiversByMonth, currentMonthIndex })
                   />
                 </div>
 
-                <div className="flex items-baseline justify-between gap-3 text-sm md:justify-end md:text-right">
-                  <span className="font-medium">
-                    {formatMoney(item.eligibleSpend)}
-                  </span>
-                  <span className="text-xs text-muted-foreground">
-                    / {formatMoney(item.minimumAmount)}
-                  </span>
+                <div className="space-y-1 text-sm md:text-right">
+                  <p>
+                    <span className="font-medium">{formatMoney(item.eligibleSpend)}</span>
+                    <span className="text-xs text-muted-foreground"> / {formatMoney(item.minimumAmount)}</span>
+                  </p>
+                  <p className={`text-xs ${item.isExempt ? "text-emerald-400" : "text-muted-foreground"}`}>
+                    {item.status === "NO_CYCLE" ? "Sin ciclo registrado"
+                      : item.status === "FUTURE" ? "Período futuro"
+                      : item.isExempt ? "Meta alcanzada"
+                      : `${item.status === "NOT_MET" ? "Faltaron" : "Faltan por registrar"} ${formatMoney(item.remainingAmount)}`}
+                  </p>
+                  {item.projectedAmount > 0 ? (
+                    <p className="text-xs text-muted-foreground">
+                      {formatMoney(item.projectedAmount)} previstos, por confirmar
+                    </p>
+                  ) : null}
                 </div>
 
                 <Button
@@ -1046,7 +1061,7 @@ function CardUsageWaiverBreakdown({ item }) {
         `${formatBreakdownDate(entry.date)}${entry.categoryName ? ` · ${entry.categoryName}` : ""}`,
     },
     {
-      title: "Suscripciones",
+      title: "Suscripciones confirmadas",
       amount: breakdown.subscriptionsAmount,
       items: breakdown.includedSubscriptions || [],
       emptyText: "No hay suscripciones que cuenten en este ciclo.",
@@ -1055,7 +1070,7 @@ function CardUsageWaiverBreakdown({ item }) {
         `${formatBreakdownDate(entry.chargeDate)}${entry.categoryName ? ` · ${entry.categoryName}` : ""}`,
     },
     {
-      title: "Compras a meses",
+      title: "Compras nuevas a meses",
       amount: breakdown.installmentPurchasesAmount,
       items: breakdown.includedInstallmentPurchases || [],
       emptyText: "No hay compras a meses que cuenten en este ciclo.",
@@ -1063,12 +1078,32 @@ function CardUsageWaiverBreakdown({ item }) {
       getDescription: (entry) =>
         `${formatBreakdownDate(entry.purchaseDate)} · compra total${entry.categoryName ? ` · ${entry.categoryName}` : ""}`,
     },
+    ...(breakdown.excludedExpenses?.length ? [{
+      title: "Cargos que no cuentan",
+      amount: breakdown.excludedAmount,
+      items: breakdown.excludedExpenses,
+      getName: (entry) => entry.concept,
+      getDescription: (entry) => `${formatBreakdownDate(entry.date)} · ${entry.reason}`,
+    }] : []),
+    ...(breakdown.projectedCharges?.length ? [{
+      title: "Previstos, por confirmar",
+      amount: item.projectedAmount,
+      items: breakdown.projectedCharges,
+      getName: (entry) => entry.name || entry.concept,
+      getDescription: (entry) => `${formatBreakdownDate(entry.chargeDate || entry.date || entry.purchaseDate)} · ${entry.reason}`,
+    }] : []),
   ];
 
   return (
     <div className="space-y-4">
       <p className="text-sm text-muted-foreground">
         Ciclo del {formatBreakdownDate(item.selectedCycle?.startDate)} al {formatBreakdownDate(item.selectedCycle?.cutDate)}
+      </p>
+      <p className="text-sm text-muted-foreground">
+        {item.product}: meta de {formatMoney(item.minimumAmount)} por período. Las comisiones,
+        sus impuestos, los intereses y las mensualidades de compras anteriores no cuentan.
+        Los cargos previstos se muestran aparte hasta registrar o verificar el cobro.
+        {" "}<a href={item.ruleSourceUrl} target="_blank" rel="noreferrer" className="underline underline-offset-4">Consultar condiciones del banco</a>.
       </p>
 
       <div className="grid gap-4 lg:grid-cols-3">

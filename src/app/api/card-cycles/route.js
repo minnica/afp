@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { cycleCreditSelect, getCycleCreditAmounts } from "@/lib/calculations/cardCredits";
+import {
+  getInstallmentStatementForCycle,
+  getStatementCycleNumber,
+} from "@/lib/calculations/installmentStatements";
 
 const cycleSelect = {
   id: true,
@@ -17,6 +22,10 @@ const cycleSelect = {
   notes: true,
   createdAt: true,
   updatedAt: true,
+  credits: {
+    select: cycleCreditSelect,
+    orderBy: { createdAt: "asc" },
+  },
   card: {
     select: {
       id: true,
@@ -67,6 +76,7 @@ const cyclePurchaseSelect = {
   purchaseDate: true,
   months: true,
   manualMonthlyPayment: true,
+  statementReconciliations: true,
   initialPaymentsMade: true,
   status: true,
   category: {
@@ -97,7 +107,9 @@ function isDateInsideRange(date, startDate, endDate) {
   );
 }
 
-function getMonthlyPaymentUsed(purchase) {
+function getMonthlyPaymentUsed(purchase, cycle) {
+  const statement = cycle && getInstallmentStatementForCycle(purchase, cycle);
+  if (statement) return Number(statement.amount);
   const totalAmount = Number(purchase.totalAmount || 0);
   const months = Number(purchase.months || 0);
   const manual = purchase.manualMonthlyPayment
@@ -148,6 +160,8 @@ function getPurchaseFirstCycleIndex(purchase, card, earliestCardCycleIndex) {
 }
 
 function getPurchaseCycleNumber(purchase, targetCycle, earliestCardCycleIndex) {
+  const verifiedNumber = getStatementCycleNumber(purchase, targetCycle);
+  if (verifiedNumber !== null) return verifiedNumber;
   const firstCycleIndex = getPurchaseFirstCycleIndex(purchase, targetCycle.card, earliestCardCycleIndex);
   const targetCycleIndex = targetCycle.year * 12 + (targetCycle.month - 1);
 
@@ -326,7 +340,7 @@ function calculateCycleAmount({
       return {
         id: purchase.id,
         concept: purchase.concept,
-        amount: getMonthlyPaymentUsed(purchase),
+        amount: getMonthlyPaymentUsed(purchase, cycle),
         totalAmount: Number(purchase.totalAmount || 0),
         purchaseDate: purchase.purchaseDate,
         months: purchase.months,
@@ -340,20 +354,26 @@ function calculateCycleAmount({
     return sum + purchase.amount;
   }, 0);
 
-  const calculatedAmount =
-    expensesAmount + subscriptionsAmount + purchasesAmount;
+  const { grossCalculatedAmount, creditsAmount, calculatedAmount, includedCredits } =
+    getCycleCreditAmounts(cycle, expensesAmount + subscriptionsAmount + purchasesAmount);
 
-  const statementAmount = cycle.statementAmount
+  const statementAmount = cycle.statementAmount !== null && cycle.statementAmount !== undefined
     ? Number(cycle.statementAmount)
     : null;
 
-  const difference =
+  const rawDifference =
     statementAmount !== null ? statementAmount - calculatedAmount : null;
+  const difference = rawDifference !== null && includedCredits.length > 0
+    ? Math.round(rawDifference * 100) / 100
+    : rawDifference;
 
   return {
     expensesAmount,
     subscriptionsAmount,
     purchasesAmount,
+    grossCalculatedAmount,
+    creditsAmount,
+    credits: undefined,
     calculatedAmount,
     statementAmount,
     difference,
@@ -362,6 +382,7 @@ function calculateCycleAmount({
           includedExpenses,
           includedSubscriptions,
           includedPurchases,
+          includedCredits,
         }
       : {}),
   };

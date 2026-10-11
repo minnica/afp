@@ -1,7 +1,15 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { buildCardUsageWaivers } from "@/lib/calculations/cardUsageWaivers";
+import { cycleCreditSelect, getCycleCreditAmounts } from "@/lib/calculations/cardCredits";
+import {
+  getInstallmentStatementForCycle,
+  getLatestInstallmentStatement,
+  getStatementCycleNumber,
+} from "@/lib/calculations/installmentStatements";
 
 const dashboardCardSelect = {
+  usagePolicy: true,
   id: true,
   name: true,
   usualCutDay: true,
@@ -9,6 +17,7 @@ const dashboardCardSelect = {
 };
 
 const dashboardCycleSelect = {
+  usageReconciliation: true,
   id: true,
   userId: true,
   cardId: true,
@@ -24,12 +33,19 @@ const dashboardCycleSelect = {
   notes: true,
   createdAt: true,
   updatedAt: true,
+  credits: {
+    select: cycleCreditSelect,
+    orderBy: { createdAt: "asc" },
+  },
   card: {
     select: dashboardCardSelect,
   },
 };
 
 const dashboardExpenseSelect = {
+  notes: true,
+  paymentMethod: true,
+  subscriptionId: true,
   id: true,
   concept: true,
   date: true,
@@ -78,6 +94,7 @@ const dashboardPurchaseSelect = {
   totalAmount: true,
   months: true,
   manualMonthlyPayment: true,
+  statementReconciliations: true,
   initialPaymentsMade: true,
   status: true,
   category: {
@@ -86,12 +103,6 @@ const dashboardPurchaseSelect = {
     },
   },
 };
-
-const CARD_USAGE_MINIMUMS = [
-  { key: "HSBC", label: "HSBC", minimumAmount: 300 },
-  { key: "BANAMEX", label: "BANAMEX", minimumAmount: 300 },
-  { key: "SANTANDER", label: "SANTANDER", minimumAmount: 200 },
-];
 
 function groupBy(items, getKey) {
   const map = new Map();
@@ -141,7 +152,9 @@ function createChargeDate(year, monthIndex, day) {
   return new Date(Date.UTC(year, monthIndex, safeDay, 12, 0, 0));
 }
 
-function getMonthlyPaymentUsed(purchase) {
+function getMonthlyPaymentUsed(purchase, cycle) {
+  const statement = cycle && getInstallmentStatementForCycle(purchase, cycle);
+  if (statement) return Number(statement.amount);
   const totalAmount = Number(purchase.totalAmount || 0);
   const months = Number(purchase.months || 0);
   const manual = purchase.manualMonthlyPayment
@@ -151,22 +164,6 @@ function getMonthlyPaymentUsed(purchase) {
   if (!months) return 0;
 
   return manual && manual > 0 ? manual : totalAmount / months;
-}
-
-function normalizeCardName(name) {
-  return String(name || "")
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toUpperCase();
-}
-
-function getCardUsageRule(card) {
-  const normalizedName = normalizeCardName(card.name);
-
-  return (
-    CARD_USAGE_MINIMUMS.find((rule) => normalizedName.includes(rule.key)) ||
-    null
-  );
 }
 
 // Primer ciclo donde cae la compra: si el día de compra es posterior al corte
@@ -192,6 +189,8 @@ function getPurchaseFirstCycleIndex(purchase, card) {
 }
 
 function getPurchaseCycleNumber(purchase, targetCycle) {
+  const verifiedNumber = getStatementCycleNumber(purchase, targetCycle);
+  if (verifiedNumber !== null) return verifiedNumber;
   const firstCycleIndex = getPurchaseFirstCycleIndex(purchase, targetCycle.card);
   const targetCycleIndex = targetCycle.year * 12 + (targetCycle.month - 1);
 
@@ -205,6 +204,13 @@ function shouldIncludePurchaseInCycle(purchase, targetCycle) {
   const cycleCutDate = new Date(targetCycle.cutDate).getTime();
 
   if (purchaseDate > cycleCutDate) return false;
+
+  if (getLatestInstallmentStatement(purchase)) {
+    if (purchase.status === "PAID_OFF" && cycleCutDate >= Date.now()) return false;
+    if (!["ACTIVE", "PAID_OFF"].includes(purchase.status)) return false;
+    const number = getStatementCycleNumber(purchase, targetCycle);
+    return number >= 1 && number <= Number(purchase.months || 0);
+  }
 
   if (purchase.status === "PAID_OFF") {
     // Mostrar en ciclos ya cortados dentro del rango de meses de la compra
@@ -338,194 +344,30 @@ function calculateCycleAmount({
     .filter((purchase) =>
       shouldIncludePurchaseInCycle(purchase, cycle),
     )
-    .reduce((sum, purchase) => sum + getMonthlyPaymentUsed(purchase), 0);
+    .reduce((sum, purchase) => sum + getMonthlyPaymentUsed(purchase, cycle), 0);
 
-  const calculatedAmount =
-    expensesAmount + subscriptionsAmount + purchasesAmount;
-  const statementAmount = cycle.statementAmount
+  const { grossCalculatedAmount, creditsAmount, calculatedAmount, includedCredits } =
+    getCycleCreditAmounts(cycle, expensesAmount + subscriptionsAmount + purchasesAmount);
+  const statementAmount = cycle.statementAmount !== null && cycle.statementAmount !== undefined
     ? Number(cycle.statementAmount)
     : null;
-  const difference =
+  const rawDifference =
     statementAmount !== null ? statementAmount - calculatedAmount : null;
+  const difference = rawDifference !== null && includedCredits.length > 0
+    ? Math.round(rawDifference * 100) / 100
+    : rawDifference;
 
   return {
     expensesAmount,
     subscriptionsAmount,
     purchasesAmount,
+    grossCalculatedAmount,
+    creditsAmount,
+    credits: undefined,
     calculatedAmount,
     statementAmount,
     difference,
   };
-}
-
-function findCycleForCardByMonth(cyclesWithAmounts, cardId, year, month) {
-  return (
-    cyclesWithAmounts
-      .filter((cycle) => cycle.cardId === cardId)
-      .find((cycle) => cycle.year === year && cycle.month === month) || null
-  );
-}
-
-function buildCardUsageWaivers({
-  cards,
-  cyclesWithAmounts,
-  expenses,
-  subscriptions,
-  purchases,
-  year,
-  month,
-}) {
-  return cards.flatMap((card) => {
-    const rule = getCardUsageRule(card);
-
-    if (!rule) return [];
-
-    const selectedCycle = findCycleForCardByMonth(
-      cyclesWithAmounts,
-      card.id,
-      year,
-      month,
-    );
-
-    if (!selectedCycle) {
-      return {
-        card,
-        applies: true,
-        bank: rule.label,
-        minimumAmount: rule.minimumAmount,
-        eligibleSpend: 0,
-        remainingAmount: rule.minimumAmount,
-        progress: 0,
-        isExempt: false,
-        selectedCycle: null,
-        breakdown: {
-          dailyExpensesAmount: 0,
-          subscriptionsAmount: 0,
-          installmentPurchasesAmount: 0,
-        },
-      };
-    }
-
-    const dailyExpensesAmount = expenses
-      .filter((expense) => expense.cardId === card.id)
-      .filter((expense) =>
-        isDateInsideRange(
-          expense.date,
-          selectedCycle.startDate,
-          selectedCycle.cutDate,
-        ),
-      )
-      .reduce((sum, expense) => sum + Number(expense.amount || 0), 0);
-
-    const includedDailyExpenses = expenses
-      .filter((expense) => expense.cardId === card.id)
-      .filter((expense) =>
-        isDateInsideRange(
-          expense.date,
-          selectedCycle.startDate,
-          selectedCycle.cutDate,
-        ),
-      )
-      .map((expense) => ({
-        id: expense.id,
-        concept: expense.concept,
-        amount: Number(expense.amount || 0),
-        date: expense.date,
-        categoryName: expense.category?.name || null,
-      }));
-
-    const includedSubscriptions = subscriptions
-      .filter((subscription) => subscription.cardId === card.id)
-      .filter((subscription) => subscription.paymentMethod === "CARD")
-      .filter((subscription) =>
-        shouldIncludeSubscriptionInCycle(subscription, selectedCycle),
-      )
-      .flatMap((subscription) => {
-        const charges = getSubscriptionChargeDatesInsideCycle(
-          subscription,
-          selectedCycle,
-        ).filter((chargeDate) => {
-          if (subscription.isActive) return true;
-          if (!subscription.deactivatedAt) return false;
-          return new Date(chargeDate) <= new Date(subscription.deactivatedAt);
-        });
-
-        return charges.map((chargeDate) => ({
-          id: `${subscription.id}-${chargeDate.toISOString()}`,
-          name: subscription.name,
-          amount: Number(subscription.amount || 0),
-          chargeDate,
-          categoryName: subscription.category?.name || null,
-        }));
-      });
-
-    const subscriptionsAmount = includedSubscriptions.reduce(
-      (sum, subscription) => sum + subscription.amount,
-      0,
-    );
-
-    const includedInstallmentPurchases = purchases
-      .filter((purchase) => purchase.cardId === card.id)
-      .filter((purchase) => purchase.status === "ACTIVE")
-      .filter((purchase) =>
-        isDateInsideRange(
-          purchase.purchaseDate,
-          selectedCycle.startDate,
-          selectedCycle.cutDate,
-        ),
-      )
-      .map((purchase) => ({
-        id: purchase.id,
-        concept: purchase.concept,
-        amount: Number(purchase.totalAmount || 0),
-        purchaseDate: purchase.purchaseDate,
-        months: purchase.months,
-        categoryName: purchase.category?.name || null,
-      }));
-
-    const installmentPurchasesAmount = includedInstallmentPurchases.reduce(
-      (sum, purchase) => sum + purchase.amount,
-      0,
-    );
-
-    const eligibleSpend =
-      dailyExpensesAmount + subscriptionsAmount + installmentPurchasesAmount;
-    const minimumAmount = rule?.minimumAmount || null;
-    const remainingAmount = minimumAmount
-      ? Math.max(minimumAmount - eligibleSpend, 0)
-      : null;
-    const progress = minimumAmount
-      ? Math.min((eligibleSpend / minimumAmount) * 100, 100)
-      : 0;
-
-    return {
-      card,
-      applies: true,
-      bank: rule.label,
-      minimumAmount,
-      eligibleSpend,
-      remainingAmount,
-      progress,
-      isExempt: Boolean(minimumAmount && eligibleSpend >= minimumAmount),
-      selectedCycle: {
-        id: selectedCycle.id,
-        startDate: selectedCycle.startDate,
-        cutDate: selectedCycle.cutDate,
-        dueDate: selectedCycle.dueDate,
-        month: selectedCycle.month,
-        year: selectedCycle.year,
-        displayStatus: selectedCycle.displayStatus,
-      },
-      breakdown: {
-        dailyExpensesAmount,
-        subscriptionsAmount,
-        installmentPurchasesAmount,
-        includedDailyExpenses,
-        includedSubscriptions,
-        includedInstallmentPurchases,
-      },
-    };
-  });
 }
 
 function getDisplayStatus(cycle) {
@@ -798,6 +640,14 @@ function buildReceivableNotices(receivables, now) {
 function shouldIncludePurchaseInMonth(purchase, targetYear, targetMonth) {
   if (purchase.status !== "ACTIVE") return false;
 
+  if (getLatestInstallmentStatement(purchase)) {
+    const number = getStatementCycleNumber(purchase, {
+      year: targetYear,
+      month: targetMonth,
+    });
+    return number >= 1 && number <= Number(purchase.months || 0);
+  }
+
   const purchaseDate = new Date(purchase.purchaseDate);
   const purchaseMonthIndex =
     purchaseDate.getUTCFullYear() * 12 + purchaseDate.getUTCMonth();
@@ -833,7 +683,7 @@ function buildCategoryBreakdown({ categories, expenses, subscriptions, purchases
     .reduce((sum, s) => sum + Number(s.amount || 0), 0);
 
   const installmentPurchasesTotal = activePurchasesForMonth.reduce(
-    (sum, p) => sum + getMonthlyPaymentUsed(p),
+    (sum, p) => sum + getMonthlyPaymentUsed(p, { year, month }),
     0,
   );
 
@@ -853,7 +703,7 @@ function buildCategoryBreakdown({ categories, expenses, subscriptions, purchases
 
       const catPurchases = activePurchasesForMonth
         .filter((p) => p.categoryId === category.id)
-        .reduce((sum, p) => sum + getMonthlyPaymentUsed(p), 0);
+        .reduce((sum, p) => sum + getMonthlyPaymentUsed(p, { year, month }), 0);
 
       const total = catDaily + catSubs + catPurchases;
       const percentage = monthlyExpenseTotal > 0 ? (total / monthlyExpenseTotal) * 100 : 0;
@@ -905,11 +755,11 @@ function buildWeeklyComparison({ expenses, subscriptions = [], purchases = [], c
 
   const prevPurchasesTotal = filteredPurchases
     .filter((p) => shouldIncludePurchaseInMonth(p, prevYear, prevMonth))
-    .reduce((sum, p) => sum + getMonthlyPaymentUsed(p), 0);
+    .reduce((sum, p) => sum + getMonthlyPaymentUsed(p, { year: prevYear, month: prevMonth }), 0);
 
   const currPurchasesTotal = filteredPurchases
     .filter((p) => shouldIncludePurchaseInMonth(p, currentYear, currentMonth))
-    .reduce((sum, p) => sum + getMonthlyPaymentUsed(p), 0);
+    .reduce((sum, p) => sum + getMonthlyPaymentUsed(p, { year: currentYear, month: currentMonth }), 0);
 
   const prevMonthTotal =
     filteredExpenses
@@ -984,14 +834,14 @@ function buildWeeklyComparison({ expenses, subscriptions = [], purchases = [], c
       week === 1
         ? filteredPurchases
             .filter((p) => shouldIncludePurchaseInMonth(p, prevYear, prevMonth))
-            .reduce((sum, p) => sum + getMonthlyPaymentUsed(p), 0)
+            .reduce((sum, p) => sum + getMonthlyPaymentUsed(p, { year: prevYear, month: prevMonth }), 0)
         : 0;
 
     const currPurchasesWeekTotal =
       week === 1
         ? filteredPurchases
             .filter((p) => shouldIncludePurchaseInMonth(p, currentYear, currentMonth))
-            .reduce((sum, p) => sum + getMonthlyPaymentUsed(p), 0)
+            .reduce((sum, p) => sum + getMonthlyPaymentUsed(p, { year: currentYear, month: currentMonth }), 0)
         : 0;
 
     const prevTotal = prevDailyTotal + prevSubsWeekTotal + prevPurchasesWeekTotal;
@@ -1337,8 +1187,12 @@ export async function GET(request) {
 
     const installmentPurchasesTotal = purchases
       .filter((purchase) => purchase.status === "ACTIVE")
+      .filter((purchase) =>
+        !getLatestInstallmentStatement(purchase) ||
+        shouldIncludePurchaseInMonth(purchase, currentYear, currentMonth),
+      )
       .reduce((sum, purchase) => {
-        return sum + getMonthlyPaymentUsed(purchase);
+        return sum + getMonthlyPaymentUsed(purchase, { year: currentYear, month: currentMonth });
       }, 0);
 
     const incomeTotal = incomes.reduce((sum, income) => {
@@ -1455,6 +1309,7 @@ export async function GET(request) {
     const cardUsageWaiversByMonth = {};
     for (let m = 0; m < 12; m++) {
       cardUsageWaiversByMonth[m] = buildCardUsageWaivers({
+        now,
         cards,
         cyclesWithAmounts,
         expenses,

@@ -189,6 +189,7 @@ export async function DELETE(request) {
 
     const income = await prisma.income.findUnique({
       where: { id },
+      include: { _count: { select: { cardCycleCredits: true } } },
     });
 
     if (!income) {
@@ -199,6 +200,13 @@ export async function DELETE(request) {
     }
 
     const receivableAccountId = income.receivableAccountId;
+
+    if (income._count.cardCycleCredits > 0) {
+      return NextResponse.json(
+        { error: "Este ingreso tiene bonificaciones aplicadas a una tarjeta. Revisa esas aplicaciones antes de eliminarlo." },
+        { status: 409 },
+      );
+    }
 
     await prisma.income.delete({
       where: { id },
@@ -274,6 +282,17 @@ export async function PATCH(request) {
     }
 
     const nextReceivableAccountId = receivableAccountId || null;
+
+    const appliedCredits = await prisma.cardCycleCredit.aggregate({
+      where: { incomeId: id },
+      _sum: { amount: true },
+    });
+    if (numericAmount < Number(appliedCredits._sum.amount || 0)) {
+      return NextResponse.json(
+        { error: "El importe no puede ser menor que las bonificaciones ya aplicadas a tarjetas." },
+        { status: 409 },
+      );
+    }
 
     const income = await prisma.income.update({
       where: { id },

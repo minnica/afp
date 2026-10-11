@@ -74,6 +74,7 @@ Archivo: [`prisma/schema.prisma`](prisma/schema.prisma)
 | `User` | `users` | Usuario autenticado vía Supabase |
 | `Card` | `cards` | Tarjetas de crédito |
 | `CardCycle` | `card_cycles` | Ciclos de corte por tarjeta |
+| `CardCycleCredit` | `card_cycle_credits` | Bonificaciones de un ingreso aplicadas a los cargos de un corte |
 | `Category` | `categories` | Categorías de gasto (por usuario) |
 | `Person` | `people` | Personas para cobrar/pagar |
 | `IncomeType` | `income_types` | Tipos de ingreso (por usuario) |
@@ -111,22 +112,56 @@ Reglas de cálculo:
 - Se incluye en el ciclo solo si `1 <= currentMonth <= months` (y, para `ACTIVE`, si `purchaseDate` no es posterior al `cutDate` del ciclo).
 - `initialPaymentsMade` **no** se usa para este cálculo — solo sirve como ancla en `getNextPaymentDueDate` (`ComprasAMesesContent.jsx`). Antes el cálculo mezclaba un valor dinámico con un fallback estático `initialPaymentsMade + 1`, lo que dejaba la cuota "congelada" en vez de avanzar mes a mes (y de excluirse al completarse).
 
+### MSI — referencias verificadas de estados de cuenta
+
+`InstallmentPurchase.statementReconciliations` es un JSON opcional con referencias por mes de corte: `year`, `month`, `paymentNumber`, `amount`, `remainingBalance` y `source`.
+
+- Una referencia bancaria prevalece sobre el cálculo de cuota e importe para ese corte. `src/lib/calculations/installmentStatements.js` valida y consulta las referencias.
+- El número de cuota de otros ciclos se calcula a partir del corte verificado. La fecha de compra y el monto original se conservan.
+- El importe de un corte sin referencia sigue siendo una estimación según la mensualidad configurada; no se presenta como un cargo confirmado por el banco.
+- En compras a meses, el progreso, mensualidad y saldo reflejan el último estado verificado, cuya fecha se muestra junto al concepto. El próximo pago corresponde al ciclo siguiente a esa referencia.
+- Las referencias se incorporan mediante una carga revisada. Editar los campos habituales de una compra conserva las referencias existentes.
+
+### Tarjetas — bonificaciones aplicadas al corte
+
+`CardCycleCredit` vincula un ingreso existente con un ciclo e indica el importe aplicado a sus cargos. El ingreso se registra una sola vez; la aplicación no crea otro ingreso ni modifica los gastos, MSI o pagos.
+
+- Tarjetas y dashboard calculan `calculatedAmount = grossCalculatedAmount - creditsAmount`. El desglose muestra cargos, bonificaciones y total a pagar.
+- Se descuenta únicamente el importe aplicado a los cargos de ese corte. La parte destinada al adeudo anterior queda documentada en las notas y no se vuelve a descontar de otro corte.
+- Cada par ingreso/ciclo admite una sola aplicación. Las aplicaciones deben pertenecer al mismo usuario, ser positivas, no exceder el ingreso disponible entre todos los ciclos ni los cargos del corte y conservar la evidencia del estado de cuenta en `notes` directamente en Supabase.
+- La carga se realiza mediante conciliación revisada. Los ingresos generales no se descuentan automáticamente de las tarjetas.
+- Un ingreso con aplicaciones no se puede eliminar desde la app ni reducir por debajo del importe aplicado. Hay que revisar primero la conciliación correspondiente.
+- La migración de este modelo es aditiva. Debe aplicarse con `prisma migrate deploy` antes de iniciar la versión que consulta la nueva tabla.
+
+### Recuperación de registros desde estados de cuenta
+
+La skill `conciliar-estados-cuenta` se mantiene en `skills/conciliar-estados-cuenta/SKILL.md`. Documenta la extracción, revisión, carga autorizada y verificación de gastos y MSI contra Supabase.
+
+- El PDF y `<banco>_conciliacion.json` conservan los datos bancarios y su evidencia.
+- El usuario edita `<banco>_aclaraciones.json` desde VS Code: nombres, categorías, personas por cobrar y notas. Su esquema local ofrece categorías y personas existentes; las fechas e importes bancarios se conservan en la conciliación.
+- `python3 skills/conciliar-estados-cuenta/scripts/revision_json.py validar estados_cuenta/<mes>/<banco>_conciliacion.json` comprueba el JSON y el SHA-256 del PDF. Código de salida 2 significa aclaraciones pendientes; 1, datos inválidos; 0, revisión completa. No escribe en la BD.
+- Los registros cargados o conciliados directamente incluyen una nota que identifica su origen y preserva las notas previas.
+
 ### Dashboard — consumo mínimo para exentar comisión de tarjeta
 
 `/dashboard` muestra una sección minimalista de consumo mínimo usando `cardUsageWaiversByMonth` de `GET /api/dashboard`; solo aparecen tarjetas con mínimo configurado y el selector de mes corresponde al mes de corte (`CardCycle.month`) del ciclo. Cada fila muestra la fecha de corte tomada y se ordena por proximidad del corte: primero las tarjetas que ya cortaron o están más cerca de cortar, al final las más lejanas.
 
-Reglas actuales:
-- HSBC: consumo mínimo de $300 por corte.
-- BANAMEX: consumo mínimo de $300 por corte.
-- SANTANDER: consumo mínimo de $200 por corte.
-- NU, DIDI, BBVA, Mercado Pago y cualquier otra tarjeta no tienen mínimo configurado para este concepto y no aparecen en esta sección.
+Las reglas se resuelven por el producto verificado en `Card.usagePolicy.productKey`, nunca por coincidencias en el nombre editable. La política conserva fecha de verificación, fuente oficial y PDF de identidad. Productos comprobados el 11 de octubre de 2026:
+- HSBC 1 y HSBC 2: **HSBC Zero**, $300 por período entre cortes. [Condiciones](https://www.hsbc.com.mx/tarjetas-de-credito/productos/zero/).
+- Banamex 1 y Banamex 2: **Joy Banamex**, $300 por período entre cortes. [Condiciones](https://www.banamex.com/es/personas/tarjetas-credito/tarjeta-de-credito-sin-anualidad-joy-ab/index.html).
+- Santander: **LikeU**, $200 por período. [Condiciones](https://www.santander.com.mx/personas/credito-y-financiamiento/tarjetas-de-credito/likeu).
+- Nu, DiDi Card y Mercado Pago no tienen meta de consumo para esta comisión. BBVA es Oro: su anualidad y posibles promociones personales se revisan aparte. Estos productos no aparecen en el indicador. Una tarjeta sin producto verificado tampoco recibe una meta inferida por banco.
 
-El consumo elegible se calcula sobre el ciclo vigente de cada tarjeta:
-- Gastos diarios con `cardId` dentro de `startDate` y `cutDate`.
-- Suscripciones con tarjeta cuya fecha de cargo cae dentro del ciclo vigente.
-- Compras a meses solo si `purchaseDate` cae dentro del ciclo vigente; cuenta el `totalAmount` de la compra en ese corte, no la cuota mensual de ciclos posteriores.
+`src/lib/calculations/cardUsageWaivers.js` calcula el consumo y el faltante a centavos:
+- Cuenta gastos registrados con tarjeta; excluye comisiones, intereses y sus impuestos. La descripción bancaria original en `notes` y los IDs de cargos excluidos verificados conservan la clasificación al renombrar un gasto. Para cargos manuales sin evidencia usa conceptos bancarios reconocibles; una categoría como Servicios no basta para excluirlo.
+- Las suscripciones cuentan cuando existe un gasto vinculado o un cargo documentado en el estado. Se emparejan por suscripción y mes del cargo para no duplicar el gasto, la referencia y el calendario. Se conserva el importe histórico del comprobante.
+- Las suscripciones sin comprobante y los movimientos futuros aparecen como previstos/por confirmar; no completan la meta. En un corte revisado no se inventan cargos de suscripciones ausentes del PDF.
+- Una compra nueva a meses cuenta por su importe original en el período de compra, incluso si ahora está liquidada; las mensualidades de compras anteriores y las canceladas no se suman.
+- `CardCycle.usageReconciliation` guarda `version: 1`, `source`, `sourceSha256`, `startDate`, `cutDate`, `subscriptionCharges` (subscriptionId, name, date, amount) y `excludedExpenseIds`. Sus fechas prevalecen **solo en Consumo mínimo**. Los períodos sin documento se muestran como previstos. Los importes y fechas del cálculo financiero del corte se conservan.
 
-Cada tarjeta incluye un botón **Desglose** que muestra los movimientos elegibles por tipo y su importe, para verificar el avance del consumo mínimo.
+Cada fila muestra producto, corte, meta y faltante. **Desglose** distingue compras, suscripciones confirmadas, cargos excluidos y previstos, y enlaza las condiciones oficiales. El indicador no representa el pago mínimo ni sustituye el pago para no generar intereses.
+
+Los dos campos JSON son opcionales y se agregan con la migración aditiva `20261011000000_add_card_usage_verification`. Aplicar con `prisma migrate deploy`, regenerar Prisma y reiniciar el servidor. La evidencia inicial y su verificación están en `estados_cuenta/consumo_minimo/`; no hay dependencia de esos archivos privados durante la ejecución. En conciliaciones futuras, actualizar estos metadatos junto con la evidencia del nuevo corte y preservar las notas de origen.
 
 ### PWA / modo offline
 
