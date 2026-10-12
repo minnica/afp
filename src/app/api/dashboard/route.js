@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { buildCardUsageWaivers } from "@/lib/calculations/cardUsageWaivers";
 import { cycleCreditSelect, getCycleCreditAmounts } from "@/lib/calculations/cardCredits";
+import { getSubscriptionStatementAmount } from "@/lib/calculations/subscriptionStatements";
 import {
   getInstallmentStatementForCycle,
   getLatestInstallmentStatement,
@@ -337,7 +338,8 @@ function calculateCycleAmount({
         if (!subscription.deactivatedAt) return false;
         return new Date(chargeDate) <= new Date(subscription.deactivatedAt);
       });
-      return sum + validCharges.length * Number(subscription.amount || 0);
+      return sum + validCharges.reduce((total, chargeDate) =>
+        total + getSubscriptionStatementAmount(subscription, cycle, chargeDate), 0);
     }, 0);
 
   const purchasesAmount = cardPurchases

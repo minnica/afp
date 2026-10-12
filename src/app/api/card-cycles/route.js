@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { cycleCreditSelect, getCycleCreditAmounts } from "@/lib/calculations/cardCredits";
+import { getSubscriptionStatementAmount } from "@/lib/calculations/subscriptionStatements";
 import {
   getInstallmentStatementForCycle,
   getStatementCycleNumber,
 } from "@/lib/calculations/installmentStatements";
 
 const cycleSelect = {
+  usageReconciliation: true,
   id: true,
   userId: true,
   cardId: true,
@@ -314,7 +316,7 @@ function calculateCycleAmount({
         id: `${subscription.id}-${chargeDate.toISOString()}`,
         subscriptionId: subscription.id,
         name: subscription.name,
-        amount: Number(subscription.amount || 0),
+        amount: getSubscriptionStatementAmount(subscription, cycle, chargeDate),
         chargeDate,
         categoryName: subscription.category?.name || null,
       }));
