@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useSyncExternalStore } from "react"
 import { format } from "date-fns"
 import { es } from "react-day-picker/locale"
 import { Calendar03Icon } from "@hugeicons/core-free-icons"
@@ -8,8 +8,25 @@ import { HugeiconsIcon } from "@hugeicons/react"
 
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
+import { Input } from "@/components/ui/input"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
+
+const TOUCH_POINTER_QUERY = "(pointer: coarse)"
+
+function subscribeToPointer(onChange) {
+  const mediaQuery = window.matchMedia(TOUCH_POINTER_QUERY)
+  mediaQuery.addEventListener("change", onChange)
+  return () => mediaQuery.removeEventListener("change", onChange)
+}
+
+function hasTouchPointer() {
+  return window.matchMedia(TOUCH_POINTER_QUERY).matches
+}
+
+function getServerPointerSnapshot() {
+  return false
+}
 
 function DatePicker({
   id,
@@ -22,10 +39,44 @@ function DatePicker({
   "aria-label": ariaLabel = "Fecha",
 }) {
   const [open, setOpen] = useState(false)
+  // Match the server during hydration, then use the device's primary pointer.
+  const useNativePicker = useSyncExternalStore(
+    subscribeToPointer,
+    hasTouchPointer,
+    getServerPointerSnapshot,
+  )
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value ?? "")
   const selectedDate = match
     ? new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]))
     : undefined
+
+  if (useNativePicker) {
+    return (
+      <div className={cn("flex w-full min-w-0 items-center gap-1", className)}>
+        <Input
+          id={id}
+          type="date"
+          value={value ?? ""}
+          onChange={(event) => onChange(event.target.value)}
+          disabled={disabled}
+          aria-label={ariaLabel}
+          className="flex-1 text-left tabular-nums [color-scheme:light] dark:[color-scheme:dark] [&::-webkit-date-and-time-value]:text-left"
+        />
+        {clearable && value ? (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            disabled={disabled}
+            aria-label={`Limpiar ${ariaLabel.toLowerCase()}`}
+            onClick={() => onChange("")}
+          >
+            Limpiar
+          </Button>
+        ) : null}
+      </div>
+    )
+  }
 
   return (
     <Popover open={open} onOpenChange={setOpen}>

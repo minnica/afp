@@ -19,7 +19,7 @@ De los 23 componentes base existentes, 18 coincidían en estructura y comportami
 | Button | Actualizado el estado hover de la variante secundaria según el registro. |
 | Card | Actualizados los espacios compartidos mediante `--card-spacing`. |
 | Chart | Sustituido el wrapper anterior por el código actual: `data-slot`, dimensiones iniciales, indicadores y manejo del payload. |
-| Calendar | Comprobada la implementación completa y retiradas clases de marcador antiguas. El DatePicker conserva encabezado sin selectores y navegación por flechas. |
+| Calendar | Comprobada la implementación completa y retiradas clases de marcador antiguas. El DatePicker de escritorio conserva encabezado sin selectores y navegación por flechas. |
 | Spinner | Añadido `data-slot="spinner"` y localizado el nombre accesible. |
 | Input, Label, Textarea, Select | Coinciden con los controles del registro. |
 | Badge, Tabs, Table, Separator | Coinciden con el registro. |
@@ -52,7 +52,7 @@ La hoja global respeta la preferencia de movimiento reducido. Las barras de las 
 
 ## Verificación
 
-- Revisión de código: no quedan `window.confirm`, controles de fecha nativos, botones HTML propios de las pantallas ni barras de progreso manuales. Los elementos HTML dentro de los componentes oficiales forman parte de su implementación.
+- Revisión de código: no quedan `window.confirm`, controles de fecha independientes del DatePicker compartido, botones HTML propios de las pantallas ni barras de progreso manuales. Los elementos HTML dentro de los componentes oficiales forman parte de su implementación.
 - Navegador: las diez pantallas renderizaron con datos de prueba a 390 px, sin errores de JavaScript ni desbordamiento horizontal del documento. Los campos de texto, numéricos y selectores visibles tenían nombres accesibles. Las tablas conservan su desplazamiento horizontal interno.
 - Calendario: encabezado con mes y año como texto, flechas de navegación y selección; sin selectores de mes o año.
 - Tablas: ordenamiento con Enter y actualización de `aria-sort`; el orden ascendente por monto situó $50 antes de $200.
@@ -63,3 +63,16 @@ La hoja global respeta la preferencia de movimiento reducido. Las barras de las 
 - Lint y compilación de producción comprobados. ESLint conserva la advertencia `react-hooks/incompatible-library` de TanStack Table 8; no se desactivó la regla.
 
 La comprobación de navegador usó una ruta temporal con los componentes reales y respuestas de API simuladas. Esa ruta se retiró del proyecto. Esta revisión verifica la interfaz y la forma de las solicitudes; no valida persistencia con credenciales reales ni constituye una certificación completa de accesibilidad.
+
+## Ajuste posterior: selector nativo en dispositivos táctiles
+
+Por petición del usuario, el DatePicker compartido utiliza el `Input` de shadcn con `type="date"` cuando el dispositivo tiene un puntero principal táctil (`pointer: coarse`). El navegador o sistema proporciona el selector. En escritorio conserva la composición `Popover` + `Calendar`, con encabezado de texto y flechas. Este comportamiento se aplica a los 18 campos de fecha existentes, incluida la PWA instalada.
+
+La detección usa `useSyncExternalStore` con una instantánea de servidor estable para respetar la hidratación. Ambos controles mantienen el contrato `YYYY-MM-DD`, las etiquetas y el estado deshabilitado; las fechas opcionales conservan la acción de limpiar.
+
+- Escritorio: seleccionar el 15 de octubre actualizó el estado a `2026-10-15` y cerró el calendario. Limpiar la fecha opcional dejó el valor vacío y cerró el calendario. No hay selectores de mes o año.
+- Emulación táctil real mediante CDP: a 412 px y 915 px de ancho se renderizaron inputs de fecha nativos en tema oscuro, sin calendario de shadcn ni desbordamiento horizontal. A 390 px con puntero de escritorio se conservó el calendario de shadcn.
+- Campo nativo: eventos de entrada simulados actualizaron el estado y otro campo vinculado a `2026-10-20`. La acción Limpiar dejó el valor vacío; el input y su acción de limpieza respetaron `disabled`.
+- Recarga en emulación táctil y comprobación de ambas versiones: sin errores de JavaScript o hidratación. La ruta temporal de comprobación se retiró.
+
+Estas comprobaciones validan el control web y su estado en emulación; el diálogo del sistema Android o iOS requiere comprobarse en un teléfono físico.

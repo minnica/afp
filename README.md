@@ -300,7 +300,7 @@ Los componentes base corresponden al registro oficial de shadcn con el estilo `r
 
 **Reglas:**
 - `toast` siempre desde `@/components/ui/sonner` (o re-export de `sonner`). No importar `sonner` directamente si ya hay wrapper local.
-- Los campos de fecha usan `DatePicker` de `src/components/ui/date-picker.jsx`, compuesto con `Popover` y `Calendar`. Recibe y devuelve fechas `YYYY-MM-DD`; usar `clearable` en fechas opcionales que el usuario pueda borrar.
+- Los campos de fecha usan `DatePicker` de `src/components/ui/date-picker.jsx`. En dispositivos con interacción táctil principal (`pointer: coarse`, incluidos celulares y la PWA instalada) usa `Input type="date"` para abrir el selector nativo del navegador o sistema; en escritorio usa `Popover` y `Calendar` de shadcn, con encabezado sin selectores y navegación por flechas. La detección no depende del ancho de pantalla y respeta la hidratación de React. Recibe y devuelve fechas `YYYY-MM-DD`; usar `clearable` en fechas opcionales que el usuario pueda borrar.
 - Botones destructivos siempre con `AlertDialog` de confirmación antes de ejecutar borrado.
 - Los paneles desplegables usan `Collapsible`; las barras de progreso, `Progress`; los avisos, `Alert`; las listas de registros, `Item`; los estados sin datos, `Empty`.
 - Las gráficas usan `ChartContainer`, `ChartTooltipContent` y `ChartLegendContent` con la configuración y tokens del wrapper local. `DataTable` compone los controles shadcn con TanStack Table; el ordenamiento usa `Button` dentro del encabezado.
