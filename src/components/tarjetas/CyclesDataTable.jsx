@@ -1,5 +1,10 @@
 "use client";
 
+import { useDialogFocus } from "@/hooks/use-dialog-focus";
+
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Skeleton } from "@/components/ui/skeleton";
+
 import { useCallback, useMemo, useState } from "react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -8,9 +13,11 @@ import { DataTable } from "@/components/ui/data-table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Label } from "@/components/ui/label";
 import {
   Dialog,
+  DialogDescription,
   DialogContent,
   DialogFooter,
   DialogHeader,
@@ -88,6 +95,7 @@ export default function CyclesDataTable({
   unmarkCycleAsPaid,
   loadCycleBreakdown,
 }) {
+  const { captureFocus, restoreFocus } = useDialogFocus();
   const [activeDialog, setActiveDialog] = useState(null);
 
   const [editCycleStartDate, setEditCycleStartDate] = useState("");
@@ -278,7 +286,7 @@ export default function CyclesDataTable({
   );
 
   return (
-    <>
+    <div onClickCapture={captureFocus}>
       <DataTable
         columns={columns}
         data={cycles}
@@ -290,33 +298,37 @@ export default function CyclesDataTable({
 
       <Dialog open={!!activeDialog} onOpenChange={(open) => { if (!open) closeDialog(); }}>
         {activeDialog?.type === "dates" && (
-          <DialogContent>
+          <DialogContent onCloseAutoFocus={restoreFocus}>
             <DialogHeader>
               <DialogTitle>Editar fechas reales</DialogTitle>
+              <DialogDescription>Actualiza las fechas de inicio, corte y vencimiento del ciclo.</DialogDescription>
             </DialogHeader>
             <div className="grid gap-3">
               <div className="space-y-2">
-                <Label>Inicio</Label>
-                <Input
-                  type="date"
+                <Label htmlFor="cycle-start-date">Inicio</Label>
+                <DatePicker
+                  id="cycle-start-date"
+                  aria-label="Fecha de inicio"
                   value={editCycleStartDate}
-                  onChange={(e) => setEditCycleStartDate(e.target.value)}
+                  onChange={setEditCycleStartDate}
                 />
               </div>
               <div className="space-y-2">
-                <Label>Corte</Label>
-                <Input
-                  type="date"
+                <Label htmlFor="cycle-cut-date">Corte</Label>
+                <DatePicker
+                  id="cycle-cut-date"
+                  aria-label="Fecha de corte"
                   value={editCycleCutDate}
-                  onChange={(e) => setEditCycleCutDate(e.target.value)}
+                  onChange={setEditCycleCutDate}
                 />
               </div>
               <div className="space-y-2">
-                <Label>Límite pago</Label>
-                <Input
-                  type="date"
+                <Label htmlFor="cycle-due-date">Límite pago</Label>
+                <DatePicker
+                  id="cycle-due-date"
+                  aria-label="Fecha límite de pago"
                   value={editCycleDueDate}
-                  onChange={(e) => setEditCycleDueDate(e.target.value)}
+                  onChange={setEditCycleDueDate}
                 />
               </div>
             </div>
@@ -329,13 +341,15 @@ export default function CyclesDataTable({
         )}
 
         {activeDialog?.type === "statement" && (
-          <DialogContent>
+          <DialogContent onCloseAutoFocus={restoreFocus}>
             <DialogHeader>
               <DialogTitle>Estado de cuenta</DialogTitle>
+              <DialogDescription>Captura el importe indicado en el estado de cuenta bancario.</DialogDescription>
             </DialogHeader>
             <div className="space-y-2">
-              <Label>Monto estado de cuenta</Label>
+              <Label htmlFor="cycles-data-table-field-1">Monto estado de cuenta</Label>
               <Input
+                id="cycles-data-table-field-1"
                 type="number"
                 min="0"
                 step="0.01"
@@ -353,22 +367,25 @@ export default function CyclesDataTable({
         )}
 
         {activeDialog?.type === "pay" && (
-          <DialogContent>
+          <DialogContent onCloseAutoFocus={restoreFocus}>
             <DialogHeader>
               <DialogTitle>Registrar pago</DialogTitle>
+              <DialogDescription>Registra la fecha y el importe pagado de este ciclo.</DialogDescription>
             </DialogHeader>
             <div className="grid gap-3">
               <div className="space-y-2">
-                <Label>Fecha de pago</Label>
-                <Input
-                  type="date"
+                <Label htmlFor="cycle-paid-at">Fecha de pago</Label>
+                <DatePicker
+                  id="cycle-paid-at"
+                  aria-label="Fecha de pago"
                   value={paidAt}
-                  onChange={(e) => setPaidAt(e.target.value)}
+                  onChange={setPaidAt}
                 />
               </div>
               <div className="space-y-2">
-                <Label>Monto pagado</Label>
+                <Label htmlFor="cycles-data-table-field-2">Monto pagado</Label>
                 <Input
+                  id="cycles-data-table-field-2"
                   type="number"
                   min="0"
                   step="0.01"
@@ -399,19 +416,22 @@ export default function CyclesDataTable({
         )}
 
         {activeDialog?.type === "breakdown" && (
-          <DialogContent className="flex max-h-[90svh] flex-col sm:max-w-4xl">
+          <DialogContent onCloseAutoFocus={restoreFocus} className="flex max-h-[90svh] flex-col sm:max-w-4xl">
             <DialogHeader>
               <DialogTitle>Desglose — {activeDialog.cycle.card.name}</DialogTitle>
+              <DialogDescription>Detalle de los movimientos e importes de este período.</DialogDescription>
             </DialogHeader>
             <div className="overflow-y-auto">
               {activeDialog.isLoading ? (
-                <p className="rounded-xl border border-border bg-muted/30 px-4 py-6 text-sm text-muted-foreground">
-                  Cargando desglose...
-                </p>
+                <div className="grid gap-4 sm:grid-cols-3" role="status" aria-label="Cargando desglose">
+                  <Skeleton className="h-40" />
+                  <Skeleton className="h-40" />
+                  <Skeleton className="h-40" />
+                </div>
               ) : activeDialog.error ? (
-                <p className="rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-6 text-sm text-destructive">
-                  {activeDialog.error}
-                </p>
+                <Alert variant="destructive">
+                  <AlertDescription>{activeDialog.error}</AlertDescription>
+                </Alert>
               ) : (
                 <CycleBreakdown cycle={activeDialog.cycle} />
               )}
@@ -419,6 +439,6 @@ export default function CyclesDataTable({
           </DialogContent>
         )}
       </Dialog>
-    </>
+    </div>
   );
 }

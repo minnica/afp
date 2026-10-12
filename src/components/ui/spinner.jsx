@@ -8,10 +8,11 @@ function Spinner({
 }) {
   return (
     <HugeiconsIcon
+      data-slot="spinner"
       icon={Loading03Icon}
       strokeWidth={2}
       role="status"
-      aria-label="Loading"
+      aria-label="Cargando"
       className={cn("size-4 animate-spin", className)}
       {...props} />
   );

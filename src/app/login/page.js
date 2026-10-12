@@ -7,6 +7,8 @@ import { ensureUserSetup } from "@/lib/userSetup";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Spinner } from "@/components/ui/spinner";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function LoginPage() {
@@ -100,18 +102,19 @@ export default function LoginPage() {
             </div>
 
             {error ? (
-              <p className="rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
-                {error}
-              </p>
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
             ) : null}
 
             {message ? (
-              <p className="rounded-lg border border-border bg-muted px-3 py-2 text-sm text-muted-foreground">
-                {message}
-              </p>
+              <Alert role="status">
+                <AlertDescription>{message}</AlertDescription>
+              </Alert>
             ) : null}
 
             <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? <Spinner /> : null}
               {isLoading
                 ? "Procesando..."
                 : mode === "login"
@@ -124,9 +127,10 @@ export default function LoginPage() {
             {mode === "login" ? (
               <>
                 ¿No tienes cuenta?{" "}
-                <button
+                <Button
                   type="button"
-                  className="text-foreground underline underline-offset-4"
+                  variant="link"
+                  className="h-auto p-0 text-sm"
                   onClick={() => {
                     setMode("register");
                     setError("");
@@ -134,14 +138,15 @@ export default function LoginPage() {
                   }}
                 >
                   Crear cuenta
-                </button>
+                </Button>
               </>
             ) : (
               <>
                 ¿Ya tienes cuenta?{" "}
-                <button
+                <Button
                   type="button"
-                  className="text-foreground underline underline-offset-4"
+                  variant="link"
+                  className="h-auto p-0 text-sm"
                   onClick={() => {
                     setMode("login");
                     setError("");
@@ -149,7 +154,7 @@ export default function LoginPage() {
                   }}
                 >
                   Iniciar sesión
-                </button>
+                </Button>
               </>
             )}
           </div>

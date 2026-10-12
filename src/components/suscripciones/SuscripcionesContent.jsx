@@ -1,14 +1,19 @@
 "use client";
 
+import { useDialogFocus } from "@/hooks/use-dialog-focus";
+
+import { Alert, AlertDescription } from "@/components/ui/alert";
+
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Pencil, Plus, PowerOff, RotateCcw, Trash2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { ensureUserSetup } from "@/lib/userSetup";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Label } from "@/components/ui/label";
 import {
   Card,
@@ -37,6 +42,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import {
   Dialog,
+  DialogDescription,
   DialogContent,
   DialogFooter,
   DialogHeader,
@@ -82,6 +88,7 @@ function getFrequencyLabel(value) {
 }
 
 export default function SuscripcionesContent() {
+  const { captureFocus, restoreFocus } = useDialogFocus();
   const router = useRouter();
 
   const [user, setUser] = useState(null);
@@ -525,7 +532,7 @@ export default function SuscripcionesContent() {
         enableSorting: false,
         cell: ({ row }) => (
           <div className="flex items-center gap-1">
-            <Button
+            <Button aria-label="Editar"
               type="button"
               variant="ghost"
               size="icon"
@@ -556,7 +563,7 @@ export default function SuscripcionesContent() {
                 <PowerOff className="h-4 w-4 text-destructive" />
               )}
             </Button>
-            <Button
+            <Button aria-label="Eliminar"
               type="button"
               variant="ghost"
               size="icon"
@@ -584,7 +591,7 @@ export default function SuscripcionesContent() {
           if (!open) setSubscriptionToDelete(null);
         }}
       >
-        <AlertDialogContent>
+        <AlertDialogContent onCloseAutoFocus={restoreFocus}>
           <AlertDialogHeader>
             <AlertDialogTitle>¿Eliminar esta suscripción?</AlertDialogTitle>
             <AlertDialogDescription>
@@ -599,7 +606,7 @@ export default function SuscripcionesContent() {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction
-              className="bg-red-800 text-white hover:bg-red-900 focus:ring-red-300"
+              variant="destructive"
               onClick={() => deleteSubscription(subscriptionToDelete.id)}
             >
               Eliminar
@@ -617,9 +624,10 @@ export default function SuscripcionesContent() {
           }
         }}
       >
-        <DialogContent className="sm:max-w-sm">
+        <DialogContent onCloseAutoFocus={restoreFocus} className="sm:max-w-sm">
           <DialogHeader>
             <DialogTitle>Desactivar suscripción</DialogTitle>
+            <DialogDescription>Revisa la información antes de confirmar los cambios.</DialogDescription>
           </DialogHeader>
 
           <p className="text-sm text-muted-foreground">
@@ -631,11 +639,12 @@ export default function SuscripcionesContent() {
           </p>
 
           <div className="space-y-2">
-            <Label>Fecha de desactivación</Label>
-            <Input
-              type="date"
+            <Label htmlFor="subscription-deactivation-date">Fecha de desactivación</Label>
+            <DatePicker
+              id="subscription-deactivation-date"
+              aria-label="Fecha de desactivación"
               value={deactivatedAtInput}
-              onChange={(e) => setDeactivatedAtInput(e.target.value)}
+              onChange={setDeactivatedAtInput}
             />
           </div>
 
@@ -668,23 +677,26 @@ export default function SuscripcionesContent() {
           if (!open) cancelEditingSubscription();
         }}
       >
-        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
+        <DialogContent onCloseAutoFocus={restoreFocus} className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle>Editar suscripción</DialogTitle>
+            <DialogDescription>Actualiza los datos y guarda los cambios.</DialogDescription>
           </DialogHeader>
 
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
-              <Label>Nombre</Label>
+              <Label htmlFor="suscripciones-field-1">Nombre</Label>
               <Input
+                id="suscripciones-field-1"
                 value={editName}
                 onChange={(event) => setEditName(event.target.value)}
               />
             </div>
 
             <div className="space-y-2">
-              <Label>Monto</Label>
+              <Label htmlFor="suscripciones-field-2">Monto</Label>
               <Input
+                id="suscripciones-field-2"
                 value={editAmount}
                 type="number"
                 min="0"
@@ -694,7 +706,7 @@ export default function SuscripcionesContent() {
             </div>
 
             <div className="space-y-2">
-              <Label>Método de pago</Label>
+              <Label htmlFor="suscripciones-field-3">Método de pago</Label>
               <Select
                 value={editPaymentMethod}
                 onValueChange={(value) => {
@@ -705,7 +717,7 @@ export default function SuscripcionesContent() {
                   }
                 }}
               >
-                <SelectTrigger>
+                <SelectTrigger id="suscripciones-field-3">
                   <SelectValue placeholder="Selecciona método" />
                 </SelectTrigger>
                 <SelectContent>
@@ -717,9 +729,9 @@ export default function SuscripcionesContent() {
 
             {editPaymentMethod === "CARD" ? (
               <div className="space-y-2">
-                <Label>Tarjeta</Label>
+                <Label htmlFor="suscripciones-field-4">Tarjeta</Label>
                 <Select value={editCardId} onValueChange={setEditCardId}>
-                  <SelectTrigger>
+                  <SelectTrigger id="suscripciones-field-4">
                     <SelectValue placeholder="Selecciona tarjeta" />
                   </SelectTrigger>
                   <SelectContent>
@@ -734,9 +746,9 @@ export default function SuscripcionesContent() {
             ) : null}
 
             <div className="space-y-2">
-              <Label>Categoría</Label>
+              <Label htmlFor="suscripciones-field-5">Categoría</Label>
               <Select value={editCategoryId} onValueChange={setEditCategoryId}>
-                <SelectTrigger>
+                <SelectTrigger id="suscripciones-field-5">
                   <SelectValue placeholder="Selecciona categoría" />
                 </SelectTrigger>
                 <SelectContent>
@@ -750,8 +762,9 @@ export default function SuscripcionesContent() {
             </div>
 
             <div className="space-y-2">
-              <Label>Día de cobro</Label>
+              <Label htmlFor="suscripciones-field-6">Día de cobro</Label>
               <Input
+                id="suscripciones-field-6"
                 value={editChargeDay}
                 type="number"
                 min="1"
@@ -761,12 +774,12 @@ export default function SuscripcionesContent() {
             </div>
 
             <div className="space-y-2">
-              <Label>Frecuencia</Label>
+              <Label htmlFor="suscripciones-field-7">Frecuencia</Label>
               <Select
                 value={editFrequencyMonths}
                 onValueChange={setEditFrequencyMonths}
               >
-                <SelectTrigger>
+                <SelectTrigger id="suscripciones-field-7">
                   <SelectValue placeholder="Selecciona frecuencia" />
                 </SelectTrigger>
                 <SelectContent>
@@ -780,9 +793,9 @@ export default function SuscripcionesContent() {
             </div>
 
             <div className="space-y-2">
-              <Label>Mes de inicio</Label>
+              <Label htmlFor="suscripciones-field-8">Mes de inicio</Label>
               <Select value={editStartMonth} onValueChange={setEditStartMonth}>
-                <SelectTrigger>
+                <SelectTrigger id="suscripciones-field-8">
                   <SelectValue placeholder="Mes" />
                 </SelectTrigger>
                 <SelectContent>
@@ -803,8 +816,9 @@ export default function SuscripcionesContent() {
             </div>
 
             <div className="space-y-2">
-              <Label>Año de inicio</Label>
+              <Label htmlFor="suscripciones-field-9">Año de inicio</Label>
               <Input
+                id="suscripciones-field-9"
                 type="number"
                 min="2000"
                 max="2100"
@@ -833,12 +847,12 @@ export default function SuscripcionesContent() {
         </DialogContent>
       </Dialog>
 
-      <main>
+      <main onClickCapture={captureFocus}>
         <section className="mx-auto flex w-full max-w-full flex-col px-4 py-5 md:py-8">
           {error ? (
-            <div className="mb-6 rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-              {error}
-            </div>
+            <Alert variant="destructive" className="mb-6">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
           ) : null}
 
           <div className="grid min-w-0 gap-5 xl:grid-cols-[420px_1fr]">
@@ -851,8 +865,9 @@ export default function SuscripcionesContent() {
 
               <CardContent className="space-y-5">
                 <div className="space-y-2">
-                  <Label>Nombre</Label>
+                  <Label htmlFor="suscripciones-field-10">Nombre</Label>
                   <Input
+                    id="suscripciones-field-10"
                     value={name}
                     placeholder="Ej. Netflix, Spotify, iCloud..."
                     onChange={(event) => setName(event.target.value)}
@@ -860,8 +875,9 @@ export default function SuscripcionesContent() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Monto</Label>
+                  <Label htmlFor="suscripciones-field-11">Monto</Label>
                   <Input
+                    id="suscripciones-field-11"
                     value={amount}
                     type="number"
                     min="0"
@@ -872,7 +888,7 @@ export default function SuscripcionesContent() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Método de pago</Label>
+                  <Label htmlFor="suscripciones-field-12">Método de pago</Label>
                   <Select
                     value={paymentMethod}
                     onValueChange={(value) => {
@@ -883,7 +899,7 @@ export default function SuscripcionesContent() {
                       }
                     }}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger id="suscripciones-field-12">
                       <SelectValue placeholder="Selecciona método" />
                     </SelectTrigger>
                     <SelectContent>
@@ -895,9 +911,9 @@ export default function SuscripcionesContent() {
 
                 {paymentMethod === "CARD" ? (
                   <div className="space-y-2">
-                    <Label>Tarjeta</Label>
+                    <Label htmlFor="suscripciones-field-13">Tarjeta</Label>
                     <Select value={cardId} onValueChange={setCardId}>
-                      <SelectTrigger>
+                      <SelectTrigger id="suscripciones-field-13">
                         <SelectValue placeholder="Selecciona tarjeta" />
                       </SelectTrigger>
                       <SelectContent>
@@ -918,9 +934,9 @@ export default function SuscripcionesContent() {
                 ) : null}
 
                 <div className="space-y-2">
-                  <Label>Categoría</Label>
+                  <Label htmlFor="suscripciones-field-14">Categoría</Label>
                   <Select value={categoryId} onValueChange={setCategoryId}>
-                    <SelectTrigger>
+                    <SelectTrigger id="suscripciones-field-14">
                       <SelectValue placeholder="Selecciona categoría" />
                     </SelectTrigger>
                     <SelectContent>
@@ -934,8 +950,9 @@ export default function SuscripcionesContent() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Día de cobro</Label>
+                  <Label htmlFor="suscripciones-field-15">Día de cobro</Label>
                   <Input
+                    id="suscripciones-field-15"
                     value={chargeDay}
                     type="number"
                     min="1"
@@ -946,12 +963,12 @@ export default function SuscripcionesContent() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Frecuencia</Label>
+                  <Label htmlFor="suscripciones-field-16">Frecuencia</Label>
                   <Select
                     value={frequencyMonths}
                     onValueChange={setFrequencyMonths}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger id="suscripciones-field-16">
                       <SelectValue placeholder="Selecciona frecuencia" />
                     </SelectTrigger>
                     <SelectContent>
@@ -966,9 +983,9 @@ export default function SuscripcionesContent() {
 
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
-                    <Label>Mes de inicio</Label>
+                    <Label htmlFor="suscripciones-field-17">Mes de inicio</Label>
                     <Select value={startMonth} onValueChange={setStartMonth}>
-                      <SelectTrigger>
+                      <SelectTrigger id="suscripciones-field-17">
                         <SelectValue placeholder="Mes" />
                       </SelectTrigger>
                       <SelectContent>
@@ -989,8 +1006,9 @@ export default function SuscripcionesContent() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label>Año de inicio</Label>
+                    <Label htmlFor="suscripciones-field-18">Año de inicio</Label>
                     <Input
+                      id="suscripciones-field-18"
                       type="number"
                       min="2000"
                       max="2100"

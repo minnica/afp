@@ -1,5 +1,15 @@
-const CACHE_NAME = "afp-shell-v2";
-const APP_SHELL_URLS = ["/", "/gastos", "/manifest.webmanifest", "/icons/app-icon.svg"];
+const CACHE_NAME = "afp-shell-v3";
+const APP_SHELL_URLS = [
+  "/",
+  "/gastos",
+  "/manifest.webmanifest",
+  "/icons/app-icon.svg?v=3",
+  "/icons/app-icon-v3-192.png",
+  "/icons/app-icon-v3-512.png",
+  "/icons/app-icon-v3-1024.png",
+  "/icons/app-icon-v3-maskable-512.png",
+  "/icons/apple-touch-icon-v3.png",
+];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -46,7 +56,7 @@ self.addEventListener("fetch", (event) => {
     url.pathname === "/api/gastos/bootstrap" ||
     url.pathname === "/api/expenses" ||
     url.pathname === "/manifest.webmanifest" ||
-    url.pathname === "/icons/app-icon.svg"
+    url.pathname.startsWith("/icons/")
   ) {
     event.respondWith(networkFirst(request));
   }

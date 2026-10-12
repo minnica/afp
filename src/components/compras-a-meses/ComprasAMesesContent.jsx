@@ -1,5 +1,9 @@
 "use client";
 
+import { useDialogFocus } from "@/hooks/use-dialog-focus";
+
+import { Alert, AlertDescription } from "@/components/ui/alert";
+
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
@@ -11,6 +15,7 @@ import { getLatestInstallmentStatement } from "@/lib/calculations/installmentSta
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -28,7 +33,7 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/sonner";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -41,6 +46,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import {
   Dialog,
+  DialogDescription,
   DialogContent,
   DialogFooter,
   DialogHeader,
@@ -119,6 +125,7 @@ function getNextPaymentDueDate(purchase) {
 }
 
 export default function ComprasAMesesContent() {
+  const { captureFocus, restoreFocus } = useDialogFocus();
   const router = useRouter();
 
   const [user, setUser] = useState(null);
@@ -543,7 +550,7 @@ export default function ComprasAMesesContent() {
         enableSorting: false,
         cell: ({ row }) => (
           <div className="flex items-center gap-1">
-            <Button
+            <Button aria-label="Editar"
               type="button"
               variant="ghost"
               size="icon"
@@ -551,7 +558,7 @@ export default function ComprasAMesesContent() {
             >
               <Pencil className="h-4 w-4" />
             </Button>
-            <Button
+            <Button aria-label="Eliminar"
               type="button"
               variant="ghost"
               size="icon"
@@ -615,7 +622,7 @@ export default function ComprasAMesesContent() {
           if (!open) setPurchaseToDelete(null);
         }}
       >
-        <AlertDialogContent>
+        <AlertDialogContent onCloseAutoFocus={restoreFocus}>
           <AlertDialogHeader>
             <AlertDialogTitle>¿Eliminar esta compra a meses?</AlertDialogTitle>
             <AlertDialogDescription>
@@ -630,7 +637,7 @@ export default function ComprasAMesesContent() {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              variant="destructive"
               onClick={() => deletePurchase(purchaseToDelete.id)}
             >
               Eliminar
@@ -645,16 +652,17 @@ export default function ComprasAMesesContent() {
           if (!open) cancelEditingPurchase();
         }}
       >
-        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
+        <DialogContent onCloseAutoFocus={restoreFocus} className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle>Editar compra a meses</DialogTitle>
+            <DialogDescription>Actualiza los datos y guarda los cambios.</DialogDescription>
           </DialogHeader>
 
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
-              <Label>Tarjeta</Label>
+              <Label htmlFor="compras-ameses-field-1">Tarjeta</Label>
               <Select value={editCardId} onValueChange={setEditCardId}>
-                <SelectTrigger>
+                <SelectTrigger id="compras-ameses-field-1">
                   <SelectValue placeholder="Selecciona tarjeta" />
                 </SelectTrigger>
                 <SelectContent>
@@ -668,25 +676,28 @@ export default function ComprasAMesesContent() {
             </div>
 
             <div className="space-y-2">
-              <Label>Fecha de compra</Label>
-              <Input
-                type="date"
+              <Label htmlFor="edit-purchase-date">Fecha de compra</Label>
+              <DatePicker
+                id="edit-purchase-date"
+                aria-label="Fecha de compra"
                 value={editPurchaseDate}
-                onChange={(event) => setEditPurchaseDate(event.target.value)}
+                onChange={setEditPurchaseDate}
               />
             </div>
 
             <div className="space-y-2 md:col-span-2">
-              <Label>Concepto</Label>
+              <Label htmlFor="compras-ameses-field-2">Concepto</Label>
               <Input
+                id="compras-ameses-field-2"
                 value={editConcept}
                 onChange={(event) => setEditConcept(event.target.value)}
               />
             </div>
 
             <div className="space-y-2">
-              <Label>Monto total</Label>
+              <Label htmlFor="compras-ameses-field-3">Monto total</Label>
               <Input
+                id="compras-ameses-field-3"
                 type="number"
                 min="0"
                 step="0.01"
@@ -696,8 +707,9 @@ export default function ComprasAMesesContent() {
             </div>
 
             <div className="space-y-2">
-              <Label>Número de meses</Label>
+              <Label htmlFor="compras-ameses-field-4">Número de meses</Label>
               <Input
+                id="compras-ameses-field-4"
                 type="number"
                 min="1"
                 value={editMonths}
@@ -706,8 +718,9 @@ export default function ComprasAMesesContent() {
             </div>
 
             <div className="space-y-2">
-              <Label>Pago mensual manual (opcional)</Label>
+              <Label htmlFor="compras-ameses-field-5">Pago mensual manual (opcional)</Label>
               <Input
+                id="compras-ameses-field-5"
                 type="number"
                 min="0"
                 step="0.01"
@@ -719,8 +732,9 @@ export default function ComprasAMesesContent() {
             </div>
 
             <div className="space-y-2">
-              <Label>Pagos ya realizados</Label>
+              <Label htmlFor="compras-ameses-field-6">Pagos ya realizados</Label>
               <Input
+                id="compras-ameses-field-6"
                 type="number"
                 min="0"
                 value={editInitialPaymentsMade}
@@ -731,12 +745,12 @@ export default function ComprasAMesesContent() {
             </div>
 
             <div className="space-y-2">
-              <Label>Categoría</Label>
+              <Label htmlFor="compras-ameses-field-7">Categoría</Label>
               <Select
                 value={editCategoryId}
                 onValueChange={setEditCategoryId}
               >
-                <SelectTrigger>
+                <SelectTrigger id="compras-ameses-field-7">
                   <SelectValue placeholder="Selecciona categoría" />
                 </SelectTrigger>
                 <SelectContent>
@@ -750,8 +764,8 @@ export default function ComprasAMesesContent() {
             </div>
 
             <div className="space-y-2 md:col-span-2">
-              <Label>Notas</Label>
-              <Textarea
+              <Label htmlFor="compras-ameses-field-8">Notas</Label>
+              <Textarea id="compras-ameses-field-8"
                 value={editNotes}
                 onChange={(event) => setEditNotes(event.target.value)}
               />
@@ -777,12 +791,12 @@ export default function ComprasAMesesContent() {
         </DialogContent>
       </Dialog>
 
-      <main>
+      <main onClickCapture={captureFocus}>
         <section className="mx-auto flex w-full max-w-full flex-col px-4 py-5 md:py-8">
           {error ? (
-            <div className="mb-6 rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-              {error}
-            </div>
+            <Alert variant="destructive" className="mb-6">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
           ) : null}
 
           <div className="grid gap-5 xl:grid-cols-[420px_1fr]">
@@ -795,9 +809,9 @@ export default function ComprasAMesesContent() {
 
               <CardContent className="space-y-5">
                 <div className="space-y-2">
-                  <Label>Tarjeta</Label>
+                  <Label htmlFor="compras-ameses-field-9">Tarjeta</Label>
                   <Select value={cardId} onValueChange={setCardId}>
-                    <SelectTrigger>
+                    <SelectTrigger id="compras-ameses-field-9">
                       <SelectValue placeholder="Selecciona tarjeta" />
                     </SelectTrigger>
                     <SelectContent>
@@ -811,17 +825,19 @@ export default function ComprasAMesesContent() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Fecha de compra</Label>
-                  <Input
-                    type="date"
+                  <Label htmlFor="purchase-date">Fecha de compra</Label>
+                  <DatePicker
+                    id="purchase-date"
+                    aria-label="Fecha de compra"
                     value={purchaseDate}
-                    onChange={(event) => setPurchaseDate(event.target.value)}
+                    onChange={setPurchaseDate}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Concepto</Label>
+                  <Label htmlFor="compras-ameses-field-10">Concepto</Label>
                   <Input
+                    id="compras-ameses-field-10"
                     value={concept}
                     placeholder="Ej. Celular, laptop, consola..."
                     onChange={(event) => setConcept(event.target.value)}
@@ -829,8 +845,9 @@ export default function ComprasAMesesContent() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Monto total</Label>
+                  <Label htmlFor="compras-ameses-field-11">Monto total</Label>
                   <Input
+                    id="compras-ameses-field-11"
                     value={totalAmount}
                     type="number"
                     min="0"
@@ -841,8 +858,9 @@ export default function ComprasAMesesContent() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Número de meses</Label>
+                  <Label htmlFor="compras-ameses-field-12">Número de meses</Label>
                   <Input
+                    id="compras-ameses-field-12"
                     value={months}
                     type="number"
                     min="1"
@@ -861,8 +879,9 @@ export default function ComprasAMesesContent() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Pagos ya realizados</Label>
+                  <Label htmlFor="compras-ameses-field-13">Pagos ya realizados</Label>
                   <Input
+                    id="compras-ameses-field-13"
                     value={initialPaymentsMade}
                     type="number"
                     min="0"
@@ -874,9 +893,9 @@ export default function ComprasAMesesContent() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Categoría</Label>
+                  <Label htmlFor="compras-ameses-field-14">Categoría</Label>
                   <Select value={categoryId} onValueChange={setCategoryId}>
-                    <SelectTrigger>
+                    <SelectTrigger id="compras-ameses-field-14">
                       <SelectValue placeholder="Selecciona categoría" />
                     </SelectTrigger>
                     <SelectContent>
@@ -890,9 +909,9 @@ export default function ComprasAMesesContent() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Persona, si aplica</Label>
+                  <Label htmlFor="compras-ameses-field-15">Persona, si aplica</Label>
                   <Select value={personId} onValueChange={setPersonId}>
-                    <SelectTrigger>
+                    <SelectTrigger id="compras-ameses-field-15">
                       <SelectValue placeholder="Sin persona" />
                     </SelectTrigger>
                     <SelectContent>
@@ -913,8 +932,8 @@ export default function ComprasAMesesContent() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Notas (opcional)</Label>
-                  <Textarea
+                  <Label htmlFor="compras-ameses-field-16">Notas (opcional)</Label>
+                  <Textarea id="compras-ameses-field-16"
                     value={notes}
                     placeholder="Detalles adicionales..."
                     onChange={(event) => setNotes(event.target.value)}

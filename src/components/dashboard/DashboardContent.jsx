@@ -1,19 +1,20 @@
 "use client";
 
+import { useDialogFocus } from "@/hooks/use-dialog-focus";
+
+import { Empty, EmptyDescription } from "@/components/ui/empty";
+
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import {
   Cell,
-  Tooltip,
-  Legend,
   BarChart,
   Bar,
   XAxis,
   YAxis,
   CartesianGrid,
-  ResponsiveContainer,
 } from "recharts";
 
 import { supabase } from "@/lib/supabase";
@@ -21,10 +22,14 @@ import { ensureUserSetup } from "@/lib/userSetup";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { Item, ItemContent, ItemDescription, ItemGroup, ItemTitle } from "@/components/ui/item";
+import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "@/components/ui/chart";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
+  DialogDescription,
   DialogContent,
   DialogHeader,
   DialogTitle,
@@ -283,6 +288,7 @@ function getNoticeIcon(group) {
 }
 
 export default function DashboardContent() {
+  const { captureFocus, restoreFocus } = useDialogFocus();
   const router = useRouter();
 
   const [user, setUser] = useState(null);
@@ -400,12 +406,12 @@ export default function DashboardContent() {
   }
 
   return (
-    <main>
+    <main onClickCapture={captureFocus}>
       <section className="mx-auto flex w-full max-w-full flex-col px-4 py-8">
         {error ? (
-          <div className="mb-6 rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-            {error}
-          </div>
+          <Alert variant="destructive" className="mb-6">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
         ) : null}
 
         <div className="space-y-6">
@@ -470,52 +476,19 @@ export default function DashboardContent() {
   );
 }
 
-const CHART_COLORS = [
-  "#3b82f6",
-  "#10b981",
-  "#f59e0b",
-  "#a855f7",
-  "#ef4444",
-  "#06b6d4",
-  "#f97316",
-  "#84cc16",
-  "#ec4899",
-  "#14b8a6",
-];
-
-const TOOLTIP_STYLE = {
-  contentStyle: {
-    backgroundColor: "#1c1c1c",
-    border: "1px solid #333",
-    borderRadius: "8px",
-    color: "#f5f5f5",
-    fontSize: "12px",
-  },
-  itemStyle: { color: "#f5f5f5" },
-  labelStyle: { color: "#a1a1aa" },
-};
-
 const MXN = new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" });
 
-function ComparisonTooltip({ active, payload, label }) {
-  if (!active || !payload || !payload.length) return null;
-  return (
-    <div style={{ ...TOOLTIP_STYLE.contentStyle, padding: "10px 14px" }}>
-      <p style={{ color: "#a1a1aa", marginBottom: "8px", fontSize: "11px" }}>{label}</p>
-      {payload.map((entry, i) => (
-        <p key={i} style={{ color: entry.color, margin: "4px 0", fontSize: "12px" }}>
-          <span style={{ color: "#a1a1aa" }}>{entry.name}: </span>
-          {MXN.format(entry.value)}
-        </p>
-      ))}
-    </div>
-  );
+function comparisonChartConfig(previousLabel, currentLabel) {
+  return {
+    previous: { label: previousLabel, color: "var(--chart-1)" },
+    current: { label: currentLabel, color: "var(--chart-2)" },
+  };
 }
 
 function MonthSelector({ value, onChange }) {
   return (
     <Select value={String(value)} onValueChange={(v) => onChange(Number(v))}>
-      <SelectTrigger className="w-full max-w-[160px] h-8 text-xs">
+      <SelectTrigger aria-label="Mes del período" className="w-full max-w-[160px] h-8 text-xs">
         <SelectValue />
       </SelectTrigger>
       <SelectContent>
@@ -557,9 +530,11 @@ function WeeklyComparisonChart({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="rounded-xl border border-border bg-muted/30 px-4 py-6 text-sm text-muted-foreground">
-            Sin datos disponibles.
-          </p>
+          <Empty>
+            <EmptyDescription>
+              Sin datos disponibles.
+            </EmptyDescription>
+          </Empty>
         </CardContent>
       </Card>
     );
@@ -569,8 +544,8 @@ function WeeklyComparisonChart({
 
   const chartData = weeks.map((w) => ({
     label: w.label,
-    [prevMonthLabel]: w.prevTotal,
-    [currMonthLabel]: w.currTotal,
+    previous: w.prevTotal,
+    current: w.currTotal,
   }));
 
   const hasData = weeks.some((w) => w.prevTotal > 0 || w.currTotal > 0);
@@ -589,7 +564,7 @@ function WeeklyComparisonChart({
           <MonthSelector value={selectedMonthIndex} onChange={setSelectedMonthIndex} />
           {categories.length > 0 && (
             <Select value={selectedCategoryId} onValueChange={setSelectedCategoryId}>
-              <SelectTrigger className="w-full max-w-[220px] h-8 text-xs">
+              <SelectTrigger aria-label="Categoría del comparativo" className="w-full max-w-[220px] h-8 text-xs">
                 <SelectValue placeholder="Filtrar por categoría" />
               </SelectTrigger>
               <SelectContent>
@@ -609,14 +584,14 @@ function WeeklyComparisonChart({
         <div className="mb-4 grid grid-cols-2 gap-3">
           <div className="rounded-xl border border-border bg-muted/30 px-4 py-3">
             <p className="text-xs text-muted-foreground">{prevMonthLabel}</p>
-            <p className="mt-1 text-lg font-semibold text-blue-400">
+            <p className="mt-1 text-lg font-semibold text-chart-1">
               {formatMoney(prevMonthTotal)}
             </p>
           </div>
 
           <div className="rounded-xl border border-border bg-muted/30 px-4 py-3">
             <p className="text-xs text-muted-foreground">{currMonthLabel}</p>
-            <p className="mt-1 text-lg font-semibold text-emerald-400">
+            <p className="mt-1 text-lg font-semibold text-chart-2">
               {formatMoney(currMonthTotal)}
             </p>
             {diffPct !== null && (
@@ -637,22 +612,24 @@ function WeeklyComparisonChart({
         </div>
 
         {!hasData ? (
-          <p className="rounded-xl border border-border bg-muted/30 px-4 py-6 text-sm text-muted-foreground">
-            Sin gastos registrados para comparar.
-          </p>
+          <Empty>
+            <EmptyDescription>
+              Sin gastos registrados para comparar.
+            </EmptyDescription>
+          </Empty>
         ) : (
-          <div style={{ width: "100%", height: "280px" }}>
-            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+          <ChartContainer config={comparisonChartConfig(prevMonthLabel, currMonthLabel)} className="h-[280px] w-full aspect-auto">
               <BarChart
+                accessibilityLayer
                 data={chartData}
                 margin={{ top: 4, right: 8, bottom: 0, left: 0 }}
               >
-                <CartesianGrid vertical={false} stroke="#333" />
+                <CartesianGrid vertical={false} stroke="var(--border)" />
                 <XAxis
                   dataKey="label"
                   tickLine={false}
                   axisLine={false}
-                  tick={{ fontSize: 11, fill: "#a1a1aa" }}
+                  tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
                 />
                 <YAxis
                   tickLine={false}
@@ -664,41 +641,35 @@ function WeeklyComparisonChart({
                       maximumFractionDigits: 0,
                     }).format(v)
                   }
-                  tick={{ fontSize: 10, fill: "#a1a1aa" }}
+                  tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
                   width={76}
                 />
-                <Tooltip content={ComparisonTooltip} />
-                <Legend
-                  content={({ payload }) => {
-                    if (!payload || payload.length === 0) return null;
-                    const ordered = [...payload].reverse();
-                    return (
-                      <div style={{ display: "flex", justifyContent: "center", gap: "16px", marginTop: "8px" }}>
-                        {ordered.map((entry, i) => (
-                          <div key={i} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                            <div style={{ width: "12px", height: "12px", backgroundColor: entry.color, borderRadius: "2px" }} />
-                            <span style={{ color: "#a1a1aa", fontSize: "12px" }}>{entry.value}</span>
-                          </div>
-                        ))}
-                      </div>
-                    );
-                  }}
+                <ChartTooltip
+                  cursor={false}
+                  content={<ChartTooltipContent formatter={(value, name) => (
+                    <div className="flex w-full items-center justify-between gap-4">
+                      <span className="text-muted-foreground">{name}</span>
+                      <span className="font-mono font-medium tabular-nums">{MXN.format(Number(value))}</span>
+                    </div>
+                  )} />}
                 />
+                <ChartLegend content={<ChartLegendContent className="flex-wrap" />} />
                 <Bar
-                  dataKey={prevMonthLabel}
-                  fill="#3b82f6"
+                  isAnimationActive={false}
+                  dataKey="previous" name={prevMonthLabel}
+                  fill="var(--color-previous)"
                   radius={[3, 3, 0, 0]}
                   maxBarSize={36}
                 />
                 <Bar
-                  dataKey={currMonthLabel}
-                  fill="#10b981"
+                  isAnimationActive={false}
+                  dataKey="current" name={currMonthLabel}
+                  fill="var(--color-current)"
                   radius={[3, 3, 0, 0]}
                   maxBarSize={36}
                 />
               </BarChart>
-            </ResponsiveContainer>
-          </div>
+            </ChartContainer>
         )}
       </CardContent>
     </Card>
@@ -729,11 +700,11 @@ function CategoryBarChart({ categoryBreakdownByMonth, currentMonthIndex }) {
     .map((id) => ({
       id,
       name: nameById[id],
-      [prevLabel]: prevBreakdown.find((c) => c.id === id)?.total || 0,
-      [currLabel]: currBreakdown.find((c) => c.id === id)?.total || 0,
+      previous: prevBreakdown.find((c) => c.id === id)?.total || 0,
+      current: currBreakdown.find((c) => c.id === id)?.total || 0,
     }))
-    .filter((c) => c[prevLabel] > 0 || c[currLabel] > 0)
-    .sort((a, b) => b[currLabel] - a[currLabel]);
+    .filter((c) => c.previous > 0 || c.current > 0)
+    .sort((a, b) => b.current - a.current);
 
   const hasData = chartData.length > 0;
 
@@ -750,24 +721,26 @@ function CategoryBarChart({ categoryBreakdownByMonth, currentMonthIndex }) {
 
       <CardContent>
         {!hasData ? (
-          <p className="rounded-xl border border-border bg-muted/30 px-4 py-6 text-sm text-muted-foreground">
-            Aún no hay gastos para este período.
-          </p>
+          <Empty>
+            <EmptyDescription>
+              Aún no hay gastos para este período.
+            </EmptyDescription>
+          </Empty>
         ) : (
-          <div style={{ width: "100%", height: "520px" }}>
-            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+          <ChartContainer config={comparisonChartConfig(prevLabel, currLabel)} className="h-[520px] w-full aspect-auto">
               <BarChart
+                accessibilityLayer
                 data={chartData}
                 margin={{ top: 4, right: 8, bottom: 48, left: 0 }}
                 barCategoryGap="20%"
                 barGap={2}
               >
-                <CartesianGrid vertical={false} stroke="#333" />
+                <CartesianGrid vertical={false} stroke="var(--border)" />
                 <XAxis
                   dataKey="name"
                   tickLine={false}
                   axisLine={false}
-                  tick={{ fontSize: 11, fill: "#a1a1aa", textAnchor: "end" }}
+                  tick={{ fontSize: 11, fill: "var(--muted-foreground)", textAnchor: "end" }}
                   angle={-35}
                   interval={0}
                 />
@@ -781,31 +754,23 @@ function CategoryBarChart({ categoryBreakdownByMonth, currentMonthIndex }) {
                       maximumFractionDigits: 0,
                     }).format(v)
                   }
-                  tick={{ fontSize: 10, fill: "#a1a1aa" }}
+                  tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
                   width={76}
                 />
-                <Tooltip content={ComparisonTooltip} />
-                <Legend
-                  content={({ payload }) => {
-                    if (!payload || payload.length === 0) return null;
-                    const ordered = [...payload].reverse();
-                    return (
-                      <div style={{ display: "flex", justifyContent: "center", gap: "16px", marginTop: "8px" }}>
-                        {ordered.map((entry, i) => (
-                          <div key={i} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                            <div style={{ width: "12px", height: "12px", backgroundColor: entry.color, borderRadius: "2px" }} />
-                            <span style={{ color: "#a1a1aa", fontSize: "12px" }}>{entry.value}</span>
-                          </div>
-                        ))}
-                      </div>
-                    );
-                  }}
+                <ChartTooltip
+                  cursor={false}
+                  content={<ChartTooltipContent formatter={(value, name) => (
+                    <div className="flex w-full items-center justify-between gap-4">
+                      <span className="text-muted-foreground">{name}</span>
+                      <span className="font-mono font-medium tabular-nums">{MXN.format(Number(value))}</span>
+                    </div>
+                  )} />}
                 />
-                <Bar dataKey={prevLabel} fill="#3b82f6" radius={[3, 3, 0, 0]} maxBarSize={36} />
-                <Bar dataKey={currLabel} fill="#10b981" radius={[3, 3, 0, 0]} maxBarSize={36} />
+                <ChartLegend content={<ChartLegendContent className="flex-wrap" />} />
+                <Bar isAnimationActive={false} dataKey="previous" name={prevLabel} fill="var(--color-previous)" radius={[3, 3, 0, 0]} maxBarSize={36} />
+                <Bar isAnimationActive={false} dataKey="current" name={currLabel} fill="var(--color-current)" radius={[3, 3, 0, 0]} maxBarSize={36} />
               </BarChart>
-            </ResponsiveContainer>
-          </div>
+            </ChartContainer>
         )}
       </CardContent>
     </Card>
@@ -828,9 +793,11 @@ function CardMonthlyComparisonChart({ cardMonthlyComparisonByMonth, currentMonth
           </div>
         </CardHeader>
         <CardContent>
-          <p className="rounded-xl border border-border bg-muted/30 px-4 py-6 text-sm text-muted-foreground">
-            Sin datos de tarjetas para comparar.
-          </p>
+          <Empty>
+            <EmptyDescription>
+              Sin datos de tarjetas para comparar.
+            </EmptyDescription>
+          </Empty>
         </CardContent>
       </Card>
     );
@@ -841,12 +808,12 @@ function CardMonthlyComparisonChart({ cardMonthlyComparisonByMonth, currentMonth
   const chartData = data
     .map((c) => ({
       name: c.cardName,
-      [prevMonthLabel]: c.prevAmount,
-      [currMonthLabel]: c.currAmount,
+      previous: c.prevAmount,
+      current: c.currAmount,
       prevIsStatement: c.prevIsStatement,
       currIsStatement: c.currIsStatement,
     }))
-    .sort((a, b) => b[currMonthLabel] - a[currMonthLabel]);
+    .sort((a, b) => b.current - a.current);
 
   return (
     <Card className="rounded-2xl border-border bg-card">
@@ -859,23 +826,23 @@ function CardMonthlyComparisonChart({ cardMonthlyComparisonByMonth, currentMonth
         </div>
       </CardHeader>
       <CardContent>
-        <div style={{ width: "100%", height: `${Math.max(chartData.length * 68 + 40, 200)}px` }}>
-          <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+        <ChartContainer config={comparisonChartConfig(prevMonthLabel, currMonthLabel)} className="w-full aspect-auto" style={{ height: Math.max(chartData.length * 68 + 40, 200) }}>
             <BarChart
+                accessibilityLayer
               layout="vertical"
               data={chartData}
               margin={{ top: 0, right: 16, bottom: 8, left: 0 }}
               barCategoryGap="20%"
               barGap={2}
             >
-              <CartesianGrid horizontal={false} stroke="#333" />
+              <CartesianGrid horizontal={false} stroke="var(--border)" />
               <YAxis
                 dataKey="name"
                 type="category"
                 tickLine={false}
                 axisLine={false}
                 width={120}
-                tick={{ fontSize: 12, fill: "#a1a1aa" }}
+                tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
               />
               <XAxis
                 type="number"
@@ -888,30 +855,22 @@ function CardMonthlyComparisonChart({ cardMonthlyComparisonByMonth, currentMonth
                     maximumFractionDigits: 0,
                   }).format(v)
                 }
-                tick={{ fontSize: 10, fill: "#a1a1aa" }}
+                tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
               />
-              <Tooltip content={ComparisonTooltip} />
-              <Legend
-                content={({ payload }) => {
-                  if (!payload || payload.length === 0) return null;
-                  const ordered = [...payload].reverse();
-                  return (
-                    <div style={{ display: "flex", justifyContent: "center", gap: "16px", marginTop: "8px" }}>
-                      {ordered.map((entry, i) => (
-                        <div key={i} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                          <div style={{ width: "12px", height: "12px", backgroundColor: entry.color, borderRadius: "2px" }} />
-                          <span style={{ color: "#a1a1aa", fontSize: "12px" }}>{entry.value}</span>
-                        </div>
-                      ))}
+              <ChartTooltip
+                  cursor={false}
+                  content={<ChartTooltipContent formatter={(value, name) => (
+                    <div className="flex w-full items-center justify-between gap-4">
+                      <span className="text-muted-foreground">{name}</span>
+                      <span className="font-mono font-medium tabular-nums">{MXN.format(Number(value))}</span>
                     </div>
-                  );
-                }}
-              />
-              <Bar dataKey={prevMonthLabel} fill="#3b82f6" radius={[0, 4, 4, 0]} maxBarSize={14} />
-              <Bar dataKey={currMonthLabel} fill="#10b981" radius={[0, 4, 4, 0]} maxBarSize={14} />
+                  )} />}
+                />
+              <ChartLegend content={<ChartLegendContent className="flex-wrap" />} />
+              <Bar isAnimationActive={false} dataKey="previous" name={prevMonthLabel} fill="var(--color-previous)" radius={[0, 4, 4, 0]} maxBarSize={14} />
+              <Bar isAnimationActive={false} dataKey="current" name={currMonthLabel} fill="var(--color-current)" radius={[0, 4, 4, 0]} maxBarSize={14} />
             </BarChart>
-          </ResponsiveContainer>
-        </div>
+          </ChartContainer>
         <p className="mt-3 text-center text-xs text-muted-foreground">
           * Monto estimado cuando no hay estado de cuenta registrado
         </p>
@@ -954,9 +913,6 @@ function CardUsageWaiverProgress({ cardUsageWaiversByMonth, currentMonthIndex })
         <div className="space-y-4">
           {items.map((item) => {
             const progress = Math.max(0, Math.min(Number(item.progress || 0), 100));
-            const barClass = item.isExempt
-              ? "bg-emerald-400"
-              : "bg-blue-400";
 
             return (
               <div
@@ -975,19 +931,11 @@ function CardUsageWaiverProgress({ cardUsageWaiversByMonth, currentMonthIndex })
                   </p>
                 </div>
 
-                <div
-                  className="h-2.5 overflow-hidden rounded-full bg-muted"
-                  role="progressbar"
+                <Progress
+                  value={progress}
                   aria-label={`Progreso de consumo de ${item.card.name}`}
-                  aria-valuemin={0}
-                  aria-valuemax={100}
-                  aria-valuenow={Math.round(progress)}
-                >
-                  <div
-                    className={`h-full rounded-full transition-[width] duration-300 ${barClass}`}
-                    style={{ width: `${progress}%` }}
-                  />
-                </div>
+                  className={`h-2.5 ${item.isExempt ? "[&_[data-slot=progress-indicator]]:bg-emerald-400" : "[&_[data-slot=progress-indicator]]:bg-blue-400"}`}
+                />
 
                 <div className="space-y-1 text-sm md:text-right">
                   <p>
@@ -1028,9 +976,10 @@ function CardUsageWaiverProgress({ cardUsageWaiversByMonth, currentMonthIndex })
         }}
       >
         {selectedItem ? (
-          <DialogContent className="flex max-h-[90svh] flex-col sm:max-w-4xl">
+          <DialogContent onCloseAutoFocus={restoreFocus} className="flex max-h-[90svh] flex-col sm:max-w-4xl">
             <DialogHeader>
               <DialogTitle>Desglose — {selectedItem.card.name}</DialogTitle>
+              <DialogDescription>Detalle de los movimientos e importes de este período.</DialogDescription>
             </DialogHeader>
             <div className="overflow-y-auto">
               <CardUsageWaiverBreakdown item={selectedItem} />
@@ -1108,34 +1057,36 @@ function CardUsageWaiverBreakdown({ item }) {
 
       <div className="grid gap-4 lg:grid-cols-3">
         {sections.map((section) => (
-          <div key={section.title} className="rounded-xl border border-border bg-card p-3">
-            <h5 className="mb-3 text-sm font-medium">
+          <Card key={section.title}>
+            <CardHeader><CardTitle>
               {section.title} ({formatMoney(section.amount)})
-            </h5>
+            </CardTitle></CardHeader>
+            <CardContent>
 
             {section.items.length === 0 ? (
-              <p className="text-sm text-muted-foreground">{section.emptyText}</p>
+              <Empty className="px-0"><EmptyDescription>{section.emptyText}</EmptyDescription></Empty>
             ) : (
-              <div className="space-y-2">
+              <ItemGroup>
                 {section.items.map((entry) => (
-                  <div
+                  <Item
                     key={entry.id}
-                    className="rounded-lg border border-border bg-background/60 px-3 py-2"
+                    variant="outline"
+                    size="sm"
+                    role="listitem"
                   >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <p className="truncate text-sm font-medium">{section.getName(entry)}</p>
-                        <p className="mt-1 truncate text-xs text-muted-foreground">
+                      <ItemContent className="min-w-0">
+                        <ItemTitle>{section.getName(entry)}</ItemTitle>
+                        <ItemDescription>
                           {section.getDescription(entry)}
-                        </p>
-                      </div>
+                        </ItemDescription>
+                      </ItemContent>
                       <p className="shrink-0 text-sm font-semibold">{formatMoney(entry.amount)}</p>
-                    </div>
-                  </div>
+                  </Item>
                 ))}
-              </div>
+              </ItemGroup>
             )}
-          </div>
+            </CardContent>
+          </Card>
         ))}
       </div>
     </div>
@@ -1153,9 +1104,11 @@ function ImportantNoticesCard({ notices }) {
         </CardHeader>
 
         <CardContent>
-          <p className="rounded-xl border border-border bg-muted/30 px-4 py-6 text-sm text-muted-foreground">
-            No tienes avisos importantes por ahora.
-          </p>
+          <Empty>
+            <EmptyDescription>
+              No tienes avisos importantes por ahora.
+            </EmptyDescription>
+          </Empty>
         </CardContent>
       </Card>
     );
@@ -1219,9 +1172,11 @@ function PaymentsTable({ items }) {
 
   if (items.length === 0) {
     return (
-      <p className="rounded-xl border border-border bg-muted/30 px-4 py-6 text-sm text-muted-foreground">
-        No hay ciclos para mostrar. Genera ciclos desde Tarjetas.
-      </p>
+      <Empty>
+        <EmptyDescription>
+          No hay ciclos para mostrar. Genera ciclos desde Tarjetas.
+        </EmptyDescription>
+      </Empty>
     );
   }
 

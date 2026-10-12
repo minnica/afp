@@ -49,3 +49,4 @@ const Toaster = ({
 }
 
 export { Toaster }
+export { toast } from "sonner"

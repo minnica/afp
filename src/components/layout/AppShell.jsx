@@ -15,6 +15,7 @@ const pageTitles = {
   "/suscripciones": "Suscripciones",
   "/ingresos": "Ingresos",
   "/cuentas-por-cobrar": "Cuentas por cobrar",
+  "/cuentas-por-pagar": "Cuentas por pagar",
   "/tarjetas": "Tarjetas",
   "/configuracion": "Configuración",
 };

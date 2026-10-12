@@ -176,6 +176,15 @@ Archivos principales:
 - `src/lib/offlineExpenses.js`: cola local por usuario en `localStorage` (`afp:offline-expenses:{userId}`).
 - `src/components/gastos/GastosContent.jsx`: integra lectura de cache, alta offline, visualización de pendientes y sincronización.
 
+Iconos de instalación:
+- `public/icons/app-icon.svg` es la fuente vectorial del símbolo de cartera, con fondo oscuro opaco y acento verde. No contiene texto pequeño ni depende de fuentes.
+- El manifest utiliza PNG de 192, 512 y 1024 px, y una variante de 512 px con `purpose: "maskable"` cuyo símbolo queda dentro de la zona segura circular de Android. La imagen ocupa todo el fondo; el sistema aplica el recorte exterior.
+- El layout declara `apple-touch-icon-v3.png` de 180 px para iPhone/iPad, y el favicon del proyecto incluye tamaños de 16 a 256 px con el mismo símbolo.
+- `npm run icons:generate` vuelve a exportar los PNG y el ICO desde el SVG mediante Sharp, declarado como dependencia de desarrollo. Al cambiar el diseño, actualizar la versión de las rutas de los iconos, sus referencias en manifest/layout y `CACHE_NAME` del service worker para renovar la caché.
+- Los iconos se precachean con el shell. Las instalaciones existentes pueden conservar la imagen anterior; una reinstalación se hace después de sincronizar cualquier gasto pendiente guardado en el dispositivo.
+
+Referencias: [iconos y zona segura de PWA](https://web.dev/learn/pwa/web-app-manifest#icons), [metadata de iconos en Next.js](https://nextjs.org/docs/app/api-reference/file-conventions/metadata/app-icons).
+
 Flujo:
 - El usuario debe abrir `/gastos` con internet al menos una vez en el dispositivo para cachear shell y datos iniciales (categorías, tarjetas, personas, cuentas, suscripciones y gastos del día).
 - Si no hay conexión, los gastos nuevos se guardan en `localStorage` como pendientes y aparecen en la tabla con badge `Pendiente` / `En cola`.
@@ -219,7 +228,7 @@ afp/
 ├── public/
 │   ├── manifest.webmanifest       → manifest PWA
 │   ├── sw.js                      → service worker PWA/offline
-│   └── icons/app-icon.svg         → icono instalable
+│   └── icons/                     → fuente SVG e iconos PNG de instalación
 ├── src/
 │   ├── app/
 │   │   ├── layout.js              → layout raíz (Toaster, fuentes, dark mode)
@@ -285,11 +294,17 @@ afp/
 
 Todos en `src/components/ui/`. No importar desde paquete externo — son locales.
 
-Disponibles: `button`, `input`, `label`, `select`, `textarea`, `card`, `tabs`, `badge`, `table`, `data-table`, `dropdown-menu`, `separator`, `dialog`, `alert-dialog`, `sonner`, `spinner`, `tooltip`, `skeleton`, `sheet`, `sidebar`, `alert`, `chart`.
+Disponibles: `button`, `input`, `label`, `select`, `textarea`, `calendar`, `popover`, `date-picker`, `card`, `tabs`, `badge`, `table`, `data-table`, `dropdown-menu`, `separator`, `dialog`, `alert-dialog`, `sonner`, `spinner`, `tooltip`, `skeleton`, `sheet`, `sidebar`, `alert`, `chart`, `collapsible`, `progress`, `empty`, `item`.
+
+Los componentes base corresponden al registro oficial de shadcn con el estilo `radix-mira` de `components.json`. Mantener JavaScript, los alias locales y la librería de iconos configurada al incorporar actualizaciones. La revisión y sus comprobaciones están en [`docs/shadcn-audit.md`](docs/shadcn-audit.md).
 
 **Reglas:**
 - `toast` siempre desde `@/components/ui/sonner` (o re-export de `sonner`). No importar `sonner` directamente si ya hay wrapper local.
+- Los campos de fecha usan `DatePicker` de `src/components/ui/date-picker.jsx`, compuesto con `Popover` y `Calendar`. Recibe y devuelve fechas `YYYY-MM-DD`; usar `clearable` en fechas opcionales que el usuario pueda borrar.
 - Botones destructivos siempre con `AlertDialog` de confirmación antes de ejecutar borrado.
+- Los paneles desplegables usan `Collapsible`; las barras de progreso, `Progress`; los avisos, `Alert`; las listas de registros, `Item`; los estados sin datos, `Empty`.
+- Las gráficas usan `ChartContainer`, `ChartTooltipContent` y `ChartLegendContent` con la configuración y tokens del wrapper local. `DataTable` compone los controles shadcn con TanStack Table; el ordenamiento usa `Button` dentro del encabezado.
+- Cada campo debe tener una etiqueta asociada o un nombre accesible; cada botón de icono, `aria-label`. Los diálogos incluyen título y descripción. Cuando se abren desde tablas o listas mediante estado, usar `useDialogFocus` para devolver el foco al botón de origen.
 - No recrear componentes similares a shadcn fuera de `src/components/ui/`.
 
 ---
@@ -308,6 +323,9 @@ npm run build
 
 # Lint
 npm run lint
+
+# Regenerar iconos de instalación desde el SVG
+npm run icons:generate
 ```
 
 ### Prisma (desde raíz del proyecto)

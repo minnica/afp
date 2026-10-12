@@ -1,5 +1,16 @@
 "use client";
 
+import { useDialogFocus } from "@/hooks/use-dialog-focus";
+
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+
+import { Empty, EmptyDescription } from "@/components/ui/empty";
+
+import { Alert, AlertDescription } from "@/components/ui/alert";
+
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -24,6 +35,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Item, ItemGroup, ItemMedia } from "@/components/ui/item";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CyclesDataTable from "@/components/tarjetas/CyclesDataTable";
 import PageSkeleton from "@/components/layout/PageSkeleton";
@@ -34,6 +46,7 @@ const MONTH_NAMES = [
 ];
 
 export default function TarjetasContent() {
+  const { captureFocus, restoreFocus } = useDialogFocus();
   const router = useRouter();
 
   const [user, setUser] = useState(null);
@@ -48,6 +61,8 @@ export default function TarjetasContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isGeneratingCycles, setIsGeneratingCycles] = useState(false);
+  const [cardToDelete, setCardToDelete] = useState(null);
+  const [cycleToUnmark, setCycleToUnmark] = useState(null);
   const [error, setError] = useState("");
 
   const [editingCardId, setEditingCardId] = useState("");
@@ -182,8 +197,6 @@ export default function TarjetasContent() {
 
   async function deleteCard(id) {
     if (!user) return;
-    const confirmed = window.confirm("¿Seguro que quieres eliminar esta tarjeta?");
-    if (!confirmed) return;
     setError("");
     try {
       const response = await fetch(`/api/cards?id=${id}`, { method: "DELETE" });
@@ -275,8 +288,6 @@ export default function TarjetasContent() {
 
   async function unmarkCycleAsPaid(cycleId) {
     if (!user) return;
-    const confirmed = window.confirm("¿Seguro que quieres deshacer el pago de este ciclo?");
-    if (!confirmed) return;
     setError("");
     try {
       const response = await fetch("/api/card-cycles", {
@@ -319,12 +330,46 @@ export default function TarjetasContent() {
   }
 
   return (
-    <main>
+    <main onClickCapture={captureFocus}>
+      <AlertDialog
+        open={Boolean(cycleToUnmark)}
+        onOpenChange={(open) => { if (!open) setCycleToUnmark(null); }}
+      >
+        <AlertDialogContent onCloseAutoFocus={restoreFocus}>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Deshacer el pago de este ciclo?</AlertDialogTitle>
+            <AlertDialogDescription>El ciclo volverá a mostrarse como pendiente de pago.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={() => unmarkCycleAsPaid(cycleToUnmark)}>
+              Deshacer pago
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      <AlertDialog
+        open={Boolean(cardToDelete)}
+        onOpenChange={(open) => { if (!open) setCardToDelete(null); }}
+      >
+        <AlertDialogContent onCloseAutoFocus={restoreFocus}>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Eliminar esta tarjeta?</AlertDialogTitle>
+            <AlertDialogDescription>Se eliminará la tarjeta seleccionada. Esta acción no se puede deshacer.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction variant="destructive" onClick={() => deleteCard(cardToDelete.id)}>
+              Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       <section className="mx-auto flex w-full max-w-7xl flex-col px-4 py-5 md:py-8">
         {error ? (
-          <div className="mb-6 rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-            {error}
-          </div>
+          <Alert variant="destructive" className="mb-6">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
         ) : null}
 
         <div className="mb-6 grid gap-4 md:grid-cols-3">
@@ -360,8 +405,9 @@ export default function TarjetasContent() {
 
                 <CardContent className="space-y-5">
                   <div className="space-y-2">
-                    <Label>Nombre de tarjeta</Label>
+                    <Label htmlFor="tarjetas-field-1">Nombre de tarjeta</Label>
                     <Input
+                      id="tarjetas-field-1"
                       value={name}
                       placeholder="Ej. HSBC 1"
                       onChange={(e) => setName(e.target.value)}
@@ -370,8 +416,9 @@ export default function TarjetasContent() {
 
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div className="space-y-2">
-                      <Label>Día de corte habitual</Label>
+                      <Label htmlFor="tarjetas-field-2">Día de corte habitual</Label>
                       <Input
+                        id="tarjetas-field-2"
                         value={usualCutDay}
                         type="number"
                         min="1"
@@ -382,8 +429,9 @@ export default function TarjetasContent() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label>Día límite habitual</Label>
+                      <Label htmlFor="tarjetas-field-3">Día límite habitual</Label>
                       <Input
+                        id="tarjetas-field-3"
                         value={usualDueDay}
                         type="number"
                         min="1"
@@ -395,8 +443,9 @@ export default function TarjetasContent() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label>Notas opcional</Label>
+                    <Label htmlFor="tarjetas-field-4">Notas opcional</Label>
                     <Input
+                      id="tarjetas-field-4"
                       value={notes}
                       placeholder="Ej. Se usa para compras grandes"
                       onChange={(e) => setNotes(e.target.value)}
@@ -424,21 +473,25 @@ export default function TarjetasContent() {
 
                 <CardContent>
                   {cards.length === 0 ? (
-                    <p className="rounded-xl border border-border bg-muted/30 px-4 py-6 text-sm text-muted-foreground">
-                      Aún no hay tarjetas registradas.
-                    </p>
+                    <Empty>
+                      <EmptyDescription>
+                        Aún no hay tarjetas registradas.
+                      </EmptyDescription>
+                    </Empty>
                   ) : (
-                    <div className="grid gap-3">
+                    <ItemGroup>
                       {cards.map((card) => (
-                        <div
+                        <Item
                           key={card.id}
-                          className="rounded-xl border border-border bg-background/60 px-4 py-4"
+                          variant="outline"
+                          role="listitem"
+                          className="block"
                         >
                           <div className="flex items-center justify-between gap-4">
                             <div className="flex min-w-0 items-start gap-3">
-                              <div className="mt-1 rounded-lg border border-border bg-muted p-2">
+                              <ItemMedia variant="icon">
                                 <CreditCard className="h-4 w-4 text-muted-foreground" />
-                              </div>
+                              </ItemMedia>
 
                               <div className="min-w-0">
                                 <div className="flex flex-wrap items-center gap-2">
@@ -459,7 +512,7 @@ export default function TarjetasContent() {
                             </div>
 
                             <div className="flex shrink-0 items-center gap-2">
-                              <Button
+                              <Button aria-label="Editar"
                                 type="button"
                                 variant="ghost"
                                 size="icon"
@@ -468,11 +521,11 @@ export default function TarjetasContent() {
                                 <Pencil className="h-4 w-4" />
                               </Button>
 
-                              <Button
+                              <Button aria-label="Eliminar"
                                 type="button"
                                 variant="ghost"
                                 size="icon"
-                                onClick={() => deleteCard(card.id)}
+                                onClick={() => setCardToDelete(card)}
                               >
                                 <Trash2 className="h-4 w-4" />
                               </Button>
@@ -484,7 +537,7 @@ export default function TarjetasContent() {
                               <div className="mb-4 flex items-center justify-between gap-4">
                                 <p className="text-sm font-medium">Editar tarjeta</p>
 
-                                <Button
+                                <Button aria-label="Cancelar edición"
                                   type="button"
                                   variant="ghost"
                                   size="icon"
@@ -496,16 +549,18 @@ export default function TarjetasContent() {
 
                               <div className="grid gap-4 md:grid-cols-2">
                                 <div className="space-y-2 md:col-span-2">
-                                  <Label>Nombre</Label>
+                                  <Label htmlFor="tarjetas-field-5">Nombre</Label>
                                   <Input
+                                    id="tarjetas-field-5"
                                     value={editCardName}
                                     onChange={(e) => setEditCardName(e.target.value)}
                                   />
                                 </div>
 
                                 <div className="space-y-2">
-                                  <Label>Día de corte habitual</Label>
+                                  <Label htmlFor="tarjetas-field-6">Día de corte habitual</Label>
                                   <Input
+                                    id="tarjetas-field-6"
                                     type="number"
                                     min="1"
                                     max="31"
@@ -515,8 +570,9 @@ export default function TarjetasContent() {
                                 </div>
 
                                 <div className="space-y-2">
-                                  <Label>Día límite habitual</Label>
+                                  <Label htmlFor="tarjetas-field-7">Día límite habitual</Label>
                                   <Input
+                                    id="tarjetas-field-7"
                                     type="number"
                                     min="1"
                                     max="31"
@@ -526,8 +582,9 @@ export default function TarjetasContent() {
                                 </div>
 
                                 <div className="space-y-2 md:col-span-2">
-                                  <Label>Notas</Label>
+                                  <Label htmlFor="tarjetas-field-8">Notas</Label>
                                   <Input
+                                    id="tarjetas-field-8"
                                     value={editCardNotes}
                                     onChange={(e) => setEditCardNotes(e.target.value)}
                                   />
@@ -553,9 +610,9 @@ export default function TarjetasContent() {
                               </div>
                             </div>
                           ) : null}
-                        </div>
+                        </Item>
                       ))}
-                    </div>
+                    </ItemGroup>
                   )}
                 </CardContent>
               </Card>
@@ -583,9 +640,11 @@ export default function TarjetasContent() {
 
               <CardContent>
                 {cycles.length === 0 ? (
-                  <p className="rounded-xl border border-border bg-muted/30 px-4 py-6 text-sm text-muted-foreground">
-                    Aún no hay ciclos generados. Agrega tarjetas y presiona &quot;Generar ciclos&quot;.
-                  </p>
+                  <Empty>
+                    <EmptyDescription>
+                      Aún no hay ciclos generados. Agrega tarjetas y presiona &quot;Generar ciclos&quot;.
+                    </EmptyDescription>
+                  </Empty>
                 ) : (
                   <Tabs value={activeMonthTab} onValueChange={setActiveMonthTab}>
                     <TabsList className="mb-6 h-auto flex-wrap">
@@ -606,7 +665,7 @@ export default function TarjetasContent() {
                           updateCycleDates={updateCycleDates}
                           updateStatementAmount={updateStatementAmount}
                           markCycleAsPaid={markCycleAsPaid}
-                          unmarkCycleAsPaid={unmarkCycleAsPaid}
+                          unmarkCycleAsPaid={setCycleToUnmark}
                           loadCycleBreakdown={loadCycleBreakdown}
                         />
                       </TabsContent>

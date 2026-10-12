@@ -17,6 +17,10 @@ export const metadata = {
   title: "Control de Gastos",
   description: "App personal para gastos, tarjetas y cuentas por cobrar",
   manifest: "/manifest.webmanifest",
+  icons: {
+    icon: [{ url: "/icons/app-icon.svg?v=3", type: "image/svg+xml", sizes: "any" }],
+    apple: [{ url: "/icons/apple-touch-icon-v3.png", type: "image/png", sizes: "180x180" }],
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",

@@ -1,5 +1,9 @@
 "use client";
 
+import { useDialogFocus } from "@/hooks/use-dialog-focus";
+
+import { Alert, AlertDescription, AlertTitle, AlertAction } from "@/components/ui/alert";
+
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
@@ -15,7 +19,10 @@ import {
 } from "@/lib/offlineExpenses";
 
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Input } from "@/components/ui/input";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -33,7 +40,7 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/sonner";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -46,6 +53,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import {
   Dialog,
+  DialogDescription,
   DialogContent,
   DialogFooter,
   DialogHeader,
@@ -153,6 +161,7 @@ function getMonthRange(yearMonth) {
 }
 
 export default function GastosContent() {
+  const { captureFocus, restoreFocus } = useDialogFocus();
   const router = useRouter();
 
   const [user, setUser] = useState(null);
@@ -980,7 +989,7 @@ export default function GastosContent() {
           if (!open) setExpenseToDelete(null);
         }}
       >
-        <AlertDialogContent>
+        <AlertDialogContent onCloseAutoFocus={restoreFocus}>
           <AlertDialogHeader>
             <AlertDialogTitle>¿Eliminar este gasto?</AlertDialogTitle>
             <AlertDialogDescription>
@@ -995,7 +1004,7 @@ export default function GastosContent() {
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isDeleting}>Cancelar</AlertDialogCancel>
             <AlertDialogAction
-              className="bg-red-800 text-white hover:bg-red-900 focus:ring-red-300"
+              variant="destructive"
               disabled={isDeleting}
               onClick={() => deleteExpense(expenseToDelete.id)}
             >
@@ -1006,19 +1015,19 @@ export default function GastosContent() {
       </AlertDialog>
 
       <Dialog open={editDialogOpen} onOpenChange={(open) => { if (!open) cancelEditingExpense(); }}>
-        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
+        <DialogContent onCloseAutoFocus={restoreFocus} className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle>Editar gasto</DialogTitle>
+            <DialogDescription>Actualiza los datos y guarda los cambios.</DialogDescription>
           </DialogHeader>
 
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="edit-date">Fecha</Label>
-              <Input
+              <DatePicker
                 id="edit-date"
-                type="date"
                 value={editDate}
-                onChange={(event) => setEditDate(event.target.value)}
+                onChange={setEditDate}
               />
             </div>
 
@@ -1152,37 +1161,36 @@ export default function GastosContent() {
         </DialogContent>
       </Dialog>
 
-      <main>
+      <main onClickCapture={captureFocus}>
         <section className="mx-auto flex w-full max-w-full flex-col px-4 py-5 md:py-8">
           {error ? (
-            <div className="mb-6 rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-              {error}
-            </div>
+            <Alert variant="destructive" className="mb-6">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
           ) : null}
 
           {!isOnline ? (
-            <div className="mb-6 flex items-center gap-3 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
+            <Alert role="status" className="mb-6 border-amber-500/40 bg-amber-500/10 text-amber-200">
               <WifiOff className="h-4 w-4 shrink-0" />
-              <span>
+              <AlertDescription className="text-amber-200">
                 Sin conexión. Los gastos nuevos se guardarán en este dispositivo
                 y se sincronizarán cuando vuelva internet.
-              </span>
-            </div>
+              </AlertDescription>
+            </Alert>
           ) : null}
 
           {pendingOfflineExpenses.length > 0 ? (
-            <div className="mb-6 flex flex-col gap-3 rounded-xl border border-border bg-card px-4 py-3 text-sm sm:flex-row sm:items-center sm:justify-between">
-              <div className="space-y-1">
-                <p className="font-medium">
+            <Alert role="status" className="mb-6">
+                <AlertTitle>
                   {pendingOfflineExpenses.length === 1
                     ? "1 gasto pendiente por sincronizar"
                     : `${pendingOfflineExpenses.length} gastos pendientes por sincronizar`}
-                </p>
-                <p className="text-muted-foreground">
+                </AlertTitle>
+                <AlertDescription>
                   Se enviarán automáticamente al recuperar conexión.
-                </p>
-              </div>
+                </AlertDescription>
 
+              <AlertAction>
               <Button
                 type="button"
                 variant="outline"
@@ -1190,14 +1198,11 @@ export default function GastosContent() {
                 disabled={!isOnline || isSyncingOfflineExpenses}
                 onClick={() => syncPendingExpenses()}
               >
-                <RefreshCw
-                  className={`mr-2 h-4 w-4 ${
-                    isSyncingOfflineExpenses ? "animate-spin" : ""
-                  }`}
-                />
+                {isSyncingOfflineExpenses ? <Spinner /> : <RefreshCw className="mr-2 h-4 w-4" />}
                 {isSyncingOfflineExpenses ? "Sincronizando..." : "Reintentar"}
               </Button>
-            </div>
+              </AlertAction>
+            </Alert>
           ) : null}
 
           <div className="grid min-w-0 gap-5 xl:grid-cols-[360px_1fr]">
@@ -1211,11 +1216,10 @@ export default function GastosContent() {
               <CardContent className="space-y-4 md:space-y-5">
                 <div className="space-y-2">
                   <Label htmlFor="date">Fecha</Label>
-                  <Input
+                  <DatePicker
                     id="date"
-                    type="date"
                     value={date}
-                    onChange={(event) => setDate(event.target.value)}
+                    onChange={setDate}
                   />
                 </div>
 
@@ -1315,21 +1319,21 @@ export default function GastosContent() {
                   />
                 </div>
 
-                <div className="rounded-xl border border-border bg-background/50 p-4">
-                  <button
+                <Collapsible open={showMoreOptions} onOpenChange={setShowMoreOptions} className="rounded-xl border border-border bg-background/50 p-4">
+                  <CollapsibleTrigger asChild>
+                  <Button
                     type="button"
-                    className="flex w-full cursor-pointer items-center justify-between text-left text-sm font-medium"
-                    aria-expanded={showMoreOptions}
-                    onClick={() => setShowMoreOptions((current) => !current)}
+                    variant="ghost"
+                    className="w-full justify-between text-left"
                   >
                     <span>Más opciones</span>
                     <span className="text-muted-foreground">
                       {showMoreOptions ? "Ocultar" : "Mostrar"}
                     </span>
-                  </button>
+                  </Button>
+                  </CollapsibleTrigger>
 
-                  {showMoreOptions ? (
-                    <div className="mt-4 space-y-4">
+                    <CollapsibleContent className="mt-4 space-y-4">
                       <div className="space-y-2">
                         <Label htmlFor="personId">Persona relacionada</Label>
                         <Select
@@ -1495,9 +1499,8 @@ export default function GastosContent() {
                           </SelectContent>
                         </Select>
                       </div>
-                    </div>
-                  ) : null}
-                </div>
+                    </CollapsibleContent>
+                </Collapsible>
 
                 <Button
                   type="button"
@@ -1528,7 +1531,7 @@ export default function GastosContent() {
                         setFilterDate("");
                       }}
                     >
-                      <SelectTrigger className="w-full sm:w-[180px]">
+                      <SelectTrigger aria-label="Filtrar por mes" className="w-full sm:w-[180px]">
                         <SelectValue placeholder="Todos los meses" />
                       </SelectTrigger>
                       <SelectContent>
@@ -1545,14 +1548,14 @@ export default function GastosContent() {
 
                     <div className="space-y-1">
                       <Label htmlFor="filterDate" className="sr-only">Filtrar por día</Label>
-                      <Input
+                      <DatePicker
                         id="filterDate"
-                        type="date"
                         value={filterDate}
-                        onChange={(e) => {
-                          setFilterDate(e.target.value);
+                        onChange={(nextDate) => {
+                          setFilterDate(nextDate);
                           setFilterMonth("");
                         }}
+                        aria-label="Filtrar por día"
                         className="w-full sm:w-[160px]"
                       />
                     </div>
@@ -1573,7 +1576,7 @@ export default function GastosContent() {
                       value={filterCategoryId || "ALL"}
                       onValueChange={(value) => setFilterCategoryId(value === "ALL" ? "" : value)}
                     >
-                      <SelectTrigger className="w-full sm:w-[180px]">
+                      <SelectTrigger aria-label="Filtrar por categoría" className="w-full sm:w-[180px]">
                         <SelectValue placeholder="Todas las categorías" />
                       </SelectTrigger>
                       <SelectContent>
@@ -1601,7 +1604,7 @@ export default function GastosContent() {
                       value={filterCardId || "ALL"}
                       onValueChange={(value) => setFilterCardId(value === "ALL" ? "" : value)}
                     >
-                      <SelectTrigger className="w-full sm:w-[180px]">
+                      <SelectTrigger aria-label="Filtrar por método de pago" className="w-full sm:w-[180px]">
                         <SelectValue placeholder="Todas las tarjetas" />
                       </SelectTrigger>
                       <SelectContent>

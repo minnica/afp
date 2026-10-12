@@ -1,17 +1,26 @@
 "use client";
 
+import { useDialogFocus } from "@/hooks/use-dialog-focus";
+
+import { Empty, EmptyDescription } from "@/components/ui/empty";
+
+import { Alert, AlertDescription } from "@/components/ui/alert";
+
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Pencil, Plus, Trash2, X } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/sonner";
 
 import { supabase } from "@/lib/supabase";
 import { ensureUserSetup } from "@/lib/userSetup";
 
 import { Button } from "@/components/ui/button";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Item, ItemContent, ItemDescription, ItemGroup, ItemTitle } from "@/components/ui/item";
 import { Input } from "@/components/ui/input";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -97,6 +106,7 @@ function toDateInputValue(dateString) {
 }
 
 export default function CuentasPorPagarContent() {
+  const { captureFocus, restoreFocus } = useDialogFocus();
   const router = useRouter();
 
   const [user, setUser] = useState(null);
@@ -364,7 +374,7 @@ export default function CuentasPorPagarContent() {
           if (!open) setPayableToDelete(null);
         }}
       >
-        <AlertDialogContent>
+        <AlertDialogContent onCloseAutoFocus={restoreFocus}>
           <AlertDialogHeader>
             <AlertDialogTitle>
               ¿Eliminar esta cuenta por pagar?
@@ -381,7 +391,7 @@ export default function CuentasPorPagarContent() {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction
-              className="bg-red-800 text-white hover:bg-red-900 focus:ring-red-300"
+              variant="destructive"
               onClick={() => deletePayable(payableToDelete.id)}
             >
               Eliminar
@@ -390,12 +400,12 @@ export default function CuentasPorPagarContent() {
         </AlertDialogContent>
       </AlertDialog>
 
-      <main>
+      <main onClickCapture={captureFocus}>
         <section className="mx-auto flex w-full max-w-6xl flex-col px-4 py-5 md:py-8">
           {error ? (
-            <div className="mb-6 rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-              {error}
-            </div>
+            <Alert variant="destructive" className="mb-6">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
           ) : null}
 
           <div className="mb-6 grid gap-4 md:grid-cols-3">
@@ -420,9 +430,9 @@ export default function CuentasPorPagarContent() {
 
               <CardContent className="space-y-5">
                 <div className="space-y-2">
-                  <Label>Persona / proveedor</Label>
+                  <Label htmlFor="cuentas-por-pagar-field-1">Persona / proveedor</Label>
                   <Select value={personId} onValueChange={setPersonId}>
-                    <SelectTrigger>
+                    <SelectTrigger id="cuentas-por-pagar-field-1">
                       <SelectValue placeholder="Selecciona persona o proveedor" />
                     </SelectTrigger>
                     <SelectContent>
@@ -442,8 +452,9 @@ export default function CuentasPorPagarContent() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Concepto</Label>
+                  <Label htmlFor="cuentas-por-pagar-field-2">Concepto</Label>
                   <Input
+                    id="cuentas-por-pagar-field-2"
                     value={concept}
                     placeholder="Ej. Préstamo pendiente, compra por pagar..."
                     onChange={(event) => setConcept(event.target.value)}
@@ -451,8 +462,9 @@ export default function CuentasPorPagarContent() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Monto original</Label>
+                  <Label htmlFor="cuentas-por-pagar-field-3">Monto original</Label>
                   <Input
+                    id="cuentas-por-pagar-field-3"
                     value={originalAmount}
                     type="number"
                     min="0"
@@ -463,17 +475,19 @@ export default function CuentasPorPagarContent() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Fecha de origen</Label>
-                  <Input
-                    type="date"
+                  <Label htmlFor="payable-origin-date">Fecha de origen</Label>
+                  <DatePicker
+                    id="payable-origin-date"
+                    aria-label="Fecha de origen"
                     value={originDate}
-                    onChange={(event) => setOriginDate(event.target.value)}
+                    onChange={setOriginDate}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Pago mensual esperado opcional</Label>
+                  <Label htmlFor="cuentas-por-pagar-field-4">Pago mensual esperado opcional</Label>
                   <Input
+                    id="cuentas-por-pagar-field-4"
                     value={expectedMonthlyPayment}
                     type="number"
                     min="0"
@@ -486,17 +500,19 @@ export default function CuentasPorPagarContent() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Fecha esperada opcional</Label>
-                  <Input
-                    type="date"
+                  <Label htmlFor="payable-expected-date">Fecha esperada opcional</Label>
+                  <DatePicker
+                    id="payable-expected-date"
+                    aria-label="Fecha esperada"
+                    clearable
                     value={expectedDate}
-                    onChange={(event) => setExpectedDate(event.target.value)}
+                    onChange={setExpectedDate}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Notas opcional</Label>
-                  <Textarea
+                  <Label htmlFor="cuentas-por-pagar-field-5">Notas opcional</Label>
+                  <Textarea id="cuentas-por-pagar-field-5"
                     value={notes}
                     placeholder="Detalles adicionales..."
                     onChange={(event) => setNotes(event.target.value)}
@@ -681,19 +697,24 @@ function PayablesList({
 }) {
   if (items.length === 0) {
     return (
-      <p className="rounded-xl border border-border bg-muted/30 px-4 py-6 text-sm text-muted-foreground">
-        {emptyText}
-      </p>
+      <Empty>
+        <EmptyDescription>
+          {emptyText}
+        </EmptyDescription>
+      </Empty>
     );
   }
 
   return (
-    <div className="grid gap-3">
+    <ItemGroup>
       {items.map((item) => (
-        <div
+        <Collapsible
           key={item.id}
-          className="rounded-xl border border-border bg-background/60 px-4 py-4"
+          open={expandedPayableId === item.id}
+          onOpenChange={(open) => setExpandedPayableId(open ? item.id : "")}
+          asChild
         >
+        <Item variant="outline" role="listitem" className="block">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
@@ -729,20 +750,17 @@ function PayablesList({
             </div>
 
             <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
+              <CollapsibleTrigger asChild>
               <Button
                 type="button"
                 variant="secondary"
                 size="sm"
-                onClick={() =>
-                  setExpandedPayableId((current) =>
-                    current === item.id ? "" : item.id,
-                  )
-                }
               >
                 {expandedPayableId === item.id ? "Ocultar pagos" : "Ver pagos"}
               </Button>
+              </CollapsibleTrigger>
 
-              <Button
+              <Button aria-label="Editar"
                 type="button"
                 variant="ghost"
                 size="icon"
@@ -751,7 +769,7 @@ function PayablesList({
                 <Pencil className="h-4 w-4" />
               </Button>
 
-              <Button
+              <Button aria-label="Eliminar"
                 type="button"
                 variant="ghost"
                 size="icon"
@@ -785,16 +803,16 @@ function PayablesList({
             </div>
           </div>
 
-          {expandedPayableId === item.id ? (
+          <CollapsibleContent>
             <PayablePaymentsBreakdown payable={item} />
-          ) : null}
+          </CollapsibleContent>
 
           {editingPayableId === item.id ? (
             <div className="mt-4 rounded-xl border border-border bg-background/70 p-4">
               <div className="mb-4 flex items-center justify-between gap-4">
                 <p className="text-sm font-medium">Editar cuenta por pagar</p>
 
-                <Button
+                <Button aria-label="Cancelar edición"
                   type="button"
                   variant="ghost"
                   size="icon"
@@ -806,9 +824,9 @@ function PayablesList({
 
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label>Persona / proveedor</Label>
+                  <Label htmlFor="cuentas-por-pagar-field-6">Persona / proveedor</Label>
                   <Select value={editPersonId} onValueChange={setEditPersonId}>
-                    <SelectTrigger>
+                    <SelectTrigger id="cuentas-por-pagar-field-6">
                       <SelectValue placeholder="Selecciona persona o proveedor" />
                     </SelectTrigger>
                     <SelectContent>
@@ -822,25 +840,28 @@ function PayablesList({
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Fecha de origen</Label>
-                  <Input
-                    type="date"
+                  <Label htmlFor={`edit-payable-origin-${item.id}`}>Fecha de origen</Label>
+                  <DatePicker
+                    id={`edit-payable-origin-${item.id}`}
+                    aria-label="Fecha de origen"
                     value={editOriginDate}
-                    onChange={(event) => setEditOriginDate(event.target.value)}
+                    onChange={setEditOriginDate}
                   />
                 </div>
 
                 <div className="space-y-2 md:col-span-2">
-                  <Label>Concepto</Label>
+                  <Label htmlFor="cuentas-por-pagar-field-7">Concepto</Label>
                   <Input
+                    id="cuentas-por-pagar-field-7"
                     value={editConcept}
                     onChange={(event) => setEditConcept(event.target.value)}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Monto original</Label>
+                  <Label htmlFor="cuentas-por-pagar-field-8">Monto original</Label>
                   <Input
+                    id="cuentas-por-pagar-field-8"
                     value={editOriginalAmount}
                     type="number"
                     min="0"
@@ -852,8 +873,9 @@ function PayablesList({
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Pago mensual esperado opcional</Label>
+                  <Label htmlFor="cuentas-por-pagar-field-9">Pago mensual esperado opcional</Label>
                   <Input
+                    id="cuentas-por-pagar-field-9"
                     value={editExpectedMonthlyPayment}
                     type="number"
                     min="0"
@@ -865,19 +887,19 @@ function PayablesList({
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Fecha esperada opcional</Label>
-                  <Input
-                    type="date"
+                  <Label htmlFor={`edit-payable-expected-${item.id}`}>Fecha esperada opcional</Label>
+                  <DatePicker
+                    id={`edit-payable-expected-${item.id}`}
+                    aria-label="Fecha esperada"
+                    clearable
                     value={editExpectedDate}
-                    onChange={(event) =>
-                      setEditExpectedDate(event.target.value)
-                    }
+                    onChange={setEditExpectedDate}
                   />
                 </div>
 
                 <div className="space-y-2 md:col-span-2">
-                  <Label>Notas</Label>
-                  <Textarea
+                  <Label htmlFor="cuentas-por-pagar-field-10">Notas</Label>
+                  <Textarea id="cuentas-por-pagar-field-10"
                     value={editNotes}
                     onChange={(event) => setEditNotes(event.target.value)}
                   />
@@ -905,9 +927,10 @@ function PayablesList({
               </div>
             </div>
           ) : null}
-        </div>
+        </Item>
+        </Collapsible>
       ))}
-    </div>
+    </ItemGroup>
   );
 }
 
@@ -921,27 +944,30 @@ function PayablePaymentsBreakdown({ payable }) {
       <h4 className="mb-4 text-sm font-medium">Desglose de pagos</h4>
 
       {payments.length === 0 ? (
-        <p className="rounded-lg border border-border bg-muted/30 px-3 py-3 text-sm text-muted-foreground">
-          Todavía no hay pagos vinculados a esta cuenta por pagar.
-        </p>
+        <Empty>
+          <EmptyDescription>
+            Todavía no hay pagos vinculados a esta cuenta por pagar.
+          </EmptyDescription>
+        </Empty>
       ) : (
-        <div className="grid gap-2">
+        <ItemGroup>
           {payments.map((payment) => (
-            <div
+            <Item
               key={payment.id}
-              className="flex flex-col gap-2 rounded-lg border border-border bg-muted/30 px-3 py-3 sm:flex-row sm:items-center sm:justify-between"
+              variant="muted"
+              role="listitem"
             >
-              <div className="min-w-0">
-                <p className="font-medium">{payment.concept}</p>
-                <p className="mt-1 text-xs text-muted-foreground">
+              <ItemContent className="min-w-0">
+                <ItemTitle>{payment.concept}</ItemTitle>
+                <ItemDescription>
                   {formatDate(payment.date)}
-                </p>
-              </div>
+                </ItemDescription>
+              </ItemContent>
 
               <p className="font-semibold">{formatMoney(payment.amount)}</p>
-            </div>
+            </Item>
           ))}
-        </div>
+        </ItemGroup>
       )}
     </div>
   );

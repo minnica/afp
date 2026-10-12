@@ -7,6 +7,7 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
+    "icons:generate": "node scripts/generate-icons.mjs",
     "postinstall": "prisma generate"
   },
   "dependencies": {
@@ -26,6 +27,7 @@
     "prisma": "^7.8.0",
     "radix-ui": "^1.4.3",
     "react": "19.2.4",
+    "react-day-picker": "^10.0.2",
     "react-dom": "19.2.4",
     "react-hook-form": "^7.75.0",
     "recharts": "^3.8.1",
@@ -39,6 +41,7 @@
     "@tailwindcss/postcss": "^4",
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
+    "sharp": "0.34.5",
     "tailwindcss": "^4"
   }
 }

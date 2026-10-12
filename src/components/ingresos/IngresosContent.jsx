@@ -1,5 +1,14 @@
 "use client";
 
+import { useDialogFocus } from "@/hooks/use-dialog-focus";
+
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+
+import { Alert, AlertDescription } from "@/components/ui/alert";
+
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
@@ -10,6 +19,7 @@ import { ensureUserSetup } from "@/lib/userSetup";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -31,6 +41,7 @@ import { Separator } from "@/components/ui/separator";
 import PageSkeleton from "@/components/layout/PageSkeleton";
 import {
   Dialog,
+  DialogDescription,
   DialogContent,
   DialogFooter,
   DialogHeader,
@@ -62,6 +73,7 @@ function formatDate(dateString) {
 }
 
 export default function IngresosContent() {
+  const { captureFocus, restoreFocus } = useDialogFocus();
   const router = useRouter();
 
   const [user, setUser] = useState(null);
@@ -79,6 +91,7 @@ export default function IngresosContent() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [incomeToDelete, setIncomeToDelete] = useState(null);
   const [error, setError] = useState("");
 
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -297,11 +310,6 @@ export default function IngresosContent() {
   async function deleteIncome(id) {
     if (!user) return;
 
-    const confirmed = window.confirm(
-      "¿Seguro que quieres eliminar este ingreso?",
-    );
-
-    if (!confirmed) return;
 
     setError("");
 
@@ -398,7 +406,7 @@ export default function IngresosContent() {
         enableSorting: false,
         cell: ({ row }) => (
           <div className="flex items-center justify-end gap-1">
-            <Button
+            <Button aria-label="Editar"
               type="button"
               variant="ghost"
               size="icon"
@@ -407,11 +415,11 @@ export default function IngresosContent() {
               <Pencil className="h-4 w-4" />
             </Button>
 
-            <Button
+            <Button aria-label="Eliminar"
               type="button"
               variant="ghost"
               size="icon"
-              onClick={() => deleteIncome(row.original.id)}
+              onClick={() => setIncomeToDelete(row.original)}
             >
               <Trash2 className="h-4 w-4" />
             </Button>
@@ -428,12 +436,29 @@ export default function IngresosContent() {
   }
 
   return (
-    <main>
+    <main onClickCapture={captureFocus}>
+      <AlertDialog
+        open={Boolean(incomeToDelete)}
+        onOpenChange={(open) => { if (!open) setIncomeToDelete(null); }}
+      >
+        <AlertDialogContent onCloseAutoFocus={restoreFocus}>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Eliminar este ingreso?</AlertDialogTitle>
+            <AlertDialogDescription>Se eliminará el ingreso seleccionado. Esta acción no se puede deshacer.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction variant="destructive" onClick={() => deleteIncome(incomeToDelete.id)}>
+              Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       <section className="mx-auto flex w-full max-w-full flex-col px-4 py-5 md:py-8">
         {error ? (
-          <div className="mb-6 rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-            {error}
-          </div>
+          <Alert variant="destructive" className="mb-6">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
         ) : null}
 
         <div className="mb-6 grid gap-4 md:grid-cols-3">
@@ -471,18 +496,18 @@ export default function IngresosContent() {
 
             <CardContent className="space-y-5">
               <div className="space-y-2">
-                <Label>Fecha</Label>
-                <Input
-                  type="date"
+                <Label htmlFor="income-date">Fecha</Label>
+                <DatePicker
+                  id="income-date"
                   value={date}
-                  onChange={(event) => setDate(event.target.value)}
+                  onChange={setDate}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label>Tipo de ingreso</Label>
+                <Label htmlFor="ingresos-field-1">Tipo de ingreso</Label>
                 <Select value={incomeTypeId} onValueChange={setIncomeTypeId}>
-                  <SelectTrigger>
+                  <SelectTrigger id="ingresos-field-1">
                     <SelectValue placeholder="Selecciona tipo" />
                   </SelectTrigger>
                   <SelectContent>
@@ -496,8 +521,9 @@ export default function IngresosContent() {
               </div>
 
               <div className="space-y-2">
-                <Label>Fuente</Label>
+                <Label htmlFor="ingresos-field-2">Fuente</Label>
                 <Input
+                  id="ingresos-field-2"
                   value={source}
                   placeholder="Ej. Empresa, Luis, Cuñado..."
                   onChange={(event) => setSource(event.target.value)}
@@ -505,8 +531,9 @@ export default function IngresosContent() {
               </div>
 
               <div className="space-y-2">
-                <Label>Concepto</Label>
+                <Label htmlFor="ingresos-field-3">Concepto</Label>
                 <Input
+                  id="ingresos-field-3"
                   value={concept}
                   placeholder="Ej. Nómina quincenal, pago celular..."
                   onChange={(event) => setConcept(event.target.value)}
@@ -514,8 +541,9 @@ export default function IngresosContent() {
               </div>
 
               <div className="space-y-2">
-                <Label>Monto</Label>
+                <Label htmlFor="ingresos-field-4">Monto</Label>
                 <Input
+                  id="ingresos-field-4"
                   value={amount}
                   type="number"
                   min="0"
@@ -526,12 +554,12 @@ export default function IngresosContent() {
               </div>
 
               <div className="space-y-2">
-                <Label>Cuenta por cobrar relacionada</Label>
+                <Label htmlFor="ingresos-field-5">Cuenta por cobrar relacionada</Label>
                 <Select
                   value={receivableAccountId}
                   onValueChange={setReceivableAccountId}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger id="ingresos-field-5">
                     <SelectValue placeholder="Sin cuenta por cobrar" />
                   </SelectTrigger>
                   <SelectContent>
@@ -554,8 +582,8 @@ export default function IngresosContent() {
               </div>
 
               <div className="space-y-2">
-                <Label>Notas opcional</Label>
-                <Textarea
+                <Label htmlFor="ingresos-field-6">Notas opcional</Label>
+                <Textarea id="ingresos-field-6"
                   value={notes}
                   placeholder="Detalles adicionales..."
                   onChange={(event) => setNotes(event.target.value)}
@@ -619,28 +647,29 @@ export default function IngresosContent() {
             if (!open) cancelEditingIncome();
           }}
         >
-          <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
+          <DialogContent onCloseAutoFocus={restoreFocus} className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
             <DialogHeader>
               <DialogTitle>Editar ingreso</DialogTitle>
+              <DialogDescription>Actualiza los datos y guarda los cambios.</DialogDescription>
             </DialogHeader>
 
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label>Fecha</Label>
-                <Input
-                  type="date"
+                <Label htmlFor="edit-income-date">Fecha</Label>
+                <DatePicker
+                  id="edit-income-date"
                   value={editDate}
-                  onChange={(event) => setEditDate(event.target.value)}
+                  onChange={setEditDate}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label>Tipo de ingreso</Label>
+                <Label htmlFor="ingresos-field-7">Tipo de ingreso</Label>
                 <Select
                   value={editIncomeTypeId}
                   onValueChange={setEditIncomeTypeId}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger id="ingresos-field-7">
                     <SelectValue placeholder="Selecciona tipo" />
                   </SelectTrigger>
                   <SelectContent>
@@ -654,24 +683,27 @@ export default function IngresosContent() {
               </div>
 
               <div className="space-y-2">
-                <Label>Fuente</Label>
+                <Label htmlFor="ingresos-field-8">Fuente</Label>
                 <Input
+                  id="ingresos-field-8"
                   value={editSource}
                   onChange={(event) => setEditSource(event.target.value)}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label>Concepto</Label>
+                <Label htmlFor="ingresos-field-9">Concepto</Label>
                 <Input
+                  id="ingresos-field-9"
                   value={editConcept}
                   onChange={(event) => setEditConcept(event.target.value)}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label>Monto</Label>
+                <Label htmlFor="ingresos-field-10">Monto</Label>
                 <Input
+                  id="ingresos-field-10"
                   value={editAmount}
                   type="number"
                   min="0"
@@ -681,12 +713,12 @@ export default function IngresosContent() {
               </div>
 
               <div className="space-y-2">
-                <Label>Cuenta por cobrar relacionada</Label>
+                <Label htmlFor="ingresos-field-11">Cuenta por cobrar relacionada</Label>
                 <Select
                   value={editReceivableAccountId}
                   onValueChange={setEditReceivableAccountId}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger id="ingresos-field-11">
                     <SelectValue placeholder="Sin cuenta por cobrar" />
                   </SelectTrigger>
                   <SelectContent>
@@ -703,8 +735,8 @@ export default function IngresosContent() {
               </div>
 
               <div className="space-y-2 md:col-span-2">
-                <Label>Notas</Label>
-                <Textarea
+                <Label htmlFor="ingresos-field-12">Notas</Label>
+                <Textarea id="ingresos-field-12"
                   value={editNotes}
                   onChange={(event) => setEditNotes(event.target.value)}
                 />

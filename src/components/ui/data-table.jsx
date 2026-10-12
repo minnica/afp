@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Empty, EmptyDescription } from "@/components/ui/empty";
 import {
   Select,
   SelectContent,
@@ -84,6 +85,7 @@ export function DataTable({
 
             {showFilter ? (
               <Input
+                aria-label={filterPlaceholder}
                 placeholder={filterPlaceholder}
                 value={filterGlobal ? globalFilter : columnFilterValue}
                 onChange={(e) => {
@@ -110,7 +112,7 @@ export function DataTable({
                   table.setPageIndex(0);
                 }}
               >
-                <SelectTrigger className="h-9 w-[70px] text-xs">
+                <SelectTrigger aria-label="Registros por página" className="h-9 w-[70px] text-xs">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -141,25 +143,30 @@ export function DataTable({
                 {headerGroup.headers.map((header) => (
                   <TableHead
                     key={header.id}
-                    className={
-                      header.column.getCanSort()
-                        ? "cursor-pointer select-none"
-                        : ""
+                    aria-sort={
+                      header.column.getIsSorted() === "asc"
+                        ? "ascending"
+                        : header.column.getIsSorted() === "desc"
+                          ? "descending"
+                          : header.column.getCanSort() ? "none" : undefined
                     }
-                    onClick={header.column.getToggleSortingHandler()}
                   >
-                    {header.isPlaceholder ? null : (
-                      <>
+                    {header.isPlaceholder ? null : header.column.getCanSort() ? (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="-ml-2"
+                        onClick={header.column.getToggleSortingHandler()}
+                      >
                         {flexRender(
                           header.column.columnDef.header,
                           header.getContext(),
                         )}
-                        {header.column.getCanSort() ? (
-                          <SortIcon isSorted={header.column.getIsSorted()} />
-                        ) : (
-                          <ChevronsUpDown className="ml-1 inline h-3.5 w-3.5 opacity-0" />
-                        )}
-                      </>
+                        <SortIcon isSorted={header.column.getIsSorted()} />
+                      </Button>
+                    ) : (
+                      flexRender(header.column.columnDef.header, header.getContext())
                     )}
                   </TableHead>
                 ))}
@@ -187,7 +194,9 @@ export function DataTable({
                   colSpan={columns.length}
                   className="py-8 text-center text-muted-foreground"
                 >
-                  Sin resultados.
+                  <Empty className="py-4">
+                    <EmptyDescription>Sin resultados.</EmptyDescription>
+                  </Empty>
                 </TableCell>
               </TableRow>
             )}

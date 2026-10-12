@@ -1,6 +1,17 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useDialogFocus } from "@/hooks/use-dialog-focus";
+
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+
+import { Empty, EmptyDescription } from "@/components/ui/empty";
+
+import { Alert, AlertDescription } from "@/components/ui/alert";
+
+import { useEffect, useId, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Trash2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
@@ -19,9 +30,11 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Item, ItemActions, ItemContent, ItemDescription, ItemGroup, ItemTitle } from "@/components/ui/item";
 import PageSkeleton from "@/components/layout/PageSkeleton";
 
 export default function SettingsContent() {
+  const { captureFocus, restoreFocus } = useDialogFocus();
   const router = useRouter();
 
   const [user, setUser] = useState(null);
@@ -37,6 +50,7 @@ export default function SettingsContent() {
   const [personNotes, setPersonNotes] = useState("");
   const [incomeTypeName, setIncomeTypeName] = useState("");
 
+  const [itemToDelete, setItemToDelete] = useState(null);
   const [error, setError] = useState("");
 
   async function loadSettings(userId) {
@@ -137,11 +151,6 @@ export default function SettingsContent() {
   async function deleteItem(type, id) {
     if (!user) return;
 
-    const confirmed = window.confirm(
-      "¿Seguro que quieres eliminar este registro?",
-    );
-
-    if (!confirmed) return;
 
     setError("");
 
@@ -176,12 +185,29 @@ export default function SettingsContent() {
   }
 
   return (
-    <main>
+    <main onClickCapture={captureFocus}>
+      <AlertDialog
+        open={Boolean(itemToDelete)}
+        onOpenChange={(open) => { if (!open) setItemToDelete(null); }}
+      >
+        <AlertDialogContent onCloseAutoFocus={restoreFocus}>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Eliminar este registro?</AlertDialogTitle>
+            <AlertDialogDescription>Se eliminará el registro seleccionado del catálogo. Esta acción no se puede deshacer.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction variant="destructive" onClick={() => deleteItem(itemToDelete.type, itemToDelete.id)}>
+              Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       <section className="mx-auto flex w-full max-w-6xl flex-col px-4 py-5 md:py-8">
         {error ? (
-          <div className="mb-6 rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-            {error}
-          </div>
+          <Alert variant="destructive" className="mb-6">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
         ) : null}
 
         <div className="mb-6 grid gap-4 md:grid-cols-3">
@@ -207,7 +233,7 @@ export default function SettingsContent() {
               onCreate={() => createItem("category")}
               isSaving={isSaving}
               items={categories}
-              onDelete={(id) => deleteItem("category", id)}
+              onDelete={(id) => setItemToDelete({ type: "category", id })}
             />
           </TabsContent>
 
@@ -222,8 +248,9 @@ export default function SettingsContent() {
               <CardContent className="space-y-6">
                 <div className="grid gap-4 md:grid-cols-[1fr_1fr_auto] md:items-end">
                   <div className="space-y-2">
-                    <Label>Nombre</Label>
+                    <Label htmlFor="settings-field-1">Nombre</Label>
                     <Input
+                      id="settings-field-1"
                       value={personName}
                       placeholder="Ej. Luis"
                       onChange={(event) => setPersonName(event.target.value)}
@@ -231,8 +258,9 @@ export default function SettingsContent() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label>Notas opcional</Label>
+                    <Label htmlFor="settings-field-2">Notas opcional</Label>
                     <Input
+                      id="settings-field-2"
                       value={personNotes}
                       placeholder="Ej. Cuñado, amigo, familiar..."
                       onChange={(event) => setPersonNotes(event.target.value)}
@@ -255,7 +283,7 @@ export default function SettingsContent() {
                   items={people}
                   type="person"
                   emptyText="Aún no hay personas registradas."
-                  onDelete={(id) => deleteItem("person", id)}
+                  onDelete={(id) => setItemToDelete({ type: "person", id })}
                 />
               </CardContent>
             </Card>
@@ -272,7 +300,7 @@ export default function SettingsContent() {
               onCreate={() => createItem("incomeType")}
               isSaving={isSaving}
               items={incomeTypes}
-              onDelete={(id) => deleteItem("incomeType", id)}
+              onDelete={(id) => setItemToDelete({ type: "incomeType", id })}
             />
           </TabsContent>
         </Tabs>
@@ -303,6 +331,7 @@ function CatalogCard({
   items,
   onDelete,
 }) {
+  const inputId = useId();
   return (
     <Card className="rounded-2xl border-border bg-card">
       <CardHeader>
@@ -312,8 +341,9 @@ function CatalogCard({
       <CardContent className="space-y-6">
         <div className="grid gap-4 md:grid-cols-[1fr_auto] md:items-end">
           <div className="space-y-2">
-            <Label>{inputLabel}</Label>
+            <Label htmlFor={inputId}>{inputLabel}</Label>
             <Input
+              id={inputId}
               value={inputValue}
               placeholder={inputPlaceholder}
               onChange={(event) => onInputChange(event.target.value)}
@@ -342,42 +372,48 @@ function CatalogCard({
 function ItemList({ items, emptyText, onDelete }) {
   if (!items.length) {
     return (
-      <p className="rounded-xl border border-border bg-muted/30 px-4 py-6 text-sm text-muted-foreground">
-        {emptyText}
-      </p>
+      <Empty>
+        <EmptyDescription>
+          {emptyText}
+        </EmptyDescription>
+      </Empty>
     );
   }
 
   return (
-    <div className="grid gap-2">
+    <ItemGroup>
       {items.map((item) => (
-        <div
+        <Item
           key={item.id}
-          className="flex items-center justify-between gap-4 rounded-xl border border-border bg-background/60 px-4 py-3"
+          variant="outline"
+          role="listitem"
         >
-          <div className="min-w-0">
-            <div className="flex items-center gap-2">
-              <p className="truncate font-medium">{item.name}</p>
+          <ItemContent className="min-w-0">
+            <ItemTitle>
+              {item.name}
               <Badge variant="secondary">Activo</Badge>
-            </div>
+            </ItemTitle>
 
             {item.notes ? (
-              <p className="mt-1 truncate text-sm text-muted-foreground">
+              <ItemDescription>
                 {item.notes}
-              </p>
+              </ItemDescription>
             ) : null}
-          </div>
+          </ItemContent>
 
+          <ItemActions>
           <Button
             type="button"
             variant="ghost"
             size="icon"
+            aria-label={`Eliminar ${item.name}`}
             onClick={() => onDelete(item.id)}
           >
             <Trash2 className="h-4 w-4" />
           </Button>
-        </div>
+          </ItemActions>
+        </Item>
       ))}
-    </div>
+    </ItemGroup>
   );
 }

@@ -2,6 +2,9 @@
 
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Empty, EmptyDescription } from "@/components/ui/empty";
+import { Item, ItemContent, ItemDescription, ItemFooter, ItemGroup, ItemTitle } from "@/components/ui/item";
 
 function formatMoney(value) {
   return new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" }).format(
@@ -16,38 +19,40 @@ function formatShortDate(dateString) {
 
 function BreakdownSection({ title, items, emptyText, getPrimary, getSecondary, getAmount, getNote }) {
   return (
-    <div className="rounded-xl border border-border bg-card p-3">
-      <h5 className="mb-3 text-sm font-medium">{title}</h5>
+    <Card>
+      <CardHeader><CardTitle>{title}</CardTitle></CardHeader>
+      <CardContent>
 
       {items.length === 0 ? (
-        <p className="text-sm text-muted-foreground">{emptyText}</p>
+        <Empty className="px-0"><EmptyDescription>{emptyText}</EmptyDescription></Empty>
       ) : (
-        <div className="space-y-2">
+        <ItemGroup>
           {items.map((item) => (
-            <div
+            <Item
               key={item.id}
-              className="rounded-lg border border-border bg-background/60 px-3 py-2"
+              variant="outline"
+              size="sm"
+              role="listitem"
             >
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-medium">{getPrimary(item)}</p>
-                  <p className="mt-1 truncate text-xs text-muted-foreground">
+                <ItemContent className="min-w-0">
+                  <ItemTitle>{getPrimary(item)}</ItemTitle>
+                  <ItemDescription>
                     {getSecondary(item)}
-                  </p>
-                </div>
+                  </ItemDescription>
+                </ItemContent>
 
                 <p className="shrink-0 text-sm font-semibold">{formatMoney(getAmount(item))}</p>
-              </div>
               {getNote?.(item) && (
-                <p className="mt-2 whitespace-pre-wrap text-xs text-muted-foreground">
+                <ItemFooter className="whitespace-pre-wrap text-xs text-muted-foreground">
                   {getNote(item)}
-                </p>
+                </ItemFooter>
               )}
-            </div>
+            </Item>
           ))}
-        </div>
+        </ItemGroup>
       )}
-    </div>
+      </CardContent>
+    </Card>
   );
 }
 

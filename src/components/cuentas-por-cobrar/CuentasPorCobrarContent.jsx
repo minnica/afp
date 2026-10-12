@@ -1,5 +1,16 @@
 "use client";
 
+import { useDialogFocus } from "@/hooks/use-dialog-focus";
+
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+
+import { Empty, EmptyDescription } from "@/components/ui/empty";
+
+import { Alert, AlertDescription } from "@/components/ui/alert";
+
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
@@ -10,6 +21,7 @@ import { ensureUserSetup } from "@/lib/userSetup";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -30,6 +42,7 @@ import { Badge } from "@/components/ui/badge";
 import PageSkeleton from "@/components/layout/PageSkeleton";
 import {
   Dialog,
+  DialogDescription,
   DialogContent,
   DialogFooter,
   DialogHeader,
@@ -37,6 +50,7 @@ import {
 } from "@/components/ui/dialog";
 import { DataTable } from "@/components/ui/data-table";
 import { TableCell, TableRow } from "@/components/ui/table";
+import { Item, ItemContent, ItemDescription, ItemGroup, ItemTitle } from "@/components/ui/item";
 
 function getTodayInputValue() {
   const today = new Date();
@@ -88,6 +102,7 @@ function formatChargeDaysInput(days) {
 }
 
 export default function CuentasPorCobrarContent() {
+  const { captureFocus, restoreFocus } = useDialogFocus();
   const router = useRouter();
 
   const [user, setUser] = useState(null);
@@ -104,6 +119,7 @@ export default function CuentasPorCobrarContent() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [receivableToDelete, setReceivableToDelete] = useState(null);
   const [error, setError] = useState("");
 
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -311,11 +327,6 @@ export default function CuentasPorCobrarContent() {
   async function deleteReceivable(id) {
     if (!user) return;
 
-    const confirmed = window.confirm(
-      "¿Seguro que quieres eliminar esta cuenta por cobrar?",
-    );
-
-    if (!confirmed) return;
 
     setError("");
 
@@ -470,7 +481,7 @@ export default function CuentasPorCobrarContent() {
               Ver pagos
             </Button>
 
-            <Button
+            <Button aria-label="Editar"
               type="button"
               variant="ghost"
               size="icon"
@@ -479,11 +490,11 @@ export default function CuentasPorCobrarContent() {
               <Pencil className="h-4 w-4" />
             </Button>
 
-            <Button
+            <Button aria-label="Eliminar"
               type="button"
               variant="ghost"
               size="icon"
-              onClick={() => deleteReceivable(row.original.id)}
+              onClick={() => setReceivableToDelete(row.original)}
             >
               <Trash2 className="h-4 w-4" />
             </Button>
@@ -530,12 +541,29 @@ export default function CuentasPorCobrarContent() {
   }
 
   return (
-    <main>
+    <main onClickCapture={captureFocus}>
+      <AlertDialog
+        open={Boolean(receivableToDelete)}
+        onOpenChange={(open) => { if (!open) setReceivableToDelete(null); }}
+      >
+        <AlertDialogContent onCloseAutoFocus={restoreFocus}>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Eliminar esta cuenta por cobrar?</AlertDialogTitle>
+            <AlertDialogDescription>Se eliminará la cuenta por cobrar seleccionada. Esta acción no se puede deshacer.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction variant="destructive" onClick={() => deleteReceivable(receivableToDelete.id)}>
+              Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       <section className="mx-auto flex w-full max-w-full flex-col px-4 py-5 md:py-8">
         {error ? (
-          <div className="mb-6 rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-            {error}
-          </div>
+          <Alert variant="destructive" className="mb-6">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
         ) : null}
 
         <div className="mb-6 grid gap-4 md:grid-cols-3">
@@ -557,9 +585,9 @@ export default function CuentasPorCobrarContent() {
 
             <CardContent className="space-y-5">
               <div className="space-y-2">
-                <Label>Persona</Label>
+                <Label htmlFor="cuentas-por-cobrar-field-1">Persona</Label>
                 <Select value={personId} onValueChange={setPersonId}>
-                  <SelectTrigger>
+                  <SelectTrigger id="cuentas-por-cobrar-field-1">
                     <SelectValue placeholder="Selecciona persona" />
                   </SelectTrigger>
                   <SelectContent>
@@ -579,8 +607,9 @@ export default function CuentasPorCobrarContent() {
               </div>
 
               <div className="space-y-2">
-                <Label>Concepto</Label>
+                <Label htmlFor="cuentas-por-cobrar-field-2">Concepto</Label>
                 <Input
+                  id="cuentas-por-cobrar-field-2"
                   value={concept}
                   placeholder="Ej. Venta de moto"
                   onChange={(event) => setConcept(event.target.value)}
@@ -588,8 +617,9 @@ export default function CuentasPorCobrarContent() {
               </div>
 
               <div className="space-y-2">
-                <Label>Monto original</Label>
+                <Label htmlFor="cuentas-por-cobrar-field-3">Monto original</Label>
                 <Input
+                  id="cuentas-por-cobrar-field-3"
                   value={originalAmount}
                   type="number"
                   min="0"
@@ -600,17 +630,19 @@ export default function CuentasPorCobrarContent() {
               </div>
 
               <div className="space-y-2">
-                <Label>Fecha de origen</Label>
-                <Input
-                  type="date"
+                <Label htmlFor="receivable-origin-date">Fecha de origen</Label>
+                <DatePicker
+                  id="receivable-origin-date"
+                  aria-label="Fecha de origen"
                   value={originDate}
-                  onChange={(event) => setOriginDate(event.target.value)}
+                  onChange={setOriginDate}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label>Pago mensual esperado opcional</Label>
+                <Label htmlFor="cuentas-por-cobrar-field-4">Pago mensual esperado opcional</Label>
                 <Input
+                  id="cuentas-por-cobrar-field-4"
                   value={expectedMonthlyPayment}
                   type="number"
                   min="0"
@@ -623,8 +655,9 @@ export default function CuentasPorCobrarContent() {
               </div>
 
               <div className="space-y-2">
-                <Label>Días de cobro opcionales</Label>
+                <Label htmlFor="cuentas-por-cobrar-field-5">Días de cobro opcionales</Label>
                 <Input
+                  id="cuentas-por-cobrar-field-5"
                   value={expectedChargeDays}
                   placeholder="Ej. 15, 30"
                   onChange={(event) =>
@@ -637,8 +670,8 @@ export default function CuentasPorCobrarContent() {
               </div>
 
               <div className="space-y-2">
-                <Label>Notas opcional</Label>
-                <Textarea
+                <Label htmlFor="cuentas-por-cobrar-field-6">Notas opcional</Label>
+                <Textarea id="cuentas-por-cobrar-field-6"
                   value={notes}
                   placeholder="Detalles adicionales..."
                   onChange={(event) => setNotes(event.target.value)}
@@ -680,7 +713,7 @@ export default function CuentasPorCobrarContent() {
                           setFilterPersonId(value === "ALL" ? "" : value)
                         }
                       >
-                        <SelectTrigger className="w-[180px]">
+                        <SelectTrigger aria-label="Filtrar por persona" className="w-[180px]">
                           <SelectValue placeholder="Todas las personas" />
                         </SelectTrigger>
                         <SelectContent>
@@ -701,7 +734,7 @@ export default function CuentasPorCobrarContent() {
                           setFilterOriginType(value === "ALL" ? "" : value)
                         }
                       >
-                        <SelectTrigger className="w-[180px]">
+                        <SelectTrigger aria-label="Filtrar por origen" className="w-[180px]">
                           <SelectValue placeholder="Todos los orígenes" />
                         </SelectTrigger>
                         <SelectContent>
@@ -724,7 +757,7 @@ export default function CuentasPorCobrarContent() {
                           setFilterStatus(value === "ALL" ? "" : value)
                         }
                       >
-                        <SelectTrigger className="w-[180px]">
+                        <SelectTrigger aria-label="Filtrar por estado" className="w-[180px]">
                           <SelectValue placeholder="Todos los estados" />
                         </SelectTrigger>
                         <SelectContent>
@@ -736,6 +769,7 @@ export default function CuentasPorCobrarContent() {
                       </Select>
 
                       <Input
+                        aria-label="Buscar por concepto"
                         placeholder="Buscar concepto..."
                         value={filterConcept}
                         onChange={(event) =>
@@ -757,16 +791,17 @@ export default function CuentasPorCobrarContent() {
             if (!open) cancelEditingReceivable();
           }}
         >
-          <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
+          <DialogContent onCloseAutoFocus={restoreFocus} className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
             <DialogHeader>
               <DialogTitle>Editar cuenta por cobrar</DialogTitle>
+              <DialogDescription>Actualiza los datos y guarda los cambios.</DialogDescription>
             </DialogHeader>
 
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label>Persona</Label>
+                <Label htmlFor="cuentas-por-cobrar-field-7">Persona</Label>
                 <Select value={editPersonId} onValueChange={setEditPersonId}>
-                  <SelectTrigger>
+                  <SelectTrigger id="cuentas-por-cobrar-field-7">
                     <SelectValue placeholder="Selecciona persona" />
                   </SelectTrigger>
                   <SelectContent>
@@ -780,25 +815,28 @@ export default function CuentasPorCobrarContent() {
               </div>
 
               <div className="space-y-2">
-                <Label>Fecha de origen</Label>
-                <Input
-                  type="date"
+                <Label htmlFor="edit-receivable-origin-date">Fecha de origen</Label>
+                <DatePicker
+                  id="edit-receivable-origin-date"
+                  aria-label="Fecha de origen"
                   value={editOriginDate}
-                  onChange={(event) => setEditOriginDate(event.target.value)}
+                  onChange={setEditOriginDate}
                 />
               </div>
 
               <div className="space-y-2 md:col-span-2">
-                <Label>Concepto</Label>
+                <Label htmlFor="cuentas-por-cobrar-field-8">Concepto</Label>
                 <Input
+                  id="cuentas-por-cobrar-field-8"
                   value={editConcept}
                   onChange={(event) => setEditConcept(event.target.value)}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label>Monto original</Label>
+                <Label htmlFor="cuentas-por-cobrar-field-9">Monto original</Label>
                 <Input
+                  id="cuentas-por-cobrar-field-9"
                   value={editOriginalAmount}
                   type="number"
                   min="0"
@@ -810,8 +848,9 @@ export default function CuentasPorCobrarContent() {
               </div>
 
               <div className="space-y-2">
-                <Label>Pago mensual esperado opcional</Label>
+                <Label htmlFor="cuentas-por-cobrar-field-10">Pago mensual esperado opcional</Label>
                 <Input
+                  id="cuentas-por-cobrar-field-10"
                   value={editExpectedMonthlyPayment}
                   type="number"
                   min="0"
@@ -823,8 +862,9 @@ export default function CuentasPorCobrarContent() {
               </div>
 
               <div className="space-y-2">
-                <Label>Días de cobro opcionales</Label>
+                <Label htmlFor="cuentas-por-cobrar-field-11">Días de cobro opcionales</Label>
                 <Input
+                  id="cuentas-por-cobrar-field-11"
                   value={editExpectedChargeDays}
                   placeholder="Ej. 15, 30"
                   onChange={(event) =>
@@ -837,8 +877,8 @@ export default function CuentasPorCobrarContent() {
               </div>
 
               <div className="space-y-2 md:col-span-2">
-                <Label>Notas</Label>
-                <Textarea
+                <Label htmlFor="cuentas-por-cobrar-field-12">Notas</Label>
+                <Textarea id="cuentas-por-cobrar-field-12"
                   value={editNotes}
                   onChange={(event) => setEditNotes(event.target.value)}
                 />
@@ -870,7 +910,7 @@ export default function CuentasPorCobrarContent() {
             if (!open) setPaymentsDialogReceivable(null);
           }}
         >
-          <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-xl">
+          <DialogContent onCloseAutoFocus={restoreFocus} className="max-h-[90vh] overflow-y-auto sm:max-w-xl">
             <DialogHeader>
               <DialogTitle>
                 Pagos vinculados
@@ -878,6 +918,7 @@ export default function CuentasPorCobrarContent() {
                   ? ` · ${paymentsDialogReceivable.concept}`
                   : ""}
               </DialogTitle>
+              <DialogDescription>Ingresos aplicados a esta cuenta por cobrar.</DialogDescription>
             </DialogHeader>
 
             {paymentsDialogReceivable ? (
@@ -910,30 +951,33 @@ function ReceivablePaymentsBreakdown({ receivable }) {
 
   if (payments.length === 0) {
     return (
-      <p className="rounded-lg border border-border bg-muted/30 px-3 py-3 text-sm text-muted-foreground">
-        Todavía no hay pagos vinculados a esta cuenta por cobrar.
-      </p>
+      <Empty>
+        <EmptyDescription>
+          Todavía no hay pagos vinculados a esta cuenta por cobrar.
+        </EmptyDescription>
+      </Empty>
     );
   }
 
   return (
-    <div className="grid gap-2">
+    <ItemGroup>
       {payments.map((payment) => (
-        <div
+        <Item
           key={payment.id}
-          className="flex flex-col gap-2 rounded-lg border border-border bg-muted/30 px-3 py-3 sm:flex-row sm:items-center sm:justify-between"
+          variant="muted"
+          role="listitem"
         >
-          <div className="min-w-0">
-            <p className="font-medium">{payment.concept}</p>
-            <p className="mt-1 text-xs text-muted-foreground">
+          <ItemContent className="min-w-0">
+            <ItemTitle>{payment.concept}</ItemTitle>
+            <ItemDescription>
               {formatDate(payment.date)}
               {payment.source ? ` · ${payment.source}` : ""}
-            </p>
-          </div>
+            </ItemDescription>
+          </ItemContent>
 
           <p className="font-semibold">{formatMoney(payment.amount)}</p>
-        </div>
+        </Item>
       ))}
-    </div>
+    </ItemGroup>
   );
 }
