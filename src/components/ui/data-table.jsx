@@ -10,7 +10,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { ChevronDown, ChevronUp, ChevronsUpDown } from "lucide-react";
 
 import {
@@ -25,6 +25,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Empty, EmptyDescription } from "@/components/ui/empty";
+import { ItemGroup, ItemSeparator } from "@/components/ui/item";
+import { cn } from "@/lib/utils";
 
 function SortIcon({ isSorted }) {
   if (isSorted === "asc")
@@ -39,11 +41,15 @@ export function DataTable({
   data,
   filterColumn,
   filterGlobal = false,
+  globalFilterFn = "includesString",
   filterPlaceholder = "Filtrar...",
   pageSize = 10,
   pageSizeOptions,
   toolbarStart,
   footerRow,
+  renderMobileRow,
+  mobileToolbar,
+  mobileListLabel = "Registros",
 }) {
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
@@ -58,7 +64,7 @@ export function DataTable({
     onColumnFiltersChange: setColumnFilters,
     onGlobalFilterChange: setGlobalFilter,
     onPaginationChange: setPagination,
-    globalFilterFn: "includesString",
+    globalFilterFn,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
@@ -75,7 +81,7 @@ export function DataTable({
     <div className="space-y-3">
       {showFilter || pageSizeOptions || toolbarStart ? (
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="flex flex-wrap items-center gap-2">
+          <div className={cn("flex flex-wrap items-center gap-2", renderMobileRow && "w-full md:w-auto")}>
             {toolbarStart}
 
             {showFilter ? (
@@ -92,13 +98,13 @@ export function DataTable({
                       ?.setFilterValue(e.target.value);
                   }
                 }}
-                className="max-w-sm"
+                className={cn("max-w-sm", renderMobileRow && "h-11 text-base md:h-7 md:text-xs")}
               />
             ) : null}
           </div>
 
           {pageSizeOptions ? (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <div className={cn("flex items-center gap-2 text-sm text-muted-foreground", renderMobileRow && "hidden md:flex")}>
               <span className="text-xs">Mostrar</span>
               <ResponsiveSelect
                 value={String(table.getState().pagination.pageSize)}
@@ -120,7 +126,27 @@ export function DataTable({
         </div>
       ) : null}
 
-      <div className="overflow-x-auto rounded-xl border border-border">
+      {renderMobileRow ? (
+        <div className="md:hidden">
+          {mobileToolbar?.(table)}
+          {table.getRowModel().rows.length ? (
+            <ItemGroup className="gap-0" aria-label={mobileListLabel}>
+              {table.getRowModel().rows.map((row, index) => (
+                <Fragment key={row.id}>
+                  {index > 0 ? <ItemSeparator className="my-0" /> : null}
+                  {renderMobileRow(row)}
+                </Fragment>
+              ))}
+            </ItemGroup>
+          ) : (
+            <Empty className="py-8">
+              <EmptyDescription>Sin resultados.</EmptyDescription>
+            </Empty>
+          )}
+        </div>
+      ) : null}
+
+      <div className={cn("overflow-x-auto rounded-xl border border-border", renderMobileRow && "hidden md:block")}>
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -202,11 +228,26 @@ export function DataTable({
             : null}
         </span>
 
+        {renderMobileRow && pageSizeOptions ? (
+          <div className="flex items-center gap-2 md:hidden">
+            <span className="text-xs">Mostrar</span>
+            <ResponsiveSelect
+              value={String(table.getState().pagination.pageSize)}
+              onValueChange={(value) => { table.setPageSize(Number(value)); table.setPageIndex(0); }}
+              aria-label="Registros por página"
+              className="h-11 w-[70px] text-sm"
+              title="Registros por página"
+              options={pageSizeOptions.map((size) => ({ value: String(size), label: String(size) }))}
+            />
+          </div>
+        ) : null}
+
         {table.getPageCount() > 1 ? (
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
               size="sm"
+              className={renderMobileRow ? "h-11 px-3 md:h-6 md:px-2" : undefined}
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
             >
@@ -215,6 +256,7 @@ export function DataTable({
             <Button
               variant="outline"
               size="sm"
+              className={renderMobileRow ? "h-11 px-3 md:h-6 md:px-2" : undefined}
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
             >

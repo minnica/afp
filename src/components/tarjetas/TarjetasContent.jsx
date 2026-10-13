@@ -17,6 +17,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   CreditCard,
+  ChevronLeft,
+  ChevronRight,
   Pencil,
   Plus,
   RefreshCcw,
@@ -41,6 +43,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Item, ItemGroup, ItemMedia } from "@/components/ui/item";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ResponsiveSelect } from "@/components/ui/responsive-select";
 import CyclesDataTable from "@/components/tarjetas/CyclesDataTable";
 import PageSkeleton from "@/components/layout/PageSkeleton";
 
@@ -447,7 +450,7 @@ export default function TarjetasContent() {
           </Alert>
         ) : null}
 
-        <div className="mb-6 grid gap-4 md:grid-cols-3">
+        <div className="mb-4 grid grid-cols-2 gap-3 md:mb-6 md:grid-cols-3 md:gap-4">
           <Card className="rounded-2xl border-border bg-card">
             <CardHeader className="pb-2">
               <CardDescription>Tarjetas registradas</CardDescription>
@@ -464,9 +467,9 @@ export default function TarjetasContent() {
         </div>
 
         <Tabs defaultValue="cycles" className="w-full">
-          <TabsList className="mb-6">
-            <TabsTrigger value="cards">Tarjetas</TabsTrigger>
-            <TabsTrigger value="cycles">Ciclos mensuales</TabsTrigger>
+          <TabsList className="mb-4 group-data-horizontal/tabs:h-12 md:mb-6 md:group-data-horizontal/tabs:h-8">
+            <TabsTrigger value="cards" className="px-3 text-sm md:px-1.5 md:text-xs">Tarjetas</TabsTrigger>
+            <TabsTrigger value="cycles" className="px-3 text-sm md:px-1.5 md:text-xs">Ciclos mensuales</TabsTrigger>
           </TabsList>
 
           <TabsContent value="cards">
@@ -629,10 +632,10 @@ export default function TarjetasContent() {
           </TabsContent>
 
           <TabsContent value="cycles">
-            <Card className="rounded-2xl border-border bg-card">
-              <CardHeader className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <Card className="rounded-xl border-border bg-card">
+              <CardHeader className="flex flex-row items-center justify-between gap-2 md:gap-3">
                 <div>
-                  <CardTitle className="text-center text-lg font-semibold uppercase">
+                  <CardTitle className="text-base font-semibold md:text-center md:text-lg md:uppercase">
                     Ciclos mensuales
                   </CardTitle>
                 </div>
@@ -641,9 +644,12 @@ export default function TarjetasContent() {
                   type="button"
                   onClick={generateCycles}
                   disabled={isGeneratingCycles || cards.length === 0}
+                  className="h-11 shrink-0 px-2 text-sm md:h-7 md:text-xs"
+                  aria-label={isGeneratingCycles ? "Generando ciclos" : "Generar ciclos"}
                 >
-                  <RefreshCcw className="mr-2 h-4 w-4" />
-                  {isGeneratingCycles ? "Generando..." : "Generar ciclos"}
+                  <RefreshCcw className="h-4 w-4 md:mr-2" />
+                  <span className="md:hidden">{isGeneratingCycles ? "..." : "Generar"}</span>
+                  <span className="hidden md:inline">{isGeneratingCycles ? "Generando..." : "Generar ciclos"}</span>
                 </Button>
               </CardHeader>
 
@@ -656,7 +662,23 @@ export default function TarjetasContent() {
                   </Empty>
                 ) : (
                   <Tabs value={activeMonthTab} onValueChange={setActiveMonthTab}>
-                    <TabsList className="mb-6 h-auto flex-wrap">
+                    <div className="mb-3 flex items-center gap-2 md:hidden">
+                      <Button type="button" variant="ghost" size="icon" className="size-11" aria-label="Mes anterior" disabled={activeMonthTab === "0"} onClick={() => setActiveMonthTab(String(Number(activeMonthTab) - 1))}>
+                        <ChevronLeft />
+                      </Button>
+                      <ResponsiveSelect
+                        value={activeMonthTab}
+                        onValueChange={setActiveMonthTab}
+                        aria-label="Mes de los ciclos"
+                        title="Mes de los ciclos"
+                        className="h-11 min-w-0 flex-1 text-sm"
+                        options={MONTH_NAMES.map((monthName, monthIndex) => ({ value: String(monthIndex), label: `${monthName} ${currentYear}` }))}
+                      />
+                      <Button type="button" variant="ghost" size="icon" className="size-11" aria-label="Mes siguiente" disabled={activeMonthTab === "11"} onClick={() => setActiveMonthTab(String(Number(activeMonthTab) + 1))}>
+                        <ChevronRight />
+                      </Button>
+                    </div>
+                    <TabsList className="mb-6 hidden h-auto flex-wrap md:flex">
                       {MONTH_NAMES.map((name, monthIndex) => (
                         <TabsTrigger key={monthIndex} value={String(monthIndex)}>
                           {name}
@@ -666,7 +688,7 @@ export default function TarjetasContent() {
 
                     {MONTH_NAMES.map((name, monthIndex) => (
                       <TabsContent key={monthIndex} value={String(monthIndex)}>
-                        <h3 className="mb-4 text-sm font-medium capitalize text-muted-foreground">
+                        <h3 className="mb-4 hidden text-sm font-medium capitalize text-muted-foreground md:block">
                           {name} {currentYear}
                         </h3>
                         <CyclesDataTable

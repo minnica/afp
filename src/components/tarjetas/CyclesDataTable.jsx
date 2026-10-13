@@ -6,6 +6,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 
 import { useCallback, useMemo, useState } from "react";
+import { ChevronDown } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 
@@ -15,6 +16,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Label } from "@/components/ui/label";
+import { Item } from "@/components/ui/item";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { ResponsiveSelect } from "@/components/ui/responsive-select";
+import { BreakdownDialogContent } from "@/components/ui/responsive-breakdown";
 import {
   Dialog,
   DialogDescription,
@@ -44,7 +49,7 @@ function toDateInputValue(dateString) {
 
 function formatCompactDate(dateString) {
   const date = new Date(dateString);
-  const dateText = format(date, "d MMMM", { locale: es });
+  const dateText = format(new Date(toDateInputValue(dateString) + "T12:00:00"), "d MMMM", { locale: es });
 
   const today = new Date();
   const todayUtc = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
@@ -85,6 +90,98 @@ function getStatusBadgeClass(status) {
     PAYMENT_PENDING: "bg-yellow-50 text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300",
   };
   return classes[status] || "border-border bg-muted text-muted-foreground";
+}
+
+const MOBILE_SORT_OPTIONS = [
+  { value: "dueDate:asc", label: "Límite: más próximo" },
+  { value: "dueDate:desc", label: "Límite: más lejano" },
+  { value: "cardName:asc", label: "Tarjeta: A a Z" },
+  { value: "cardName:desc", label: "Tarjeta: Z a A" },
+  { value: "cutDate:asc", label: "Corte: más próximo" },
+  { value: "cutDate:desc", label: "Corte: más lejano" },
+  { value: "calculatedAmount:desc", label: "Calculado: mayor primero" },
+  { value: "calculatedAmount:asc", label: "Calculado: menor primero" },
+  { value: "statementAmount:desc", label: "Estado de cuenta: mayor primero" },
+  { value: "statementAmount:asc", label: "Estado de cuenta: menor primero" },
+  { value: "difference:desc", label: "Diferencia: mayor primero" },
+  { value: "difference:asc", label: "Diferencia: menor primero" },
+  { value: "displayStatus:asc", label: "Estado: A a Z" },
+  { value: "displayStatus:desc", label: "Estado: Z a A" },
+];
+
+function filterCycle(row, _columnId, filterValue) {
+  const search = filterValue.trim().toLocaleLowerCase("es");
+  return `${row.original.card.name} ${getStatusLabel(row.original.displayStatus)}`
+    .toLocaleLowerCase("es")
+    .includes(search);
+}
+
+function MobileCycleItem({ cycle, openDialog }) {
+  const hasStatement = cycle.statementAmount != null;
+
+  return (
+    <Item role="listitem" className="block min-w-0 rounded-none border-0 px-0 py-4 text-sm">
+      <Collapsible>
+        <div className="mb-3 flex items-start justify-between gap-3">
+          <h4 className="min-w-0 break-words text-base font-semibold">{cycle.card.name}</h4>
+          <Badge variant="outline" className={`shrink-0 ${getStatusBadgeClass(cycle.displayStatus)}`}>
+            {getStatusLabel(cycle.displayStatus)}
+          </Badge>
+        </div>
+
+        <dl className="grid grid-cols-2 gap-x-3 gap-y-3">
+          <div className="col-span-2 min-w-0">
+            <dt className="text-xs text-muted-foreground">{hasStatement ? "Estado de cuenta" : "Calculado · estimado"}</dt>
+            <dd className="break-words text-lg font-semibold tabular-nums">{formatMoney(hasStatement ? cycle.statementAmount : cycle.calculatedAmount)}</dd>
+          </div>
+          <div className="min-w-0">
+            <dt className="text-xs text-muted-foreground">Corte</dt>
+            <dd className="text-sm font-medium">{formatCompactDate(cycle.cutDate)}</dd>
+          </div>
+          <div className="min-w-0 text-right">
+            <dt className="text-xs text-muted-foreground">Límite de pago</dt>
+            <dd className="text-sm font-medium">{formatCompactDate(cycle.dueDate)}</dd>
+          </div>
+        </dl>
+
+        <div className="mt-2 flex items-center justify-between gap-2">
+          <Button type="button" variant="ghost" className="h-11 px-2 text-sm" onClick={() => openDialog("breakdown", cycle)} aria-label={`Ver desglose de ${cycle.card.name}`}>
+            Desglose
+          </Button>
+          <CollapsibleTrigger asChild>
+            <Button type="button" variant="ghost" className="group h-11 px-2 text-sm" aria-label={`Detalles de ${cycle.card.name}`}>
+              Detalles
+              <ChevronDown className="transition-transform duration-150 group-aria-expanded:rotate-180 motion-reduce:transition-none" />
+            </Button>
+          </CollapsibleTrigger>
+        </div>
+
+        <CollapsibleContent>
+          <dl className="grid grid-cols-2 gap-3 border-t border-border pt-3 text-sm">
+            <div className="col-span-2 min-w-0">
+              <dt className="text-xs text-muted-foreground">Inicio</dt>
+              <dd>{format(new Date(toDateInputValue(cycle.startDate) + "T12:00:00"), "d MMM yyyy", { locale: es })}</dd>
+            </div>
+            <div className="min-w-0">
+              <dt className="text-xs text-muted-foreground">Calculado</dt>
+              <dd className="break-words font-medium tabular-nums">{formatMoney(cycle.calculatedAmount)}</dd>
+            </div>
+            <div className="min-w-0 text-right">
+              <dt className="text-xs text-muted-foreground">Diferencia</dt>
+              <dd className={`break-words tabular-nums ${cycle.difference == null ? "text-muted-foreground" : Math.abs(Number(cycle.difference)) > 35 ? "text-red-400" : "text-emerald-400"}`}>
+                {cycle.difference != null ? formatMoney(cycle.difference) : "Sin estado de cuenta"}
+              </dd>
+            </div>
+          </dl>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Button type="button" variant="secondary" className="h-11 px-3 text-sm" onClick={() => openDialog("dates", cycle)}>Fechas</Button>
+            <Button type="button" variant="secondary" className="h-11 px-3 text-sm" onClick={() => openDialog("statement", cycle)}>Cuenta</Button>
+            <Button type="button" className="h-11 px-3 text-sm" onClick={() => openDialog("pay", cycle)}>{cycle.displayStatus === "PAID" ? "Ver pago" : "Pagar"}</Button>
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
+    </Item>
+  );
 }
 
 export default function CyclesDataTable({
@@ -224,6 +321,7 @@ export default function CyclesDataTable({
       {
         accessorKey: "displayStatus",
         header: "Estado",
+        sortingFn: (rowA, rowB) => getStatusLabel(rowA.original.displayStatus).localeCompare(getStatusLabel(rowB.original.displayStatus), "es"),
         cell: ({ getValue }) => {
           const status = getValue();
           return (
@@ -290,10 +388,29 @@ export default function CyclesDataTable({
       <DataTable
         columns={columns}
         data={cycles}
-        filterColumn="cardName"
+        filterGlobal
+        globalFilterFn={filterCycle}
         filterPlaceholder="Filtrar por tarjeta o estado..."
         pageSize={10}
         pageSizeOptions={[10, 25, 50, 100]}
+        mobileListLabel="Ciclos mensuales"
+        renderMobileRow={(row) => <MobileCycleItem key={row.original.id} cycle={row.original} openDialog={openDialog} />}
+        mobileToolbar={(table) => (
+          <div className="mb-1 flex items-center gap-2">
+            <span className="text-xs text-muted-foreground">Ordenar</span>
+            <ResponsiveSelect
+              aria-label="Ordenar ciclos"
+              title="Ordenar ciclos"
+              className="h-11 min-w-0 flex-1 text-sm"
+              value={table.getState().sorting[0] ? `${table.getState().sorting[0].id}:${table.getState().sorting[0].desc ? "desc" : "asc"}` : "dueDate:asc"}
+              options={MOBILE_SORT_OPTIONS}
+              onValueChange={(value) => {
+                const [id, direction] = value.split(":");
+                table.setSorting([{ id, desc: direction === "desc" }]);
+              }}
+            />
+          </div>
+        )}
       />
 
       <Dialog open={!!activeDialog} onOpenChange={(open) => { if (!open) closeDialog(); }}>
@@ -418,12 +535,7 @@ export default function CyclesDataTable({
         )}
 
         {activeDialog?.type === "breakdown" && (
-          <DialogContent onCloseAutoFocus={restoreFocus} className="flex max-h-[90svh] flex-col sm:max-w-4xl">
-            <DialogHeader>
-              <DialogTitle>Desglose — {activeDialog.cycle.card.name}</DialogTitle>
-              <DialogDescription>Detalle de los movimientos e importes de este período.</DialogDescription>
-            </DialogHeader>
-            <div className="overflow-y-auto">
+          <BreakdownDialogContent onCloseAutoFocus={restoreFocus} data-cycle-breakdown-dialog title={`Desglose — ${activeDialog.cycle.card.name}`}>
               {activeDialog.isLoading ? (
                 <div className="grid gap-4 sm:grid-cols-3" role="status" aria-label="Cargando desglose">
                   <Skeleton className="h-40" />
@@ -437,8 +549,7 @@ export default function CyclesDataTable({
               ) : (
                 <CycleBreakdown cycle={activeDialog.cycle} />
               )}
-            </div>
-          </DialogContent>
+          </BreakdownDialogContent>
         )}
       </Dialog>
     </div>

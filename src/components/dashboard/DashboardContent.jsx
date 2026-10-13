@@ -27,18 +27,13 @@ import { ensureUserSetup } from "@/lib/userSetup";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Item, ItemContent, ItemDescription, ItemGroup, ItemTitle } from "@/components/ui/item";
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "@/components/ui/chart";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import {
-  Dialog,
-  DialogDescription,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog } from "@/components/ui/dialog";
 import PageSkeleton from "@/components/layout/PageSkeleton";
+import CardUsageWaiverBreakdown from "@/components/dashboard/CardUsageWaiverBreakdown";
+import { BreakdownDialogContent } from "@/components/ui/responsive-breakdown";
 import CyclePeriodHelp from "@/components/dashboard/CyclePeriodHelp";
 import {
   AlertTriangle,
@@ -972,6 +967,7 @@ function CardUsageWaiverProgress({ cardUsageWaiversByMonth, currentMonthIndex })
                   type="button"
                   variant="secondary"
                   size="sm"
+                  className="h-11 md:h-6"
                   onClick={(event) => {
                     captureFocus(event);
                     setSelectedItem(item);
@@ -992,120 +988,12 @@ function CardUsageWaiverProgress({ cardUsageWaiversByMonth, currentMonthIndex })
         }}
       >
         {selectedItem ? (
-          <DialogContent onCloseAutoFocus={restoreFocus} className="flex max-h-[90svh] flex-col sm:max-w-4xl">
-            <DialogHeader>
-              <DialogTitle>Desglose — {selectedItem.card.name}</DialogTitle>
-              <DialogDescription>Detalle de los movimientos e importes de este período.</DialogDescription>
-            </DialogHeader>
-            <div className="overflow-y-auto">
-              <CardUsageWaiverBreakdown item={selectedItem} />
-            </div>
-          </DialogContent>
+          <BreakdownDialogContent onCloseAutoFocus={restoreFocus} data-usage-breakdown-dialog title={`Desglose — ${selectedItem.card.name}`}>
+            <CardUsageWaiverBreakdown item={selectedItem} />
+          </BreakdownDialogContent>
         ) : null}
       </Dialog>
     </Card>
-  );
-}
-
-function formatBreakdownDate(dateString) {
-  if (!dateString) return "-";
-
-  return format(new Date(dateString), "d MMM", { locale: es });
-}
-
-function CardUsageWaiverBreakdown({ item }) {
-  const breakdown = item.breakdown || {};
-  const sections = [
-    {
-      title: "Gastos diarios",
-      amount: breakdown.dailyExpensesAmount,
-      items: breakdown.includedDailyExpenses || [],
-      emptyText: "No hay gastos diarios que cuenten en este ciclo.",
-      getName: (entry) => entry.concept,
-      getDescription: (entry) =>
-        `${formatBreakdownDate(entry.date)}${entry.categoryName ? ` · ${entry.categoryName}` : ""}`,
-    },
-    {
-      title: "Suscripciones confirmadas",
-      amount: breakdown.subscriptionsAmount,
-      items: breakdown.includedSubscriptions || [],
-      emptyText: "No hay suscripciones que cuenten en este ciclo.",
-      getName: (entry) => entry.name,
-      getDescription: (entry) =>
-        `${formatBreakdownDate(entry.chargeDate)}${entry.categoryName ? ` · ${entry.categoryName}` : ""}`,
-    },
-    {
-      title: "Compras nuevas a meses",
-      amount: breakdown.installmentPurchasesAmount,
-      items: breakdown.includedInstallmentPurchases || [],
-      emptyText: "No hay compras a meses que cuenten en este ciclo.",
-      getName: (entry) => entry.concept,
-      getDescription: (entry) =>
-        `${formatBreakdownDate(entry.purchaseDate)} · compra total${entry.categoryName ? ` · ${entry.categoryName}` : ""}`,
-    },
-    ...(breakdown.excludedExpenses?.length ? [{
-      title: "Cargos que no cuentan",
-      amount: breakdown.excludedAmount,
-      items: breakdown.excludedExpenses,
-      getName: (entry) => entry.concept,
-      getDescription: (entry) => `${formatBreakdownDate(entry.date)} · ${entry.reason}`,
-    }] : []),
-    ...(breakdown.projectedCharges?.length ? [{
-      title: "Previstos, por confirmar",
-      amount: item.projectedAmount,
-      items: breakdown.projectedCharges,
-      getName: (entry) => entry.name || entry.concept,
-      getDescription: (entry) => `${formatBreakdownDate(entry.chargeDate || entry.date || entry.purchaseDate)} · ${entry.reason}`,
-    }] : []),
-  ];
-
-  return (
-    <div className="space-y-4">
-      <p className="text-sm text-muted-foreground">
-        Ciclo del {formatBreakdownDate(item.selectedCycle?.startDate)} al {formatBreakdownDate(item.selectedCycle?.cutDate)}
-      </p>
-      <p className="text-sm text-muted-foreground">
-        {item.product}: meta de {formatMoney(item.minimumAmount)} por período. Las comisiones,
-        sus impuestos, los intereses y las mensualidades de compras anteriores no cuentan.
-        Los cargos previstos se muestran aparte hasta registrar o verificar el cobro.
-        {" "}<a href={item.ruleSourceUrl} target="_blank" rel="noreferrer" className="underline underline-offset-4">Consultar condiciones del banco</a>.
-      </p>
-
-      <div className="grid gap-4 lg:grid-cols-3">
-        {sections.map((section) => (
-          <Card key={section.title}>
-            <CardHeader><CardTitle>
-              {section.title} ({formatMoney(section.amount)})
-            </CardTitle></CardHeader>
-            <CardContent>
-
-            {section.items.length === 0 ? (
-              <Empty className="px-0"><EmptyDescription>{section.emptyText}</EmptyDescription></Empty>
-            ) : (
-              <ItemGroup>
-                {section.items.map((entry) => (
-                  <Item
-                    key={entry.id}
-                    variant="outline"
-                    size="sm"
-                    role="listitem"
-                  >
-                      <ItemContent className="min-w-0">
-                        <ItemTitle>{section.getName(entry)}</ItemTitle>
-                        <ItemDescription>
-                          {section.getDescription(entry)}
-                        </ItemDescription>
-                      </ItemContent>
-                      <p className="shrink-0 text-sm font-semibold">{formatMoney(entry.amount)}</p>
-                  </Item>
-                ))}
-              </ItemGroup>
-            )}
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    </div>
   );
 }
 

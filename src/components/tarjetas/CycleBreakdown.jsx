@@ -2,10 +2,10 @@
 
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Empty, EmptyDescription } from "@/components/ui/empty";
+import { BreakdownSection, DisclosureButton } from "@/components/ui/responsive-breakdown";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Item, ItemContent, ItemDescription, ItemFooter, ItemGroup, ItemTitle } from "@/components/ui/item";
 
 function formatMoney(value) {
   return new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" }).format(
@@ -15,55 +15,54 @@ function formatMoney(value) {
 
 function formatShortDate(dateString) {
   if (!dateString) return "-";
-  return format(new Date(dateString), "d MMM", { locale: es });
-}
-
-function BreakdownSection({ title, items, emptyText, getPrimary, getSecondary, getAmount, getNote }) {
-  return (
-    <Card>
-      <CardHeader><CardTitle>{title}</CardTitle></CardHeader>
-      <CardContent>
-
-      {items.length === 0 ? (
-        <Empty className="px-0"><EmptyDescription>{emptyText}</EmptyDescription></Empty>
-      ) : (
-        <ItemGroup>
-          {items.map((item) => (
-            <Item
-              key={item.id}
-              variant="outline"
-              size="sm"
-              role="listitem"
-            >
-                <ItemContent className="min-w-0">
-                  <ItemTitle>{getPrimary(item)}</ItemTitle>
-                  <ItemDescription>
-                    {getSecondary(item)}
-                  </ItemDescription>
-                </ItemContent>
-
-                <p className="shrink-0 text-sm font-semibold">{formatMoney(getAmount(item))}</p>
-              {getNote?.(item) && (
-                <ItemFooter className="whitespace-pre-wrap text-xs text-muted-foreground">
-                  {getNote(item)}
-                </ItemFooter>
-              )}
-            </Item>
-          ))}
-        </ItemGroup>
-      )}
-      </CardContent>
-    </Card>
-  );
+  return format(new Date(dateString.slice(0, 10) + "T12:00:00"), "d MMM", { locale: es });
 }
 
 export default function CycleBreakdown({ cycle }) {
+  const isMobile = useIsMobile();
   const hasCredits = Number(cycle.creditsAmount || 0) > 0;
+  const warnings = cycle.dataWarnings || [];
+  const explanation = "El cálculo incluye los gastos registrados y las cuotas y suscripciones previstas; los importes conciliados usan su referencia bancaria. Una diferencia pendiente requiere revisar el estado de cuenta.";
   return (
     <div className="space-y-4">
-      {cycle.dataWarnings?.map((warning) => (
+      {!isMobile && warnings.map((warning) => (
         <Alert key={warning} variant="destructive"><AlertDescription>{warning}</AlertDescription></Alert>
       ))}
+      {isMobile ? (
+        <div className="space-y-3">
+          <p className="text-sm text-muted-foreground">Del {formatShortDate(cycle.startDate)} al {formatShortDate(cycle.cutDate)}</p>
+          <dl className="space-y-2">
+            <div className="flex items-baseline justify-between gap-3">
+              <dt className="text-sm">Total calculado</dt>
+              <dd className="min-w-0 break-words text-right text-lg font-semibold tabular-nums">{formatMoney(cycle.calculatedAmount)}</dd>
+            </div>
+            {cycle.statementAmount != null ? (
+              <div className="flex items-baseline justify-between gap-3">
+                <dt className="text-sm text-muted-foreground">Estado de cuenta</dt>
+                <dd className="min-w-0 break-words text-right text-sm font-medium tabular-nums">{formatMoney(cycle.statementAmount)}</dd>
+              </div>
+            ) : <p className="text-xs text-muted-foreground">Estado de cuenta sin capturar.</p>}
+            {cycle.difference != null && (
+              <div className="flex items-baseline justify-between gap-3">
+                <dt className="text-sm text-muted-foreground">Diferencia{Number(cycle.difference) !== 0 ? " por conciliar" : ""}</dt>
+                <dd className={`min-w-0 break-words text-right text-sm font-medium tabular-nums ${Number(cycle.difference) !== 0 ? "text-red-400" : "text-emerald-400"}`}>{formatMoney(cycle.difference)}</dd>
+              </div>
+            )}
+          </dl>
+          {warnings.length > 0 && (
+            <Alert variant="destructive" className="px-3 py-2">
+              <AlertDescription>
+                <Collapsible>
+                  <DisclosureButton className="group flex min-h-11 h-auto w-full items-center justify-between gap-2 px-0 py-2 text-left text-sm text-destructive whitespace-normal" aria-label="Ver avisos del período">Fechas por revisar ({warnings.length})</DisclosureButton>
+                  <CollapsibleContent>
+                    <ul className="space-y-2 pb-2 text-sm">{warnings.map((warning) => <li key={warning} className="break-words">{warning}</li>)}</ul>
+                  </CollapsibleContent>
+                </Collapsible>
+              </AlertDescription>
+            </Alert>
+          )}
+        </div>
+      ) : (
         <dl className="grid gap-3 rounded-xl border border-border bg-muted/30 p-4 sm:grid-cols-3">
           <div>
             <dt className="text-sm text-muted-foreground">Cargos del corte</dt>
@@ -86,14 +85,16 @@ export default function CycleBreakdown({ cycle }) {
             <dd className="font-semibold">{formatMoney(cycle.difference)}</dd>
           </div>}
         </dl>
-      <p className="text-xs text-muted-foreground">
+      )}
+      {!isMobile && <p className="text-xs text-muted-foreground">
         Del {formatShortDate(cycle.startDate)} al {formatShortDate(cycle.cutDate)}.
-        {" "}El cálculo incluye los gastos registrados y las cuotas y suscripciones previstas;
-        los importes conciliados usan su referencia bancaria. Una diferencia pendiente requiere revisar el estado de cuenta.
-      </p>
-      <div className={`grid gap-4 ${hasCredits ? "lg:grid-cols-2" : "lg:grid-cols-3"}`}>
+        {" "}{explanation}
+      </p>}
+      <div className={isMobile ? "border-t border-border" : `grid gap-4 ${hasCredits ? "lg:grid-cols-2" : "lg:grid-cols-3"}`}>
         <BreakdownSection
-          title={`Gastos (${formatMoney(cycle.expensesAmount)})`}
+          title="Gastos"
+          amount={cycle.expensesAmount}
+          isMobile={isMobile}
           items={cycle.includedExpenses || []}
           emptyText="No hay gastos diarios en este ciclo."
           getPrimary={(item) => item.concept}
@@ -104,7 +105,9 @@ export default function CycleBreakdown({ cycle }) {
         />
 
         <BreakdownSection
-          title={`Suscripciones (${formatMoney(cycle.subscriptionsAmount)})`}
+          title="Suscripciones"
+          amount={cycle.subscriptionsAmount}
+          isMobile={isMobile}
           items={cycle.includedSubscriptions || []}
           emptyText="No hay suscripciones en este ciclo."
           getPrimary={(item) => item.name}
@@ -117,7 +120,9 @@ export default function CycleBreakdown({ cycle }) {
         />
 
         <BreakdownSection
-          title={`Compras a meses (${formatMoney(cycle.purchasesAmount)})`}
+          title="Compras a meses"
+          amount={cycle.purchasesAmount}
+          isMobile={isMobile}
           items={cycle.includedPurchases || []}
           emptyText="No hay mensualidades en este ciclo."
           getPrimary={(item) => item.concept}
@@ -130,7 +135,9 @@ export default function CycleBreakdown({ cycle }) {
         />
         {hasCredits && (
           <BreakdownSection
-            title={`Bonificaciones aplicadas (${formatMoney(-cycle.creditsAmount)})`}
+            title="Bonificaciones aplicadas"
+            amount={-cycle.creditsAmount}
+            isMobile={isMobile}
             items={cycle.includedCredits || []}
             emptyText="No hay bonificaciones aplicadas en este ciclo."
             getPrimary={(item) => item.concept}
@@ -142,6 +149,19 @@ export default function CycleBreakdown({ cycle }) {
           />
         )}
       </div>
+      {isMobile && (
+        <Collapsible>
+          <DisclosureButton>Cómo se calcula</DisclosureButton>
+          <CollapsibleContent className="space-y-3 pb-1">
+            <dl className="space-y-2 text-sm">
+              <div className="flex justify-between gap-3"><dt className="text-muted-foreground">Cargos del corte</dt><dd className="min-w-0 break-words text-right font-medium tabular-nums">{formatMoney(cycle.grossCalculatedAmount)}</dd></div>
+              {hasCredits && <div className="flex justify-between gap-3"><dt className="text-muted-foreground">Bonificaciones aplicadas</dt><dd className="min-w-0 break-words text-right font-medium text-emerald-400 tabular-nums">{formatMoney(-cycle.creditsAmount)}</dd></div>}
+            </dl>
+            <p className="text-sm text-muted-foreground">{explanation}</p>
+            {cycle.difference != null && <p className="text-xs text-muted-foreground">Diferencia = estado de cuenta − total calculado.</p>}
+          </CollapsibleContent>
+        </Collapsible>
+      )}
     </div>
   );
 }
