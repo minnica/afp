@@ -1,8 +1,11 @@
+"use client"
+
 import * as React from "react"
+import { NumberInput } from "@/components/ui/number-input"
 
 import { cn } from "@/lib/utils"
 
-function Input({
+function InputBase({
   className,
   type,
   ...props
@@ -19,6 +22,13 @@ function Input({
       )}
       {...props} />
   );
+}
+
+function Input({ type, formatNumber = false, ...props }) {
+  if (type === "number" && formatNumber) {
+    return <NumberInput customInput={InputBase} {...props} />
+  }
+  return <InputBase type={type} {...props} />
 }
 
 export { Input }

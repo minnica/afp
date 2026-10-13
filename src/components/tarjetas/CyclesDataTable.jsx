@@ -351,6 +351,7 @@ export default function CyclesDataTable({
               <Input
                 id="cycles-data-table-field-1"
                 type="number"
+                formatNumber
                 min="0"
                 step="0.01"
                 value={statementAmount}
@@ -387,6 +388,7 @@ export default function CyclesDataTable({
                 <Input
                   id="cycles-data-table-field-2"
                   type="number"
+                  formatNumber
                   min="0"
                   step="0.01"
                   value={paidAmount}

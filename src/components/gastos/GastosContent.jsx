@@ -557,6 +557,7 @@ export default function GastosContent() {
     setIsSaving(true);
 
     const payload = getCreateExpensePayload();
+    const toastOptions = compactEntry ? { position: "top-center" } : undefined;
     const shouldQueueOffline =
       typeof navigator !== "undefined" && navigator.onLine === false;
     let saved = false;
@@ -567,7 +568,7 @@ export default function GastosContent() {
 
         setPendingOfflineExpenses((current) => [offlineExpense, ...current]);
         resetCreateExpenseForm();
-        toast.info("Sin conexión. Gasto guardado como pendiente.");
+        toast.info("Sin conexión. Gasto guardado como pendiente.", toastOptions);
         return true;
       }
 
@@ -590,13 +591,13 @@ export default function GastosContent() {
       await loadExpenses(user.id, { force: true });
       await loadReceivables(user.id);
       await loadPayables(user.id);
-      toast.success("Gasto guardado exitosamente.");
+      toast.success("Gasto guardado exitosamente.", toastOptions);
       return true;
     } catch (err) {
       if (saved) {
         // Un fallo al refrescar después del POST no debe duplicar el gasto en la cola.
         setError("El gasto se guardó, pero no se pudo actualizar la lista. Recarga para verlo.");
-        toast.success("Gasto guardado exitosamente.");
+        toast.success("Gasto guardado exitosamente.", toastOptions);
         return true;
       }
       const wentOffline =
@@ -607,7 +608,7 @@ export default function GastosContent() {
 
         setPendingOfflineExpenses((current) => [offlineExpense, ...current]);
         resetCreateExpenseForm();
-        toast.info("Sin conexión. Gasto guardado como pendiente.");
+        toast.info("Sin conexión. Gasto guardado como pendiente.", toastOptions);
         return true;
       }
 
@@ -1072,6 +1073,7 @@ export default function GastosContent() {
           aria-describedby={createError?.field === "amount" ? "create-expense-error" : undefined}
           value={amount}
           type="number"
+          formatNumber
           min="0"
           step="0.01"
           placeholder="0.00"
@@ -1356,6 +1358,7 @@ export default function GastosContent() {
               <Input
                 id="edit-amount"
                 type="number"
+                formatNumber
                 min="0"
                 step="0.01"
                 value={editAmount}
@@ -1593,6 +1596,7 @@ export default function GastosContent() {
                       <Input
                         id="filterAmount"
                         type="number"
+                        formatNumber
                         min="0"
                         step="0.01"
                         placeholder="Monto exacto..."

@@ -85,7 +85,7 @@ Se incorporaron `Command` e `InputGroup` desde el registro `radix-mira`, manteni
 
 - La búsqueda opera sobre etiquetas, ignora acentos y mayúsculas y conserva los IDs originales. Ordena alfabéticamente; opciones como «Sin persona» y «Todas las categorías» quedan al principio.
 - En móvil, el panel ocupa como máximo el 70 % de la altura. El encabezado y buscador permanecen visibles; la lista tiene desplazamiento independiente. Las filas, buscador y botón de cerrar tienen una altura de 48 px. La tipografía del buscador permanece en 16 px, también en orientación horizontal.
-- El panel enfoca el título al abrir, para que el teclado aparezca cuando se toca el buscador. `visualViewport` ajusta la altura y posición cuando el teclado reduce o desplaza el área visible. Respeta el área segura inferior y el movimiento reducido.
+- En la primera versión, el panel enfocaba el título al abrir, para que el teclado apareciera al tocar el buscador. El ajuste posterior de foco automático se documenta al final. `visualViewport` ajusta la altura y posición cuando el teclado reduce o desplaza el área visible. Respeta el área segura inferior y el movimiento reducido.
 - Elegir una opción cierra el panel y devuelve el foco al campo. Cancelar conserva el valor. Los catálogos vacíos, las búsquedas sin coincidencias y los campos deshabilitados tienen estados explícitos.
 
 Comprobaciones de navegador realizadas con los componentes reales y respuestas de API simuladas:
@@ -177,3 +177,34 @@ Por petición del usuario, el estado inicial de `ExpenseCreateSurface` toma el m
 Comprobación inicial en navegador web sobre GastosContent real con datos simulados: a 390 px el diálogo aparece y enfoca Concepto sin pulsar el botón; cancelar y cambiar los filtros no lo reabre; la reapertura manual conserva el borrador. Una nueva carga a 1280 px mantiene la captura integrada. Sin errores de JavaScript; ESLint del componente y `git diff --check` correctos. La ruta temporal se retiró y el navegador se cerró, sin pruebas del emulador ni escrituras reales.
 
 Después, por preferencia del usuario, `onOpenAutoFocus` se ajustó para enfocar `DialogContent` en lugar de Concepto. El diálogo sigue abierto al entrar, pero el usuario elige el campo inicial. Se mantiene la gestión accesible de foco de Radix y la navegación por teclado. ESLint del componente y `git diff --check` correctos.
+
+### Foco inmediato en los buscadores de los selectores
+
+Por petición del usuario, los paneles móviles de `ResponsiveSelect` que contienen `CommandInput` enfocan ese input directamente durante `onOpenAutoFocus`. No hay temporizadores ni un segundo toque necesario. Los paneles sin buscador siguen enfocando el título. Se conservan el ajuste de visualViewport y el retorno del foco al campo al seleccionar o cancelar.
+
+Comprobado en navegador web a 390 px sobre GastosContent con datos simulados: el diálogo principal abrió con foco en su contenedor; abrir Categoría enfocó `CommandInput`; escribir «Comida» sin pulsar el buscador filtró hasta una opción. Elegirla cerró el panel y devolvió el foco a Categoría. La lista corta de tarjetas mantuvo el foco en su título y no presentó buscador. Sin errores de JavaScript; ESLint del componente y `git diff --check` correctos. Se retiró la ruta temporal y se cerró el navegador de pruebas; no se usó el emulador ni se guardaron gastos reales.
+
+## Ajuste posterior: formato de importes durante la captura
+
+`Input` admite `formatNumber` para importes de dinero. La composición local `NumberInput` utiliza `NumericFormat` de `react-number-format` con el Input base de shadcn, cuyos estilos se conservan. Se aplica explícitamente a los 20 campos monetarios de captura, edición y filtro de Gastos, Ingresos, Suscripciones, Compras a meses, Cuentas por cobrar, Cuentas por pagar y ciclos de Tarjetas. Los 12 campos de años, días y cantidades de meses/pagos mantienen el tipo numérico nativo.
+
+- Muestra separadores de miles con coma y decimales con punto al escribir, cargar o pegar: `9000.50` → `9,000.50`. No añade símbolo de moneda, decimales obligatorios ni redondeo durante la edición.
+- Los manejadores reciben `event.target.value` y `event.currentTarget.value` sin separadores; los contratos de API, cálculos y cola offline se conservan. La cantidad visible usa `type="text"` con teclado decimal y semántica `spinbutton`, ya que el tipo HTML numérico no admite comas.
+- Conserva etiquetas, refs, estados deshabilitado/solo lectura y restricciones `min`, `max`, `step` y `required`; reproduce la validación numérica con un input nativo y mantiene el incremento por flechas.
+- Pruebas web: escritura progresiva, decimales y ceros finales al perder foco, carga desde estado, vaciado, pegado con comas, inserción en medio, borrado junto al separador y reemplazo de selección. Se comprobaron valores crudos de los eventos, campos no controlados, restricciones numéricas e incrementos con teclado.
+- GastosContent real con API simulada: monto visible `9,000.50`, una única solicitud POST con `amount: "9000.50"`, cierre correcto y foco inicial conservado en el contenedor del diálogo. Móvil a 390 px y escritorio a 1280 px: altura de 28 px, tipografía de 14/12 px y sin desbordamiento horizontal ni errores de JavaScript.
+
+ESLint terminó sin errores, conservando únicamente la advertencia existente de TanStack Table; la compilación de producción y `git diff --check` pasaron. Se retiró la ruta temporal y se cerró el navegador de pruebas. No se ejecutó el emulador ni se guardaron registros reales. Referencia del comportamiento de la dependencia: [NumericFormat](https://s-yadav.github.io/react-number-format/docs/numeric_format/) y [propiedades](https://s-yadav.github.io/react-number-format/docs/props/).
+
+
+## Ajuste posterior: registrar varios gastos sin cerrar
+
+Por petición del usuario, guardar un gasto mantiene abierto el Dialog canónico de `ExpenseCreateSurface`. Tras guardar o encolar offline, se limpian Concepto, Monto, Notas y relaciones opcionales; fecha, método, tarjeta y categoría se conservan. El cuerpo vuelve al inicio para mostrar los campos principales, sin enfocar ningún input automáticamente. Cerrar con «Cerrar», la X, Escape o fuera del diálogo conserva el borrador y devuelve el foco a la acción de apertura. Mientras se guarda se mantienen los bloqueos de cierre y envíos duplicados.
+
+«Guardar gasto» conserva el estilo primario y usa `FloppyDiskIcon`; «Nuevo gasto» usa el signo + con la variante `outline` oficial de Button. La descripción explica que se puede continuar con el siguiente gasto y el botón secundario se llama «Cerrar». No se modifica el componente base Dialog. Los avisos de creación en móvil se muestran arriba mediante la propiedad `position` de Sonner: antes el aviso inferior se superponía al botón con el diálogo abierto. Escritorio conserva su formulario integrado y la ubicación habitual de los avisos.
+
+Comprobado en web con GastosContent real y API simulada: dos capturas sucesivas generan solicitudes separadas, limpian campos, conservan fecha/categoría y mantienen abierto el diálogo; el importe se envía sin comas. Un envío pendiente bloquea Escape y un segundo submit; un error conserva los datos y el reintento exitoso mantiene abierta la captura. Cerrar y reabrir conserva el borrador y restaura el foco. A 320 px el cuerpo vuelve al inicio tras guardar, sin desbordamiento horizontal. El guardado offline encola una captura sin POST ni cierre. A 1280 px se conserva la captura integrada. Se comprobó visualmente el botón de guardado y que el aviso de éxito no lo cubre. Sin errores de JavaScript.
+
+La ruta temporal se retiró y el navegador se cerró. No se utilizó el emulador ni se escribieron registros reales.
+
+ESLint de los dos componentes modificados, compilación de producción y `git diff --check`: correctos.

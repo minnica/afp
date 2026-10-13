@@ -462,6 +462,7 @@ export default function CuentasPorPagarContent() {
                     id="cuentas-por-pagar-field-3"
                     value={originalAmount}
                     type="number"
+                    formatNumber
                     min="0"
                     step="0.01"
                     placeholder="0.00"
@@ -485,6 +486,7 @@ export default function CuentasPorPagarContent() {
                     id="cuentas-por-pagar-field-4"
                     value={expectedMonthlyPayment}
                     type="number"
+                    formatNumber
                     min="0"
                     step="0.01"
                     placeholder="Ej. 1000"
@@ -859,6 +861,7 @@ function PayablesList({
                     id="cuentas-por-pagar-field-8"
                     value={editOriginalAmount}
                     type="number"
+                    formatNumber
                     min="0"
                     step="0.01"
                     onChange={(event) =>
@@ -873,6 +876,7 @@ function PayablesList({
                     id="cuentas-por-pagar-field-9"
                     value={editExpectedMonthlyPayment}
                     type="number"
+                    formatNumber
                     min="0"
                     step="0.01"
                     onChange={(event) =>

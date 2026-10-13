@@ -224,7 +224,11 @@ function MobileOptions({ title, open, searchable, children }) {
       className="[--selector-max-height:min(70dvh,var(--selector-viewport-height,100dvh))] data-[side=bottom]:h-auto max-h-(--selector-max-height) gap-0 overflow-hidden rounded-t-xl pb-[env(safe-area-inset-bottom)] outline-none"
       onOpenAutoFocus={(event) => {
         event.preventDefault()
-        titleRef.current?.focus({ preventScroll: true })
+        const searchInput = searchable
+          ? contentRef.current?.querySelector('[data-slot="command-input"]')
+          : null
+        const focusTarget = searchInput ?? titleRef.current
+        focusTarget?.focus({ preventScroll: true })
       }}
     >
       <SheetHeader className="relative shrink-0 p-4 pr-16 text-left">

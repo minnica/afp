@@ -697,6 +697,7 @@ export default function SuscripcionesContent() {
                 id="suscripciones-field-2"
                 value={editAmount}
                 type="number"
+                formatNumber
                 min="0"
                 step="0.01"
                 onChange={(event) => setEditAmount(event.target.value)}
@@ -904,6 +905,7 @@ export default function SuscripcionesContent() {
                     id="suscripciones-field-11"
                     value={amount}
                     type="number"
+                    formatNumber
                     min="0"
                     step="0.01"
                     placeholder="0.00"

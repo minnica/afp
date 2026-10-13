@@ -697,6 +697,7 @@ export default function ComprasAMesesContent() {
               <Input
                 id="compras-ameses-field-3"
                 type="number"
+                formatNumber
                 min="0"
                 step="0.01"
                 value={editTotalAmount}
@@ -720,6 +721,7 @@ export default function ComprasAMesesContent() {
               <Input
                 id="compras-ameses-field-5"
                 type="number"
+                formatNumber
                 min="0"
                 step="0.01"
                 value={editManualMonthlyPayment}
@@ -846,6 +848,7 @@ export default function ComprasAMesesContent() {
                     id="compras-ameses-field-11"
                     value={totalAmount}
                     type="number"
+                    formatNumber
                     min="0"
                     step="0.01"
                     placeholder="0.00"

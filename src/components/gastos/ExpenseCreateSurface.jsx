@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react"
 import { HugeiconsIcon } from "@hugeicons/react"
-import { Add01Icon } from "@hugeicons/core-free-icons"
+import { Add01Icon, FloppyDiskIcon } from "@hugeicons/core-free-icons"
 
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
@@ -28,6 +28,7 @@ export default function ExpenseCreateSurface({ compact, children, error, isSavin
   const [open, setOpen] = useState(compact)
   const contentRef = useRef(null)
   const formRef = useRef(null)
+  const fieldsRef = useRef(null)
   // Conserva el diálogo abierto si cambia la orientación durante la captura.
   const inDialog = compact || open
 
@@ -58,12 +59,12 @@ export default function ExpenseCreateSurface({ compact, children, error, isSavin
     event.preventDefault()
     if (isSaving) return
     const saved = await onSubmit()
-    if (saved) setOpen(false)
+    if (saved && fieldsRef.current) fieldsRef.current.scrollTop = 0
   }
 
   const form = (
     <form ref={formRef} noValidate onSubmit={handleSubmit} className={cn(inDialog ? "flex min-h-0 flex-1 flex-col" : "space-y-4 md:space-y-5")}>
-      <div className={cn("space-y-4 md:space-y-5", inDialog && "min-h-0 flex-1 overflow-y-auto overscroll-contain pr-1 pb-2")}>
+      <div ref={fieldsRef} className={cn("space-y-4 md:space-y-5", inDialog && "min-h-0 flex-1 overflow-y-auto overscroll-contain pr-1 pb-2")}>
         {error ? (
           <Alert id="create-expense-error" role="alert" variant="destructive">
             <AlertDescription>{error.message}</AlertDescription>
@@ -79,11 +80,11 @@ export default function ExpenseCreateSurface({ compact, children, error, isSavin
       <DialogFooter className={cn(inDialog ? "mt-4 shrink-0 flex-row gap-2" : "")}>
         {inDialog ? (
           <DialogClose asChild>
-            <Button type="button" variant="outline" disabled={isSaving} className="h-11">Cancelar</Button>
+            <Button type="button" variant="outline" disabled={isSaving} className="h-11">Cerrar</Button>
           </DialogClose>
         ) : null}
         <Button type="submit" disabled={isSaving} className={cn("w-full", inDialog && "h-11 flex-1")}>
-          {isSaving ? <Spinner /> : <HugeiconsIcon icon={Add01Icon} strokeWidth={2} aria-hidden="true" />}
+          {isSaving ? <Spinner /> : <HugeiconsIcon icon={FloppyDiskIcon} strokeWidth={2} aria-hidden="true" />}
           {isSaving ? "Guardando…" : "Guardar gasto"}
         </Button>
       </DialogFooter>
@@ -105,7 +106,7 @@ export default function ExpenseCreateSurface({ compact, children, error, isSavin
     <Dialog open={open} onOpenChange={(nextOpen) => { if (!isSaving) setOpen(nextOpen) }}>
       <div data-slot="expense-create-action" className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
         <DialogTrigger asChild>
-          <Button className="mx-auto flex h-12 w-full max-w-lg text-sm" disabled={isSaving}>
+          <Button variant="outline" className="mx-auto flex h-12 w-full max-w-lg text-sm" disabled={isSaving}>
             <HugeiconsIcon icon={Add01Icon} strokeWidth={2} aria-hidden="true" />
             Nuevo gasto
           </Button>
@@ -123,7 +124,7 @@ export default function ExpenseCreateSurface({ compact, children, error, isSavin
       >
         <DialogHeader className="shrink-0 pr-6">
           <DialogTitle>Nuevo gasto</DialogTitle>
-          <DialogDescription>Completa los datos y guarda tu gasto.</DialogDescription>
+          <DialogDescription>Guarda un gasto y continúa con el siguiente.</DialogDescription>
         </DialogHeader>
         {form}
       </DialogContent>

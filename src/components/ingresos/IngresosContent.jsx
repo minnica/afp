@@ -544,6 +544,7 @@ export default function IngresosContent() {
                   id="ingresos-field-4"
                   value={amount}
                   type="number"
+                  formatNumber
                   min="0"
                   step="0.01"
                   placeholder="0.00"
@@ -698,6 +699,7 @@ export default function IngresosContent() {
                   id="ingresos-field-10"
                   value={editAmount}
                   type="number"
+                  formatNumber
                   min="0"
                   step="0.01"
                   onChange={(event) => setEditAmount(event.target.value)}

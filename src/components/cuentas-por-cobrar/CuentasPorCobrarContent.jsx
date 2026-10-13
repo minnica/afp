@@ -619,6 +619,7 @@ export default function CuentasPorCobrarContent() {
                   id="cuentas-por-cobrar-field-3"
                   value={originalAmount}
                   type="number"
+                  formatNumber
                   min="0"
                   step="0.01"
                   placeholder="0.00"
@@ -642,6 +643,7 @@ export default function CuentasPorCobrarContent() {
                   id="cuentas-por-cobrar-field-4"
                   value={expectedMonthlyPayment}
                   type="number"
+                  formatNumber
                   min="0"
                   step="0.01"
                   placeholder="Ej. 1000"
@@ -837,6 +839,7 @@ export default function CuentasPorCobrarContent() {
                   id="cuentas-por-cobrar-field-9"
                   value={editOriginalAmount}
                   type="number"
+                  formatNumber
                   min="0"
                   step="0.01"
                   onChange={(event) =>
@@ -851,6 +854,7 @@ export default function CuentasPorCobrarContent() {
                   id="cuentas-por-cobrar-field-10"
                   value={editExpectedMonthlyPayment}
                   type="number"
+                  formatNumber
                   min="0"
                   step="0.01"
                   onChange={(event) =>
