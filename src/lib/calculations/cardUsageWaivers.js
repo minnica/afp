@@ -19,6 +19,10 @@ function usageDay(value) {
   return Number.isFinite(date.getTime()) ? date.toISOString().slice(0, 10) : null;
 }
 
+function isStatementDay(value) {
+  return typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value) && usageDay(value) === value;
+}
+
 function usageInRange(value, start, end) {
   const date = usageDay(value);
   return date !== null && date >= usageDay(start) && date <= usageDay(end);
@@ -48,10 +52,10 @@ export function getUsageExclusion(expense) {
 
 function verifiedUsageStatement(cycle) {
   const evidence = cycle.usageReconciliation;
-  if (!evidence || evidence.version !== 1 || !evidence.source || !/^[a-f0-9]{64}$/.test(evidence.sourceSha256 || "")) return null;
-  const start = usageDay(evidence.startDate);
-  const cut = usageDay(evidence.cutDate);
-  if (!start || !cut || start > cut || Number(cut.slice(0, 4)) !== cycle.year || Number(cut.slice(5, 7)) !== cycle.month) return null;
+  if (!evidence || evidence.version !== 1 || typeof evidence.source !== "string" || !evidence.source.trim() || !/^[a-f0-9]{64}$/.test(evidence.sourceSha256 || "")) return null;
+  const start = evidence.startDate;
+  const cut = evidence.cutDate;
+  if (!isStatementDay(start) || !isStatementDay(cut) || start > cut || Number(cut.slice(0, 4)) !== cycle.year || Number(cut.slice(5, 7)) !== cycle.month) return null;
   return evidence;
 }
 
@@ -89,12 +93,13 @@ export function buildCardUsageWaivers({ cards, cyclesWithAmounts, expenses, subs
     const confirmedSubscriptions = [];
     const projected = [];
     const newPurchases = [];
+    let confirmationPending = false;
     const cardExpenses = expenses.filter((item) => item.cardId === card.id && item.paymentMethod !== "CASH");
     if (cycle) {
       for (const expense of cardExpenses) {
         if (!usageInRange(expense.date, cycle.startDate, cycle.cutDate)) continue;
         const item = { id: expense.id, concept: expense.concept, amount: usageMoney(expense.amount), date: expense.date, categoryName: expense.category?.name || null };
-        const reason = evidence?.excludedExpenseIds?.includes(expense.id)
+        const reason = Array.isArray(evidence?.excludedExpenseIds) && evidence.excludedExpenseIds.includes(expense.id)
           ? "Comisión, interés o impuesto bancario verificado"
           : getUsageExclusion(expense);
         if (reason) excluded.push({ ...item, reason });
@@ -104,14 +109,66 @@ export function buildCardUsageWaivers({ cards, cyclesWithAmounts, expenses, subs
 
       // Evidencia del estado: importe y fecha reales, incluso si la suscripción cambió después.
       const receipts = (Array.isArray(evidence?.subscriptionCharges) ? evidence.subscriptionCharges : []).filter((receipt) => (
-        receipt.subscriptionId && Number.isFinite(Number(receipt.amount)) && Number(receipt.amount) > 0 && usageInRange(receipt.date, cycle.startDate, cycle.cutDate)
+        receipt && typeof receipt.subscriptionId === "string" && receipt.subscriptionId.trim() &&
+        ["number", "string"].includes(typeof receipt.amount) && /^\d+(?:\.\d{1,2})?$/.test(String(receipt.amount)) &&
+        Number.isFinite(Number(receipt.amount)) && Number(receipt.amount) > 0 &&
+        isStatementDay(receipt.date) && usageInRange(receipt.date, cycle.startDate, cycle.cutDate)
       ));
+      const receiptKey = (subscriptionId, date) => `${subscriptionId}:${usageDay(date)?.slice(0, 7)}`;
+      const reviewReasons = new Map();
+      const reviewExpenseIds = new Map();
+      for (const key of new Set(receipts.map((receipt) => receiptKey(receipt.subscriptionId, receipt.date)))) {
+        const groupReceipts = receipts.filter((receipt) => receiptKey(receipt.subscriptionId, receipt.date) === key);
+        const groupExpenses = cardExpenses.filter((expense) => expense.subscriptionId &&
+          receiptKey(expense.subscriptionId, expense.date) === key && usageInRange(expense.date, cycle.startDate, cycle.cutDate));
+        if (!groupExpenses.length) continue;
+        const unmatched = groupExpenses.map((expense) => Math.round(Number(expense.amount) * 100));
+        let exactMatches = 0;
+        for (const receipt of groupReceipts) {
+          const index = unmatched.indexOf(Math.round(Number(receipt.amount) * 100));
+          if (index < 0) continue;
+          unmatched.splice(index, 1);
+          exactMatches++;
+        }
+        if (exactMatches === Math.min(groupExpenses.length, groupReceipts.length)) continue;
+        const amounts = (items) => items.map((item) => `$${usageMoney(item.amount).toFixed(2)}`).join(", ");
+        const reason = `Importe distinto al estado: gasto ${amounts(groupExpenses)}, comprobante ${amounts(groupReceipts)}; requiere conciliación`;
+        reviewReasons.set(key, reason);
+        for (const expense of groupExpenses) reviewExpenseIds.set(expense.id, reason);
+        confirmationPending = true;
+      }
+      // Una discrepancia conserva los importes originales, pero no acredita consumo confirmado.
+      for (let index = daily.length - 1; index >= 0; index--) {
+        const reason = reviewExpenseIds.get(daily[index].id);
+        if (reason) projected.push({ ...daily.splice(index, 1)[0], reason });
+      }
+      for (const item of projected) {
+        const reason = reviewExpenseIds.get(item.id);
+        if (reason) item.reason = reason;
+      }
       const matchedExpenseIds = new Set();
-      for (const receipt of receipts) {
-        const alreadyRecorded = cardExpenses.find((expense) => !matchedExpenseIds.has(expense.id) && expense.subscriptionId === receipt.subscriptionId && usageDay(expense.date)?.slice(0, 7) === usageDay(receipt.date)?.slice(0, 7) && usageInRange(expense.date, cycle.startDate, cycle.cutDate));
-        if (alreadyRecorded) { matchedExpenseIds.add(alreadyRecorded.id); continue; }
-        const item = { id: `${receipt.subscriptionId}-${receipt.date}-${receipts.indexOf(receipt)}`, name: receipt.name, amount: usageMoney(receipt.amount), chargeDate: `${usageDay(receipt.date)}T12:00:00.000Z`, source: evidence.source };
-        if (usageDay(receipt.date) <= today) confirmedSubscriptions.push(item);
+      const matchedReceipts = new Set();
+      // Reservar primero coincidencias exactas evita emparejar otro cargo del mismo mes.
+      for (const exactOnly of [true, false]) {
+        for (const [index, receipt] of receipts.entries()) {
+          if (matchedReceipts.has(index)) continue;
+          const recorded = cardExpenses.find((expense) => !matchedExpenseIds.has(expense.id) &&
+            expense.subscriptionId === receipt.subscriptionId &&
+            usageDay(expense.date)?.slice(0, 7) === usageDay(receipt.date)?.slice(0, 7) &&
+            usageInRange(expense.date, cycle.startDate, cycle.cutDate) &&
+            (!exactOnly || usageMoney(expense.amount) === usageMoney(receipt.amount)));
+          if (recorded) {
+            matchedExpenseIds.add(recorded.id);
+            matchedReceipts.add(index);
+          }
+        }
+      }
+      for (const [index, receipt] of receipts.entries()) {
+        if (matchedReceipts.has(index)) continue;
+        const item = { id: `${receipt.subscriptionId}-${receipt.date}-${receipts.indexOf(receipt)}`, name: typeof receipt.name === "string" ? receipt.name : "Suscripción", amount: usageMoney(receipt.amount), chargeDate: `${usageDay(receipt.date)}T12:00:00.000Z`, source: evidence.source };
+        const reviewReason = reviewReasons.get(receiptKey(receipt.subscriptionId, receipt.date));
+        if (reviewReason) projected.push({ ...item, reason: reviewReason });
+        else if (usageDay(receipt.date) <= today) confirmedSubscriptions.push(item);
         else projected.push({ ...item, reason: "Cargo con fecha futura" });
       }
 
@@ -143,12 +200,12 @@ export function buildCardUsageWaivers({ cards, cyclesWithAmounts, expenses, subs
     const remainingAmount = usageMoney(Math.max(rule.minimumAmount - eligibleSpend, 0));
     const isFuture = Boolean(cycle && usageDay(cycle.startDate) > today);
     const isClosed = Boolean(cycle && usageDay(cycle.cutDate) < today);
-    const isExempt = Boolean(cycle && !isFuture && eligibleSpend >= rule.minimumAmount);
+    const isExempt = Boolean(cycle && !isFuture && !confirmationPending && eligibleSpend >= rule.minimumAmount);
     return [{ card, applies: true, bank: rule.product, product: rule.product, ruleSourceUrl: rule.sourceUrl,
       policyVerifiedAt: card.usagePolicy.verifiedAt, minimumAmount: rule.minimumAmount,
-      eligibleSpend, remainingAmount, progress: Math.min(eligibleSpend / rule.minimumAmount * 100, 100), isExempt,
+      eligibleSpend, remainingAmount, progress: Math.min(eligibleSpend / rule.minimumAmount * 100, 100), isExempt, confirmationPending,
       projectedAmount, projectedTotal: usageMoney(eligibleSpend + projectedAmount),
-      status: !cycle ? "NO_CYCLE" : isFuture ? "FUTURE" : isExempt ? "MET" : projectedAmount > 0 ? "UNCONFIRMED" : isClosed ? "NOT_MET" : "IN_PROGRESS",
+      status: !cycle ? "NO_CYCLE" : isFuture ? "FUTURE" : isExempt ? "MET" : confirmationPending || projectedAmount > 0 ? "UNCONFIRMED" : isClosed ? "NOT_MET" : "IN_PROGRESS",
       periodVerified: Boolean(evidence), statementSource: evidence?.source || null,
       selectedCycle: cycle ? { id: cycle.id, startDate: cycle.startDate, cutDate: cycle.cutDate, dueDate: cycle.dueDate, month, year, displayStatus: cycle.displayStatus } : null,
       breakdown: { dailyExpensesAmount, subscriptionsAmount, installmentPurchasesAmount,

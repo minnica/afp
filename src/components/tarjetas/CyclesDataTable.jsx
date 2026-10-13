@@ -111,10 +111,10 @@ export default function CyclesDataTable({
       setEditCycleCutDate(toDateInputValue(cycle.cutDate));
       setEditCycleDueDate(toDateInputValue(cycle.dueDate));
     } else if (type === "statement") {
-      setStatementAmount(cycle.statementAmount ? String(cycle.statementAmount) : "");
+      setStatementAmount(cycle.statementAmount != null ? String(cycle.statementAmount) : "");
     } else if (type === "pay") {
       setPaidAt(getTodayInputValue());
-      setPaidAmount(cycle.statementAmount ? String(cycle.statementAmount) : "");
+      setPaidAmount(cycle.statementAmount != null ? String(cycle.statementAmount) : "");
     }
 
     if (type !== "breakdown") {
@@ -201,7 +201,7 @@ export default function CyclesDataTable({
         header: "Estado cuenta",
         cell: ({ getValue }) => {
           const v = getValue();
-          return v ? formatMoney(v) : <span className="text-muted-foreground">-</span>;
+          return v != null ? formatMoney(v) : <span className="text-muted-foreground">-</span>;
         },
         sortingFn: "basic",
       },

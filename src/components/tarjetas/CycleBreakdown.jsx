@@ -4,6 +4,7 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Empty, EmptyDescription } from "@/components/ui/empty";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Item, ItemContent, ItemDescription, ItemFooter, ItemGroup, ItemTitle } from "@/components/ui/item";
 
 function formatMoney(value) {
@@ -60,22 +61,36 @@ export default function CycleBreakdown({ cycle }) {
   const hasCredits = Number(cycle.creditsAmount || 0) > 0;
   return (
     <div className="space-y-4">
-      {hasCredits && (
+      {cycle.dataWarnings?.map((warning) => (
+        <Alert key={warning} variant="destructive"><AlertDescription>{warning}</AlertDescription></Alert>
+      ))}
         <dl className="grid gap-3 rounded-xl border border-border bg-muted/30 p-4 sm:grid-cols-3">
           <div>
             <dt className="text-sm text-muted-foreground">Cargos del corte</dt>
             <dd className="font-semibold">{formatMoney(cycle.grossCalculatedAmount)}</dd>
           </div>
-          <div>
+          {hasCredits && <div>
             <dt className="text-sm text-muted-foreground">Bonificaciones aplicadas</dt>
             <dd className="font-semibold text-emerald-400">{formatMoney(-cycle.creditsAmount)}</dd>
-          </div>
+          </div>}
           <div>
             <dt className="text-sm text-muted-foreground">Total calculado a pagar</dt>
             <dd className="font-semibold">{formatMoney(cycle.calculatedAmount)}</dd>
           </div>
+          {cycle.statementAmount != null && <div>
+            <dt className="text-sm text-muted-foreground">Estado de cuenta</dt>
+            <dd className="font-semibold">{formatMoney(cycle.statementAmount)}</dd>
+          </div>}
+          {cycle.difference != null && <div>
+            <dt className="text-sm text-muted-foreground">Diferencia (estado − calculado)</dt>
+            <dd className="font-semibold">{formatMoney(cycle.difference)}</dd>
+          </div>}
         </dl>
-      )}
+      <p className="text-xs text-muted-foreground">
+        Del {formatShortDate(cycle.startDate)} al {formatShortDate(cycle.cutDate)}.
+        {" "}El cálculo incluye los gastos registrados y las cuotas y suscripciones previstas;
+        los importes conciliados usan su referencia bancaria. Una diferencia pendiente requiere revisar el estado de cuenta.
+      </p>
       <div className={`grid gap-4 ${hasCredits ? "lg:grid-cols-2" : "lg:grid-cols-3"}`}>
         <BreakdownSection
           title={`Gastos (${formatMoney(cycle.expensesAmount)})`}

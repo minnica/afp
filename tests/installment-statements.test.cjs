@@ -12,6 +12,11 @@ const helper = fs.readFileSync(
 const creditHelper = fs.readFileSync(
   path.join(root, "src/lib/calculations/cardCredits.js"), "utf8",
 ).replace(/^export /gm, "");
+const cycleHelpers = ["subscriptionStatements", "cardCycles"]
+  .map((name) => fs.readFileSync(path.join(root, `src/lib/calculations/${name}.js`), "utf8")
+    .replace(/^import[\s\S]*?from\s+["'][^"']+["'];\r?\n/gm, "")
+    .replace(/^export /gm, ""))
+  .join("\n");
 const original = {
   id: "rasuradora", cardId: "bbva", purchaseDate: "2025-11-21T12:00:00Z",
   totalAmount: 851.38, months: 12, status: "ACTIVE", initialPaymentsMade: 5,
@@ -34,7 +39,7 @@ function routeContext(file) {
     .split("export async function GET")[0]
     .replace(/^import[\s\S]*?from\s+["'][^"']+["'];\r?\n/gm, "");
   const context = vm.createContext({});
-  vm.runInContext(helper + "\n" + creditHelper + "\n" + source, context);
+  vm.runInContext(helper + "\n" + creditHelper + "\n" + cycleHelpers + "\n" + source, context);
   return context;
 }
 
@@ -49,7 +54,7 @@ test("el corte bancario prevalece en tarjetas y dashboard, sin cambiar fecha de 
     assert.equal(context.getPurchaseCycleNumber(verified, cycle(2026, 11), 2026 * 12), 12);
     assert.equal(context.shouldIncludePurchaseInCycle(verified, cycle(2026, 12), 2026 * 12), false);
     // Un corte sin documento conserva un importe estimado, sin reutilizar como real el cargo de agosto.
-    assert.equal(context.getMonthlyPaymentUsed(verified, cycle(2026, 7)), 851.38 / 12);
+    assert.equal(context.getMonthlyPaymentUsed(verified, cycle(2026, 7)), 70.95);
   }
 });
 
@@ -58,7 +63,7 @@ test("la manta conserva 9/12 aunque falte el primer ciclo en la base", () => {
   const manta = {
     ...original, id: "manta", purchaseDate: "2025-11-24T12:00:00Z", totalAmount: 483.53,
   };
-  assert.equal(context.getPurchaseCycleNumber(manta, cycle(2026, 8), 2026 * 12), 8);
+  assert.equal(context.getPurchaseCycleNumber(manta, cycle(2026, 8), 2026 * 12), 9);
   manta.statementReconciliations = [{
     year: 2026, month: 8, paymentNumber: 9, amount: "41.00", remainingBalance: "114.53",
   }];

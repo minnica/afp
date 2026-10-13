@@ -135,3 +135,123 @@ test("sin ciclo y evidencia inválida nunca producen un cumplimiento inventado",
   const [invalid] = run({ cyclesWithAmounts: [{ ...cycle, usageReconciliation: { ...evidence, cutDate: "2026-11-08" } }] });
   assert.equal(invalid.periodVerified, false);
 });
+
+test("fechas bancarias malformadas conservan el período previsto y sus movimientos", () => {
+  for (const patch of [
+    { startDate: "2026-09-09T12:00:00Z" },
+    { cutDate: "2026-10-08T12:00:00Z" },
+    { startDate: "2026-02-30" },
+    { startDate: null },
+    { cutDate: "2026-11-08" },
+    { cutDate: "2025-10-08" },
+    { startDate: "2026-10-09", cutDate: "2026-10-08" },
+  ]) {
+    const [result] = run({
+      cyclesWithAmounts: [{ ...cycle, usageReconciliation: { ...evidence, ...patch } }],
+      expenses: [expense("recorded", 350)],
+    });
+    assert.equal(result.periodVerified, false, JSON.stringify(patch));
+    assert.equal(result.selectedCycle.startDate, cycle.startDate);
+    assert.equal(result.selectedCycle.cutDate, cycle.cutDate);
+    assert.equal(result.eligibleSpend, 350);
+  }
+});
+
+test("fechas imposibles no se normalizan como fechas bancarias verificadas", () => {
+  const [result] = run({
+    month: 3,
+    cyclesWithAmounts: [{ ...cycle, month: 3, startDate: "2026-02-11", cutDate: "2026-03-10", usageReconciliation: {
+      ...evidence, startDate: "2026-02-01", cutDate: "2026-02-30",
+    } }],
+  });
+  assert.equal(result.periodVerified, false);
+  assert.equal(result.selectedCycle.cutDate, "2026-03-10");
+});
+
+test("recibos nulos o malformados no interrumpen el cálculo ni suman consumo", () => {
+  const valid = { subscriptionId: "sub", name: "Servicio", date: "2026-10-03", amount: "199.50" };
+  const malformed = [null, false, 399, "recibo", {},
+    { ...valid, subscriptionId: {} }, { ...valid, subscriptionId: " " },
+    { ...valid, amount: true }, { ...valid, amount: [399] },
+    { ...valid, amount: "Infinity" }, { ...valid, amount: -399 },
+    { ...valid, amount: "399.001" }, { ...valid, date: "2026-10-03T12:00:00Z" },
+    { ...valid, date: "2026-09-31" }, { ...valid, date: "2026-10-09" },
+  ];
+  const [result] = run({ cyclesWithAmounts: [{ ...cycle, usageReconciliation: {
+    ...evidence, subscriptionCharges: [...malformed, valid], excludedExpenseIds: {},
+  } }], expenses: [expense("recorded", 50)] });
+  assert.equal(result.eligibleSpend, 249.5);
+  assert.equal(result.remainingAmount, 50.5);
+  assert.equal(result.breakdown.includedSubscriptions.length, 1);
+  assert.equal(result.breakdown.excludedAmount, 0);
+  assert.equal(result.isExempt, false);
+});
+
+test("un nombre malformado conserva el importe válido sin romper el desglose", () => {
+  const [result] = run({ cyclesWithAmounts: [{ ...cycle, usageReconciliation: {
+    ...evidence, subscriptionCharges: [{ subscriptionId: "sub", name: {}, date: "2026-10-03", amount: 199 }],
+  } }] });
+  assert.equal(result.eligibleSpend, 199);
+  assert.equal(result.breakdown.includedSubscriptions[0].name, "Suscripción");
+});
+
+test("un gasto distinto al comprobante queda por revisar sin acreditar una meta falsa", () => {
+  const recorded = { ...expense("linked", 399, "Servicio", "2026-10-03"), subscriptionId: "sub" };
+  const receipt = { subscriptionId: "sub", name: "Servicio", date: "2026-10-03", amount: 199 };
+  const [result] = run({ expenses: [recorded], cyclesWithAmounts: [{ ...cycle, usageReconciliation: {
+    ...evidence, subscriptionCharges: [receipt],
+  } }] });
+  assert.equal(result.confirmationPending, true);
+  assert.equal(result.isExempt, false);
+  assert.equal(result.eligibleSpend, 0);
+  assert.equal(result.projectedAmount, 399);
+  assert.equal(result.breakdown.includedSubscriptions.length, 0);
+  assert.match(result.breakdown.projectedCharges[0].reason, /gasto \$399\.00, comprobante \$199\.00; requiere conciliación/);
+  assert.equal(recorded.amount, 399);
+  assert.equal(receipt.amount, 199);
+});
+
+test("grupos ambiguos conservan multiplicidad e importes fuera del consumo confirmado", () => {
+  const receipt = (amount) => ({ subscriptionId: "sub", name: "Servicio", date: "2026-10-03", amount });
+  for (const [expenseAmounts, receiptAmounts, expectedProjection] of [
+    [[399], [199, 299], 698],
+    [[399, 499], [199], 898],
+    [[199, 499], [199, 299], 698],
+  ]) {
+    const [result] = run({
+      expenses: expenseAmounts.map((amount, index) => ({ ...expense(`linked-${index}`, amount, "Servicio", "2026-10-03"), subscriptionId: "sub" })),
+      cyclesWithAmounts: [{ ...cycle, usageReconciliation: { ...evidence, subscriptionCharges: receiptAmounts.map(receipt) } }],
+    });
+    assert.equal(result.confirmationPending, true);
+    assert.equal(result.isExempt, false);
+    assert.equal(result.eligibleSpend, 0);
+    assert.equal(result.projectedAmount, expectedProjection);
+    assert.ok(result.breakdown.projectedCharges.every((item) => item.reason.includes("requiere conciliación")));
+  }
+});
+
+test("emparejamientos exactos con distinta posición no crean discrepancias", () => {
+  const [result] = run({
+    expenses: [199, 399].map((amount, index) => ({ ...expense(`linked-${index}`, amount, "Servicio", "2026-10-03"), subscriptionId: "sub" })),
+    cyclesWithAmounts: [{ ...cycle, usageReconciliation: { ...evidence, subscriptionCharges: [399, 199].map((amount) => ({
+      subscriptionId: "sub", name: "Servicio", date: "2026-10-03", amount,
+    })) } }],
+  });
+  assert.equal(result.confirmationPending, false);
+  assert.equal(result.eligibleSpend, 598);
+  assert.equal(result.projectedAmount, 0);
+  assert.equal(result.isExempt, true);
+});
+
+test("un comprobante adicional no consume la coincidencia exacta de otro cargo", () => {
+  const [result] = run({
+    expenses: [{ ...expense("linked", 199, "Servicio", "2026-10-03"), subscriptionId: "sub" }],
+    cyclesWithAmounts: [{ ...cycle, usageReconciliation: { ...evidence, subscriptionCharges: [399, 199].map((amount) => ({
+      subscriptionId: "sub", name: "Servicio", date: "2026-10-03", amount,
+    })) } }],
+  });
+  assert.equal(result.confirmationPending, false);
+  assert.equal(result.eligibleSpend, 598);
+  assert.equal(result.breakdown.includedSubscriptions[0].amount, 399);
+  assert.equal(result.projectedAmount, 0);
+});

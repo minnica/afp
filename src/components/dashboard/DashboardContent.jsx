@@ -39,6 +39,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import PageSkeleton from "@/components/layout/PageSkeleton";
+import CyclePeriodHelp from "@/components/dashboard/CyclePeriodHelp";
 import {
   AlertTriangle,
   Bell,
@@ -285,7 +286,6 @@ function getNoticeIcon(group) {
 }
 
 export default function DashboardContent() {
-  const { captureFocus, restoreFocus } = useDialogFocus();
   const router = useRouter();
 
   const [user, setUser] = useState(null);
@@ -403,7 +403,7 @@ export default function DashboardContent() {
   }
 
   return (
-    <main onClickCapture={captureFocus}>
+    <main>
       <section className="mx-auto flex w-full max-w-full flex-col px-4 py-8">
         {error ? (
           <Alert variant="destructive" className="mb-6">
@@ -426,9 +426,17 @@ export default function DashboardContent() {
 
           <Card className="rounded-2xl border-border bg-card">
             <CardHeader>
-              <CardTitle className="text-lg font-semibold uppercase text-center">
-                Pagos de tarjetas
-              </CardTitle>
+              <div className="flex items-center justify-center gap-1">
+                <CardTitle className="text-lg font-semibold uppercase text-center">
+                  Pagos de tarjetas
+                </CardTitle>
+                <CyclePeriodHelp
+                  key={activeMonthTab}
+                  cycles={cycles}
+                  month={activeMonthIndex + 1}
+                  year={currentYear}
+                />
+              </div>
             </CardHeader>
 
             <CardContent>
@@ -883,6 +891,7 @@ function CardMonthlyComparisonChart({ cardMonthlyComparisonByMonth, currentMonth
 }
 
 function CardUsageWaiverProgress({ cardUsageWaiversByMonth, currentMonthIndex }) {
+  const { captureFocus, restoreFocus } = useDialogFocus();
   const [selectedMonthIndex, setSelectedMonthIndex] = useState(currentMonthIndex);
   const [selectedItem, setSelectedItem] = useState(null);
   const items = useMemo(() => {
@@ -946,7 +955,8 @@ function CardUsageWaiverProgress({ cardUsageWaiversByMonth, currentMonthIndex })
                     <span className="text-xs text-muted-foreground"> / {formatMoney(item.minimumAmount)}</span>
                   </p>
                   <p className={`text-xs ${item.isExempt ? "text-emerald-400" : "text-muted-foreground"}`}>
-                    {item.status === "NO_CYCLE" ? "Sin ciclo registrado"
+                    {item.confirmationPending ? "Por revisar: importes distintos al estado"
+                      : item.status === "NO_CYCLE" ? "Sin ciclo registrado"
                       : item.status === "FUTURE" ? "Período futuro"
                       : item.isExempt ? "Meta alcanzada"
                       : `${item.status === "NOT_MET" ? "Faltaron" : "Faltan por registrar"} ${formatMoney(item.remainingAmount)}`}
@@ -962,7 +972,10 @@ function CardUsageWaiverProgress({ cardUsageWaiversByMonth, currentMonthIndex })
                   type="button"
                   variant="secondary"
                   size="sm"
-                  onClick={() => setSelectedItem(item)}
+                  onClick={(event) => {
+                    captureFocus(event);
+                    setSelectedItem(item);
+                  }}
                 >
                   Desglose
                 </Button>
@@ -1267,7 +1280,7 @@ function PaymentsTable({ items }) {
               <div className="rounded-lg border border-border bg-muted/30 px-3 py-3">
                 <p className="text-xs text-muted-foreground">Estado cuenta</p>
                 <p className="text-lg font-semibold">
-                  {item.cycle.statementAmount
+                  {item.cycle.statementAmount != null
                     ? formatMoney(item.cycle.statementAmount)
                     : "-"}
                 </p>
@@ -1307,7 +1320,7 @@ function PaymentsTable({ items }) {
               </div>
 
               <div className="font-semibold">
-                {item.cycle.statementAmount
+                {item.cycle.statementAmount != null
                   ? formatMoney(item.cycle.statementAmount)
                   : "-"}
               </div>

@@ -107,12 +107,23 @@ Reglas de cálculo:
 
 ### Compras a meses (MSI) — cálculo de cuota actual
 
-`InstallmentPurchase` no guarda la cuota actual; se calcula dinámicamente en cada ciclo a partir de `purchaseDate` y el `usualCutDay` de la tarjeta (lógica duplicada en `card-cycles/route.js` y `dashboard/route.js`, funciones `getPurchaseFirstCycleIndex` / `getPurchaseCycleNumber` / `shouldIncludePurchaseInCycle`):
+`InstallmentPurchase` no guarda la cuota actual; se calcula dinámicamente en cada ciclo a partir de `purchaseDate` y el `usualCutDay` de la tarjeta. Dashboard y Tarjetas comparten `src/lib/calculations/cardCycles.js` (`getPurchaseCycleNumber` / `shouldIncludePurchaseInCycle`):
 
 - `firstCycleIndex`: ciclo (año*12+mes) donde cae la primera cuota — el mismo mes de `purchaseDate` si la fecha es **antes o igual** al `usualCutDay`, o el mes siguiente si es posterior.
 - `currentMonth` de un ciclo objetivo = `(targetCycleIndex - firstCycleIndex) + 1`.
 - Se incluye en el ciclo solo si `1 <= currentMonth <= months` (y, para `ACTIVE`, si `purchaseDate` no es posterior al `cutDate` del ciclo).
 - `initialPaymentsMade` **no** se usa para este cálculo — solo sirve como ancla en `getNextPaymentDueDate` (`ComprasAMesesContent.jsx`). Antes el cálculo mezclaba un valor dinámico con un fallback estático `initialPaymentsMade + 1`, lo que dejaba la cuota "congelada" en vez de avanzar mes a mes (y de excluirse al completarse).
+- La ausencia de ciclos anteriores en la BD no desplaza la primera cuota. Listado, detalle y dashboard usan la misma numeración; las compras liquidadas conservan únicamente sus cuotas históricas dentro de plazo.
+
+### Desgloses — consistencia de importes y períodos
+
+- `cardCycles.js` calcula una vez las partidas y sus subtotales para ambas API. Los límites incluyen el día UTC completo, incluso cuando un gasto histórico tiene una hora distinta a la del corte.
+- Cada importe se redondea a centavos antes de sumarlo, de modo que las partidas visibles sumen exactamente al subtotal. Las cuotas sin referencia bancaria siguen siendo estimaciones.
+- Las suscripciones se incluyen por la fecha del cobro y su frecuencia, no por el mes del corte. Un gasto con `subscriptionId` sustituye la previsión de esa suscripción y mes. Las categorías y comparativos mensuales aplican la misma deduplicación, aunque haya cambiado el método de pago o la categoría.
+- Un estado de cuenta de cero es un importe confirmado; no se sustituye por el cálculo estimado. El desglose de Tarjetas muestra cargos, bonificaciones, total calculado, estado de cuenta y diferencia cuando corresponda.
+- `cycleDataQuality.js` detecta fechas de ciclos superpuestas o días sin cubrir. En dashboard, un icono de ayuda junto a “Pagos de tarjetas” abre un popover con las tarjetas y fechas por confirmar del mes seleccionado; se oculta cuando no hay pendientes. Los desgloses de Tarjetas conservan el detalle. No reasigna movimientos ni corrige fechas bancarias automáticamente. Los avisos y las diferencias requieren conciliación con evidencia.
+- Consumo mínimo mantiene separado su período bancario verificado. Si un gasto vinculado contradice el importe de un comprobante de suscripción, la partida queda por revisar y no confirma la exención. Los metadatos inválidos no interrumpen el dashboard.
+- `node --test tests/*.test.cjs` ejecuta las regresiones de cálculos, referencias, bonificaciones y desgloses. `python3 scripts/audit-card-breakdowns.py <directorio-evidencia> [antes|despues]` contrasta un snapshot de solo lectura (`snapshot.json`) con respuestas guardadas de las API (`tarjetas-<fase>.json`, `dashboard-<fase>.json`) mediante aritmética decimal independiente; conserva las discrepancias bancarias como pendientes de conciliación. Los archivos con datos personales permanecen en `estados_cuenta/`, excluido de Git.
 
 ### MSI — referencias verificadas de estados de cuenta
 
