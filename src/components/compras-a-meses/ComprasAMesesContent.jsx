@@ -1,5 +1,7 @@
 "use client";
 
+import CreateRecordSurface, { useCreateDialogMode } from "@/components/ui/create-record-surface";
+
 import { ResponsiveSelect } from "@/components/ui/responsive-select";
 
 import { SearchableSelect } from "@/components/ui/searchable-select";
@@ -12,7 +14,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { ensureUserSetup } from "@/lib/userSetup";
 import { getLatestInstallmentStatement } from "@/lib/calculations/installmentStatements";
@@ -124,6 +126,8 @@ function getNextPaymentDueDate(purchase) {
 export default function ComprasAMesesContent() {
   const { captureFocus, restoreFocus } = useDialogFocus();
   const router = useRouter();
+  const compactEntry = useCreateDialogMode();
+  const [createError, setCreateError] = useState(null);
 
   const [user, setUser] = useState(null);
   const [cards, setCards] = useState([]);
@@ -232,11 +236,14 @@ export default function ComprasAMesesContent() {
   }, [router]);
 
   async function createPurchase() {
-    if (!user) return;
+    if (!user || isSaving) return false;
 
+    setCreateError(null);
     setError("");
     setIsSaving(true);
 
+    let saved = false;
+    const toastOptions = compactEntry ? { position: "top-center" } : undefined;
     try {
       const response = await fetch("/api/installment-purchases", {
         method: "POST",
@@ -264,20 +271,26 @@ export default function ComprasAMesesContent() {
         throw new Error(data.error || "No se pudo guardar la compra.");
       }
 
+      saved = true;
       setConcept("");
       setTotalAmount("");
       setMonths("");
       setManualMonthlyPayment("");
       setInitialPaymentsMade("0");
       setPersonId("NONE");
-      setCategoryId("");
       setNotes("");
 
       await loadPurchases(user.id);
-      toast.success("Compra guardada exitosamente.");
+      toast.success("Compra guardada exitosamente.", toastOptions);
+      return true;
     } catch (err) {
-      setError(err.message || "No se pudo guardar la compra.");
-      toast.error(err.message || "No se pudo guardar la compra.");
+      if (saved) {
+        setError("El registro se guardó, pero no se pudo actualizar la lista. Recarga para verlo.");
+        toast.success("Compra guardada exitosamente.", toastOptions);
+        return true;
+      }
+      setCreateError({ message: err.message || "No se pudo guardar la compra." });
+      return false;
     } finally {
       setIsSaving(false);
     }
@@ -789,170 +802,159 @@ export default function ComprasAMesesContent() {
       </Dialog>
 
       <main onClickCapture={captureFocus}>
-        <section className="mx-auto flex w-full max-w-full flex-col px-4 py-5 md:py-8">
+        <section className={`mx-auto flex w-full max-w-full flex-col px-4 py-5 md:py-8 ${compactEntry ? "pb-28!" : ""}`}>
           {error ? (
             <Alert variant="destructive" className="mb-6">
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           ) : null}
 
-          <div className="grid gap-5 xl:grid-cols-[420px_1fr]">
-            <Card className="rounded-2xl border-border bg-card">
-              <CardHeader>
-                <CardTitle className="text-lg font-semibold uppercase text-center">
-                  Nueva compra
-                </CardTitle>
-              </CardHeader>
+          <div className={`grid gap-5 ${compactEntry ? "" : "xl:grid-cols-[420px_1fr]"}`}>
+            <CreateRecordSurface
+              compact={compactEntry}
+              title="Nueva compra"
+              saveLabel="Guardar compra"
+              error={createError}
+              isSaving={isSaving}
+              onSubmit={createPurchase}
+            >
+              <div className="space-y-2">
+                <Label htmlFor="compras-ameses-field-9">Tarjeta</Label>
+                <ResponsiveSelect
+                  value={cardId}
+                  onValueChange={setCardId}
+                  id="compras-ameses-field-9"
+                  title="Seleccionar tarjeta"
+                  placeholder="Selecciona tarjeta"
+                  options={cards.map(card => ({
+                    value: String(card.id),
+                    label: String(card.name)
+                  }))}
+                  searchable="auto"
+                  searchPlaceholder="Buscar tarjeta…"
+                />
+              </div>
 
-              <CardContent className="space-y-5">
-                <div className="space-y-2">
-                  <Label htmlFor="compras-ameses-field-9">Tarjeta</Label>
-                  <ResponsiveSelect
-                    value={cardId}
-                    onValueChange={setCardId}
-                    id="compras-ameses-field-9"
-                    title="Seleccionar tarjeta"
-                    placeholder="Selecciona tarjeta"
-                    options={cards.map(card => ({
-                      value: String(card.id),
-                      label: String(card.name)
-                    }))}
-                    searchable="auto"
-                    searchPlaceholder="Buscar tarjeta…"
-                  />
-                </div>
+              <div className="space-y-2">
+                <Label htmlFor="purchase-date">Fecha de compra</Label>
+                <DatePicker
+                  id="purchase-date"
+                  aria-label="Fecha de compra"
+                  value={purchaseDate}
+                  onChange={setPurchaseDate}
+                />
+              </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="purchase-date">Fecha de compra</Label>
-                  <DatePicker
-                    id="purchase-date"
-                    aria-label="Fecha de compra"
-                    value={purchaseDate}
-                    onChange={setPurchaseDate}
-                  />
-                </div>
+              <div className="space-y-2">
+                <Label htmlFor="compras-ameses-field-10">Concepto</Label>
+                <Input
+                  id="compras-ameses-field-10"
+                  value={concept}
+                  placeholder="Ej. Celular, laptop, consola..."
+                  onChange={(event) => setConcept(event.target.value)}
+                />
+              </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="compras-ameses-field-10">Concepto</Label>
-                  <Input
-                    id="compras-ameses-field-10"
-                    value={concept}
-                    placeholder="Ej. Celular, laptop, consola..."
-                    onChange={(event) => setConcept(event.target.value)}
-                  />
-                </div>
+              <div className="space-y-2">
+                <Label htmlFor="compras-ameses-field-11">Monto total</Label>
+                <Input
+                  id="compras-ameses-field-11"
+                  value={totalAmount}
+                  type="number"
+                  formatNumber
+                  min="0"
+                  step="0.01"
+                  placeholder="0.00"
+                  onChange={(event) => setTotalAmount(event.target.value)}
+                />
+              </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="compras-ameses-field-11">Monto total</Label>
-                  <Input
-                    id="compras-ameses-field-11"
-                    value={totalAmount}
-                    type="number"
-                    formatNumber
-                    min="0"
-                    step="0.01"
-                    placeholder="0.00"
-                    onChange={(event) => setTotalAmount(event.target.value)}
-                  />
-                </div>
+              <div className="space-y-2">
+                <Label htmlFor="compras-ameses-field-12">Número de meses</Label>
+                <Input
+                  id="compras-ameses-field-12"
+                  value={months}
+                  type="number"
+                  min="1"
+                  placeholder="Ej. 12"
+                  onChange={(event) => setMonths(event.target.value)}
+                />
+              </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="compras-ameses-field-12">Número de meses</Label>
-                  <Input
-                    id="compras-ameses-field-12"
-                    value={months}
-                    type="number"
-                    min="1"
-                    placeholder="Ej. 12"
-                    onChange={(event) => setMonths(event.target.value)}
-                  />
-                </div>
+              <div className="rounded-xl border border-border bg-background/50 px-4 py-3">
+                <p className="text-sm text-muted-foreground">
+                  Pago mensual calculado
+                </p>
+                <p className="text-xl font-semibold">
+                  {formatMoney(calculatedMonthlyPayment)}
+                </p>
+              </div>
 
-                <div className="rounded-xl border border-border bg-background/50 px-4 py-3">
-                  <p className="text-sm text-muted-foreground">
-                    Pago mensual calculado
+              <div className="space-y-2">
+                <Label htmlFor="compras-ameses-field-13">Pagos ya realizados</Label>
+                <Input
+                  id="compras-ameses-field-13"
+                  value={initialPaymentsMade}
+                  type="number"
+                  min="0"
+                  placeholder="0"
+                  onChange={(event) =>
+                    setInitialPaymentsMade(event.target.value)
+                  }
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="compras-ameses-field-14">Categoría</Label>
+                <SearchableSelect
+                  value={categoryId}
+                  onValueChange={setCategoryId}
+                  id="compras-ameses-field-14"
+                  title="Seleccionar categoría"
+                  placeholder="Selecciona categoría"
+                  searchPlaceholder="Buscar categoría…"
+                  options={categories.map(item => ({
+                    value: item.id,
+                    label: item.name
+                  }))}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="compras-ameses-field-15">Persona, si aplica</Label>
+                <SearchableSelect
+                  value={personId}
+                  onValueChange={setPersonId}
+                  id="compras-ameses-field-15"
+                  title="Seleccionar persona"
+                  placeholder="Sin persona"
+                  searchPlaceholder="Buscar persona…"
+                  options={[{
+                    value: "NONE",
+                    label: "Sin persona",
+                    pinned: true
+                  }, ...people.map(item => ({
+                    value: item.id,
+                    label: item.name
+                  }))]}
+                />
+
+                {personId !== "NONE" ? (
+                  <p className="text-xs text-muted-foreground">
+                    Se creará una cuenta por cobrar por el monto total.
                   </p>
-                  <p className="text-xl font-semibold">
-                    {formatMoney(calculatedMonthlyPayment)}
-                  </p>
-                </div>
+                ) : null}
+              </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="compras-ameses-field-13">Pagos ya realizados</Label>
-                  <Input
-                    id="compras-ameses-field-13"
-                    value={initialPaymentsMade}
-                    type="number"
-                    min="0"
-                    placeholder="0"
-                    onChange={(event) =>
-                      setInitialPaymentsMade(event.target.value)
-                    }
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="compras-ameses-field-14">Categoría</Label>
-                  <SearchableSelect
-                    value={categoryId}
-                    onValueChange={setCategoryId}
-                    id="compras-ameses-field-14"
-                    title="Seleccionar categoría"
-                    placeholder="Selecciona categoría"
-                    searchPlaceholder="Buscar categoría…"
-                    options={categories.map(item => ({
-                      value: item.id,
-                      label: item.name
-                    }))}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="compras-ameses-field-15">Persona, si aplica</Label>
-                  <SearchableSelect
-                    value={personId}
-                    onValueChange={setPersonId}
-                    id="compras-ameses-field-15"
-                    title="Seleccionar persona"
-                    placeholder="Sin persona"
-                    searchPlaceholder="Buscar persona…"
-                    options={[{
-                      value: "NONE",
-                      label: "Sin persona",
-                      pinned: true
-                    }, ...people.map(item => ({
-                      value: item.id,
-                      label: item.name
-                    }))]}
-                  />
-
-                  {personId !== "NONE" ? (
-                    <p className="text-xs text-muted-foreground">
-                      Se creará una cuenta por cobrar por el monto total.
-                    </p>
-                  ) : null}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="compras-ameses-field-16">Notas (opcional)</Label>
-                  <Textarea id="compras-ameses-field-16"
-                    value={notes}
-                    placeholder="Detalles adicionales..."
-                    onChange={(event) => setNotes(event.target.value)}
-                  />
-                </div>
-
-                <Button
-                  type="button"
-                  className="w-full"
-                  onClick={createPurchase}
-                  disabled={isSaving}
-                >
-                  <Plus className="mr-2 h-4 w-4" />
-                  {isSaving ? "Guardando..." : "Guardar compra"}
-                </Button>
-              </CardContent>
-            </Card>
+              <div className="space-y-2">
+                <Label htmlFor="compras-ameses-field-16">Notas (opcional)</Label>
+                <Textarea id="compras-ameses-field-16"
+                  value={notes}
+                  placeholder="Detalles adicionales..."
+                  onChange={(event) => setNotes(event.target.value)}
+                />
+              </div>
+            </CreateRecordSurface>
 
             <Card className="rounded-2xl border-border bg-card">
               <CardHeader>

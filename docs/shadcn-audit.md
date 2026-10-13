@@ -208,3 +208,31 @@ Comprobado en web con GastosContent real y API simulada: dos capturas sucesivas 
 La ruta temporal se retiró y el navegador se cerró. No se utilizó el emulador ni se escribieron registros reales.
 
 ESLint de los dos componentes modificados, compilación de producción y `git diff --check`: correctos.
+
+
+## Ajuste posterior: captura continua en las páginas de registro
+
+`CreateRecordSurface` extrae la composición de captura de Gastos y la reutiliza en las ocho páginas que dan de alta datos: Gastos, Compras a meses, Suscripciones, Ingresos, Cuentas por cobrar, Cuentas por pagar, Tarjetas y Configuración. `ExpenseCreateSurface` queda como una composición del componente compartido que conserva el aviso offline y el identificador de error de Gastos. El componente base Dialog no se modifica; se confirmó nuevamente mediante el MCP de shadcn. No se agregan dependencias.
+
+En pantallas menores de 768 px o con puntero principal táctil, la captura abre automáticamente al montar la página con datos cargados y enfoca el contenedor, sin enfocar inputs. El cuerpo tiene desplazamiento interno y se adapta a `visualViewport`; «Cerrar» y guardar permanecen accesibles. Guardar mantiene abierto el diálogo y vuelve al inicio del cuerpo. Cerrar conserva el borrador. El signo + y la variante outline identifican la apertura; guardar utiliza disquete, estilo primario y Spinner durante el envío. En escritorio continúa la captura integrada.
+
+Los errores de alta se anuncian dentro del formulario y conservan los datos para reintentar; los errores de consulta o edición siguen en la página. El componente compartido bloquea un segundo submit incluso antes del siguiente render y deshabilita el fieldset durante el envío. Los controladores devuelven el resultado del guardado y distinguen un POST exitoso de un fallo posterior al refrescar la lista. Los avisos de guardado se muestran arriba en móvil, dejando libres las acciones.
+
+Se conservan las selecciones reutilizables: tarjeta/fecha/categoría en compras; método/tarjeta/categoría/frecuencia/período de inicio en suscripciones; fecha/tipo en ingresos; persona/fecha de origen en cuentas. Los campos específicos de un registro se limpian. Tarjetas limpia todos los campos. Configuración muestra un único diálogo para seleccionar entre categorías, personas y tipos de ingreso; conserva el catálogo elegido y los borradores de los otros catálogos. Su diálogo se monta fuera de las pestañas de listas. En Tarjetas también se monta fuera de las pestañas en móvil para abrir aunque la vista inicial sea Ciclos mensuales.
+
+Verificación con los componentes reales y una API simulada, sin registros reales:
+
+- Las ocho páginas abren un solo diálogo con foco en el contenedor. En cada formulario principal se comprobaron dos altas sucesivas, solicitudes separadas, importe sin comas, limpieza y selecciones conservadas, error/reintento y cierre/reapertura del borrador. Las listas reflejan los registros simulados; los tres catálogos de Configuración enviaron su tipo correspondiente y actualizaron sus listas.
+- A 390 px y 320 px: sin desbordamiento horizontal; el diálogo permanece dentro del viewport. Se revisaron capturas de Suscripciones y Cuentas por pagar.
+- A 1280 px: altas integradas en las ocho páginas, guardado, limpieza y actualización de listas; sin diálogo ni errores de JavaScript. Los Select de escritorio se comprobaron por teclado.
+- Dos eventos submit en el mismo turno generaron un solo POST; Escape no cerró durante el envío y los campos quedaron deshabilitados hasta terminar. Un fallo de refresco tras guardar confirmó el registro sin duplicar la solicitud. En horizontal y con reducción simulada de visualViewport, el footer siguió dentro de la pantalla.
+
+Se retiró la ruta de prueba y se cerró el navegador. No se ejecutó el emulador.
+
+ESLint completo sin errores (solo la advertencia existente de TanStack Table), compilación de producción y `git diff --check`: correctos.
+
+## Excepciones: Tarjetas y Configuración
+
+Por preferencia del usuario, Tarjetas y Configuración conservan sus formularios de alta integrados también en móvil. Tarjetas inicia en Ciclos mensuales y «Nueva tarjeta» aparece únicamente dentro de la pestaña Tarjetas; `CreateRecordSurface` recibe `compact={false}`. Configuración muestra los formularios de categorías, personas y tipos de ingreso dentro de sus respectivas pestañas. Se retiraron el diálogo de catálogo, la detección del modo compacto, las acciones fijas y el espacio inferior reservado de ambas páginas. Se conservan los iconos de guardado, los estados de espera y el manejo de errores y refresco. Los diálogos de captura siguen activos en Gastos, Compras a meses, Suscripciones, Ingresos y Cuentas por cobrar/pagar.
+
+Comprobado en web a 390 px con API simulada: Tarjetas inicia en Ciclos, su formulario aparece al elegir Tarjetas y guarda/actualiza la lista; Configuración permite guardar en los tres catálogos. Ninguna muestra diálogo de alta ni acción fija. También se comprobó Configuración a 1280 px. Sin errores de JavaScript ni desbordamiento horizontal. Se retiró la ruta temporal y se cerró el navegador; no se ejecutó el emulador ni se escribieron datos reales. ESLint de ambas páginas y `git diff --check` correctos.

@@ -1,5 +1,7 @@
 "use client";
 
+import CreateRecordSurface, { useCreateDialogMode } from "@/components/ui/create-record-surface";
+
 import { SearchableSelect } from "@/components/ui/searchable-select";
 
 import { useDialogFocus } from "@/hooks/use-dialog-focus";
@@ -12,7 +14,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { Pencil, Plus, Trash2, X } from "lucide-react";
+import { Pencil, Trash2, X } from "lucide-react";
 import { toast } from "@/components/ui/sonner";
 
 import { supabase } from "@/lib/supabase";
@@ -103,6 +105,8 @@ function toDateInputValue(dateString) {
 export default function CuentasPorPagarContent() {
   const { captureFocus, restoreFocus } = useDialogFocus();
   const router = useRouter();
+  const compactEntry = useCreateDialogMode();
+  const [createError, setCreateError] = useState(null);
 
   const [user, setUser] = useState(null);
   const [people, setPeople] = useState([]);
@@ -187,11 +191,14 @@ export default function CuentasPorPagarContent() {
   }, [router]);
 
   async function createPayable() {
-    if (!user) return;
+    if (!user || isSaving) return false;
 
+    setCreateError(null);
     setError("");
     setIsSaving(true);
 
+    let saved = false;
+    const toastOptions = compactEntry ? { position: "top-center" } : undefined;
     try {
       const response = await fetch("/api/payables", {
         method: "POST",
@@ -216,19 +223,24 @@ export default function CuentasPorPagarContent() {
         throw new Error(data.error || "No se pudo crear la cuenta por pagar.");
       }
 
-      setPersonId("");
+      saved = true;
       setConcept("");
       setOriginalAmount("");
-      setOriginDate(getTodayInputValue());
       setExpectedMonthlyPayment("");
       setExpectedDate("");
       setNotes("");
 
       await loadPayables(user.id);
-      toast.success("Cuenta por pagar guardada exitosamente.");
+      toast.success("Cuenta por pagar guardada exitosamente.", toastOptions);
+      return true;
     } catch (err) {
-      setError(err.message || "No se pudo crear la cuenta por pagar.");
-      toast.error(err.message || "No se pudo crear la cuenta por pagar.");
+      if (saved) {
+        setError("El registro se guardó, pero no se pudo actualizar la lista. Recarga para verlo.");
+        toast.success("Cuenta por pagar guardada exitosamente.", toastOptions);
+        return true;
+      }
+      setCreateError({ message: err.message || "No se pudo crear la cuenta por pagar." });
+      return false;
     } finally {
       setIsSaving(false);
     }
@@ -396,7 +408,7 @@ export default function CuentasPorPagarContent() {
       </AlertDialog>
 
       <main onClickCapture={captureFocus}>
-        <section className="mx-auto flex w-full max-w-6xl flex-col px-4 py-5 md:py-8">
+        <section className={`mx-auto flex w-full max-w-6xl flex-col px-4 py-5 md:py-8 ${compactEntry ? "pb-28!" : ""}`}>
           {error ? (
             <Alert variant="destructive" className="mb-6">
               <AlertDescription>{error}</AlertDescription>
@@ -415,118 +427,107 @@ export default function CuentasPorPagarContent() {
             />
           </div>
 
-          <div className="grid gap-5 xl:grid-cols-[420px_1fr]">
-            <Card className="rounded-2xl border-border bg-card">
-              <CardHeader>
-                <CardTitle className="text-lg font-semibold uppercase text-center">
-                  Nueva cuenta por pagar
-                </CardTitle>
-              </CardHeader>
+          <div className={`grid gap-5 ${compactEntry ? "" : "xl:grid-cols-[420px_1fr]"}`}>
+            <CreateRecordSurface
+              compact={compactEntry}
+              title="Nueva cuenta por pagar"
+              saveLabel="Guardar cuenta"
+              error={createError}
+              isSaving={isSaving}
+              onSubmit={createPayable}
+            >
+              <div className="space-y-2">
+                <Label htmlFor="cuentas-por-pagar-field-1">Persona / proveedor</Label>
+                <SearchableSelect
+                  value={personId}
+                  onValueChange={setPersonId}
+                  id="cuentas-por-pagar-field-1"
+                  title="Seleccionar persona"
+                  placeholder="Selecciona persona o proveedor"
+                  searchPlaceholder="Buscar persona…"
+                  options={people.map(item => ({
+                    value: item.id,
+                    label: item.name
+                  }))}
+                />
 
-              <CardContent className="space-y-5">
-                <div className="space-y-2">
-                  <Label htmlFor="cuentas-por-pagar-field-1">Persona / proveedor</Label>
-                  <SearchableSelect
-                    value={personId}
-                    onValueChange={setPersonId}
-                    id="cuentas-por-pagar-field-1"
-                    title="Seleccionar persona"
-                    placeholder="Selecciona persona o proveedor"
-                    searchPlaceholder="Buscar persona…"
-                    options={people.map(item => ({
-                      value: item.id,
-                      label: item.name
-                    }))}
-                  />
+                {people.length === 0 ? (
+                  <p className="text-xs text-muted-foreground">
+                    Primero agrega personas en Configuración.
+                  </p>
+                ) : null}
+              </div>
 
-                  {people.length === 0 ? (
-                    <p className="text-xs text-muted-foreground">
-                      Primero agrega personas en Configuración.
-                    </p>
-                  ) : null}
-                </div>
+              <div className="space-y-2">
+                <Label htmlFor="cuentas-por-pagar-field-2">Concepto</Label>
+                <Input
+                  id="cuentas-por-pagar-field-2"
+                  value={concept}
+                  placeholder="Ej. Préstamo pendiente, compra por pagar..."
+                  onChange={(event) => setConcept(event.target.value)}
+                />
+              </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="cuentas-por-pagar-field-2">Concepto</Label>
-                  <Input
-                    id="cuentas-por-pagar-field-2"
-                    value={concept}
-                    placeholder="Ej. Préstamo pendiente, compra por pagar..."
-                    onChange={(event) => setConcept(event.target.value)}
-                  />
-                </div>
+              <div className="space-y-2">
+                <Label htmlFor="cuentas-por-pagar-field-3">Monto original</Label>
+                <Input
+                  id="cuentas-por-pagar-field-3"
+                  value={originalAmount}
+                  type="number"
+                  formatNumber
+                  min="0"
+                  step="0.01"
+                  placeholder="0.00"
+                  onChange={(event) => setOriginalAmount(event.target.value)}
+                />
+              </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="cuentas-por-pagar-field-3">Monto original</Label>
-                  <Input
-                    id="cuentas-por-pagar-field-3"
-                    value={originalAmount}
-                    type="number"
-                    formatNumber
-                    min="0"
-                    step="0.01"
-                    placeholder="0.00"
-                    onChange={(event) => setOriginalAmount(event.target.value)}
-                  />
-                </div>
+              <div className="space-y-2">
+                <Label htmlFor="payable-origin-date">Fecha de origen</Label>
+                <DatePicker
+                  id="payable-origin-date"
+                  aria-label="Fecha de origen"
+                  value={originDate}
+                  onChange={setOriginDate}
+                />
+              </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="payable-origin-date">Fecha de origen</Label>
-                  <DatePicker
-                    id="payable-origin-date"
-                    aria-label="Fecha de origen"
-                    value={originDate}
-                    onChange={setOriginDate}
-                  />
-                </div>
+              <div className="space-y-2">
+                <Label htmlFor="cuentas-por-pagar-field-4">Pago mensual esperado opcional</Label>
+                <Input
+                  id="cuentas-por-pagar-field-4"
+                  value={expectedMonthlyPayment}
+                  type="number"
+                  formatNumber
+                  min="0"
+                  step="0.01"
+                  placeholder="Ej. 1000"
+                  onChange={(event) =>
+                    setExpectedMonthlyPayment(event.target.value)
+                  }
+                />
+              </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="cuentas-por-pagar-field-4">Pago mensual esperado opcional</Label>
-                  <Input
-                    id="cuentas-por-pagar-field-4"
-                    value={expectedMonthlyPayment}
-                    type="number"
-                    formatNumber
-                    min="0"
-                    step="0.01"
-                    placeholder="Ej. 1000"
-                    onChange={(event) =>
-                      setExpectedMonthlyPayment(event.target.value)
-                    }
-                  />
-                </div>
+              <div className="space-y-2">
+                <Label htmlFor="payable-expected-date">Fecha esperada opcional</Label>
+                <DatePicker
+                  id="payable-expected-date"
+                  aria-label="Fecha esperada"
+                  clearable
+                  value={expectedDate}
+                  onChange={setExpectedDate}
+                />
+              </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="payable-expected-date">Fecha esperada opcional</Label>
-                  <DatePicker
-                    id="payable-expected-date"
-                    aria-label="Fecha esperada"
-                    clearable
-                    value={expectedDate}
-                    onChange={setExpectedDate}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="cuentas-por-pagar-field-5">Notas opcional</Label>
-                  <Textarea id="cuentas-por-pagar-field-5"
-                    value={notes}
-                    placeholder="Detalles adicionales..."
-                    onChange={(event) => setNotes(event.target.value)}
-                  />
-                </div>
-
-                <Button
-                  type="button"
-                  className="w-full"
-                  onClick={createPayable}
-                  disabled={isSaving}
-                >
-                  <Plus className="mr-2 h-4 w-4" />
-                  {isSaving ? "Guardando..." : "Guardar cuenta"}
-                </Button>
-              </CardContent>
-            </Card>
+              <div className="space-y-2">
+                <Label htmlFor="cuentas-por-pagar-field-5">Notas opcional</Label>
+                <Textarea id="cuentas-por-pagar-field-5"
+                  value={notes}
+                  placeholder="Detalles adicionales..."
+                  onChange={(event) => setNotes(event.target.value)}
+                />
+              </div>
+            </CreateRecordSurface>
 
             <Card className="rounded-2xl border-border bg-card">
               <CardHeader>

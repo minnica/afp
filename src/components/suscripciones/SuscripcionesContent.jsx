@@ -1,5 +1,7 @@
 "use client";
 
+import CreateRecordSurface, { useCreateDialogMode } from "@/components/ui/create-record-surface";
+
 import { ResponsiveSelect } from "@/components/ui/responsive-select";
 import { PaymentMethodSelector } from "@/components/ui/payment-method-selector";
 
@@ -11,7 +13,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Pencil, Plus, PowerOff, RotateCcw, Trash2 } from "lucide-react";
+import { Pencil, PowerOff, RotateCcw, Trash2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { ensureUserSetup } from "@/lib/userSetup";
 import { toast } from "@/components/ui/sonner";
@@ -88,6 +90,8 @@ function getFrequencyLabel(value) {
 export default function SuscripcionesContent() {
   const { captureFocus, restoreFocus } = useDialogFocus();
   const router = useRouter();
+  const compactEntry = useCreateDialogMode();
+  const [createError, setCreateError] = useState(null);
 
   const [user, setUser] = useState(null);
   const [categories, setCategories] = useState([]);
@@ -199,11 +203,14 @@ export default function SuscripcionesContent() {
   }, [router]);
 
   async function createSubscription() {
-    if (!user) return;
+    if (!user || isSaving) return false;
 
+    setCreateError(null);
     setError("");
     setIsSaving(true);
 
+    let saved = false;
+    const toastOptions = compactEntry ? { position: "top-center" } : undefined;
     try {
       const response = await fetch("/api/subscriptions", {
         method: "POST",
@@ -230,21 +237,22 @@ export default function SuscripcionesContent() {
         throw new Error(data.error || "No se pudo guardar la suscripción.");
       }
 
+      saved = true;
       setName("");
       setAmount("");
-      setPaymentMethod("CARD");
-      setCardId("");
-      setCategoryId("");
       setChargeDay("");
-      setFrequencyMonths("1");
-      setStartMonth(getCurrentMonthValue());
-      setStartYear(getCurrentYearValue());
 
       await loadSubscriptions(user.id);
-      toast.success("Suscripción guardada exitosamente.");
+      toast.success("Suscripción guardada exitosamente.", toastOptions);
+      return true;
     } catch (err) {
-      setError(err.message || "No se pudo guardar la suscripción.");
-      toast.error(err.message || "No se pudo guardar la suscripción.");
+      if (saved) {
+        setError("El registro se guardó, pero no se pudo actualizar la lista. Recarga para verlo.");
+        toast.success("Suscripción guardada exitosamente.", toastOptions);
+        return true;
+      }
+      setCreateError({ message: err.message || "No se pudo guardar la suscripción." });
+      return false;
     } finally {
       setIsSaving(false);
     }
@@ -873,214 +881,203 @@ export default function SuscripcionesContent() {
       </Dialog>
 
       <main onClickCapture={captureFocus}>
-        <section className="mx-auto flex w-full max-w-full flex-col px-4 py-5 md:py-8">
+        <section className={`mx-auto flex w-full max-w-full flex-col px-4 py-5 md:py-8 ${compactEntry ? "pb-28!" : ""}`}>
           {error ? (
             <Alert variant="destructive" className="mb-6">
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           ) : null}
 
-          <div className="grid min-w-0 gap-5 xl:grid-cols-[420px_1fr]">
-            <Card className="rounded-2xl border-border bg-card">
-              <CardHeader>
-                <CardTitle className="text-lg font-semibold uppercase text-center">
-                  Nueva suscripción
-                </CardTitle>
-              </CardHeader>
+          <div className={`grid min-w-0 gap-5 ${compactEntry ? "" : "xl:grid-cols-[420px_1fr]"}`}>
+            <CreateRecordSurface
+              compact={compactEntry}
+              title="Nueva suscripción"
+              saveLabel="Guardar suscripción"
+              error={createError}
+              isSaving={isSaving}
+              onSubmit={createSubscription}
+            >
+              <div className="space-y-2">
+                <Label htmlFor="suscripciones-field-10">Nombre</Label>
+                <Input
+                  id="suscripciones-field-10"
+                  value={name}
+                  placeholder="Ej. Netflix, Spotify, iCloud..."
+                  onChange={(event) => setName(event.target.value)}
+                />
+              </div>
 
-              <CardContent className="space-y-5">
+              <div className="space-y-2">
+                <Label htmlFor="suscripciones-field-11">Monto</Label>
+                <Input
+                  id="suscripciones-field-11"
+                  value={amount}
+                  type="number"
+                  formatNumber
+                  min="0"
+                  step="0.01"
+                  placeholder="0.00"
+                  onChange={(event) => setAmount(event.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label id="suscripciones-field-12-label">Método de pago</Label>
+                <PaymentMethodSelector
+                  value={paymentMethod}
+                  onValueChange={value => {
+                    setPaymentMethod(value);
+                    if (value === "CASH") {
+                      setCardId("");
+                    }
+                  }}
+                  id="suscripciones-field-12"
+                />
+              </div>
+
+              {paymentMethod === "CARD" ? (
                 <div className="space-y-2">
-                  <Label htmlFor="suscripciones-field-10">Nombre</Label>
-                  <Input
-                    id="suscripciones-field-10"
-                    value={name}
-                    placeholder="Ej. Netflix, Spotify, iCloud..."
-                    onChange={(event) => setName(event.target.value)}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="suscripciones-field-11">Monto</Label>
-                  <Input
-                    id="suscripciones-field-11"
-                    value={amount}
-                    type="number"
-                    formatNumber
-                    min="0"
-                    step="0.01"
-                    placeholder="0.00"
-                    onChange={(event) => setAmount(event.target.value)}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label id="suscripciones-field-12-label">Método de pago</Label>
-                  <PaymentMethodSelector
-                    value={paymentMethod}
-                    onValueChange={value => {
-                      setPaymentMethod(value);
-                      if (value === "CASH") {
-                        setCardId("");
-                      }
-                    }}
-                    id="suscripciones-field-12"
-                  />
-                </div>
-
-                {paymentMethod === "CARD" ? (
-                  <div className="space-y-2">
-                    <Label htmlFor="suscripciones-field-13">Tarjeta</Label>
-                    <ResponsiveSelect
-                      value={cardId}
-                      onValueChange={setCardId}
-                      id="suscripciones-field-13"
-                      title="Seleccionar tarjeta"
-                      placeholder="Selecciona tarjeta"
-                      options={cards.map(card => ({
-                        value: String(card.id),
-                        label: String(card.name)
-                      }))}
-                      searchable="auto"
-                      searchPlaceholder="Buscar tarjeta…"
-                    />
-
-                    {cards.length === 0 ? (
-                      <p className="text-xs text-muted-foreground">
-                        Aún no tienes tarjetas. Agrégalas en Tarjetas.
-                      </p>
-                    ) : null}
-                  </div>
-                ) : null}
-
-                <div className="space-y-2">
-                  <Label htmlFor="suscripciones-field-14">Categoría</Label>
-                  <SearchableSelect
-                    value={categoryId}
-                    onValueChange={setCategoryId}
-                    id="suscripciones-field-14"
-                    title="Seleccionar categoría"
-                    placeholder="Selecciona categoría"
-                    searchPlaceholder="Buscar categoría…"
-                    options={categories.map(item => ({
-                      value: item.id,
-                      label: item.name
-                    }))}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="suscripciones-field-15">Día de cobro</Label>
-                  <Input
-                    id="suscripciones-field-15"
-                    value={chargeDay}
-                    type="number"
-                    min="1"
-                    max="31"
-                    placeholder="Ej. 15"
-                    onChange={(event) => setChargeDay(event.target.value)}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="suscripciones-field-16">Frecuencia</Label>
+                  <Label htmlFor="suscripciones-field-13">Tarjeta</Label>
                   <ResponsiveSelect
-                    value={frequencyMonths}
-                    onValueChange={setFrequencyMonths}
-                    id="suscripciones-field-16"
-                    title="Seleccionar frecuencia"
-                    placeholder="Selecciona frecuencia"
+                    value={cardId}
+                    onValueChange={setCardId}
+                    id="suscripciones-field-13"
+                    title="Seleccionar tarjeta"
+                    placeholder="Selecciona tarjeta"
+                    options={cards.map(card => ({
+                      value: String(card.id),
+                      label: String(card.name)
+                    }))}
+                    searchable="auto"
+                    searchPlaceholder="Buscar tarjeta…"
+                  />
+
+                  {cards.length === 0 ? (
+                    <p className="text-xs text-muted-foreground">
+                      Aún no tienes tarjetas. Agrégalas en Tarjetas.
+                    </p>
+                  ) : null}
+                </div>
+              ) : null}
+
+              <div className="space-y-2">
+                <Label htmlFor="suscripciones-field-14">Categoría</Label>
+                <SearchableSelect
+                  value={categoryId}
+                  onValueChange={setCategoryId}
+                  id="suscripciones-field-14"
+                  title="Seleccionar categoría"
+                  placeholder="Selecciona categoría"
+                  searchPlaceholder="Buscar categoría…"
+                  options={categories.map(item => ({
+                    value: item.id,
+                    label: item.name
+                  }))}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="suscripciones-field-15">Día de cobro</Label>
+                <Input
+                  id="suscripciones-field-15"
+                  value={chargeDay}
+                  type="number"
+                  min="1"
+                  max="31"
+                  placeholder="Ej. 15"
+                  onChange={(event) => setChargeDay(event.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="suscripciones-field-16">Frecuencia</Label>
+                <ResponsiveSelect
+                  value={frequencyMonths}
+                  onValueChange={setFrequencyMonths}
+                  id="suscripciones-field-16"
+                  title="Seleccionar frecuencia"
+                  placeholder="Selecciona frecuencia"
+                  options={[{
+                    value: "1",
+                    label: "Mensual"
+                  }, {
+                    value: "2",
+                    label: "Cada 2 meses"
+                  }, {
+                    value: "3",
+                    label: "Cada 3 meses"
+                  }, {
+                    value: "6",
+                    label: "Cada 6 meses"
+                  }, {
+                    value: "12",
+                    label: "Anual"
+                  }]}
+                />
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="suscripciones-field-17">Mes de inicio</Label>
+                  <ResponsiveSelect
+                    value={startMonth}
+                    onValueChange={setStartMonth}
+                    id="suscripciones-field-17"
+                    title="Seleccionar mes"
+                    placeholder="Mes"
                     options={[{
                       value: "1",
-                      label: "Mensual"
+                      label: "Enero"
                     }, {
                       value: "2",
-                      label: "Cada 2 meses"
+                      label: "Febrero"
                     }, {
                       value: "3",
-                      label: "Cada 3 meses"
+                      label: "Marzo"
+                    }, {
+                      value: "4",
+                      label: "Abril"
+                    }, {
+                      value: "5",
+                      label: "Mayo"
                     }, {
                       value: "6",
-                      label: "Cada 6 meses"
+                      label: "Junio"
+                    }, {
+                      value: "7",
+                      label: "Julio"
+                    }, {
+                      value: "8",
+                      label: "Agosto"
+                    }, {
+                      value: "9",
+                      label: "Septiembre"
+                    }, {
+                      value: "10",
+                      label: "Octubre"
+                    }, {
+                      value: "11",
+                      label: "Noviembre"
                     }, {
                       value: "12",
-                      label: "Anual"
+                      label: "Diciembre"
                     }]}
                   />
                 </div>
 
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="suscripciones-field-17">Mes de inicio</Label>
-                    <ResponsiveSelect
-                      value={startMonth}
-                      onValueChange={setStartMonth}
-                      id="suscripciones-field-17"
-                      title="Seleccionar mes"
-                      placeholder="Mes"
-                      options={[{
-                        value: "1",
-                        label: "Enero"
-                      }, {
-                        value: "2",
-                        label: "Febrero"
-                      }, {
-                        value: "3",
-                        label: "Marzo"
-                      }, {
-                        value: "4",
-                        label: "Abril"
-                      }, {
-                        value: "5",
-                        label: "Mayo"
-                      }, {
-                        value: "6",
-                        label: "Junio"
-                      }, {
-                        value: "7",
-                        label: "Julio"
-                      }, {
-                        value: "8",
-                        label: "Agosto"
-                      }, {
-                        value: "9",
-                        label: "Septiembre"
-                      }, {
-                        value: "10",
-                        label: "Octubre"
-                      }, {
-                        value: "11",
-                        label: "Noviembre"
-                      }, {
-                        value: "12",
-                        label: "Diciembre"
-                      }]}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="suscripciones-field-18">Año de inicio</Label>
-                    <Input
-                      id="suscripciones-field-18"
-                      type="number"
-                      min="2000"
-                      max="2100"
-                      value={startYear}
-                      onChange={(event) => setStartYear(event.target.value)}
-                    />
-                  </div>
+                <div className="space-y-2">
+                  <Label htmlFor="suscripciones-field-18">Año de inicio</Label>
+                  <Input
+                    id="suscripciones-field-18"
+                    type="number"
+                    min="2000"
+                    max="2100"
+                    value={startYear}
+                    onChange={(event) => setStartYear(event.target.value)}
+                  />
                 </div>
-
-                <Button
-                  type="button"
-                  className="w-full"
-                  onClick={createSubscription}
-                  disabled={isSaving}
-                >
-                  <Plus className="mr-2 h-4 w-4" />
-                  {isSaving ? "Guardando..." : "Guardar suscripción"}
-                </Button>
-              </CardContent>
-            </Card>
+              </div>
+            </CreateRecordSurface>
 
             <div className="min-w-0">
               <Card className="rounded-2xl border-border bg-card">

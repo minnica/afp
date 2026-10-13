@@ -1,5 +1,7 @@
 "use client";
 
+import CreateRecordSurface, { useCreateDialogMode } from "@/components/ui/create-record-surface";
+
 import { ResponsiveSelect } from "@/components/ui/responsive-select";
 
 import { SearchableSelect } from "@/components/ui/searchable-select";
@@ -17,9 +19,11 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { ensureUserSetup } from "@/lib/userSetup";
+
+import { toast } from "@/components/ui/sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -72,6 +76,8 @@ function formatDate(dateString) {
 export default function IngresosContent() {
   const { captureFocus, restoreFocus } = useDialogFocus();
   const router = useRouter();
+  const compactEntry = useCreateDialogMode();
+  const [createError, setCreateError] = useState(null);
 
   const [user, setUser] = useState(null);
   const [incomeTypes, setIncomeTypes] = useState([]);
@@ -184,11 +190,14 @@ export default function IngresosContent() {
   }, [router]);
 
   async function createIncome() {
-    if (!user) return;
+    if (!user || isSaving) return false;
 
+    setCreateError(null);
     setError("");
     setIsSaving(true);
 
+    let saved = false;
+    const toastOptions = compactEntry ? { position: "top-center" } : undefined;
     try {
       const response = await fetch("/api/incomes", {
         method: "POST",
@@ -214,8 +223,7 @@ export default function IngresosContent() {
         throw new Error(data.error || "No se pudo guardar el ingreso.");
       }
 
-      setDate(getTodayInputValue());
-      setIncomeTypeId("");
+      saved = true;
       setSource("");
       setConcept("");
       setAmount("");
@@ -223,8 +231,16 @@ export default function IngresosContent() {
       setNotes("");
 
       await Promise.all([loadIncomes(user.id), loadReceivables(user.id)]);
+      toast.success("Ingreso guardado exitosamente.", toastOptions);
+      return true;
     } catch (err) {
-      setError(err.message || "No se pudo guardar el ingreso.");
+      if (saved) {
+        setError("El registro se guardó, pero no se pudo actualizar la lista. Recarga para verlo.");
+        toast.success("Ingreso guardado exitosamente.", toastOptions);
+        return true;
+      }
+      setCreateError({ message: err.message || "No se pudo guardar el ingreso." });
+      return false;
     } finally {
       setIsSaving(false);
     }
@@ -451,7 +467,7 @@ export default function IngresosContent() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      <section className="mx-auto flex w-full max-w-full flex-col px-4 py-5 md:py-8">
+      <section className={`mx-auto flex w-full max-w-full flex-col px-4 py-5 md:py-8 ${compactEntry ? "pb-28!" : ""}`}>
         {error ? (
           <Alert variant="destructive" className="mb-6">
             <AlertDescription>{error}</AlertDescription>
@@ -483,119 +499,108 @@ export default function IngresosContent() {
           </Card>
         </div>
 
-        <div className="grid min-w-0 gap-5 xl:grid-cols-[360px_1fr]">
-          <Card className="rounded-2xl border-border bg-card">
-            <CardHeader>
-              <CardTitle className="text-lg font-semibold uppercase text-center">
-                Nuevo ingreso
-              </CardTitle>
-            </CardHeader>
-
-            <CardContent className="space-y-5">
+        <div className={`grid min-w-0 gap-5 ${compactEntry ? "" : "xl:grid-cols-[360px_1fr]"}`}>
+          <CreateRecordSurface
+              compact={compactEntry}
+              title="Nuevo ingreso"
+              saveLabel="Guardar ingreso"
+              error={createError}
+              isSaving={isSaving}
+              onSubmit={createIncome}
+            >
               <div className="space-y-2">
-                <Label htmlFor="income-date">Fecha</Label>
-                <DatePicker
-                  id="income-date"
-                  value={date}
-                  onChange={setDate}
-                />
+              <Label htmlFor="income-date">Fecha</Label>
+              <DatePicker
+                id="income-date"
+                value={date}
+                onChange={setDate}
+              />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="ingresos-field-1">Tipo de ingreso</Label>
-                <ResponsiveSelect
-                  value={incomeTypeId}
-                  onValueChange={setIncomeTypeId}
-                  id="ingresos-field-1"
-                  title="Seleccionar tipo de ingreso"
-                  placeholder="Selecciona tipo"
-                  options={incomeTypes.map(type => ({
-                    value: String(type.id),
-                    label: String(type.name)
-                  }))}
-                  searchable="auto"
-                  searchPlaceholder="Buscar tipo de ingreso…"
-                />
+              <Label htmlFor="ingresos-field-1">Tipo de ingreso</Label>
+              <ResponsiveSelect
+                value={incomeTypeId}
+                onValueChange={setIncomeTypeId}
+                id="ingresos-field-1"
+                title="Seleccionar tipo de ingreso"
+                placeholder="Selecciona tipo"
+                options={incomeTypes.map(type => ({
+                  value: String(type.id),
+                  label: String(type.name)
+                }))}
+                searchable="auto"
+                searchPlaceholder="Buscar tipo de ingreso…"
+              />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="ingresos-field-2">Fuente</Label>
-                <Input
-                  id="ingresos-field-2"
-                  value={source}
-                  placeholder="Ej. Empresa, Luis, Cuñado..."
-                  onChange={(event) => setSource(event.target.value)}
-                />
+              <Label htmlFor="ingresos-field-2">Fuente</Label>
+              <Input
+                id="ingresos-field-2"
+                value={source}
+                placeholder="Ej. Empresa, Luis, Cuñado..."
+                onChange={(event) => setSource(event.target.value)}
+              />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="ingresos-field-3">Concepto</Label>
-                <Input
-                  id="ingresos-field-3"
-                  value={concept}
-                  placeholder="Ej. Nómina quincenal, pago celular..."
-                  onChange={(event) => setConcept(event.target.value)}
-                />
+              <Label htmlFor="ingresos-field-3">Concepto</Label>
+              <Input
+                id="ingresos-field-3"
+                value={concept}
+                placeholder="Ej. Nómina quincenal, pago celular..."
+                onChange={(event) => setConcept(event.target.value)}
+              />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="ingresos-field-4">Monto</Label>
-                <Input
-                  id="ingresos-field-4"
-                  value={amount}
-                  type="number"
-                  formatNumber
-                  min="0"
-                  step="0.01"
-                  placeholder="0.00"
-                  onChange={(event) => setAmount(event.target.value)}
-                />
+              <Label htmlFor="ingresos-field-4">Monto</Label>
+              <Input
+                id="ingresos-field-4"
+                value={amount}
+                type="number"
+                formatNumber
+                min="0"
+                step="0.01"
+                placeholder="0.00"
+                onChange={(event) => setAmount(event.target.value)}
+              />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="ingresos-field-5">Cuenta por cobrar relacionada</Label>
-                <SearchableSelect
-                  value={receivableAccountId}
-                  onValueChange={setReceivableAccountId}
-                  id="ingresos-field-5"
-                  title="Seleccionar cuenta por cobrar"
-                  placeholder="Sin cuenta por cobrar"
-                  searchPlaceholder="Buscar persona o concepto…"
-                  options={[
-                    { value: "NONE", label: "Sin cuenta por cobrar", pinned: true },
-                    ...selectableReceivables.map((item) => {
-                      const pendingBalance = Number(item.pendingBalance || 0);
-                      const isPaidOff =
-                        item.status === "PAID_OFF" || pendingBalance <= 0;
-                      return {
-                        value: item.id,
-                        label: `${item.person?.name || ""} · ${item.concept} · ${isPaidOff ? "liquidada" : "pendiente"} ${formatMoney(pendingBalance)}`,
-                      };
-                    }),
-                  ]}
-                />
+              <Label htmlFor="ingresos-field-5">Cuenta por cobrar relacionada</Label>
+              <SearchableSelect
+                value={receivableAccountId}
+                onValueChange={setReceivableAccountId}
+                id="ingresos-field-5"
+                title="Seleccionar cuenta por cobrar"
+                placeholder="Sin cuenta por cobrar"
+                searchPlaceholder="Buscar persona o concepto…"
+                options={[
+                  { value: "NONE", label: "Sin cuenta por cobrar", pinned: true },
+                  ...selectableReceivables.map((item) => {
+                    const pendingBalance = Number(item.pendingBalance || 0);
+                    const isPaidOff =
+                      item.status === "PAID_OFF" || pendingBalance <= 0;
+                    return {
+                      value: item.id,
+                      label: `${item.person?.name || ""} · ${item.concept} · ${isPaidOff ? "liquidada" : "pendiente"} ${formatMoney(pendingBalance)}`,
+                    };
+                  }),
+                ]}
+              />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="ingresos-field-6">Notas opcional</Label>
-                <Textarea id="ingresos-field-6"
-                  value={notes}
-                  placeholder="Detalles adicionales..."
-                  onChange={(event) => setNotes(event.target.value)}
-                />
+              <Label htmlFor="ingresos-field-6">Notas opcional</Label>
+              <Textarea id="ingresos-field-6"
+                value={notes}
+                placeholder="Detalles adicionales..."
+                onChange={(event) => setNotes(event.target.value)}
+              />
               </div>
-
-              <Button
-                type="button"
-                className="w-full"
-                onClick={createIncome}
-                disabled={isSaving}
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                {isSaving ? "Guardando..." : "Guardar ingreso"}
-              </Button>
-            </CardContent>
-          </Card>
+            </CreateRecordSurface>
 
           <div className="min-w-0">
             <Card className="rounded-2xl border-border bg-card">

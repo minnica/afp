@@ -1,5 +1,7 @@
 "use client";
 
+import CreateRecordSurface from "@/components/ui/create-record-surface";
+
 import { useDialogFocus } from "@/hooks/use-dialog-focus";
 
 import {
@@ -23,6 +25,8 @@ import {
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { ensureUserSetup } from "@/lib/userSetup";
+
+import { toast } from "@/components/ui/sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -48,6 +52,7 @@ const MONTH_NAMES = [
 export default function TarjetasContent() {
   const { captureFocus, restoreFocus } = useDialogFocus();
   const router = useRouter();
+  const [createError, setCreateError] = useState(null);
 
   const [user, setUser] = useState(null);
   const [cards, setCards] = useState([]);
@@ -129,9 +134,11 @@ export default function TarjetasContent() {
   }, [router]);
 
   async function createCard() {
-    if (!user) return;
+    if (!user || isSaving) return false;
+    setCreateError(null);
     setError("");
     setIsSaving(true);
+    let saved = false;
     try {
       const response = await fetch("/api/cards", {
         method: "POST",
@@ -140,13 +147,22 @@ export default function TarjetasContent() {
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "No se pudo crear la tarjeta.");
+      saved = true;
       setName("");
       setUsualCutDay("");
       setUsualDueDay("");
       setNotes("");
       await Promise.all([loadCards(user.id), loadCycles(user.id)]);
+      toast.success("Tarjeta guardada exitosamente.");
+      return true;
     } catch (err) {
-      setError(err.message || "No se pudo crear la tarjeta.");
+      if (saved) {
+        setError("El registro se guardó, pero no se pudo actualizar la lista. Recarga para verlo.");
+        toast.success("Tarjeta guardada exitosamente.");
+        return true;
+      }
+      setCreateError({ message: err.message || "No se pudo crear la tarjeta." });
+      return false;
     } finally {
       setIsSaving(false);
     }
@@ -329,6 +345,65 @@ export default function TarjetasContent() {
     return <PageSkeleton variant="form-table" />;
   }
 
+  const cardCreateForm = (
+    <CreateRecordSurface
+      compact={false}
+      title="Nueva tarjeta"
+      saveLabel="Guardar tarjeta"
+      error={createError}
+      isSaving={isSaving}
+      onSubmit={createCard}
+    >
+      <div className="space-y-2">
+        <Label htmlFor="tarjetas-field-1">Nombre de tarjeta</Label>
+        <Input
+          id="tarjetas-field-1"
+          value={name}
+          placeholder="Ej. HSBC 1"
+          onChange={(e) => setName(e.target.value)}
+        />
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="space-y-2">
+          <Label htmlFor="tarjetas-field-2">Día de corte habitual</Label>
+          <Input
+            id="tarjetas-field-2"
+            value={usualCutDay}
+            type="number"
+            min="1"
+            max="31"
+            placeholder="Ej. 12"
+            onChange={(e) => setUsualCutDay(e.target.value)}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="tarjetas-field-3">Día límite habitual</Label>
+          <Input
+            id="tarjetas-field-3"
+            value={usualDueDay}
+            type="number"
+            min="1"
+            max="31"
+            placeholder="Ej. 2"
+            onChange={(e) => setUsualDueDay(e.target.value)}
+          />
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="tarjetas-field-4">Notas opcional</Label>
+        <Input
+          id="tarjetas-field-4"
+          value={notes}
+          placeholder="Ej. Se usa para compras grandes"
+          onChange={(e) => setNotes(e.target.value)}
+        />
+      </div>
+    </CreateRecordSurface>
+  );
+
   return (
     <main onClickCapture={captureFocus}>
       <AlertDialog
@@ -396,73 +471,7 @@ export default function TarjetasContent() {
 
           <TabsContent value="cards">
             <div className="grid gap-6 lg:grid-cols-[420px_1fr]">
-              <Card className="rounded-2xl border-border bg-card">
-                <CardHeader>
-                  <CardTitle className="text-center text-lg font-semibold uppercase">
-                    Nueva tarjeta
-                  </CardTitle>
-                </CardHeader>
-
-                <CardContent className="space-y-5">
-                  <div className="space-y-2">
-                    <Label htmlFor="tarjetas-field-1">Nombre de tarjeta</Label>
-                    <Input
-                      id="tarjetas-field-1"
-                      value={name}
-                      placeholder="Ej. HSBC 1"
-                      onChange={(e) => setName(e.target.value)}
-                    />
-                  </div>
-
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <div className="space-y-2">
-                      <Label htmlFor="tarjetas-field-2">Día de corte habitual</Label>
-                      <Input
-                        id="tarjetas-field-2"
-                        value={usualCutDay}
-                        type="number"
-                        min="1"
-                        max="31"
-                        placeholder="Ej. 12"
-                        onChange={(e) => setUsualCutDay(e.target.value)}
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="tarjetas-field-3">Día límite habitual</Label>
-                      <Input
-                        id="tarjetas-field-3"
-                        value={usualDueDay}
-                        type="number"
-                        min="1"
-                        max="31"
-                        placeholder="Ej. 2"
-                        onChange={(e) => setUsualDueDay(e.target.value)}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="tarjetas-field-4">Notas opcional</Label>
-                    <Input
-                      id="tarjetas-field-4"
-                      value={notes}
-                      placeholder="Ej. Se usa para compras grandes"
-                      onChange={(e) => setNotes(e.target.value)}
-                    />
-                  </div>
-
-                  <Button
-                    type="button"
-                    className="w-full"
-                    onClick={createCard}
-                    disabled={isSaving}
-                  >
-                    <Plus className="mr-2 h-4 w-4" />
-                    {isSaving ? "Guardando..." : "Agregar tarjeta"}
-                  </Button>
-                </CardContent>
-              </Card>
+              {cardCreateForm}
 
               <Card className="rounded-2xl border-border bg-card">
                 <CardHeader>

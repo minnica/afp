@@ -1,5 +1,10 @@
 "use client";
 
+import { toast } from "@/components/ui/sonner";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { FloppyDiskIcon } from "@hugeicons/core-free-icons";
+import { Spinner } from "@/components/ui/spinner";
+
 import { useDialogFocus } from "@/hooks/use-dialog-focus";
 
 import {
@@ -13,7 +18,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 
 import { useEffect, useId, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { ensureUserSetup } from "@/lib/userSetup";
 
@@ -36,6 +41,7 @@ import PageSkeleton from "@/components/layout/PageSkeleton";
 export default function SettingsContent() {
   const { captureFocus, restoreFocus } = useDialogFocus();
   const router = useRouter();
+  const [createError, setCreateError] = useState(null);
 
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -95,11 +101,18 @@ export default function SettingsContent() {
   }, [router]);
 
   async function createItem(type) {
-    if (!user) return;
+    if (!user || isSaving) return false;
 
+    const enteredName = type === "category" ? categoryName : type === "person" ? personName : incomeTypeName;
+    if (!enteredName.trim()) {
+      setCreateError({ message: "El nombre es requerido." });
+      return false;
+    }
+    setCreateError(null);
     setError("");
     setIsSaving(true);
 
+    let saved = false;
     try {
       let payload = {
         userId: user.id,
@@ -133,6 +146,7 @@ export default function SettingsContent() {
         throw new Error(data.error || "No se pudo guardar.");
       }
 
+      saved = true;
       if (type === "category") setCategoryName("");
       if (type === "person") {
         setPersonName("");
@@ -141,8 +155,16 @@ export default function SettingsContent() {
       if (type === "incomeType") setIncomeTypeName("");
 
       await loadSettings(user.id);
+      toast.success("Registro guardado exitosamente.");
+      return true;
     } catch (err) {
-      setError(err.message || "No se pudo guardar.");
+      if (saved) {
+        setError("El registro se guardó, pero no se pudo actualizar la lista. Recarga para verlo.");
+        toast.success("Registro guardado exitosamente.");
+        return true;
+      }
+      setCreateError({ message: err.message || "No se pudo guardar." });
+      return false;
     } finally {
       setIsSaving(false);
     }
@@ -216,6 +238,12 @@ export default function SettingsContent() {
           <SummaryCard title="Tipos de ingreso" value={totals.incomeTypes} />
         </div>
 
+        {createError ? (
+          <Alert variant="destructive" role="alert" className="mb-6">
+            <AlertDescription>{createError.message}</AlertDescription>
+          </Alert>
+        ) : null}
+
         <Tabs defaultValue="categories" className="w-full">
           <TabsList className="mb-6">
             <TabsTrigger value="categories">Categorías</TabsTrigger>
@@ -272,8 +300,8 @@ export default function SettingsContent() {
                     onClick={() => createItem("person")}
                     disabled={isSaving}
                   >
-                    <Plus className="mr-2 h-4 w-4" />
-                    Agregar
+                    {isSaving ? <Spinner /> : <HugeiconsIcon icon={FloppyDiskIcon} strokeWidth={2} aria-hidden="true" />}
+                    {isSaving ? "Guardando…" : "Guardar persona"}
                   </Button>
                 </div>
 
@@ -351,8 +379,8 @@ function CatalogCard({
           </div>
 
           <Button type="button" onClick={onCreate} disabled={isSaving}>
-            <Plus className="mr-2 h-4 w-4" />
-            Agregar
+            {isSaving ? <Spinner /> : <HugeiconsIcon icon={FloppyDiskIcon} strokeWidth={2} aria-hidden="true" />}
+            {isSaving ? "Guardando…" : "Guardar"}
           </Button>
         </div>
 

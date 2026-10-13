@@ -1,5 +1,7 @@
 "use client";
 
+import CreateRecordSurface, { useCreateDialogMode } from "@/components/ui/create-record-surface";
+
 import { ResponsiveSelect } from "@/components/ui/responsive-select";
 
 import { SearchableSelect } from "@/components/ui/searchable-select";
@@ -19,9 +21,11 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { ensureUserSetup } from "@/lib/userSetup";
+
+import { toast } from "@/components/ui/sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -101,6 +105,8 @@ function formatChargeDaysInput(days) {
 export default function CuentasPorCobrarContent() {
   const { captureFocus, restoreFocus } = useDialogFocus();
   const router = useRouter();
+  const compactEntry = useCreateDialogMode();
+  const [createError, setCreateError] = useState(null);
 
   const [user, setUser] = useState(null);
   const [people, setPeople] = useState([]);
@@ -194,11 +200,14 @@ export default function CuentasPorCobrarContent() {
   }, [router]);
 
   async function createReceivable() {
-    if (!user) return;
+    if (!user || isSaving) return false;
 
+    setCreateError(null);
     setError("");
     setIsSaving(true);
 
+    let saved = false;
+    const toastOptions = compactEntry ? { position: "top-center" } : undefined;
     try {
       const response = await fetch("/api/receivables", {
         method: "POST",
@@ -223,17 +232,24 @@ export default function CuentasPorCobrarContent() {
         throw new Error(data.error || "No se pudo crear la cuenta por cobrar.");
       }
 
-      setPersonId("");
+      saved = true;
       setConcept("");
       setOriginalAmount("");
-      setOriginDate(getTodayInputValue());
       setExpectedMonthlyPayment("");
       setExpectedChargeDays("");
       setNotes("");
 
       await loadReceivables(user.id);
+      toast.success("Cuenta por cobrar guardada exitosamente.", toastOptions);
+      return true;
     } catch (err) {
-      setError(err.message || "No se pudo crear la cuenta por cobrar.");
+      if (saved) {
+        setError("El registro se guardó, pero no se pudo actualizar la lista. Recarga para verlo.");
+        toast.success("Cuenta por cobrar guardada exitosamente.", toastOptions);
+        return true;
+      }
+      setCreateError({ message: err.message || "No se pudo crear la cuenta por cobrar." });
+      return false;
     } finally {
       setIsSaving(false);
     }
@@ -556,7 +572,7 @@ export default function CuentasPorCobrarContent() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      <section className="mx-auto flex w-full max-w-full flex-col px-4 py-5 md:py-8">
+      <section className={`mx-auto flex w-full max-w-full flex-col px-4 py-5 md:py-8 ${compactEntry ? "pb-28!" : ""}`}>
         {error ? (
           <Alert variant="destructive" className="mb-6">
             <AlertDescription>{error}</AlertDescription>
@@ -572,122 +588,111 @@ export default function CuentasPorCobrarContent() {
           <SummaryCard title="Pendiente" value={formatMoney(summary.pending)} />
         </div>
 
-        <div className="grid min-w-0 gap-5 xl:grid-cols-[360px_1fr]">
-          <Card className="rounded-2xl border-border bg-card">
-            <CardHeader>
-              <CardTitle className="text-lg font-semibold uppercase text-center">
-                Nueva cuenta por cobrar
-              </CardTitle>
-            </CardHeader>
-
-            <CardContent className="space-y-5">
+        <div className={`grid min-w-0 gap-5 ${compactEntry ? "" : "xl:grid-cols-[360px_1fr]"}`}>
+          <CreateRecordSurface
+              compact={compactEntry}
+              title="Nueva cuenta por cobrar"
+              saveLabel="Guardar cuenta"
+              error={createError}
+              isSaving={isSaving}
+              onSubmit={createReceivable}
+            >
               <div className="space-y-2">
-                <Label htmlFor="cuentas-por-cobrar-field-1">Persona</Label>
-                <SearchableSelect
-                  value={personId}
-                  onValueChange={setPersonId}
-                  id="cuentas-por-cobrar-field-1"
-                  title="Seleccionar persona"
-                  placeholder="Selecciona persona"
-                  searchPlaceholder="Buscar persona…"
-                  options={people.map(item => ({
-                    value: item.id,
-                    label: item.name
-                  }))}
-                />
+              <Label htmlFor="cuentas-por-cobrar-field-1">Persona</Label>
+              <SearchableSelect
+                value={personId}
+                onValueChange={setPersonId}
+                id="cuentas-por-cobrar-field-1"
+                title="Seleccionar persona"
+                placeholder="Selecciona persona"
+                searchPlaceholder="Buscar persona…"
+                options={people.map(item => ({
+                  value: item.id,
+                  label: item.name
+                }))}
+              />
 
-                {people.length === 0 ? (
-                  <p className="text-xs text-muted-foreground">
-                    Primero agrega personas en Configuración.
-                  </p>
-                ) : null}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="cuentas-por-cobrar-field-2">Concepto</Label>
-                <Input
-                  id="cuentas-por-cobrar-field-2"
-                  value={concept}
-                  placeholder="Ej. Venta de moto"
-                  onChange={(event) => setConcept(event.target.value)}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="cuentas-por-cobrar-field-3">Monto original</Label>
-                <Input
-                  id="cuentas-por-cobrar-field-3"
-                  value={originalAmount}
-                  type="number"
-                  formatNumber
-                  min="0"
-                  step="0.01"
-                  placeholder="0.00"
-                  onChange={(event) => setOriginalAmount(event.target.value)}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="receivable-origin-date">Fecha de origen</Label>
-                <DatePicker
-                  id="receivable-origin-date"
-                  aria-label="Fecha de origen"
-                  value={originDate}
-                  onChange={setOriginDate}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="cuentas-por-cobrar-field-4">Pago mensual esperado opcional</Label>
-                <Input
-                  id="cuentas-por-cobrar-field-4"
-                  value={expectedMonthlyPayment}
-                  type="number"
-                  formatNumber
-                  min="0"
-                  step="0.01"
-                  placeholder="Ej. 1000"
-                  onChange={(event) =>
-                    setExpectedMonthlyPayment(event.target.value)
-                  }
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="cuentas-por-cobrar-field-5">Días de cobro opcionales</Label>
-                <Input
-                  id="cuentas-por-cobrar-field-5"
-                  value={expectedChargeDays}
-                  placeholder="Ej. 15, 30"
-                  onChange={(event) =>
-                    setExpectedChargeDays(event.target.value)
-                  }
-                />
+              {people.length === 0 ? (
                 <p className="text-xs text-muted-foreground">
-                  Puedes capturar uno o varios días separados por coma.
+                  Primero agrega personas en Configuración.
                 </p>
+              ) : null}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="cuentas-por-cobrar-field-6">Notas opcional</Label>
-                <Textarea id="cuentas-por-cobrar-field-6"
-                  value={notes}
-                  placeholder="Detalles adicionales..."
-                  onChange={(event) => setNotes(event.target.value)}
-                />
+              <Label htmlFor="cuentas-por-cobrar-field-2">Concepto</Label>
+              <Input
+                id="cuentas-por-cobrar-field-2"
+                value={concept}
+                placeholder="Ej. Venta de moto"
+                onChange={(event) => setConcept(event.target.value)}
+              />
               </div>
 
-              <Button
-                type="button"
-                className="w-full"
-                onClick={createReceivable}
-                disabled={isSaving}
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                {isSaving ? "Guardando..." : "Guardar cuenta"}
-              </Button>
-            </CardContent>
-          </Card>
+              <div className="space-y-2">
+              <Label htmlFor="cuentas-por-cobrar-field-3">Monto original</Label>
+              <Input
+                id="cuentas-por-cobrar-field-3"
+                value={originalAmount}
+                type="number"
+                formatNumber
+                min="0"
+                step="0.01"
+                placeholder="0.00"
+                onChange={(event) => setOriginalAmount(event.target.value)}
+              />
+              </div>
+
+              <div className="space-y-2">
+              <Label htmlFor="receivable-origin-date">Fecha de origen</Label>
+              <DatePicker
+                id="receivable-origin-date"
+                aria-label="Fecha de origen"
+                value={originDate}
+                onChange={setOriginDate}
+              />
+              </div>
+
+              <div className="space-y-2">
+              <Label htmlFor="cuentas-por-cobrar-field-4">Pago mensual esperado opcional</Label>
+              <Input
+                id="cuentas-por-cobrar-field-4"
+                value={expectedMonthlyPayment}
+                type="number"
+                formatNumber
+                min="0"
+                step="0.01"
+                placeholder="Ej. 1000"
+                onChange={(event) =>
+                  setExpectedMonthlyPayment(event.target.value)
+                }
+              />
+              </div>
+
+              <div className="space-y-2">
+              <Label htmlFor="cuentas-por-cobrar-field-5">Días de cobro opcionales</Label>
+              <Input
+                id="cuentas-por-cobrar-field-5"
+                value={expectedChargeDays}
+                placeholder="Ej. 15, 30"
+                onChange={(event) =>
+                  setExpectedChargeDays(event.target.value)
+                }
+              />
+              <p className="text-xs text-muted-foreground">
+                Puedes capturar uno o varios días separados por coma.
+              </p>
+              </div>
+
+              <div className="space-y-2">
+              <Label htmlFor="cuentas-por-cobrar-field-6">Notas opcional</Label>
+              <Textarea id="cuentas-por-cobrar-field-6"
+                value={notes}
+                placeholder="Detalles adicionales..."
+                onChange={(event) => setNotes(event.target.value)}
+              />
+              </div>
+            </CreateRecordSurface>
 
           <div className="min-w-0">
             <Card className="rounded-2xl border-border bg-card">
