@@ -1,5 +1,7 @@
 "use client";
 
+import { SearchableSelect } from "@/components/ui/searchable-select";
+
 import { useDialogFocus } from "@/hooks/use-dialog-focus";
 
 import { Empty, EmptyDescription } from "@/components/ui/empty";
@@ -30,13 +32,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -431,18 +426,18 @@ export default function CuentasPorPagarContent() {
               <CardContent className="space-y-5">
                 <div className="space-y-2">
                   <Label htmlFor="cuentas-por-pagar-field-1">Persona / proveedor</Label>
-                  <Select value={personId} onValueChange={setPersonId}>
-                    <SelectTrigger id="cuentas-por-pagar-field-1">
-                      <SelectValue placeholder="Selecciona persona o proveedor" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {people.map((person) => (
-                        <SelectItem key={person.id} value={person.id}>
-                          {person.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <SearchableSelect
+                    value={personId}
+                    onValueChange={setPersonId}
+                    id="cuentas-por-pagar-field-1"
+                    title="Seleccionar persona"
+                    placeholder="Selecciona persona o proveedor"
+                    searchPlaceholder="Buscar persona…"
+                    options={people.map(item => ({
+                      value: item.id,
+                      label: item.name
+                    }))}
+                  />
 
                   {people.length === 0 ? (
                     <p className="text-xs text-muted-foreground">
@@ -825,18 +820,18 @@ function PayablesList({
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="cuentas-por-pagar-field-6">Persona / proveedor</Label>
-                  <Select value={editPersonId} onValueChange={setEditPersonId}>
-                    <SelectTrigger id="cuentas-por-pagar-field-6">
-                      <SelectValue placeholder="Selecciona persona o proveedor" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {people.map((person) => (
-                        <SelectItem key={person.id} value={person.id}>
-                          {person.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <SearchableSelect
+                    value={editPersonId}
+                    onValueChange={setEditPersonId}
+                    id="cuentas-por-pagar-field-6"
+                    title="Seleccionar persona"
+                    placeholder="Selecciona persona o proveedor"
+                    searchPlaceholder="Buscar persona…"
+                    options={people.map(item => ({
+                      value: item.id,
+                      label: item.name
+                    }))}
+                  />
                 </div>
 
                 <div className="space-y-2">

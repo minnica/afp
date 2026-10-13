@@ -1,5 +1,9 @@
 "use client";
 
+import { ResponsiveSelect } from "@/components/ui/responsive-select";
+
+import { SearchableSelect } from "@/components/ui/searchable-select";
+
 import { useDialogFocus } from "@/hooks/use-dialog-focus";
 
 import {
@@ -29,13 +33,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import PageSkeleton from "@/components/layout/PageSkeleton";
@@ -506,18 +503,19 @@ export default function IngresosContent() {
 
               <div className="space-y-2">
                 <Label htmlFor="ingresos-field-1">Tipo de ingreso</Label>
-                <Select value={incomeTypeId} onValueChange={setIncomeTypeId}>
-                  <SelectTrigger id="ingresos-field-1">
-                    <SelectValue placeholder="Selecciona tipo" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {incomeTypes.map((type) => (
-                      <SelectItem key={type.id} value={type.id}>
-                        {type.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <ResponsiveSelect
+                  value={incomeTypeId}
+                  onValueChange={setIncomeTypeId}
+                  id="ingresos-field-1"
+                  title="Seleccionar tipo de ingreso"
+                  placeholder="Selecciona tipo"
+                  options={incomeTypes.map(type => ({
+                    value: String(type.id),
+                    label: String(type.name)
+                  }))}
+                  searchable="auto"
+                  searchPlaceholder="Buscar tipo de ingreso…"
+                />
               </div>
 
               <div className="space-y-2">
@@ -555,30 +553,26 @@ export default function IngresosContent() {
 
               <div className="space-y-2">
                 <Label htmlFor="ingresos-field-5">Cuenta por cobrar relacionada</Label>
-                <Select
+                <SearchableSelect
                   value={receivableAccountId}
                   onValueChange={setReceivableAccountId}
-                >
-                  <SelectTrigger id="ingresos-field-5">
-                    <SelectValue placeholder="Sin cuenta por cobrar" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="NONE">Sin cuenta por cobrar</SelectItem>
-                    {selectableReceivables.map((item) => {
+                  id="ingresos-field-5"
+                  title="Seleccionar cuenta por cobrar"
+                  placeholder="Sin cuenta por cobrar"
+                  searchPlaceholder="Buscar persona o concepto…"
+                  options={[
+                    { value: "NONE", label: "Sin cuenta por cobrar", pinned: true },
+                    ...selectableReceivables.map((item) => {
                       const pendingBalance = Number(item.pendingBalance || 0);
                       const isPaidOff =
                         item.status === "PAID_OFF" || pendingBalance <= 0;
-
-                      return (
-                        <SelectItem key={item.id} value={item.id}>
-                          {item.person?.name} · {item.concept} ·{" "}
-                          {isPaidOff ? "liquidada" : "pendiente"}{" "}
-                          {formatMoney(pendingBalance)}
-                        </SelectItem>
-                      );
-                    })}
-                  </SelectContent>
-                </Select>
+                      return {
+                        value: item.id,
+                        label: `${item.person?.name || ""} · ${item.concept} · ${isPaidOff ? "liquidada" : "pendiente"} ${formatMoney(pendingBalance)}`,
+                      };
+                    }),
+                  ]}
+                />
               </div>
 
               <div className="space-y-2">
@@ -665,21 +659,19 @@ export default function IngresosContent() {
 
               <div className="space-y-2">
                 <Label htmlFor="ingresos-field-7">Tipo de ingreso</Label>
-                <Select
+                <ResponsiveSelect
                   value={editIncomeTypeId}
                   onValueChange={setEditIncomeTypeId}
-                >
-                  <SelectTrigger id="ingresos-field-7">
-                    <SelectValue placeholder="Selecciona tipo" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {incomeTypes.map((type) => (
-                      <SelectItem key={type.id} value={type.id}>
-                        {type.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  id="ingresos-field-7"
+                  title="Seleccionar tipo de ingreso"
+                  placeholder="Selecciona tipo"
+                  options={incomeTypes.map(type => ({
+                    value: String(type.id),
+                    label: String(type.name)
+                  }))}
+                  searchable="auto"
+                  searchPlaceholder="Buscar tipo de ingreso…"
+                />
               </div>
 
               <div className="space-y-2">
@@ -714,24 +706,22 @@ export default function IngresosContent() {
 
               <div className="space-y-2">
                 <Label htmlFor="ingresos-field-11">Cuenta por cobrar relacionada</Label>
-                <Select
+                <SearchableSelect
                   value={editReceivableAccountId}
                   onValueChange={setEditReceivableAccountId}
-                >
-                  <SelectTrigger id="ingresos-field-11">
-                    <SelectValue placeholder="Sin cuenta por cobrar" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="NONE">Sin cuenta por cobrar</SelectItem>
-                    {receivables.map((item) => (
-                      <SelectItem key={item.id} value={item.id}>
-                        {item.person?.name} · {item.concept} · pendiente{" "}
-                        {formatMoney(item.pendingBalance)} ·{" "}
-                        {item.status === "PAID_OFF" ? "Liquidada" : "Activa"}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  id="ingresos-field-11"
+                  title="Seleccionar cuenta por cobrar"
+                  placeholder="Sin cuenta por cobrar"
+                  searchPlaceholder="Buscar cuenta por cobrar…"
+                  options={[{
+                    value: "NONE",
+                    label: "Sin cuenta por cobrar",
+                    pinned: true
+                  }, ...receivables.map(item => ({
+                    value: item.id,
+                    label: `${item.person?.name || ""} · ${item.concept} · pendiente ${formatMoney(item.pendingBalance)} · ${item.status === "PAID_OFF" ? "Liquidada" : "Activa"}`
+                  }))]}
+                />
               </div>
 
               <div className="space-y-2 md:col-span-2">

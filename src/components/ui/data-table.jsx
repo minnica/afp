@@ -1,5 +1,7 @@
 "use client";
 
+import { ResponsiveSelect } from "@/components/ui/responsive-select";
+
 import {
   flexRender,
   getCoreRowModel,
@@ -23,13 +25,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Empty, EmptyDescription } from "@/components/ui/empty";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 function SortIcon({ isSorted }) {
   if (isSorted === "asc")
@@ -105,28 +100,21 @@ export function DataTable({
           {pageSizeOptions ? (
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <span className="text-xs">Mostrar</span>
-              <Select
+              <ResponsiveSelect
                 value={String(table.getState().pagination.pageSize)}
-                onValueChange={(value) => {
+                onValueChange={value => {
                   table.setPageSize(Number(value));
                   table.setPageIndex(0);
                 }}
-              >
-                <SelectTrigger aria-label="Registros por página" className="h-9 w-[70px] text-xs">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {pageSizeOptions.map((size) => (
-                    <SelectItem
-                      key={size}
-                      value={String(size)}
-                      className="text-xs"
-                    >
-                      {size}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                aria-label="Registros por página"
+                className="h-9 w-[70px] text-xs"
+                title="Registros por página"
+                placeholder="Selecciona una opción"
+                options={pageSizeOptions.map(size => ({
+                  value: String(size),
+                  label: String(size)
+                }))}
+              />
             </div>
           ) : null}
         </div>

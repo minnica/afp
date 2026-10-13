@@ -1,5 +1,9 @@
 "use client";
 
+import { ResponsiveSelect } from "@/components/ui/responsive-select";
+
+import { SearchableSelect } from "@/components/ui/searchable-select";
+
 import { useDialogFocus } from "@/hooks/use-dialog-focus";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -24,13 +28,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/components/ui/sonner";
@@ -661,18 +658,19 @@ export default function ComprasAMesesContent() {
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="compras-ameses-field-1">Tarjeta</Label>
-              <Select value={editCardId} onValueChange={setEditCardId}>
-                <SelectTrigger id="compras-ameses-field-1">
-                  <SelectValue placeholder="Selecciona tarjeta" />
-                </SelectTrigger>
-                <SelectContent>
-                  {cards.map((card) => (
-                    <SelectItem key={card.id} value={card.id}>
-                      {card.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <ResponsiveSelect
+                value={editCardId}
+                onValueChange={setEditCardId}
+                id="compras-ameses-field-1"
+                title="Seleccionar tarjeta"
+                placeholder="Selecciona tarjeta"
+                options={cards.map(card => ({
+                  value: String(card.id),
+                  label: String(card.name)
+                }))}
+                searchable="auto"
+                searchPlaceholder="Buscar tarjeta…"
+              />
             </div>
 
             <div className="space-y-2">
@@ -746,21 +744,18 @@ export default function ComprasAMesesContent() {
 
             <div className="space-y-2">
               <Label htmlFor="compras-ameses-field-7">Categoría</Label>
-              <Select
+              <SearchableSelect
                 value={editCategoryId}
                 onValueChange={setEditCategoryId}
-              >
-                <SelectTrigger id="compras-ameses-field-7">
-                  <SelectValue placeholder="Selecciona categoría" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
-                      {category.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                id="compras-ameses-field-7"
+                title="Seleccionar categoría"
+                placeholder="Selecciona categoría"
+                searchPlaceholder="Buscar categoría…"
+                options={categories.map(item => ({
+                  value: item.id,
+                  label: item.name
+                }))}
+              />
             </div>
 
             <div className="space-y-2 md:col-span-2">
@@ -810,18 +805,19 @@ export default function ComprasAMesesContent() {
               <CardContent className="space-y-5">
                 <div className="space-y-2">
                   <Label htmlFor="compras-ameses-field-9">Tarjeta</Label>
-                  <Select value={cardId} onValueChange={setCardId}>
-                    <SelectTrigger id="compras-ameses-field-9">
-                      <SelectValue placeholder="Selecciona tarjeta" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {cards.map((card) => (
-                        <SelectItem key={card.id} value={card.id}>
-                          {card.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <ResponsiveSelect
+                    value={cardId}
+                    onValueChange={setCardId}
+                    id="compras-ameses-field-9"
+                    title="Seleccionar tarjeta"
+                    placeholder="Selecciona tarjeta"
+                    options={cards.map(card => ({
+                      value: String(card.id),
+                      label: String(card.name)
+                    }))}
+                    searchable="auto"
+                    searchPlaceholder="Buscar tarjeta…"
+                  />
                 </div>
 
                 <div className="space-y-2">
@@ -894,35 +890,38 @@ export default function ComprasAMesesContent() {
 
                 <div className="space-y-2">
                   <Label htmlFor="compras-ameses-field-14">Categoría</Label>
-                  <Select value={categoryId} onValueChange={setCategoryId}>
-                    <SelectTrigger id="compras-ameses-field-14">
-                      <SelectValue placeholder="Selecciona categoría" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categories.map((category) => (
-                        <SelectItem key={category.id} value={category.id}>
-                          {category.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <SearchableSelect
+                    value={categoryId}
+                    onValueChange={setCategoryId}
+                    id="compras-ameses-field-14"
+                    title="Seleccionar categoría"
+                    placeholder="Selecciona categoría"
+                    searchPlaceholder="Buscar categoría…"
+                    options={categories.map(item => ({
+                      value: item.id,
+                      label: item.name
+                    }))}
+                  />
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="compras-ameses-field-15">Persona, si aplica</Label>
-                  <Select value={personId} onValueChange={setPersonId}>
-                    <SelectTrigger id="compras-ameses-field-15">
-                      <SelectValue placeholder="Sin persona" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="NONE">Sin persona</SelectItem>
-                      {people.map((person) => (
-                        <SelectItem key={person.id} value={person.id}>
-                          {person.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <SearchableSelect
+                    value={personId}
+                    onValueChange={setPersonId}
+                    id="compras-ameses-field-15"
+                    title="Seleccionar persona"
+                    placeholder="Sin persona"
+                    searchPlaceholder="Buscar persona…"
+                    options={[{
+                      value: "NONE",
+                      label: "Sin persona",
+                      pinned: true
+                    }, ...people.map(item => ({
+                      value: item.id,
+                      label: item.name
+                    }))]}
+                  />
 
                   {personId !== "NONE" ? (
                     <p className="text-xs text-muted-foreground">

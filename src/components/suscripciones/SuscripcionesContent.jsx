@@ -1,5 +1,10 @@
 "use client";
 
+import { ResponsiveSelect } from "@/components/ui/responsive-select";
+import { PaymentMethodSelector } from "@/components/ui/payment-method-selector";
+
+import { SearchableSelect } from "@/components/ui/searchable-select";
+
 import { useDialogFocus } from "@/hooks/use-dialog-focus";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -21,13 +26,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import PageSkeleton from "@/components/layout/PageSkeleton";
 import {
@@ -706,59 +704,52 @@ export default function SuscripcionesContent() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="suscripciones-field-3">Método de pago</Label>
-              <Select
+              <Label id="suscripciones-field-3-label">Método de pago</Label>
+              <PaymentMethodSelector
                 value={editPaymentMethod}
-                onValueChange={(value) => {
+                onValueChange={value => {
                   setEditPaymentMethod(value);
-
                   if (value === "CASH") {
                     setEditCardId("");
                   }
                 }}
-              >
-                <SelectTrigger id="suscripciones-field-3">
-                  <SelectValue placeholder="Selecciona método" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="CARD">Tarjeta</SelectItem>
-                  <SelectItem value="CASH">Efectivo</SelectItem>
-                </SelectContent>
-              </Select>
+                id="suscripciones-field-3"
+              />
             </div>
 
             {editPaymentMethod === "CARD" ? (
               <div className="space-y-2">
                 <Label htmlFor="suscripciones-field-4">Tarjeta</Label>
-                <Select value={editCardId} onValueChange={setEditCardId}>
-                  <SelectTrigger id="suscripciones-field-4">
-                    <SelectValue placeholder="Selecciona tarjeta" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {cards.map((card) => (
-                      <SelectItem key={card.id} value={card.id}>
-                        {card.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <ResponsiveSelect
+                  value={editCardId}
+                  onValueChange={setEditCardId}
+                  id="suscripciones-field-4"
+                  title="Seleccionar tarjeta"
+                  placeholder="Selecciona tarjeta"
+                  options={cards.map(card => ({
+                    value: String(card.id),
+                    label: String(card.name)
+                  }))}
+                  searchable="auto"
+                  searchPlaceholder="Buscar tarjeta…"
+                />
               </div>
             ) : null}
 
             <div className="space-y-2">
               <Label htmlFor="suscripciones-field-5">Categoría</Label>
-              <Select value={editCategoryId} onValueChange={setEditCategoryId}>
-                <SelectTrigger id="suscripciones-field-5">
-                  <SelectValue placeholder="Selecciona categoría" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
-                      {category.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <SearchableSelect
+                value={editCategoryId}
+                onValueChange={setEditCategoryId}
+                id="suscripciones-field-5"
+                title="Seleccionar categoría"
+                placeholder="Selecciona categoría"
+                searchPlaceholder="Buscar categoría…"
+                options={categories.map(item => ({
+                  value: item.id,
+                  label: item.name
+                }))}
+              />
             </div>
 
             <div className="space-y-2">
@@ -775,44 +766,77 @@ export default function SuscripcionesContent() {
 
             <div className="space-y-2">
               <Label htmlFor="suscripciones-field-7">Frecuencia</Label>
-              <Select
+              <ResponsiveSelect
                 value={editFrequencyMonths}
                 onValueChange={setEditFrequencyMonths}
-              >
-                <SelectTrigger id="suscripciones-field-7">
-                  <SelectValue placeholder="Selecciona frecuencia" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1">Mensual</SelectItem>
-                  <SelectItem value="2">Cada 2 meses</SelectItem>
-                  <SelectItem value="3">Cada 3 meses</SelectItem>
-                  <SelectItem value="6">Cada 6 meses</SelectItem>
-                  <SelectItem value="12">Anual</SelectItem>
-                </SelectContent>
-              </Select>
+                id="suscripciones-field-7"
+                title="Seleccionar frecuencia"
+                placeholder="Selecciona frecuencia"
+                options={[{
+                  value: "1",
+                  label: "Mensual"
+                }, {
+                  value: "2",
+                  label: "Cada 2 meses"
+                }, {
+                  value: "3",
+                  label: "Cada 3 meses"
+                }, {
+                  value: "6",
+                  label: "Cada 6 meses"
+                }, {
+                  value: "12",
+                  label: "Anual"
+                }]}
+              />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="suscripciones-field-8">Mes de inicio</Label>
-              <Select value={editStartMonth} onValueChange={setEditStartMonth}>
-                <SelectTrigger id="suscripciones-field-8">
-                  <SelectValue placeholder="Mes" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1">Enero</SelectItem>
-                  <SelectItem value="2">Febrero</SelectItem>
-                  <SelectItem value="3">Marzo</SelectItem>
-                  <SelectItem value="4">Abril</SelectItem>
-                  <SelectItem value="5">Mayo</SelectItem>
-                  <SelectItem value="6">Junio</SelectItem>
-                  <SelectItem value="7">Julio</SelectItem>
-                  <SelectItem value="8">Agosto</SelectItem>
-                  <SelectItem value="9">Septiembre</SelectItem>
-                  <SelectItem value="10">Octubre</SelectItem>
-                  <SelectItem value="11">Noviembre</SelectItem>
-                  <SelectItem value="12">Diciembre</SelectItem>
-                </SelectContent>
-              </Select>
+              <ResponsiveSelect
+                value={editStartMonth}
+                onValueChange={setEditStartMonth}
+                id="suscripciones-field-8"
+                title="Seleccionar mes"
+                placeholder="Mes"
+                options={[{
+                  value: "1",
+                  label: "Enero"
+                }, {
+                  value: "2",
+                  label: "Febrero"
+                }, {
+                  value: "3",
+                  label: "Marzo"
+                }, {
+                  value: "4",
+                  label: "Abril"
+                }, {
+                  value: "5",
+                  label: "Mayo"
+                }, {
+                  value: "6",
+                  label: "Junio"
+                }, {
+                  value: "7",
+                  label: "Julio"
+                }, {
+                  value: "8",
+                  label: "Agosto"
+                }, {
+                  value: "9",
+                  label: "Septiembre"
+                }, {
+                  value: "10",
+                  label: "Octubre"
+                }, {
+                  value: "11",
+                  label: "Noviembre"
+                }, {
+                  value: "12",
+                  label: "Diciembre"
+                }]}
+              />
             </div>
 
             <div className="space-y-2">
@@ -888,42 +912,35 @@ export default function SuscripcionesContent() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="suscripciones-field-12">Método de pago</Label>
-                  <Select
+                  <Label id="suscripciones-field-12-label">Método de pago</Label>
+                  <PaymentMethodSelector
                     value={paymentMethod}
-                    onValueChange={(value) => {
+                    onValueChange={value => {
                       setPaymentMethod(value);
-
                       if (value === "CASH") {
                         setCardId("");
                       }
                     }}
-                  >
-                    <SelectTrigger id="suscripciones-field-12">
-                      <SelectValue placeholder="Selecciona método" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="CARD">Tarjeta</SelectItem>
-                      <SelectItem value="CASH">Efectivo</SelectItem>
-                    </SelectContent>
-                  </Select>
+                    id="suscripciones-field-12"
+                  />
                 </div>
 
                 {paymentMethod === "CARD" ? (
                   <div className="space-y-2">
                     <Label htmlFor="suscripciones-field-13">Tarjeta</Label>
-                    <Select value={cardId} onValueChange={setCardId}>
-                      <SelectTrigger id="suscripciones-field-13">
-                        <SelectValue placeholder="Selecciona tarjeta" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {cards.map((card) => (
-                          <SelectItem key={card.id} value={card.id}>
-                            {card.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <ResponsiveSelect
+                      value={cardId}
+                      onValueChange={setCardId}
+                      id="suscripciones-field-13"
+                      title="Seleccionar tarjeta"
+                      placeholder="Selecciona tarjeta"
+                      options={cards.map(card => ({
+                        value: String(card.id),
+                        label: String(card.name)
+                      }))}
+                      searchable="auto"
+                      searchPlaceholder="Buscar tarjeta…"
+                    />
 
                     {cards.length === 0 ? (
                       <p className="text-xs text-muted-foreground">
@@ -935,18 +952,18 @@ export default function SuscripcionesContent() {
 
                 <div className="space-y-2">
                   <Label htmlFor="suscripciones-field-14">Categoría</Label>
-                  <Select value={categoryId} onValueChange={setCategoryId}>
-                    <SelectTrigger id="suscripciones-field-14">
-                      <SelectValue placeholder="Selecciona categoría" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categories.map((category) => (
-                        <SelectItem key={category.id} value={category.id}>
-                          {category.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <SearchableSelect
+                    value={categoryId}
+                    onValueChange={setCategoryId}
+                    id="suscripciones-field-14"
+                    title="Seleccionar categoría"
+                    placeholder="Selecciona categoría"
+                    searchPlaceholder="Buscar categoría…"
+                    options={categories.map(item => ({
+                      value: item.id,
+                      label: item.name
+                    }))}
+                  />
                 </div>
 
                 <div className="space-y-2">
@@ -964,45 +981,78 @@ export default function SuscripcionesContent() {
 
                 <div className="space-y-2">
                   <Label htmlFor="suscripciones-field-16">Frecuencia</Label>
-                  <Select
+                  <ResponsiveSelect
                     value={frequencyMonths}
                     onValueChange={setFrequencyMonths}
-                  >
-                    <SelectTrigger id="suscripciones-field-16">
-                      <SelectValue placeholder="Selecciona frecuencia" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1">Mensual</SelectItem>
-                      <SelectItem value="2">Cada 2 meses</SelectItem>
-                      <SelectItem value="3">Cada 3 meses</SelectItem>
-                      <SelectItem value="6">Cada 6 meses</SelectItem>
-                      <SelectItem value="12">Anual</SelectItem>
-                    </SelectContent>
-                  </Select>
+                    id="suscripciones-field-16"
+                    title="Seleccionar frecuencia"
+                    placeholder="Selecciona frecuencia"
+                    options={[{
+                      value: "1",
+                      label: "Mensual"
+                    }, {
+                      value: "2",
+                      label: "Cada 2 meses"
+                    }, {
+                      value: "3",
+                      label: "Cada 3 meses"
+                    }, {
+                      value: "6",
+                      label: "Cada 6 meses"
+                    }, {
+                      value: "12",
+                      label: "Anual"
+                    }]}
+                  />
                 </div>
 
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="suscripciones-field-17">Mes de inicio</Label>
-                    <Select value={startMonth} onValueChange={setStartMonth}>
-                      <SelectTrigger id="suscripciones-field-17">
-                        <SelectValue placeholder="Mes" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="1">Enero</SelectItem>
-                        <SelectItem value="2">Febrero</SelectItem>
-                        <SelectItem value="3">Marzo</SelectItem>
-                        <SelectItem value="4">Abril</SelectItem>
-                        <SelectItem value="5">Mayo</SelectItem>
-                        <SelectItem value="6">Junio</SelectItem>
-                        <SelectItem value="7">Julio</SelectItem>
-                        <SelectItem value="8">Agosto</SelectItem>
-                        <SelectItem value="9">Septiembre</SelectItem>
-                        <SelectItem value="10">Octubre</SelectItem>
-                        <SelectItem value="11">Noviembre</SelectItem>
-                        <SelectItem value="12">Diciembre</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <ResponsiveSelect
+                      value={startMonth}
+                      onValueChange={setStartMonth}
+                      id="suscripciones-field-17"
+                      title="Seleccionar mes"
+                      placeholder="Mes"
+                      options={[{
+                        value: "1",
+                        label: "Enero"
+                      }, {
+                        value: "2",
+                        label: "Febrero"
+                      }, {
+                        value: "3",
+                        label: "Marzo"
+                      }, {
+                        value: "4",
+                        label: "Abril"
+                      }, {
+                        value: "5",
+                        label: "Mayo"
+                      }, {
+                        value: "6",
+                        label: "Junio"
+                      }, {
+                        value: "7",
+                        label: "Julio"
+                      }, {
+                        value: "8",
+                        label: "Agosto"
+                      }, {
+                        value: "9",
+                        label: "Septiembre"
+                      }, {
+                        value: "10",
+                        label: "Octubre"
+                      }, {
+                        value: "11",
+                        label: "Noviembre"
+                      }, {
+                        value: "12",
+                        label: "Diciembre"
+                      }]}
+                    />
                   </div>
 
                   <div className="space-y-2">

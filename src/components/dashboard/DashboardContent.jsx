@@ -1,5 +1,9 @@
 "use client";
 
+import { ResponsiveSelect } from "@/components/ui/responsive-select";
+
+import { SearchableSelect } from "@/components/ui/searchable-select";
+
 import { useDialogFocus } from "@/hooks/use-dialog-focus";
 
 import { Empty, EmptyDescription } from "@/components/ui/empty";
@@ -42,13 +46,6 @@ import {
   Scissors,
 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 const MONTH_NAMES = [
   "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
@@ -487,16 +484,18 @@ function comparisonChartConfig(previousLabel, currentLabel) {
 
 function MonthSelector({ value, onChange }) {
   return (
-    <Select value={String(value)} onValueChange={(v) => onChange(Number(v))}>
-      <SelectTrigger aria-label="Mes del período" className="w-full max-w-[160px] h-8 text-xs">
-        <SelectValue />
-      </SelectTrigger>
-      <SelectContent>
-        {MONTH_NAMES.map((name, i) => (
-          <SelectItem key={i} value={String(i)}>{name}</SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+    <ResponsiveSelect
+      value={String(value)}
+      onValueChange={v => onChange(Number(v))}
+      aria-label="Mes del período"
+      className="w-full max-w-[160px] h-8 text-xs"
+      title="Mes del período"
+      placeholder="Selecciona una opción"
+      options={MONTH_NAMES.map((name, i) => ({
+        value: String(i),
+        label: String(name)
+      }))}
+    />
   );
 }
 
@@ -563,19 +562,23 @@ function WeeklyComparisonChart({
           </CardTitle>
           <MonthSelector value={selectedMonthIndex} onChange={setSelectedMonthIndex} />
           {categories.length > 0 && (
-            <Select value={selectedCategoryId} onValueChange={setSelectedCategoryId}>
-              <SelectTrigger aria-label="Categoría del comparativo" className="w-full max-w-[220px] h-8 text-xs">
-                <SelectValue placeholder="Filtrar por categoría" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todas las categorías</SelectItem>
-                {categories.map((cat) => (
-                  <SelectItem key={cat.id} value={cat.id}>
-                    {cat.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <SearchableSelect
+              value={selectedCategoryId}
+              onValueChange={setSelectedCategoryId}
+              aria-label="Categoría del comparativo"
+              className="w-full max-w-[220px] h-8 text-xs"
+              title="Seleccionar categoría"
+              placeholder="Filtrar por categoría"
+              searchPlaceholder="Buscar categoría…"
+              options={[{
+                value: "all",
+                label: "Todas las categorías",
+                pinned: true
+              }, ...categories.map(item => ({
+                value: item.id,
+                label: item.name
+              }))]}
+            />
           )}
         </div>
       </CardHeader>

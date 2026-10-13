@@ -1,5 +1,9 @@
 "use client";
 
+import { ResponsiveSelect } from "@/components/ui/responsive-select";
+
+import { SearchableSelect } from "@/components/ui/searchable-select";
+
 import { useDialogFocus } from "@/hooks/use-dialog-focus";
 
 import {
@@ -31,13 +35,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import PageSkeleton from "@/components/layout/PageSkeleton";
 import {
@@ -586,18 +583,18 @@ export default function CuentasPorCobrarContent() {
             <CardContent className="space-y-5">
               <div className="space-y-2">
                 <Label htmlFor="cuentas-por-cobrar-field-1">Persona</Label>
-                <Select value={personId} onValueChange={setPersonId}>
-                  <SelectTrigger id="cuentas-por-cobrar-field-1">
-                    <SelectValue placeholder="Selecciona persona" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {people.map((person) => (
-                      <SelectItem key={person.id} value={person.id}>
-                        {person.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <SearchableSelect
+                  value={personId}
+                  onValueChange={setPersonId}
+                  id="cuentas-por-cobrar-field-1"
+                  title="Seleccionar persona"
+                  placeholder="Selecciona persona"
+                  searchPlaceholder="Buscar persona…"
+                  options={people.map(item => ({
+                    value: item.id,
+                    label: item.name
+                  }))}
+                />
 
                 {people.length === 0 ? (
                   <p className="text-xs text-muted-foreground">
@@ -707,66 +704,67 @@ export default function CuentasPorCobrarContent() {
                   footerRow={renderReceivablesTotalsFooter}
                   toolbarStart={
                     <>
-                      <Select
+                      <SearchableSelect
                         value={filterPersonId || "ALL"}
-                        onValueChange={(value) =>
-                          setFilterPersonId(value === "ALL" ? "" : value)
-                        }
-                      >
-                        <SelectTrigger aria-label="Filtrar por persona" className="w-[180px]">
-                          <SelectValue placeholder="Todas las personas" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="ALL">
-                            Todas las personas
-                          </SelectItem>
-                          {people.map((person) => (
-                            <SelectItem key={person.id} value={person.id}>
-                              {person.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                        onValueChange={value => setFilterPersonId(value === "ALL" ? "" : value)}
+                        aria-label="Filtrar por persona"
+                        className="w-[180px]"
+                        title="Seleccionar persona"
+                        placeholder="Todas las personas"
+                        searchPlaceholder="Buscar persona…"
+                        options={[{
+                          value: "ALL",
+                          label: "Todas las personas",
+                          pinned: true
+                        }, ...people.map(item => ({
+                          value: item.id,
+                          label: item.name
+                        }))]}
+                      />
 
-                      <Select
+                      <ResponsiveSelect
                         value={filterOriginType || "ALL"}
-                        onValueChange={(value) =>
-                          setFilterOriginType(value === "ALL" ? "" : value)
-                        }
-                      >
-                        <SelectTrigger aria-label="Filtrar por origen" className="w-[180px]">
-                          <SelectValue placeholder="Todos los orígenes" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="ALL">
-                            Todos los orígenes
-                          </SelectItem>
-                          <SelectItem value="MANUAL">Manual</SelectItem>
-                          <SelectItem value="DAILY_EXPENSE">
-                            Gasto diario
-                          </SelectItem>
-                          <SelectItem value="INSTALLMENT_PURCHASE">
-                            Compra a meses
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
+                        onValueChange={value => setFilterOriginType(value === "ALL" ? "" : value)}
+                        aria-label="Filtrar por origen"
+                        className="w-[180px]"
+                        title="Filtrar por origen"
+                        placeholder="Todos los orígenes"
+                        options={[{
+                          value: "ALL",
+                          label: "Todos los or\xEDgenes"
+                        }, {
+                          value: "MANUAL",
+                          label: "Manual"
+                        }, {
+                          value: "DAILY_EXPENSE",
+                          label: "Gasto diario"
+                        }, {
+                          value: "INSTALLMENT_PURCHASE",
+                          label: "Compra a meses"
+                        }]}
+                      />
 
-                      <Select
+                      <ResponsiveSelect
                         value={filterStatus || "ALL"}
-                        onValueChange={(value) =>
-                          setFilterStatus(value === "ALL" ? "" : value)
-                        }
-                      >
-                        <SelectTrigger aria-label="Filtrar por estado" className="w-[180px]">
-                          <SelectValue placeholder="Todos los estados" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="ALL">Todos los estados</SelectItem>
-                          <SelectItem value="ACTIVE">Activa</SelectItem>
-                          <SelectItem value="PAID_OFF">Liquidada</SelectItem>
-                          <SelectItem value="CANCELLED">Cancelada</SelectItem>
-                        </SelectContent>
-                      </Select>
+                        onValueChange={value => setFilterStatus(value === "ALL" ? "" : value)}
+                        aria-label="Filtrar por estado"
+                        className="w-[180px]"
+                        title="Filtrar por estado"
+                        placeholder="Todos los estados"
+                        options={[{
+                          value: "ALL",
+                          label: "Todos los estados"
+                        }, {
+                          value: "ACTIVE",
+                          label: "Activa"
+                        }, {
+                          value: "PAID_OFF",
+                          label: "Liquidada"
+                        }, {
+                          value: "CANCELLED",
+                          label: "Cancelada"
+                        }]}
+                      />
 
                       <Input
                         aria-label="Buscar por concepto"
@@ -800,18 +798,18 @@ export default function CuentasPorCobrarContent() {
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="cuentas-por-cobrar-field-7">Persona</Label>
-                <Select value={editPersonId} onValueChange={setEditPersonId}>
-                  <SelectTrigger id="cuentas-por-cobrar-field-7">
-                    <SelectValue placeholder="Selecciona persona" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {people.map((person) => (
-                      <SelectItem key={person.id} value={person.id}>
-                        {person.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <SearchableSelect
+                  value={editPersonId}
+                  onValueChange={setEditPersonId}
+                  id="cuentas-por-cobrar-field-7"
+                  title="Seleccionar persona"
+                  placeholder="Selecciona persona"
+                  searchPlaceholder="Buscar persona…"
+                  options={people.map(item => ({
+                    value: item.id,
+                    label: item.name
+                  }))}
+                />
               </div>
 
               <div className="space-y-2">

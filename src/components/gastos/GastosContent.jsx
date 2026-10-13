@@ -1,5 +1,12 @@
 "use client";
 
+import ExpenseCreateSurface, { useExpenseDialogMode } from "@/components/gastos/ExpenseCreateSurface";
+
+import { ResponsiveSelect } from "@/components/ui/responsive-select";
+import { PaymentMethodSelector } from "@/components/ui/payment-method-selector";
+
+import { SearchableSelect } from "@/components/ui/searchable-select";
+
 import { useDialogFocus } from "@/hooks/use-dialog-focus";
 
 import { Alert, AlertDescription, AlertTitle, AlertAction } from "@/components/ui/alert";
@@ -31,13 +38,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "@/components/ui/sonner";
@@ -163,6 +163,7 @@ function getMonthRange(yearMonth) {
 export default function GastosContent() {
   const { captureFocus, restoreFocus } = useDialogFocus();
   const router = useRouter();
+  const compactEntry = useExpenseDialogMode();
 
   const [user, setUser] = useState(null);
   const [categories, setCategories] = useState([]);
@@ -186,6 +187,7 @@ export default function GastosContent() {
     useState(false);
   const [pendingOfflineExpenses, setPendingOfflineExpenses] = useState([]);
   const [error, setError] = useState("");
+  const [createError, setCreateError] = useState(null);
 
   const [people, setPeople] = useState([]);
   const [receivables, setReceivables] = useState([]);
@@ -531,31 +533,33 @@ export default function GastosContent() {
   ]);
 
   async function createExpense() {
-    if (!user) return;
+    if (!user || isSaving) return false;
 
     if (!concept.trim()) {
-      setError("El concepto es requerido.");
-      return;
+      setCreateError({ field: "concept", message: "El concepto es requerido." });
+      return false;
     }
     if (!amount || Number(amount) <= 0) {
-      setError("El monto debe ser mayor a 0.");
-      return;
+      setCreateError({ field: "amount", message: "El monto debe ser mayor a 0." });
+      return false;
     }
     if (!categoryId) {
-      setError("La categoría es requerida.");
-      return;
+      setCreateError({ field: "categoryId", message: "La categoría es requerida." });
+      return false;
     }
     if (paymentMethod === "CARD" && !cardId) {
-      setError("Debes seleccionar una tarjeta.");
-      return;
+      setCreateError({ field: "cardId", message: "Debes seleccionar una tarjeta." });
+      return false;
     }
 
+    setCreateError(null);
     setError("");
     setIsSaving(true);
 
     const payload = getCreateExpensePayload();
     const shouldQueueOffline =
       typeof navigator !== "undefined" && navigator.onLine === false;
+    let saved = false;
 
     try {
       if (shouldQueueOffline) {
@@ -564,7 +568,7 @@ export default function GastosContent() {
         setPendingOfflineExpenses((current) => [offlineExpense, ...current]);
         resetCreateExpenseForm();
         toast.info("Sin conexión. Gasto guardado como pendiente.");
-        return;
+        return true;
       }
 
       const response = await fetch("/api/expenses", {
@@ -581,12 +585,20 @@ export default function GastosContent() {
         throw new Error(data.error || "No se pudo guardar el gasto.");
       }
 
+      saved = true;
       resetCreateExpenseForm();
       await loadExpenses(user.id, { force: true });
       await loadReceivables(user.id);
       await loadPayables(user.id);
       toast.success("Gasto guardado exitosamente.");
+      return true;
     } catch (err) {
+      if (saved) {
+        // Un fallo al refrescar después del POST no debe duplicar el gasto en la cola.
+        setError("El gasto se guardó, pero no se pudo actualizar la lista. Recarga para verlo.");
+        toast.success("Gasto guardado exitosamente.");
+        return true;
+      }
       const wentOffline =
         typeof navigator !== "undefined" && navigator.onLine === false;
 
@@ -596,10 +608,11 @@ export default function GastosContent() {
         setPendingOfflineExpenses((current) => [offlineExpense, ...current]);
         resetCreateExpenseForm();
         toast.info("Sin conexión. Gasto guardado como pendiente.");
-        return;
+        return true;
       }
 
-      setError(err.message || "No se pudo guardar el gasto.");
+      setCreateError({ message: err.message || "No se pudo guardar el gasto." });
+      return false;
     } finally {
       setIsSaving(false);
     }
@@ -981,6 +994,271 @@ export default function GastosContent() {
     return <GastosPageSkeleton />;
   }
 
+  const createPaymentFields = (
+    <>
+      <div className="space-y-2">
+        <Label htmlFor="date">Fecha</Label>
+        <DatePicker
+          id="date"
+          value={date}
+          onChange={setDate}
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label id="paymentMethod-label">Método de pago</Label>
+        <PaymentMethodSelector
+          value={paymentMethod}
+          onValueChange={value => {
+            setPaymentMethod(value);
+            if (value === "CASH") {
+              setCardId("");
+            }
+          }}
+          id="paymentMethod"
+        />
+      </div>
+
+      {paymentMethod === "CARD" ? (
+        <div className="space-y-2">
+          <Label htmlFor="cardId">Tarjeta</Label>
+          <ResponsiveSelect
+            value={cardId}
+            onValueChange={setCardId}
+            id="cardId"
+            aria-invalid={createError?.field === "cardId"}
+            aria-describedby={createError?.field === "cardId" ? "create-expense-error" : undefined}
+            title="Seleccionar tarjeta"
+            placeholder="Selecciona tarjeta"
+            options={cards.map(card => ({
+              value: String(card.id),
+              label: String(card.name)
+            }))}
+            searchable="auto"
+            searchPlaceholder="Buscar tarjeta…"
+          />
+
+          {cards.length === 0 ? (
+            <p className="text-xs text-muted-foreground">
+              Aún no tienes tarjetas. Agrégalas en la pantalla
+              Tarjetas.
+            </p>
+          ) : null}
+        </div>
+      ) : null}
+    </>
+  );
+
+  const createPrimaryFields = (
+    <>
+      <div className="space-y-2">
+        <Label htmlFor="concept">Concepto</Label>
+        <Input
+          id="concept"
+          aria-invalid={createError?.field === "concept"}
+          aria-describedby={createError?.field === "concept" ? "create-expense-error" : undefined}
+          value={concept}
+          placeholder="Ej. Tacos, Uber, Cine..."
+          onChange={(event) => setConcept(event.target.value)}
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="amount">Monto</Label>
+        <Input
+          id="amount"
+          inputMode="decimal"
+          aria-invalid={createError?.field === "amount"}
+          aria-describedby={createError?.field === "amount" ? "create-expense-error" : undefined}
+          value={amount}
+          type="number"
+          min="0"
+          step="0.01"
+          placeholder="0.00"
+          onChange={(event) => setAmount(event.target.value)}
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="categoryId">Categoría</Label>
+        <SearchableSelect
+          value={categoryId}
+          onValueChange={setCategoryId}
+          id="categoryId"
+          aria-invalid={createError?.field === "categoryId"}
+          aria-describedby={createError?.field === "categoryId" ? "create-expense-error" : undefined}
+          title="Seleccionar categoría"
+          placeholder="Selecciona categoría"
+          searchPlaceholder="Buscar categoría…"
+          options={categories.map(item => ({
+            value: item.id,
+            label: item.name
+          }))}
+        />
+      </div>
+    </>
+  );
+
+  const createOptionalFields = (
+    <>
+      <div className="space-y-2">
+        <Label htmlFor="notes">Notas (opcional)</Label>
+        <Textarea
+          id="notes"
+          value={notes}
+          placeholder="Algún detalle adicional..."
+          onChange={(event) => setNotes(event.target.value)}
+        />
+      </div>
+
+      <Collapsible open={showMoreOptions} onOpenChange={setShowMoreOptions} className="rounded-xl border border-border bg-background/50 p-4">
+        <CollapsibleTrigger asChild>
+        <Button
+          type="button"
+          variant="ghost"
+          className="w-full justify-between text-left"
+        >
+          <span>Más opciones</span>
+          <span className="text-muted-foreground">
+            {showMoreOptions ? "Ocultar" : "Mostrar"}
+          </span>
+        </Button>
+        </CollapsibleTrigger>
+
+          <CollapsibleContent className="mt-4 space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="personId">Persona relacionada</Label>
+              <SearchableSelect
+                value={personId || "NONE"}
+                onValueChange={value => {
+                  const nextValue = value === "NONE" ? "" : value;
+                  setPersonId(nextValue);
+                  if (!nextValue) {
+                    setReceivableMode("CREATE");
+                    setReceivableAccountId("");
+                  }
+                }}
+                id="personId"
+                title="Seleccionar persona"
+                placeholder="Selecciona persona"
+                searchPlaceholder="Buscar persona…"
+                options={[{
+                  value: "NONE",
+                  label: "Sin persona",
+                  pinned: true
+                }, ...people.map(item => ({
+                  value: item.id,
+                  label: item.name
+                }))]}
+              />
+
+              {people.length === 0 ? (
+                <p className="text-xs text-muted-foreground">
+                  Puedes agregar personas en Configuración.
+                </p>
+              ) : null}
+            </div>
+
+            {personId ? (
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="receivableMode">Cuenta por cobrar</Label>
+                  <ResponsiveSelect
+                    value={receivableMode}
+                    onValueChange={value => {
+                      setReceivableMode(value);
+                      if (value === "CREATE") {
+                        setReceivableAccountId("");
+                      }
+                    }}
+                    id="receivableMode"
+                    title="Seleccionar opción"
+                    placeholder="Selecciona opción"
+                    options={[{
+                      value: "CREATE",
+                      label: "Crear nueva autom\xE1ticamente"
+                    }, {
+                      value: "EXISTING",
+                      label: "Vincular a existente"
+                    }]}
+                  />
+                </div>
+
+                {receivableMode === "EXISTING" ? (
+                  <div className="space-y-2">
+                    <Label htmlFor="receivableAccountId">Cuenta existente</Label>
+                    <SearchableSelect
+                      value={receivableAccountId}
+                      onValueChange={setReceivableAccountId}
+                      id="receivableAccountId"
+                      title="Seleccionar cuenta por cobrar"
+                      placeholder="Selecciona cuenta por cobrar"
+                      searchPlaceholder="Buscar cuenta por cobrar…"
+                      options={receivables.filter(item => item.personId === personId).map(item => ({
+                        value: item.id,
+                        label: `${item.concept} · pendiente ${formatMoney(item.pendingBalance)}`
+                      }))}
+                    />
+
+                    {receivables.filter(
+                      (item) => item.personId === personId,
+                    ).length === 0 ? (
+                      <p className="text-xs text-muted-foreground">
+                        Esta persona no tiene cuentas por cobrar
+                        activas.
+                      </p>
+                    ) : null}
+                  </div>
+                ) : null}
+
+                <div className="space-y-2">
+                  <Label htmlFor="payableAccountId">Cuenta por pagar relacionada</Label>
+                  <SearchableSelect
+                    value={payableAccountId}
+                    onValueChange={setPayableAccountId}
+                    id="payableAccountId"
+                    title="Seleccionar cuenta por pagar"
+                    placeholder="Selecciona cuenta por pagar"
+                    searchPlaceholder="Buscar persona o concepto…"
+                    options={[{
+                      value: "NONE",
+                      label: "Sin cuenta por pagar",
+                      pinned: true
+                    }, ...payables.filter(item => item.status === "ACTIVE" && Number(item.pendingBalance || 0) > 0).map(item => ({
+                      value: item.id,
+                      label: `${item.person?.name || ""} · ${item.concept} · pendiente ${formatMoney(item.pendingBalance)}`
+                    }))]}
+                  />
+                </div>
+              </>
+            ) : null}
+
+            <Separator />
+
+            <div className="space-y-2">
+              <Label htmlFor="subscriptionId">Suscripción relacionada</Label>
+              <SearchableSelect
+                value={subscriptionId}
+                onValueChange={setSubscriptionId}
+                id="subscriptionId"
+                title="Seleccionar suscripción"
+                placeholder="Selecciona suscripción"
+                searchPlaceholder="Buscar suscripción…"
+                options={[{
+                  value: "NONE",
+                  label: "Sin suscripción",
+                  pinned: true
+                }, ...subscriptions.filter(item => item.paymentMethod === "CASH").map(item => ({
+                  value: item.id,
+                  label: `${item.name} · ${formatMoney(item.amount)}`
+                }))]}
+              />
+            </div>
+          </CollapsibleContent>
+      </Collapsible>
+    </>
+  );
+
   return (
     <>
       <AlertDialog
@@ -1032,42 +1310,35 @@ export default function GastosContent() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="edit-paymentMethod">Método</Label>
-              <Select
+              <Label id="edit-paymentMethod-label">Método</Label>
+              <PaymentMethodSelector
                 value={editPaymentMethod}
-                onValueChange={(value) => {
+                onValueChange={value => {
                   setEditPaymentMethod(value);
-
                   if (value === "CASH") {
                     setEditCardId("");
                   }
                 }}
-              >
-                <SelectTrigger id="edit-paymentMethod">
-                  <SelectValue placeholder="Selecciona método" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="CASH">Efectivo</SelectItem>
-                  <SelectItem value="CARD">Tarjeta</SelectItem>
-                </SelectContent>
-              </Select>
+                id="edit-paymentMethod"
+              />
             </div>
 
             {editPaymentMethod === "CARD" ? (
               <div className="space-y-2">
                 <Label htmlFor="edit-cardId">Tarjeta</Label>
-                <Select value={editCardId} onValueChange={setEditCardId}>
-                  <SelectTrigger id="edit-cardId">
-                    <SelectValue placeholder="Selecciona tarjeta" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {cards.map((card) => (
-                      <SelectItem key={card.id} value={card.id}>
-                        {card.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <ResponsiveSelect
+                  value={editCardId}
+                  onValueChange={setEditCardId}
+                  id="edit-cardId"
+                  title="Seleccionar tarjeta"
+                  placeholder="Selecciona tarjeta"
+                  options={cards.map(card => ({
+                    value: String(card.id),
+                    label: String(card.name)
+                  }))}
+                  searchable="auto"
+                  searchPlaceholder="Buscar tarjeta…"
+                />
               </div>
             ) : null}
 
@@ -1094,42 +1365,38 @@ export default function GastosContent() {
 
             <div className="space-y-2">
               <Label htmlFor="edit-categoryId">Categoría</Label>
-              <Select value={editCategoryId} onValueChange={setEditCategoryId}>
-                <SelectTrigger id="edit-categoryId">
-                  <SelectValue placeholder="Selecciona categoría" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
-                      {category.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <SearchableSelect
+                value={editCategoryId}
+                onValueChange={setEditCategoryId}
+                id="edit-categoryId"
+                title="Seleccionar categoría"
+                placeholder="Selecciona categoría"
+                searchPlaceholder="Buscar categoría…"
+                options={categories.map(item => ({
+                  value: item.id,
+                  label: item.name
+                }))}
+              />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="edit-subscriptionId">Suscripción relacionada</Label>
-              <Select
+              <SearchableSelect
                 value={editSubscriptionId}
                 onValueChange={setEditSubscriptionId}
-              >
-                <SelectTrigger id="edit-subscriptionId">
-                  <SelectValue placeholder="Selecciona suscripción" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="NONE">Sin suscripción</SelectItem>
-                  {subscriptions
-                    .filter(
-                      (subscription) => subscription.paymentMethod === "CASH",
-                    )
-                    .map((subscription) => (
-                      <SelectItem key={subscription.id} value={subscription.id}>
-                        {subscription.name} · {formatMoney(subscription.amount)}
-                      </SelectItem>
-                    ))}
-                </SelectContent>
-              </Select>
+                id="edit-subscriptionId"
+                title="Seleccionar suscripción"
+                placeholder="Selecciona suscripción"
+                searchPlaceholder="Buscar suscripción…"
+                options={[{
+                  value: "NONE",
+                  label: "Sin suscripción",
+                  pinned: true
+                }, ...subscriptions.filter(item => item.paymentMethod === "CASH").map(item => ({
+                  value: item.id,
+                  label: `${item.name} · ${formatMoney(item.amount)}`
+                }))]}
+              />
             </div>
 
             <div className="space-y-2 md:col-span-2">
@@ -1162,7 +1429,7 @@ export default function GastosContent() {
       </Dialog>
 
       <main onClickCapture={captureFocus}>
-        <section className="mx-auto flex w-full max-w-full flex-col px-4 py-5 md:py-8">
+        <section className={`mx-auto flex w-full max-w-full flex-col px-4 py-5 md:py-8 ${compactEntry ? "pb-28!" : ""}`}>
           {error ? (
             <Alert variant="destructive" className="mb-6">
               <AlertDescription>{error}</AlertDescription>
@@ -1205,314 +1472,16 @@ export default function GastosContent() {
             </Alert>
           ) : null}
 
-          <div className="grid min-w-0 gap-5 xl:grid-cols-[360px_1fr]">
-            <Card className="rounded-2xl border-border bg-card">
-              <CardHeader>
-                <CardTitle className="text-lg font-semibold uppercase text-center">
-                  Nuevo gasto
-                </CardTitle>
-              </CardHeader>
-
-              <CardContent className="space-y-4 md:space-y-5">
-                <div className="space-y-2">
-                  <Label htmlFor="date">Fecha</Label>
-                  <DatePicker
-                    id="date"
-                    value={date}
-                    onChange={setDate}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="paymentMethod">Método de pago</Label>
-                  <Select
-                    value={paymentMethod}
-                    onValueChange={(value) => {
-                      setPaymentMethod(value);
-
-                      if (value === "CASH") {
-                        setCardId("");
-                      }
-                    }}
-                  >
-                    <SelectTrigger id="paymentMethod">
-                      <SelectValue placeholder="Selecciona método" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="CASH">Efectivo</SelectItem>
-                      <SelectItem value="CARD">Tarjeta</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {paymentMethod === "CARD" ? (
-                  <div className="space-y-2">
-                    <Label htmlFor="cardId">Tarjeta</Label>
-                    <Select value={cardId} onValueChange={setCardId}>
-                      <SelectTrigger id="cardId">
-                        <SelectValue placeholder="Selecciona tarjeta" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {cards.map((card) => (
-                          <SelectItem key={card.id} value={card.id}>
-                            {card.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-
-                    {cards.length === 0 ? (
-                      <p className="text-xs text-muted-foreground">
-                        Aún no tienes tarjetas. Agrégalas en la pantalla
-                        Tarjetas.
-                      </p>
-                    ) : null}
-                  </div>
-                ) : null}
-
-                <div className="space-y-2">
-                  <Label htmlFor="concept">Concepto</Label>
-                  <Input
-                    id="concept"
-                    value={concept}
-                    placeholder="Ej. Tacos, Uber, Cine..."
-                    onChange={(event) => setConcept(event.target.value)}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="amount">Monto</Label>
-                  <Input
-                    id="amount"
-                    value={amount}
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    placeholder="0.00"
-                    onChange={(event) => setAmount(event.target.value)}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="categoryId">Categoría</Label>
-                  <Select value={categoryId} onValueChange={setCategoryId}>
-                    <SelectTrigger id="categoryId">
-                      <SelectValue placeholder="Selecciona categoría" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categories.map((category) => (
-                        <SelectItem key={category.id} value={category.id}>
-                          {category.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="notes">Notas (opcional)</Label>
-                  <Textarea
-                    id="notes"
-                    value={notes}
-                    placeholder="Algún detalle adicional..."
-                    onChange={(event) => setNotes(event.target.value)}
-                  />
-                </div>
-
-                <Collapsible open={showMoreOptions} onOpenChange={setShowMoreOptions} className="rounded-xl border border-border bg-background/50 p-4">
-                  <CollapsibleTrigger asChild>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    className="w-full justify-between text-left"
-                  >
-                    <span>Más opciones</span>
-                    <span className="text-muted-foreground">
-                      {showMoreOptions ? "Ocultar" : "Mostrar"}
-                    </span>
-                  </Button>
-                  </CollapsibleTrigger>
-
-                    <CollapsibleContent className="mt-4 space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="personId">Persona relacionada</Label>
-                        <Select
-                          value={personId || "NONE"}
-                          onValueChange={(value) => {
-                            const nextValue = value === "NONE" ? "" : value;
-                            setPersonId(nextValue);
-
-                            if (!nextValue) {
-                              setReceivableMode("CREATE");
-                              setReceivableAccountId("");
-                            }
-                          }}
-                        >
-                          <SelectTrigger id="personId">
-                            <SelectValue placeholder="Selecciona persona" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="NONE">Sin persona</SelectItem>
-                            {people.map((person) => (
-                              <SelectItem key={person.id} value={person.id}>
-                                {person.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-
-                        {people.length === 0 ? (
-                          <p className="text-xs text-muted-foreground">
-                            Puedes agregar personas en Configuración.
-                          </p>
-                        ) : null}
-                      </div>
-
-                      {personId ? (
-                        <>
-                          <div className="space-y-2">
-                            <Label htmlFor="receivableMode">Cuenta por cobrar</Label>
-                            <Select
-                              value={receivableMode}
-                              onValueChange={(value) => {
-                                setReceivableMode(value);
-
-                                if (value === "CREATE") {
-                                  setReceivableAccountId("");
-                                }
-                              }}
-                            >
-                              <SelectTrigger id="receivableMode">
-                                <SelectValue placeholder="Selecciona opción" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="CREATE">
-                                  Crear nueva automáticamente
-                                </SelectItem>
-                                <SelectItem value="EXISTING">
-                                  Vincular a existente
-                                </SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-
-                          {receivableMode === "EXISTING" ? (
-                            <div className="space-y-2">
-                              <Label htmlFor="receivableAccountId">Cuenta existente</Label>
-                              <Select
-                                value={receivableAccountId}
-                                onValueChange={setReceivableAccountId}
-                              >
-                                <SelectTrigger id="receivableAccountId">
-                                  <SelectValue placeholder="Selecciona cuenta por cobrar" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {receivables
-                                    .filter(
-                                      (item) => item.personId === personId,
-                                    )
-                                    .map((item) => (
-                                      <SelectItem key={item.id} value={item.id}>
-                                        {item.concept} · pendiente{" "}
-                                        {formatMoney(item.pendingBalance)}
-                                      </SelectItem>
-                                    ))}
-                                </SelectContent>
-                              </Select>
-
-                              {receivables.filter(
-                                (item) => item.personId === personId,
-                              ).length === 0 ? (
-                                <p className="text-xs text-muted-foreground">
-                                  Esta persona no tiene cuentas por cobrar
-                                  activas.
-                                </p>
-                              ) : null}
-                            </div>
-                          ) : null}
-
-                          <div className="space-y-2">
-                            <Label htmlFor="payableAccountId">Cuenta por pagar relacionada</Label>
-                            <Select
-                              value={payableAccountId}
-                              onValueChange={setPayableAccountId}
-                            >
-                              <SelectTrigger id="payableAccountId">
-                                <SelectValue placeholder="Selecciona cuenta por pagar" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="NONE">
-                                  Sin cuenta por pagar
-                                </SelectItem>
-                                {payables
-                                  .filter((item) => {
-                                    const pendingBalance = Number(
-                                      item.pendingBalance || 0,
-                                    );
-                                    return (
-                                      item.status === "ACTIVE" &&
-                                      pendingBalance > 0
-                                    );
-                                  })
-                                  .map((item) => (
-                                    <SelectItem key={item.id} value={item.id}>
-                                      {item.person?.name} · {item.concept} ·
-                                      pendiente{" "}
-                                      {formatMoney(item.pendingBalance)}
-                                    </SelectItem>
-                                  ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        </>
-                      ) : null}
-
-                      <Separator />
-
-                      <div className="space-y-2">
-                        <Label htmlFor="subscriptionId">Suscripción relacionada</Label>
-                        <Select
-                          value={subscriptionId}
-                          onValueChange={setSubscriptionId}
-                        >
-                          <SelectTrigger id="subscriptionId">
-                            <SelectValue placeholder="Selecciona suscripción" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="NONE">
-                              Sin suscripción
-                            </SelectItem>
-                            {subscriptions
-                              .filter(
-                                (subscription) =>
-                                  subscription.paymentMethod === "CASH",
-                              )
-                              .map((subscription) => (
-                                <SelectItem
-                                  key={subscription.id}
-                                  value={subscription.id}
-                                >
-                                  {subscription.name} ·{" "}
-                                  {formatMoney(subscription.amount)}
-                                </SelectItem>
-                              ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </CollapsibleContent>
-                </Collapsible>
-
-                <Button
-                  type="button"
-                  className="w-full"
-                  onClick={createExpense}
-                  disabled={isSaving}
-                >
-                  <Plus className="mr-2 h-4 w-4" />
-                  {isSaving ? "Guardando..." : "Guardar gasto"}
-                </Button>
-              </CardContent>
-            </Card>
+          <div className={`grid min-w-0 gap-5 ${compactEntry ? "" : "xl:grid-cols-[360px_1fr]"}`}>
+            <ExpenseCreateSurface compact={compactEntry} error={createError} isSaving={isSaving} isOnline={isOnline} onSubmit={createExpense}>
+              {({ compact }) => (
+                <>
+                  {compact ? createPrimaryFields : createPaymentFields}
+                  {compact ? createPaymentFields : createPrimaryFields}
+                  {createOptionalFields}
+                </>
+              )}
+            </ExpenseCreateSurface>
 
             <div className="min-w-0 space-y-6">
               <Card className="rounded-2xl border-border bg-card">
@@ -1524,27 +1493,24 @@ export default function GastosContent() {
 
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 gap-3 sm:flex sm:flex-wrap">
-                    <Select
+                    <ResponsiveSelect
                       value={filterMonth || "ALL"}
-                      onValueChange={(value) => {
+                      onValueChange={value => {
                         setFilterMonth(value === "ALL" ? "" : value);
                         setFilterDate("");
                       }}
-                    >
-                      <SelectTrigger aria-label="Filtrar por mes" className="w-full sm:w-[180px]">
-                        <SelectValue placeholder="Todos los meses" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="ALL">Todos los meses</SelectItem>
-                        {availableMonthsWithPending
-                          .filter(isValidYearMonth)
-                          .map((m) => (
-                            <SelectItem key={m} value={m}>
-                              {formatMonthLabel(m)}
-                            </SelectItem>
-                          ))}
-                      </SelectContent>
-                    </Select>
+                      aria-label="Filtrar por mes"
+                      className="w-full sm:w-[180px]"
+                      title="Filtrar por mes"
+                      placeholder="Todos los meses"
+                      options={[{
+                        value: "ALL",
+                        label: "Todos los meses"
+                      }, ...availableMonthsWithPending.filter(isValidYearMonth).map(m => ({
+                        value: String(m),
+                        label: String(formatMonthLabel(m))
+                      }))]}
+                    />
 
                     <div className="space-y-1">
                       <Label htmlFor="filterDate" className="sr-only">Filtrar por día</Label>
@@ -1572,22 +1538,23 @@ export default function GastosContent() {
                       </Button>
                     ) : null}
 
-                    <Select
+                    <SearchableSelect
                       value={filterCategoryId || "ALL"}
-                      onValueChange={(value) => setFilterCategoryId(value === "ALL" ? "" : value)}
-                    >
-                      <SelectTrigger aria-label="Filtrar por categoría" className="w-full sm:w-[180px]">
-                        <SelectValue placeholder="Todas las categorías" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="ALL">Todas las categorías</SelectItem>
-                        {categories.map((cat) => (
-                          <SelectItem key={cat.id} value={cat.id}>
-                            {cat.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                      onValueChange={value => setFilterCategoryId(value === "ALL" ? "" : value)}
+                      aria-label="Filtrar por categoría"
+                      className="w-full sm:w-[180px]"
+                      title="Seleccionar categoría"
+                      placeholder="Todas las categorías"
+                      searchPlaceholder="Buscar categoría…"
+                      options={[{
+                        value: "ALL",
+                        label: "Todas las categorías",
+                        pinned: true
+                      }, ...categories.map(item => ({
+                        value: item.id,
+                        label: item.name
+                      }))]}
+                    />
 
                     <div className="space-y-1">
                       <Label htmlFor="filterConcept" className="sr-only">Buscar por concepto</Label>
@@ -1600,23 +1567,26 @@ export default function GastosContent() {
                       />
                     </div>
 
-                    <Select
+                    <ResponsiveSelect
                       value={filterCardId || "ALL"}
-                      onValueChange={(value) => setFilterCardId(value === "ALL" ? "" : value)}
-                    >
-                      <SelectTrigger aria-label="Filtrar por método de pago" className="w-full sm:w-[180px]">
-                        <SelectValue placeholder="Todas las tarjetas" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="ALL">Todas las tarjetas</SelectItem>
-                        <SelectItem value="CASH">Efectivo</SelectItem>
-                        {cards.map((card) => (
-                          <SelectItem key={card.id} value={card.id}>
-                            {card.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                      onValueChange={value => setFilterCardId(value === "ALL" ? "" : value)}
+                      aria-label="Filtrar por método de pago"
+                      className="w-full sm:w-[180px]"
+                      title="Filtrar por método de pago"
+                      placeholder="Todas las tarjetas"
+                      options={[{
+                        value: "ALL",
+                        label: "Todas las tarjetas"
+                      }, {
+                        value: "CASH",
+                        label: "Efectivo"
+                      }, ...cards.map(card => ({
+                        value: String(card.id),
+                        label: String(card.name)
+                      }))]}
+                      searchable="auto"
+                      searchPlaceholder="Buscar tarjeta…"
+                    />
 
                     <div className="space-y-1">
                       <Label htmlFor="filterAmount" className="sr-only">Filtrar por monto</Label>
