@@ -1,44 +1,21 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import AppHeader from "@/components/layout/AppHeader";
 import AppSidebar from "@/components/layout/AppSidebar";
 import {
   SidebarInset,
   SidebarProvider,
-  SidebarTrigger,
 } from "@/components/ui/sidebar";
 
-const pageTitles = {
-  "/gastos": "Gastos",
-  "/dashboard": "Dashboard",
-  "/compras-a-meses": "Compras a meses",
-  "/suscripciones": "Suscripciones",
-  "/ingresos": "Ingresos",
-  "/cuentas-por-cobrar": "Cuentas por cobrar",
-  "/cuentas-por-pagar": "Cuentas por pagar",
-  "/tarjetas": "Tarjetas",
-  "/configuracion": "Configuración",
-};
-
 export default function AppShell({ children }) {
-  const pathname = usePathname();
-
-  const currentPageTitle = pageTitles[pathname] || "AFP";
-
   return (
     <SidebarProvider>
       <AppSidebar />
 
       <SidebarInset className="min-w-0">
-        <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border bg-background/90 px-4 backdrop-blur">
-          <SidebarTrigger />
+        <AppHeader />
 
-          <div className="min-w-0">
-            <h1 className="truncate text-sm font-medium">{currentPageTitle}</h1>
-          </div>
-        </header>
-
-        <div className="min-h-[calc(100dvh-3.5rem)] bg-background text-foreground">
+        <div className="min-h-[calc(100dvh-3rem)] bg-background text-foreground md:min-h-[calc(100dvh-3.5rem)]">
           {children}
         </div>
       </SidebarInset>

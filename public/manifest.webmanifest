@@ -2,7 +2,7 @@
   "name": "Control de Gastos",
   "short_name": "Gastos",
   "description": "App personal para gastos, tarjetas y cuentas por cobrar",
-  "start_url": "/gastos",
+  "start_url": "/dashboard",
   "scope": "/",
   "display": "standalone",
   "background_color": "#09090b",

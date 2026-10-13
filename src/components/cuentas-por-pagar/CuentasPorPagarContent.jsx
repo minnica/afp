@@ -1,5 +1,8 @@
 "use client";
 
+import { useCreationDraft } from "@/hooks/use-creation-draft";
+import { useIsMobile } from "@/hooks/use-mobile";
+
 import CreateRecordSurface, { useCreateDialogMode } from "@/components/ui/create-record-surface";
 
 import { SearchableSelect } from "@/components/ui/searchable-select";
@@ -105,6 +108,7 @@ function toDateInputValue(dateString) {
 export default function CuentasPorPagarContent() {
   const { captureFocus, restoreFocus } = useDialogFocus();
   const router = useRouter();
+  const mobileNavigation = useIsMobile();
   const compactEntry = useCreateDialogMode();
   const [createError, setCreateError] = useState(null);
 
@@ -119,6 +123,14 @@ export default function CuentasPorPagarContent() {
   const [expectedMonthlyPayment, setExpectedMonthlyPayment] = useState("");
   const [expectedDate, setExpectedDate] = useState("");
   const [notes, setNotes] = useState("");
+
+  useCreationDraft({
+    name: "cuentas-por-pagar",
+    userId: user?.id,
+    enabled: mobileNavigation,
+    values: { personId, concept, originalAmount, originDate, expectedMonthlyPayment, expectedDate, notes },
+    setters: { personId: setPersonId, concept: setConcept, originalAmount: setOriginalAmount, originDate: setOriginDate, expectedMonthlyPayment: setExpectedMonthlyPayment, expectedDate: setExpectedDate, notes: setNotes },
+  });
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);

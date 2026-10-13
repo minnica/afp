@@ -1,5 +1,8 @@
 "use client";
 
+import { useCreationDraft } from "@/hooks/use-creation-draft";
+import { useIsMobile } from "@/hooks/use-mobile";
+
 import CreateRecordSurface, { useCreateDialogMode } from "@/components/ui/create-record-surface";
 
 import { ResponsiveSelect } from "@/components/ui/responsive-select";
@@ -90,6 +93,7 @@ function getFrequencyLabel(value) {
 export default function SuscripcionesContent() {
   const { captureFocus, restoreFocus } = useDialogFocus();
   const router = useRouter();
+  const mobileNavigation = useIsMobile();
   const compactEntry = useCreateDialogMode();
   const [createError, setCreateError] = useState(null);
 
@@ -107,6 +111,14 @@ export default function SuscripcionesContent() {
   const [frequencyMonths, setFrequencyMonths] = useState("1");
   const [startMonth, setStartMonth] = useState(getCurrentMonthValue());
   const [startYear, setStartYear] = useState(getCurrentYearValue());
+
+  useCreationDraft({
+    name: "suscripciones",
+    userId: user?.id,
+    enabled: mobileNavigation,
+    values: { name, amount, paymentMethod, cardId, categoryId, chargeDay, frequencyMonths, startMonth, startYear },
+    setters: { name: setName, amount: setAmount, paymentMethod: setPaymentMethod, cardId: setCardId, categoryId: setCategoryId, chargeDay: setChargeDay, frequencyMonths: setFrequencyMonths, startMonth: setStartMonth, startYear: setStartYear },
+  });
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -633,7 +645,7 @@ export default function SuscripcionesContent() {
         <DialogContent onCloseAutoFocus={restoreFocus} className="sm:max-w-sm">
           <DialogHeader>
             <DialogTitle>Desactivar suscripción</DialogTitle>
-            <DialogDescription>Revisa la información antes de confirmar los cambios.</DialogDescription>
+            <DialogDescription className="sr-only">Revisa la información antes de confirmar los cambios.</DialogDescription>
           </DialogHeader>
 
           <p className="text-sm text-muted-foreground">
@@ -686,7 +698,7 @@ export default function SuscripcionesContent() {
         <DialogContent onCloseAutoFocus={restoreFocus} className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle>Editar suscripción</DialogTitle>
-            <DialogDescription>Actualiza los datos y guarda los cambios.</DialogDescription>
+            <DialogDescription className="sr-only">Actualiza los datos y guarda los cambios.</DialogDescription>
           </DialogHeader>
 
           <div className="grid gap-4 md:grid-cols-2">

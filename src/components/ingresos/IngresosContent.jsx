@@ -1,5 +1,8 @@
 "use client";
 
+import { useCreationDraft } from "@/hooks/use-creation-draft";
+import { useIsMobile } from "@/hooks/use-mobile";
+
 import CreateRecordSurface, { useCreateDialogMode } from "@/components/ui/create-record-surface";
 
 import { ResponsiveSelect } from "@/components/ui/responsive-select";
@@ -76,6 +79,7 @@ function formatDate(dateString) {
 export default function IngresosContent() {
   const { captureFocus, restoreFocus } = useDialogFocus();
   const router = useRouter();
+  const mobileNavigation = useIsMobile();
   const compactEntry = useCreateDialogMode();
   const [createError, setCreateError] = useState(null);
 
@@ -91,6 +95,14 @@ export default function IngresosContent() {
   const [amount, setAmount] = useState("");
   const [receivableAccountId, setReceivableAccountId] = useState("NONE");
   const [notes, setNotes] = useState("");
+
+  useCreationDraft({
+    name: "ingresos",
+    userId: user?.id,
+    enabled: mobileNavigation,
+    values: { date, incomeTypeId, source, concept, amount, receivableAccountId, notes },
+    setters: { date: setDate, incomeTypeId: setIncomeTypeId, source: setSource, concept: setConcept, amount: setAmount, receivableAccountId: setReceivableAccountId, notes: setNotes },
+  });
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -650,7 +662,7 @@ export default function IngresosContent() {
           <DialogContent onCloseAutoFocus={restoreFocus} className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
             <DialogHeader>
               <DialogTitle>Editar ingreso</DialogTitle>
-              <DialogDescription>Actualiza los datos y guarda los cambios.</DialogDescription>
+              <DialogDescription className="sr-only">Actualiza los datos y guarda los cambios.</DialogDescription>
             </DialogHeader>
 
             <div className="grid gap-4 md:grid-cols-2">

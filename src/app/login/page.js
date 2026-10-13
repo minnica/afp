@@ -40,7 +40,7 @@ export default function LoginPage() {
 
         await ensureUserSetup(data.user);
 
-        router.push("/gastos");
+        router.push("/dashboard");
         router.refresh();
       }
 

@@ -9,6 +9,12 @@ body:has([data-slot="expense-create-action"], [data-slot="record-create-action"]
   bottom: calc(5rem + env(safe-area-inset-bottom));
 }
 
+/* El aviso de guardado deja libre la cabecera de la captura móvil. */
+body:has([data-slot="record-create-panel"]) [data-sonner-toaster][data-y-position="top"] {
+  top: calc(3rem + var(--mobile-offset-top, 1rem));
+  clip-path: inset(0 -100vw -100vh);
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

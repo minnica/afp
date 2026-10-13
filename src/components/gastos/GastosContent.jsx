@@ -1,5 +1,8 @@
 "use client";
 
+import { useCreationDraft } from "@/hooks/use-creation-draft";
+import { useIsMobile } from "@/hooks/use-mobile";
+
 import ExpenseCreateSurface, { useExpenseDialogMode } from "@/components/gastos/ExpenseCreateSurface";
 
 import { ResponsiveSelect } from "@/components/ui/responsive-select";
@@ -163,6 +166,7 @@ function getMonthRange(yearMonth) {
 export default function GastosContent() {
   const { captureFocus, restoreFocus } = useDialogFocus();
   const router = useRouter();
+  const mobileNavigation = useIsMobile();
   const compactEntry = useExpenseDialogMode();
 
   const [user, setUser] = useState(null);
@@ -200,6 +204,14 @@ export default function GastosContent() {
   const [receivableAccountId, setReceivableAccountId] = useState("");
   const [payableAccountId, setPayableAccountId] = useState("NONE");
   const [subscriptionId, setSubscriptionId] = useState("NONE");
+
+  useCreationDraft({
+    name: "gastos",
+    userId: user?.id,
+    enabled: mobileNavigation,
+    values: { date, paymentMethod, cardId, concept, amount, categoryId, notes, showMoreOptions, personId, receivableMode, receivableAccountId, payableAccountId, subscriptionId },
+    setters: { date: setDate, paymentMethod: setPaymentMethod, cardId: setCardId, concept: setConcept, amount: setAmount, categoryId: setCategoryId, notes: setNotes, showMoreOptions: setShowMoreOptions, personId: setPersonId, receivableMode: setReceivableMode, receivableAccountId: setReceivableAccountId, payableAccountId: setPayableAccountId, subscriptionId: setSubscriptionId },
+  });
 
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingExpenseId, setEditingExpenseId] = useState("");
@@ -1298,7 +1310,7 @@ export default function GastosContent() {
         <DialogContent onCloseAutoFocus={restoreFocus} className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle>Editar gasto</DialogTitle>
-            <DialogDescription>Actualiza los datos y guarda los cambios.</DialogDescription>
+            <DialogDescription className="sr-only">Actualiza los datos y guarda los cambios.</DialogDescription>
           </DialogHeader>
 
           <div className="grid gap-4 md:grid-cols-2">

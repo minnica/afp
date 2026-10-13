@@ -1,5 +1,8 @@
 "use client";
 
+import { useCreationDraft } from "@/hooks/use-creation-draft";
+import { useIsMobile } from "@/hooks/use-mobile";
+
 import CreateRecordSurface, { useCreateDialogMode } from "@/components/ui/create-record-surface";
 
 import { ResponsiveSelect } from "@/components/ui/responsive-select";
@@ -105,6 +108,7 @@ function formatChargeDaysInput(days) {
 export default function CuentasPorCobrarContent() {
   const { captureFocus, restoreFocus } = useDialogFocus();
   const router = useRouter();
+  const mobileNavigation = useIsMobile();
   const compactEntry = useCreateDialogMode();
   const [createError, setCreateError] = useState(null);
 
@@ -119,6 +123,14 @@ export default function CuentasPorCobrarContent() {
   const [expectedMonthlyPayment, setExpectedMonthlyPayment] = useState("");
   const [expectedChargeDays, setExpectedChargeDays] = useState("");
   const [notes, setNotes] = useState("");
+
+  useCreationDraft({
+    name: "cuentas-por-cobrar",
+    userId: user?.id,
+    enabled: mobileNavigation,
+    values: { personId, concept, originalAmount, originDate, expectedMonthlyPayment, expectedChargeDays, notes },
+    setters: { personId: setPersonId, concept: setConcept, originalAmount: setOriginalAmount, originDate: setOriginDate, expectedMonthlyPayment: setExpectedMonthlyPayment, expectedChargeDays: setExpectedChargeDays, notes: setNotes },
+  });
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -799,7 +811,7 @@ export default function CuentasPorCobrarContent() {
           <DialogContent onCloseAutoFocus={restoreFocus} className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
             <DialogHeader>
               <DialogTitle>Editar cuenta por cobrar</DialogTitle>
-              <DialogDescription>Actualiza los datos y guarda los cambios.</DialogDescription>
+              <DialogDescription className="sr-only">Actualiza los datos y guarda los cambios.</DialogDescription>
             </DialogHeader>
 
             <div className="grid gap-4 md:grid-cols-2">

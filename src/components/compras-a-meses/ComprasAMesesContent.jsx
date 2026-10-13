@@ -1,5 +1,8 @@
 "use client";
 
+import { useCreationDraft } from "@/hooks/use-creation-draft";
+import { useIsMobile } from "@/hooks/use-mobile";
+
 import CreateRecordSurface, { useCreateDialogMode } from "@/components/ui/create-record-surface";
 
 import { ResponsiveSelect } from "@/components/ui/responsive-select";
@@ -126,6 +129,7 @@ function getNextPaymentDueDate(purchase) {
 export default function ComprasAMesesContent() {
   const { captureFocus, restoreFocus } = useDialogFocus();
   const router = useRouter();
+  const mobileNavigation = useIsMobile();
   const compactEntry = useCreateDialogMode();
   const [createError, setCreateError] = useState(null);
 
@@ -145,6 +149,14 @@ export default function ComprasAMesesContent() {
   const [personId, setPersonId] = useState("NONE");
   const [categoryId, setCategoryId] = useState("");
   const [notes, setNotes] = useState("");
+
+  useCreationDraft({
+    name: "compras-a-meses",
+    userId: user?.id,
+    enabled: mobileNavigation,
+    values: { cardId, purchaseDate, concept, totalAmount, months, manualMonthlyPayment, initialPaymentsMade, personId, categoryId, notes },
+    setters: { cardId: setCardId, purchaseDate: setPurchaseDate, concept: setConcept, totalAmount: setTotalAmount, months: setMonths, manualMonthlyPayment: setManualMonthlyPayment, initialPaymentsMade: setInitialPaymentsMade, personId: setPersonId, categoryId: setCategoryId, notes: setNotes },
+  });
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -665,7 +677,7 @@ export default function ComprasAMesesContent() {
         <DialogContent onCloseAutoFocus={restoreFocus} className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle>Editar compra a meses</DialogTitle>
-            <DialogDescription>Actualiza los datos y guarda los cambios.</DialogDescription>
+            <DialogDescription className="sr-only">Actualiza los datos y guarda los cambios.</DialogDescription>
           </DialogHeader>
 
           <div className="grid gap-4 md:grid-cols-2">

@@ -236,3 +236,84 @@ ESLint completo sin errores (solo la advertencia existente de TanStack Table), c
 Por preferencia del usuario, Tarjetas y Configuración conservan sus formularios de alta integrados también en móvil. Tarjetas inicia en Ciclos mensuales y «Nueva tarjeta» aparece únicamente dentro de la pestaña Tarjetas; `CreateRecordSurface` recibe `compact={false}`. Configuración muestra los formularios de categorías, personas y tipos de ingreso dentro de sus respectivas pestañas. Se retiraron el diálogo de catálogo, la detección del modo compacto, las acciones fijas y el espacio inferior reservado de ambas páginas. Se conservan los iconos de guardado, los estados de espera y el manejo de errores y refresco. Los diálogos de captura siguen activos en Gastos, Compras a meses, Suscripciones, Ingresos y Cuentas por cobrar/pagar.
 
 Comprobado en web a 390 px con API simulada: Tarjetas inicia en Ciclos, su formulario aparece al elegir Tarjetas y guarda/actualiza la lista; Configuración permite guardar en los tres catálogos. Ninguna muestra diálogo de alta ni acción fija. También se comprobó Configuración a 1280 px. Sin errores de JavaScript ni desbordamiento horizontal. Se retiró la ruta temporal y se cerró el navegador; no se ejecutó el emulador ni se escribieron datos reales. ESLint de ambas páginas y `git diff --check` correctos.
+
+
+## Navegación entre secciones desde la captura móvil
+
+`MobileNavigationSheet` compone los componentes oficiales Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetClose y SheetFooter con `side="bottom"`. Se consultaron el registro y el ejemplo `sheet-side` mediante el MCP de shadcn. El componente base no se modifica y no se añaden dependencias. La lista de destinos se extrajo a `src/lib/navigation.js` y se comparte con AppSidebar, conservando sus etiquetas, rutas, iconos y orden.
+
+Solo aparece con ancho menor de 768 px. En AppShell sustituye el acceso al menú lateral por «Cambiar sección»; también se monta dentro del encabezado de los diálogos de alta, con lo que se navega en dos toques sin cerrar primero el formulario. Escritorio conserva su SidebarTrigger y presentación. Las nueve secciones son enlaces reales; la actual usa `aria-current="page"`, fondo y marca. Enlaces y cierre tienen áreas de 48 px. No hay buscador ni foco en inputs: abre con foco en el título. Cancelar o elegir la sección actual cierra únicamente el Sheet y devuelve el foco al acceso. Elegir otro destino cierra el diálogo de captura y navega; se evita restaurar foco a una capa que va a desaparecer. El acceso de la captura está deshabilitado mientras se guarda.
+
+La lista tiene desplazamiento independiente, respeta el área segura inferior y se adapta a visualViewport. El footer conserva «Cerrar sesión», muestra espera y permite reintentar si falla. Los enlaces y el cierre se bloquean durante esa operación.
+
+`useCreationDraft` conserva campos y selecciones de Gastos, Compras a meses, Suscripciones, Ingresos y Cuentas por cobrar/pagar en sessionStorage por usuario y sección, con respaldo en memoria. La lectura es posterior a la hidratación y valida los tipos de los campos; la escritura espera a completar la restauración para no sobrescribir el borrador con valores iniciales. En escritorio no restaura ni escribe. Si ya se estaban editando campos al pasar a móvil, conserva esos valores. El reset existente tras guardar u offline se refleja en el borrador; se conservan los contratos de estado, API y cola offline.
+
+Pruebas en navegador web con las páginas y rutas reales, sesión y API simuladas:
+
+- A 390 px: Sheet inferior, nueve enlaces de 48 px, sección activa y foco en título sin input. Escape y elegir la sección actual conservaron el formulario y devolvieron el foco. Se revisó visualmente el panel final, incluido cierre de sesión.
+- Navegación en dos toques a las nueve secciones; las seis capturas abrieron su diálogo y recuperaron sus respectivos conceptos e importes. Notas y categoría de Gastos se conservaron. Tarjetas y Configuración mantuvieron su vista integrada. Dashboard marcó la sección correcta.
+- Guardar Gastos envió una única cantidad sin comas, mantuvo el diálogo y dejó concepto/monto vacíos al volver; categoría conservada. Navegar desde la captura quedó bloqueado durante el POST pendiente.
+- Borradores aislados entre dos usuarios, recuperación tras recarga y respaldo al bloquear sessionStorage. Al pasar de escritorio a celular se conservó la captura ya iniciada.
+- A 320 px, en horizontal de 640 × 390 px y con reducción simulada de visualViewport: sin desbordamiento horizontal, panel dentro del espacio disponible y lista desplazable.
+- A 1280 px: SidebarTrigger y captura integrada; sin acceso ni Sheet móvil, y sin restaurar el borrador de celular.
+- Cierre de sesión simulado: error visible, reintento y redirección a login sin capas bloqueadas. Sin errores de JavaScript.
+
+Se retiró la ruta temporal y se cerró el navegador. No se ejecutó el emulador ni se guardaron registros reales.
+
+ESLint completo sin errores (solo la advertencia existente de TanStack Table), compilación de producción y `git diff --check`: correctos.
+
+
+## Cabecera móvil independiente del diálogo de captura
+
+`AppHeader` reúne la cabecera existente de AppShell y se reutiliza en la captura móvil. «Cambiar sección» y el nombre de la página ocupan una barra sticky de 56 px, visualmente independiente de la tarjeta del formulario. Se retiró el acceso del `DialogHeader`: allí quedan únicamente el título y la descripción de la captura. La tarjeta conserva el cuerpo desplazable, las acciones visibles y el cierre. En escritorio AppShell conserva la misma presentación, el SidebarTrigger y los formularios integrados.
+
+Se consultaron otra vez Dialog y Sheet a través del MCP de shadcn. Los componentes base permanecen canónicos. En celular, DialogContent delimita el espacio de visualViewport y contiene dos superficies: cabecera y tarjeta. Esta composición mantiene la navegación dentro del alcance de foco de Radix y evita elevar una cabecera externa que el modal ocultaría a tecnologías de asistencia. Solo la cabecera y la tarjeta reciben eventos de puntero; tocar el fondo sigue cerrando la captura, salvo durante el guardado. El Sheet sigue abriendo sobre ambas superficies y cancelar devuelve el foco a la cabecera.
+
+La posición y el tamaño se ajustan tanto al montar cada portal como cuando cambia visualViewport. Así, abrir la navegación con el teclado ya visible también limita correctamente el panel. Los avisos de guardado se sitúan debajo de la cabecera y su animación se recorta por encima de esa zona para dejar libre la navegación.
+
+La revisión de layout de impeccable se ejecutó con dos agentes independientes: evaluación de jerarquía/espaciado y detección de patrones de layout. El detector no encontró incidencias; la composición separa navegación global y captura, conserva las escalas existentes y reserva la altura de la cabecera.
+
+Validación en navegador web con rutas reales, sesión y API simuladas:
+
+- Las seis capturas muestran la misma cabecera independiente y conservan sus borradores al navegar y volver. Sheet, selección de la sección actual, Escape y restauración de foco funcionan.
+- El recorrido con Tab incluye la cabecera y queda dentro de la capa modal; el contenido de fondo permanece excluido de accesibilidad. Abrir la captura no enfoca ningún input.
+- A 320 px, en horizontal 640 × 390 px y con visualViewport reducido a 300 px y desplazado 20 px: cabecera estable, formulario desplazable, footer visible y ausencia de desbordamiento horizontal. Abrir el Sheet con esa reducción ya aplicada respeta el espacio disponible.
+- Tocar el fondo cierra la captura; reabrir y guardar mantienen el comportamiento continuo. El guardado envía el importe sin separadores y limpia los campos del registro. Su aviso deja libre la navegación.
+- A 1280 px, la captura sigue integrada y se conserva SidebarTrigger. Tarjetas y Configuración mantienen sus excepciones.
+
+No se ejecutó el emulador ni se guardaron datos reales.
+
+Se retiró la ruta temporal y se cerró el navegador. ESLint completo sin errores (solo la advertencia existente de TanStack Table), compilación de producción y `git diff --check`: correctos.
+
+
+## Simplificación visual de la cabecera móvil
+
+La barra de AppHeader pasa de 56 a 48 px únicamente por debajo de 768 px. «Cambiar sección» usa la variante ghost del Button local de shadcn, sin borde, fondo ni padding horizontal decorativo. Conserva icono, etiqueta, área táctil de 44 px, foco visible y estados deshabilitado/abierto. El acceso usa muted-foreground para que el nombre de la página mantenga la jerarquía: los tokens existentes ofrecen aproximadamente 7.6:1 sobre el fondo oscuro y 4.7:1 sobre el claro. No cambia el Sheet ni sus destinos.
+
+La altura mínima del contenido de AppShell y el desplazamiento de los avisos de guardado se ajustan a los 48 px de la barra móvil. Escritorio conserva sus 56 px y SidebarTrigger.
+
+Comprobado en navegador a 390 y 320 px: captura abierta sin foco en inputs, acceso transparente y sin borde, nueve destinos en el Sheet, Escape y restauración del foco, sin desbordamiento horizontal. Revisada la captura visualmente. A 1280 px se conserva el formulario integrado y la cabecera de escritorio. Sin errores de JavaScript. ESLint de los componentes modificados y git diff --check correctos. Se retiró la ruta temporal y se cerró el navegador; no se ejecutó el emulador ni se guardaron datos reales.
+
+
+## Más espacio en los formularios de diálogo
+
+Las descripciones bajo el título de los formularios de alta y edición, desactivación de suscripción y captura de ciclos de tarjetas usan `sr-only`: dejan de ocupar espacio visual y conservan la descripción accesible de Radix. Se mantienen los títulos, campos, avisos del formulario y acciones. El cambio de alta se aplica a las seis páginas mediante CreateRecordSurface. ESLint de los componentes modificados y git diff --check correctos; no se ejecutó el emulador.
+
+
+## Menú móvil desplegado desde arriba
+
+Se consultó el ejemplo oficial `sheet-side` mediante el MCP de shadcn y se cambió únicamente MobileNavigationSheet a `side="top"`. El componente base Sheet mantiene sus estilos y animación oficiales. La composición usa esquinas inferiores redondeadas y área segura superior; visualViewport ajusta `top` a offsetTop y conserva el máximo de altura, con la lista desplazable. Los selectores mantienen sus paneles inferiores.
+
+Comprobado en navegador a 390 px y en horizontal con visualViewport de 300 px y offsetTop de 20 px, incluido abrir el menú cuando esa reducción ya existe: nueve enlaces, foco en título, panel dentro del área visible, lista desplazable y Escape devuelve el foco a la cabecera sin cerrar la captura. Sin errores de JavaScript ni desbordamiento horizontal. ESLint del componente y git diff --check correctos. Ruta temporal retirada y navegador cerrado; no se ejecutó el emulador.
+
+
+## Menú sin textos introductorios visibles
+
+El título «Cambiar sección» y la descripción del Sheet usan sr-only: siguen disponibles para lectores de pantalla y no ocupan espacio visual. El encabezado se reduce a una fila de 48 px para el cierre, separado de los enlaces para evitar superposiciones al desplazar la lista. Se conserva el foco inicial en el título accesible y la restauración al acceso. ESLint del componente y git diff --check correctos.
+
+
+## Cierre integrado en el pie del menú
+
+La revisión de impeccable con el flujo distill elimina la fila vacía de 48 px que dejaba la X aislada. El Sheet empieza con la lista y 8 px de espacio superior. SheetHeader permanece solo para lectores de pantalla y conserva el foco inicial. SheetClose se mueve al footer con icono X y etiqueta «Cerrar menú», en un Button ghost de 48 px, sin borde ni fondo; «Cerrar sesión» permanece a la izquierda. Ambas acciones usan ghost y muted-foreground. El pie queda fuera del área desplazable. Los tokens conservan el contraste de la interfaz y se evita superponer el cierre a los destinos. El estado de espera usa texto truncable para caber también a 320 px.
+
+Validado en navegador a 390 y 320 px: nueve destinos, cierre identificado, ambos botones de 48 px, sin desbordamiento y captura/borrador conservados al cerrar. Revisada la captura visualmente. En horizontal con visualViewport de 300 px y offsetTop de 20 px, la lista se desplaza y el pie sigue visible. Cierre de sesión simulado: botones bloqueados durante la espera, sin desbordamiento a 320 px, error visible y cierre habilitado para volver; Escape conserva el diálogo y devuelve el foco. Sin errores de JavaScript. ESLint del componente y git diff --check correctos; ruta temporal retirada y navegador cerrado. No se ejecutó el emulador ni se escribieron datos reales.

@@ -301,7 +301,7 @@ export default function CyclesDataTable({
           <DialogContent onCloseAutoFocus={restoreFocus}>
             <DialogHeader>
               <DialogTitle>Editar fechas reales</DialogTitle>
-              <DialogDescription>Actualiza las fechas de inicio, corte y vencimiento del ciclo.</DialogDescription>
+              <DialogDescription className="sr-only">Actualiza las fechas de inicio, corte y vencimiento del ciclo.</DialogDescription>
             </DialogHeader>
             <div className="grid gap-3">
               <div className="space-y-2">
@@ -344,7 +344,7 @@ export default function CyclesDataTable({
           <DialogContent onCloseAutoFocus={restoreFocus}>
             <DialogHeader>
               <DialogTitle>Estado de cuenta</DialogTitle>
-              <DialogDescription>Captura el importe indicado en el estado de cuenta bancario.</DialogDescription>
+              <DialogDescription className="sr-only">Captura el importe indicado en el estado de cuenta bancario.</DialogDescription>
             </DialogHeader>
             <div className="space-y-2">
               <Label htmlFor="cycles-data-table-field-1">Monto estado de cuenta</Label>
@@ -371,7 +371,7 @@ export default function CyclesDataTable({
           <DialogContent onCloseAutoFocus={restoreFocus}>
             <DialogHeader>
               <DialogTitle>Registrar pago</DialogTitle>
-              <DialogDescription>Registra la fecha y el importe pagado de este ciclo.</DialogDescription>
+              <DialogDescription className="sr-only">Registra la fecha y el importe pagado de este ciclo.</DialogDescription>
             </DialogHeader>
             <div className="grid gap-3">
               <div className="space-y-2">
