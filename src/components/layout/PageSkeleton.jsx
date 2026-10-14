@@ -118,7 +118,7 @@ export default function PageSkeleton({ variant = "form-table" }) {
       <main>
         <section className="mx-auto flex w-full max-w-full flex-col px-4 py-8">
           <div className="space-y-6">
-            <Card className="rounded-2xl border-border bg-card">
+            <Card className="hidden rounded-2xl border-border bg-card md:flex">
               <CardHeader>
                 <Skeleton className="mx-auto h-5 w-40" />
               </CardHeader>

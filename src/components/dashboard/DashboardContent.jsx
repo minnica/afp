@@ -1,51 +1,17 @@
 "use client";
 
-import { ResponsiveSelect } from "@/components/ui/responsive-select";
-
-import { useDialogFocus } from "@/hooks/use-dialog-focus";
-
-import { Empty, EmptyDescription } from "@/components/ui/empty";
-
-import { useEffect, useId, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
-import { format } from "date-fns";
-import { es } from "date-fns/locale";
-
-import { supabase } from "@/lib/supabase";
-import { ensureUserSetup } from "@/lib/userSetup";
-
+import { useMemo, useState } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { useDashboard } from "@/components/dashboard/DashboardProvider";
+import { CardUsageWaiverProgress, ImportantNoticesCard } from "@/components/dashboard/DashboardPanels";
+import { MONTH_NAMES, formatMoney, formatCompactDate } from "@/lib/dashboardPresentation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
-import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Dialog } from "@/components/ui/dialog";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Empty, EmptyDescription } from "@/components/ui/empty";
 import PageSkeleton from "@/components/layout/PageSkeleton";
-import CardUsageWaiverBreakdown from "@/components/dashboard/CardUsageWaiverBreakdown";
-import { BreakdownDialogContent } from "@/components/ui/responsive-breakdown";
 import CyclePeriodHelp from "@/components/dashboard/CyclePeriodHelp";
-import {
-  AlertTriangle,
-  Bell,
-  CalendarClock,
-  Scissors,
-} from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-
-const MONTH_NAMES = [
-  "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-  "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre",
-];
-
-function formatMoney(value) {
-  const numberValue = Number(value || 0);
-
-  return new Intl.NumberFormat("es-MX", {
-    style: "currency",
-    currency: "MXN",
-  }).format(numberValue);
-}
 
 function getLastDayOfMonthUtc(year, monthIndex) {
   return new Date(Date.UTC(year, monthIndex + 1, 0)).getUTCDate();
@@ -137,52 +103,7 @@ function getPayrollAccentClass(dueDateString) {
   return "border-l-4 border-l-pink-400/70";
 }
 
-function formatCompactDate(dateString) {
-  if (!dateString) return "-";
 
-  const date = new Date(dateString);
-  const dateText = format(date, "d MMMM", { locale: es });
-
-  const today = new Date();
-
-  const todayUtc = Date.UTC(
-    today.getFullYear(),
-    today.getMonth(),
-    today.getDate(),
-  );
-
-  const targetUtc = Date.UTC(
-    date.getUTCFullYear(),
-    date.getUTCMonth(),
-    date.getUTCDate(),
-  );
-
-  const diffDays = Math.round((targetUtc - todayUtc) / 86400000);
-
-  if (diffDays === 0) return `${dateText} [Hoy]`;
-  if (diffDays > 0) return `${dateText} [+${diffDays}]`;
-
-  return `${dateText} [${diffDays}]`;
-}
-
-function getCutDateSortValue(dateString) {
-  if (!dateString) return Number.MAX_SAFE_INTEGER;
-  const date = new Date(dateString);
-  if (Number.isNaN(date.getTime())) return Number.MAX_SAFE_INTEGER;
-  return Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
-}
-
-function compareByCutDate(a, b, direction) {
-  const aDate = getCutDateSortValue(a.selectedCycle?.cutDate);
-  const bDate = getCutDateSortValue(b.selectedCycle?.cutDate);
-  // Los ciclos sin fecha permanecen al final en ambos sentidos.
-  const difference = aDate === Number.MAX_SAFE_INTEGER || bDate === Number.MAX_SAFE_INTEGER
-    ? aDate - bDate
-    : (aDate - bDate) * (direction === "desc" ? -1 : 1);
-  return difference || String(a.card?.name || "").localeCompare(
-    String(b.card?.name || ""), "es",
-  );
-}
 
 function getStatusLabel(status) {
   const labels = {
@@ -215,77 +136,11 @@ function getStatusBadgeClass(status) {
   return classes[status] || "border-border bg-muted text-muted-foreground";
 }
 
-function getNoticeAlertClass(group) {
-  const classes = {
-    overdue: "border-red-500/60 bg-red-500/15 text-red-400 dark:text-red-300",
-    today:
-      "border-orange-500/60 bg-orange-500/15 text-orange-400 dark:text-orange-300",
-    upcoming:
-      "border-amber-500/50 bg-amber-500/12 text-amber-500 dark:text-amber-400",
-    cut: "border-blue-500/25 bg-blue-500/8 text-blue-500 dark:text-blue-400",
-  };
-
-  return classes[group] || "border-border bg-muted/30";
-}
-
-function getNoticeIcon(group) {
-  if (group === "overdue") return AlertTriangle;
-  if (group === "today") return CalendarClock;
-  if (group === "cut") return Scissors;
-  return Bell;
-}
 
 export default function DashboardContent() {
-  const router = useRouter();
+  const { dashboard, isLoading, error, today: now } = useDashboard();
+  const mobile = useIsMobile();
 
-  const [user, setUser] = useState(null);
-  const [dashboard, setDashboard] = useState(null);
-
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  async function loadDashboard(userId) {
-    const clientDate = new Date().toLocaleDateString("en-CA");
-    const response = await fetch(
-      `/api/dashboard?userId=${userId}&clientDate=${clientDate}`,
-    );
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.error || "No se pudo cargar el dashboard.");
-    }
-
-    setDashboard(data);
-  }
-
-  useEffect(() => {
-    async function init() {
-      try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-
-        if (!session) {
-          router.replace("/login");
-          return;
-        }
-
-        setUser(session.user);
-
-        await ensureUserSetup(session.user);
-
-        await loadDashboard(session.user.id);
-      } catch (err) {
-        setError(err.message || "Ocurrió un error.");
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    init();
-  }, [router]);
-
-  const now = useMemo(() => new Date(), []);
   const currentYear = now.getFullYear();
   const currentMonthIndex = now.getMonth(); // 0-11
 
@@ -340,18 +195,20 @@ export default function DashboardContent() {
           </Alert>
         ) : null}
 
-        <div className="space-y-6">
-          {hasCardUsageWaivers ? (
-            <div className="grid gap-6 lg:grid-cols-2">
+        <div className="flex flex-col gap-6">
+          {!mobile ? (
+            hasCardUsageWaivers ? (
+              <div className="grid gap-6 lg:grid-cols-2">
+                <ImportantNoticesCard notices={importantNotices} />
+                <CardUsageWaiverProgress
+                  cardUsageWaiversByMonth={cardUsageWaiversByMonth}
+                  currentMonthIndex={currentMonthIndex}
+                />
+              </div>
+            ) : (
               <ImportantNoticesCard notices={importantNotices} />
-              <CardUsageWaiverProgress
-                cardUsageWaiversByMonth={cardUsageWaiversByMonth}
-                currentMonthIndex={currentMonthIndex}
-              />
-            </div>
-          ) : (
-            <ImportantNoticesCard notices={importantNotices} />
-          )}
+            )
+          ) : null}
 
           <Card className="rounded-2xl border-border bg-card">
             <CardHeader>
@@ -393,206 +250,6 @@ export default function DashboardContent() {
   );
 }
 
-function MonthSelector({ value, onChange, id, className = "w-full max-w-[160px] h-8 text-xs" }) {
-  return (
-    <ResponsiveSelect
-      id={id}
-      value={String(value)}
-      onValueChange={v => onChange(Number(v))}
-      aria-label="Mes del período"
-      className={className}
-      title="Mes del período"
-      placeholder="Selecciona una opción"
-      options={MONTH_NAMES.map((name, i) => ({
-        value: String(i),
-        label: String(name)
-      }))}
-    />
-  );
-}
-
-function CardUsageWaiverProgress({ cardUsageWaiversByMonth, currentMonthIndex }) {
-  const { captureFocus, restoreFocus } = useDialogFocus();
-  const [selectedMonthIndex, setSelectedMonthIndex] = useState(currentMonthIndex);
-  const [selectedItem, setSelectedItem] = useState(null);
-  const [sortDirection, setSortDirection] = useState("asc");
-  const sortId = useId();
-  const monthId = useId();
-  const items = useMemo(() => {
-    const monthItems = cardUsageWaiversByMonth[selectedMonthIndex] || [];
-
-    return [...monthItems].sort((a, b) => compareByCutDate(a, b, sortDirection));
-  }, [cardUsageWaiversByMonth, selectedMonthIndex, sortDirection]);
-
-  if (!items.length) {
-    return null;
-  }
-
-  return (
-    <Card data-usage-waivers className="rounded-2xl border-border bg-card">
-      <CardHeader>
-        <div className="flex flex-col items-center gap-3">
-          <CardTitle className="text-lg font-semibold uppercase text-center">
-            Consumo mínimo
-          </CardTitle>
-          <FieldGroup className="grid max-w-sm grid-cols-[minmax(0,6.25rem)_minmax(0,1fr)] gap-1">
-            <Field className="min-w-0">
-              <FieldLabel htmlFor={monthId} className="sr-only">Mes del período</FieldLabel>
-              <MonthSelector
-                id={monthId}
-                className="h-8 px-1.5 text-xs"
-                value={selectedMonthIndex}
-                onChange={setSelectedMonthIndex}
-              />
-            </Field>
-            <Field className="min-w-0">
-              <FieldLabel htmlFor={sortId} className="sr-only">Orden de consumo mínimo</FieldLabel>
-              <ResponsiveSelect
-                id={sortId}
-                value={sortDirection}
-                onValueChange={setSortDirection}
-                aria-label="Orden de consumo mínimo"
-                title="Ordenar consumo mínimo"
-                className="h-8 px-1.5 text-xs"
-                options={[
-                  { value: "asc", label: "Corte más próximo" },
-                  { value: "desc", label: "Corte más lejano" },
-                ]}
-              />
-            </Field>
-          </FieldGroup>
-        </div>
-      </CardHeader>
-
-      <CardContent>
-        <div className="space-y-4">
-          {items.map((item) => {
-            const progress = Math.max(0, Math.min(Number(item.progress || 0), 100));
-
-            return (
-              <div
-                key={item.card.id}
-                data-usage-card={item.card.id}
-                className="grid gap-2 md:grid-cols-[190px_1fr_160px_auto] md:items-center"
-              >
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-medium">
-                    {item.card.name}
-                  </p>
-                  <p className="mt-0.5 text-xs text-muted-foreground">
-                    Corte {item.periodVerified ? "verificado" : "previsto"}: {formatCompactDate(item.selectedCycle?.cutDate)}
-                  </p>
-                </div>
-
-                <Progress
-                  value={progress}
-                  aria-label={`Progreso de consumo de ${item.card.name}`}
-                  className={`h-2.5 ${item.isExempt ? "[&_[data-slot=progress-indicator]]:bg-emerald-400" : "[&_[data-slot=progress-indicator]]:bg-blue-400"}`}
-                />
-
-                <div className="space-y-1 text-sm md:text-right">
-                  <p>
-                    <span className="font-medium">{formatMoney(item.eligibleSpend)}</span>
-                    <span className="text-xs text-muted-foreground"> / {formatMoney(item.minimumAmount)}</span>
-                  </p>
-                  <p className={`text-xs ${item.isExempt ? "text-emerald-400" : "text-muted-foreground"}`}>
-                    {item.confirmationPending ? "Por revisar: importes distintos al estado"
-                      : item.status === "NO_CYCLE" ? "Sin ciclo registrado"
-                      : item.status === "FUTURE" ? "Período futuro"
-                      : item.isExempt ? "Meta alcanzada"
-                      : `${item.status === "NOT_MET" ? "Faltaron" : "Faltan por registrar"} ${formatMoney(item.remainingAmount)}`}
-                  </p>
-                  {item.projectedAmount > 0 ? (
-                    <p className="text-xs text-muted-foreground">
-                      {formatMoney(item.projectedAmount)} previstos, por confirmar
-                    </p>
-                  ) : null}
-                </div>
-
-                <Button
-                  type="button"
-                  variant="secondary"
-                  size="sm"
-                  className="h-11 md:h-6"
-                  onClick={(event) => {
-                    captureFocus(event);
-                    setSelectedItem(item);
-                  }}
-                >
-                  Desglose
-                </Button>
-              </div>
-            );
-          })}
-        </div>
-      </CardContent>
-
-      <Dialog
-        open={Boolean(selectedItem)}
-        onOpenChange={(open) => {
-          if (!open) setSelectedItem(null);
-        }}
-      >
-        {selectedItem ? (
-          <BreakdownDialogContent onCloseAutoFocus={restoreFocus} data-usage-breakdown-dialog title={`Desglose — ${selectedItem.card.name}`}>
-            <CardUsageWaiverBreakdown item={selectedItem} />
-          </BreakdownDialogContent>
-        ) : null}
-      </Dialog>
-    </Card>
-  );
-}
-
-function ImportantNoticesCard({ notices }) {
-  if (notices.length === 0) {
-    return (
-      <Card className="rounded-2xl border-border bg-card">
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold uppercase text-center">
-            Avisos importantes
-          </CardTitle>
-        </CardHeader>
-
-        <CardContent>
-          <Empty>
-            <EmptyDescription>
-              No tienes avisos importantes por ahora.
-            </EmptyDescription>
-          </Empty>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  return (
-    <Card className="rounded-2xl border-border bg-card">
-      <CardHeader>
-        <CardTitle className="text-lg font-semibold uppercase text-center">
-          Avisos importantes
-        </CardTitle>
-      </CardHeader>
-
-      <CardContent>
-        <div className="grid gap-3">
-          {notices.map((notice) => {
-            const Icon = getNoticeIcon(notice.group);
-
-            return (
-              <Alert
-                key={notice.id}
-                className={getNoticeAlertClass(notice.group)}
-              >
-                <Icon className="h-4 w-4" />
-                <AlertTitle>{notice.title}</AlertTitle>
-                <AlertDescription>{notice.description}</AlertDescription>
-              </Alert>
-            );
-          })}
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
 
 function PaymentsTable({ items }) {
   const totalCalculatedAmount = items.reduce((total, item) => {

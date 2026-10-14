@@ -5,6 +5,7 @@ import { useIsMobile } from "@/hooks/use-mobile"
 import { navItems } from "@/lib/navigation"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import MobileNavigationSheet from "@/components/layout/MobileNavigationSheet"
+import AppHeaderActions from "@/components/layout/AppHeaderActions"
 import { cn } from "@/lib/utils"
 
 export default function AppHeader({ disabled = false, onNavigate, className, ...props }) {
@@ -22,6 +23,7 @@ export default function AppHeader({ disabled = false, onNavigate, className, ...
       <div className="min-w-0">
         <h1 className="truncate text-sm font-medium">{title}</h1>
       </div>
+      {mobile ? <AppHeaderActions disabled={disabled} /> : null}
     </header>
   )
 }

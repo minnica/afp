@@ -192,3 +192,15 @@ body:has([data-slot="record-create-panel"]) [data-sonner-toaster][data-y-positio
     font-size: 0.875rem;
   }
 }
+
+/* Las consultas del dashboard se leen en móvil sin tarjetas anidadas. */
+[data-header-dialog] [data-slot="dialog-title"] {
+  font-size: 1rem;
+}
+
+[data-header-dialog] :is([data-slot="alert-title"], [data-slot="alert-description"], [data-slot="empty-description"]) {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
