@@ -4,17 +4,20 @@ import { useCreationDraft } from "@/hooks/use-creation-draft";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 import ExpenseCreateSurface, { useExpenseDialogMode } from "@/components/gastos/ExpenseCreateSurface";
+import DailyExpenseCards, { DailyExpenseCardsSkeleton } from "@/components/gastos/DailyExpenseCards";
 
 import { ResponsiveSelect } from "@/components/ui/responsive-select";
 import { PaymentMethodSelector } from "@/components/ui/payment-method-selector";
 
 import { SearchableSelect } from "@/components/ui/searchable-select";
+import { ExpenseFilterCombobox } from "@/components/ui/expense-filter-combobox";
+import { matchesExpenseFilters } from "@/lib/expenseFilters";
 
 import { useDialogFocus } from "@/hooks/use-dialog-focus";
 
 import { Alert, AlertDescription, AlertTitle, AlertAction } from "@/components/ui/alert";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -37,6 +40,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Card,
+  CardAction,
   CardContent,
   CardHeader,
   CardTitle,
@@ -235,6 +239,8 @@ export default function GastosContent() {
   const [filterConcept, setFilterConcept] = useState("");
   const [filterCardId, setFilterCardId] = useState("");
   const [filterAmount, setFilterAmount] = useState("");
+  const [mobileFilters, setMobileFilters] = useState([]);
+  const [mobileFilterResetKey, setMobileFilterResetKey] = useState(0);
   const didLoadInitialExpensesRef = useRef(false);
   const lastExpensesUrlRef = useRef("");
 
@@ -297,6 +303,9 @@ export default function GastosContent() {
       params.set("startDate", range.startDate);
       params.set("endDate", range.endDate);
     }
+
+    // En móvil se consulta el período completo para combinar alternativas por campo.
+    if (mobileNavigation) return `/api/expenses?${params.toString()}`;
 
     if (filterCategoryId) params.set("categoryId", filterCategoryId);
 
@@ -542,6 +551,7 @@ export default function GastosContent() {
     filterConcept,
     filterCardId,
     filterAmount,
+    mobileNavigation,
   ]);
 
   async function createExpense() {
@@ -784,7 +794,7 @@ export default function GastosContent() {
     };
   }
 
-  function doesExpenseMatchFilters(expense) {
+  const doesExpenseMatchFilters = useCallback((expense) => {
     const datePart = String(expense.date).split("T")[0];
 
     if (filterDate && datePart !== filterDate) return false;
@@ -792,6 +802,8 @@ export default function GastosContent() {
     if (!filterDate && filterMonth && datePart.slice(0, 7) !== filterMonth) {
       return false;
     }
+
+    if (mobileNavigation) return matchesExpenseFilters(expense, mobileFilters);
 
     if (filterCategoryId && expense.categoryId !== filterCategoryId) {
       return false;
@@ -827,12 +839,11 @@ export default function GastosContent() {
     }
 
     return true;
-  }
+  }, [filterDate, filterMonth, filterCategoryId, filterConcept, filterCardId, filterAmount, mobileNavigation, mobileFilters]);
 
-  const filteredExpenses = useMemo(() => {
+  const expenseRows = useMemo(() => {
     const offlineRows = pendingOfflineExpenses
-      .map((offlineExpense) => buildOfflineExpenseRow(offlineExpense))
-      .filter(doesExpenseMatchFilters);
+      .map((offlineExpense) => buildOfflineExpenseRow(offlineExpense));
 
     return [...offlineRows, ...expenses];
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -845,13 +856,9 @@ export default function GastosContent() {
     receivables,
     payables,
     subscriptions,
-    filterMonth,
-    filterDate,
-    filterCategoryId,
-    filterConcept,
-    filterCardId,
-    filterAmount,
   ]);
+
+  const filteredExpenses = useMemo(() => expenseRows.filter(doesExpenseMatchFilters), [expenseRows, doesExpenseMatchFilters]);
 
   const availableMonthsWithPending = useMemo(() => {
     const months = new Set(availableMonths);
@@ -1499,15 +1506,33 @@ export default function GastosContent() {
             </ExpenseCreateSurface>
 
             <div className="min-w-0 space-y-6">
-              <Card className="rounded-2xl border-border bg-card">
-                <CardHeader>
+              <Card className="expense-results rounded-2xl border-border bg-card">
+                <CardHeader className="expense-results-header">
                   <CardTitle className="text-lg font-semibold uppercase text-center">
-                    Gastos filtrados
+                    <h2>Gastos filtrados</h2>
                   </CardTitle>
+                  {mobileNavigation ? (
+                    <CardAction>
+                      <Button
+                        type="button"
+                        variant="link"
+                        size="sm"
+                        className="expense-clear-filters relative h-7 px-0"
+                        onClick={() => {
+                          setFilterDate("");
+                          setFilterMonth("");
+                          setMobileFilters([]);
+                          setMobileFilterResetKey((current) => current + 1);
+                        }}
+                      >
+                        Quitar filtros
+                      </Button>
+                    </CardAction>
+                  ) : null}
                 </CardHeader>
 
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 gap-3 sm:flex sm:flex-wrap">
+                <CardContent className="flex flex-col gap-3 md:gap-4">
+                  <div className="grid grid-cols-1 gap-3 md:flex md:flex-wrap">
                     <ResponsiveSelect
                       value={filterMonth || "ALL"}
                       onValueChange={value => {
@@ -1515,7 +1540,7 @@ export default function GastosContent() {
                         setFilterDate("");
                       }}
                       aria-label="Filtrar por mes"
-                      className="w-full sm:w-[180px]"
+                      className="w-full md:w-[180px]"
                       title="Filtrar por mes"
                       placeholder="Todos los meses"
                       options={[{
@@ -1527,7 +1552,7 @@ export default function GastosContent() {
                       }))]}
                     />
 
-                    <div className="space-y-1">
+                    <div className="min-w-0">
                       <Label htmlFor="filterDate" className="sr-only">Filtrar por día</Label>
                       <DatePicker
                         id="filterDate"
@@ -1537,11 +1562,11 @@ export default function GastosContent() {
                           setFilterMonth("");
                         }}
                         aria-label="Filtrar por día"
-                        className="w-full sm:w-[160px]"
+                        className="w-full md:w-[160px]"
                       />
                     </div>
 
-                    {filterDate ? (
+                    {filterDate && !mobileNavigation ? (
                       <Button
                         type="button"
                         variant="ghost"
@@ -1553,6 +1578,7 @@ export default function GastosContent() {
                       </Button>
                     ) : null}
 
+                    {!mobileNavigation ? <>
                     <SearchableSelect
                       value={filterCategoryId || "ALL"}
                       onValueChange={value => setFilterCategoryId(value === "ALL" ? "" : value)}
@@ -1617,10 +1643,33 @@ export default function GastosContent() {
                         className="w-full sm:w-[150px]"
                       />
                     </div>
+                    </> : null}
                   </div>
 
+                  {mobileNavigation ? (
+                    <ExpenseFilterCombobox
+                      key={mobileFilterResetKey}
+                      categories={categories}
+                      cards={cards}
+                      expenses={expenseRows.filter((expense) => {
+                        const day = String(expense.date).split("T")[0];
+                        return filterDate ? day === filterDate : !filterMonth || day.startsWith(filterMonth);
+                      })}
+                      value={mobileFilters}
+                      onValueChange={setMobileFilters}
+                    />
+                  ) : null}
+
                   {isExpensesLoading ? (
-                    <ExpensesTableSkeleton />
+                    <ExpensesResultsSkeleton />
+                  ) : mobileNavigation ? (
+                    <DailyExpenseCards
+                      key={JSON.stringify([filterDate, filterMonth, mobileFilters])}
+                      expenses={filteredExpenses}
+                      isOnline={isOnline}
+                      onEdit={startEditingExpense}
+                      onDelete={setExpenseToDelete}
+                    />
                   ) : (
                     <DataTable
                       columns={expenseColumns}
@@ -1661,7 +1710,7 @@ function GastosPageSkeleton() {
     <main>
       <section className="mx-auto flex w-full max-w-full flex-col px-4 py-5 md:py-8">
         <div className="grid min-w-0 gap-5 xl:grid-cols-[360px_1fr]">
-          <Card className="rounded-2xl border-border bg-card">
+          <Card className="hidden rounded-2xl border-border bg-card md:flex">
             <CardHeader>
               <Skeleton className="mx-auto h-5 w-32" />
             </CardHeader>
@@ -1680,7 +1729,7 @@ function GastosPageSkeleton() {
           </Card>
 
           <div className="min-w-0 space-y-6">
-            <Card className="rounded-2xl border-border bg-card">
+            <Card className="expense-results rounded-2xl border-border bg-card">
               <CardHeader>
                 <Skeleton className="mx-auto h-5 w-40" />
               </CardHeader>
@@ -1689,19 +1738,29 @@ function GastosPageSkeleton() {
                 <div className="grid grid-cols-1 gap-3 sm:flex sm:flex-wrap">
                   <Skeleton className="h-10 w-full sm:w-[180px]" />
                   <Skeleton className="h-10 w-full sm:w-[160px]" />
-                  <Skeleton className="h-10 w-full sm:w-[180px]" />
-                  <Skeleton className="h-10 w-full sm:w-[200px]" />
-                  <Skeleton className="h-10 w-full sm:w-[180px]" />
-                  <Skeleton className="h-10 w-full sm:w-[150px]" />
+                  <Skeleton className="hidden h-10 w-full sm:w-[180px] md:block" />
+                  <Skeleton className="hidden h-10 w-full sm:w-[200px] md:block" />
+                  <Skeleton className="hidden h-10 w-full sm:w-[180px] md:block" />
+                  <Skeleton className="hidden h-10 w-full sm:w-[150px] md:block" />
+                  <Skeleton className="h-7 w-full md:hidden" />
                 </div>
 
-                <ExpensesTableSkeleton />
+                <ExpensesResultsSkeleton />
               </CardContent>
             </Card>
           </div>
         </div>
       </section>
     </main>
+  );
+}
+
+function ExpensesResultsSkeleton() {
+  return (
+    <>
+      <div className="md:hidden"><DailyExpenseCardsSkeleton /></div>
+      <div className="hidden md:block"><ExpensesTableSkeleton /></div>
+    </>
   );
 }
 

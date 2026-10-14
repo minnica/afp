@@ -39,6 +39,7 @@ body:has([data-slot="record-create-panel"]) [data-sonner-toaster][data-y-positio
   --color-border: var(--border);
   --color-destructive: var(--destructive);
   --color-warning: var(--warning);
+  --color-success: var(--success);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
@@ -78,6 +79,7 @@ body:has([data-slot="record-create-panel"]) [data-sonner-toaster][data-y-positio
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.985 0 0);
   --warning: oklch(0.555 0.163 48.998);
+  --success: oklch(0.508 0.118 165.612);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
@@ -115,6 +117,7 @@ body:has([data-slot="record-create-panel"]) [data-sonner-toaster][data-y-positio
   --destructive: oklch(0.704 0.191 22.216);
   --destructive-foreground: oklch(0.985 0 0);
   --warning: oklch(0.828 0.189 84.429);
+  --success: oklch(0.765 0.177 163.223);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.556 0 0);
@@ -170,6 +173,141 @@ body:has([data-slot="record-create-panel"]) [data-sonner-toaster][data-y-positio
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* El resumen diario usa el tamaño de lectura móvil, conservando los tokens Mira. */
+.daily-expenses [data-day-total] {
+  color: var(--success);
+}
+
+.daily-expenses [data-slot="card"] > [data-slot="card-header"] {
+  background-color: var(--muted);
+  padding-block: var(--card-spacing);
+}
+
+.daily-expenses [data-slot="card-title"],
+.daily-expenses-empty [data-slot="empty-title"] {
+  font-size: 1rem;
+}
+
+.daily-expenses [data-slot="card-description"],
+.daily-expenses-empty [data-slot="empty-description"] {
+  font-size: 0.875rem;
+}
+
+.daily-expenses [data-slot="badge"] {
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.daily-expenses [data-slot="item-content"] {
+  overflow-wrap: anywhere;
+}
+
+/* Un campo reúne los filtros de gastos y conserva controles táctiles accesibles. */
+.expense-filter-combobox {
+  min-height: 1.75rem;
+  gap: 0.25rem;
+  padding: 0 0.5rem;
+}
+
+.expense-filter-combobox [data-slot="combobox-chip-input"] {
+  min-width: min(4rem, 100%);
+  min-height: 1.625rem;
+  font-size: 0.875rem;
+}
+
+.expense-filter-combobox [data-slot="combobox-chip-input"]::placeholder {
+  color: var(--muted-foreground);
+  opacity: 1;
+}
+
+.expense-filter-combobox [data-slot="combobox-chip"] {
+  max-width: 100%;
+  height: auto;
+  min-height: 1.5rem;
+  font-size: 0.75rem;
+}
+
+.expense-filter-combobox [data-slot="combobox-chip-remove"] {
+  width: 2.75rem;
+  height: 1.5rem;
+  flex-shrink: 0;
+  opacity: 1;
+}
+
+.expense-filter-combobox [data-slot="combobox-clear"] {
+  width: 1.75rem;
+  height: 1.5rem;
+}
+
+.expense-filter-combobox :is([data-slot="combobox-chip-remove"], [data-slot="combobox-clear"]) {
+  position: relative;
+}
+
+.expense-filter-combobox :is([data-slot="combobox-chip-remove"], [data-slot="combobox-clear"])::after {
+  content: "";
+  position: absolute;
+  inset: -0.625rem 0;
+}
+
+.expense-filter-combobox [data-slot="combobox-clear"]::after {
+  inset-inline: -0.5rem;
+}
+
+.expense-clear-filters {
+  color: var(--muted-foreground);
+}
+
+.expense-clear-filters::after {
+  content: "";
+  position: absolute;
+  inset: -0.5rem;
+}
+
+.expense-filter-options [data-slot="combobox-list"] {
+  max-height: min(50dvh, calc(var(--available-height) - 4rem));
+}
+
+.expense-filter-options [data-slot="combobox-item"] {
+  min-height: 2.75rem;
+  padding-block: 0.5rem;
+  font-size: 0.875rem;
+  overflow-wrap: anywhere;
+}
+
+.expense-filter-options [data-slot="combobox-label"] {
+  font-size: 0.875rem;
+}
+
+@media (width < 768px) {
+  .expense-results > .expense-results-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  /* La sección deja de envolver las tarjetas diarias en otra tarjeta. */
+  .expense-results[data-slot="card"] {
+    background: transparent;
+    box-shadow: none;
+    border-radius: 0;
+    overflow: visible;
+    padding-block: 0;
+  }
+
+  .expense-results > [data-slot="card-header"],
+  .expense-results > [data-slot="card-content"] {
+    padding-inline: 0;
+  }
+
+  .expense-results > [data-slot="card-header"] > [data-slot="card-title"] {
+    font-size: 1rem;
+    text-transform: none;
+    text-align: left;
   }
 }
 
