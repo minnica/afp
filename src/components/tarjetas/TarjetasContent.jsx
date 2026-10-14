@@ -17,11 +17,9 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   CreditCard,
-  ChevronLeft,
-  ChevronRight,
+  ChevronDown,
   Pencil,
   Plus,
-  RefreshCcw,
   Trash2,
   X,
 } from "lucide-react";
@@ -36,14 +34,12 @@ import { Label } from "@/components/ui/label";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Item, ItemGroup, ItemMedia } from "@/components/ui/item";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ResponsiveSelect } from "@/components/ui/responsive-select";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import CyclesDataTable from "@/components/tarjetas/CyclesDataTable";
 import PageSkeleton from "@/components/layout/PageSkeleton";
 
@@ -68,7 +64,6 @@ export default function TarjetasContent() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [isGeneratingCycles, setIsGeneratingCycles] = useState(false);
   const [cardToDelete, setCardToDelete] = useState(null);
   const [cycleToUnmark, setCycleToUnmark] = useState(null);
   const [error, setError] = useState("");
@@ -285,26 +280,6 @@ export default function TarjetasContent() {
     }
   }
 
-  async function generateCycles() {
-    if (!user) return;
-    setError("");
-    setIsGeneratingCycles(true);
-    try {
-      const response = await fetch("/api/card-cycles", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: user.id }),
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "No se pudieron generar los ciclos.");
-      setCycles(data.cycles || []);
-    } catch (err) {
-      setError(err.message || "No se pudieron generar los ciclos.");
-    } finally {
-      setIsGeneratingCycles(false);
-    }
-  }
-
   async function unmarkCycleAsPaid(cycleId) {
     if (!user) return;
     setError("");
@@ -321,8 +296,6 @@ export default function TarjetasContent() {
       setError(err.message || "No se pudo deshacer el pago.");
     }
   }
-
-  const totalCards = useMemo(() => cards.length, [cards]);
 
   const currentYear = useMemo(() => new Date().getFullYear(), []);
 
@@ -450,29 +423,35 @@ export default function TarjetasContent() {
           </Alert>
         ) : null}
 
-        <div className="mb-4 grid grid-cols-2 gap-3 md:mb-6 md:grid-cols-3 md:gap-4">
-          <Card className="rounded-2xl border-border bg-card">
-            <CardHeader className="pb-2">
-              <CardDescription>Tarjetas registradas</CardDescription>
-              <CardTitle className="text-3xl">{totalCards}</CardTitle>
-            </CardHeader>
-          </Card>
+        <Card className="rounded-none bg-transparent py-0 ring-0 [--card-spacing:0px] md:rounded-xl md:bg-card md:py-4 md:ring-1 md:[--card-spacing:--spacing(4)]">
+          <CardHeader className="mb-3 md:mb-0">
+            <CardTitle className="text-base font-semibold md:text-lg">
+              Ciclos mensuales
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <CyclesDataTable
+              cycles={cyclesByMonthIndex[Number(activeMonthTab)] || []}
+              month={activeMonthTab}
+              onMonthChange={setActiveMonthTab}
+              monthOptions={MONTH_NAMES.map((monthName, monthIndex) => ({ value: String(monthIndex), label: `${monthName} ${currentYear}`, shortLabel: `${monthName.slice(0, 3)} ${currentYear}` }))}
+              updateCycleDates={updateCycleDates}
+              updateStatementAmount={updateStatementAmount}
+              markCycleAsPaid={markCycleAsPaid}
+              unmarkCycleAsPaid={setCycleToUnmark}
+              loadCycleBreakdown={loadCycleBreakdown}
+            />
+          </CardContent>
+        </Card>
 
-          <Card className="rounded-2xl border-border bg-card">
-            <CardHeader className="pb-2">
-              <CardDescription>Ciclos generados</CardDescription>
-              <CardTitle className="text-3xl">{cycles.length}</CardTitle>
-            </CardHeader>
-          </Card>
-        </div>
-
-        <Tabs defaultValue="cycles" className="w-full">
-          <TabsList className="mb-4 group-data-horizontal/tabs:h-12 md:mb-6 md:group-data-horizontal/tabs:h-8">
-            <TabsTrigger value="cards" className="px-3 text-sm md:px-1.5 md:text-xs">Tarjetas</TabsTrigger>
-            <TabsTrigger value="cycles" className="px-3 text-sm md:px-1.5 md:text-xs">Ciclos mensuales</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="cards">
+        <Collapsible className="mt-6" data-card-administration>
+          <CollapsibleTrigger asChild>
+            <Button type="button" variant="ghost" className="group h-11 gap-2 md:h-9">
+              Administrar tarjetas
+              <ChevronDown data-icon="inline-end" className="group-data-[state=open]:rotate-180" />
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="pt-4">
             <div className="grid gap-6 lg:grid-cols-[420px_1fr]">
               {cardCreateForm}
 
@@ -629,84 +608,8 @@ export default function TarjetasContent() {
                 </CardContent>
               </Card>
             </div>
-          </TabsContent>
-
-          <TabsContent value="cycles">
-            <Card className="rounded-none bg-transparent py-0 ring-0 [--card-spacing:0px] md:rounded-xl md:bg-card md:py-4 md:ring-1 md:[--card-spacing:--spacing(4)]">
-              <CardHeader className="mb-3 flex flex-row items-center justify-between gap-2 md:mb-0 md:gap-3">
-                <div>
-                  <CardTitle className="text-base font-semibold md:text-center md:text-lg md:uppercase">
-                    Ciclos mensuales
-                  </CardTitle>
-                </div>
-
-                <Button
-                  type="button"
-                  onClick={generateCycles}
-                  disabled={isGeneratingCycles || cards.length === 0}
-                  className="h-11 shrink-0 px-2 text-sm md:h-7 md:text-xs"
-                  aria-label={isGeneratingCycles ? "Generando ciclos" : "Generar ciclos"}
-                >
-                  <RefreshCcw className="h-4 w-4 md:mr-2" />
-                  <span className="md:hidden">{isGeneratingCycles ? "..." : "Generar"}</span>
-                  <span className="hidden md:inline">{isGeneratingCycles ? "Generando..." : "Generar ciclos"}</span>
-                </Button>
-              </CardHeader>
-
-              <CardContent>
-                {cycles.length === 0 ? (
-                  <Empty>
-                    <EmptyDescription>
-                      Aún no hay ciclos generados. Agrega tarjetas y presiona &quot;Generar ciclos&quot;.
-                    </EmptyDescription>
-                  </Empty>
-                ) : (
-                  <Tabs value={activeMonthTab} onValueChange={setActiveMonthTab}>
-                    <div className="mb-3 flex items-center gap-2 md:hidden">
-                      <Button type="button" variant="ghost" size="icon" className="size-11" aria-label="Mes anterior" disabled={activeMonthTab === "0"} onClick={() => setActiveMonthTab(String(Number(activeMonthTab) - 1))}>
-                        <ChevronLeft />
-                      </Button>
-                      <ResponsiveSelect
-                        value={activeMonthTab}
-                        onValueChange={setActiveMonthTab}
-                        aria-label="Mes de los ciclos"
-                        title="Mes de los ciclos"
-                        className="h-11 min-w-0 flex-1 text-sm"
-                        options={MONTH_NAMES.map((monthName, monthIndex) => ({ value: String(monthIndex), label: `${monthName} ${currentYear}` }))}
-                      />
-                      <Button type="button" variant="ghost" size="icon" className="size-11" aria-label="Mes siguiente" disabled={activeMonthTab === "11"} onClick={() => setActiveMonthTab(String(Number(activeMonthTab) + 1))}>
-                        <ChevronRight />
-                      </Button>
-                    </div>
-                    <TabsList className="mb-6 hidden h-auto flex-wrap md:flex">
-                      {MONTH_NAMES.map((name, monthIndex) => (
-                        <TabsTrigger key={monthIndex} value={String(monthIndex)}>
-                          {name}
-                        </TabsTrigger>
-                      ))}
-                    </TabsList>
-
-                    {MONTH_NAMES.map((name, monthIndex) => (
-                      <TabsContent key={monthIndex} value={String(monthIndex)}>
-                        <h3 className="mb-4 hidden text-sm font-medium capitalize text-muted-foreground md:block">
-                          {name} {currentYear}
-                        </h3>
-                        <CyclesDataTable
-                          cycles={cyclesByMonthIndex[monthIndex] || []}
-                          updateCycleDates={updateCycleDates}
-                          updateStatementAmount={updateStatementAmount}
-                          markCycleAsPaid={markCycleAsPaid}
-                          unmarkCycleAsPaid={setCycleToUnmark}
-                          loadCycleBreakdown={loadCycleBreakdown}
-                        />
-                      </TabsContent>
-                    ))}
-                  </Tabs>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+          </CollapsibleContent>
+        </Collapsible>
       </section>
     </main>
   );

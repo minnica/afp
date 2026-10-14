@@ -34,7 +34,7 @@ export function BreakdownHelp({ title, label = title, description, children, foo
         sideOffset={8}
         collisionPadding={16}
         aria-labelledby={titleId}
-        aria-describedby={descriptionId}
+        aria-describedby={description ? descriptionId : undefined}
         onOpenAutoFocus={(event) => {
           event.preventDefault();
           contentRef.current?.focus();
@@ -44,7 +44,7 @@ export function BreakdownHelp({ title, label = title, description, children, foo
       >
         <PopoverHeader><PopoverTitle id={titleId}>{title}</PopoverTitle></PopoverHeader>
         {children}
-        <PopoverDescription id={descriptionId}>{description}</PopoverDescription>
+        {description && <PopoverDescription id={descriptionId}>{description}</PopoverDescription>}
         {footer}
       </PopoverContent>
     </Popover>

@@ -249,7 +249,7 @@ function MobileOptions({ title, open, searchable, children }) {
   )
 }
 
-/** Opciones: { value: string, label: string, pinned?: boolean, disabled?: boolean }[]. */
+/** Opciones: { value: string, label: string, shortLabel?: string, pinned?: boolean, disabled?: boolean }[]. */
 function ResponsiveSelect({
   id,
   value = "",
@@ -324,7 +324,7 @@ function ResponsiveSelect({
       )}
     >
       <span className={cn("truncate", !selectedOption && "text-muted-foreground")}>
-        {selectedOption?.label ?? placeholder}
+        {(isSheet ? selectedOption?.shortLabel ?? selectedOption?.label : selectedOption?.label) ?? placeholder}
       </span>
       <HugeiconsIcon icon={UnfoldMoreIcon} strokeWidth={2} className="size-3.5 shrink-0 text-muted-foreground" aria-hidden="true" />
     </Button>

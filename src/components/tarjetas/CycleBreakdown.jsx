@@ -2,11 +2,9 @@
 
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { BreakdownHelp, BreakdownSection, BreakdownSections, DisclosureButton } from "@/components/ui/responsive-breakdown";
+import { BreakdownHelp, BreakdownSection, BreakdownSections } from "@/components/ui/responsive-breakdown";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { PopoverDescription } from "@/components/ui/popover";
 
 function formatMoney(value) {
@@ -26,13 +24,23 @@ export default function CycleBreakdown({ cycle }) {
   const warnings = cycle.dataWarnings || [];
   const explanation = "El cálculo incluye los gastos registrados y las cuotas y suscripciones previstas; los importes conciliados usan su referencia bancaria. Una diferencia pendiente requiere revisar el estado de cuenta.";
   return (
-    <div className="space-y-4">
-      {!isMobile && warnings.map((warning) => (
-        <Alert key={warning} variant="destructive"><AlertDescription>{warning}</AlertDescription></Alert>
-      ))}
+    <div className="flex flex-col gap-4">
+      <div className="flex items-center gap-1 text-muted-foreground">
+        <p className={cn(isMobile ? "text-sm" : "text-xs")}>Del {formatShortDate(cycle.startDate)} al {formatShortDate(cycle.cutDate)}</p>
+        {warnings.length > 0 && (
+          <BreakdownHelp
+            title={`Fechas por revisar (${warnings.length})`}
+            label={`Ver avisos del período (${warnings.length})`}
+            data-cycle-period-help
+          >
+            <ul className="flex flex-col gap-3">
+              {warnings.map((warning) => <li key={warning} className="break-words">{warning}</li>)}
+            </ul>
+          </BreakdownHelp>
+        )}
+      </div>
       {isMobile ? (
         <div className="space-y-3">
-          <p className="text-sm text-muted-foreground">Del {formatShortDate(cycle.startDate)} al {formatShortDate(cycle.cutDate)}</p>
           <dl className="space-y-2">
             <div className="flex items-baseline justify-between gap-3">
               <dt className="flex min-w-0 items-center text-sm">
@@ -65,18 +73,6 @@ export default function CycleBreakdown({ cycle }) {
               </div>
             )}
           </dl>
-          {warnings.length > 0 && (
-            <Alert variant="destructive" className="px-3 py-2">
-              <AlertDescription>
-                <Collapsible>
-                  <DisclosureButton className="group flex min-h-11 h-auto w-full items-center justify-between gap-2 px-0 py-2 text-left text-sm text-destructive whitespace-normal" aria-label="Ver avisos del período">Fechas por revisar ({warnings.length})</DisclosureButton>
-                  <CollapsibleContent>
-                    <ul className="space-y-2 pb-2 text-sm">{warnings.map((warning) => <li key={warning} className="break-words">{warning}</li>)}</ul>
-                  </CollapsibleContent>
-                </Collapsible>
-              </AlertDescription>
-            </Alert>
-          )}
         </div>
       ) : (
         <dl className="grid gap-3 rounded-xl border border-border bg-muted/30 p-4 sm:grid-cols-3">
@@ -103,8 +99,7 @@ export default function CycleBreakdown({ cycle }) {
         </dl>
       )}
       {!isMobile && <p className="text-xs text-muted-foreground">
-        Del {formatShortDate(cycle.startDate)} al {formatShortDate(cycle.cutDate)}.
-        {" "}{explanation}
+        {explanation}
       </p>}
       <BreakdownSections isMobile={isMobile} className={cn("grid gap-4", hasCredits ? "lg:grid-cols-2" : "lg:grid-cols-3")}>
         <BreakdownSection

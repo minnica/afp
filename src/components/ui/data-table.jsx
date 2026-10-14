@@ -45,6 +45,7 @@ export function DataTable({
   filterPlaceholder = "Filtrar...",
   pageSize = 10,
   pageSizeOptions,
+  initialSorting = [],
   toolbarStart,
   footerRow,
   renderMobileRow,
@@ -52,7 +53,7 @@ export function DataTable({
   mobileListLabel = "Registros",
   mobileRowSeparator = true,
 }) {
-  const [sorting, setSorting] = useState([]);
+  const [sorting, setSorting] = useState(initialSorting);
   const [columnFilters, setColumnFilters] = useState([]);
   const [globalFilter, setGlobalFilter] = useState("");
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize });
@@ -79,11 +80,11 @@ export function DataTable({
   const showFilter = filterGlobal || filterColumn;
 
   return (
-    <div className="space-y-3">
+    <div className="flex flex-col gap-3">
       {showFilter || pageSizeOptions || toolbarStart ? (
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className={cn("flex flex-wrap items-center gap-2", renderMobileRow && "w-full md:w-auto")}>
-            {toolbarStart}
+          <div className={cn("flex flex-wrap items-center gap-2", renderMobileRow && "w-full md:w-auto", typeof toolbarStart === "function" && "min-w-0 flex-1")}>
+            {typeof toolbarStart === "function" ? toolbarStart(table) : toolbarStart}
 
             {showFilter ? (
               <Input

@@ -95,7 +95,7 @@ function getStatusBadgeClass(status) {
   return classes[status] || "border-border bg-muted text-muted-foreground";
 }
 
-const MOBILE_SORT_OPTIONS = [
+const SORT_OPTIONS = [
   { value: "dueDate:asc", label: "Límite: más próximo" },
   { value: "dueDate:desc", label: "Límite: más lejano" },
   { value: "cardName:asc", label: "Tarjeta: A a Z" },
@@ -111,13 +111,6 @@ const MOBILE_SORT_OPTIONS = [
   { value: "displayStatus:asc", label: "Estado: A a Z" },
   { value: "displayStatus:desc", label: "Estado: Z a A" },
 ];
-
-function filterCycle(row, _columnId, filterValue) {
-  const search = filterValue.trim().toLocaleLowerCase("es");
-  return `${row.original.card.name} ${getStatusLabel(row.original.displayStatus)}`
-    .toLocaleLowerCase("es")
-    .includes(search);
-}
 
 function MobileCycleItem({ cycle, openDialog }) {
   const hasStatement = cycle.statementAmount != null;
@@ -180,6 +173,9 @@ function CycleDetails({ cycle }) {
 
 export default function CyclesDataTable({
   cycles,
+  month,
+  onMonthChange,
+  monthOptions,
   updateCycleDates,
   updateStatementAmount,
   markCycleAsPaid,
@@ -396,23 +392,28 @@ export default function CyclesDataTable({
       <DataTable
         columns={columns}
         data={cycles}
-        filterGlobal
-        globalFilterFn={filterCycle}
-        filterPlaceholder="Filtrar por tarjeta o estado..."
+        initialSorting={[{ id: "dueDate", desc: false }]}
         pageSize={10}
         pageSizeOptions={[10, 25, 50, 100]}
         mobileListLabel="Ciclos mensuales"
         mobileRowSeparator={false}
         renderMobileRow={(row) => <MobileCycleItem key={row.original.id} cycle={row.original} openDialog={openDialog} />}
-        mobileToolbar={(table) => (
-          <div className="mb-3 flex items-center gap-2">
-            <span className="text-xs text-muted-foreground">Ordenar</span>
+        toolbarStart={(table) => (
+          <div className="grid w-full min-w-0 grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] gap-2 md:max-w-md" data-cycle-filters>
+            <ResponsiveSelect
+              value={month}
+              onValueChange={onMonthChange}
+              aria-label="Mes de los ciclos"
+              title="Mes de los ciclos"
+              className="h-11 gap-1 px-2 text-xs md:h-9"
+              options={monthOptions}
+            />
             <ResponsiveSelect
               aria-label="Ordenar ciclos"
               title="Ordenar ciclos"
-              className="h-11 min-w-0 flex-1 text-sm"
+              className="h-11 gap-1 px-2 text-xs md:h-9"
               value={table.getState().sorting[0] ? `${table.getState().sorting[0].id}:${table.getState().sorting[0].desc ? "desc" : "asc"}` : "dueDate:asc"}
-              options={MOBILE_SORT_OPTIONS}
+              options={SORT_OPTIONS}
               onValueChange={(value) => {
                 const [id, direction] = value.split(":");
                 table.setSorting([{ id, desc: direction === "desc" }]);

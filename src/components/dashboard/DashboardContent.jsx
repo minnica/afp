@@ -920,9 +920,6 @@ function CardUsageWaiverProgress({ cardUsageWaiversByMonth, currentMonthIndex })
                   <p className="truncate text-sm font-medium">
                     {item.card.name}
                   </p>
-                  <p className="mt-0.5 truncate text-xs text-muted-foreground">
-                    {item.product}
-                  </p>
                   <p className="mt-0.5 text-xs text-muted-foreground">
                     Corte {item.periodVerified ? "verificado" : "previsto"}: {formatCompactDate(item.selectedCycle?.cutDate)}
                   </p>
