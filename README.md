@@ -20,6 +20,7 @@ La página inicial es `/dashboard`: `/` redirige allí, el login navega al Dashb
 |---|---|---|
 | `/gastos` | `GastosContent.jsx` | Registro y gestión de gastos diarios |
 | `/dashboard` | `DashboardContent.jsx` | Resumen financiero del período |
+| `/analisis` | `AnalysisContent.jsx` | Comparativos mensuales por semana, tarjeta y categoría |
 | `/compras-a-meses` | `ComprasAMesesContent.jsx` | Compras a meses / MSI en tarjeta |
 | `/suscripciones` | `SuscripcionesContent.jsx` | Suscripciones recurrentes |
 | `/ingresos` | `IngresosContent.jsx` | Registro de ingresos |
@@ -155,6 +156,14 @@ La skill `conciliar-estados-cuenta` se mantiene en `skills/conciliar-estados-cue
 - `python3 skills/conciliar-estados-cuenta/scripts/revision_json.py validar estados_cuenta/<mes>/<banco>_conciliacion.json` comprueba el JSON y el SHA-256 del PDF. Código de salida 2 significa aclaraciones pendientes; 1, datos inválidos; 0, revisión completa. No escribe en la BD.
 - Los registros cargados o conciliados directamente incluyen una nota que identifica su origen y preserva las notas previas.
 
+### Análisis
+
+`/analisis` comienza directamente con el selector de mes y las vistas Semanas, Tarjetas y Categorías. Conserva el mes al cambiar de vista y el filtro de categoría al volver a Semanas. Las comparaciones semanales y por categoría usan meses calendario; Tarjetas usa meses de corte.
+
+- Categorías muestra inicialmente las cinco de mayor gasto del mes elegido con barras horizontales; «Ver todas» permite consultar el resto. Los importes de ambos meses se consultan en los tooltips de las barras, con valores completos e identificación de los estimados cuando corresponde. Los totales mensuales se muestran en el resumen de Semanas.
+- La página usa `useAnalysis` y el contrato existente de `GET /api/dashboard`, con carga diferida de las gráficas, skeleton propio y recuperación de errores. `categoryBreakdownByMonth[-1]` contiene diciembre del año anterior para comparar enero correctamente.
+- Análisis se abre desde la navegación compartida y concentra los tres comparativos. Dashboard conserva avisos, consumo mínimo y pagos de tarjetas con su presentación original; no carga las gráficas ni sus placeholders. Tarjetas mantiene su presentación y sus flujos originales.
+
 ### Dashboard — consumo mínimo para exentar comisión de tarjeta
 
 `/dashboard` muestra una sección minimalista de consumo mínimo usando `cardUsageWaiversByMonth` de `GET /api/dashboard`; solo aparecen tarjetas con mínimo configurado y el selector de mes corresponde al mes de corte (`CardCycle.month`) del ciclo. Los selectores de mes y orden comparten una sola fila, sin etiqueta ni descripción visibles; conservan nombres accesibles. El selector de orden permite elegir «Corte más próximo» (ascendente, predeterminado) o «Corte más lejano» (descendente) dentro del mes elegido; las fechas ausentes o inválidas quedan al final y los empates se resuelven por nombre. Cada fila muestra la fecha de corte. El orden seleccionado se conserva al cambiar de mes durante la sesión de la página.
@@ -249,6 +258,7 @@ afp/
 │   │   ├── login/page.js          → auth Supabase
 │   │   ├── gastos/page.js
 │   │   ├── dashboard/page.js
+│   │   ├── analisis/page.js
 │   │   ├── compras-a-meses/page.js
 │   │   ├── suscripciones/page.js
 │   │   ├── ingresos/page.js
@@ -275,6 +285,8 @@ afp/
 │   │   ├── ui/                    → componentes shadcn locales (incl. data-table.jsx)
 │   │   ├── gastos/GastosContent.jsx
 │   │   ├── dashboard/DashboardContent.jsx
+│   │   ├── analisis/AnalysisContent.jsx   → filtros y vistas de comparativos
+│   │   ├── analisis/AnalysisCharts.jsx    → gráficas e importes, carga diferida
 │   │   ├── compras-a-meses/ComprasAMesesContent.jsx
 │   │   ├── suscripciones/SuscripcionesContent.jsx
 │   │   ├── ingresos/IngresosContent.jsx
@@ -285,7 +297,8 @@ afp/
 │   │   ├── tarjetas/CycleBreakdown.jsx   → desglose de cálculo por ciclo
 │   │   └── configuracion/SettingsContent.jsx
 │   ├── hooks/
-│   │   └── use-mobile.js
+│   │   ├── use-mobile.js
+│   │   └── use-analysis.js         → sesión y carga de Análisis
 │   └── lib/
 │       ├── prisma.js              → PrismaClient singleton
 │       ├── supabase.js            → Supabase client
@@ -312,7 +325,7 @@ Disponibles: `button`, `field`, `input`, `number-input`, `create-record-surface`
 Los componentes base corresponden al registro oficial de shadcn con el estilo `radix-mira` de `components.json`. Mantener JavaScript, los alias locales y la librería de iconos configurada al incorporar actualizaciones. La revisión y sus comprobaciones están en [`docs/shadcn-audit.md`](docs/shadcn-audit.md).
 
 **Reglas:**
-- En celular (ancho menor de 768 px), «Cambiar sección» abre `MobileNavigationSheet`, una composición del Sheet canónico de shadcn con `side="top"`. Está disponible en `AppHeader`, una cabecera sticky compartida por todas las páginas: mide 48 px en celular y 56 px en escritorio. El acceso móvil usa icono y texto sin fondo ni borde, con un área táctil de 44 px y foco visible. Con un diálogo de alta abierto, la cabecera se mantiene como una superficie independiente por encima de la tarjeta de captura; no ocupa espacio en el encabezado del formulario. Permite navegar en dos toques sin cerrar primero la captura. Muestra los nueve destinos de `src/lib/navigation.js`, iconos, enlaces de 48 px, `aria-current` y cierre de sesión. El menú empieza directamente con las secciones; título y descripción quedan solo para lectores de pantalla. «Cerrar menú» aparece en el pie junto a «Cerrar sesión», ambos sin fondo ni borde y con áreas táctiles de 48 px. Enfoca el título accesible sin abrir el teclado; cancelar devuelve el foco y conserva el formulario. La lista se desplaza y `visualViewport` ajusta el panel. Cambiar de página cierra las capas; durante el guardado se bloquea el acceso desde la captura. Escritorio conserva SidebarTrigger y la navegación habitual.
+- En celular (ancho menor de 768 px), «Cambiar sección» abre `MobileNavigationSheet`, una composición del Sheet canónico de shadcn con `side="top"`. Está disponible en `AppHeader`, una cabecera sticky compartida por todas las páginas: mide 48 px en celular y 56 px en escritorio. El acceso móvil usa icono y texto sin fondo ni borde, con un área táctil de 44 px y foco visible. Con un diálogo de alta abierto, la cabecera se mantiene como una superficie independiente por encima de la tarjeta de captura; no ocupa espacio en el encabezado del formulario. Permite navegar en dos toques sin cerrar primero la captura. Muestra los destinos definidos en `src/lib/navigation.js`, iconos, enlaces de 48 px, `aria-current` y cierre de sesión. El menú empieza directamente con las secciones; título y descripción quedan solo para lectores de pantalla. «Cerrar menú» aparece en el pie junto a «Cerrar sesión», ambos sin fondo ni borde y con áreas táctiles de 48 px. Enfoca el título accesible sin abrir el teclado; cancelar devuelve el foco y conserva el formulario. La lista se desplaza y `visualViewport` ajusta el panel. Cambiar de página cierra las capas; durante el guardado se bloquea el acceso desde la captura. Escritorio conserva SidebarTrigger y la navegación habitual.
 - Los borradores de las seis capturas con diálogo se conservan en la pestaña mediante `useCreationDraft`, separados por usuario y sección. Usa sessionStorage y respaldo en memoria si el almacenamiento está bloqueado. Incluye campos y selecciones de alta, sin afectar edición, filtros, API ni cola offline. Tras guardar se persiste el reinicio habitual del formulario, para no recuperar como borrador un registro ya enviado. La restauración solo se activa en celular; al pasar de escritorio a celular conserva los datos que ya se estaban editando.
 - Los importes usan `Input type="number" formatNumber`: `NumberInput` compone `react-number-format` con el mismo control y estilos de shadcn. Muestra miles con coma y decimales con punto mientras se escribe (`9000.50` → `9,000.50`), sin símbolo ni decimales obligatorios. `onChange` entrega el valor sin separadores a los formularios; las API, cálculos y cola offline conservan su contrato numérico. Mantiene el teclado decimal, las etiquetas, refs, estados y restricciones `min`, `max`, `step` y `required`. Los campos de años, días y número de meses/pagos conservan el input numérico nativo.
 - Los selectores usan `ResponsiveSelect`. El campo cerrado sigue la escala de `Input`: altura predeterminada de 28 px, texto de 14 px en pantallas pequeñas y 12 px desde 768 px. En la variante con panel inferior, una extensión transparente añade área táctil hasta 44 px sin agrandar el borde visible. En pantallas menores de 768 px o con puntero principal táctil abre un `Sheet` inferior: altura ajustada al contenido, máximo del 70 % de la pantalla, filas, buscador y cierre de al menos 48 px y desplazamiento interno de la lista. Los paneles con buscador enfocan su campo de búsqueda inmediatamente al abrir; los que no tienen buscador enfocan el título. `visualViewport` adapta el panel al teclado. En escritorio usa el `Select` oficial cuando no hay búsqueda y `Popover` + `Command` cuando la hay. Las opciones reciben `{ value, label, pinned?, disabled? }`; conserva los IDs, etiquetas, estado deshabilitado y manejadores `onValueChange`. La detección mantiene una instantánea de servidor estable para respetar la hidratación.

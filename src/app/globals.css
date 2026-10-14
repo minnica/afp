@@ -169,3 +169,26 @@ body:has([data-slot="record-create-panel"]) [data-sonner-toaster][data-y-positio
     scroll-behavior: auto !important;
   }
 }
+
+/* Lectura cómoda en Análisis, conservando los tokens Mira. */
+.analysis-page [data-slot="card-title"] {
+  font-size: 1rem;
+}
+
+.analysis-page :is([data-slot="card-description"], [data-slot="item-description"], [data-slot="alert-description"], [data-slot="alert-title"], [data-slot="empty-description"]) {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  -webkit-line-clamp: unset;
+  text-wrap: pretty;
+}
+
+.analysis-page :is([data-slot="card"], [data-slot="card-content"], [data-slot="tabs-content"]) {
+  min-width: 0;
+}
+
+@media (width < 768px), (pointer: coarse) {
+  .analysis-page :is([data-slot="button"], [data-slot="tabs-trigger"]) {
+    min-height: 2.75rem;
+    font-size: 0.875rem;
+  }
+}

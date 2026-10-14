@@ -1032,6 +1032,16 @@ export async function GET(request) {
     });
 
     const categoryBreakdownByMonth = {};
+    // Enero se compara con diciembre anterior, no con diciembre del mismo año.
+    categoryBreakdownByMonth[-1] = buildCategoryBreakdown({
+      categories,
+      expenses: getExpensesForMonth(currentYear - 1, 12),
+      subscriptions,
+      purchases,
+      cycles: cardCycles,
+      year: currentYear - 1,
+      month: 12,
+    });
     for (let m = 0; m < 12; m++) {
       categoryBreakdownByMonth[m] = buildCategoryBreakdown({
         categories,

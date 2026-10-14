@@ -12,6 +12,11 @@ export const navItems = [
     icon: BarChart3,
   },
   {
+    label: "Análisis",
+    href: "/analisis",
+    icon: BarChart3,
+  },
+  {
     label: "Compras a meses",
     href: "/compras-a-meses",
     icon: WalletCards,

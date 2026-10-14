@@ -86,23 +86,6 @@ function SummaryGridSkeleton() {
   );
 }
 
-function ChartGridSkeleton() {
-  return (
-    <div className="grid gap-6 lg:grid-cols-2">
-      {Array.from({ length: 2 }).map((_, index) => (
-        <Card key={index} className="rounded-2xl border-border bg-card">
-          <CardHeader>
-            <Skeleton className="mx-auto h-5 w-40" />
-          </CardHeader>
-          <CardContent>
-            <Skeleton className="h-[260px] w-full rounded-xl" />
-          </CardContent>
-        </Card>
-      ))}
-    </div>
-  );
-}
-
 function ListSkeleton({ cards = 5 }) {
   return (
     <div className="grid gap-3">
@@ -155,7 +138,6 @@ export default function PageSkeleton({ variant = "form-table" }) {
                 </div>
               </CardContent>
             </Card>
-            <ChartGridSkeleton />
           </div>
         </section>
       </main>

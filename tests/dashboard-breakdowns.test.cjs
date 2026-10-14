@@ -97,3 +97,22 @@ test("API listado/detalle devuelve mismos importes y obtiene vínculos de gastos
   assert.equal(detail.cycle.calculatedAmount, 0);
   assert.equal(detail.cycle.includedPurchases.length, 0);
 });
+
+test("API conserva diciembre anterior para enero sin mezclar diciembre futuro", async () => {
+  const expense = (id, date, amount) => ({ id, date, amount, categoryId: "cat", paymentMethod: "CASH" });
+  const fake = {
+    card: { findMany: async () => [] },
+    cardCycle: { findMany: async () => [] },
+    dailyExpense: { findMany: async () => [expense("anterior", "2025-12-20T12:00:00Z", 125.43), expense("enero", "2026-01-20T12:00:00Z", 50), expense("futuro", "2026-12-20T12:00:00Z", 999)] },
+    subscription: { findMany: async () => [] },
+    installmentPurchase: { findMany: async () => [] },
+    income: { findMany: async () => [] },
+    category: { findMany: async () => [{ id: "cat", name: "Gastos" }] },
+    receivableAccount: { findMany: async () => [] },
+  };
+  const route = context("dashboard", { prisma: fake, NextResponse: { json: (body) => body }, buildCardUsageWaivers: () => [] });
+  const response = await route.GET({ url: "http://localhost/api/dashboard?userId=u&clientDate=2026-10-13" });
+  assert.equal(response.categoryBreakdownByMonth[-1][0].total, 125.43);
+  assert.equal(response.categoryBreakdownByMonth[0][0].total, 50);
+  assert.equal(response.categoryBreakdownByMonth[11][0].total, 999);
+});
