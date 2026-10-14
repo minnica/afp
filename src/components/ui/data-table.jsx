@@ -50,6 +50,7 @@ export function DataTable({
   renderMobileRow,
   mobileToolbar,
   mobileListLabel = "Registros",
+  mobileRowSeparator = true,
 }) {
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
@@ -130,10 +131,10 @@ export function DataTable({
         <div className="md:hidden">
           {mobileToolbar?.(table)}
           {table.getRowModel().rows.length ? (
-            <ItemGroup className="gap-0" aria-label={mobileListLabel}>
+            <ItemGroup className={mobileRowSeparator ? "gap-0" : "gap-3"} aria-label={mobileListLabel}>
               {table.getRowModel().rows.map((row, index) => (
                 <Fragment key={row.id}>
-                  {index > 0 ? <ItemSeparator className="my-0" /> : null}
+                  {mobileRowSeparator && index > 0 ? <ItemSeparator className="my-0" /> : null}
                   {renderMobileRow(row)}
                 </Fragment>
               ))}

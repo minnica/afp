@@ -3,8 +3,7 @@
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
-import { BreakdownSection, DisclosureButton } from "@/components/ui/responsive-breakdown";
+import { BreakdownHelp, BreakdownSection, BreakdownSections } from "@/components/ui/responsive-breakdown";
 
 function formatMoney(value) {
   return new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" }).format(Number(value || 0));
@@ -76,7 +75,18 @@ export default function CardUsageWaiverBreakdown({ item }) {
             {item.selectedCycle && <p>Del {formatBreakdownDate(item.selectedCycle.startDate)} al {formatBreakdownDate(item.selectedCycle.cutDate)}</p>}
           </div>
           <dl className="space-y-2">
-            <div className="flex items-baseline justify-between gap-3"><dt className="text-sm">Consumo que cuenta</dt><dd className="min-w-0 break-words text-right text-lg font-semibold tabular-nums">{formatMoney(item.eligibleSpend)}</dd></div>
+            <div className="flex items-baseline justify-between gap-3">
+              <dt className="flex min-w-0 items-center text-sm">
+                Consumo que cuenta
+                <BreakdownHelp
+                  title="Qué cuenta para la meta"
+                  description={rules}
+                  data-usage-calculation-help
+                  footer={<a href={item.ruleSourceUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center underline underline-offset-4">Consultar condiciones del banco</a>}
+                />
+              </dt>
+              <dd className="min-w-0 max-w-[55%] shrink-0 break-words text-right text-lg font-semibold tabular-nums">{formatMoney(item.eligibleSpend)}</dd>
+            </div>
             <div className="flex items-baseline justify-between gap-3"><dt className="text-sm text-muted-foreground">Meta del período</dt><dd className="min-w-0 break-words text-right text-sm font-medium tabular-nums">{formatMoney(item.minimumAmount)}</dd></div>
             <div className="flex items-baseline justify-between gap-3"><dt className="text-sm text-muted-foreground">{item.status === "NOT_MET" ? "Faltó para la meta" : "Falta para la meta"}</dt><dd className="min-w-0 break-words text-right text-sm font-medium tabular-nums">{formatMoney(item.remainingAmount)}</dd></div>
           </dl>
@@ -89,19 +99,10 @@ export default function CardUsageWaiverBreakdown({ item }) {
         </>
       )}
 
-      <div className={isMobile ? "border-t border-border" : "grid gap-4 lg:grid-cols-3"}>
+      <BreakdownSections isMobile={isMobile} className="grid gap-4 lg:grid-cols-3">
         {sections.map((section) => <BreakdownSection key={section.title} {...section} isMobile={isMobile} getAmount={(entry) => entry.amount} />)}
-      </div>
+      </BreakdownSections>
 
-      {isMobile && (
-        <Collapsible>
-          <DisclosureButton>Qué cuenta para la meta</DisclosureButton>
-          <CollapsibleContent className="space-y-2 pb-1">
-            <p className="text-sm text-muted-foreground">{rules}</p>
-            <a href={item.ruleSourceUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center text-sm underline underline-offset-4">Consultar condiciones del banco</a>
-          </CollapsibleContent>
-        </Collapsible>
-      )}
     </div>
   );
 }

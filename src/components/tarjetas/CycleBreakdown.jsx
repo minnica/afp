@@ -2,10 +2,12 @@
 
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { BreakdownSection, DisclosureButton } from "@/components/ui/responsive-breakdown";
+import { BreakdownHelp, BreakdownSection, BreakdownSections, DisclosureButton } from "@/components/ui/responsive-breakdown";
+import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { PopoverDescription } from "@/components/ui/popover";
 
 function formatMoney(value) {
   return new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" }).format(
@@ -33,8 +35,22 @@ export default function CycleBreakdown({ cycle }) {
           <p className="text-sm text-muted-foreground">Del {formatShortDate(cycle.startDate)} al {formatShortDate(cycle.cutDate)}</p>
           <dl className="space-y-2">
             <div className="flex items-baseline justify-between gap-3">
-              <dt className="text-sm">Total calculado</dt>
-              <dd className="min-w-0 break-words text-right text-lg font-semibold tabular-nums">{formatMoney(cycle.calculatedAmount)}</dd>
+              <dt className="flex min-w-0 items-center text-sm">
+                Total calculado
+                <BreakdownHelp
+                  title="Cómo se calcula"
+                  label="Cómo se calcula el total"
+                  description={explanation}
+                  data-cycle-calculation-help
+                  footer={cycle.difference != null && <PopoverDescription>Diferencia = estado de cuenta − total calculado.</PopoverDescription>}
+                >
+                  <dl className="flex flex-col gap-2">
+                    <div className="flex justify-between gap-3"><dt className="text-muted-foreground">Cargos del corte</dt><dd className="min-w-0 break-words text-right font-medium tabular-nums">{formatMoney(cycle.grossCalculatedAmount)}</dd></div>
+                    {hasCredits && <div className="flex justify-between gap-3"><dt className="text-muted-foreground">Bonificaciones aplicadas</dt><dd className="min-w-0 break-words text-right font-medium tabular-nums">{formatMoney(-cycle.creditsAmount)}</dd></div>}
+                  </dl>
+                </BreakdownHelp>
+              </dt>
+              <dd className="min-w-0 max-w-[55%] shrink-0 break-words text-right text-lg font-semibold tabular-nums">{formatMoney(cycle.calculatedAmount)}</dd>
             </div>
             {cycle.statementAmount != null ? (
               <div className="flex items-baseline justify-between gap-3">
@@ -90,7 +106,7 @@ export default function CycleBreakdown({ cycle }) {
         Del {formatShortDate(cycle.startDate)} al {formatShortDate(cycle.cutDate)}.
         {" "}{explanation}
       </p>}
-      <div className={isMobile ? "border-t border-border" : `grid gap-4 ${hasCredits ? "lg:grid-cols-2" : "lg:grid-cols-3"}`}>
+      <BreakdownSections isMobile={isMobile} className={cn("grid gap-4", hasCredits ? "lg:grid-cols-2" : "lg:grid-cols-3")}>
         <BreakdownSection
           title="Gastos"
           amount={cycle.expensesAmount}
@@ -148,20 +164,7 @@ export default function CycleBreakdown({ cycle }) {
             getNote={(item) => item.notes}
           />
         )}
-      </div>
-      {isMobile && (
-        <Collapsible>
-          <DisclosureButton>Cómo se calcula</DisclosureButton>
-          <CollapsibleContent className="space-y-3 pb-1">
-            <dl className="space-y-2 text-sm">
-              <div className="flex justify-between gap-3"><dt className="text-muted-foreground">Cargos del corte</dt><dd className="min-w-0 break-words text-right font-medium tabular-nums">{formatMoney(cycle.grossCalculatedAmount)}</dd></div>
-              {hasCredits && <div className="flex justify-between gap-3"><dt className="text-muted-foreground">Bonificaciones aplicadas</dt><dd className="min-w-0 break-words text-right font-medium text-emerald-400 tabular-nums">{formatMoney(-cycle.creditsAmount)}</dd></div>}
-            </dl>
-            <p className="text-sm text-muted-foreground">{explanation}</p>
-            {cycle.difference != null && <p className="text-xs text-muted-foreground">Diferencia = estado de cuenta − total calculado.</p>}
-          </CollapsibleContent>
-        </Collapsible>
-      )}
+      </BreakdownSections>
     </div>
   );
 }

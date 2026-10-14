@@ -5,8 +5,9 @@ import { useDialogFocus } from "@/hooks/use-dialog-focus";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 
-import { useCallback, useMemo, useState } from "react";
-import { ChevronDown } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowRight01Icon, Cancel01Icon } from "@hugeicons/core-free-icons";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 
@@ -15,13 +16,15 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DatePicker } from "@/components/ui/date-picker";
-import { Label } from "@/components/ui/label";
-import { Item } from "@/components/ui/item";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
+import { Item, ItemHeader } from "@/components/ui/item";
 import { ResponsiveSelect } from "@/components/ui/responsive-select";
 import { BreakdownDialogContent } from "@/components/ui/responsive-breakdown";
 import {
   Dialog,
+  DialogClose,
   DialogDescription,
   DialogContent,
   DialogFooter,
@@ -120,67 +123,58 @@ function MobileCycleItem({ cycle, openDialog }) {
   const hasStatement = cycle.statementAmount != null;
 
   return (
-    <Item role="listitem" className="block min-w-0 rounded-none border-0 px-0 py-4 text-sm">
-      <Collapsible>
-        <div className="mb-3 flex items-start justify-between gap-3">
-          <h4 className="min-w-0 break-words text-base font-semibold">{cycle.card.name}</h4>
-          <Badge variant="outline" className={`shrink-0 ${getStatusBadgeClass(cycle.displayStatus)}`}>
-            {getStatusLabel(cycle.displayStatus)}
-          </Badge>
+    <Item role="listitem" variant="outline" className="block min-w-0 rounded-xl bg-card p-4" aria-label={`Ciclo de ${cycle.card.name}`}>
+      <ItemHeader className="mb-3 items-start gap-3">
+        <h4 className="min-w-0 break-words text-base font-semibold">{cycle.card.name}</h4>
+        <Badge variant="outline" className={cn("shrink-0", getStatusBadgeClass(cycle.displayStatus))}>
+          {getStatusLabel(cycle.displayStatus)}
+        </Badge>
+      </ItemHeader>
+      <Separator className="mb-3" />
+
+      <dl className="grid grid-cols-2 gap-x-3 gap-y-3">
+        <div className="col-span-2 min-w-0">
+          <dt className="text-xs text-muted-foreground">{hasStatement ? "Estado de cuenta" : "Calculado · estimado"}</dt>
+          <dd className="break-words text-lg font-semibold tabular-nums">{formatMoney(hasStatement ? cycle.statementAmount : cycle.calculatedAmount)}</dd>
         </div>
-
-        <dl className="grid grid-cols-2 gap-x-3 gap-y-3">
-          <div className="col-span-2 min-w-0">
-            <dt className="text-xs text-muted-foreground">{hasStatement ? "Estado de cuenta" : "Calculado · estimado"}</dt>
-            <dd className="break-words text-lg font-semibold tabular-nums">{formatMoney(hasStatement ? cycle.statementAmount : cycle.calculatedAmount)}</dd>
-          </div>
-          <div className="min-w-0">
-            <dt className="text-xs text-muted-foreground">Corte</dt>
-            <dd className="text-sm font-medium">{formatCompactDate(cycle.cutDate)}</dd>
-          </div>
-          <div className="min-w-0 text-right">
-            <dt className="text-xs text-muted-foreground">Límite de pago</dt>
-            <dd className="text-sm font-medium">{formatCompactDate(cycle.dueDate)}</dd>
-          </div>
-        </dl>
-
-        <div className="mt-2 flex items-center justify-between gap-2">
-          <Button type="button" variant="ghost" className="h-11 px-2 text-sm" onClick={() => openDialog("breakdown", cycle)} aria-label={`Ver desglose de ${cycle.card.name}`}>
-            Desglose
-          </Button>
-          <CollapsibleTrigger asChild>
-            <Button type="button" variant="ghost" className="group h-11 px-2 text-sm" aria-label={`Detalles de ${cycle.card.name}`}>
-              Detalles
-              <ChevronDown className="transition-transform duration-150 group-aria-expanded:rotate-180 motion-reduce:transition-none" />
-            </Button>
-          </CollapsibleTrigger>
+        <div className="min-w-0">
+          <dt className="text-xs text-muted-foreground">Corte</dt>
+          <dd className="text-sm font-medium">{formatCompactDate(cycle.cutDate)}</dd>
         </div>
+        <div className="min-w-0 text-right">
+          <dt className="text-xs text-muted-foreground">Límite de pago</dt>
+          <dd className="text-sm font-medium">{formatCompactDate(cycle.dueDate)}</dd>
+        </div>
+      </dl>
 
-        <CollapsibleContent>
-          <dl className="grid grid-cols-2 gap-3 border-t border-border pt-3 text-sm">
-            <div className="col-span-2 min-w-0">
-              <dt className="text-xs text-muted-foreground">Inicio</dt>
-              <dd>{format(new Date(toDateInputValue(cycle.startDate) + "T12:00:00"), "d MMM yyyy", { locale: es })}</dd>
-            </div>
-            <div className="min-w-0">
-              <dt className="text-xs text-muted-foreground">Calculado</dt>
-              <dd className="break-words font-medium tabular-nums">{formatMoney(cycle.calculatedAmount)}</dd>
-            </div>
-            <div className="min-w-0 text-right">
-              <dt className="text-xs text-muted-foreground">Diferencia</dt>
-              <dd className={`break-words tabular-nums ${cycle.difference == null ? "text-muted-foreground" : Math.abs(Number(cycle.difference)) > 35 ? "text-red-400" : "text-emerald-400"}`}>
-                {cycle.difference != null ? formatMoney(cycle.difference) : "Sin estado de cuenta"}
-              </dd>
-            </div>
-          </dl>
-          <div className="mt-3 flex flex-wrap gap-2">
-            <Button type="button" variant="secondary" className="h-11 px-3 text-sm" onClick={() => openDialog("dates", cycle)}>Fechas</Button>
-            <Button type="button" variant="secondary" className="h-11 px-3 text-sm" onClick={() => openDialog("statement", cycle)}>Cuenta</Button>
-            <Button type="button" className="h-11 px-3 text-sm" onClick={() => openDialog("pay", cycle)}>{cycle.displayStatus === "PAID" ? "Ver pago" : "Pagar"}</Button>
-          </div>
-        </CollapsibleContent>
-      </Collapsible>
+      <div className="mt-4 grid grid-cols-2 gap-2">
+        <Button type="button" variant="secondary" className="h-11" onClick={() => openDialog("breakdown", cycle)} aria-label={`Ver desglose de ${cycle.card.name}`}>
+          Desglose
+        </Button>
+        <Button type="button" variant="outline" className="h-11 gap-2" onClick={() => openDialog("details", cycle)} aria-label={`Detalles de ${cycle.card.name}`} aria-haspopup="dialog">
+          Detalles <HugeiconsIcon icon={ArrowRight01Icon} strokeWidth={2} aria-hidden="true" data-icon="inline-end" />
+        </Button>
+      </div>
     </Item>
+  );
+}
+
+function CycleDetails({ cycle }) {
+  return (
+    <div className="flex flex-col gap-4">
+      <Badge variant="outline" className={getStatusBadgeClass(cycle.displayStatus)}>{getStatusLabel(cycle.displayStatus)}</Badge>
+      <dl className="grid grid-cols-2 gap-x-4 gap-y-4 text-sm">
+        <div className="min-w-0"><dt className="text-xs text-muted-foreground">Calculado</dt><dd className="break-words font-semibold tabular-nums">{formatMoney(cycle.calculatedAmount)}</dd></div>
+        <div className="min-w-0 text-right"><dt className="text-xs text-muted-foreground">Estado de cuenta</dt><dd className="break-words font-semibold tabular-nums">{cycle.statementAmount != null ? formatMoney(cycle.statementAmount) : "Sin capturar"}</dd></div>
+        <div className="col-span-2 min-w-0"><dt className="text-xs text-muted-foreground">Diferencia (estado − calculado)</dt><dd className={cn("break-words font-medium tabular-nums", cycle.difference == null ? "text-muted-foreground" : Math.abs(Number(cycle.difference)) > 35 ? "text-destructive" : "text-foreground")}>{cycle.difference != null ? formatMoney(cycle.difference) : "Sin estado de cuenta"}</dd></div>
+        <Separator className="col-span-2" />
+        <div className="min-w-0"><dt className="text-xs text-muted-foreground">Inicio</dt><dd>{format(new Date(toDateInputValue(cycle.startDate) + "T12:00:00"), "d MMM yyyy", { locale: es })}</dd></div>
+        <div className="min-w-0 text-right"><dt className="text-xs text-muted-foreground">Corte</dt><dd>{formatCompactDate(cycle.cutDate)}</dd></div>
+        <div className="col-span-2 min-w-0"><dt className="text-xs text-muted-foreground">Límite de pago</dt><dd>{formatCompactDate(cycle.dueDate)}</dd></div>
+        {cycle.paidAt && <div className="min-w-0"><dt className="text-xs text-muted-foreground">Fecha de pago</dt><dd>{format(new Date(toDateInputValue(cycle.paidAt) + "T12:00:00"), "d MMM yyyy", { locale: es })}</dd></div>}
+        {cycle.paidAmount != null && <div className="min-w-0 text-right"><dt className="text-xs text-muted-foreground">Monto pagado</dt><dd className="break-words font-medium tabular-nums">{formatMoney(cycle.paidAmount)}</dd></div>}
+      </dl>
+    </div>
   );
 }
 
@@ -194,6 +188,16 @@ export default function CyclesDataTable({
 }) {
   const { captureFocus, restoreFocus } = useDialogFocus();
   const [activeDialog, setActiveDialog] = useState(null);
+  const dialogTitleRef = useRef(null);
+  const dialogRequestRef = useRef(0);
+  const dialogType = activeDialog?.type;
+  const currentCycle = activeDialog ? cycles.find((cycle) => cycle.id === activeDialog.cycle.id) || activeDialog.cycle : null;
+
+  useEffect(() => {
+    if (dialogType && dialogType !== "breakdown") {
+      dialogTitleRef.current?.focus({ preventScroll: true });
+    }
+  }, [dialogType]);
 
   const [editCycleStartDate, setEditCycleStartDate] = useState("");
   const [editCycleCutDate, setEditCycleCutDate] = useState("");
@@ -203,6 +207,7 @@ export default function CyclesDataTable({
   const [paidAmount, setPaidAmount] = useState("");
 
   const openDialog = useCallback(async (type, cycle) => {
+    const requestId = ++dialogRequestRef.current;
     if (type === "dates") {
       setEditCycleStartDate(toDateInputValue(cycle.startDate));
       setEditCycleCutDate(toDateInputValue(cycle.cutDate));
@@ -215,7 +220,7 @@ export default function CyclesDataTable({
     }
 
     if (type !== "breakdown") {
-      setActiveDialog({ type, cycle });
+      setActiveDialog((previous) => ({ type, cycle, returnToDetails: type !== "details" && (previous?.type === "details" || previous?.returnToDetails) }));
       return;
     }
 
@@ -226,6 +231,7 @@ export default function CyclesDataTable({
         ? await loadCycleBreakdown(cycle.id)
         : cycle;
 
+      if (requestId !== dialogRequestRef.current) return;
       setActiveDialog({
         type,
         cycle: detailedCycle || cycle,
@@ -233,6 +239,7 @@ export default function CyclesDataTable({
         error: "",
       });
     } catch (error) {
+      if (requestId !== dialogRequestRef.current) return;
       setActiveDialog({
         type,
         cycle,
@@ -243,6 +250,7 @@ export default function CyclesDataTable({
   }, [loadCycleBreakdown]);
 
   function closeDialog() {
+    dialogRequestRef.current += 1;
     setActiveDialog(null);
   }
 
@@ -394,9 +402,10 @@ export default function CyclesDataTable({
         pageSize={10}
         pageSizeOptions={[10, 25, 50, 100]}
         mobileListLabel="Ciclos mensuales"
+        mobileRowSeparator={false}
         renderMobileRow={(row) => <MobileCycleItem key={row.original.id} cycle={row.original} openDialog={openDialog} />}
         mobileToolbar={(table) => (
-          <div className="mb-1 flex items-center gap-2">
+          <div className="mb-3 flex items-center gap-2">
             <span className="text-xs text-muted-foreground">Ordenar</span>
             <ResponsiveSelect
               aria-label="Ordenar ciclos"
@@ -414,121 +423,112 @@ export default function CyclesDataTable({
       />
 
       <Dialog open={!!activeDialog} onOpenChange={(open) => { if (!open) closeDialog(); }}>
-        {activeDialog?.type === "dates" && (
-          <DialogContent onCloseAutoFocus={restoreFocus}>
-            <DialogHeader>
-              <DialogTitle>Editar fechas reales</DialogTitle>
-              <DialogDescription className="sr-only">Actualiza las fechas de inicio, corte y vencimiento del ciclo.</DialogDescription>
+        {activeDialog && activeDialog.type !== "breakdown" && (
+          <DialogContent onCloseAutoFocus={restoreFocus} showCloseButton={false} data-cycle-action={activeDialog.type} className="flex max-h-[90svh] max-w-[calc(100%-1rem)] flex-col md:max-w-md" onOpenAutoFocus={(event) => { event.preventDefault(); dialogTitleRef.current?.focus({ preventScroll: true }); }}>
+            <DialogHeader className="shrink-0 pr-12">
+              <DialogTitle ref={dialogTitleRef} tabIndex={-1} className="break-words outline-none">
+                {activeDialog.type === "details" ? "Detalles" : activeDialog.type === "dates" ? "Editar fechas reales" : activeDialog.type === "statement" ? "Estado de cuenta" : "Registrar pago"} — {currentCycle.card.name}
+              </DialogTitle>
+              <DialogDescription className="sr-only">Fechas, importes y acciones del ciclo de esta tarjeta.</DialogDescription>
             </DialogHeader>
-            <div className="grid gap-3">
-              <div className="space-y-2">
-                <Label htmlFor="cycle-start-date">Inicio</Label>
-                <DatePicker
-                  id="cycle-start-date"
-                  aria-label="Fecha de inicio"
-                  value={editCycleStartDate}
-                  onChange={setEditCycleStartDate}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="cycle-cut-date">Corte</Label>
-                <DatePicker
-                  id="cycle-cut-date"
-                  aria-label="Fecha de corte"
-                  value={editCycleCutDate}
-                  onChange={setEditCycleCutDate}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="cycle-due-date">Límite pago</Label>
-                <DatePicker
-                  id="cycle-due-date"
-                  aria-label="Fecha límite de pago"
-                  value={editCycleDueDate}
-                  onChange={setEditCycleDueDate}
-                />
-              </div>
+            <DialogClose asChild>
+              <Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2 size-11" aria-label={activeDialog.type === "details" ? "Cerrar detalles" : "Cerrar edición"}><HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} aria-hidden="true" /></Button>
+            </DialogClose>
+            <div className="min-h-0 overflow-y-auto overscroll-contain pr-1 [color-scheme:dark] [scrollbar-gutter:stable]" role="region" aria-label="Información del ciclo" tabIndex={0}>
+              {activeDialog.type === "details" && <CycleDetails cycle={currentCycle} />}
+              {activeDialog.type === "dates" && (
+                <FieldGroup className="gap-3">
+                  <Field>
+                    <FieldLabel htmlFor="cycle-start-date">Inicio</FieldLabel>
+                    <DatePicker
+                      id="cycle-start-date"
+                      aria-label="Fecha de inicio"
+                      value={editCycleStartDate}
+                      onChange={setEditCycleStartDate}
+                    />
+                  </Field>
+                  <Field>
+                    <FieldLabel htmlFor="cycle-cut-date">Corte</FieldLabel>
+                    <DatePicker
+                      id="cycle-cut-date"
+                      aria-label="Fecha de corte"
+                      value={editCycleCutDate}
+                      onChange={setEditCycleCutDate}
+                    />
+                  </Field>
+                  <Field>
+                    <FieldLabel htmlFor="cycle-due-date">Límite pago</FieldLabel>
+                    <DatePicker
+                      id="cycle-due-date"
+                      aria-label="Fecha límite de pago"
+                      value={editCycleDueDate}
+                      onChange={setEditCycleDueDate}
+                    />
+                  </Field>
+                </FieldGroup>
+              )}
+              {activeDialog.type === "statement" && (
+                <FieldGroup>
+                  <Field>
+                    <FieldLabel htmlFor="cycles-data-table-field-1">Monto estado de cuenta</FieldLabel>
+                    <Input
+                      id="cycles-data-table-field-1"
+                      type="number"
+                      formatNumber
+                      min="0"
+                      step="0.01"
+                      value={statementAmount}
+                      placeholder="0.00"
+                      onChange={(e) => setStatementAmount(e.target.value)}
+                    />
+                  </Field>
+                </FieldGroup>
+              )}
+              {activeDialog.type === "pay" && (
+                <FieldGroup className="gap-3">
+                  <Field>
+                    <FieldLabel htmlFor="cycle-paid-at">Fecha de pago</FieldLabel>
+                    <DatePicker
+                      id="cycle-paid-at"
+                      aria-label="Fecha de pago"
+                      value={paidAt}
+                      onChange={setPaidAt}
+                    />
+                  </Field>
+                  <Field>
+                    <FieldLabel htmlFor="cycles-data-table-field-2">Monto pagado</FieldLabel>
+                    <Input
+                      id="cycles-data-table-field-2"
+                      type="number"
+                      formatNumber
+                      min="0"
+                      step="0.01"
+                      value={paidAmount}
+                      placeholder="0.00"
+                      onChange={(e) => setPaidAmount(e.target.value)}
+                    />
+                  </Field>
+                </FieldGroup>
+              )}
             </div>
-            <DialogFooter>
-              <Button type="button" onClick={handleUpdateDates}>
-                Guardar fechas
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        )}
-
-        {activeDialog?.type === "statement" && (
-          <DialogContent onCloseAutoFocus={restoreFocus}>
-            <DialogHeader>
-              <DialogTitle>Estado de cuenta</DialogTitle>
-              <DialogDescription className="sr-only">Captura el importe indicado en el estado de cuenta bancario.</DialogDescription>
-            </DialogHeader>
-            <div className="space-y-2">
-              <Label htmlFor="cycles-data-table-field-1">Monto estado de cuenta</Label>
-              <Input
-                id="cycles-data-table-field-1"
-                type="number"
-                formatNumber
-                min="0"
-                step="0.01"
-                value={statementAmount}
-                placeholder="0.00"
-                onChange={(e) => setStatementAmount(e.target.value)}
-              />
-            </div>
-            <DialogFooter>
-              <Button type="button" onClick={handleUpdateStatement}>
-                Guardar
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        )}
-
-        {activeDialog?.type === "pay" && (
-          <DialogContent onCloseAutoFocus={restoreFocus}>
-            <DialogHeader>
-              <DialogTitle>Registrar pago</DialogTitle>
-              <DialogDescription className="sr-only">Registra la fecha y el importe pagado de este ciclo.</DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-3">
-              <div className="space-y-2">
-                <Label htmlFor="cycle-paid-at">Fecha de pago</Label>
-                <DatePicker
-                  id="cycle-paid-at"
-                  aria-label="Fecha de pago"
-                  value={paidAt}
-                  onChange={setPaidAt}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="cycles-data-table-field-2">Monto pagado</Label>
-                <Input
-                  id="cycles-data-table-field-2"
-                  type="number"
-                  formatNumber
-                  min="0"
-                  step="0.01"
-                  value={paidAmount}
-                  placeholder="0.00"
-                  onChange={(e) => setPaidAmount(e.target.value)}
-                />
-              </div>
-            </div>
-            <DialogFooter className="flex-col sm:flex-row">
-              <Button type="button" onClick={handleMarkAsPaid}>
-                Confirmar pago
-              </Button>
-              {activeDialog.cycle.displayStatus === "PAID" && (
-                <Button
-                  type="button"
-                  variant="destructive"
-                  onClick={() => {
-                    unmarkCycleAsPaid(activeDialog.cycle.id);
-                    closeDialog();
-                  }}
-                >
-                  Deshacer pago
-                </Button>
+            <DialogFooter className="grid shrink-0 grid-cols-2 gap-2 pt-1 sm:grid sm:grid-cols-2">
+              <Separator className="col-span-2 mb-1" />
+              {activeDialog.type === "details" ? (
+                <>
+                  <Button type="button" variant="secondary" className="h-11" onClick={() => openDialog("dates", currentCycle)}>Fechas</Button>
+                  <Button type="button" variant="secondary" className="h-11" onClick={() => openDialog("statement", currentCycle)}>Cuenta</Button>
+                  <Button type="button" className="col-span-2 h-11" onClick={() => openDialog("pay", currentCycle)}>{currentCycle.displayStatus === "PAID" ? "Ver pago" : "Pagar"}</Button>
+                </>
+              ) : (
+                <>
+                  <Button type="button" className="col-span-2 h-11" onClick={activeDialog.type === "dates" ? handleUpdateDates : activeDialog.type === "statement" ? handleUpdateStatement : handleMarkAsPaid}>
+                    {activeDialog.type === "dates" ? "Guardar fechas" : activeDialog.type === "statement" ? "Guardar" : "Confirmar pago"}
+                  </Button>
+                  {activeDialog.type === "pay" && currentCycle.displayStatus === "PAID" && (
+                    <Button type="button" variant="destructive" className="col-span-2 h-11" onClick={() => { unmarkCycleAsPaid(currentCycle.id); closeDialog(); }}>Deshacer pago</Button>
+                  )}
+                  {activeDialog.returnToDetails && <Button type="button" variant="ghost" className="col-span-2 h-11" onClick={() => openDialog("details", currentCycle)}>Volver a detalles</Button>}
+                </>
               )}
             </DialogFooter>
           </DialogContent>

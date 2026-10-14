@@ -8,7 +8,7 @@ import { useDialogFocus } from "@/hooks/use-dialog-focus";
 
 import { Empty, EmptyDescription } from "@/components/ui/empty";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -26,6 +26,7 @@ import { ensureUserSetup } from "@/lib/userSetup";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Progress } from "@/components/ui/progress";
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "@/components/ui/chart";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -175,57 +176,22 @@ function formatCompactDate(dateString) {
   return `${dateText} [${diffDays}]`;
 }
 
-function getCutDateSortValues(cutDateString) {
-  if (!cutDateString) {
-    return {
-      distance: Number.MAX_SAFE_INTEGER,
-      time: Number.MAX_SAFE_INTEGER,
-    };
-  }
-
-  const cutDate = new Date(cutDateString);
-
-  if (Number.isNaN(cutDate.getTime())) {
-    return {
-      distance: Number.MAX_SAFE_INTEGER,
-      time: Number.MAX_SAFE_INTEGER,
-    };
-  }
-
-  const today = new Date();
-  const todayUtc = Date.UTC(
-    today.getFullYear(),
-    today.getMonth(),
-    today.getDate(),
-  );
-  const cutUtc = Date.UTC(
-    cutDate.getUTCFullYear(),
-    cutDate.getUTCMonth(),
-    cutDate.getUTCDate(),
-  );
-  const diffDays = Math.round((cutUtc - todayUtc) / 86400000);
-
-  return {
-    distance: Math.abs(diffDays),
-    time: cutUtc,
-  };
+function getCutDateSortValue(dateString) {
+  if (!dateString) return Number.MAX_SAFE_INTEGER;
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return Number.MAX_SAFE_INTEGER;
+  return Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
 }
 
-function compareByCutDateProximity(a, b) {
-  const aCut = getCutDateSortValues(a.selectedCycle?.cutDate);
-  const bCut = getCutDateSortValues(b.selectedCycle?.cutDate);
-
-  if (aCut.distance !== bCut.distance) {
-    return aCut.distance - bCut.distance;
-  }
-
-  if (aCut.time !== bCut.time) {
-    return aCut.time - bCut.time;
-  }
-
-  return String(a.card?.name || "").localeCompare(
-    String(b.card?.name || ""),
-    "es",
+function compareByCutDate(a, b, direction) {
+  const aDate = getCutDateSortValue(a.selectedCycle?.cutDate);
+  const bDate = getCutDateSortValue(b.selectedCycle?.cutDate);
+  // Los ciclos sin fecha permanecen al final en ambos sentidos.
+  const difference = aDate === Number.MAX_SAFE_INTEGER || bDate === Number.MAX_SAFE_INTEGER
+    ? aDate - bDate
+    : (aDate - bDate) * (direction === "desc" ? -1 : 1);
+  return difference || String(a.card?.name || "").localeCompare(
+    String(b.card?.name || ""), "es",
   );
 }
 
@@ -485,13 +451,14 @@ function comparisonChartConfig(previousLabel, currentLabel) {
   };
 }
 
-function MonthSelector({ value, onChange }) {
+function MonthSelector({ value, onChange, id, className = "w-full max-w-[160px] h-8 text-xs" }) {
   return (
     <ResponsiveSelect
+      id={id}
       value={String(value)}
       onValueChange={v => onChange(Number(v))}
       aria-label="Mes del período"
-      className="w-full max-w-[160px] h-8 text-xs"
+      className={className}
       title="Mes del período"
       placeholder="Selecciona una opción"
       options={MONTH_NAMES.map((name, i) => ({
@@ -889,30 +856,52 @@ function CardUsageWaiverProgress({ cardUsageWaiversByMonth, currentMonthIndex })
   const { captureFocus, restoreFocus } = useDialogFocus();
   const [selectedMonthIndex, setSelectedMonthIndex] = useState(currentMonthIndex);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [sortDirection, setSortDirection] = useState("asc");
+  const sortId = useId();
+  const monthId = useId();
   const items = useMemo(() => {
     const monthItems = cardUsageWaiversByMonth[selectedMonthIndex] || [];
 
-    return [...monthItems].sort(compareByCutDateProximity);
-  }, [cardUsageWaiversByMonth, selectedMonthIndex]);
+    return [...monthItems].sort((a, b) => compareByCutDate(a, b, sortDirection));
+  }, [cardUsageWaiversByMonth, selectedMonthIndex, sortDirection]);
 
   if (!items.length) {
     return null;
   }
 
   return (
-    <Card className="rounded-2xl border-border bg-card">
+    <Card data-usage-waivers className="rounded-2xl border-border bg-card">
       <CardHeader>
         <div className="flex flex-col items-center gap-3">
           <CardTitle className="text-lg font-semibold uppercase text-center">
             Consumo mínimo
           </CardTitle>
-          <MonthSelector
-            value={selectedMonthIndex}
-            onChange={setSelectedMonthIndex}
-          />
-          <p className="text-center text-xs text-muted-foreground">
-            Compras del período para evitar la comisión por falta de uso.
-          </p>
+          <FieldGroup className="grid max-w-sm grid-cols-[minmax(0,6.25rem)_minmax(0,1fr)] gap-1">
+            <Field className="min-w-0">
+              <FieldLabel htmlFor={monthId} className="sr-only">Mes del período</FieldLabel>
+              <MonthSelector
+                id={monthId}
+                className="h-8 px-1.5 text-xs"
+                value={selectedMonthIndex}
+                onChange={setSelectedMonthIndex}
+              />
+            </Field>
+            <Field className="min-w-0">
+              <FieldLabel htmlFor={sortId} className="sr-only">Orden de consumo mínimo</FieldLabel>
+              <ResponsiveSelect
+                id={sortId}
+                value={sortDirection}
+                onValueChange={setSortDirection}
+                aria-label="Orden de consumo mínimo"
+                title="Ordenar consumo mínimo"
+                className="h-8 px-1.5 text-xs"
+                options={[
+                  { value: "asc", label: "Corte más próximo" },
+                  { value: "desc", label: "Corte más lejano" },
+                ]}
+              />
+            </Field>
+          </FieldGroup>
         </div>
       </CardHeader>
 
@@ -924,6 +913,7 @@ function CardUsageWaiverProgress({ cardUsageWaiversByMonth, currentMonthIndex })
             return (
               <div
                 key={item.card.id}
+                data-usage-card={item.card.id}
                 className="grid gap-2 md:grid-cols-[190px_1fr_160px_auto] md:items-center"
               >
                 <div className="min-w-0">

@@ -632,8 +632,8 @@ export default function TarjetasContent() {
           </TabsContent>
 
           <TabsContent value="cycles">
-            <Card className="rounded-xl border-border bg-card">
-              <CardHeader className="flex flex-row items-center justify-between gap-2 md:gap-3">
+            <Card className="rounded-none bg-transparent py-0 ring-0 [--card-spacing:0px] md:rounded-xl md:bg-card md:py-4 md:ring-1 md:[--card-spacing:--spacing(4)]">
+              <CardHeader className="mb-3 flex flex-row items-center justify-between gap-2 md:mb-0 md:gap-3">
                 <div>
                   <CardTitle className="text-base font-semibold md:text-center md:text-lg md:uppercase">
                     Ciclos mensuales
