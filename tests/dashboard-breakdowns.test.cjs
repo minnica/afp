@@ -9,7 +9,7 @@ const read = (file) => fs.readFileSync(path.join(root, file), "utf8")
   .replace(/^export /gm, "");
 function context(route = "dashboard", globals = {}) {
   const ctx = vm.createContext({ URL, console, ...globals });
-  const helpers = ["installmentStatements", "subscriptionStatements", "cardCredits", "cardCycles", "cycleDataQuality"]
+  const helpers = ["installmentStatements", "subscriptionStatements", "cardCredits", "cardCycles", "cycleDataQuality", "cardUsageWaivers"]
     .map((name) => read(`src/lib/calculations/${name}.js`)).join("\n");
   vm.runInContext(helpers + "\n" + read(`src/app/api/${route}/route.js`), ctx);
   return ctx;
@@ -110,9 +110,34 @@ test("API conserva diciembre anterior para enero sin mezclar diciembre futuro", 
     category: { findMany: async () => [{ id: "cat", name: "Gastos" }] },
     receivableAccount: { findMany: async () => [] },
   };
-  const route = context("dashboard", { prisma: fake, NextResponse: { json: (body) => body }, buildCardUsageWaivers: () => [] });
+  const route = context("dashboard", { prisma: fake, NextResponse: { json: (body) => body } });
   const response = await route.GET({ url: "http://localhost/api/dashboard?userId=u&clientDate=2026-10-13" });
   assert.equal(response.categoryBreakdownByMonth[-1][0].total, 125.43);
   assert.equal(response.categoryBreakdownByMonth[0][0].total, 50);
   assert.equal(response.categoryBreakdownByMonth[11][0].total, 999);
+  assert.equal(response.cardUsageWaiversCurrent.length, 0);
+  assert.equal(response.cardUsageWaiverHistory.length, 0);
+});
+
+test("API separa consumo vigente e historial sin cambiar los cortes financieros", async () => {
+  const usageCard = { ...card, usagePolicy: { productKey: "HSBC_ZERO" } };
+  const storedCycles = [
+    { ...cycle(10), card: usageCard, year: 2026, startDate: "2026-09-11", cutDate: "2026-10-10", dueDate: "2026-10-28" },
+    { ...cycle(11), card: usageCard, year: 2026, startDate: "2026-10-11", cutDate: "2026-11-10", dueDate: "2026-11-28" },
+  ];
+  const fake = {
+    card: { findMany: async () => [usageCard] }, cardCycle: { findMany: async () => storedCycles },
+    dailyExpense: { findMany: async () => [{ id: "actual", concept: "Compra", date: "2026-10-12", amount: 100, cardId: card.id, paymentMethod: "CARD" }] },
+    subscription: { findMany: async () => [] }, installmentPurchase: { findMany: async () => [] },
+    income: { findMany: async () => [] }, category: { findMany: async () => [] }, receivableAccount: { findMany: async () => [] },
+  };
+  const route = context("dashboard", { prisma: fake, NextResponse: { json: (body) => body } });
+  const before = JSON.stringify(storedCycles);
+  const response = await route.GET({ url: "http://localhost/api/dashboard?userId=u&clientDate=2026-10-13" });
+  assert.equal(response.cardUsageWaiversCurrent[0].selectedCycle.id, "cycle-11");
+  assert.equal(response.cardUsageWaiversCurrent[0].remainingAmount, 200);
+  assert.equal(response.cardUsageWaiverHistory[0].selectedCycle.id, "cycle-10");
+  assert.equal(response.cardUsageWaiversByMonth[9][0].selectedCycle.id, "cycle-10");
+  assert.equal(response.cycles.length, 2);
+  assert.equal(JSON.stringify(storedCycles), before);
 });

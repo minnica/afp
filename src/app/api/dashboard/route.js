@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { buildCardUsageWaivers } from "@/lib/calculations/cardUsageWaivers";
+import { buildCardUsageWaivers, buildCurrentCardUsageWaivers, buildCardUsageWaiverHistory } from "@/lib/calculations/cardUsageWaivers";
 import { cycleCreditSelect } from "@/lib/calculations/cardCredits";
 import { getSubscriptionStatementAmount } from "@/lib/calculations/subscriptionStatements";
 import { getCyclePeriodWarnings } from "@/lib/calculations/cycleDataQuality";
@@ -1125,6 +1125,9 @@ export async function GET(request) {
       });
     }
     const cardUsageWaivers = cardUsageWaiversByMonth[currentMonth - 1] || [];
+    const usageArgs = { now, cards, cyclesWithAmounts, expenses, subscriptions, purchases };
+    const cardUsageWaiversCurrent = buildCurrentCardUsageWaivers(usageArgs);
+    const cardUsageWaiverHistory = buildCardUsageWaiverHistory(usageArgs);
 
     const importantNotices = [
       ...cardPaymentNotices,
@@ -1165,6 +1168,8 @@ export async function GET(request) {
       cardMonthlyComparisonByMonth,
       cardUsageWaivers,
       cardUsageWaiversByMonth,
+      cardUsageWaiversCurrent,
+      cardUsageWaiverHistory,
       categories: categories.map((c) => ({ id: c.id, name: c.name })),
       activeReceivables,
       importantNotices,

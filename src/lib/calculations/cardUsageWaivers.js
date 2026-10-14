@@ -59,6 +59,55 @@ function verifiedUsageStatement(cycle) {
   return evidence;
 }
 
+function usagePeriod(cycle) {
+  const evidence = verifiedUsageStatement(cycle);
+  const start = evidence?.startDate || usageDay(cycle.startDate);
+  const cut = evidence?.cutDate || usageDay(cycle.cutDate);
+  if (!cycle.startDate || !cycle.cutDate || !start || !cut || start > cut) return null;
+  return { start, cut, verified: Boolean(evidence) };
+}
+
+// El período vigente depende de sus fechas bancarias, no del mes ni del pago.
+export function buildCurrentCardUsageWaivers(args) {
+  const now = args.now || new Date();
+  const today = usageDay(now);
+  return args.cards.flatMap((card) => {
+    if (!CARD_USAGE_PRODUCTS[card.usagePolicy?.productKey]) return [];
+    const candidates = args.cyclesWithAmounts
+      .filter((cycle) => cycle.cardId === card.id)
+      .map((cycle) => ({ cycle, period: usagePeriod(cycle) }))
+      .filter(({ period }) => period && period.start <= today && today <= period.cut)
+      .sort((a, b) => Number(b.period.verified) - Number(a.period.verified)
+        || b.period.start.localeCompare(a.period.start)
+        || a.period.cut.localeCompare(b.period.cut));
+    const selected = candidates[0]?.cycle;
+    const [item] = buildCardUsageWaivers({
+      ...args, now, cards: [card], cyclesWithAmounts: selected ? [selected] : [],
+      year: selected?.year ?? now.getUTCFullYear(),
+      month: selected?.month ?? now.getUTCMonth() + 1,
+    });
+    // No se acredita una meta cuando dos períodos compiten por los movimientos.
+    return [{ ...item, periodSelectionPending: candidates.length > 1,
+      ...(candidates.length > 1 ? { isExempt: false, status: "PERIOD_REVIEW" } : {}),
+    }];
+  });
+}
+
+export function buildCardUsageWaiverHistory(args) {
+  const now = args.now || new Date();
+  const today = usageDay(now);
+  const cards = new Map(args.cards.map((card) => [card.id, card]));
+  return args.cyclesWithAmounts.flatMap((cycle) => {
+    const card = cards.get(cycle.cardId);
+    const period = usagePeriod(cycle);
+    if (!card || !CARD_USAGE_PRODUCTS[card.usagePolicy?.productKey] || !period || period.cut >= today) return [];
+    return buildCardUsageWaivers({
+      ...args, now, cards: [card], cyclesWithAmounts: [cycle],
+      year: cycle.year, month: cycle.month,
+    });
+  });
+}
+
 function usageScheduledCharges(subscription, cycle) {
   const start = new Date(cycle.startDate);
   const end = new Date(cycle.cutDate);

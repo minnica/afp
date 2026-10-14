@@ -12,6 +12,8 @@ export default function ExpenseCreateSurface({ isOnline, ...props }) {
     description="Guarda un gasto y continúa con el siguiente."
     errorId="create-expense-error"
     actionSlot="expense-create-action"
+    showSavingOverlay
+    savingOverlayLabel="Guardando gasto"
     notice={!isOnline ? "Sin conexión. El gasto quedará pendiente hasta recuperar internet." : undefined}
   />
 }

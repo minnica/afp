@@ -1,12 +1,14 @@
 "use client";
 
+import { useRef, useState } from "react";
 import { Notification03Icon, Target02Icon } from "@hugeicons/core-free-icons";
 import { useDashboard } from "@/components/dashboard/DashboardProvider";
-import { CardUsageWaiverProgress, ImportantNoticesCard } from "@/components/dashboard/DashboardPanels";
+import { CardUsageWaiverProgress, CardUsageWaiverTabs, ImportantNoticesCard } from "@/components/dashboard/DashboardPanels";
 import { HeaderDialog } from "@/components/ui/header-dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs } from "@/components/ui/tabs";
 
 function DashboardStatus({ isLoading, error, dashboard, retry }) {
   if (isLoading) {
@@ -30,9 +32,21 @@ function DashboardStatus({ isLoading, error, dashboard, retry }) {
 
 export default function AppHeaderActions({ disabled = false }) {
   const data = useDashboard();
-  const { dashboard, refresh, today, usageMonth, setUsageMonth, usageSort, setUsageSort } = data;
+  const { dashboard, refresh, today, usageHistoryPeriod, setUsageHistoryPeriod } = data;
+  const [usageView, setUsageView] = useState("current");
+  const usageScrollRef = useRef(null);
   const notices = dashboard?.importantNotices || [];
   const onOpenChange = (open) => { if (open) refresh(); };
+  const onUsageOpenChange = (open) => {
+    if (open) {
+      setUsageView("current");
+      refresh();
+    }
+  };
+  const onUsageViewChange = (view) => {
+    setUsageView(view);
+    if (usageScrollRef.current) usageScrollRef.current.scrollTop = 0;
+  };
 
   return (
     <div data-slot="app-header-actions" className="ml-auto flex shrink-0 items-center gap-1">
@@ -48,27 +62,31 @@ export default function AppHeaderActions({ disabled = false }) {
         <DashboardStatus {...data} />
         {dashboard ? <ImportantNoticesCard notices={notices} inDialog /> : null}
       </HeaderDialog>
-      <HeaderDialog
-        title="Consumo mínimo"
-        description="Consulta el consumo, la meta y el faltante para exentar la comisión de tus tarjetas."
-        icon={Target02Icon}
-        disabled={disabled}
-        onOpenChange={onOpenChange}
-        data-dashboard-usage-dialog
-      >
-        <DashboardStatus {...data} />
-        {dashboard ? (
-          <CardUsageWaiverProgress
-            cardUsageWaiversByMonth={dashboard.cardUsageWaiversByMonth || {}}
-            currentMonthIndex={today.getMonth()}
-            selectedMonthIndex={usageMonth}
-            onMonthChange={setUsageMonth}
-            sortDirection={usageSort}
-            onSortChange={setUsageSort}
-            inDialog
-          />
-        ) : null}
-      </HeaderDialog>
+      <Tabs value={usageView} onValueChange={onUsageViewChange} className="gap-0">
+        <HeaderDialog
+          title="Consumo mínimo"
+          description="Consulta cuánto falta y cuándo corta el período vigente de cada tarjeta. Toca una tarjeta para ver su desglose."
+          icon={Target02Icon}
+          disabled={disabled}
+          onOpenChange={onUsageOpenChange}
+          headerContent={<CardUsageWaiverTabs />}
+          scrollRef={usageScrollRef}
+          data-dashboard-usage-dialog
+        >
+          <DashboardStatus {...data} />
+          {dashboard ? (
+            <CardUsageWaiverProgress
+              currentItems={dashboard.cardUsageWaiversCurrent || []}
+              historyItems={dashboard.cardUsageWaiverHistory || []}
+              today={today}
+              historyPeriod={usageHistoryPeriod}
+              onHistoryPeriodChange={setUsageHistoryPeriod}
+              inDialog
+              externalTabs
+            />
+          ) : null}
+        </HeaderDialog>
+      </Tabs>
     </div>
   );
 }

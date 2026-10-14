@@ -58,7 +58,8 @@ export default function CardUsageWaiverBreakdown({ item }) {
     }] : []),
   ];
   const rules = "Las comisiones, sus impuestos, los intereses y las mensualidades de compras anteriores no cuentan. Los cargos previstos se muestran aparte hasta registrar o verificar el cobro.";
-  const statusText = item.confirmationPending ? "Por revisar: importes distintos al estado"
+  const statusText = item.periodSelectionPending ? "Por revisar: hay períodos superpuestos"
+    : item.confirmationPending ? "Por revisar: importes distintos al estado"
     : item.status === "NO_CYCLE" ? "Sin ciclo registrado"
     : item.status === "FUTURE" ? "Período futuro"
     : item.isExempt ? "Meta alcanzada"

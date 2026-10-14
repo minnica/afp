@@ -17,8 +17,7 @@ export function DashboardProvider({ children }) {
   const mobile = useIsMobile();
   const [state, setState] = useState(initialState);
   const [today, setToday] = useState(() => new Date());
-  const [usageMonth, setUsageMonth] = useState(today.getMonth());
-  const [usageSort, setUsageSort] = useState("asc");
+  const [usageHistoryPeriod, setUsageHistoryPeriod] = useState("");
   const requestRef = useRef(null);
   const loadedRouteRef = useRef(null);
   const userIdRef = useRef(null);
@@ -104,8 +103,7 @@ export function DashboardProvider({ children }) {
         userIdRef.current = null;
         loadedRouteRef.current = null;
         setState(initialState);
-        setUsageMonth(new Date().getMonth());
-        setUsageSort("asc");
+        setUsageHistoryPeriod("");
         if (event === "SIGNED_OUT") router.replace("/login");
       }
     });
@@ -120,8 +118,8 @@ export function DashboardProvider({ children }) {
 
   const value = useMemo(() => ({
     ...state, refresh, retry: refresh, today,
-    usageMonth, setUsageMonth, usageSort, setUsageSort,
-  }), [state, refresh, today, usageMonth, usageSort]);
+    usageHistoryPeriod, setUsageHistoryPeriod,
+  }), [state, refresh, today, usageHistoryPeriod]);
 
   return <DashboardContext.Provider value={value}>{children}</DashboardContext.Provider>;
 }

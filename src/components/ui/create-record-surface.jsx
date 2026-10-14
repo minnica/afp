@@ -28,6 +28,7 @@ export function useCreateDialogMode() {
 export default function CreateRecordSurface({
   compact, children, title, saveLabel, description = "Guarda un registro y continúa con el siguiente.",
   error, errorId: providedErrorId, isSaving, notice, onSubmit, actionSlot = "record-create-action",
+  showSavingOverlay = false, savingOverlayLabel = "Guardando registro",
 }) {
   const generatedId = useId()
   const mobile = useIsMobile()
@@ -91,7 +92,7 @@ export default function CreateRecordSurface({
   }
 
   const form = (
-    <form ref={formRef} noValidate onSubmit={handleSubmit} className={cn(inDialog ? "flex min-h-0 flex-1 flex-col" : "space-y-4 md:space-y-5")}>
+    <form ref={formRef} noValidate aria-busy={isSaving} onSubmit={handleSubmit} className={cn(inDialog ? "flex min-h-0 flex-1 flex-col" : "space-y-4 md:space-y-5")}>
       <div ref={fieldsRef} className={cn("space-y-4 md:space-y-5", inDialog && "min-h-0 flex-1 overflow-y-auto overscroll-contain pr-1 pb-2")}>
         {error ? (
           <Alert id={errorId} role="alert" variant="destructive">
@@ -181,6 +182,25 @@ export default function CreateRecordSurface({
             </div>
           </>
         ) : capture}
+        {showSavingOverlay && isSaving ? (
+          <Dialog open>
+            <DialogContent
+              data-saving-overlay
+              showCloseButton={false}
+              className="inset-0 flex h-dvh max-h-none max-w-none translate-x-0 translate-y-0 items-center justify-center rounded-none bg-transparent p-0 ring-0 sm:max-w-none motion-reduce:animate-none"
+              onEscapeKeyDown={(event) => event.preventDefault()}
+              onInteractOutside={(event) => event.preventDefault()}
+              onCloseAutoFocus={(event) => {
+                event.preventDefault()
+                contentRef.current?.focus({ preventScroll: true })
+              }}
+            >
+              <DialogTitle className="sr-only">{savingOverlayLabel}</DialogTitle>
+              <DialogDescription className="sr-only">Espera mientras se completa el guardado.</DialogDescription>
+              <Spinner className="size-8 motion-reduce:animate-none" aria-label={savingOverlayLabel} />
+            </DialogContent>
+          </Dialog>
+        ) : null}
       </DialogContent>
     </Dialog>
   )

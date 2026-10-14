@@ -10,7 +10,7 @@ import {
   DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog";
 
-export function HeaderDialog({ title, description, icon, count = 0, disabled = false, onOpenChange, children, ...props }) {
+export function HeaderDialog({ title, description, icon, count = 0, disabled = false, onOpenChange, headerContent, scrollRef, children, ...props }) {
   const titleRef = useRef(null);
 
   return (
@@ -43,16 +43,19 @@ export function HeaderDialog({ title, description, icon, count = 0, disabled = f
         }}
         {...props}
       >
-        <DialogHeader className="shrink-0 pr-10">
-          <DialogTitle ref={titleRef} tabIndex={-1} className="outline-none">{title}</DialogTitle>
-          <DialogDescription className="sr-only">{description}</DialogDescription>
-        </DialogHeader>
+        <div data-header-dialog-header className="flex shrink-0 flex-col gap-4">
+          <DialogHeader className="pr-10">
+            <DialogTitle ref={titleRef} tabIndex={-1} className="outline-none">{title}</DialogTitle>
+            <DialogDescription className="sr-only">{description}</DialogDescription>
+          </DialogHeader>
+          {headerContent}
+        </div>
         <DialogClose asChild>
           <Button type="button" variant="ghost" size="icon-lg" className="absolute top-2 right-2 size-11" aria-label={`Cerrar ${title.toLowerCase()}`}>
             <HugeiconsIcon icon={Cancel01Icon} data-icon="inline-start" aria-hidden="true" />
           </Button>
         </DialogClose>
-        <div data-header-dialog-scroll className="flex min-h-0 flex-col gap-4 overflow-y-auto overscroll-contain [color-scheme:dark]">
+        <div ref={scrollRef} data-header-dialog-scroll className="flex min-h-0 flex-col gap-4 overflow-y-auto overscroll-contain [color-scheme:dark]">
           {children}
         </div>
       </DialogContent>

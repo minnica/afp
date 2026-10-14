@@ -11,6 +11,95 @@ const evidence = { version: 1, source: "statement.pdf", sourceSha256: "a".repeat
 const expense = (id, amount, concept = "Compra", date = "2026-09-20T12:00:00Z") => ({ id, cardId: card.id, amount, concept, date, paymentMethod: "CARD" });
 const subscription = { id: "sub", cardId: card.id, name: "Servicio", amount: 399, paymentMethod: "CARD", chargeDay: 3, frequencyMonths: 1, startMonth: 1, startYear: 2026, isActive: true };
 const run = (changes = {}) => ctx.buildCardUsageWaivers({ cards: [card], cyclesWithAmounts: [cycle], expenses: [], subscriptions: [], purchases: [], year: 2026, month: 10, now: new Date("2026-10-11T12:00:00Z"), ...changes });
+const current = (changes = {}) => ctx.buildCurrentCardUsageWaivers({ cards: [card], cyclesWithAmounts: [cycle], expenses: [], subscriptions: [], purchases: [], now: new Date("2026-10-13T12:00:00Z"), ...changes });
+
+test("en curso reúne octubre y noviembre según el período de cada tarjeta", () => {
+  const secondCard = { ...card, id: "second" };
+  const next = { ...cycle, id: "nov", month: 11, startDate: "2026-10-11", cutDate: "2026-11-10", status: "PAID" };
+  const pending = { ...cycle, id: "second-oct", cardId: secondCard.id, startDate: "2026-09-19", cutDate: "2026-10-18" };
+  const cycles = [cycle, next, pending];
+  const before = JSON.stringify(cycles);
+  const results = current({ cards: [card, secondCard], cyclesWithAmounts: cycles,
+    expenses: [expense("old", 500), expense("new", 125, "Compra actual", "2026-10-12")],
+  });
+  assert.equal(results.length, 2);
+  assert.equal(results[0].selectedCycle.id, "nov");
+  assert.equal(results[0].eligibleSpend, 125);
+  assert.equal(results[0].remainingAmount, 175);
+  assert.equal(results[1].selectedCycle.id, "second-oct");
+  assert.equal(JSON.stringify(cycles), before);
+});
+
+test("el día de corte completo sigue vigente y al día siguiente cambia de período", () => {
+  const next = { ...cycle, id: "nov", month: 11, startDate: "2026-10-11", cutDate: "2026-11-10" };
+  const cyclesWithAmounts = [cycle, next];
+  assert.equal(current({ cyclesWithAmounts, now: new Date("2026-10-10T23:59:59Z") })[0].selectedCycle.id, "oct");
+  assert.equal(current({ cyclesWithAmounts, now: new Date("2026-10-11T00:00:00Z") })[0].selectedCycle.id, "nov");
+});
+
+test("cortes terminados salen de en curso aunque hayan cumplido o tengan cargos por confirmar", () => {
+  for (const patch of [{ expenses: [expense("met", 400)] }, { subscriptions: [subscription] }]) {
+    const [item] = current(patch);
+    assert.equal(item.selectedCycle, null);
+    assert.equal(item.status, "NO_CYCLE");
+    assert.equal(item.isExempt, false);
+  }
+});
+
+test("la selección vigente usa el período bancario verificado", () => {
+  const stored = { ...cycle, cutDate: "2026-10-18", usageReconciliation: evidence };
+  assert.equal(current({ cyclesWithAmounts: [stored] })[0].selectedCycle, null);
+  const [active] = current({ cyclesWithAmounts: [stored], now: new Date("2026-10-08T12:00:00Z") });
+  assert.equal(active.selectedCycle.cutDate, "2026-10-08T12:00:00.000Z");
+  assert.equal(active.periodVerified, true);
+});
+
+test("diciembre selecciona enero del siguiente año y no arrastra la meta anterior", () => {
+  const december = { ...cycle, id: "dec", month: 12, startDate: "2026-11-11", cutDate: "2026-12-10" };
+  const january = { ...cycle, id: "jan", year: 2027, month: 1, startDate: "2026-12-11", cutDate: "2027-01-10" };
+  const [item] = current({ cyclesWithAmounts: [december, january], now: new Date("2026-12-31T12:00:00Z"),
+    expenses: [expense("dec", 400, "Anterior", "2026-12-05"), expense("jan", 80, "Actual", "2026-12-20")],
+  });
+  assert.equal(item.selectedCycle.id, "jan");
+  assert.equal(item.eligibleSpend, 80);
+  assert.equal(item.remainingAmount, 220);
+});
+
+test("sin período vigente conserva la tarjeta sin seleccionar ciclos futuros ni inválidos", () => {
+  for (const candidate of [
+    { ...cycle, startDate: "2026-10-14", cutDate: "2026-11-10" },
+    { ...cycle, startDate: "invalida", cutDate: "2026-11-10" },
+    { ...cycle, startDate: "2026-11-10", cutDate: "2026-10-11" },
+    { ...cycle, startDate: null, cutDate: "2026-11-10" },
+  ]) {
+    const [item] = current({ cyclesWithAmounts: [candidate] });
+    assert.equal(item.card.id, card.id);
+    assert.equal(item.selectedCycle, null);
+    assert.equal(item.status, "NO_CYCLE");
+  }
+  assert.equal(current({ cards: [{ id: "no-policy", name: "HSBC" }] }).length, 0);
+});
+
+test("períodos superpuestos requieren revisión y no acreditan una meta ambigua", () => {
+  const verified = { ...cycle, usageReconciliation: { ...evidence, startDate: "2026-09-11", cutDate: "2026-10-18" } };
+  const overlap = { ...cycle, id: "next", month: 11, startDate: "2026-10-11", cutDate: "2026-11-10" };
+  const [item] = current({ cyclesWithAmounts: [overlap, verified], expenses: [expense("met", 400)] });
+  assert.equal(item.selectedCycle.id, "oct");
+  assert.equal(item.periodSelectionPending, true);
+  assert.equal(item.isExempt, false);
+  assert.equal(item.status, "PERIOD_REVIEW");
+});
+
+test("historial incluye cortes terminados de años distintos y excluye vigentes y futuros", () => {
+  const january = { ...cycle, id: "jan", year: 2027, month: 1, startDate: "2026-12-11", cutDate: "2027-01-10" };
+  const december = { ...cycle, id: "dec", month: 12, startDate: "2026-11-11", cutDate: "2026-12-10" };
+  const future = { ...january, id: "feb", month: 2, startDate: "2027-01-11", cutDate: "2027-02-10" };
+  const args = { cards: [card], cyclesWithAmounts: [cycle, december, january, future], expenses: [], subscriptions: [subscription], purchases: [] };
+  const history = ctx.buildCardUsageWaiverHistory({ ...args, now: new Date("2027-01-10T23:59:59Z") });
+  assert.deepEqual(Array.from(history, (item) => item.selectedCycle.id), ["oct", "dec"]);
+  assert.equal(history[0].status, "UNCONFIRMED");
+  assert.equal(ctx.buildCardUsageWaiverHistory({ ...args, now: new Date("2027-01-11T12:00:00Z") }).length, 3);
+});
 
 test("HSBC octubre: comisiones e IVA no completan los $300", () => {
   const rows = [expense("a", "293.38"), expense("b", 186, "Administración de tarjeta HSBC1"), expense("c", "29.76", "IVA de comisión HSBC1")];

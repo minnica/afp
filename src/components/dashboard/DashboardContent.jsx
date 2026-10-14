@@ -138,7 +138,7 @@ function getStatusBadgeClass(status) {
 
 
 export default function DashboardContent() {
-  const { dashboard, isLoading, error, today: now } = useDashboard();
+  const { dashboard, isLoading, error, today: now, usageHistoryPeriod, setUsageHistoryPeriod } = useDashboard();
   const mobile = useIsMobile();
 
   const currentYear = now.getFullYear();
@@ -148,19 +148,11 @@ export default function DashboardContent() {
 
   const cycles = useMemo(() => dashboard?.cycles || [], [dashboard?.cycles]);
 
-  const cardUsageWaiversByMonth = useMemo(() => {
-    return dashboard?.cardUsageWaiversByMonth || {};
-  }, [dashboard?.cardUsageWaiversByMonth]);
-
   const activeMonthIndex = Number(activeMonthTab);
 
   const importantNotices = dashboard?.importantNotices || [];
 
-  const hasCardUsageWaivers = useMemo(() => {
-    return Object.values(cardUsageWaiversByMonth).some((items) => {
-      return Array.isArray(items) && items.length > 0;
-    });
-  }, [cardUsageWaiversByMonth]);
+  const hasCardUsageWaivers = Boolean(dashboard?.cardUsageWaiversCurrent?.length || dashboard?.cardUsageWaiverHistory?.length);
 
   const paymentsByMonth = useMemo(() => {
     const map = {};
@@ -201,8 +193,11 @@ export default function DashboardContent() {
               <div className="grid gap-6 lg:grid-cols-2">
                 <ImportantNoticesCard notices={importantNotices} />
                 <CardUsageWaiverProgress
-                  cardUsageWaiversByMonth={cardUsageWaiversByMonth}
-                  currentMonthIndex={currentMonthIndex}
+                  currentItems={dashboard.cardUsageWaiversCurrent || []}
+                  historyItems={dashboard.cardUsageWaiverHistory || []}
+                  today={now}
+                  historyPeriod={usageHistoryPeriod}
+                  onHistoryPeriodChange={setUsageHistoryPeriod}
                 />
               </div>
             ) : (
