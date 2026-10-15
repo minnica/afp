@@ -60,7 +60,7 @@ export default function AppHeaderActions({ disabled = false }) {
         data-dashboard-notices-dialog
       >
         <DashboardStatus {...data} />
-        {dashboard ? <ImportantNoticesCard notices={notices} inDialog /> : null}
+        {dashboard ? <ImportantNoticesCard notices={notices} today={today} inDialog /> : null}
       </HeaderDialog>
       <Tabs value={usageView} onValueChange={onUsageViewChange} className="gap-0">
         <HeaderDialog

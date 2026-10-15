@@ -57,6 +57,8 @@ import {
 import { DataTable } from "@/components/ui/data-table";
 import { TableCell, TableRow } from "@/components/ui/table";
 import PageSkeleton from "@/components/layout/PageSkeleton";
+import { RecordActions, RecordCard, RecordField, RecordListCard, RecordListToolbar, RecordNote } from "@/components/ui/record-card";
+import { Progress } from "@/components/ui/progress";
 
 function getTodayInputValue() {
   const today = new Date();
@@ -438,6 +440,41 @@ export default function ComprasAMesesContent() {
     return numericTotal / numericMonths;
   }, [totalAmount, months]);
 
+  const purchaseMobileView = {
+    mobileListLabel: "Compras registradas",
+    mobileRowSeparator: false,
+    renderMobileRow: ({ original: purchase }) => {
+      const nextPayment = getNextPaymentDueDate(purchase);
+      const statusLabel = { ACTIVE: "Activa", PAID_OFF: "Liquidada", CANCELLED: "Cancelada", ADJUSTED: "Ajustada" }[purchase.status] || purchase.status;
+      return (
+        <RecordCard
+          title={purchase.concept}
+          subtitle={purchase.card?.name}
+          badges={<Badge variant="outline">{statusLabel}</Badge>}
+          amount={formatMoney(purchase.monthlyPaymentUsed)}
+          amountLabel="Mensualidad"
+          actions={<RecordActions label={`compra: ${purchase.concept}`} onEdit={() => startEditingPurchase(purchase)} onDelete={() => setPurchaseToDelete(purchase)} />}
+        >
+          {purchase.category?.name ? <Badge variant="secondary" className="h-auto max-w-full whitespace-normal break-words">{purchase.category.name}</Badge> : null}
+          <dl className="grid grid-cols-2 gap-3">
+            <RecordField label="Saldo pendiente">{formatMoney(purchase.remainingBalance)}</RecordField>
+            <RecordField label="Próximo pago">{nextPayment ? format(nextPayment, "d MMM yyyy", { locale: es }) : "Sin próximo pago"}</RecordField>
+            <RecordField label="Total de la compra">{formatMoney(purchase.totalAmount)}</RecordField>
+            <RecordField label="Fecha de compra">{formatDate(purchase.purchaseDate)}</RecordField>
+          </dl>
+          <div className="flex flex-col gap-2">
+            <p className="text-sm text-muted-foreground">Cuota {purchase.currentMonth} de {purchase.months}</p>
+            <Progress value={Math.min(100, Math.max(0, Number(purchase.currentMonth || 0) / Math.max(1, Number(purchase.months)) * 100))} aria-label={`Avance de cuotas: ${purchase.concept}`} aria-valuetext={`Cuota ${purchase.currentMonth} de ${purchase.months}`} />
+          </div>
+          {purchase.verifiedStatementDate ? <RecordNote>Estado de cuenta: {format(new Date(purchase.verifiedStatementDate + "-01T12:00:00Z"), "MMM yyyy", { locale: es })}</RecordNote> : null}
+          {purchase.person?.name ? <RecordNote>Por cobrar a {purchase.person.name}</RecordNote> : null}
+          <RecordNote>{purchase.notes}</RecordNote>
+        </RecordCard>
+      );
+    },
+    mobileToolbar: (table) => <RecordListToolbar table={table} label="compras" totals={[{ key: "monthlyPaymentUsed", label: "Mensualidades" }, { key: "totalAmount", label: "Total de compras" }, { key: "remainingBalance", label: "Saldo pendiente" }]} />,
+  };
+
   const purchaseColumns = useMemo(
     () => [
       {
@@ -633,7 +670,7 @@ export default function ComprasAMesesContent() {
   }
 
   if (isLoading) {
-    return <PageSkeleton variant="form-table" />;
+    return <PageSkeleton variant="form-table" mobileCards />;
   }
 
   return (
@@ -968,7 +1005,7 @@ export default function ComprasAMesesContent() {
               </div>
             </CreateRecordSurface>
 
-            <Card className="rounded-2xl border-border bg-card">
+            <RecordListCard>
               <CardHeader>
                 <CardTitle className="text-lg font-semibold uppercase text-center">
                   Compras registradas
@@ -991,10 +1028,11 @@ export default function ComprasAMesesContent() {
 
                   <TabsContent value="active">
                     <DataTable
+                      {...purchaseMobileView}
                       columns={purchaseColumns}
                       data={activePurchases}
                       filterGlobal
-                      filterPlaceholder="Buscar en tabla..."
+                      filterPlaceholder="Buscar compra..."
                       pageSize={15}
                       pageSizeOptions={[15, 25, 50, 100]}
                       footerRow={purchasesFooterRow}
@@ -1003,10 +1041,11 @@ export default function ComprasAMesesContent() {
 
                   <TabsContent value="paid">
                     <DataTable
+                      {...purchaseMobileView}
                       columns={purchaseColumns}
                       data={paidOffPurchases}
                       filterGlobal
-                      filterPlaceholder="Buscar en tabla..."
+                      filterPlaceholder="Buscar compra..."
                       pageSize={15}
                       pageSizeOptions={[15, 25, 50, 100]}
                       footerRow={purchasesFooterRow}
@@ -1015,10 +1054,11 @@ export default function ComprasAMesesContent() {
 
                   <TabsContent value="all">
                     <DataTable
+                      {...purchaseMobileView}
                       columns={purchaseColumns}
                       data={purchases}
                       filterGlobal
-                      filterPlaceholder="Buscar en tabla..."
+                      filterPlaceholder="Buscar compra..."
                       pageSize={15}
                       pageSizeOptions={[15, 25, 50, 100]}
                       footerRow={purchasesFooterRow}
@@ -1026,7 +1066,7 @@ export default function ComprasAMesesContent() {
                   </TabsContent>
                 </Tabs>
               </CardContent>
-            </Card>
+            </RecordListCard>
           </div>
         </section>
       </main>

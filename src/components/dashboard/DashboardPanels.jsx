@@ -1,9 +1,21 @@
 "use client";
 
-import { AlertTriangle, Bell, CalendarClock, Scissors } from "lucide-react";
+import Link from "next/link";
+import { AlertTriangle, Bell, CalendarClock, ChevronRight, Scissors } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Empty, EmptyDescription } from "@/components/ui/empty";
+import { formatPaymentDeadline } from "@/lib/cardPaymentPresentation";
+import { DialogClose } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
+
+const NOTICE_DESTINATIONS = {
+  CARD_PAYMENT: { href: "/tarjetas", label: "Tarjetas" },
+  CUT_CYCLE: { href: "/tarjetas", label: "Tarjetas" },
+  CUT_CYCLE_UPCOMING: { href: "/tarjetas", label: "Tarjetas" },
+  RECEIVABLE: { href: "/ingresos", label: "Ingresos" },
+  CASH_SUBSCRIPTION: { href: "/gastos", label: "Gastos" },
+};
 
 export { default as CardUsageWaiverProgress, CardUsageWaiverTabs } from "./CardUsageWaiverProgress";
 
@@ -27,7 +39,7 @@ function getNoticeIcon(group) {
   return Bell;
 }
 
-export function ImportantNoticesCard({ notices, inDialog = false }) {
+export function ImportantNoticesCard({ notices, today, inDialog = false }) {
   const content = notices.length === 0 ? (
     <Empty>
       <EmptyDescription>No tienes avisos importantes por ahora.</EmptyDescription>
@@ -36,14 +48,50 @@ export function ImportantNoticesCard({ notices, inDialog = false }) {
     <div className="grid gap-3">
       {notices.map((notice) => {
         const Icon = getNoticeIcon(notice.group);
+        const destination = NOTICE_DESTINATIONS[notice.type];
 
-        return (
-          <Alert key={notice.id} className={getNoticeAlertClass(notice.group)}>
+        const alert = (
+          <Alert key={notice.id} className={cn(getNoticeAlertClass(notice.group), destination && "min-h-11 transition-colors hover:border-current motion-reduce:transition-none")}>
             <Icon aria-hidden="true" />
-            <AlertTitle>{notice.title}</AlertTitle>
-            <AlertDescription>{notice.description}</AlertDescription>
+            <AlertTitle className="flex items-start justify-between gap-3">
+              <span className="min-w-0">{notice.title}</span>
+              {destination ? <ChevronRight className="size-3.5 shrink-0" aria-hidden="true" /> : null}
+            </AlertTitle>
+            <AlertDescription>
+              <div className="flex flex-col gap-1">
+                {notice.description.split("\n").filter(Boolean).map((line, index) => {
+                  const separator = line.indexOf(":");
+                  const label = line.slice(0, separator);
+                  const value = ["Vencido", "Vence", "Corte"].includes(label)
+                    ? formatPaymentDeadline(notice.date, today)
+                    : line.slice(separator + 1).trim();
+                  return (
+                    <div key={index}>
+                      {separator === -1 ? line : (
+                        <><strong className="font-semibold">{label}:</strong>{" "}{value}</>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </AlertDescription>
           </Alert>
         );
+
+        if (!destination) return alert;
+
+        const link = (
+          <Link
+            key={notice.id}
+            href={destination.href}
+            aria-label={`${notice.title}. Ir a ${destination.label}`}
+            className="block rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          >
+            {alert}
+          </Link>
+        );
+
+        return inDialog ? <DialogClose key={notice.id} asChild>{link}</DialogClose> : link;
       })}
     </div>
   );

@@ -112,7 +112,22 @@ function ListSkeleton({ cards = 5 }) {
   );
 }
 
-export default function PageSkeleton({ variant = "form-table" }) {
+export default function PageSkeleton({ variant = "form-table", mobileCards = false }) {
+  if (mobileCards) {
+    return (
+      <>
+        <main className="md:hidden" aria-label="Cargando registros" aria-busy="true">
+          <section className="flex flex-col gap-4 px-4 py-5">
+            <Skeleton className="mx-auto h-5 w-44" />
+            <Skeleton className="h-11 w-full" />
+            <ListSkeleton cards={3} />
+          </section>
+        </main>
+        <div className="hidden md:block"><PageSkeleton variant={variant} /></div>
+      </>
+    );
+  }
+
   if (variant === "dashboard") {
     return (
       <main>

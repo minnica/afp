@@ -52,6 +52,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { DataTable } from "@/components/ui/data-table";
+import { RecordActions, RecordCard, RecordField, RecordListCard, RecordListToolbar } from "@/components/ui/record-card";
+
 import { TableCell, TableRow } from "@/components/ui/table";
 
 function formatMoney(value) {
@@ -449,6 +451,35 @@ export default function SuscripcionesContent() {
     }
   }
 
+  const subscriptionMobileView = {
+    mobileListLabel: "Suscripciones registradas",
+    mobileRowSeparator: false,
+    renderMobileRow: ({ original: subscription }) => (
+      <RecordCard
+        title={subscription.name}
+        subtitle={`${getPaymentMethodLabel(subscription.paymentMethod)}${subscription.card ? ` · ${subscription.card.name}` : ""}`}
+        badges={<Badge variant={subscription.isActive === false ? "outline" : "secondary"}>{subscription.isActive === false ? "Inactiva" : "Activa"}</Badge>}
+        amount={formatMoney(subscription.amount)}
+        amountLabel="Importe por cobro"
+        actions={
+          <RecordActions label={`suscripción: ${subscription.name}`} onEdit={() => startEditingSubscription(subscription)} onDelete={() => setSubscriptionToDelete(subscription)}>
+            <Button type="button" variant="outline" className="h-11" disabled={isToggling} aria-label={`${subscription.isActive === false ? "Reactivar" : "Desactivar"} suscripción: ${subscription.name}`} onClick={() => subscription.isActive === false ? reactivateSubscription(subscription) : openDeactivateDialog(subscription)}>
+              {subscription.isActive === false ? <RotateCcw data-icon="inline-start" aria-hidden="true" /> : <PowerOff data-icon="inline-start" aria-hidden="true" />}
+              {subscription.isActive === false ? "Reactivar" : "Desactivar"}
+            </Button>
+          </RecordActions>
+        }
+      >
+        {subscription.category?.name ? <Badge variant="secondary" className="h-auto max-w-full whitespace-normal break-words">{subscription.category.name}</Badge> : null}
+        <dl className="grid grid-cols-2 gap-3">
+          <RecordField label="Día de cobro">Día {subscription.chargeDay}</RecordField>
+          <RecordField label="Frecuencia">{getFrequencyLabel(subscription.frequencyMonths)}</RecordField>
+        </dl>
+      </RecordCard>
+    ),
+    mobileToolbar: (table) => <RecordListToolbar table={table} label="suscripciones" totals={[{ key: "amount", label: "Total activas", include: (subscription) => subscription.isActive !== false }]} />,
+  };
+
   const subscriptionColumns = useMemo(
     () => [
       {
@@ -598,7 +629,7 @@ export default function SuscripcionesContent() {
   );
 
   if (isLoading) {
-    return <PageSkeleton variant="form-table" />;
+    return <PageSkeleton variant="form-table" mobileCards />;
   }
 
   return (
@@ -1092,7 +1123,7 @@ export default function SuscripcionesContent() {
             </CreateRecordSurface>
 
             <div className="min-w-0">
-              <Card className="rounded-2xl border-border bg-card">
+              <RecordListCard>
                 <CardHeader>
                   <CardTitle className="text-lg font-semibold uppercase text-center">
                     Suscripciones registradas
@@ -1101,6 +1132,7 @@ export default function SuscripcionesContent() {
 
                 <CardContent>
                   <DataTable
+                    {...subscriptionMobileView}
                     columns={subscriptionColumns}
                     data={subscriptions}
                     filterGlobal
@@ -1134,7 +1166,7 @@ export default function SuscripcionesContent() {
                     }}
                   />
                 </CardContent>
-              </Card>
+              </RecordListCard>
             </div>
           </div>
         </section>

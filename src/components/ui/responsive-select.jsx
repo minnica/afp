@@ -5,7 +5,7 @@ import { HugeiconsIcon } from "@hugeicons/react"
 import { Cancel01Icon, Tick02Icon, UnfoldMoreIcon } from "@hugeicons/core-free-icons"
 
 import { Button } from "@/components/ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
   Command,
   CommandEmpty,
@@ -119,6 +119,17 @@ function CompactOptionList({ options, value, onSelect, title, isSheet }) {
   const active = enabledOptions.some((option) => option.value === activeValue)
     ? activeValue
     : enabledOptions[0]?.value
+
+  useEffect(() => {
+    const list = listRef.current
+    const selected = list?.querySelector('[aria-selected="true"]')
+    if (!selected) return
+
+    // Abre la lista alrededor de la selección sin desplazar la página ni mover el foco.
+    const listRect = list.getBoundingClientRect()
+    const selectedRect = selected.getBoundingClientRect()
+    list.scrollTop += selectedRect.top - listRect.top - (list.clientHeight - selectedRect.height) / 2
+  }, [value])
 
   function focusOption(nextValue) {
     const index = options.findIndex((option) => option.value === nextValue)
@@ -296,9 +307,11 @@ function ResponsiveSelect({
         </SelectTrigger>
         <SelectContent position="popper" align="start">
           {!sortedOptions.length && <p role="status" className="p-4 text-sm text-muted-foreground">No hay opciones disponibles.</p>}
-          {sortedOptions.map((option) => (
-            <SelectItem key={option.value} value={option.value} disabled={option.disabled}>{option.label}</SelectItem>
-          ))}
+          <SelectGroup>
+            {sortedOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value} disabled={option.disabled}>{option.label}</SelectItem>
+            ))}
+          </SelectGroup>
         </SelectContent>
       </Select>
     )

@@ -41,6 +41,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PageSkeleton from "@/components/layout/PageSkeleton";
+import { RecordActions, RecordCardContent, RecordField, RecordListCard, RecordNote } from "@/components/ui/record-card";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -382,7 +383,7 @@ export default function CuentasPorPagarContent() {
   }, [payables]);
 
   if (isLoading) {
-    return <PageSkeleton variant="list" />;
+    return <PageSkeleton variant="list" mobileCards />;
   }
 
   return (
@@ -541,7 +542,7 @@ export default function CuentasPorPagarContent() {
               </div>
             </CreateRecordSurface>
 
-            <Card className="rounded-2xl border-border bg-card">
+            <RecordListCard>
               <CardHeader>
                 <CardTitle className="text-lg font-semibold uppercase text-center">
                   Cuentas por pagar
@@ -659,7 +660,7 @@ export default function CuentasPorPagarContent() {
                   </TabsContent>
                 </Tabs>
               </CardContent>
-            </Card>
+            </RecordListCard>
           </div>
         </section>
       </main>
@@ -705,6 +706,8 @@ function PayablesList({
   expandedPayableId,
   setExpandedPayableId,
 }) {
+  const mobile = useIsMobile();
+
   if (items.length === 0) {
     return (
       <Empty>
@@ -716,7 +719,7 @@ function PayablesList({
   }
 
   return (
-    <ItemGroup>
+    <ItemGroup className="max-md:gap-3" aria-label="Cuentas por pagar">
       {items.map((item) => (
         <Collapsible
           key={item.id}
@@ -724,7 +727,36 @@ function PayablesList({
           onOpenChange={(open) => setExpandedPayableId(open ? item.id : "")}
           asChild
         >
-        <Item variant="outline" role="listitem" className="block">
+        <Item variant="outline" role="listitem" aria-label={`Cuenta por pagar: ${item.concept}`} className="block min-w-0 max-md:rounded-xl max-md:bg-card max-md:p-4">
+          {mobile ? (
+            <RecordCardContent
+              title={item.person?.name || item.concept}
+              subtitle={item.person?.name ? item.concept : null}
+              badges={<Badge variant="secondary">{getStatusLabel(item.status)}</Badge>}
+              amount={formatMoney(item.pendingBalance)}
+              amountLabel="Pendiente de pago"
+              actions={
+                <RecordActions label={`cuenta por pagar: ${item.concept}`} onEdit={() => onEdit(item)} onDelete={() => onRequestDelete(item)}>
+                  <CollapsibleTrigger asChild>
+                    <Button type="button" variant="outline" className="h-11" aria-label={`${expandedPayableId === item.id ? "Ocultar" : "Ver"} pagos de ${item.concept}`}>
+                      {expandedPayableId === item.id ? "Ocultar pagos" : "Ver pagos"}
+                    </Button>
+                  </CollapsibleTrigger>
+                </RecordActions>
+              }
+            >
+              <dl className="grid grid-cols-2 gap-3">
+                <RecordField label="Monto original">{formatMoney(item.originalAmount)}</RecordField>
+                <RecordField label="Pagado">{formatMoney(item.paidAmount)}</RecordField>
+                {item.expectedMonthlyPayment ? <RecordField label="Pago esperado">{formatMoney(item.expectedMonthlyPayment)}</RecordField> : null}
+                {item.expectedDate ? <RecordField label="Fecha esperada">{formatDate(item.expectedDate)}</RecordField> : null}
+                <RecordField label="Fecha de origen">{formatDate(item.originDate)}</RecordField>
+                <RecordField label="Origen">{getOriginLabel(item.originType)}</RecordField>
+              </dl>
+              <RecordNote>{item.notes}</RecordNote>
+            </RecordCardContent>
+          ) : (
+          <>
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
@@ -812,6 +844,9 @@ function PayablesList({
               </p>
             </div>
           </div>
+
+          </>
+          )}
 
           <CollapsibleContent>
             <PayablePaymentsBreakdown payable={item} />

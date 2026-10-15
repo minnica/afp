@@ -113,8 +113,6 @@ const SORT_OPTIONS = [
 ];
 
 function MobileCycleItem({ cycle, openDialog }) {
-  const hasStatement = cycle.statementAmount != null;
-
   return (
     <Item role="listitem" variant="outline" className="block min-w-0 rounded-xl bg-card p-4" aria-label={`Ciclo de ${cycle.card.name}`}>
       <ItemHeader className="mb-3 items-start gap-3">
@@ -126,9 +124,16 @@ function MobileCycleItem({ cycle, openDialog }) {
       <Separator className="mb-3" />
 
       <dl className="grid grid-cols-2 gap-x-3 gap-y-3">
-        <div className="col-span-2 min-w-0">
-          <dt className="text-xs text-muted-foreground">{hasStatement ? "Estado de cuenta" : "Calculado · estimado"}</dt>
-          <dd className="break-words text-lg font-semibold tabular-nums">{formatMoney(hasStatement ? cycle.statementAmount : cycle.calculatedAmount)}</dd>
+        <div className="min-w-0">
+          <dt className="text-xs text-muted-foreground">Pago calculado</dt>
+          <dd>
+            <p className="break-words text-lg font-semibold tabular-nums">{formatMoney(cycle.calculatedAmount)}</p>
+            <p className="text-xs text-muted-foreground">Estimado</p>
+          </dd>
+        </div>
+        <div className="min-w-0 text-right">
+          <dt className="text-xs text-muted-foreground">Estado de cuenta</dt>
+          <dd className="break-words text-lg font-semibold tabular-nums">{cycle.statementAmount != null ? formatMoney(cycle.statementAmount) : <span className="text-sm font-normal text-muted-foreground">Sin capturar</span>}</dd>
         </div>
         <div className="min-w-0">
           <dt className="text-xs text-muted-foreground">Corte</dt>
@@ -291,18 +296,18 @@ export default function CyclesDataTable({
       },
       {
         accessorKey: "calculatedAmount",
-        header: "Calculado",
+        header: "Pago calculado",
         cell: ({ getValue }) => (
-          <span className="font-medium">{formatMoney(getValue())}</span>
+          <div className="flex flex-col gap-1"><span className="font-medium">{formatMoney(getValue())}</span><span className="text-xs text-muted-foreground">Estimado</span></div>
         ),
         sortingFn: "basic",
       },
       {
         accessorKey: "statementAmount",
-        header: "Estado cuenta",
+        header: "Estado de cuenta",
         cell: ({ getValue }) => {
           const v = getValue();
-          return v != null ? formatMoney(v) : <span className="text-muted-foreground">-</span>;
+          return v != null ? formatMoney(v) : <span className="text-muted-foreground">Sin capturar</span>;
         },
         sortingFn: "basic",
       },

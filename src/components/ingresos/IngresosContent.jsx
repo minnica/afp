@@ -52,6 +52,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { DataTable } from "@/components/ui/data-table";
+import { RecordActions, RecordCard, RecordField, RecordListCard, RecordListToolbar, RecordNote } from "@/components/ui/record-card";
+
 import { TableCell, TableRow } from "@/components/ui/table";
 
 function getTodayInputValue() {
@@ -361,6 +363,30 @@ export default function IngresosContent() {
     }, 0);
   }, [incomes]);
 
+  const incomeMobileView = {
+    mobileListLabel: "Ingresos registrados",
+    mobileRowSeparator: false,
+    renderMobileRow: ({ original: income }) => (
+      <RecordCard
+        title={income.concept}
+        subtitle={formatDate(income.date)}
+        amount={formatMoney(income.amount)}
+        amountLabel="Ingreso registrado"
+        actions={<RecordActions label={`ingreso: ${income.concept}`} onEdit={() => startEditingIncome(income)} onDelete={() => setIncomeToDelete(income)} />}
+      >
+        {income.incomeType?.name ? <Badge variant="secondary" className="h-auto max-w-full whitespace-normal break-words">{income.incomeType.name}</Badge> : null}
+        {income.source || income.receivableAccount ? (
+          <dl className="grid gap-3">
+            {income.source ? <RecordField label="Fuente">{income.source}</RecordField> : null}
+            {income.receivableAccount ? <RecordField label="Cuenta por cobrar">{income.receivableAccount.person?.name} · {income.receivableAccount.concept}</RecordField> : null}
+          </dl>
+        ) : null}
+        <RecordNote>{income.notes}</RecordNote>
+      </RecordCard>
+    ),
+    mobileToolbar: (table) => <RecordListToolbar table={table} label="ingresos" totals={[{ key: "amount", label: "Total filtrado" }]} />,
+  };
+
   const incomeColumns = useMemo(
     () => [
       {
@@ -457,7 +483,7 @@ export default function IngresosContent() {
   );
 
   if (isLoading) {
-    return <PageSkeleton variant="form-table" />;
+    return <PageSkeleton variant="form-table" mobileCards />;
   }
 
   return (
@@ -615,7 +641,7 @@ export default function IngresosContent() {
             </CreateRecordSurface>
 
           <div className="min-w-0">
-            <Card className="rounded-2xl border-border bg-card">
+            <RecordListCard>
               <CardHeader>
                 <CardTitle className="text-lg font-semibold uppercase text-center">
                   Ingresos registrados
@@ -624,6 +650,7 @@ export default function IngresosContent() {
 
               <CardContent>
                 <DataTable
+                  {...incomeMobileView}
                   columns={incomeColumns}
                   data={incomes}
                   filterGlobal
@@ -649,7 +676,7 @@ export default function IngresosContent() {
                   }}
                 />
               </CardContent>
-            </Card>
+            </RecordListCard>
           </div>
         </div>
 

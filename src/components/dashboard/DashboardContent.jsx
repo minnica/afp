@@ -10,6 +10,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Empty, EmptyDescription } from "@/components/ui/empty";
+import { ResponsiveSelect } from "@/components/ui/responsive-select";
+import { Item, ItemContent } from "@/components/ui/item";
+import { Separator } from "@/components/ui/separator";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { formatPaymentDeadline, getDashboardPayment } from "@/lib/cardPaymentPresentation";
+import { cn } from "@/lib/utils";
 import PageSkeleton from "@/components/layout/PageSkeleton";
 import CyclePeriodHelp from "@/components/dashboard/CyclePeriodHelp";
 
@@ -117,12 +123,6 @@ function getStatusLabel(status) {
   return labels[status] || status || "-";
 }
 
-function getStatusVariant(status) {
-  if (status === "PAID") return "secondary";
-  if (status === "OVERDUE") return "destructive";
-  return "outline";
-}
-
 function getStatusBadgeClass(status) {
   const classes = {
     PAID: "bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300",
@@ -191,7 +191,7 @@ export default function DashboardContent() {
           {!mobile ? (
             hasCardUsageWaivers ? (
               <div className="grid gap-6 lg:grid-cols-2">
-                <ImportantNoticesCard notices={importantNotices} />
+                <ImportantNoticesCard notices={importantNotices} today={now} />
                 <CardUsageWaiverProgress
                   currentItems={dashboard.cardUsageWaiversCurrent || []}
                   historyItems={dashboard.cardUsageWaiverHistory || []}
@@ -201,7 +201,7 @@ export default function DashboardContent() {
                 />
               </div>
             ) : (
-              <ImportantNoticesCard notices={importantNotices} />
+              <ImportantNoticesCard notices={importantNotices} today={now} />
             )
           ) : null}
 
@@ -221,21 +221,38 @@ export default function DashboardContent() {
             </CardHeader>
 
             <CardContent>
-              <Tabs value={activeMonthTab} onValueChange={setActiveMonthTab}>
-                <TabsList className="mb-6 h-auto w-full flex-nowrap justify-start overflow-x-auto md:w-fit md:flex-wrap md:justify-center md:overflow-x-visible">
-                  {MONTH_NAMES.map((name, monthIndex) => (
-                    <TabsTrigger key={monthIndex} value={String(monthIndex)} className="flex-none">
-                      {name}
-                    </TabsTrigger>
-                  ))}
-                </TabsList>
+              {mobile ? (
+                <div className="flex flex-col gap-6">
+                  <ResponsiveSelect
+                    value={activeMonthTab}
+                    onValueChange={setActiveMonthTab}
+                    aria-label={`Mes de pagos de tarjetas: ${MONTH_NAMES[activeMonthIndex]} ${currentYear}`}
+                    title="Mes de pagos de tarjetas"
+                    className="h-11"
+                    options={MONTH_NAMES.map((name, monthIndex) => ({
+                      value: String(monthIndex),
+                      label: `${name} ${currentYear}`,
+                    }))}
+                  />
+                  <PaymentsTable items={paymentsByMonth[activeMonthIndex] || []} today={now} />
+                </div>
+              ) : (
+                <Tabs value={activeMonthTab} onValueChange={setActiveMonthTab}>
+                  <TabsList className="mb-6 h-auto w-full flex-nowrap justify-start overflow-x-auto md:w-fit md:flex-wrap md:justify-center md:overflow-x-visible">
+                    {MONTH_NAMES.map((name, monthIndex) => (
+                      <TabsTrigger key={monthIndex} value={String(monthIndex)} className="flex-none">
+                        {name}
+                      </TabsTrigger>
+                    ))}
+                  </TabsList>
 
-                {MONTH_NAMES.map((name, monthIndex) => (
-                  <TabsContent key={monthIndex} value={String(monthIndex)}>
-                    <PaymentsTable items={paymentsByMonth[monthIndex] || []} />
-                  </TabsContent>
-                ))}
-              </Tabs>
+                  {MONTH_NAMES.map((name, monthIndex) => (
+                    <TabsContent key={monthIndex} value={String(monthIndex)}>
+                      <PaymentsTable items={paymentsByMonth[monthIndex] || []} today={now} />
+                    </TabsContent>
+                  ))}
+                </Tabs>
+              )}
             </CardContent>
           </Card>
 
@@ -246,37 +263,22 @@ export default function DashboardContent() {
 }
 
 
-function PaymentsTable({ items }) {
-  const totalCalculatedAmount = items.reduce((total, item) => {
-    return total + Number(item.cycle.calculatedAmount || 0);
-  }, 0);
-
-  const totalStatementAmount = items.reduce((total, item) => {
-    return total + Number(item.cycle.statementAmount || 0);
-  }, 0);
-
-  const payrollTotals = items.reduce(
-    (totals, item) => {
-      const { group } = getPayrollGroupForDueDate(item.cycle.dueDate);
-      const amount = Number(
-        item.cycle.statementAmount ?? item.cycle.calculatedAmount ?? 0,
-      );
-
-      totals[group] += amount;
-
-      return totals;
-    },
-    {
-      Q15: 0,
-      Q30: 0,
-    },
-  );
+function PaymentsTable({ items, today }) {
+  const payments = items.map((item) => ({
+    ...item,
+    payment: getDashboardPayment(item.cycle, today),
+  }));
+  const totalCents = payments.reduce((total, { payment }) => total + Math.round(payment.amount * 100), 0);
+  const payrollCents = payments.reduce((totals, { cycle, payment }) => {
+    totals[getPayrollGroupForDueDate(cycle.dueDate).group] += Math.round(payment.amount * 100);
+    return totals;
+  }, { Q15: 0, Q30: 0 });
 
   if (items.length === 0) {
     return (
       <Empty>
         <EmptyDescription>
-          No hay ciclos para mostrar. Genera ciclos desde Tarjetas.
+          No hay ciclos para mostrar. Revisa los períodos en Tarjetas.
         </EmptyDescription>
       </Empty>
     );
@@ -284,144 +286,98 @@ function PaymentsTable({ items }) {
 
   return (
     <div>
-      <div className="mb-4 grid gap-3 md:grid-cols-3">
-        <div className="rounded-xl border border-border bg-muted/30 px-4 py-3">
-          <p className="text-xs text-muted-foreground">Total pago calculado</p>
-          <p className="mt-1 text-xl font-semibold">
-            {formatMoney(totalCalculatedAmount)}
-          </p>
-        </div>
-
-        <div className="rounded-xl border border-border bg-muted/30 px-4 py-3">
-          <p className="text-xs text-muted-foreground">
-            Total estado de cuenta
-          </p>
-          <p className="mt-1 text-xl font-semibold">
-            {formatMoney(totalStatementAmount)}
-          </p>
-        </div>
-
-        <div className="rounded-xl border border-border bg-muted/30 px-4 py-3">
-          <p className="text-xs text-muted-foreground">Carga por nómina</p>
-
-          <div className="mt-2 grid grid-cols-2 gap-3">
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="h-2.5 w-2.5 rounded-full bg-cyan-400/70" />
-                <p className="text-xs text-muted-foreground">Q15</p>
-              </div>
-              <p className="mt-1 text-sm font-semibold">
-                {formatMoney(payrollTotals.Q15)}
-              </p>
+      <Item variant="muted" size="sm" role="region" aria-label="Resumen de pagos del mes" className="mb-4">
+        <ItemContent className="min-w-0">
+          <dl className="grid grid-cols-2 gap-x-3 gap-y-2 md:grid-cols-3">
+            <div className="col-span-2 flex min-w-0 flex-col gap-1 md:col-span-1">
+              <dt className="text-xs text-muted-foreground">Total del mes</dt>
+              <dd className="break-words text-lg font-semibold tabular-nums">{formatMoney(totalCents / 100)}</dd>
             </div>
-
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="h-2.5 w-2.5 rounded-full bg-pink-400/70" />
-                <p className="text-xs text-muted-foreground">Q30</p>
-              </div>
-              <p className="mt-1 text-sm font-semibold">
-                {formatMoney(payrollTotals.Q30)}
-              </p>
+            <Separator className="col-span-2 my-1 md:hidden" />
+            <div className="flex min-w-0 flex-col gap-1">
+              <dt className="flex items-center gap-2 text-xs text-muted-foreground">
+                <span className="size-2.5 shrink-0 rounded-full bg-cyan-400/70" aria-hidden="true" />
+                Nómina Q15
+              </dt>
+              <dd className="break-words text-sm font-medium tabular-nums">{formatMoney(payrollCents.Q15 / 100)}</dd>
             </div>
-          </div>
-        </div>
-      </div>
-      {/* Vista móvil */}
-      <div className="grid gap-3 md:hidden">
-        {items.map((item) => (
+            <div className="flex min-w-0 flex-col gap-1">
+              <dt className="flex items-center gap-2 text-xs text-muted-foreground">
+                <span className="size-2.5 shrink-0 rounded-full bg-pink-400/70" aria-hidden="true" />
+                Nómina Q30
+              </dt>
+              <dd className="break-words text-sm font-medium tabular-nums">{formatMoney(payrollCents.Q30 / 100)}</dd>
+            </div>
+          </dl>
+        </ItemContent>
+      </Item>
+
+      <div className="grid gap-3 md:hidden" role="list" aria-label="Pagos de tarjetas del mes">
+        {payments.map(({ card, cycle, payment }) => (
           <div
-            key={item.cycle.id}
-            className={`rounded-xl border border-border bg-background/60 px-4 py-4 ${getPayrollAccentClass(
-              item.cycle.dueDate,
-            )}`}
+            key={cycle.id}
+            role="listitem"
+            aria-label={`Pago de ${card.name}`}
+            className={cn("rounded-xl border border-border bg-background/60 px-4 py-4", getPayrollAccentClass(cycle.dueDate))}
           >
-            <div className="mb-3 flex items-start justify-between gap-3">
-              <div>
-                <p className="font-medium">{item.card.name}</p>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  Corte: {formatCompactDate(item.cycle.cutDate)}
-                </p>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  Límite: {formatCompactDate(item.cycle.dueDate)}
-                </p>
+            <div className="mb-4 flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="break-words font-medium">{card.name}</p>
+                <p className="mt-1 text-xs text-muted-foreground">Corte: {formatCompactDate(cycle.cutDate)}</p>
               </div>
-
-              <Badge
-                variant="outline"
-                className={getStatusBadgeClass(item.cycle.displayStatus)}
-              >
-                {getStatusLabel(item.cycle.displayStatus)}
+              <Badge variant="outline" className={getStatusBadgeClass(cycle.displayStatus)}>
+                {getStatusLabel(cycle.displayStatus)}
               </Badge>
             </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div className="rounded-lg border border-border bg-muted/30 px-3 py-3">
-                <p className="text-xs text-muted-foreground">Pago calculado</p>
-                <p className="text-lg font-semibold">
-                  {formatMoney(item.cycle.calculatedAmount)}
-                </p>
+            <dl className="grid grid-cols-2 gap-3">
+              <div className="min-w-0">
+                <dt className="text-xs text-muted-foreground">{cycle.displayStatus === "PAID" ? "Pago del período" : "Pago a realizar"}</dt>
+                <dd className="mt-1">
+                  <p className="break-words text-xl font-semibold tabular-nums">{formatMoney(payment.amount)}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{payment.isStatement ? "Estado de cuenta" : "Estimado"}</p>
+                </dd>
               </div>
-
-              <div className="rounded-lg border border-border bg-muted/30 px-3 py-3">
-                <p className="text-xs text-muted-foreground">Estado cuenta</p>
-                <p className="text-lg font-semibold">
-                  {item.cycle.statementAmount != null
-                    ? formatMoney(item.cycle.statementAmount)
-                    : "-"}
-                </p>
+              <div className="min-w-0 text-right">
+                <dt className="text-xs text-muted-foreground">Límite de pago</dt>
+                <dd className="mt-1 text-sm font-semibold">
+                  {formatPaymentDeadline(cycle.dueDate, today).split(/ (?=\[)/).map((part, index) => (
+                    <span key={part} className={cn("block", index > 0 && "whitespace-nowrap text-xs font-normal text-muted-foreground")}>{part}</span>
+                  ))}
+                </dd>
               </div>
-            </div>
+            </dl>
           </div>
         ))}
       </div>
 
-      {/* Vista escritorio */}
-      <div className="hidden overflow-hidden rounded-xl border border-border md:block">
-        <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr] gap-4 border-b border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
-          <div>Tarjeta</div>
-          <div>Corte</div>
-          <div>Límite pago</div>
-          <div>Pago calculado</div>
-          <div>Estado cuenta</div>
-          <div>Estado</div>
-        </div>
-
-        <div className="divide-y divide-border">
-          {items.map((item) => (
-            <div
-              key={item.cycle.id}
-              className={`grid gap-4 px-4 py-4 text-sm md:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr] ${getPayrollAccentClass(
-                item.cycle.dueDate,
-              )}`}
-            >
-              <div className="font-medium">{item.card.name}</div>
-
-              <div>{formatCompactDate(item.cycle.cutDate)}</div>
-
-              <div>{formatCompactDate(item.cycle.dueDate)}</div>
-
-              <div className="font-semibold">
-                {formatMoney(item.cycle.calculatedAmount)}
-              </div>
-
-              <div className="font-semibold">
-                {item.cycle.statementAmount != null
-                  ? formatMoney(item.cycle.statementAmount)
-                  : "-"}
-              </div>
-
-              <div>
-                <Badge
-                  variant="outline"
-                  className={getStatusBadgeClass(item.cycle.displayStatus)}
-                >
-                  {getStatusLabel(item.cycle.displayStatus)}
-                </Badge>
-              </div>
-            </div>
-          ))}
-        </div>
+      <div className="hidden md:block">
+        <Table aria-label="Pagos de tarjetas del mes">
+          <TableHeader>
+            <TableRow>
+              <TableHead>Tarjeta</TableHead>
+              <TableHead>Pago del período</TableHead>
+              <TableHead>Límite de pago</TableHead>
+              <TableHead>Corte</TableHead>
+              <TableHead>Estado</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {payments.map(({ card, cycle, payment }) => (
+              <TableRow key={cycle.id} className={getPayrollAccentClass(cycle.dueDate)}>
+                <TableCell className="font-medium">{card.name}</TableCell>
+                <TableCell>
+                  <p className="text-base font-semibold tabular-nums">{formatMoney(payment.amount)}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{payment.isStatement ? "Estado de cuenta" : "Estimado"}</p>
+                </TableCell>
+                <TableCell className="font-semibold">{formatCompactDate(cycle.dueDate)}</TableCell>
+                <TableCell>{formatCompactDate(cycle.cutDate)}</TableCell>
+                <TableCell>
+                  <Badge variant="outline" className={getStatusBadgeClass(cycle.displayStatus)}>{getStatusLabel(cycle.displayStatus)}</Badge>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </div>
     </div>
   );

@@ -212,28 +212,28 @@ function getNoticeTiming(diffDays) {
       group: "overdue",
       label:
         Math.abs(diffDays) === 1
-          ? "Vencido desde hace 1 día"
-          : `Vencido desde hace ${Math.abs(diffDays)} días`,
+          ? "Vencido: desde hace 1 día"
+          : `Vencido: desde hace ${Math.abs(diffDays)} días`,
     };
   }
 
   if (diffDays === 0) {
     return {
       group: "today",
-      label: "Vence hoy",
+      label: "Vence: hoy",
     };
   }
 
   if (diffDays === 1) {
     return {
       group: "upcoming",
-      label: "Vence mañana",
+      label: "Vence: mañana",
     };
   }
 
   return {
     group: "upcoming",
-    label: `Vence en ${diffDays} días`,
+    label: `Vence: en ${diffDays} días`,
   };
 }
 
@@ -268,11 +268,11 @@ function buildCardPaymentNotices(payments, now) {
         timing.group === "overdue"
           ? `Pago vencido de ${card.name}`
           : `Pago de tarjeta: ${card.name}`,
-      description: `${timing.label}. ${
+      description: `${timing.label}\n${
         cycle.statementAmount !== null && cycle.statementAmount !== undefined
-          ? `Estado de cuenta: ${formatMoneyForNotice(cycle.statementAmount)}.`
-          : `Pago calculado: ${formatMoneyForNotice(cycle.calculatedAmount)}.`
-      } No está marcado como pagado.`,
+          ? `Estado de cuenta: ${formatMoneyForNotice(cycle.statementAmount)}`
+          : `Pago calculado: ${formatMoneyForNotice(cycle.calculatedAmount)}`
+      }`,
       date: cycle.dueDate,
       amount: Number(cycle.statementAmount ?? cycle.calculatedAmount ?? 0),
     });
@@ -334,9 +334,9 @@ function buildCashSubscriptionNotices(subscriptions, now) {
         timing.group === "overdue"
           ? `Suscripción pendiente: ${subscription.name}`
           : `Suscripción en efectivo: ${subscription.name}`,
-      description: `${timing.label}. Pago estimado: ${formatMoneyForNotice(
+      description: `${timing.label}\nPago estimado: ${formatMoneyForNotice(
         subscription.amount,
-      )}. No hay gasto registrado vinculado a esta suscripción.`,
+      )}`,
       date: dueDate,
       amount: Number(subscription.amount || 0),
     });
@@ -420,13 +420,13 @@ function buildReceivableNotices(receivables, now) {
           timing.group === "overdue"
             ? `Cobro pendiente: ${receivable.person?.name || "Persona"}`
             : `Cobro programado: ${receivable.person?.name || "Persona"}`,
-        description: `${timing.label}. ${
+        description: `${timing.label}\n${
           receivable.expectedMonthlyPayment
             ? `Pago esperado: ${formatMoneyForNotice(
                 receivable.expectedMonthlyPayment,
-              )}.`
-            : `Cuenta: ${receivable.concept}.`
-        } No hay ingreso registrado para este cobro.`,
+              )}`
+            : `Cuenta: ${receivable.concept}`
+        }`,
         date: chargeDate,
         amount: Number(receivable.expectedMonthlyPayment || 0),
       });
@@ -718,17 +718,17 @@ function buildCutCycleNotices(cyclesWithAmounts, cards, now) {
       const daysSinceCut = getDaysDifference(now, cycle.cutDate);
       const cutAgoLabel =
         daysSinceCut === 0
-          ? "Cortada hoy"
+          ? "hoy"
           : daysSinceCut === 1
-            ? "Cortada hace 1 día"
-            : `Cortada hace ${daysSinceCut} días`;
+            ? "hace 1 día"
+            : `hace ${daysSinceCut} días`;
 
       notices.push({
         id: `cut-cycle-${cycle.id}`,
         type: "CUT_CYCLE",
         group: "cut",
         title: `Tarjeta cortada: ${card.name}`,
-        description: `${cutAgoLabel}. Actualiza la fecha y el monto del estado de cuenta para que el aviso desaparezca.`,
+        description: `Corte: ${cutAgoLabel}`,
         date: cycle.cutDate,
         amount: Number(cycle.calculatedAmount || 0),
       });
@@ -744,7 +744,7 @@ function buildCutCycleNotices(cyclesWithAmounts, cards, now) {
         type: "CUT_CYCLE_UPCOMING",
         group: "cut",
         title: `Corte ${cutLabel}: ${card.name}`,
-        description: `La tarjeta se corta ${cutLabel}. Recuerda actualizar la fecha y el monto del estado de cuenta una vez cortado.`,
+        description: `Corte: ${cutLabel}`,
         date: cycle.cutDate,
         amount: Number(cycle.calculatedAmount || 0),
       });

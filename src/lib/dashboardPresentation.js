@@ -19,7 +19,7 @@ export function formatCompactDate(dateString) {
   if (!dateString) return "-";
 
   const date = new Date(dateString);
-  const dateText = format(date, "d MMMM", { locale: es });
+  const dateText = format(new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), 12), "d MMMM", { locale: es });
 
   const today = new Date();
 

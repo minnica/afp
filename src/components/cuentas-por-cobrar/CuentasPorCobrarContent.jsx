@@ -53,6 +53,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { DataTable } from "@/components/ui/data-table";
+import { RecordActions, RecordCard, RecordField, RecordListCard, RecordListToolbar, RecordNote } from "@/components/ui/record-card";
+
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Item, ItemContent, ItemDescription, ItemGroup, ItemTitle } from "@/components/ui/item";
 
@@ -416,6 +418,37 @@ export default function CuentasPorCobrarContent() {
     filterConcept,
   ]);
 
+  const receivableMobileView = {
+    mobileListLabel: "Cuentas por cobrar",
+    mobileRowSeparator: false,
+    renderMobileRow: ({ original: item }) => (
+      <RecordCard
+        title={item.person?.name || item.concept}
+        subtitle={item.person?.name ? item.concept : null}
+        badges={<Badge variant="secondary">{getStatusLabel(item.status)}</Badge>}
+        amount={formatMoney(item.pendingBalance)}
+        amountLabel="Pendiente de cobro"
+        aria-label={`Cuenta por cobrar: ${item.concept}`}
+        actions={
+          <RecordActions label={`cuenta por cobrar: ${item.concept}`} onEdit={() => startEditingReceivable(item)} onDelete={() => setReceivableToDelete(item)}>
+            <Button type="button" variant="outline" className="h-11" aria-label={`Ver pagos de ${item.concept}`} onClick={() => openPaymentsDialog(item)}>Ver pagos</Button>
+          </RecordActions>
+        }
+      >
+        <dl className="grid grid-cols-2 gap-3">
+          <RecordField label="Monto original">{formatMoney(item.originalAmount)}</RecordField>
+          <RecordField label="Cobrado">{formatMoney(item.paidAmount)}</RecordField>
+          {item.expectedMonthlyPayment ? <RecordField label="Pago esperado">{formatMoney(item.expectedMonthlyPayment)}</RecordField> : null}
+          {item.expectedChargeDays?.length ? <RecordField label="Días de cobro">{item.expectedChargeDays.join(", ")}</RecordField> : null}
+          <RecordField label="Fecha de origen">{formatDate(item.originDate)}</RecordField>
+          <RecordField label="Origen">{getOriginLabel(item.originType)}</RecordField>
+        </dl>
+        <RecordNote>{item.notes}</RecordNote>
+      </RecordCard>
+    ),
+    mobileToolbar: (table) => <RecordListToolbar table={table} label="cuentas por cobrar" totals={[{ key: "originalAmount", label: "Monto original" }, { key: "paidAmount", label: "Cobrado" }, { key: "pendingBalance", label: "Pendiente" }]} />,
+  };
+
   const receivableColumns = useMemo(
     () => [
       {
@@ -562,7 +595,7 @@ export default function CuentasPorCobrarContent() {
   }
 
   if (isLoading) {
-    return <PageSkeleton variant="form-table" />;
+    return <PageSkeleton variant="form-table" mobileCards />;
   }
 
   return (
@@ -707,7 +740,7 @@ export default function CuentasPorCobrarContent() {
             </CreateRecordSurface>
 
           <div className="min-w-0">
-            <Card className="rounded-2xl border-border bg-card">
+            <RecordListCard>
               <CardHeader>
                 <CardTitle className="text-lg font-semibold uppercase text-center">
                   Cuentas por cobrar
@@ -716,6 +749,7 @@ export default function CuentasPorCobrarContent() {
 
               <CardContent>
                 <DataTable
+                  {...receivableMobileView}
                   columns={receivableColumns}
                   data={filteredReceivables}
                   pageSize={10}
@@ -727,7 +761,7 @@ export default function CuentasPorCobrarContent() {
                         value={filterPersonId || "ALL"}
                         onValueChange={value => setFilterPersonId(value === "ALL" ? "" : value)}
                         aria-label="Filtrar por persona"
-                        className="w-[180px]"
+                        className="w-full md:w-[180px]"
                         title="Seleccionar persona"
                         placeholder="Todas las personas"
                         searchPlaceholder="Buscar persona…"
@@ -745,7 +779,7 @@ export default function CuentasPorCobrarContent() {
                         value={filterOriginType || "ALL"}
                         onValueChange={value => setFilterOriginType(value === "ALL" ? "" : value)}
                         aria-label="Filtrar por origen"
-                        className="w-[180px]"
+                        className="w-full md:w-[180px]"
                         title="Filtrar por origen"
                         placeholder="Todos los orígenes"
                         options={[{
@@ -767,7 +801,7 @@ export default function CuentasPorCobrarContent() {
                         value={filterStatus || "ALL"}
                         onValueChange={value => setFilterStatus(value === "ALL" ? "" : value)}
                         aria-label="Filtrar por estado"
-                        className="w-[180px]"
+                        className="w-full md:w-[180px]"
                         title="Filtrar por estado"
                         placeholder="Todos los estados"
                         options={[{
@@ -792,13 +826,13 @@ export default function CuentasPorCobrarContent() {
                         onChange={(event) =>
                           setFilterConcept(event.target.value)
                         }
-                        className="w-[200px]"
+                        className="h-11 w-full text-base md:h-7 md:w-[200px] md:text-xs"
                       />
                     </>
                   }
                 />
               </CardContent>
-            </Card>
+            </RecordListCard>
           </div>
         </div>
 
