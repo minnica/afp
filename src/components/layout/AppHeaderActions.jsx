@@ -1,9 +1,11 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Notification03Icon, Target02Icon } from "@hugeicons/core-free-icons";
+import { Notification03Icon, Target02Icon, ArrowLeft01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { useDashboard } from "@/components/dashboard/DashboardProvider";
-import { CardUsageWaiverProgress, CardUsageWaiverTabs, ImportantNoticesCard } from "@/components/dashboard/DashboardPanels";
+import { CardUsageWaiverProgress, CardUsageWaiverTabs } from "@/components/dashboard/DashboardPanels";
+import ImportantNotices, { HiddenNoticesButton } from "@/components/dashboard/ImportantNotices";
 import { HeaderDialog } from "@/components/ui/header-dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -32,11 +34,17 @@ function DashboardStatus({ isLoading, error, dashboard, retry }) {
 
 export default function AppHeaderActions({ disabled = false }) {
   const data = useDashboard();
-  const { dashboard, refresh, today, usageHistoryPeriod, setUsageHistoryPeriod } = data;
+  const { dashboard, refresh, today, usageHistoryPeriod, setUsageHistoryPeriod, noticePreferences } = data;
   const [usageView, setUsageView] = useState("current");
+  const [noticeView, setNoticeView] = useState("active");
+  const noticesScrollRef = useRef(null);
   const usageScrollRef = useRef(null);
-  const notices = dashboard?.importantNotices || [];
-  const onOpenChange = (open) => { if (open) refresh(); };
+  const notices = data.visibleNotices;
+  const onOpenChange = (open) => { if (open) { setNoticeView("active"); refresh(); noticePreferences.refresh(); } };
+  const onNoticeViewChange = (view) => {
+    setNoticeView(view);
+    if (noticesScrollRef.current) noticesScrollRef.current.scrollTop = 0;
+  };
   const onUsageOpenChange = (open) => {
     if (open) {
       setUsageView("current");
@@ -52,15 +60,23 @@ export default function AppHeaderActions({ disabled = false }) {
     <div data-slot="app-header-actions" className="ml-auto flex shrink-0 items-center gap-1">
       <HeaderDialog
         title="Avisos importantes"
-        description="Todos tus avisos de pagos, vencimientos y cortes."
+        contentTitle={noticeView === "hidden" ? "Ocultos este mes" : "Avisos importantes"}
+        description={noticeView === "hidden" ? "Avisos ocultos solo durante este mes. Puedes volver a mostrarlos y regresar a los avisos importantes." : "Todos tus avisos de pagos, vencimientos y cortes."}
         icon={Notification03Icon}
         count={notices.length}
         disabled={disabled}
         onOpenChange={onOpenChange}
+        scrollRef={noticesScrollRef}
+        headerLeading={noticeView === "hidden" ? (
+          <Button type="button" variant="ghost" size="icon-lg" className="size-11" aria-label="Volver a avisos importantes" onClick={() => onNoticeViewChange("active")}>
+            <HugeiconsIcon icon={ArrowLeft01Icon} data-icon="inline-start" aria-hidden="true" />
+          </Button>
+        ) : null}
+        headerActions={noticeView === "active" && data.hiddenNotices.length > 0 ? <HiddenNoticesButton onClick={() => onNoticeViewChange("hidden")} /> : null}
         data-dashboard-notices-dialog
       >
         <DashboardStatus {...data} />
-        {dashboard ? <ImportantNoticesCard notices={notices} today={today} inDialog /> : null}
+        {dashboard ? <ImportantNotices inDialog view={noticeView} onViewChange={onNoticeViewChange} /> : null}
       </HeaderDialog>
       <Tabs value={usageView} onValueChange={onUsageViewChange} className="gap-0">
         <HeaderDialog
@@ -69,7 +85,7 @@ export default function AppHeaderActions({ disabled = false }) {
           icon={Target02Icon}
           disabled={disabled}
           onOpenChange={onUsageOpenChange}
-          headerContent={<CardUsageWaiverTabs />}
+          headerActions={<CardUsageWaiverTabs inHeader />}
           scrollRef={usageScrollRef}
           data-dashboard-usage-dialog
         >

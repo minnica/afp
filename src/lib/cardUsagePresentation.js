@@ -36,10 +36,9 @@ export function formatUsageCutDate(item, today, historical = false) {
   if (cut === null) return "Período sin registrar";
   const date = new Intl.DateTimeFormat("es-MX", { day: "numeric", month: "short", timeZone: "UTC" })
     .format(new Date(cut));
-  const prefix = item.periodVerified ? "Corte" : "Corte previsto";
-  if (historical) return `${prefix}: ${date}`;
+  if (historical) return `Corte: ${date}`;
   const localDay = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
   const days = Math.round((cut - localDay) / 86400000);
   const timing = days === 0 ? "hoy" : days === 1 ? "mañana" : `en ${days} días`;
-  return `${prefix}: ${date} · ${timing}`;
+  return `Corte: ${date} · ${timing}`;
 }

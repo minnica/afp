@@ -3,7 +3,8 @@
 import { useMemo, useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useDashboard } from "@/components/dashboard/DashboardProvider";
-import { CardUsageWaiverProgress, ImportantNoticesCard } from "@/components/dashboard/DashboardPanels";
+import { CardUsageWaiverProgress } from "@/components/dashboard/DashboardPanels";
+import ImportantNotices from "@/components/dashboard/ImportantNotices";
 import { MONTH_NAMES, formatMoney, formatCompactDate } from "@/lib/dashboardPresentation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -150,8 +151,6 @@ export default function DashboardContent() {
 
   const activeMonthIndex = Number(activeMonthTab);
 
-  const importantNotices = dashboard?.importantNotices || [];
-
   const hasCardUsageWaivers = Boolean(dashboard?.cardUsageWaiversCurrent?.length || dashboard?.cardUsageWaiverHistory?.length);
 
   const paymentsByMonth = useMemo(() => {
@@ -191,7 +190,7 @@ export default function DashboardContent() {
           {!mobile ? (
             hasCardUsageWaivers ? (
               <div className="grid gap-6 lg:grid-cols-2">
-                <ImportantNoticesCard notices={importantNotices} today={now} />
+                <ImportantNotices />
                 <CardUsageWaiverProgress
                   currentItems={dashboard.cardUsageWaiversCurrent || []}
                   historyItems={dashboard.cardUsageWaiverHistory || []}
@@ -201,7 +200,7 @@ export default function DashboardContent() {
                 />
               </div>
             ) : (
-              <ImportantNoticesCard notices={importantNotices} today={now} />
+              <ImportantNotices />
             )
           ) : null}
 

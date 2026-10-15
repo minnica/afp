@@ -5,13 +5,14 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowDown01Icon, ArrowRight01Icon } from "@hugeicons/core-free-icons";
 import { cn } from "@/lib/utils";
 import { formatMoney } from "@/lib/dashboardPresentation";
+import { formatPaymentDeadline } from "@/lib/cardPaymentPresentation";
 import { formatUsageCutDate, sortUsageByCutDate, usageHistoryOptions, usageHistoryPeriod } from "@/lib/cardUsagePresentation";
 import { ResponsiveSelect } from "@/components/ui/responsive-select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
-import { Item, ItemContent, ItemGroup, ItemHeader, ItemMedia, ItemSeparator } from "@/components/ui/item";
+import { Item, ItemActions, ItemContent, ItemGroup, ItemHeader, ItemMedia, ItemSeparator } from "@/components/ui/item";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -20,16 +21,68 @@ import { Empty, EmptyDescription } from "@/components/ui/empty";
 import { BreakdownDialogContent } from "@/components/ui/responsive-breakdown";
 import CardUsageWaiverBreakdown from "@/components/dashboard/CardUsageWaiverBreakdown";
 
-export function CardUsageWaiverTabs() {
+export function CardUsageWaiverTabs({ inHeader = false }) {
   return (
-    <TabsList variant="line" aria-label="Vista de consumo mínimo" className="h-8 w-fit self-start p-0 group-data-horizontal/tabs:h-8">
+    <TabsList variant="line" aria-label="Vista de consumo mínimo" data-usage-header-tabs={inHeader || undefined}
+      className={cn("h-8 w-fit shrink-0 p-0 group-data-horizontal/tabs:h-8", inHeader ? "self-center" : "self-start")}>
       <TabsTrigger value="current" className="h-8 flex-none px-2 before:absolute before:inset-x-0 before:top-1/2 before:min-h-11 before:-translate-y-1/2 motion-reduce:transition-none">En curso</TabsTrigger>
       <TabsTrigger value="history" className="h-8 flex-none px-2 before:absolute before:inset-x-0 before:top-1/2 before:min-h-11 before:-translate-y-1/2 motion-reduce:transition-none">Historial</TabsTrigger>
     </TabsList>
   );
 }
 
-function UsageList({ items, today, historical = false, onBreakdown }) {
+function MobileCurrentUsageList({ items, today, onBreakdown }) {
+  const listId = useId();
+  return (
+    <ItemGroup className="gap-3" data-usage-current-list>
+      {items.map((item) => {
+        const hasCycle = Boolean(item.selectedCycle);
+        const needsReview = item.confirmationPending || item.periodSelectionPending;
+        const descriptionId = `${listId}-${item.selectedCycle?.id || item.card.id}`;
+        const content = (
+          <ItemContent id={descriptionId} className="min-w-0 gap-2.5">
+            <ItemHeader className="items-start">
+              <p className="min-w-0 flex-1 text-sm font-medium [overflow-wrap:anywhere]">{item.card.name}</p>
+              <ItemActions className="shrink-0 gap-1">
+                {!hasCycle ? <Badge variant="outline">Sin período</Badge>
+                  : needsReview ? <Badge variant="warning">{item.periodSelectionPending ? "Revisar fechas" : "Por revisar"}</Badge>
+                  : item.isExempt ? <Badge variant="secondary">Meta alcanzada</Badge>
+                  : <p className="text-right text-sm font-semibold tabular-nums">Faltan {formatMoney(item.remainingAmount)}</p>}
+                {hasCycle ? <ItemMedia variant="icon"><HugeiconsIcon icon={ArrowRight01Icon} aria-hidden="true" /></ItemMedia> : null}
+              </ItemActions>
+            </ItemHeader>
+            {hasCycle ? (
+              <>
+                <p className="text-sm font-normal">Corte: {formatPaymentDeadline(item.selectedCycle.cutDate, today, { includeDate: false })}</p>
+                {!needsReview ? (
+                  <Progress
+                    value={Math.max(0, Math.min(Number(item.progress || 0), 100))}
+                    aria-label={`Consumo registrado de ${item.card.name}`}
+                    aria-valuetext={`${formatMoney(item.eligibleSpend)} de ${formatMoney(item.minimumAmount)}`}
+                    className="[&_[data-slot=progress-indicator]]:motion-reduce:transition-none"
+                  />
+                ) : null}
+              </>
+            ) : <p className="text-xs text-muted-foreground">Revisa sus ciclos en Tarjetas.</p>}
+          </ItemContent>
+        );
+        return (
+          <div key={item.selectedCycle?.id || item.card.id} role="listitem" data-usage-card={item.card.id}>
+            {hasCycle ? (
+              <Item asChild variant="outline" className="min-h-11 rounded-lg p-3 hover:bg-muted/50 motion-reduce:transition-none">
+                <button type="button" className="text-left" aria-label={`Ver desglose de ${item.card.name}`} aria-describedby={descriptionId} onClick={(event) => onBreakdown(item, event.currentTarget)}>
+                  {content}
+                </button>
+              </Item>
+            ) : <Item variant="outline" className="rounded-lg p-3">{content}</Item>}
+          </div>
+        );
+      })}
+    </ItemGroup>
+  );
+}
+
+function UsageList({ items, today, historical = false, compact = false, onBreakdown }) {
   const listId = useId();
   return (
     <ItemGroup className="gap-0">
@@ -42,6 +95,11 @@ function UsageList({ items, today, historical = false, onBreakdown }) {
           : item.isExempt ? "Meta alcanzada"
           : historical && item.status === "UNCONFIRMED" ? "Por confirmar"
           : `${historical ? "Faltaron" : "Faltan"} ${formatMoney(item.remainingAmount)}`;
+        const relativeCut = compact && !historical && Boolean(item.selectedCycle);
+        const cutText = relativeCut
+          ? `Corte: ${formatPaymentDeadline(item.selectedCycle.cutDate, today, { includePreposition: true })}`
+          : formatUsageCutDate(item, today, historical);
+        const [cutTiming, cutDateLabel] = cutText.split(/ (?=\[)/);
         const content = (
           <ItemContent id={`${listId}-${item.selectedCycle?.id || item.card.id}`} className="min-w-0 gap-2">
             <ItemHeader className="items-start">
@@ -53,7 +111,11 @@ function UsageList({ items, today, historical = false, onBreakdown }) {
               ) : null}
             </ItemHeader>
             <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-              <p className="text-xs text-muted-foreground">{formatUsageCutDate(item, today, historical)}</p>
+              <p className={cn("text-xs text-muted-foreground", relativeCut && "text-sm text-foreground")}>
+                {relativeCut ? (
+                  <>{cutTiming}{cutDateLabel ? <> <span className="whitespace-nowrap">{cutDateLabel}</span></> : null}</>
+                ) : cutText}
+              </p>
               {missedGoal ? <Badge variant="warning" data-usage-missed-goal>Posible comisión</Badge> : null}
             </div>
             {item.selectedCycle ? (
@@ -70,7 +132,7 @@ function UsageList({ items, today, historical = false, onBreakdown }) {
                 {needsReview ? (
                   <p className="text-xs text-destructive">{item.periodSelectionPending ? "Hay períodos superpuestos." : "Hay importes distintos al estado."}</p>
                 ) : null}
-                {Number(item.projectedAmount) > 0 ? (
+                {!compact && Number(item.projectedAmount) > 0 ? (
                   <p className="text-xs text-muted-foreground tabular-nums">{formatMoney(item.projectedAmount)} por confirmar</p>
                 ) : null}
               </>
@@ -119,14 +181,15 @@ export default function CardUsageWaiverProgress({
     breakdownTriggerRef.current = trigger;
     setSelectedItem(item);
   };
-  const listProps = { today, onBreakdown };
+  const listProps = { today, onBreakdown, compact: inDialog };
+  const CurrentList = inDialog ? MobileCurrentUsageList : UsageList;
   const panels = (
     <>
       <TabsContent value="current" className="flex min-w-0 flex-col gap-3 data-[state=inactive]:hidden">
-        {pending.length ? <UsageList items={pending} {...listProps} /> : current.length === completed.length && completed.length ? (
+        {pending.length ? <CurrentList items={pending} {...listProps} /> : current.length === completed.length && completed.length ? (
           <Empty className="px-0 py-4"><EmptyDescription>Todas tus metas en curso están alcanzadas.</EmptyDescription></Empty>
         ) : null}
-        {missing.length ? <UsageList items={missing} {...listProps} /> : null}
+        {missing.length ? <CurrentList items={missing} {...listProps} /> : null}
         {completed.length ? (
           <Collapsible className="flex flex-col gap-2">
             <CollapsibleTrigger asChild>
@@ -135,7 +198,7 @@ export default function CardUsageWaiverProgress({
                 <HugeiconsIcon icon={ArrowDown01Icon} data-icon="inline-end" aria-hidden="true" className="transition-transform duration-200 group-aria-expanded:rotate-180 motion-reduce:transition-none" />
               </Button>
             </CollapsibleTrigger>
-            <CollapsibleContent><UsageList items={completed} {...listProps} /></CollapsibleContent>
+            <CollapsibleContent><CurrentList items={completed} {...listProps} /></CollapsibleContent>
           </Collapsible>
         ) : null}
         {!current.length ? <Empty><EmptyDescription>No tienes tarjetas con consumo mínimo configurado.</EmptyDescription></Empty> : null}

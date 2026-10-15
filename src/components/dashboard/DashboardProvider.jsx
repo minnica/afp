@@ -6,10 +6,12 @@ import { supabase } from "@/lib/supabase";
 import { ensureUserSetup } from "@/lib/userSetup";
 import { navItems } from "@/lib/navigation";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useNoticeDismissals } from "@/hooks/use-notice-dismissals";
+import { getNoticeMonth, partitionNotices } from "@/lib/noticeDismissals";
 
 const DashboardContext = createContext(null);
 const appRoutes = new Set(navItems.map((item) => item.href));
-const initialState = { dashboard: null, isLoading: true, error: "" };
+const initialState = { dashboard: null, userId: null, isLoading: true, error: "" };
 
 export function DashboardProvider({ children }) {
   const pathname = usePathname();
@@ -22,6 +24,12 @@ export function DashboardProvider({ children }) {
   const loadedRouteRef = useRef(null);
   const userIdRef = useRef(null);
   const generationRef = useRef(0);
+  const noticePreferences = useNoticeDismissals({
+    userId: state.userId,
+    month: getNoticeMonth(today),
+    enabled: appRoutes.has(pathname) && (mobile || pathname === "/dashboard" || pathname === "/analisis"),
+  });
+  const notices = partitionNotices(state.dashboard?.importantNotices || [], noticePreferences.entries, noticePreferences.month);
 
   const refresh = useCallback(async () => {
     const generation = generationRef.current;
@@ -43,6 +51,7 @@ export function DashboardProvider({ children }) {
       const sameUser = userIdRef.current === userId;
       userIdRef.current = userId;
       setState((previous) => ({
+        userId,
         dashboard: sameUser ? previous.dashboard : null,
         isLoading: !sameUser || !previous.dashboard,
         error: "",
@@ -58,7 +67,7 @@ export function DashboardProvider({ children }) {
           const dashboard = await response.json();
           if (!response.ok) throw new Error(dashboard.error || "No se pudo cargar la información.");
           if (!request.controller.signal.aborted) {
-            setState({ dashboard, isLoading: false, error: "" });
+            setState({ dashboard, userId, isLoading: false, error: "" });
             setToday(requestDate);
           }
         } catch (err) {
@@ -76,6 +85,17 @@ export function DashboardProvider({ children }) {
       }
     }
   }, [router]);
+
+  useEffect(() => {
+    if (!appRoutes.has(pathname) || (!mobile && pathname !== "/dashboard" && pathname !== "/analisis")) return;
+    const nextDay = new Date();
+    nextDay.setHours(24, 0, 0, 0);
+    const timer = window.setTimeout(() => {
+      setToday(new Date());
+      refresh();
+    }, nextDay.getTime() - Date.now() + 100);
+    return () => window.clearTimeout(timer);
+  }, [pathname, mobile, today, refresh]);
 
   useEffect(() => {
     if (!appRoutes.has(pathname) || (!mobile && pathname !== "/dashboard" && pathname !== "/analisis")) return;
@@ -119,7 +139,8 @@ export function DashboardProvider({ children }) {
   const value = useMemo(() => ({
     ...state, refresh, retry: refresh, today,
     usageHistoryPeriod, setUsageHistoryPeriod,
-  }), [state, refresh, today, usageHistoryPeriod]);
+    noticePreferences, visibleNotices: notices.visible, hiddenNotices: notices.hidden,
+  }), [state, refresh, today, usageHistoryPeriod, noticePreferences, notices.visible, notices.hidden]);
 
   return <DashboardContext.Provider value={value}>{children}</DashboardContext.Provider>;
 }

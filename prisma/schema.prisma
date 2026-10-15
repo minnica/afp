@@ -67,8 +67,23 @@ model User {
   incomes              Income[]
   receivableAccounts   ReceivableAccount[]
   payableAccounts      PayableAccount[]
+  noticeDismissals     NoticeDismissal[]
 
   @@map("users")
+}
+
+model NoticeDismissal {
+  id        String   @id @default(uuid())
+  userId    String
+  month     String
+  noticeKey String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, month, noticeKey])
+  @@index([userId, month])
+  @@map("notice_dismissals")
 }
 
 model Card {

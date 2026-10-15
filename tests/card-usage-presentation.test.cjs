@@ -23,9 +23,9 @@ test("historial distingue años, deduplica períodos y ofrece el más reciente p
 
 test("fecha de corte respeta el día almacenado y hoy, mañana y días restantes", () => {
   const today = new Date(2026, 9, 13, 23, 45);
-  assert.equal(helpers.formatUsageCutDate(row("A", "2026-10-13T00:00:00Z"), today), "Corte previsto: 13 oct · hoy");
-  assert.equal(helpers.formatUsageCutDate(row("A", "2026-10-14T00:00:00Z"), today), "Corte previsto: 14 oct · mañana");
-  assert.equal(helpers.formatUsageCutDate(row("A", "2026-10-18T00:00:00Z"), today), "Corte previsto: 18 oct · en 5 días");
+  assert.equal(helpers.formatUsageCutDate(row("A", "2026-10-13T00:00:00Z"), today), "Corte: 13 oct · hoy");
+  assert.equal(helpers.formatUsageCutDate(row("A", "2026-10-14T00:00:00Z"), today), "Corte: 14 oct · mañana");
+  assert.equal(helpers.formatUsageCutDate(row("A", "2026-10-18T00:00:00Z"), today), "Corte: 18 oct · en 5 días");
   assert.equal(helpers.formatUsageCutDate({ ...row("A", "2026-10-08"), periodVerified: true }, today, true), "Corte: 8 oct");
   assert.equal(helpers.formatUsageCutDate({ card: { name: "A" } }, today), "Período sin registrar");
 });
