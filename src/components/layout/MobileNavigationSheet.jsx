@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { Check, LogOut, Menu, X } from "lucide-react"
 import { useIsMobile } from "@/hooks/use-mobile"
-import { navItems } from "@/lib/navigation"
+import { mobileNavItems } from "@/lib/navigation"
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Spinner } from "@/components/ui/spinner"
@@ -114,7 +114,7 @@ export default function MobileNavigationSheet({ disabled = false, onNavigate, cl
           <SheetDescription>Elige dónde quieres continuar.</SheetDescription>
         </SheetHeader>
         <nav aria-label="Secciones de AFP" className="min-h-0 overflow-y-auto overscroll-contain px-2 pt-2">
-          {navItems.map(({ href, label, icon: Icon }) => {
+          {mobileNavItems.map(({ href, label, icon: Icon }) => {
             const active = pathname === href
             return (
               <SheetClose key={href} asChild>

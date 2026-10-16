@@ -53,3 +53,7 @@ export const navItems = [
   },
 ];
 
+export const mobileNavItems = [...navItems];
+const [cardsItem] = mobileNavItems.splice(mobileNavItems.findIndex(item => item.href === "/tarjetas"), 1);
+mobileNavItems.splice(mobileNavItems.findIndex(item => item.href === "/dashboard"), 0, cardsItem);
+

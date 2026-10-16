@@ -5,6 +5,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 
 import ExpenseCreateSurface, { useExpenseDialogMode } from "@/components/gastos/ExpenseCreateSurface";
 import DailyExpenseCards, { DailyExpenseCardsSkeleton } from "@/components/gastos/DailyExpenseCards";
+import SubscriptionCharges from "@/components/gastos/SubscriptionCharges";
 
 import { ResponsiveSelect } from "@/components/ui/responsive-select";
 import { PaymentMethodSelector } from "@/components/ui/payment-method-selector";
@@ -579,7 +580,11 @@ export default function GastosContent() {
     setIsSaving(true);
 
     const payload = getCreateExpensePayload();
-    const toastOptions = compactEntry ? { position: "top-center" } : undefined;
+    // En el diálogo, la confirmación vive junto a las acciones, sin superponerlas.
+    function confirmSave(message, type = "success") {
+      if (!compactEntry) toast[type](message);
+      return { message, type };
+    }
     const shouldQueueOffline =
       typeof navigator !== "undefined" && navigator.onLine === false;
     let saved = false;
@@ -590,8 +595,7 @@ export default function GastosContent() {
 
         setPendingOfflineExpenses((current) => [offlineExpense, ...current]);
         resetCreateExpenseForm();
-        toast.info("Sin conexión. Gasto guardado como pendiente.", toastOptions);
-        return true;
+        return confirmSave("Sin conexión. Gasto guardado como pendiente.", "info");
       }
 
       const response = await fetch("/api/expenses", {
@@ -613,14 +617,12 @@ export default function GastosContent() {
       await loadExpenses(user.id, { force: true });
       await loadReceivables(user.id);
       await loadPayables(user.id);
-      toast.success("Gasto guardado exitosamente.", toastOptions);
-      return true;
+      return confirmSave(data.alreadyConfirmed ? "Este cobro ya estaba registrado." : "Gasto guardado exitosamente.");
     } catch (err) {
       if (saved) {
         // Un fallo al refrescar después del POST no debe duplicar el gasto en la cola.
         setError("El gasto se guardó, pero no se pudo actualizar la lista. Recarga para verlo.");
-        toast.success("Gasto guardado exitosamente.", toastOptions);
-        return true;
+        return confirmSave("Gasto guardado; recarga la lista para verlo.");
       }
       const wentOffline =
         typeof navigator !== "undefined" && navigator.onLine === false;
@@ -630,8 +632,7 @@ export default function GastosContent() {
 
         setPendingOfflineExpenses((current) => [offlineExpense, ...current]);
         resetCreateExpenseForm();
-        toast.info("Sin conexión. Gasto guardado como pendiente.", toastOptions);
-        return true;
+        return confirmSave("Sin conexión. Gasto guardado como pendiente.", "info");
       }
 
       setCreateError({ message: err.message || "No se pudo guardar el gasto." });
@@ -1014,6 +1015,28 @@ export default function GastosContent() {
     return <GastosPageSkeleton />;
   }
 
+  function advanceCreateField(event, nextId, openSelector = false) {
+    if (!compactEntry || event.key !== "Enter" || event.nativeEvent.isComposing) return;
+    event.preventDefault();
+    const next = event.currentTarget.form?.querySelector(`#${nextId}`);
+    next?.focus();
+    if (openSelector) next?.click();
+  }
+
+  function openCreateDatePicker() {
+    const field = document.getElementById("date");
+    field?.focus();
+    if (field?.type === "date") {
+      try {
+        field.showPicker?.();
+      } catch {
+        // Si el navegador restringe la apertura, la fecha queda enfocada.
+      }
+    } else {
+      field?.click();
+    }
+  }
+
   const createPaymentFields = (
     <>
       <div className="space-y-2">
@@ -1075,6 +1098,8 @@ export default function GastosContent() {
         <Label htmlFor="concept">Concepto</Label>
         <Input
           id="concept"
+          enterKeyHint={compactEntry ? "next" : undefined}
+          onKeyDown={(event) => advanceCreateField(event, "amount")}
           aria-invalid={createError?.field === "concept"}
           aria-describedby={createError?.field === "concept" ? "create-expense-error" : undefined}
           value={concept}
@@ -1087,6 +1112,8 @@ export default function GastosContent() {
         <Label htmlFor="amount">Monto</Label>
         <Input
           id="amount"
+          enterKeyHint={compactEntry ? "next" : undefined}
+          onKeyDown={(event) => advanceCreateField(event, "categoryId", true)}
           inputMode="decimal"
           aria-invalid={createError?.field === "amount"}
           aria-describedby={createError?.field === "amount" ? "create-expense-error" : undefined}
@@ -1106,6 +1133,7 @@ export default function GastosContent() {
           value={categoryId}
           onValueChange={setCategoryId}
           id="categoryId"
+          onSelectionComplete={compactEntry ? openCreateDatePicker : undefined}
           aria-invalid={createError?.field === "categoryId"}
           aria-describedby={createError?.field === "categoryId" ? "create-expense-error" : undefined}
           title="Seleccionar categoría"
@@ -1269,7 +1297,7 @@ export default function GastosContent() {
                   value: "NONE",
                   label: "Sin suscripción",
                   pinned: true
-                }, ...subscriptions.filter(item => item.paymentMethod === "CASH").map(item => ({
+                }, ...subscriptions.map(item => ({
                   value: item.id,
                   label: `${item.name} · ${formatMoney(item.amount)}`
                 }))]}
@@ -1414,7 +1442,7 @@ export default function GastosContent() {
                   value: "NONE",
                   label: "Sin suscripción",
                   pinned: true
-                }, ...subscriptions.filter(item => item.paymentMethod === "CASH").map(item => ({
+                }, ...subscriptions.map(item => ({
                   value: item.id,
                   label: `${item.name} · ${formatMoney(item.amount)}`
                 }))]}
@@ -1505,14 +1533,14 @@ export default function GastosContent() {
               )}
             </ExpenseCreateSurface>
 
-            <div className="min-w-0 space-y-6">
+            <div className="flex min-w-0 flex-col gap-6">
               <Card className="expense-results rounded-2xl border-border bg-card">
-                <CardHeader className="expense-results-header">
+                <CardHeader className="expense-results-header items-center">
                   <CardTitle className="text-lg font-semibold uppercase text-center">
                     <h2>Gastos filtrados</h2>
                   </CardTitle>
-                  {mobileNavigation ? (
-                    <CardAction>
+                  <CardAction className="row-span-1 flex items-center gap-2 self-center">
+                    {mobileNavigation ? (
                       <Button
                         type="button"
                         variant="link"
@@ -1527,8 +1555,10 @@ export default function GastosContent() {
                       >
                         Quitar filtros
                       </Button>
-                    </CardAction>
-                  ) : null}
+                    ) : null}
+                    <SubscriptionCharges userId={user?.id} isOnline={isOnline} refreshKey={expenses}
+                      onChanged={() => loadExpenses(user.id, { force: true })} />
+                  </CardAction>
                 </CardHeader>
 
                 <CardContent className="flex flex-col gap-3 md:gap-4">

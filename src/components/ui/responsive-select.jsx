@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useId, useRef, useState, useSyncExternalStore } from "react"
+import { flushSync } from "react-dom"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { Cancel01Icon, Tick02Icon, UnfoldMoreIcon } from "@hugeicons/core-free-icons"
 
@@ -201,7 +202,7 @@ function CompactOptionList({ options, value, onSelect, title, isSheet }) {
   )
 }
 
-function MobileOptions({ title, open, searchable, children }) {
+function MobileOptions({ title, open, searchable, children, onCloseAutoFocus }) {
   const contentRef = useRef(null)
   const titleRef = useRef(null)
 
@@ -241,6 +242,7 @@ function MobileOptions({ title, open, searchable, children }) {
         const focusTarget = searchInput ?? titleRef.current
         focusTarget?.focus({ preventScroll: true })
       }}
+      onCloseAutoFocus={onCloseAutoFocus}
     >
       <SheetHeader className="relative shrink-0 p-4 pr-16 text-left">
         <SheetTitle ref={titleRef} tabIndex={-1} className="text-base outline-none">
@@ -265,6 +267,7 @@ function ResponsiveSelect({
   id,
   value = "",
   onValueChange,
+  onSelectionComplete,
   options,
   title = "Seleccionar opción",
   placeholder = "Selecciona una opción",
@@ -279,6 +282,7 @@ function ResponsiveSelect({
   "aria-labelledby": ariaLabelledBy,
 }) {
   const [open, setOpen] = useState(false)
+  const selectedOnCloseRef = useRef(false)
   const [searchOnOpen, setSearchOnOpen] = useState(false)
   const isSheet = useSyncExternalStore(subscribeToSheetQuery, getSheetSnapshot, getServerSnapshot)
   const selectedOption = options.find((option) => option.value === value)
@@ -289,11 +293,24 @@ function ResponsiveSelect({
   ) : options
 
   function handleOpenChange(nextOpen) {
-    if (nextOpen) setSearchOnOpen(shouldSearch)
+    if (nextOpen) {
+      selectedOnCloseRef.current = false
+      setSearchOnOpen(shouldSearch)
+    }
     setOpen(nextOpen)
   }
 
   function handleSelect(nextValue) {
+    selectedOnCloseRef.current = true
+    if (isSheet && onSelectionComplete) {
+      // Conserva el gesto del usuario para abrir selectores nativos (showPicker).
+      flushSync(() => {
+        onValueChange(nextValue)
+        setOpen(false)
+      })
+      onSelectionComplete()
+      return
+    }
     onValueChange(nextValue)
     setOpen(false)
   }
@@ -357,7 +374,12 @@ function ResponsiveSelect({
     return (
       <Sheet open={open} onOpenChange={handleOpenChange}>
         <SheetTrigger asChild>{trigger}</SheetTrigger>
-        <MobileOptions title={title} open={open} searchable={canSearch}>{list}</MobileOptions>
+        <MobileOptions title={title} open={open} searchable={canSearch} onCloseAutoFocus={(event) => {
+          if (selectedOnCloseRef.current && onSelectionComplete) {
+            event.preventDefault()
+            selectedOnCloseRef.current = false
+          }
+        }}>{list}</MobileOptions>
       </Sheet>
     )
   }

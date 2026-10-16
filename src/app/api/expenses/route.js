@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { applySubscriptionCharge, SubscriptionChargeError } from "@/lib/subscriptionChargeService";
 
 const expenseSelect = {
   id: true,
@@ -279,6 +280,19 @@ export async function POST(request) {
 
     let finalReceivableAccountId = receivableAccountId || null;
 
+    if (subscriptionId) {
+      const result = await prisma.$transaction(tx => applySubscriptionCharge(tx, userId, {
+        subscriptionId, month: date.slice(0, 7), date, amount: numericAmount, action: "confirm",
+        today: new Date().toISOString().slice(0, 10), createReceivable,
+        expenseData: { concept: concept.trim(), paymentMethod, cardId: cardId || null, categoryId,
+          notes: notes?.trim() || null, personId: personId || null,
+          receivableAccountId: finalReceivableAccountId, payableAccountId: payableAccountId || null },
+      }));
+      const expense = await prisma.dailyExpense.findUnique({ where: { id: result.expenseId }, select: expenseSelect });
+      if (payableAccountId) await updatePayableStatusIfNeeded(payableAccountId);
+      return NextResponse.json({ expense, alreadyConfirmed: result.alreadyConfirmed });
+    }
+
     if (personId && createReceivable) {
       const receivable = await prisma.receivableAccount.create({
         data: {
@@ -319,6 +333,7 @@ export async function POST(request) {
 
     return NextResponse.json({ expense });
   } catch (error) {
+    if (error instanceof SubscriptionChargeError) return NextResponse.json({ error: error.message }, { status: error.status });
     console.error("Error creating expense:", error);
 
     return NextResponse.json(
@@ -425,23 +440,41 @@ export async function PATCH(request) {
       return NextResponse.json({ error: "Fecha no válida." }, { status: 400 });
     }
 
-    const expense = await prisma.dailyExpense.update({
-      where: { id },
-      data: {
-        date: parsedDate,
-        paymentMethod,
-        cardId: paymentMethod === "CARD" ? cardId : null,
-        concept: concept.trim(),
-        amount: numericAmount,
-        categoryId,
-        notes: notes?.trim() || null,
-        subscriptionId: subscriptionId || null,
-      },
-      select: expenseSelect,
+    const expense = await prisma.$transaction(async tx => {
+      const existing = await tx.dailyExpense.findUnique({ where: { id } });
+      if (!existing) throw new SubscriptionChargeError("Gasto no encontrado.", 404);
+      for (const linkedId of [...new Set([existing.subscriptionId, subscriptionId].filter(Boolean))].sort()) {
+        const rows = await tx.$queryRaw`SELECT "id" FROM "subscriptions" WHERE "id" = ${linkedId} AND "userId" = ${existing.userId} FOR UPDATE`;
+        if (!rows.length) throw new SubscriptionChargeError("La suscripción no está disponible.", 404);
+      }
+      const linkedCharge = await tx.subscriptionCharge.findUnique({ where: { expenseId: id } });
+      if (linkedCharge && subscriptionId !== linkedCharge.subscriptionId) {
+        throw new SubscriptionChargeError("Este gasto confirma una suscripción. Conserva su vínculo al editarlo.");
+      }
+      if (subscriptionId) {
+        const month = linkedCharge?.month || date.slice(0, 7);
+        const decision = await tx.subscriptionCharge.findUnique({ where: { subscriptionId_month: { subscriptionId, month } } });
+        if (decision?.status === "SKIPPED") throw new SubscriptionChargeError("Restaura el cobro omitido antes de vincularlo.", 409);
+        const candidates = await tx.dailyExpense.findMany({ where: { subscriptionId, id: { not: id } },
+          select: { date: true, subscriptionCharge: { select: { month: true } } } });
+        if (candidates.some(item => (item.subscriptionCharge?.month || item.date.toISOString().slice(0, 7)) === month)) {
+          throw new SubscriptionChargeError("Ya existe un gasto para esta suscripción y mes.", 409);
+        }
+      }
+      return tx.dailyExpense.update({
+        where: { id },
+        data: {
+          date: parsedDate, paymentMethod, cardId: paymentMethod === "CARD" ? cardId : null,
+          concept: concept.trim(), amount: numericAmount, categoryId, notes: notes?.trim() || null,
+          subscriptionId: subscriptionId || null,
+        },
+        select: expenseSelect,
+      });
     });
 
     return NextResponse.json({ expense });
   } catch (error) {
+    if (error instanceof SubscriptionChargeError) return NextResponse.json({ error: error.message }, { status: error.status });
     console.error("Error updating expense:", error);
 
     return NextResponse.json(

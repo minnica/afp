@@ -211,7 +211,6 @@ export default function CuentasPorPagarContent() {
     setIsSaving(true);
 
     let saved = false;
-    const toastOptions = compactEntry ? { position: "top-center" } : undefined;
     try {
       const response = await fetch("/api/payables", {
         method: "POST",
@@ -244,13 +243,13 @@ export default function CuentasPorPagarContent() {
       setNotes("");
 
       await loadPayables(user.id);
-      toast.success("Cuenta por pagar guardada exitosamente.", toastOptions);
-      return true;
+      if (!compactEntry) toast.success("Cuenta por pagar guardada exitosamente.");
+      return { message: "Cuenta por pagar guardada exitosamente.", type: "success" };
     } catch (err) {
       if (saved) {
         setError("El registro se guardó, pero no se pudo actualizar la lista. Recarga para verlo.");
-        toast.success("Cuenta por pagar guardada exitosamente.", toastOptions);
-        return true;
+        if (!compactEntry) toast.success("El registro se guardó; recarga la lista para verlo.");
+        return { message: "El registro se guardó; recarga la lista para verlo.", type: "success" };
       }
       setCreateError({ message: err.message || "No se pudo crear la cuenta por pagar." });
       return false;
@@ -442,6 +441,7 @@ export default function CuentasPorPagarContent() {
 
           <div className={`grid gap-5 ${compactEntry ? "" : "xl:grid-cols-[420px_1fr]"}`}>
             <CreateRecordSurface
+              showSaveFeedback
               compact={compactEntry}
               title="Nueva cuenta por pagar"
               saveLabel="Guardar cuenta"

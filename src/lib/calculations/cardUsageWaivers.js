@@ -1,3 +1,5 @@
+import { isSubscriptionChargeResolved } from "../subscriptionCharges";
+
 // Reglas por producto, nunca inferidas del nombre editable de la tarjeta.
 export const CARD_USAGE_PRODUCTS = {
   HSBC_ZERO: {
@@ -119,6 +121,7 @@ function usageScheduledCharges(subscription, cycle) {
     const month = index % 12;
     const lastDay = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
     const date = new Date(Date.UTC(year, month, Math.min(Number(subscription.chargeDay), lastDay), 12));
+    if (isSubscriptionChargeResolved(subscription, usageDay(date).slice(0, 7))) continue;
     if (!usageInRange(date, cycle.startDate, cycle.cutDate)) continue;
     if (!subscription.isActive && (!subscription.deactivatedAt || usageDay(date) > usageDay(subscription.deactivatedAt))) continue;
     dates.push(date.toISOString());
@@ -224,7 +227,8 @@ export function buildCardUsageWaivers({ cards, cyclesWithAmounts, expenses, subs
       for (const subscription of subscriptions.filter((item) => item.cardId === card.id && item.paymentMethod === "CARD")) {
         for (const chargeDate of usageScheduledCharges(subscription, cycle)) {
           const monthKey = usageDay(chargeDate).slice(0, 7);
-          const recorded = cardExpenses.some((expense) => expense.subscriptionId === subscription.id && usageDay(expense.date)?.slice(0, 7) === monthKey);
+          const recorded = cardExpenses.some((expense) => expense.subscriptionId === subscription.id
+            && (expense.subscriptionCharge?.month || usageDay(expense.date)?.slice(0, 7)) === monthKey);
           const confirmed = receipts.some((receipt) => receipt.subscriptionId === subscription.id && usageDay(receipt.date).slice(0, 7) === monthKey);
           // Un estado ya revisado es la fuente de verdad sobre los cargos de ese corte.
           if (recorded || confirmed || evidence) continue;

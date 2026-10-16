@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react"
 import { HugeiconsIcon } from "@hugeicons/react"
-import { Add01Icon, Cancel01Icon, FloppyDiskIcon } from "@hugeicons/core-free-icons"
+import { Add01Icon, Cancel01Icon, CheckmarkCircle02Icon, FloppyDiskIcon, InformationCircleIcon } from "@hugeicons/core-free-icons"
 
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
@@ -29,6 +29,7 @@ export default function CreateRecordSurface({
   compact, children, title, saveLabel, description = "Guarda un registro y continúa con el siguiente.",
   error, errorId: providedErrorId, isSaving, notice, onSubmit, actionSlot = "record-create-action",
   showSavingOverlay = false, savingOverlayLabel = "Guardando registro",
+  showSaveFeedback = false,
 }) {
   const generatedId = useId()
   const mobile = useIsMobile()
@@ -36,6 +37,7 @@ export default function CreateRecordSurface({
   const submittingRef = useRef(false)
   // La captura comienza abierta en móvil; los cierres posteriores se respetan.
   const [open, setOpen] = useState(compact)
+  const [saveFeedback, setSaveFeedback] = useState("")
   const contentRef = useRef(null)
   const formRef = useRef(null)
   const fieldsRef = useRef(null)
@@ -79,13 +81,23 @@ export default function CreateRecordSurface({
     if (error?.field) formRef.current?.querySelector(`#${error.field}`)?.focus()
   }, [error])
 
+  useEffect(() => {
+    if (!saveFeedback) return
+    const timer = window.setTimeout(() => setSaveFeedback(""), 3000)
+    return () => window.clearTimeout(timer)
+  }, [saveFeedback])
+
   async function handleSubmit(event) {
     event.preventDefault()
     if (isSaving || submittingRef.current) return
     submittingRef.current = true
+    setSaveFeedback("")
     try {
       const saved = await onSubmit()
       if (saved && fieldsRef.current) fieldsRef.current.scrollTop = 0
+      if (saved && showSaveFeedback && inDialog) {
+        setSaveFeedback({ message: saved.message || "Registro guardado.", type: saved.type || "success" })
+      }
     } finally {
       submittingRef.current = false
     }
@@ -108,6 +120,16 @@ export default function CreateRecordSurface({
           {typeof children === "function" ? children({ compact: inDialog }) : children}
         </fieldset>
       </div>
+      {showSaveFeedback && inDialog ? (
+        <div role="status" aria-live="polite" aria-atomic="true" className="mt-2 min-h-10 shrink-0">
+          {saveFeedback && !error && !isSaving ? (
+            <Alert role="presentation" variant={saveFeedback.type === "success" ? "success" : "default"} className="py-2">
+              <HugeiconsIcon icon={saveFeedback.type === "success" ? CheckmarkCircle02Icon : InformationCircleIcon} strokeWidth={2} aria-hidden="true" />
+              <AlertDescription>{saveFeedback.message}</AlertDescription>
+            </Alert>
+          ) : null}
+        </div>
+      ) : null}
       <DialogFooter className={cn(inDialog ? "mt-4 shrink-0 flex-row gap-2" : "")}>
         {inDialog ? (
           <DialogClose asChild>
@@ -144,7 +166,12 @@ export default function CreateRecordSurface({
   }
 
   return (
-    <Dialog open={open} onOpenChange={(nextOpen) => { if (!isSaving) setOpen(nextOpen) }}>
+    <Dialog open={open} onOpenChange={(nextOpen) => {
+      if (!isSaving) {
+        setOpen(nextOpen)
+        setSaveFeedback("")
+      }
+    }}>
       <div data-slot={actionSlot} className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
         <DialogTrigger asChild>
           <Button variant="outline" className="mx-auto flex h-12 w-full max-w-lg text-sm" disabled={isSaving}>

@@ -5,7 +5,7 @@ const vm = require("node:vm");
 const { test } = require("node:test");
 
 const root = path.resolve(__dirname, "..");
-const source = ["installmentStatements", "subscriptionStatements", "cardCredits", "cardCycles"]
+const source = ["../subscriptionCharges", "installmentStatements", "subscriptionStatements", "cardCredits", "cardCycles"]
   .map((name) => fs.readFileSync(path.join(root, `src/lib/calculations/${name}.js`), "utf8")
     .replace(/^import[\s\S]*?from\s+["'][^"']+["'];\r?\n/gm, "")
     .replace(/^export /gm, ""))
@@ -153,4 +153,14 @@ test("bonificación se descuenta una sola vez y estado cero concilia", () => {
   assert.equal(result.calculatedAmount, 0);
   assert.equal(result.difference, 0);
   assert.equal(result.includedCredits.length, 1);
+});
+
+test("omitir una suscripción retira solo su período y confirmar en otro mes sustituye la previsión", () => {
+  const skipped = { ...sub, charges: [{ month: "2024-07", status: "SKIPPED", expenseId: null }] };
+  assert.equal(calc(8, { subscriptions: [skipped] }).subscriptionsAmount, 0);
+  assert.equal(calc(9, { subscriptions: [skipped] }).subscriptionsAmount, 100);
+  const confirmed = { ...sub, charges: [{ month: "2024-07", status: "CONFIRMED", expenseId: "confirmed" }] };
+  const expenses = [expense("confirmed", "2024-08-11", 120, { subscriptionId: "sub", paymentMethod: "CARD", subscriptionCharge: { month: "2024-07" } })];
+  assert.equal(calc(8, { subscriptions: [confirmed], expenses }).calculatedAmount, 0);
+  assert.equal(calc(9, { subscriptions: [confirmed], expenses }).calculatedAmount, 220);
 });

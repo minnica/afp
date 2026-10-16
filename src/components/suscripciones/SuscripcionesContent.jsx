@@ -224,7 +224,6 @@ export default function SuscripcionesContent() {
     setIsSaving(true);
 
     let saved = false;
-    const toastOptions = compactEntry ? { position: "top-center" } : undefined;
     try {
       const response = await fetch("/api/subscriptions", {
         method: "POST",
@@ -257,13 +256,13 @@ export default function SuscripcionesContent() {
       setChargeDay("");
 
       await loadSubscriptions(user.id);
-      toast.success("Suscripción guardada exitosamente.", toastOptions);
-      return true;
+      if (!compactEntry) toast.success("Suscripción guardada exitosamente.");
+      return { message: "Suscripción guardada exitosamente.", type: "success" };
     } catch (err) {
       if (saved) {
         setError("El registro se guardó, pero no se pudo actualizar la lista. Recarga para verlo.");
-        toast.success("Suscripción guardada exitosamente.", toastOptions);
-        return true;
+        if (!compactEntry) toast.success("El registro se guardó; recarga la lista para verlo.");
+        return { message: "El registro se guardó; recarga la lista para verlo.", type: "success" };
       }
       setCreateError({ message: err.message || "No se pudo guardar la suscripción." });
       return false;
@@ -933,6 +932,7 @@ export default function SuscripcionesContent() {
 
           <div className={`grid min-w-0 gap-5 ${compactEntry ? "" : "xl:grid-cols-[420px_1fr]"}`}>
             <CreateRecordSurface
+              showSaveFeedback
               compact={compactEntry}
               title="Nueva suscripción"
               saveLabel="Guardar suscripción"

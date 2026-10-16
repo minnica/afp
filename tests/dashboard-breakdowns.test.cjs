@@ -9,7 +9,7 @@ const read = (file) => fs.readFileSync(path.join(root, file), "utf8")
   .replace(/^export /gm, "");
 function context(route = "dashboard", globals = {}) {
   const ctx = vm.createContext({ URL, console, ...globals });
-  const helpers = ["installmentStatements", "subscriptionStatements", "cardCredits", "cardCycles", "cycleDataQuality", "cardUsageWaivers"]
+  const helpers = ["../subscriptionCharges", "installmentStatements", "subscriptionStatements", "cardCredits", "cardCycles", "cycleDataQuality", "cardUsageWaivers"]
     .map((name) => read(`src/lib/calculations/${name}.js`)).join("\n");
   vm.runInContext(helpers + "\n" + read(`src/app/api/${route}/route.js`), ctx);
   return ctx;
@@ -140,4 +140,13 @@ test("API separa consumo vigente e historial sin cambiar los cortes financieros"
   assert.equal(response.cardUsageWaiversByMonth[9][0].selectedCycle.id, "cycle-10");
   assert.equal(response.cycles.length, 2);
   assert.equal(JSON.stringify(storedCycles), before);
+});
+
+test("omitir o confirmar por período retira la previsión y el aviso de efectivo", () => {
+  for (const decision of [{ status: "SKIPPED", expenseId: null }, { status: "CONFIRMED", expenseId: "e" }]) {
+    const sub = { ...subscription, charges: [{ ...decision, month: "2024-07" }] };
+    assert.equal(ctx.getMonthlySubscriptions([sub], [], [], 2024, 7).length, 0);
+    assert.equal(ctx.getMonthlySubscriptions([sub], [], [], 2024, 8).length, 1);
+    assert.equal(ctx.buildCashSubscriptionNotices([sub], new Date("2024-07-21T12:00:00Z")).length, 0);
+  }
 });

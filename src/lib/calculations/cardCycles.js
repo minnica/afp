@@ -1,5 +1,6 @@
 import { getCycleCreditAmounts } from "./cardCredits";
 import { getSubscriptionStatementAmount } from "./subscriptionStatements";
+import { isSubscriptionChargeResolved } from "../subscriptionCharges";
 import {
   getInstallmentStatementForCycle,
   getStatementCycleNumber,
@@ -76,6 +77,7 @@ export function getSubscriptionChargeDatesInsideCycle(subscription, cycle) {
   for (let index = firstIndex; index <= lastIndex; index += 1) {
     if (index < subscriptionStart || (index - subscriptionStart) % frequency !== 0) continue;
     const date = cycleChargeDate(Math.floor(index / 12), index % 12, subscription.chargeDay);
+    if (isSubscriptionChargeResolved(subscription, cycleDay(date).slice(0, 7))) continue;
     if (!cycleInRange(date, cycle.startDate, cycle.cutDate)) continue;
     if (!subscription.isActive && (!cycleDay(subscription.deactivatedAt)
       || cycleDay(date) > cycleDay(subscription.deactivatedAt))) continue;
@@ -116,7 +118,7 @@ export function calculateCycleAmount({
   // fecha efectiva de contabilización lo sitúa al otro lado del corte.
   const recordedSubscriptionMonths = new Set(cardExpenses
     .filter((expense) => expense.subscriptionId && cycleDay(expense.date))
-    .map((expense) => `${expense.subscriptionId}:${cycleDay(expense.date).slice(0, 7)}`));
+    .map((expense) => `${expense.subscriptionId}:${expense.subscriptionCharge?.month || cycleDay(expense.date).slice(0, 7)}`));
   const includedSubscriptions = cardSubscriptions.flatMap((subscription) =>
     getSubscriptionChargeDatesInsideCycle(subscription, cycle)
       .filter((date) => !recordedSubscriptionMonths.has(`${subscription.id}:${cycleDay(date).slice(0, 7)}`))

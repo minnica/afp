@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { buildCardUsageWaivers, buildCurrentCardUsageWaivers, buildCardUsageWaiverHistory } from "@/lib/calculations/cardUsageWaivers";
 import { cycleCreditSelect } from "@/lib/calculations/cardCredits";
 import { getSubscriptionStatementAmount } from "@/lib/calculations/subscriptionStatements";
+import { isSubscriptionChargeResolved } from "@/lib/subscriptionCharges";
 import { getCyclePeriodWarnings } from "@/lib/calculations/cycleDataQuality";
 import {
   calculateCycleAmount,
@@ -45,6 +46,7 @@ const dashboardCycleSelect = {
 };
 
 const dashboardExpenseSelect = {
+  subscriptionCharge: { select: { month: true } },
   notes: true,
   paymentMethod: true,
   subscriptionId: true,
@@ -62,6 +64,7 @@ const dashboardExpenseSelect = {
 };
 
 const dashboardSubscriptionSelect = {
+  charges: { select: { month: true, status: true, expenseId: true } },
   id: true,
   name: true,
   amount: true,
@@ -83,6 +86,7 @@ const dashboardSubscriptionSelect = {
     select: {
       id: true,
       date: true,
+      subscriptionCharge: { select: { month: true } },
     },
   },
 };
@@ -162,6 +166,7 @@ function shouldIncludeSubscriptionInMonth(subscription, year, month) {
 }
 
 function isSubscriptionChargeableInMonth(subscription, year, month) {
+  if (isSubscriptionChargeResolved(subscription, `${year}-${String(month).padStart(2, "0")}`)) return false;
   if (!shouldIncludeSubscriptionInMonth(subscription, year, month)) return false;
   if (subscription.isActive) return true;
   if (!subscription.deactivatedAt) return false;
@@ -299,6 +304,7 @@ function buildCashSubscriptionNotices(subscriptions, now) {
   for (const subscription of subscriptions) {
     if (subscription.paymentMethod !== "CASH") continue;
     if (!subscription.isActive) continue;
+    if (isSubscriptionChargeResolved(subscription, `${currentYear}-${String(currentMonth).padStart(2, "0")}`)) continue;
 
     if (
       !shouldIncludeSubscriptionInMonth(subscription, currentYear, currentMonth)
@@ -366,6 +372,7 @@ function hasExpenseForSubscriptionFromDate(subscription, chargeDate, now) {
   const endStr = toUtcDateStr(now);
 
   return (subscription.dailyExpenses || []).some((expense) => {
+    if (expense.subscriptionCharge) return expense.subscriptionCharge.month === monthStartStr.slice(0, 7);
     const expenseStr = toUtcDateStr(expense.date);
     return expenseStr >= monthStartStr && expenseStr <= endStr;
   });
@@ -452,7 +459,8 @@ function shouldIncludePurchaseInMonth(purchase, targetYear, targetMonth) {
 function getMonthlySubscriptions(subscriptions, expenses, cycles, year, month) {
   const monthKey = `${year}-${String(month).padStart(2, "0")}`;
   const recordedIds = new Set(expenses
-    .filter((expense) => expense.subscriptionId && new Date(expense.date).toISOString().startsWith(monthKey))
+    .filter((expense) => expense.subscriptionId && (expense.subscriptionCharge
+      ? expense.subscriptionCharge.month === monthKey : new Date(expense.date).toISOString().startsWith(monthKey)))
     .map((expense) => expense.subscriptionId));
   return subscriptions
     .filter((subscription) => isSubscriptionChargeableInMonth(subscription, year, month) && !recordedIds.has(subscription.id))

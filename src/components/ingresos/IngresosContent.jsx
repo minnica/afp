@@ -211,7 +211,6 @@ export default function IngresosContent() {
     setIsSaving(true);
 
     let saved = false;
-    const toastOptions = compactEntry ? { position: "top-center" } : undefined;
     try {
       const response = await fetch("/api/incomes", {
         method: "POST",
@@ -245,13 +244,13 @@ export default function IngresosContent() {
       setNotes("");
 
       await Promise.all([loadIncomes(user.id), loadReceivables(user.id)]);
-      toast.success("Ingreso guardado exitosamente.", toastOptions);
-      return true;
+      if (!compactEntry) toast.success("Ingreso guardado exitosamente.");
+      return { message: "Ingreso guardado exitosamente.", type: "success" };
     } catch (err) {
       if (saved) {
         setError("El registro se guardó, pero no se pudo actualizar la lista. Recarga para verlo.");
-        toast.success("Ingreso guardado exitosamente.", toastOptions);
-        return true;
+        if (!compactEntry) toast.success("El registro se guardó; recarga la lista para verlo.");
+        return { message: "El registro se guardó; recarga la lista para verlo.", type: "success" };
       }
       setCreateError({ message: err.message || "No se pudo guardar el ingreso." });
       return false;
@@ -539,6 +538,7 @@ export default function IngresosContent() {
 
         <div className={`grid min-w-0 gap-5 ${compactEntry ? "" : "xl:grid-cols-[360px_1fr]"}`}>
           <CreateRecordSurface
+              showSaveFeedback
               compact={compactEntry}
               title="Nuevo ingreso"
               saveLabel="Guardar ingreso"

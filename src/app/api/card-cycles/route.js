@@ -36,6 +36,7 @@ const cycleSelect = {
 };
 
 const cycleExpenseSelect = {
+  subscriptionCharge: { select: { month: true } },
   subscriptionId: true,
   paymentMethod: true,
   id: true,
@@ -51,6 +52,7 @@ const cycleExpenseSelect = {
 };
 
 const cycleSubscriptionSelect = {
+  charges: { select: { month: true, status: true, expenseId: true } },
   id: true,
   paymentMethod: true,
   cardId: true,

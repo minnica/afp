@@ -5,7 +5,7 @@ const vm = require('node:vm');
 const { test } = require('node:test');
 const root = path.resolve(__dirname, '..');
 const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
-const helpers = ['installmentStatements', 'cardCredits', 'subscriptionStatements', 'cardCycles']
+const helpers = ['../subscriptionCharges', 'installmentStatements', 'cardCredits', 'subscriptionStatements', 'cardCycles']
   .map(name => read(`src/lib/calculations/${name}.js`).replace(/^import[\s\S]*?from\s+["'][^"']+["'];\r?\n/gm, '').replace(/^export /gm, '')).join('\n');
 const contexts = ['card-cycles', 'dashboard'].map(route => {
   const ctx = vm.createContext({});

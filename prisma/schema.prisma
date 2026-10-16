@@ -11,6 +11,11 @@ enum PaymentMethod {
   CARD
 }
 
+enum SubscriptionChargeStatus {
+  CONFIRMED
+  SKIPPED
+}
+
 enum CardCycleStatus {
   OPEN
   CUT
@@ -64,6 +69,7 @@ model User {
   dailyExpenses        DailyExpense[]
   installmentPurchases InstallmentPurchase[]
   subscriptions        Subscription[]
+  subscriptionCharges  SubscriptionCharge[]
   incomes              Income[]
   receivableAccounts   ReceivableAccount[]
   payableAccounts      PayableAccount[]
@@ -224,6 +230,7 @@ model DailyExpense {
   receivableAccount ReceivableAccount? @relation(fields: [receivableAccountId], references: [id], onDelete: SetNull)
   payableAccount    PayableAccount?    @relation(fields: [payableAccountId], references: [id], onDelete: SetNull)
   subscription      Subscription?      @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+  subscriptionCharge SubscriptionCharge?
 
   @@index([userId, date])
   @@index([cardId])
@@ -284,11 +291,31 @@ model Subscription {
   card          Card?          @relation(fields: [cardId], references: [id], onDelete: SetNull)
   category      Category       @relation(fields: [categoryId], references: [id])
   dailyExpenses DailyExpense[]
+  charges       SubscriptionCharge[]
 
   @@index([userId])
   @@index([cardId])
   @@index([categoryId])
   @@map("subscriptions")
+}
+
+model SubscriptionCharge {
+  id             String                   @id @default(uuid())
+  userId         String
+  subscriptionId String
+  month          String
+  status         SubscriptionChargeStatus
+  expenseId      String?                  @unique
+  createdAt      DateTime                 @default(now())
+  updatedAt      DateTime                 @updatedAt
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscription Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  expense      DailyExpense? @relation(fields: [expenseId], references: [id], onDelete: SetNull)
+
+  @@unique([subscriptionId, month])
+  @@index([userId, month])
+  @@map("subscription_charges")
 }
 
 model ReceivableAccount {

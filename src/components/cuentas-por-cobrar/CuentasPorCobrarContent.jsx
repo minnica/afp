@@ -221,7 +221,6 @@ export default function CuentasPorCobrarContent() {
     setIsSaving(true);
 
     let saved = false;
-    const toastOptions = compactEntry ? { position: "top-center" } : undefined;
     try {
       const response = await fetch("/api/receivables", {
         method: "POST",
@@ -254,13 +253,13 @@ export default function CuentasPorCobrarContent() {
       setNotes("");
 
       await loadReceivables(user.id);
-      toast.success("Cuenta por cobrar guardada exitosamente.", toastOptions);
-      return true;
+      if (!compactEntry) toast.success("Cuenta por cobrar guardada exitosamente.");
+      return { message: "Cuenta por cobrar guardada exitosamente.", type: "success" };
     } catch (err) {
       if (saved) {
         setError("El registro se guardó, pero no se pudo actualizar la lista. Recarga para verlo.");
-        toast.success("Cuenta por cobrar guardada exitosamente.", toastOptions);
-        return true;
+        if (!compactEntry) toast.success("El registro se guardó; recarga la lista para verlo.");
+        return { message: "El registro se guardó; recarga la lista para verlo.", type: "success" };
       }
       setCreateError({ message: err.message || "No se pudo crear la cuenta por cobrar." });
       return false;
@@ -635,6 +634,7 @@ export default function CuentasPorCobrarContent() {
 
         <div className={`grid min-w-0 gap-5 ${compactEntry ? "" : "xl:grid-cols-[360px_1fr]"}`}>
           <CreateRecordSurface
+              showSaveFeedback
               compact={compactEntry}
               title="Nueva cuenta por cobrar"
               saveLabel="Guardar cuenta"
