@@ -11,6 +11,7 @@ function fixture() {
     const result = tail.then(async () => {
       const draft = structuredClone(state);
       const tx = {
+        $queryRaw: async () => [{ locked: 1 }],
         expenseOperation: {
           createMany: async ({ data }) => { if (!draft.operations.some(row => row.userId === data.userId && row.operationId === data.operationId)) draft.operations.push(data); },
           findUnique: async ({ where }) => draft.operations.find(row => row.userId === where.userId_operationId.userId && row.operationId === where.userId_operationId.operationId),

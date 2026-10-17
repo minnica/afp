@@ -1,4 +1,5 @@
 import { apiResponse as NextResponse, requireApiUser, apiAccessErrorResponse, requireOwnedReferences, ApiAccessError } from "@/lib/apiAuth";
+import { lockDebtAccounts, runDebtAccountOperation, refreshDebtAccount } from "@/lib/debtAccountService";
 import { prisma } from "@/lib/prisma";
 import { applySubscriptionCharge, SubscriptionChargeError } from "@/lib/subscriptionChargeService";
 
@@ -57,42 +58,6 @@ const expenseSelect = {
     },
   },
 };
-
-async function updatePayableStatusIfNeeded(payableAccountId, userId, db = prisma) {
-  if (!payableAccountId) return;
-
-  const [payable, paid] = await Promise.all([
-    db.payableAccount.findUnique({
-      where: { id: payableAccountId, userId },
-      select: {
-        originalAmount: true,
-        status: true,
-      },
-    }),
-    db.dailyExpense.aggregate({
-      where: { payableAccountId, userId },
-      _sum: {
-        amount: true,
-      },
-    }),
-  ]);
-
-  if (!payable) return;
-
-  const paidAmount = Number(paid._sum.amount || 0);
-  const pendingBalance = Number(payable.originalAmount || 0) - paidAmount;
-
-  const nextStatus = pendingBalance <= 0 ? "PAID_OFF" : "ACTIVE";
-
-  if (payable.status !== nextStatus) {
-    await db.payableAccount.update({
-      where: { id: payableAccountId, userId },
-      data: {
-        status: nextStatus,
-      },
-    });
-  }
-}
 
 function parseDateInput(dateValue) {
   if (!dateValue) return null;
@@ -223,6 +188,7 @@ export async function POST(request) {
     const userId = user.id;
     const body = await request.json();
     const result = await runExpenseOperation(prisma, userId, body, async tx => {
+      await lockDebtAccounts(tx, userId);
       await requireOwnedReferences(tx, userId, body, ["cardId", "categoryId", "personId", "receivableAccountId", "payableAccountId", "subscriptionId"]);
 
       const {
@@ -282,7 +248,7 @@ export async function POST(request) {
             receivableAccountId: finalReceivableAccountId, payableAccountId: payableAccountId || null },
         });
         const expense = await tx.dailyExpense.findUnique({ where: { id: result.expenseId, userId }, select: expenseSelect });
-        if (payableAccountId) await updatePayableStatusIfNeeded(payableAccountId, userId, tx);
+        if (payableAccountId) await refreshDebtAccount(tx, userId, "payable", payableAccountId);
         return { expense, alreadyConfirmed: result.alreadyConfirmed };
       }
 
@@ -321,7 +287,7 @@ export async function POST(request) {
       });
 
       if (payableAccountId) {
-        await updatePayableStatusIfNeeded(payableAccountId, userId, tx);
+        await refreshDebtAccount(tx, userId, "payable", payableAccountId);
       }
 
       return { expense };
@@ -344,35 +310,37 @@ export async function DELETE(request) {
   try {
     const user = await requireApiUser(request);
     const userId = user.id;
-    const { searchParams } = new URL(request.url);
-    const id = searchParams.get("id");
+    return await runDebtAccountOperation(prisma, userId, async tx => {
+      const { searchParams } = new URL(request.url);
+      const id = searchParams.get("id");
 
-    if (!id) {
-      return NextResponse.json({ error: "Falta id." }, { status: 400 });
-    }
+      if (!id) {
+        return NextResponse.json({ error: "Falta id." }, { status: 400 });
+      }
 
-    const existingExpense = await prisma.dailyExpense.findUnique({
-      where: { id, userId },
+      const existingExpense = await tx.dailyExpense.findUnique({
+        where: { id, userId },
+      });
+
+      if (!existingExpense) {
+        return NextResponse.json(
+          { error: "Gasto no encontrado." },
+          { status: 404 },
+        );
+      }
+
+      const previousPayableAccountId = existingExpense.payableAccountId;
+
+      await tx.dailyExpense.delete({
+        where: { id, userId },
+      });
+
+      if (previousPayableAccountId) {
+        await refreshDebtAccount(tx, userId, "payable", previousPayableAccountId);
+      }
+
+      return NextResponse.json({ ok: true });
     });
-
-    if (!existingExpense) {
-      return NextResponse.json(
-        { error: "Gasto no encontrado." },
-        { status: 404 },
-      );
-    }
-
-    const previousPayableAccountId = existingExpense.payableAccountId;
-
-    await prisma.dailyExpense.delete({
-      where: { id, userId },
-    });
-
-    if (previousPayableAccountId) {
-      await updatePayableStatusIfNeeded(previousPayableAccountId, userId);
-    }
-
-    return NextResponse.json({ ok: true });
   } catch (error) {
     const accessResponse = apiAccessErrorResponse(error);
     if (accessResponse) return accessResponse;
@@ -444,7 +412,7 @@ export async function PATCH(request) {
       return NextResponse.json({ error: "Fecha no válida." }, { status: 400 });
     }
 
-    const expense = await prisma.$transaction(async tx => {
+    const expense = await runDebtAccountOperation(prisma, userId, async tx => {
       const existing = await tx.dailyExpense.findUnique({ where: { id, userId } });
       if (!existing) throw new SubscriptionChargeError("Gasto no encontrado.", 404);
       for (const linkedId of [...new Set([existing.subscriptionId, subscriptionId].filter(Boolean))].sort()) {
@@ -465,7 +433,7 @@ export async function PATCH(request) {
           throw new SubscriptionChargeError("Ya existe un gasto para esta suscripción y mes.", 409);
         }
       }
-      return tx.dailyExpense.update({
+      const updated = await tx.dailyExpense.update({
         where: { id, userId },
         data: {
           date: parsedDate, paymentMethod, cardId: paymentMethod === "CARD" ? cardId : null,
@@ -474,6 +442,8 @@ export async function PATCH(request) {
         },
         select: expenseSelect,
       });
+      await refreshDebtAccount(tx, userId, "payable", existing.payableAccountId);
+      return updated;
     });
 
     return NextResponse.json({ expense });

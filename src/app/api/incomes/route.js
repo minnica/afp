@@ -1,4 +1,5 @@
 import { apiResponse as NextResponse, requireApiUser, apiAccessErrorResponse, requireOwnedReferences } from "@/lib/apiAuth";
+import { runDebtAccountOperation, refreshDebtAccount } from "@/lib/debtAccountService";
 import { prisma } from "@/lib/prisma";
 
 const incomeSelect = {
@@ -38,49 +39,6 @@ function parseDateInput(dateValue) {
   return new Date(`${dateValue}T12:00:00.000Z`);
 }
 
-async function updateReceivableStatusIfNeeded(receivableAccountId, userId) {
-  if (!receivableAccountId) return;
-
-  const [receivable, paid] = await Promise.all([
-    prisma.receivableAccount.findUnique({
-      where: { id: receivableAccountId, userId },
-      select: {
-        originalAmount: true,
-        status: true,
-      },
-    }),
-    prisma.income.aggregate({
-      where: { receivableAccountId, userId },
-      _sum: {
-        amount: true,
-      },
-    }),
-  ]);
-
-  if (!receivable) return;
-
-  const paidAmount = Number(paid._sum.amount || 0);
-  const pendingBalance = Number(receivable.originalAmount || 0) - paidAmount;
-
-  if (pendingBalance <= 0 && receivable.status !== "PAID_OFF") {
-    await prisma.receivableAccount.update({
-      where: { id: receivableAccountId, userId },
-      data: {
-        status: "PAID_OFF",
-      },
-    });
-  }
-
-  if (pendingBalance > 0 && receivable.status === "PAID_OFF") {
-    await prisma.receivableAccount.update({
-      where: { id: receivableAccountId, userId },
-      data: {
-        status: "ACTIVE",
-      },
-    });
-  }
-}
-
 export async function GET(request) {
   try {
     const user = await requireApiUser(request);
@@ -115,59 +73,61 @@ export async function POST(request) {
     const user = await requireApiUser(request);
     const userId = user.id;
     const body = await request.json();
-    await requireOwnedReferences(prisma, userId, body, ["incomeTypeId", "receivableAccountId"]);
+    return await runDebtAccountOperation(prisma, userId, async tx => {
+      await requireOwnedReferences(tx, userId, body, ["incomeTypeId", "receivableAccountId"]);
 
-    const {
-      date,
-      incomeTypeId,
-      source,
-      concept,
-      amount,
-      receivableAccountId,
-      notes,
-    } = body;
-
-    if (!userId || !date || !incomeTypeId || !source || !concept || !amount) {
-      return NextResponse.json(
-        { error: "Faltan datos obligatorios." },
-        { status: 400 },
-      );
-    }
-
-    const numericAmount = Number(amount);
-
-    if (!Number.isFinite(numericAmount) || numericAmount <= 0) {
-      return NextResponse.json(
-        { error: "El monto debe ser mayor a 0." },
-        { status: 400 },
-      );
-    }
-
-    const parsedDate = parseDateInput(date);
-
-    if (!parsedDate || Number.isNaN(parsedDate.getTime())) {
-      return NextResponse.json({ error: "Fecha no válida." }, { status: 400 });
-    }
-
-    const income = await prisma.income.create({
-      data: {
-        userId,
-        date: parsedDate,
+      const {
+        date,
         incomeTypeId,
-        source: source.trim(),
-        concept: concept.trim(),
-        amount: numericAmount,
-        receivableAccountId: receivableAccountId || null,
-        notes: notes?.trim() || null,
-      },
-      select: incomeSelect,
+        source,
+        concept,
+        amount,
+        receivableAccountId,
+        notes,
+      } = body;
+
+      if (!userId || !date || !incomeTypeId || !source || !concept || !amount) {
+        return NextResponse.json(
+          { error: "Faltan datos obligatorios." },
+          { status: 400 },
+        );
+      }
+
+      const numericAmount = Number(amount);
+
+      if (!Number.isFinite(numericAmount) || numericAmount <= 0) {
+        return NextResponse.json(
+          { error: "El monto debe ser mayor a 0." },
+          { status: 400 },
+        );
+      }
+
+      const parsedDate = parseDateInput(date);
+
+      if (!parsedDate || Number.isNaN(parsedDate.getTime())) {
+        return NextResponse.json({ error: "Fecha no válida." }, { status: 400 });
+      }
+
+      const income = await tx.income.create({
+        data: {
+          userId,
+          date: parsedDate,
+          incomeTypeId,
+          source: source.trim(),
+          concept: concept.trim(),
+          amount: numericAmount,
+          receivableAccountId: receivableAccountId || null,
+          notes: notes?.trim() || null,
+        },
+        select: incomeSelect,
+      });
+
+      if (receivableAccountId) {
+        await refreshDebtAccount(tx, userId, "receivable", receivableAccountId);
+      }
+
+      return NextResponse.json({ income });
     });
-
-    if (receivableAccountId) {
-      await updateReceivableStatusIfNeeded(receivableAccountId, userId);
-    }
-
-    return NextResponse.json({ income });
   } catch (error) {
     const accessResponse = apiAccessErrorResponse(error);
     if (accessResponse) return accessResponse;
@@ -184,43 +144,45 @@ export async function DELETE(request) {
   try {
     const user = await requireApiUser(request);
     const userId = user.id;
-    const { searchParams } = new URL(request.url);
-    const id = searchParams.get("id");
+    return await runDebtAccountOperation(prisma, userId, async tx => {
+      const { searchParams } = new URL(request.url);
+      const id = searchParams.get("id");
 
-    if (!id) {
-      return NextResponse.json({ error: "Falta id." }, { status: 400 });
-    }
+      if (!id) {
+        return NextResponse.json({ error: "Falta id." }, { status: 400 });
+      }
 
-    const income = await prisma.income.findUnique({
-      where: { id, userId },
-      include: { _count: { select: { cardCycleCredits: true } } },
+      const income = await tx.income.findUnique({
+        where: { id, userId },
+        include: { _count: { select: { cardCycleCredits: true } } },
+      });
+
+      if (!income) {
+        return NextResponse.json(
+          { error: "Ingreso no encontrado." },
+          { status: 404 },
+        );
+      }
+
+      const receivableAccountId = income.receivableAccountId;
+
+      if (income._count.cardCycleCredits > 0) {
+        return NextResponse.json(
+          { error: "Este ingreso tiene bonificaciones aplicadas a una tarjeta. Revisa esas aplicaciones antes de eliminarlo." },
+          { status: 409 },
+        );
+      }
+
+      await tx.income.delete({
+        where: { id, userId },
+      });
+
+      if (receivableAccountId) {
+        await refreshDebtAccount(tx, userId, "receivable", receivableAccountId);
+      }
+
+      return NextResponse.json({ ok: true });
     });
-
-    if (!income) {
-      return NextResponse.json(
-        { error: "Ingreso no encontrado." },
-        { status: 404 },
-      );
-    }
-
-    const receivableAccountId = income.receivableAccountId;
-
-    if (income._count.cardCycleCredits > 0) {
-      return NextResponse.json(
-        { error: "Este ingreso tiene bonificaciones aplicadas a una tarjeta. Revisa esas aplicaciones antes de eliminarlo." },
-        { status: 409 },
-      );
-    }
-
-    await prisma.income.delete({
-      where: { id, userId },
-    });
-
-    if (receivableAccountId) {
-      await updateReceivableStatusIfNeeded(receivableAccountId, userId);
-    }
-
-    return NextResponse.json({ ok: true });
   } catch (error) {
     const accessResponse = apiAccessErrorResponse(error);
     if (accessResponse) return accessResponse;
@@ -238,104 +200,92 @@ export async function PATCH(request) {
     const user = await requireApiUser(request);
     const userId = user.id;
     const body = await request.json();
-    await requireOwnedReferences(prisma, userId, body, ["incomeTypeId", "receivableAccountId"]);
+    return await runDebtAccountOperation(prisma, userId, async tx => {
+      await requireOwnedReferences(tx, userId, body, ["incomeTypeId", "receivableAccountId"]);
 
-    const {
-      id,
-      date,
-      incomeTypeId,
-      source,
-      concept,
-      amount,
-      receivableAccountId,
-      notes,
-    } = body;
-
-    if (!id) {
-      return NextResponse.json({ error: "Falta id." }, { status: 400 });
-    }
-
-    if (!date || !incomeTypeId || !source || !concept || !amount) {
-      return NextResponse.json(
-        { error: "Faltan datos obligatorios." },
-        { status: 400 },
-      );
-    }
-
-    const existingIncome = await prisma.income.findUnique({
-      where: { id, userId },
-    });
-
-    if (!existingIncome) {
-      return NextResponse.json(
-        { error: "Ingreso no encontrado." },
-        { status: 404 },
-      );
-    }
-
-    const previousReceivableAccountId = existingIncome.receivableAccountId;
-
-    const numericAmount = Number(amount);
-
-    if (!Number.isFinite(numericAmount) || numericAmount <= 0) {
-      return NextResponse.json(
-        { error: "El monto debe ser mayor a 0." },
-        { status: 400 },
-      );
-    }
-
-    const parsedDate = parseDateInput(date);
-
-    if (!parsedDate || Number.isNaN(parsedDate.getTime())) {
-      return NextResponse.json({ error: "Fecha no válida." }, { status: 400 });
-    }
-
-    const nextReceivableAccountId = receivableAccountId || null;
-
-    const appliedCredits = await prisma.cardCycleCredit.aggregate({
-      where: { incomeId: id, userId },
-      _sum: { amount: true },
-    });
-    if (numericAmount < Number(appliedCredits._sum.amount || 0)) {
-      return NextResponse.json(
-        { error: "El importe no puede ser menor que las bonificaciones ya aplicadas a tarjetas." },
-        { status: 409 },
-      );
-    }
-
-    const income = await prisma.income.update({
-      where: { id, userId },
-      data: {
-        date: parsedDate,
+      const {
+        id,
+        date,
         incomeTypeId,
-        source: source.trim(),
-        concept: concept.trim(),
-        amount: numericAmount,
-        receivableAccountId: nextReceivableAccountId,
-        notes: notes?.trim() || null,
-      },
-      select: incomeSelect,
+        source,
+        concept,
+        amount,
+        receivableAccountId,
+        notes,
+      } = body;
+
+      if (!id) {
+        return NextResponse.json({ error: "Falta id." }, { status: 400 });
+      }
+
+      if (!date || !incomeTypeId || !source || !concept || !amount) {
+        return NextResponse.json(
+          { error: "Faltan datos obligatorios." },
+          { status: 400 },
+        );
+      }
+
+      const existingIncome = await tx.income.findUnique({
+        where: { id, userId },
+      });
+
+      if (!existingIncome) {
+        return NextResponse.json(
+          { error: "Ingreso no encontrado." },
+          { status: 404 },
+        );
+      }
+
+      const previousReceivableAccountId = existingIncome.receivableAccountId;
+
+      const numericAmount = Number(amount);
+
+      if (!Number.isFinite(numericAmount) || numericAmount <= 0) {
+        return NextResponse.json(
+          { error: "El monto debe ser mayor a 0." },
+          { status: 400 },
+        );
+      }
+
+      const parsedDate = parseDateInput(date);
+
+      if (!parsedDate || Number.isNaN(parsedDate.getTime())) {
+        return NextResponse.json({ error: "Fecha no válida." }, { status: 400 });
+      }
+
+      const nextReceivableAccountId = receivableAccountId || null;
+
+      const appliedCredits = await tx.cardCycleCredit.aggregate({
+        where: { incomeId: id, userId },
+        _sum: { amount: true },
+      });
+      if (numericAmount < Number(appliedCredits._sum.amount || 0)) {
+        return NextResponse.json(
+          { error: "El importe no puede ser menor que las bonificaciones ya aplicadas a tarjetas." },
+          { status: 409 },
+        );
+      }
+
+      const income = await tx.income.update({
+        where: { id, userId },
+        data: {
+          date: parsedDate,
+          incomeTypeId,
+          source: source.trim(),
+          concept: concept.trim(),
+          amount: numericAmount,
+          receivableAccountId: nextReceivableAccountId,
+          notes: notes?.trim() || null,
+        },
+        select: incomeSelect,
+      });
+
+      for (const accountId of new Set([previousReceivableAccountId, nextReceivableAccountId].filter(Boolean))) {
+        await refreshDebtAccount(tx, userId, "receivable", accountId);
+      }
+
+      return NextResponse.json({ income });
     });
-
-    if (previousReceivableAccountId) {
-      await updateReceivableStatusIfNeeded(previousReceivableAccountId, userId);
-    }
-
-    if (
-      nextReceivableAccountId &&
-      nextReceivableAccountId !== previousReceivableAccountId
-    ) {
-      await updateReceivableStatusIfNeeded(nextReceivableAccountId, userId);
-    }
-
-    if (
-      nextReceivableAccountId &&
-      nextReceivableAccountId === previousReceivableAccountId
-    ) {
-      await updateReceivableStatusIfNeeded(nextReceivableAccountId, userId);
-    }
-
-    return NextResponse.json({ income });
   } catch (error) {
     const accessResponse = apiAccessErrorResponse(error);
     if (accessResponse) return accessResponse;

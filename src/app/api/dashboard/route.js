@@ -1,3 +1,4 @@
+import { getDebtAccountState } from "@/lib/calculations/debtAccounts";
 import { getCyclePaymentState } from "@/lib/calculations/cardCyclePayments";
 import { apiResponse as NextResponse, requireApiUser, apiAccessErrorResponse } from "@/lib/apiAuth";
 import { prisma } from "@/lib/prisma";
@@ -176,16 +177,7 @@ function isSubscriptionChargeableInMonth(subscription, year, month) {
 }
 
 function getReceivableAmounts(receivable) {
-  const paidAmount = receivable.incomes.reduce((sum, income) => {
-    return sum + Number(income.amount || 0);
-  }, 0);
-
-  const pendingBalance = Number(receivable.originalAmount || 0) - paidAmount;
-
-  return {
-    paidAmount,
-    pendingBalance,
-  };
+  return getDebtAccountState(receivable, receivable.incomes);
 }
 
 function startOfLocalDay(date) {

@@ -1,3 +1,4 @@
+import { getDebtAccountState } from "@/lib/calculations/debtAccounts";
 import { apiResponse as NextResponse, requireApiUser, apiAccessErrorResponse } from "@/lib/apiAuth";
 import { prisma } from "@/lib/prisma";
 
@@ -175,31 +176,11 @@ function getAvailableMonths(expenseDates) {
 }
 
 function formatReceivable(item) {
-  const paidAmount = item.incomes.reduce((sum, income) => {
-    return sum + Number(income.amount || 0);
-  }, 0);
-
-  const pendingBalance = Number(item.originalAmount || 0) - paidAmount;
-
-  return {
-    ...item,
-    paidAmount,
-    pendingBalance,
-  };
+  return { ...item, ...getDebtAccountState(item, item.incomes) };
 }
 
 function formatPayable(item) {
-  const paidAmount = item.dailyExpenses.reduce((sum, expense) => {
-    return sum + Number(expense.amount || 0);
-  }, 0);
-
-  const pendingBalance = Number(item.originalAmount || 0) - paidAmount;
-
-  return {
-    ...item,
-    paidAmount,
-    pendingBalance,
-  };
+  return { ...item, ...getDebtAccountState(item, item.dailyExpenses) };
 }
 
 export async function GET(request) {

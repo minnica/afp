@@ -1,4 +1,6 @@
 import { apiResponse as NextResponse, requireApiUser, apiAccessErrorResponse, requireOwnedReferences } from "@/lib/apiAuth";
+import { runDebtAccountOperation, refreshDebtAccount } from "@/lib/debtAccountService";
+import { getDebtAccountState } from "@/lib/calculations/debtAccounts";
 import { prisma } from "@/lib/prisma";
 
 const payableSelect = {
@@ -38,17 +40,7 @@ function parseDateInput(dateValue) {
 }
 
 function formatPayable(item) {
-  const paidAmount = item.dailyExpenses.reduce((sum, expense) => {
-    return sum + Number(expense.amount || 0);
-  }, 0);
-
-  const pendingBalance = Number(item.originalAmount || 0) - paidAmount;
-
-  return {
-    ...item,
-    paidAmount,
-    pendingBalance,
-  };
+  return { ...item, ...getDebtAccountState(item, item.dailyExpenses) };
 }
 
 export async function GET(request) {
@@ -191,93 +183,96 @@ export async function PATCH(request) {
     const user = await requireApiUser(request);
     const userId = user.id;
     const body = await request.json();
-    await requireOwnedReferences(prisma, userId, body, ["personId"]);
+    return await runDebtAccountOperation(prisma, userId, async tx => {
+      await requireOwnedReferences(tx, userId, body, ["personId"]);
 
-    const {
-      id,
-      personId,
-      concept,
-      originalAmount,
-      originDate,
-      expectedMonthlyPayment,
-      expectedDate,
-      notes,
-    } = body;
+      const {
+        id,
+        personId,
+        concept,
+        originalAmount,
+        originDate,
+        expectedMonthlyPayment,
+        expectedDate,
+        notes,
+      } = body;
 
-    if (!id) {
-      return NextResponse.json({ error: "Falta id." }, { status: 400 });
-    }
+      if (!id) {
+        return NextResponse.json({ error: "Falta id." }, { status: 400 });
+      }
 
-    if (!personId || !concept || !originalAmount || !originDate) {
-      return NextResponse.json(
-        { error: "Faltan datos obligatorios." },
-        { status: 400 },
-      );
-    }
-
-    const numericOriginalAmount = Number(originalAmount);
-
-    if (!Number.isFinite(numericOriginalAmount) || numericOriginalAmount <= 0) {
-      return NextResponse.json(
-        { error: "El monto original debe ser mayor a 0." },
-        { status: 400 },
-      );
-    }
-
-    let numericExpectedMonthlyPayment = null;
-
-    if (expectedMonthlyPayment) {
-      numericExpectedMonthlyPayment = Number(expectedMonthlyPayment);
-
-      if (
-        !Number.isFinite(numericExpectedMonthlyPayment) ||
-        numericExpectedMonthlyPayment <= 0
-      ) {
+      if (!personId || !concept || !originalAmount || !originDate) {
         return NextResponse.json(
-          { error: "El pago mensual esperado debe ser mayor a 0." },
+          { error: "Faltan datos obligatorios." },
           { status: 400 },
         );
       }
-    }
 
-    const parsedOriginDate = parseDateInput(originDate);
-    const parsedExpectedDate = expectedDate
-      ? parseDateInput(expectedDate)
-      : null;
+      const numericOriginalAmount = Number(originalAmount);
 
-    if (!parsedOriginDate || Number.isNaN(parsedOriginDate.getTime())) {
-      return NextResponse.json(
-        { error: "Fecha de origen no válida." },
-        { status: 400 },
-      );
-    }
+      if (!Number.isFinite(numericOriginalAmount) || numericOriginalAmount <= 0) {
+        return NextResponse.json(
+          { error: "El monto original debe ser mayor a 0." },
+          { status: 400 },
+        );
+      }
 
-    if (
-      expectedDate &&
-      (!parsedExpectedDate || Number.isNaN(parsedExpectedDate.getTime()))
-    ) {
-      return NextResponse.json(
-        { error: "Fecha esperada no válida." },
-        { status: 400 },
-      );
-    }
+      let numericExpectedMonthlyPayment = null;
 
-    const payable = await prisma.payableAccount.update({
-      where: { id, userId },
-      data: {
-        personId,
-        concept: concept.trim(),
-        originalAmount: numericOriginalAmount,
-        originDate: parsedOriginDate,
-        expectedMonthlyPayment: numericExpectedMonthlyPayment,
-        expectedDate: parsedExpectedDate,
-        notes: notes?.trim() || null,
-      },
-      select: payableSelect,
-    });
+      if (expectedMonthlyPayment) {
+        numericExpectedMonthlyPayment = Number(expectedMonthlyPayment);
 
-    return NextResponse.json({
-      payable: formatPayable(payable),
+        if (
+          !Number.isFinite(numericExpectedMonthlyPayment) ||
+          numericExpectedMonthlyPayment <= 0
+        ) {
+          return NextResponse.json(
+            { error: "El pago mensual esperado debe ser mayor a 0." },
+            { status: 400 },
+          );
+        }
+      }
+
+      const parsedOriginDate = parseDateInput(originDate);
+      const parsedExpectedDate = expectedDate
+        ? parseDateInput(expectedDate)
+        : null;
+
+      if (!parsedOriginDate || Number.isNaN(parsedOriginDate.getTime())) {
+        return NextResponse.json(
+          { error: "Fecha de origen no válida." },
+          { status: 400 },
+        );
+      }
+
+      if (
+        expectedDate &&
+        (!parsedExpectedDate || Number.isNaN(parsedExpectedDate.getTime()))
+      ) {
+        return NextResponse.json(
+          { error: "Fecha esperada no válida." },
+          { status: 400 },
+        );
+      }
+
+      const payable = await tx.payableAccount.update({
+        where: { id, userId },
+        data: {
+          personId,
+          concept: concept.trim(),
+          originalAmount: numericOriginalAmount,
+          originDate: parsedOriginDate,
+          expectedMonthlyPayment: numericExpectedMonthlyPayment,
+          expectedDate: parsedExpectedDate,
+          notes: notes?.trim() || null,
+        },
+        select: payableSelect,
+      });
+
+      const state = await refreshDebtAccount(tx, userId, "payable", id);
+      return NextResponse.json({
+        payable: formatPayable({ ...payable, ...state }),
+      });
     });
   } catch (error) {
     const accessResponse = apiAccessErrorResponse(error);
@@ -295,18 +290,20 @@ export async function DELETE(request) {
   try {
     const user = await requireApiUser(request);
     const userId = user.id;
-    const { searchParams } = new URL(request.url);
-    const id = searchParams.get("id");
+    return await runDebtAccountOperation(prisma, userId, async tx => {
+      const { searchParams } = new URL(request.url);
+      const id = searchParams.get("id");
 
-    if (!id) {
-      return NextResponse.json({ error: "Falta id." }, { status: 400 });
-    }
+      if (!id) {
+        return NextResponse.json({ error: "Falta id." }, { status: 400 });
+      }
 
-    await prisma.payableAccount.delete({
-      where: { id, userId },
+      await tx.payableAccount.delete({
+        where: { id, userId },
+      });
+
+      return NextResponse.json({ ok: true });
     });
-
-    return NextResponse.json({ ok: true });
   } catch (error) {
     const accessResponse = apiAccessErrorResponse(error);
     if (accessResponse) return accessResponse;

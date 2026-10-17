@@ -161,6 +161,9 @@ test("un ingreso aplicado no se borra ni se reduce por debajo de sus aplicacione
       cardCycleCredit: { aggregate: async () => ({ _sum: { amount: "1472.57" } }) },
     },
   });
+  ctx.prisma.$transaction = async run => run(ctx.prisma);
+  ctx.prisma.$queryRaw = async () => [{ locked: 1 }];
+  Object.assign(ctx, require('./helpers/load-source.cjs').sourceLoader()('src/lib/debtAccountService.js'));
   vm.runInContext(source, ctx);
   assert.equal((await ctx.DELETE({ url: "http://localhost/api/incomes?id=cashback" })).status, 409);
   assert.equal((await ctx.PATCH({ json: async () => ({

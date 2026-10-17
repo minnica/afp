@@ -17,7 +17,7 @@ export async function runExpenseOperation(db, userId, body, create) {
   const { operationId, userId: ignoredUserId, ...input } = body;
   void ignoredUserId;
   // Compatibilidad con otros clientes; /gastos siempre envía UUID desde la captura.
-  if (operationId === undefined) return db.$transaction(create);
+  if (operationId === undefined) return db.$transaction(create, { isolationLevel: "ReadCommitted" });
   if (typeof operationId !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(operationId)) {
     throw new ApiAccessError("Identificador de operación no válido.", 400);
   }
@@ -39,5 +39,5 @@ export async function runExpenseOperation(db, userId, body, create) {
     const serialized = JSON.parse(JSON.stringify(response));
     await tx.expenseOperation.update({ where: { userId_operationId: key }, data: { response: serialized } });
     return serialized;
-  });
+  }, { isolationLevel: "ReadCommitted" });
 }

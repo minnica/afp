@@ -2,11 +2,11 @@ AFP · Auditoría técnica y propuestas de producto · 15 de octubre de 2026
 
 # Proteger los datos y asegurar los registros antes de ampliar funciones
 
-La aplicación tiene una base funcional sólida para gastos, cortes, MSI, suscripciones y conciliación. La auditoría original detectó como hallazgo prioritario la ausencia de autorización en 12 de sus 14 rutas API; A01 ya tiene una corrección implementada y verificada localmente. A02 también tiene una corrección local de sincronización y A03 de liquidación de cortes; permanecen otros hallazgos sobre estados financieros y consulta del historial.
+La aplicación tiene una base funcional sólida para gastos, cortes, MSI, suscripciones y conciliación. La auditoría original detectó como hallazgo prioritario la ausencia de autorización en 12 de sus 14 rutas API; A01 ya tiene una corrección implementada y verificada localmente. A02 también tiene una corrección local de sincronización, A03 de liquidación de cortes y A05 de estado de deudas; permanecen otros hallazgos sobre estados financieros y consulta del historial.
 
 **14 hallazgos priorizados: 1 P0, 6 P1 y 7 P2.** P0 exige atención inmediata si la app es accesible por terceros; P1 protege datos o decisiones financieras; P2 corrige exactitud, experiencia o crecimiento. Las alertas del gestor de paquetes se agrupan como un hallazgo y no representan 91 fallos explotados en AFP.
 
-**Seguimiento · 17 de octubre de 2026:** 3 hallazgos implementados localmente (A01, A02 y A03) y 11 pendientes. La actividad de implementación de A03 queda **concluida**. El despliegue autorizado y las verificaciones integradas con PostgreSQL siguen pendientes; no se declaran resueltos en producción. [A01](#A01-seguimiento) · [A02](#A02-seguimiento) · [A03](#A03-seguimiento).
+**Seguimiento · 17 de octubre de 2026:** 4 hallazgos implementados localmente (A01, A02, A03 y A05) y 10 pendientes. La actividad A05 queda **concluida**, con regresiones y pruebas reales en PostgreSQL desechable. El despliegue autorizado y las verificaciones integradas pendientes de los otros hallazgos conservan su alcance; no se declaran resueltos en producción. [A01](#A01-seguimiento) · [A02](#A02-seguimiento) · [A03](#A03-seguimiento) · [A05](#A05-seguimiento).
 
 **Contenido**
 
@@ -114,7 +114,7 @@ Este seguimiento corresponde a A01. Los ajustes de autenticación de la cola y d
 | PostgreSQL real | Suite de idempotencia/concurrencia/rollback preparada; omitida junto con la de suscripciones por falta de `AFP_TEST_DATABASE_URL`. Requiere base local `afp_test…` y migraciones aplicadas. |
 | Build / lint | Build correcto con Google Fonts accesible. Lint: cero errores, una advertencia previa de `useReactTable`. |
 
-**Pendiente de operación:** aplicar la migración aditiva y desplegar con autorización explícita, y ejecutar las suites integradas en PostgreSQL aislado. La implementación está concluida; la verificación actual no equivale a una validación del formulario autenticado contra una BD real ni a un despliegue. A05, el resto de A06 y A12 conservan su alcance pendiente.
+**Pendiente de operación:** aplicar la migración aditiva y desplegar con autorización explícita, y ejecutar las suites integradas en PostgreSQL aislado. La implementación está concluida; la verificación actual no equivale a una validación del formulario autenticado contra una BD real ni a un despliegue. A05 se implementó posteriormente como se documenta abajo; el resto de A06 y A12 conservan su alcance pendiente.
 
 
 ---
@@ -174,11 +174,32 @@ También hay un problema con cero: `statementAmount: 0` numérico se rechaza, au
 
 ### A05 · P1 · Estado de deuda desactualizado al editar
 
+**Estado: actividad concluida, implementada y verificada localmente · 17 de octubre de 2026.** Incluye pruebas con PostgreSQL real desechable. Pendiente de despliegue. La descripción siguiente conserva el hallazgo original.
+
 **Ubicación:** `src/app/api/expenses/route.js:443–475`; `payables/route.js:187`; `receivables/route.js:240`.
 
 Al crear o borrar un abono se recalcula la cuenta por pagar, pero al editarlo no. Cambiar de $100 a $50 el abono que había liquidado una deuda puede dejarla marcada como liquidada. Cambiar el principal de $100 a $200 conserva `PAID_OFF` con $100 pendientes. Los listados filtran activas/liquidadas por ese estado, así que la deuda puede quedar en el grupo equivocado.
 
 **Corrección:** centralizar el cálculo de saldo y estado; ejecutarlo en la misma transacción al crear, editar o borrar abonos y al modificar el principal, tanto en cobrar como en pagar. Respetar cancelaciones y definir el tratamiento de saldos a favor. Probar también centavos y abonos concurrentes.
+
+<a id="A05-seguimiento"></a>
+
+#### Actividad concluida · implementación local · 17 de octubre de 2026
+
+- **Cálculo único:** [`debtAccounts.js`](../../src/lib/calculations/debtAccounts.js) usa Decimal y redondea individualmente el principal y cada abono a centavos. Gastos, Ingresos, cuentas, bootstrap de Gastos y Dashboard comparten saldo/estado. Los listados derivan la clasificación histórica sin escribir al consultar; modificar un abono o principal corrige el estado persistido.
+- **Mutaciones atómicas:** [`debtAccountService.js`](../../src/lib/debtAccountService.js) coordina las altas, ediciones y eliminaciones de abonos y la edición del principal en `ReadCommitted`, con bloqueo asesor por usuario antes de leer. Cubre operaciones simultáneas y traslados de ingresos entre cuentas. Conserva el recibo idempotente del POST de gastos y la relación existente al editar gastos. Un fallo del estado revierte el movimiento/principal.
+- **Cancelaciones y excedentes:** `CANCELLED` permanece cancelada. Saldo cero o negativo liquida las demás cuentas; el excedente se conserva como `pendingBalance` negativo y `excessAmount` positivo, sin compensaciones ni devoluciones automáticas. Reducir el abono o aumentar el principal reabre la cuenta cuando vuelve a existir saldo.
+- **Alcance:** sin migración ni cambios visuales. No modifica datos de Supabase ni despliega. A06 sigue pendiente para los demás flujos relacionados, especialmente compras a meses; A11 conserva el problema del historial de migraciones.
+
+| Comprobación | Resultado |
+| --- | --- |
+| Regresiones A05 | [10 pruebas](../../tests/debt-accounts.test.cjs): $100 → $50 en abono, $100 → $200 en principal, pago excedente, cancelaciones, centavos, datos históricos con más decimales, traslado/desvinculación de ingresos, concurrencia simulada y rollback de las cuatro mutaciones. |
+| Suite completa | `node --test --experimental-test-isolation=none tests/*.test.cjs`: **175 casos, 171 correctos, 4 omitidos**, cero fallos. Las omisiones corresponden a integración sin variable de BD. [Log](a05-pruebas.log). |
+| PostgreSQL real | [2 pruebas de integración A05](../../tests/debt-accounts-integration.test.cjs) correctas, sin omisiones: diez altas y diez ediciones concurrentes por tipo de cuenta, edición de principal concurrente, cancelación, rollback real de alta/edición/borrado/principal y lecturas de cuentas, Gastos y Dashboard. [Log](a05-postgres.log). |
+| Entorno de integración | PostgreSQL 16 en contenedor desechable, base local `afp_test_a05`, datos ficticios eliminados al finalizar. Esquema generado desde `schema.prisma` con `prisma migrate diff --from-empty`; no prueba las migraciones de A11. Auth simulada; Prisma y SQL reales. El driver emitió una advertencia de deprecación de consultas concurrentes de `pg`; no hubo fallos. |
+| Build / lint | Build de producción correcto con Google Fonts accesible. Lint: cero errores y la advertencia previa de `useReactTable`. [Build](a05-build.log) · [Lint](a05-lint.log). |
+
+**Cierre:** implementación y verificación A05 concluidas. Para repetir la integración, configurar `AFP_TEST_DATABASE_URL` con una base local desechable cuyo nombre empiece por `afp_test`, con el esquema actual, y ejecutar `node --test --experimental-test-isolation=none tests/debt-accounts-integration.test.cjs`. Queda pendiente el despliegue con autorización explícita y la comprobación del flujo autenticado en ese ambiente; no se declara resuelto en producción.
 
 ---
 
@@ -340,7 +361,7 @@ Para llamar a una cifra «dinero disponible» se necesitan saldos iniciales, cue
 ## Orden recomendado
 
 1. **Seguridad:** completar el despliegue autorizado y la validación integrada de A01, cuya implementación local ya está terminada; continuar con la actualización controlada A10 y pruebas de aislamiento. Alinear migraciones y RLS versionado (A11) para poder crear un entorno confiable de pruebas.
-2. **Integridad de registros:** A02 implementado localmente; completar su migración/despliegue autorizado y validación PostgreSQL. Continuar con A05 y el resto de A06: transacciones y regresiones de concurrencia.
+2. **Integridad de registros:** A02 y A05 implementados localmente; A05 ya tiene verificación PostgreSQL desechable. Completar migración/despliegue autorizado y validación pendiente de A02; continuar con el resto de A06: transacciones y regresiones de concurrencia.
 3. **Exactitud visible:** A03 implementado localmente; continuar con calendario A04, historial completo A07, validaciones A08 y filtros A09.
 4. **Operación diaria:** política offline A12, consultas A13, login A14, recuperación de acceso y CI.
 5. **Producto:** conciliación revisable, calendario/reservas y presupuestos; después proyección con saldos reales.
