@@ -1,0 +1,2545 @@
+{
+  "migrations": [
+    {
+      "migration_name": "20260509070227_init",
+      "checksum": "1ff8bca46c1f428981d455d8f4078194aa7dd47e6c58319c54fc584ae70c2b41",
+      "finished": true,
+      "rolled_back": false
+    },
+    {
+      "migration_name": "20260517045000_add_payable_accounts",
+      "checksum": "50c239f9c08407ed7107a926a660b785583849dbe729c290b1691ecfb0556e30",
+      "finished": true,
+      "rolled_back": false
+    },
+    {
+      "migration_name": "20260517222440_add_subscription_frequency",
+      "checksum": "ab2fce6df5b4b14baac3c10e4d83df85ddda1167140c2d0aa321605b885c3f56",
+      "finished": true,
+      "rolled_back": false
+    },
+    {
+      "migration_name": "20260517235633_replace_receivable_expected_date_with_charge_day",
+      "checksum": "1e1f4decb4b19bc185906545755cbd43b6510c3919408e3d077f88446c77c502",
+      "finished": true,
+      "rolled_back": false
+    },
+    {
+      "migration_name": "20260518002802_replace_receivable_charge_day_with_charge_days",
+      "checksum": "9a4e80ec04bd471c5f8616da3a38feed07e0d156e128afdcf4c34a0579d9369a",
+      "finished": true,
+      "rolled_back": false
+    },
+    {
+      "migration_name": "20260518041110_add_expense_subscription_relation",
+      "checksum": "12c4fe245e66a08076d473b58fa48e07431b93e39e440ade52ba10c07c8fa86b",
+      "finished": true,
+      "rolled_back": false
+    },
+    {
+      "migration_name": "20260518234708_add_payable_loan_support",
+      "checksum": "8ef7dcd79b9e4439e96092a131bbb569cb04b405721054e6916e71479a8c40b1",
+      "finished": true,
+      "rolled_back": false
+    },
+    {
+      "migration_name": "20260604000000_add_subscription_active_fields",
+      "checksum": "a7a8905cf9facf6135d2b095dff53a0d63392adef65519cfc919f060cd5affb8",
+      "finished": true,
+      "rolled_back": false
+    },
+    {
+      "migration_name": "20261009000000_add_installment_statement_reconciliations",
+      "checksum": "c5b70602e66ac44fff6f46d7d432e06277d4d5927227c7935383506099216b5b",
+      "finished": true,
+      "rolled_back": false
+    },
+    {
+      "migration_name": "20261010000000_add_card_cycle_credits",
+      "checksum": "bce78dbd21bdae948e03b1a314ab18586da68d7c7ea63088c39ef34bca349497",
+      "finished": true,
+      "rolled_back": false
+    },
+    {
+      "migration_name": "20261011000000_add_card_usage_verification",
+      "checksum": "ab7b6a61669a4910c4c6af563e02912944daf58416198f1dbcdb8fddd5032fb3",
+      "finished": true,
+      "rolled_back": false
+    },
+    {
+      "migration_name": "20261015000000_add_notice_dismissals",
+      "checksum": "8b082a23fdd3e10c8712590b6c0c1529640c9328f386fc7a5902689ac2cded87",
+      "finished": true,
+      "rolled_back": false
+    },
+    {
+      "migration_name": "20261016000000_add_subscription_charges",
+      "checksum": "fe3d2bdd2e3fe3b495e51c5a8a29e398e47e6ee26595ec7a1b91f156ed5add21",
+      "finished": true,
+      "rolled_back": false
+    }
+  ],
+  "columns": [
+    {
+      "table_name": "card_cycle_credits",
+      "column_name": "amount",
+      "data_type": "numeric",
+      "udt_name": "numeric",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": 65,
+      "numeric_scale": 30,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "card_cycle_credits",
+      "column_name": "createdAt",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "column_default": "CURRENT_TIMESTAMP",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": 3
+    },
+    {
+      "table_name": "card_cycle_credits",
+      "column_name": "cycleId",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "card_cycle_credits",
+      "column_name": "id",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "card_cycle_credits",
+      "column_name": "incomeId",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "card_cycle_credits",
+      "column_name": "notes",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "card_cycle_credits",
+      "column_name": "updatedAt",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": 3
+    },
+    {
+      "table_name": "card_cycle_credits",
+      "column_name": "userId",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "card_cycles",
+      "column_name": "cardId",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "card_cycles",
+      "column_name": "createdAt",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "column_default": "CURRENT_TIMESTAMP",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": 3
+    },
+    {
+      "table_name": "card_cycles",
+      "column_name": "cutDate",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": 3
+    },
+    {
+      "table_name": "card_cycles",
+      "column_name": "dueDate",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": 3
+    },
+    {
+      "table_name": "card_cycles",
+      "column_name": "id",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "card_cycles",
+      "column_name": "month",
+      "data_type": "integer",
+      "udt_name": "int4",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "card_cycles",
+      "column_name": "notes",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "card_cycles",
+      "column_name": "paidAmount",
+      "data_type": "numeric",
+      "udt_name": "numeric",
+      "column_default": null,
+      "is_nullable": "YES",
+      "numeric_precision": 65,
+      "numeric_scale": 30,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "card_cycles",
+      "column_name": "paidAt",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "column_default": null,
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": 3
+    },
+    {
+      "table_name": "card_cycles",
+      "column_name": "startDate",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": 3
+    },
+    {
+      "table_name": "card_cycles",
+      "column_name": "statementAmount",
+      "data_type": "numeric",
+      "udt_name": "numeric",
+      "column_default": null,
+      "is_nullable": "YES",
+      "numeric_precision": 65,
+      "numeric_scale": 30,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "card_cycles",
+      "column_name": "status",
+      "data_type": "USER-DEFINED",
+      "udt_name": "CardCycleStatus",
+      "column_default": "'OPEN'::\"CardCycleStatus\"",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "card_cycles",
+      "column_name": "updatedAt",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": 3
+    },
+    {
+      "table_name": "card_cycles",
+      "column_name": "usageReconciliation",
+      "data_type": "jsonb",
+      "udt_name": "jsonb",
+      "column_default": null,
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "card_cycles",
+      "column_name": "userId",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "card_cycles",
+      "column_name": "year",
+      "data_type": "integer",
+      "udt_name": "int4",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "cards",
+      "column_name": "createdAt",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "column_default": "CURRENT_TIMESTAMP",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": 3
+    },
+    {
+      "table_name": "cards",
+      "column_name": "id",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "cards",
+      "column_name": "name",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "cards",
+      "column_name": "notes",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "cards",
+      "column_name": "updatedAt",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": 3
+    },
+    {
+      "table_name": "cards",
+      "column_name": "usagePolicy",
+      "data_type": "jsonb",
+      "udt_name": "jsonb",
+      "column_default": null,
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "cards",
+      "column_name": "userId",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "cards",
+      "column_name": "usualCutDay",
+      "data_type": "integer",
+      "udt_name": "int4",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "cards",
+      "column_name": "usualDueDay",
+      "data_type": "integer",
+      "udt_name": "int4",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "categories",
+      "column_name": "createdAt",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "column_default": "CURRENT_TIMESTAMP",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": 3
+    },
+    {
+      "table_name": "categories",
+      "column_name": "id",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "categories",
+      "column_name": "name",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "categories",
+      "column_name": "userId",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "daily_expenses",
+      "column_name": "amount",
+      "data_type": "numeric",
+      "udt_name": "numeric",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": 65,
+      "numeric_scale": 30,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "daily_expenses",
+      "column_name": "cardId",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "daily_expenses",
+      "column_name": "categoryId",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "daily_expenses",
+      "column_name": "concept",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "daily_expenses",
+      "column_name": "createdAt",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "column_default": "CURRENT_TIMESTAMP",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": 3
+    },
+    {
+      "table_name": "daily_expenses",
+      "column_name": "date",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": 3
+    },
+    {
+      "table_name": "daily_expenses",
+      "column_name": "id",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "daily_expenses",
+      "column_name": "loanBalanceAfterPayment",
+      "data_type": "numeric",
+      "udt_name": "numeric",
+      "column_default": null,
+      "is_nullable": "YES",
+      "numeric_precision": 65,
+      "numeric_scale": 30,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "daily_expenses",
+      "column_name": "loanInterestAmount",
+      "data_type": "numeric",
+      "udt_name": "numeric",
+      "column_default": null,
+      "is_nullable": "YES",
+      "numeric_precision": 65,
+      "numeric_scale": 30,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "daily_expenses",
+      "column_name": "loanPrincipalAmount",
+      "data_type": "numeric",
+      "udt_name": "numeric",
+      "column_default": null,
+      "is_nullable": "YES",
+      "numeric_precision": 65,
+      "numeric_scale": 30,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "daily_expenses",
+      "column_name": "notes",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "daily_expenses",
+      "column_name": "payableAccountId",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "daily_expenses",
+      "column_name": "paymentMethod",
+      "data_type": "USER-DEFINED",
+      "udt_name": "PaymentMethod",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "daily_expenses",
+      "column_name": "personId",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "daily_expenses",
+      "column_name": "receivableAccountId",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "daily_expenses",
+      "column_name": "subscriptionId",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "daily_expenses",
+      "column_name": "updatedAt",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": 3
+    },
+    {
+      "table_name": "daily_expenses",
+      "column_name": "userId",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "income_types",
+      "column_name": "createdAt",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "column_default": "CURRENT_TIMESTAMP",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": 3
+    },
+    {
+      "table_name": "income_types",
+      "column_name": "id",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "income_types",
+      "column_name": "name",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "income_types",
+      "column_name": "userId",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "incomes",
+      "column_name": "amount",
+      "data_type": "numeric",
+      "udt_name": "numeric",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": 65,
+      "numeric_scale": 30,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "incomes",
+      "column_name": "concept",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "incomes",
+      "column_name": "createdAt",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "column_default": "CURRENT_TIMESTAMP",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": 3
+    },
+    {
+      "table_name": "incomes",
+      "column_name": "date",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": 3
+    },
+    {
+      "table_name": "incomes",
+      "column_name": "id",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "incomes",
+      "column_name": "incomeTypeId",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "incomes",
+      "column_name": "notes",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "incomes",
+      "column_name": "receivableAccountId",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "incomes",
+      "column_name": "source",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "incomes",
+      "column_name": "updatedAt",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": 3
+    },
+    {
+      "table_name": "incomes",
+      "column_name": "userId",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "installment_purchases",
+      "column_name": "cardId",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "installment_purchases",
+      "column_name": "categoryId",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "installment_purchases",
+      "column_name": "concept",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "installment_purchases",
+      "column_name": "createdAt",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "column_default": "CURRENT_TIMESTAMP",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": 3
+    },
+    {
+      "table_name": "installment_purchases",
+      "column_name": "id",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "installment_purchases",
+      "column_name": "initialPaymentsMade",
+      "data_type": "integer",
+      "udt_name": "int4",
+      "column_default": "0",
+      "is_nullable": "NO",
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "installment_purchases",
+      "column_name": "manualMonthlyPayment",
+      "data_type": "numeric",
+      "udt_name": "numeric",
+      "column_default": null,
+      "is_nullable": "YES",
+      "numeric_precision": 65,
+      "numeric_scale": 30,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "installment_purchases",
+      "column_name": "months",
+      "data_type": "integer",
+      "udt_name": "int4",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "installment_purchases",
+      "column_name": "notes",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "installment_purchases",
+      "column_name": "personId",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "installment_purchases",
+      "column_name": "purchaseDate",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": 3
+    },
+    {
+      "table_name": "installment_purchases",
+      "column_name": "receivableAccountId",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "installment_purchases",
+      "column_name": "statementReconciliations",
+      "data_type": "jsonb",
+      "udt_name": "jsonb",
+      "column_default": null,
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "installment_purchases",
+      "column_name": "status",
+      "data_type": "USER-DEFINED",
+      "udt_name": "InstallmentPurchaseStatus",
+      "column_default": "'ACTIVE'::\"InstallmentPurchaseStatus\"",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "installment_purchases",
+      "column_name": "totalAmount",
+      "data_type": "numeric",
+      "udt_name": "numeric",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": 65,
+      "numeric_scale": 30,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "installment_purchases",
+      "column_name": "updatedAt",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": 3
+    },
+    {
+      "table_name": "installment_purchases",
+      "column_name": "userId",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "notice_dismissals",
+      "column_name": "createdAt",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "column_default": "CURRENT_TIMESTAMP",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": 3
+    },
+    {
+      "table_name": "notice_dismissals",
+      "column_name": "id",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "notice_dismissals",
+      "column_name": "month",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "notice_dismissals",
+      "column_name": "noticeKey",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "notice_dismissals",
+      "column_name": "userId",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "payable_accounts",
+      "column_name": "accountType",
+      "data_type": "USER-DEFINED",
+      "udt_name": "PayableAccountType",
+      "column_default": "'SIMPLE'::\"PayableAccountType\"",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "payable_accounts",
+      "column_name": "annualInterestRate",
+      "data_type": "numeric",
+      "udt_name": "numeric",
+      "column_default": null,
+      "is_nullable": "YES",
+      "numeric_precision": 65,
+      "numeric_scale": 30,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "payable_accounts",
+      "column_name": "concept",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "payable_accounts",
+      "column_name": "createdAt",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "column_default": "CURRENT_TIMESTAMP",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": 3
+    },
+    {
+      "table_name": "payable_accounts",
+      "column_name": "currentBalance",
+      "data_type": "numeric",
+      "udt_name": "numeric",
+      "column_default": null,
+      "is_nullable": "YES",
+      "numeric_precision": 65,
+      "numeric_scale": 30,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "payable_accounts",
+      "column_name": "expectedDate",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "column_default": null,
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": 3
+    },
+    {
+      "table_name": "payable_accounts",
+      "column_name": "expectedMonthlyPayment",
+      "data_type": "numeric",
+      "udt_name": "numeric",
+      "column_default": null,
+      "is_nullable": "YES",
+      "numeric_precision": 65,
+      "numeric_scale": 30,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "payable_accounts",
+      "column_name": "firstPaymentDate",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "column_default": null,
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": 3
+    },
+    {
+      "table_name": "payable_accounts",
+      "column_name": "id",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "payable_accounts",
+      "column_name": "notes",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "payable_accounts",
+      "column_name": "originDate",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": 3
+    },
+    {
+      "table_name": "payable_accounts",
+      "column_name": "originId",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "payable_accounts",
+      "column_name": "originType",
+      "data_type": "USER-DEFINED",
+      "udt_name": "PayableOriginType",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "payable_accounts",
+      "column_name": "originalAmount",
+      "data_type": "numeric",
+      "udt_name": "numeric",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": 65,
+      "numeric_scale": 30,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "payable_accounts",
+      "column_name": "paymentAmount",
+      "data_type": "numeric",
+      "udt_name": "numeric",
+      "column_default": null,
+      "is_nullable": "YES",
+      "numeric_precision": 65,
+      "numeric_scale": 30,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "payable_accounts",
+      "column_name": "paymentDays",
+      "data_type": "ARRAY",
+      "udt_name": "_int4",
+      "column_default": "ARRAY[]::integer[]",
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "payable_accounts",
+      "column_name": "paymentsMade",
+      "data_type": "integer",
+      "udt_name": "int4",
+      "column_default": null,
+      "is_nullable": "YES",
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "payable_accounts",
+      "column_name": "personId",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "payable_accounts",
+      "column_name": "reimbursementReceivableId",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "payable_accounts",
+      "column_name": "status",
+      "data_type": "USER-DEFINED",
+      "udt_name": "PayableAccountStatus",
+      "column_default": "'ACTIVE'::\"PayableAccountStatus\"",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "payable_accounts",
+      "column_name": "totalPayments",
+      "data_type": "integer",
+      "udt_name": "int4",
+      "column_default": null,
+      "is_nullable": "YES",
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "payable_accounts",
+      "column_name": "updatedAt",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": 3
+    },
+    {
+      "table_name": "payable_accounts",
+      "column_name": "userId",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "people",
+      "column_name": "createdAt",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "column_default": "CURRENT_TIMESTAMP",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": 3
+    },
+    {
+      "table_name": "people",
+      "column_name": "id",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "people",
+      "column_name": "name",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "people",
+      "column_name": "notes",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "people",
+      "column_name": "userId",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "receivable_accounts",
+      "column_name": "concept",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "receivable_accounts",
+      "column_name": "createdAt",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "column_default": "CURRENT_TIMESTAMP",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": 3
+    },
+    {
+      "table_name": "receivable_accounts",
+      "column_name": "expectedChargeDays",
+      "data_type": "ARRAY",
+      "udt_name": "_int4",
+      "column_default": "ARRAY[]::integer[]",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "receivable_accounts",
+      "column_name": "expectedMonthlyPayment",
+      "data_type": "numeric",
+      "udt_name": "numeric",
+      "column_default": null,
+      "is_nullable": "YES",
+      "numeric_precision": 65,
+      "numeric_scale": 30,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "receivable_accounts",
+      "column_name": "id",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "receivable_accounts",
+      "column_name": "notes",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "receivable_accounts",
+      "column_name": "originDate",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": 3
+    },
+    {
+      "table_name": "receivable_accounts",
+      "column_name": "originId",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "receivable_accounts",
+      "column_name": "originType",
+      "data_type": "USER-DEFINED",
+      "udt_name": "ReceivableOriginType",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "receivable_accounts",
+      "column_name": "originalAmount",
+      "data_type": "numeric",
+      "udt_name": "numeric",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": 65,
+      "numeric_scale": 30,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "receivable_accounts",
+      "column_name": "personId",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "receivable_accounts",
+      "column_name": "status",
+      "data_type": "USER-DEFINED",
+      "udt_name": "ReceivableAccountStatus",
+      "column_default": "'ACTIVE'::\"ReceivableAccountStatus\"",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "receivable_accounts",
+      "column_name": "updatedAt",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": 3
+    },
+    {
+      "table_name": "receivable_accounts",
+      "column_name": "userId",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "subscription_charges",
+      "column_name": "createdAt",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "column_default": "CURRENT_TIMESTAMP",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": 3
+    },
+    {
+      "table_name": "subscription_charges",
+      "column_name": "expenseId",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "subscription_charges",
+      "column_name": "id",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "subscription_charges",
+      "column_name": "month",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "subscription_charges",
+      "column_name": "status",
+      "data_type": "USER-DEFINED",
+      "udt_name": "SubscriptionChargeStatus",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "subscription_charges",
+      "column_name": "subscriptionId",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "subscription_charges",
+      "column_name": "updatedAt",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": 3
+    },
+    {
+      "table_name": "subscription_charges",
+      "column_name": "userId",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "subscriptions",
+      "column_name": "amount",
+      "data_type": "numeric",
+      "udt_name": "numeric",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": 65,
+      "numeric_scale": 30,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "subscriptions",
+      "column_name": "cardId",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "subscriptions",
+      "column_name": "categoryId",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "subscriptions",
+      "column_name": "chargeDay",
+      "data_type": "integer",
+      "udt_name": "int4",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "subscriptions",
+      "column_name": "createdAt",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "column_default": "CURRENT_TIMESTAMP",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": 3
+    },
+    {
+      "table_name": "subscriptions",
+      "column_name": "deactivatedAt",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "column_default": null,
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": 3
+    },
+    {
+      "table_name": "subscriptions",
+      "column_name": "frequencyMonths",
+      "data_type": "integer",
+      "udt_name": "int4",
+      "column_default": "1",
+      "is_nullable": "NO",
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "subscriptions",
+      "column_name": "id",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "subscriptions",
+      "column_name": "isActive",
+      "data_type": "boolean",
+      "udt_name": "bool",
+      "column_default": "true",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "subscriptions",
+      "column_name": "name",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "subscriptions",
+      "column_name": "paymentMethod",
+      "data_type": "USER-DEFINED",
+      "udt_name": "PaymentMethod",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "subscriptions",
+      "column_name": "startMonth",
+      "data_type": "integer",
+      "udt_name": "int4",
+      "column_default": "1",
+      "is_nullable": "NO",
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "subscriptions",
+      "column_name": "startYear",
+      "data_type": "integer",
+      "udt_name": "int4",
+      "column_default": "2026",
+      "is_nullable": "NO",
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "subscriptions",
+      "column_name": "updatedAt",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": 3
+    },
+    {
+      "table_name": "subscriptions",
+      "column_name": "userId",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "users",
+      "column_name": "createdAt",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "column_default": "CURRENT_TIMESTAMP",
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": 3
+    },
+    {
+      "table_name": "users",
+      "column_name": "email",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "users",
+      "column_name": "id",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "NO",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    },
+    {
+      "table_name": "users",
+      "column_name": "name",
+      "data_type": "text",
+      "udt_name": "text",
+      "column_default": null,
+      "is_nullable": "YES",
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "datetime_precision": null
+    }
+  ],
+  "constraints": [
+    {
+      "table_name": "card_cycle_credits",
+      "name": "card_cycle_credits_cycleId_fkey",
+      "definition": "FOREIGN KEY (\"cycleId\") REFERENCES card_cycles(id) ON UPDATE CASCADE ON DELETE CASCADE"
+    },
+    {
+      "table_name": "card_cycle_credits",
+      "name": "card_cycle_credits_incomeId_fkey",
+      "definition": "FOREIGN KEY (\"incomeId\") REFERENCES incomes(id) ON UPDATE CASCADE ON DELETE RESTRICT"
+    },
+    {
+      "table_name": "card_cycle_credits",
+      "name": "card_cycle_credits_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "card_cycle_credits",
+      "name": "card_cycle_credits_userId_fkey",
+      "definition": "FOREIGN KEY (\"userId\") REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE"
+    },
+    {
+      "table_name": "card_cycles",
+      "name": "card_cycles_cardId_fkey",
+      "definition": "FOREIGN KEY (\"cardId\") REFERENCES cards(id) ON UPDATE CASCADE ON DELETE CASCADE"
+    },
+    {
+      "table_name": "card_cycles",
+      "name": "card_cycles_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "card_cycles",
+      "name": "card_cycles_userId_fkey",
+      "definition": "FOREIGN KEY (\"userId\") REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE"
+    },
+    {
+      "table_name": "cards",
+      "name": "cards_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "cards",
+      "name": "cards_userId_fkey",
+      "definition": "FOREIGN KEY (\"userId\") REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE"
+    },
+    {
+      "table_name": "categories",
+      "name": "categories_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "categories",
+      "name": "categories_userId_fkey",
+      "definition": "FOREIGN KEY (\"userId\") REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE"
+    },
+    {
+      "table_name": "daily_expenses",
+      "name": "daily_expenses_cardId_fkey",
+      "definition": "FOREIGN KEY (\"cardId\") REFERENCES cards(id) ON UPDATE CASCADE ON DELETE SET NULL"
+    },
+    {
+      "table_name": "daily_expenses",
+      "name": "daily_expenses_categoryId_fkey",
+      "definition": "FOREIGN KEY (\"categoryId\") REFERENCES categories(id) ON UPDATE CASCADE ON DELETE RESTRICT"
+    },
+    {
+      "table_name": "daily_expenses",
+      "name": "daily_expenses_payableAccountId_fkey",
+      "definition": "FOREIGN KEY (\"payableAccountId\") REFERENCES payable_accounts(id) ON UPDATE CASCADE ON DELETE SET NULL"
+    },
+    {
+      "table_name": "daily_expenses",
+      "name": "daily_expenses_personId_fkey",
+      "definition": "FOREIGN KEY (\"personId\") REFERENCES people(id) ON UPDATE CASCADE ON DELETE SET NULL"
+    },
+    {
+      "table_name": "daily_expenses",
+      "name": "daily_expenses_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "daily_expenses",
+      "name": "daily_expenses_receivableAccountId_fkey",
+      "definition": "FOREIGN KEY (\"receivableAccountId\") REFERENCES receivable_accounts(id) ON UPDATE CASCADE ON DELETE SET NULL"
+    },
+    {
+      "table_name": "daily_expenses",
+      "name": "daily_expenses_subscriptionId_fkey",
+      "definition": "FOREIGN KEY (\"subscriptionId\") REFERENCES subscriptions(id) ON UPDATE CASCADE ON DELETE SET NULL"
+    },
+    {
+      "table_name": "daily_expenses",
+      "name": "daily_expenses_userId_fkey",
+      "definition": "FOREIGN KEY (\"userId\") REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE"
+    },
+    {
+      "table_name": "income_types",
+      "name": "income_types_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "income_types",
+      "name": "income_types_userId_fkey",
+      "definition": "FOREIGN KEY (\"userId\") REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE"
+    },
+    {
+      "table_name": "incomes",
+      "name": "incomes_incomeTypeId_fkey",
+      "definition": "FOREIGN KEY (\"incomeTypeId\") REFERENCES income_types(id) ON UPDATE CASCADE ON DELETE RESTRICT"
+    },
+    {
+      "table_name": "incomes",
+      "name": "incomes_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "incomes",
+      "name": "incomes_receivableAccountId_fkey",
+      "definition": "FOREIGN KEY (\"receivableAccountId\") REFERENCES receivable_accounts(id) ON UPDATE CASCADE ON DELETE SET NULL"
+    },
+    {
+      "table_name": "incomes",
+      "name": "incomes_userId_fkey",
+      "definition": "FOREIGN KEY (\"userId\") REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE"
+    },
+    {
+      "table_name": "installment_purchases",
+      "name": "installment_purchases_cardId_fkey",
+      "definition": "FOREIGN KEY (\"cardId\") REFERENCES cards(id) ON UPDATE CASCADE ON DELETE RESTRICT"
+    },
+    {
+      "table_name": "installment_purchases",
+      "name": "installment_purchases_categoryId_fkey",
+      "definition": "FOREIGN KEY (\"categoryId\") REFERENCES categories(id) ON UPDATE CASCADE ON DELETE RESTRICT"
+    },
+    {
+      "table_name": "installment_purchases",
+      "name": "installment_purchases_personId_fkey",
+      "definition": "FOREIGN KEY (\"personId\") REFERENCES people(id) ON UPDATE CASCADE ON DELETE SET NULL"
+    },
+    {
+      "table_name": "installment_purchases",
+      "name": "installment_purchases_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "installment_purchases",
+      "name": "installment_purchases_receivableAccountId_fkey",
+      "definition": "FOREIGN KEY (\"receivableAccountId\") REFERENCES receivable_accounts(id) ON UPDATE CASCADE ON DELETE SET NULL"
+    },
+    {
+      "table_name": "installment_purchases",
+      "name": "installment_purchases_userId_fkey",
+      "definition": "FOREIGN KEY (\"userId\") REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE"
+    },
+    {
+      "table_name": "notice_dismissals",
+      "name": "notice_dismissals_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "notice_dismissals",
+      "name": "notice_dismissals_userId_fkey",
+      "definition": "FOREIGN KEY (\"userId\") REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE"
+    },
+    {
+      "table_name": "payable_accounts",
+      "name": "payable_accounts_personId_fkey",
+      "definition": "FOREIGN KEY (\"personId\") REFERENCES people(id) ON UPDATE CASCADE ON DELETE RESTRICT"
+    },
+    {
+      "table_name": "payable_accounts",
+      "name": "payable_accounts_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "payable_accounts",
+      "name": "payable_accounts_reimbursementReceivableId_fkey",
+      "definition": "FOREIGN KEY (\"reimbursementReceivableId\") REFERENCES receivable_accounts(id) ON UPDATE CASCADE ON DELETE SET NULL"
+    },
+    {
+      "table_name": "payable_accounts",
+      "name": "payable_accounts_userId_fkey",
+      "definition": "FOREIGN KEY (\"userId\") REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE"
+    },
+    {
+      "table_name": "people",
+      "name": "people_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "people",
+      "name": "people_userId_fkey",
+      "definition": "FOREIGN KEY (\"userId\") REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE"
+    },
+    {
+      "table_name": "receivable_accounts",
+      "name": "receivable_accounts_personId_fkey",
+      "definition": "FOREIGN KEY (\"personId\") REFERENCES people(id) ON UPDATE CASCADE ON DELETE RESTRICT"
+    },
+    {
+      "table_name": "receivable_accounts",
+      "name": "receivable_accounts_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "receivable_accounts",
+      "name": "receivable_accounts_userId_fkey",
+      "definition": "FOREIGN KEY (\"userId\") REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE"
+    },
+    {
+      "table_name": "subscription_charges",
+      "name": "subscription_charges_expenseId_fkey",
+      "definition": "FOREIGN KEY (\"expenseId\") REFERENCES daily_expenses(id) ON UPDATE CASCADE ON DELETE SET NULL"
+    },
+    {
+      "table_name": "subscription_charges",
+      "name": "subscription_charges_month_check",
+      "definition": "CHECK ((month ~ '^[0-9]{4}-(0[1-9]|1[0-2])$'::text))"
+    },
+    {
+      "table_name": "subscription_charges",
+      "name": "subscription_charges_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "subscription_charges",
+      "name": "subscription_charges_skipped_check",
+      "definition": "CHECK (((status <> 'SKIPPED'::\"SubscriptionChargeStatus\") OR (\"expenseId\" IS NULL)))"
+    },
+    {
+      "table_name": "subscription_charges",
+      "name": "subscription_charges_subscriptionId_fkey",
+      "definition": "FOREIGN KEY (\"subscriptionId\") REFERENCES subscriptions(id) ON UPDATE CASCADE ON DELETE CASCADE"
+    },
+    {
+      "table_name": "subscription_charges",
+      "name": "subscription_charges_userId_fkey",
+      "definition": "FOREIGN KEY (\"userId\") REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE"
+    },
+    {
+      "table_name": "subscriptions",
+      "name": "subscriptions_cardId_fkey",
+      "definition": "FOREIGN KEY (\"cardId\") REFERENCES cards(id) ON UPDATE CASCADE ON DELETE SET NULL"
+    },
+    {
+      "table_name": "subscriptions",
+      "name": "subscriptions_categoryId_fkey",
+      "definition": "FOREIGN KEY (\"categoryId\") REFERENCES categories(id) ON UPDATE CASCADE ON DELETE RESTRICT"
+    },
+    {
+      "table_name": "subscriptions",
+      "name": "subscriptions_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "subscriptions",
+      "name": "subscriptions_userId_fkey",
+      "definition": "FOREIGN KEY (\"userId\") REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE"
+    },
+    {
+      "table_name": "users",
+      "name": "users_pkey",
+      "definition": "PRIMARY KEY (id)"
+    }
+  ],
+  "indexes": [
+    {
+      "tablename": "card_cycle_credits",
+      "indexname": "card_cycle_credits_cycleId_incomeId_key",
+      "indexdef": "CREATE UNIQUE INDEX \"card_cycle_credits_cycleId_incomeId_key\" ON public.card_cycle_credits USING btree (\"cycleId\", \"incomeId\")"
+    },
+    {
+      "tablename": "card_cycle_credits",
+      "indexname": "card_cycle_credits_incomeId_idx",
+      "indexdef": "CREATE INDEX \"card_cycle_credits_incomeId_idx\" ON public.card_cycle_credits USING btree (\"incomeId\")"
+    },
+    {
+      "tablename": "card_cycle_credits",
+      "indexname": "card_cycle_credits_pkey",
+      "indexdef": "CREATE UNIQUE INDEX card_cycle_credits_pkey ON public.card_cycle_credits USING btree (id)"
+    },
+    {
+      "tablename": "card_cycle_credits",
+      "indexname": "card_cycle_credits_userId_idx",
+      "indexdef": "CREATE INDEX \"card_cycle_credits_userId_idx\" ON public.card_cycle_credits USING btree (\"userId\")"
+    },
+    {
+      "tablename": "card_cycles",
+      "indexname": "card_cycles_cardId_idx",
+      "indexdef": "CREATE INDEX \"card_cycles_cardId_idx\" ON public.card_cycles USING btree (\"cardId\")"
+    },
+    {
+      "tablename": "card_cycles",
+      "indexname": "card_cycles_cardId_month_year_key",
+      "indexdef": "CREATE UNIQUE INDEX \"card_cycles_cardId_month_year_key\" ON public.card_cycles USING btree (\"cardId\", month, year)"
+    },
+    {
+      "tablename": "card_cycles",
+      "indexname": "card_cycles_pkey",
+      "indexdef": "CREATE UNIQUE INDEX card_cycles_pkey ON public.card_cycles USING btree (id)"
+    },
+    {
+      "tablename": "card_cycles",
+      "indexname": "card_cycles_userId_idx",
+      "indexdef": "CREATE INDEX \"card_cycles_userId_idx\" ON public.card_cycles USING btree (\"userId\")"
+    },
+    {
+      "tablename": "cards",
+      "indexname": "cards_pkey",
+      "indexdef": "CREATE UNIQUE INDEX cards_pkey ON public.cards USING btree (id)"
+    },
+    {
+      "tablename": "cards",
+      "indexname": "cards_userId_name_key",
+      "indexdef": "CREATE UNIQUE INDEX \"cards_userId_name_key\" ON public.cards USING btree (\"userId\", name)"
+    },
+    {
+      "tablename": "categories",
+      "indexname": "categories_pkey",
+      "indexdef": "CREATE UNIQUE INDEX categories_pkey ON public.categories USING btree (id)"
+    },
+    {
+      "tablename": "categories",
+      "indexname": "categories_userId_name_key",
+      "indexdef": "CREATE UNIQUE INDEX \"categories_userId_name_key\" ON public.categories USING btree (\"userId\", name)"
+    },
+    {
+      "tablename": "daily_expenses",
+      "indexname": "daily_expenses_cardId_idx",
+      "indexdef": "CREATE INDEX \"daily_expenses_cardId_idx\" ON public.daily_expenses USING btree (\"cardId\")"
+    },
+    {
+      "tablename": "daily_expenses",
+      "indexname": "daily_expenses_categoryId_idx",
+      "indexdef": "CREATE INDEX \"daily_expenses_categoryId_idx\" ON public.daily_expenses USING btree (\"categoryId\")"
+    },
+    {
+      "tablename": "daily_expenses",
+      "indexname": "daily_expenses_payableAccountId_idx",
+      "indexdef": "CREATE INDEX \"daily_expenses_payableAccountId_idx\" ON public.daily_expenses USING btree (\"payableAccountId\")"
+    },
+    {
+      "tablename": "daily_expenses",
+      "indexname": "daily_expenses_pkey",
+      "indexdef": "CREATE UNIQUE INDEX daily_expenses_pkey ON public.daily_expenses USING btree (id)"
+    },
+    {
+      "tablename": "daily_expenses",
+      "indexname": "daily_expenses_subscriptionId_idx",
+      "indexdef": "CREATE INDEX \"daily_expenses_subscriptionId_idx\" ON public.daily_expenses USING btree (\"subscriptionId\")"
+    },
+    {
+      "tablename": "daily_expenses",
+      "indexname": "daily_expenses_userId_date_idx",
+      "indexdef": "CREATE INDEX \"daily_expenses_userId_date_idx\" ON public.daily_expenses USING btree (\"userId\", date)"
+    },
+    {
+      "tablename": "income_types",
+      "indexname": "income_types_pkey",
+      "indexdef": "CREATE UNIQUE INDEX income_types_pkey ON public.income_types USING btree (id)"
+    },
+    {
+      "tablename": "income_types",
+      "indexname": "income_types_userId_name_key",
+      "indexdef": "CREATE UNIQUE INDEX \"income_types_userId_name_key\" ON public.income_types USING btree (\"userId\", name)"
+    },
+    {
+      "tablename": "incomes",
+      "indexname": "incomes_incomeTypeId_idx",
+      "indexdef": "CREATE INDEX \"incomes_incomeTypeId_idx\" ON public.incomes USING btree (\"incomeTypeId\")"
+    },
+    {
+      "tablename": "incomes",
+      "indexname": "incomes_pkey",
+      "indexdef": "CREATE UNIQUE INDEX incomes_pkey ON public.incomes USING btree (id)"
+    },
+    {
+      "tablename": "incomes",
+      "indexname": "incomes_receivableAccountId_idx",
+      "indexdef": "CREATE INDEX \"incomes_receivableAccountId_idx\" ON public.incomes USING btree (\"receivableAccountId\")"
+    },
+    {
+      "tablename": "incomes",
+      "indexname": "incomes_userId_date_idx",
+      "indexdef": "CREATE INDEX \"incomes_userId_date_idx\" ON public.incomes USING btree (\"userId\", date)"
+    },
+    {
+      "tablename": "installment_purchases",
+      "indexname": "installment_purchases_cardId_idx",
+      "indexdef": "CREATE INDEX \"installment_purchases_cardId_idx\" ON public.installment_purchases USING btree (\"cardId\")"
+    },
+    {
+      "tablename": "installment_purchases",
+      "indexname": "installment_purchases_categoryId_idx",
+      "indexdef": "CREATE INDEX \"installment_purchases_categoryId_idx\" ON public.installment_purchases USING btree (\"categoryId\")"
+    },
+    {
+      "tablename": "installment_purchases",
+      "indexname": "installment_purchases_pkey",
+      "indexdef": "CREATE UNIQUE INDEX installment_purchases_pkey ON public.installment_purchases USING btree (id)"
+    },
+    {
+      "tablename": "installment_purchases",
+      "indexname": "installment_purchases_userId_purchaseDate_idx",
+      "indexdef": "CREATE INDEX \"installment_purchases_userId_purchaseDate_idx\" ON public.installment_purchases USING btree (\"userId\", \"purchaseDate\")"
+    },
+    {
+      "tablename": "notice_dismissals",
+      "indexname": "notice_dismissals_pkey",
+      "indexdef": "CREATE UNIQUE INDEX notice_dismissals_pkey ON public.notice_dismissals USING btree (id)"
+    },
+    {
+      "tablename": "notice_dismissals",
+      "indexname": "notice_dismissals_userId_month_idx",
+      "indexdef": "CREATE INDEX \"notice_dismissals_userId_month_idx\" ON public.notice_dismissals USING btree (\"userId\", month)"
+    },
+    {
+      "tablename": "notice_dismissals",
+      "indexname": "notice_dismissals_userId_month_noticeKey_key",
+      "indexdef": "CREATE UNIQUE INDEX \"notice_dismissals_userId_month_noticeKey_key\" ON public.notice_dismissals USING btree (\"userId\", month, \"noticeKey\")"
+    },
+    {
+      "tablename": "payable_accounts",
+      "indexname": "payable_accounts_personId_idx",
+      "indexdef": "CREATE INDEX \"payable_accounts_personId_idx\" ON public.payable_accounts USING btree (\"personId\")"
+    },
+    {
+      "tablename": "payable_accounts",
+      "indexname": "payable_accounts_pkey",
+      "indexdef": "CREATE UNIQUE INDEX payable_accounts_pkey ON public.payable_accounts USING btree (id)"
+    },
+    {
+      "tablename": "payable_accounts",
+      "indexname": "payable_accounts_reimbursementReceivableId_idx",
+      "indexdef": "CREATE INDEX \"payable_accounts_reimbursementReceivableId_idx\" ON public.payable_accounts USING btree (\"reimbursementReceivableId\")"
+    },
+    {
+      "tablename": "payable_accounts",
+      "indexname": "payable_accounts_userId_idx",
+      "indexdef": "CREATE INDEX \"payable_accounts_userId_idx\" ON public.payable_accounts USING btree (\"userId\")"
+    },
+    {
+      "tablename": "people",
+      "indexname": "people_pkey",
+      "indexdef": "CREATE UNIQUE INDEX people_pkey ON public.people USING btree (id)"
+    },
+    {
+      "tablename": "people",
+      "indexname": "people_userId_name_key",
+      "indexdef": "CREATE UNIQUE INDEX \"people_userId_name_key\" ON public.people USING btree (\"userId\", name)"
+    },
+    {
+      "tablename": "receivable_accounts",
+      "indexname": "receivable_accounts_personId_idx",
+      "indexdef": "CREATE INDEX \"receivable_accounts_personId_idx\" ON public.receivable_accounts USING btree (\"personId\")"
+    },
+    {
+      "tablename": "receivable_accounts",
+      "indexname": "receivable_accounts_pkey",
+      "indexdef": "CREATE UNIQUE INDEX receivable_accounts_pkey ON public.receivable_accounts USING btree (id)"
+    },
+    {
+      "tablename": "receivable_accounts",
+      "indexname": "receivable_accounts_userId_idx",
+      "indexdef": "CREATE INDEX \"receivable_accounts_userId_idx\" ON public.receivable_accounts USING btree (\"userId\")"
+    },
+    {
+      "tablename": "subscription_charges",
+      "indexname": "subscription_charges_expenseId_key",
+      "indexdef": "CREATE UNIQUE INDEX \"subscription_charges_expenseId_key\" ON public.subscription_charges USING btree (\"expenseId\")"
+    },
+    {
+      "tablename": "subscription_charges",
+      "indexname": "subscription_charges_pkey",
+      "indexdef": "CREATE UNIQUE INDEX subscription_charges_pkey ON public.subscription_charges USING btree (id)"
+    },
+    {
+      "tablename": "subscription_charges",
+      "indexname": "subscription_charges_subscriptionId_month_key",
+      "indexdef": "CREATE UNIQUE INDEX \"subscription_charges_subscriptionId_month_key\" ON public.subscription_charges USING btree (\"subscriptionId\", month)"
+    },
+    {
+      "tablename": "subscription_charges",
+      "indexname": "subscription_charges_userId_month_idx",
+      "indexdef": "CREATE INDEX \"subscription_charges_userId_month_idx\" ON public.subscription_charges USING btree (\"userId\", month)"
+    },
+    {
+      "tablename": "subscriptions",
+      "indexname": "subscriptions_cardId_idx",
+      "indexdef": "CREATE INDEX \"subscriptions_cardId_idx\" ON public.subscriptions USING btree (\"cardId\")"
+    },
+    {
+      "tablename": "subscriptions",
+      "indexname": "subscriptions_categoryId_idx",
+      "indexdef": "CREATE INDEX \"subscriptions_categoryId_idx\" ON public.subscriptions USING btree (\"categoryId\")"
+    },
+    {
+      "tablename": "subscriptions",
+      "indexname": "subscriptions_pkey",
+      "indexdef": "CREATE UNIQUE INDEX subscriptions_pkey ON public.subscriptions USING btree (id)"
+    },
+    {
+      "tablename": "subscriptions",
+      "indexname": "subscriptions_userId_idx",
+      "indexdef": "CREATE INDEX \"subscriptions_userId_idx\" ON public.subscriptions USING btree (\"userId\")"
+    },
+    {
+      "tablename": "users",
+      "indexname": "users_email_key",
+      "indexdef": "CREATE UNIQUE INDEX users_email_key ON public.users USING btree (email)"
+    },
+    {
+      "tablename": "users",
+      "indexname": "users_pkey",
+      "indexdef": "CREATE UNIQUE INDEX users_pkey ON public.users USING btree (id)"
+    }
+  ],
+  "enums": [
+    {
+      "name": "CardCycleStatus",
+      "values": [
+        "OPEN",
+        "CUT",
+        "PAYMENT_PENDING",
+        "PAID",
+        "OVERDUE"
+      ]
+    },
+    {
+      "name": "InstallmentPurchaseStatus",
+      "values": [
+        "ACTIVE",
+        "PAID_OFF",
+        "CANCELLED",
+        "ADJUSTED"
+      ]
+    },
+    {
+      "name": "PayableAccountStatus",
+      "values": [
+        "ACTIVE",
+        "PAID_OFF",
+        "CANCELLED"
+      ]
+    },
+    {
+      "name": "PayableAccountType",
+      "values": [
+        "SIMPLE",
+        "LOAN"
+      ]
+    },
+    {
+      "name": "PayableOriginType",
+      "values": [
+        "MANUAL",
+        "DAILY_EXPENSE"
+      ]
+    },
+    {
+      "name": "PaymentMethod",
+      "values": [
+        "CASH",
+        "CARD"
+      ]
+    },
+    {
+      "name": "ReceivableAccountStatus",
+      "values": [
+        "ACTIVE",
+        "PAID_OFF",
+        "CANCELLED"
+      ]
+    },
+    {
+      "name": "ReceivableOriginType",
+      "values": [
+        "MANUAL",
+        "DAILY_EXPENSE",
+        "INSTALLMENT_PURCHASE"
+      ]
+    },
+    {
+      "name": "SubscriptionChargeStatus",
+      "values": [
+        "CONFIRMED",
+        "SKIPPED"
+      ]
+    }
+  ],
+  "security": [
+    {
+      "table_name": "_prisma_migrations",
+      "rls": true,
+      "force_rls": false,
+      "policies": 0
+    },
+    {
+      "table_name": "card_cycle_credits",
+      "rls": true,
+      "force_rls": false,
+      "policies": 0
+    },
+    {
+      "table_name": "card_cycles",
+      "rls": true,
+      "force_rls": false,
+      "policies": 0
+    },
+    {
+      "table_name": "cards",
+      "rls": true,
+      "force_rls": false,
+      "policies": 0
+    },
+    {
+      "table_name": "categories",
+      "rls": true,
+      "force_rls": false,
+      "policies": 0
+    },
+    {
+      "table_name": "daily_expenses",
+      "rls": true,
+      "force_rls": false,
+      "policies": 0
+    },
+    {
+      "table_name": "income_types",
+      "rls": true,
+      "force_rls": false,
+      "policies": 0
+    },
+    {
+      "table_name": "incomes",
+      "rls": true,
+      "force_rls": false,
+      "policies": 0
+    },
+    {
+      "table_name": "installment_purchases",
+      "rls": true,
+      "force_rls": false,
+      "policies": 0
+    },
+    {
+      "table_name": "notice_dismissals",
+      "rls": true,
+      "force_rls": false,
+      "policies": 0
+    },
+    {
+      "table_name": "payable_accounts",
+      "rls": true,
+      "force_rls": false,
+      "policies": 0
+    },
+    {
+      "table_name": "people",
+      "rls": true,
+      "force_rls": false,
+      "policies": 0
+    },
+    {
+      "table_name": "receivable_accounts",
+      "rls": true,
+      "force_rls": false,
+      "policies": 0
+    },
+    {
+      "table_name": "subscription_charges",
+      "rls": true,
+      "force_rls": false,
+      "policies": 0
+    },
+    {
+      "table_name": "subscriptions",
+      "rls": true,
+      "force_rls": false,
+      "policies": 0
+    },
+    {
+      "table_name": "users",
+      "rls": true,
+      "force_rls": false,
+      "policies": 0
+    }
+  ]
+}

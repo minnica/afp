@@ -10,6 +10,8 @@
     "icons:generate": "node scripts/generate-icons.mjs",
     "postinstall": "prisma generate",
     "test": "node --test --experimental-test-isolation=none tests/*.test.cjs",
+    "db:verify": "prisma generate && node scripts/verify-database-reproduction.cjs",
+    "db:audit-history": "node scripts/audit-migration-history.cjs",
     "audit:prod": "pnpm audit --prod",
     "audit:all": "pnpm audit"
   },

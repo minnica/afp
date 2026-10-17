@@ -210,7 +210,7 @@ No requiere migración ni modifica datos de producción. La regla de calendario 
 - `src/lib/debtAccountService.js` guarda movimiento/principal y estado en una sola transacción `ReadCommitted`. Un bloqueo asesor de PostgreSQL por usuario se adquiere antes de leer los registros y dura hasta commit/rollback. Serializa estas mutaciones del mismo usuario, incluidos traslados y borrados de cuentas; otros usuarios tienen claves distintas. Un fallo al actualizar el estado revierte también el movimiento o el principal. El POST de gastos conserva su recibo idempotente de A02 dentro de esa misma transacción.
 - Las lecturas derivan el estado del saldo actual, también para datos históricos incoherentes, sin escribir en la BD al consultar. El estado persistido se corrige al modificar el principal o un abono. No hay migración, reparación masiva de datos ni cambios de interfaz.
 
-Verificación: `node --test --experimental-test-isolation=none tests/*.test.cjs` terminó con **175 casos: 171 correctos, 4 omitidos sin `AFP_TEST_DATABASE_URL`, cero fallos**. `tests/debt-accounts.test.cjs` contiene diez regresiones de rutas y cálculo, incluidas cancelaciones, centavos, excedentes, traslados simultáneos y rollback. `tests/debt-accounts-integration.test.cjs` ejecutó **dos pruebas correctas contra PostgreSQL 16 desechable**, con diez abonos concurrentes por tipo de cuenta, ediciones concurrentes, principal, rollback real y lecturas de Gastos/Dashboard. La autenticación se simula; Prisma y PostgreSQL son reales. Para repetirlas, configurar `AFP_TEST_DATABASE_URL` exclusivamente a localhost y una BD `afp_test…` con el esquema actual, y ejecutar ese archivo con `node --test --experimental-test-isolation=none`. La base desechable se inicializó desde `schema.prisma`; esto no valida el historial de migraciones pendiente de A11. Build correcto; lint sin errores y con la advertencia previa de `useReactTable`. [Evidencia y cierre A05](artifacts/auditoria-2026-10-15/informe.md#A05-seguimiento).
+Verificación: `node --test --experimental-test-isolation=none tests/*.test.cjs` terminó con **175 casos: 171 correctos, 4 omitidos sin `AFP_TEST_DATABASE_URL`, cero fallos**. `tests/debt-accounts.test.cjs` contiene diez regresiones de rutas y cálculo, incluidas cancelaciones, centavos, excedentes, traslados simultáneos y rollback. `tests/debt-accounts-integration.test.cjs` ejecutó **dos pruebas correctas contra PostgreSQL 16 desechable**, con diez abonos concurrentes por tipo de cuenta, ediciones concurrentes, principal, rollback real y lecturas de Gastos/Dashboard. La autenticación se simula; Prisma y PostgreSQL son reales. Para repetirlas, configurar `AFP_TEST_DATABASE_URL` exclusivamente a localhost y una BD `afp_test…` con el esquema actual, y ejecutar ese archivo con `node --test --experimental-test-isolation=none`. La base desechable se inicializó desde `schema.prisma`; esa prueba no validaba el historial de migraciones; A11 lo verifica posteriormente. Build correcto; lint sin errores y con la advertencia previa de `useReactTable`. [Evidencia y cierre A05](artifacts/auditoria-2026-10-15/informe.md#A05-seguimiento).
 
 No se modificó Supabase ni se desplegó producción. A06 completa la protección de los flujos relacionados, incluida la creación desde compras a meses, como se describe a continuación.
 
@@ -346,8 +346,35 @@ Verificación: `node --test --experimental-test-isolation=none tests/*.test.cjs`
 
 - No ejecutar `migrate reset` ni `db push` en ambiente compartido/productivo.
 - Usar `prisma migrate deploy` para aplicar migraciones.
-- Migraciones en `prisma/migrations/` — no modificar manualmente.
+- Migraciones en `prisma/migrations/`: no modificar SQL ya aplicado ni sus checksums. Recuperar archivos ausentes solo con checksum verificado; versionar los cambios posteriores en migraciones nuevas.
 - No subir `.env` ni `.env.local` al repositorio.
+
+### Reconstrucción de la BD desde Git (A11)
+
+**Actividad concluida · implementación y verificación local · 17 de octubre de 2026.** Las **15 migraciones** permiten crear el esquema completo desde una base vacía con `prisma migrate deploy`. La fuente de estructura es `schema.prisma`; la configuración RLS también requiere el SQL versionado. No usar `migrate diff --from-empty` como sustituto del historial para inicializar entornos.
+
+- Se reconstruyó `20260518234708_add_payable_loan_support` desde los metadatos de solo lectura y el SQL generado por Prisma. Su SHA-256 **coincide exactamente** con el almacenado al aplicarla: `8ef7dcd79b9e4439e96092a131bbb569cb04b405721054e6916e71479a8c40b1`. No se inventó otro archivo bajo el nombre antiguo ni se modificó `_prisma_migrations`. Los otros doce checksums aplicados también coinciden.
+- El esquema incorpora los objetos históricos omitidos: enum `PayableAccountType`, nueve campos de préstamos en `PayableAccount`, tres campos de desglose de abonos en `DailyExpense`, relación de reembolso e índices de reembolso/suscripción. Conserva sus tipos, valores predeterminados y relaciones existentes. Esto alinea la persistencia; no introduce reglas nuevas de amortización ni formularios de préstamos.
+- La migración **aditiva de seguridad** `20261017020000_enable_application_rls` activa RLS en las 16 tablas de aplicación y en `_prisma_migrations`, en una transacción. Es repetible y no cambia registros, grants ni políticas. Conserva la denegación sin políticas públicas y el acceso del propietario desde Prisma; A01 sigue siendo obligatorio en la API. También reproduce `public.rls_auto_enable()` y el event trigger `ensure_rls`, existentes en Supabase, para activar RLS al crear tablas en `public`. Se conserva su definición observada, incluido el registro de errores; las futuras tablas deben seguir declarando RLS explícitamente en su migración.
+- La consulta de Supabase fue de solo lectura: tenía 13 migraciones aplicadas. Permanecen por aplicar allí `20261017000000_add_expense_operations` (A02) y la nueva migración RLS. Restaurar el archivo histórico no vuelve a ejecutar su SQL en una base que ya lo registra. No se modificó producción ni se desplegó.
+
+`pnpm db:audit-history` verifica nombres y SHA-256 contra `_prisma_migrations` en una transacción de solo lectura. Exige `AFP_MIGRATION_AUDIT_DATABASE_URL` explícita y no carga conexiones de `.env`. Devuelve 0 con historial completo, 2 si solo hay pendientes y 1 ante archivos ausentes, SQL alterado, duplicados o migraciones incompletas. `migrate status` no sustituye esta comprobación de checksums; `migrate deploy` tampoco demuestra ausencia de drift.
+
+La migración de seguridad requiere permiso para administrar event triggers: superusuario en PostgreSQL o el rol `postgres` habilitado por Supautils en Supabase. Para verificar la reconstrucción local se requiere Podman y una conexión desechable con esos permisos y capacidad de crear bases/roles:
+
+```bash
+podman run --rm -d --name afp-a11-postgres \
+  -e POSTGRES_PASSWORD=afp_test_only -e POSTGRES_DB=afp_test_a11 \
+  -p 127.0.0.1:55441:5432 docker.io/library/postgres:16-alpine
+AFP_MIGRATION_TEST_DATABASE_URL=postgresql://postgres:afp_test_only@127.0.0.1:55441/afp_test_a11 pnpm db:verify
+podman stop afp-a11-postgres
+```
+
+`db:verify` solo acepta localhost y una base `afp_test…`, sin parámetros de conexión. Crea dos bases y tres roles con nombres aleatorios y los elimina al terminar; no modifica las tablas de la base indicada. Prueba una instalación vacía y una actualización desde las 13 migraciones aplicadas, usando exclusivamente `migrate deploy`. Contrasta columnas, tipos, defaults, índices, claves y enums con el snapshot de Supabase; comprueba `migrate diff --exit-code`, checksums, segundo deploy sin cambios, conservación del préstamo/abono/reembolso e historial, y RLS con roles sin privilegios y un propietario sin `BYPASSRLS`. Compara también la función/event trigger con su snapshot y prueba `CREATE TABLE`, `CREATE TABLE AS` y `SELECT INTO`, limitados a `public`. Ejecuta las 182 regresiones con esa base recién migrada, incluidas las cinco integraciones. La consulta SQL y el snapshot no contienen datos financieros ni credenciales.
+
+En un entorno nuevo, configurar `DIRECT_URL`, aplicar `pnpm exec prisma migrate deploy` y ejecutar `pnpm exec prisma generate` antes de arrancar la app. Para actualizar un ambiente compartido, revisar primero historial/checksums, pendientes y diff de solo lectura, contar con respaldo y autorización explícita; aplicar mediante `migrate deploy` y repetir las comprobaciones. El diff previo desde la base conectada al esquema actual solo debe requerir la tabla A02; Prisma no representa RLS, que se comprueba aparte en el catálogo. No ejecutar automáticamente el SQL de un diff.
+
+La reconstrucción cubre el esquema `public` de AFP y su RLS, no usuarios/datos financieros, configuración de Supabase Auth, roles administrados por el proveedor ni secretos. [Evidencia y cierre A11](artifacts/auditoria-2026-10-15/informe.md#A11-seguimiento). Referencias: [historial de Prisma 7](https://www.prisma.io/docs/orm/v7/prisma-migrate/understanding-prisma-migrate/migration-histories) y [RLS en PostgreSQL](https://www.postgresql.org/docs/16/ddl-rowsecurity.html) y [event triggers de Supabase](https://supabase.com/docs/guides/database/postgres/event-triggers).
 
 ---
 
@@ -357,6 +384,7 @@ Verificación: `node --test --experimental-test-isolation=none tests/*.test.cjs`
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 DATABASE_URL=          # conexión PostgreSQL para Prisma
+DIRECT_URL=            # conexión de Prisma CLI para migraciones y diff; prisma.config.ts
 ```
 
 > No subir estos valores al repo.

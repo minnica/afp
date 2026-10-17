@@ -1,0 +1,42 @@
+{
+  "date": "2026-10-17",
+  "status": "implementation_complete_locally",
+  "source_access": "Supabase: solo lectura; metadatos estructurales sin cambios al finalizar",
+  "restored_migration": "20260518234708_add_payable_loan_support",
+  "restored_sha256": "8ef7dcd79b9e4439e96092a131bbb569cb04b405721054e6916e71479a8c40b1",
+  "matching_applied_checksums": 13,
+  "local_migrations": 15,
+  "pending_on_source": [
+    "20261017000000_add_expense_operations",
+    "20261017020000_enable_application_rls"
+  ],
+  "scenarios": [
+    "base vacía",
+    "actualización desde las 13 migraciones aplicadas"
+  ],
+  "schema_diff": "empty in both scenarios",
+  "source_catalog": "columns, types, defaults, nullability, indexes, constraints, enums, RLS, function and event trigger",
+  "rls_tables": 17,
+  "rls_policies": 0,
+  "new_table_rls_events": [
+    "CREATE TABLE",
+    "CREATE TABLE AS",
+    "SELECT INTO"
+  ],
+  "data_and_history_preserved": true,
+  "tests": {
+    "total": 182,
+    "passed": 182,
+    "failed": 0,
+    "skipped": 0,
+    "real_postgres_integrations": 5
+  },
+  "schema_validate": "passed",
+  "lint": {
+    "errors": 0,
+    "preexisting_warnings": 1
+  },
+  "test_database": "PostgreSQL 16 desechable; Auth simulado en API",
+  "production_modified": false,
+  "deployed": false
+}

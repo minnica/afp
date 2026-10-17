@@ -1,0 +1,16 @@
+
+> afp@0.1.0 db:verify /home/garatachia/projects/afp
+> prisma generate && node scripts/verify-database-reproduction.cjs
+
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma/schema.prisma.
+
+✔ Generated Prisma Client (v7.10.1) to ./node_modules/.pnpm/@prisma+client@7.10.1_prisma@7.10.1_@types+node@26.6.5_@types+react@19.3.0_react-dom@19_d75f92b6bc1a2f462202a15da19385e4/node_modules/@prisma/client in 198ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+
+OK base vacía: catálogo equivalente, diff vacío, checksums, deploy repetible, registros intactos y RLS.
+OK actualización desde las 13 migraciones aplicadas: catálogo equivalente, diff vacío, checksums, deploy repetible, registros intactos y RLS.
+A11: reconstrucción y actualización verificadas; 15 migraciones y 17 tablas con RLS, incluido el historial.

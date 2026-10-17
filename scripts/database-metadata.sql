@@ -1,0 +1,8 @@
+SELECT json_build_object(
+'migrations', (SELECT json_agg(t ORDER BY migration_name) FROM (SELECT migration_name, checksum, finished_at IS NOT NULL AS finished, rolled_back_at IS NOT NULL AS rolled_back FROM public._prisma_migrations) t),
+'columns', (SELECT json_agg(t ORDER BY table_name, column_name) FROM (SELECT table_name, column_name, data_type, udt_name, column_default, is_nullable, numeric_precision, numeric_scale, datetime_precision FROM information_schema.columns WHERE table_schema='public' AND table_name <> '_prisma_migrations') t),
+'constraints', (SELECT json_agg(t ORDER BY table_name,name) FROM (SELECT c.relname AS table_name, con.conname AS name, pg_get_constraintdef(con.oid) AS definition FROM pg_constraint con JOIN pg_class c ON c.oid=con.conrelid JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relname <> '_prisma_migrations') t),
+'indexes', (SELECT json_agg(t ORDER BY tablename,indexname) FROM (SELECT tablename,indexname,indexdef FROM pg_indexes WHERE schemaname='public' AND tablename <> '_prisma_migrations') t),
+'enums', (SELECT json_agg(t ORDER BY name) FROM (SELECT typname AS name, array_agg(enumlabel ORDER BY enumsortorder) AS values FROM pg_type JOIN pg_enum ON enumtypid=pg_type.oid JOIN pg_namespace n ON n.oid=typnamespace WHERE n.nspname='public' GROUP BY typname) t),
+'security', (SELECT json_agg(t ORDER BY table_name) FROM (SELECT c.relname AS table_name, c.relrowsecurity AS rls, c.relforcerowsecurity AS force_rls, (SELECT count(*)::int FROM pg_policy p WHERE p.polrelid=c.oid) AS policies FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relkind='r') t)
+) AS metadata;
