@@ -34,7 +34,7 @@ La página inicial es `/dashboard`: `/` redirige allí, el login navega al Dashb
 
 ## Stack
 
-- **Framework**: Next.js 16.2.6 (App Router)
+- **Framework**: Next.js 16.3.8 (App Router)
 - **Lenguaje**: JavaScript (jsconfig.json, no TypeScript)
 - **UI**: shadcn/ui (componentes locales en `src/components/ui/`) + Radix UI + Tailwind CSS v4; el Combobox oficial usa Base UI para la selección múltiple
 - **Íconos**: lucide-react + @hugeicons/react
@@ -316,7 +316,7 @@ Iconos de instalación:
 - `public/icons/app-icon.svg` es la fuente vectorial del símbolo de cartera, con fondo oscuro opaco y acento verde. No contiene texto pequeño ni depende de fuentes.
 - El manifest utiliza PNG de 192, 512 y 1024 px, y una variante de 512 px con `purpose: "maskable"` cuyo símbolo queda dentro de la zona segura circular de Android. La imagen ocupa todo el fondo; el sistema aplica el recorte exterior.
 - El layout declara `apple-touch-icon-v3.png` de 180 px para iPhone/iPad, y el favicon del proyecto incluye tamaños de 16 a 256 px con el mismo símbolo.
-- `npm run icons:generate` vuelve a exportar los PNG y el ICO desde el SVG mediante Sharp, declarado como dependencia de desarrollo. Al cambiar el diseño, actualizar la versión de las rutas de los iconos, sus referencias en manifest/layout y `CACHE_NAME` del service worker para renovar la caché.
+- `pnpm icons:generate` vuelve a exportar los PNG y el ICO desde el SVG mediante Sharp, declarado como dependencia de desarrollo. Al cambiar el diseño, actualizar la versión de las rutas de los iconos, sus referencias en manifest/layout y `CACHE_NAME` del service worker para renovar la caché.
 - Los iconos se precachean con el shell. Las instalaciones existentes pueden conservar la imagen anterior; una reinstalación se hace después de sincronizar cualquier gasto pendiente guardado en el dispositivo.
 
 Referencias: [iconos y zona segura de PWA](https://web.dev/learn/pwa/web-app-manifest#icons), [metadata de iconos en Next.js](https://nextjs.org/docs/app/api-reference/file-conventions/metadata/app-icons).
@@ -483,28 +483,42 @@ Con el servidor de desarrollo ejecutándose en el puerto 3000, abrir `http://10.
 La sesión pertenece al origen del navegador: si todavía no se ha iniciado sesión desde esa dirección, la app abre `/login`. Las pruebas usan los datos y la sesión propios del emulador.
 
 ```bash
-# Instalar dependencias
-npm install
+# Instalar exactamente las versiones del lockfile (incluye herramientas de build)
+pnpm install --frozen-lockfile
 
 # Dev (puerto 3000)
-npm run dev
+pnpm dev
 
 # Build (incluye prisma generate)
-npm run build
+pnpm build
 
-# Lint
-npm run lint
+# Lint y regresiones
+pnpm lint
+pnpm test
+
+# Auditorías separadas: producción y árbol completo
+pnpm audit:prod
+pnpm audit:all
 
 # Regenerar iconos de instalación desde el SVG
-npm run icons:generate
+pnpm icons:generate
 ```
+
+### Dependencias y seguridad (A10)
+
+**Actualización implementada · 17 de octubre de 2026.** Usar **pnpm 10.33.0** (declarado en `packageManager`) y conservar `pnpm-lock.yaml`. Verificado con Node.js 22.23.2. Instalar con `pnpm install --frozen-lockfile`; no generar un segundo lockfile con npm.
+
+- Next.js y `eslint-config-next` quedan fijados en **16.3.8**; Sharp en **0.35.5**, compartido con la dependencia opcional de Next. Prisma, Client y adapter-pg se actualizan juntos a **7.10.1**. Las demás actualizaciones respetan sus versiones mayores; React y React DOM permanecen en 19.2.4. No se añadieron overrides forzados.
+- `shadcn` **4.22.0** pasa a desarrollo. Su import `shadcn/tailwind.css` sigue siendo necesario al compilar: instalar también `devDependencies` en el entorno de build. La CLI no forma parte de la instalación de producción. Prisma permanece disponible para el flujo existente de generación y migraciones.
+- `pnpm audit:prod`: **cero avisos**. `pnpm audit:all`: queda **un aviso alto** de `braces@3.0.3`, sin parche publicado, a través de herramientas de desarrollo (ESLint y shadcn). Se conserva visible: no hay exclusiones ni reducción del umbral. No hay una ruta de producción que lo use; ejecutar estas herramientas solo con patrones y configuraciones de confianza. Revisar el [aviso pendiente](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm) en la siguiente actualización y sustituirlo cuando exista una corrección compatible.
+- Los resultados corresponden al registro consultado en esta fecha; repetir ambas auditorías antes de publicar. El detalle, la comparación antes/después y los límites de verificación están en el [cierre A10](artifacts/auditoria-2026-10-15/informe.md#A10-seguimiento).
 
 ### Prisma (desde raíz del proyecto)
 
 ```bash
-npx prisma generate
-npx prisma migrate deploy
-npx prisma studio          # explorador visual de BD
+pnpm exec prisma generate
+pnpm exec prisma migrate deploy
+pnpm exec prisma studio          # explorador visual de BD
 ```
 
 ---
