@@ -6,7 +6,7 @@ La aplicación tiene una base funcional sólida para gastos, cortes, MSI, suscri
 
 **14 hallazgos priorizados: 1 P0, 6 P1 y 7 P2.** P0 exige atención inmediata si la app es accesible por terceros; P1 protege datos o decisiones financieras; P2 corrige exactitud, experiencia o crecimiento. Las alertas del gestor de paquetes se agrupan como un hallazgo y no representan 91 fallos explotados en AFP.
 
-**Seguimiento · 17 de octubre de 2026:** 6 hallazgos con implementación local concluida (A01, A02, A03, A05, A06 y A10) y 8 pendientes. A10 deja cero avisos en dependencias de producción y un aviso residual de desarrollo sin parche publicado, documentado en su cierre. El despliegue autorizado y las verificaciones integradas pendientes conservan su alcance; no se declaran resueltos en producción. [A01](#A01-seguimiento) · [A02](#A02-seguimiento) · [A03](#A03-seguimiento) · [A05](#A05-seguimiento) · [A06](#A06-seguimiento) · [A10](#A10-seguimiento).
+**Seguimiento · 17 de octubre de 2026:** 7 hallazgos con implementación local concluida (A01, A02, A03, A05, A06, A10 y A11) y 7 pendientes. A11 permite reconstruir la BD y RLS desde Git, con el checksum original recuperado y verificación en PostgreSQL desechable. A10 deja cero avisos en dependencias de producción y un aviso residual de desarrollo sin parche publicado, documentado en su cierre. El despliegue autorizado y las verificaciones integradas pendientes conservan su alcance; no se declaran resueltos en producción. [A01](#A01-seguimiento) · [A02](#A02-seguimiento) · [A03](#A03-seguimiento) · [A05](#A05-seguimiento) · [A06](#A06-seguimiento) · [A10](#A10-seguimiento) · [A11](#A11-seguimiento).
 
 **Contenido**
 
@@ -189,7 +189,7 @@ Al crear o borrar un abono se recalcula la cuenta por pagar, pero al editarlo no
 - **Cálculo único:** [`debtAccounts.js`](../../src/lib/calculations/debtAccounts.js) usa Decimal y redondea individualmente el principal y cada abono a centavos. Gastos, Ingresos, cuentas, bootstrap de Gastos y Dashboard comparten saldo/estado. Los listados derivan la clasificación histórica sin escribir al consultar; modificar un abono o principal corrige el estado persistido.
 - **Mutaciones atómicas:** [`debtAccountService.js`](../../src/lib/debtAccountService.js) coordina las altas, ediciones y eliminaciones de abonos y la edición del principal en `ReadCommitted`, con bloqueo asesor por usuario antes de leer. Cubre operaciones simultáneas y traslados de ingresos entre cuentas. Conserva el recibo idempotente del POST de gastos y la relación existente al editar gastos. Un fallo del estado revierte el movimiento/principal.
 - **Cancelaciones y excedentes:** `CANCELLED` permanece cancelada. Saldo cero o negativo liquida las demás cuentas; el excedente se conserva como `pendingBalance` negativo y `excessAmount` positivo, sin compensaciones ni devoluciones automáticas. Reducir el abono o aumentar el principal reabre la cuenta cuando vuelve a existir saldo.
-- **Alcance:** sin migración ni cambios visuales. No modifica datos de Supabase ni despliega. A06 se completó posteriormente para los demás flujos relacionados, especialmente compras a meses; A11 conserva el problema del historial de migraciones.
+- **Alcance:** sin migración ni cambios visuales. No modifica datos de Supabase ni despliega. A06 se completó posteriormente para los demás flujos relacionados, especialmente compras a meses; A11 resuelve posteriormente el historial de migraciones, como se documenta en su cierre.
 
 | Comprobación | Resultado |
 | --- | --- |
@@ -224,7 +224,7 @@ La cuenta por cobrar se crea antes del gasto o de la compra MSI. Si falla la seg
 - **Validación de relaciones:** alta/edición de MSI y edición de gastos comprueban la pertenencia de las referencias dentro de la transacción, antes de escribir y después del bloqueo por usuario. Se conserva la validación del cuerpo y la autorización por Bearer de A01.
 - **Gastos e ingresos:** se verificó la cobertura ya implementada en A02/A05. Gastos incluye recibo idempotente, cuenta opcional, gasto, decisión de suscripción y saldo por pagar; ingresos incluye movimiento y ambas cuentas al trasladar un abono. El fallo de la segunda actualización de saldo revierte también la primera.
 - **Idempotencia y límites:** Gastos conserva el UUID y la respuesta durable; los reintentos concurrentes no duplican registros y el contenido distinto devuelve 409. MSI e Ingresos conservan su contrato sin recibo idempotente: el reintento después de rollback es seguro, pero no se afirma deduplicación si se pierde la respuesta después del commit. No cambia el tratamiento de cuentas independientes al editar/borrar una compra ni se reparan huérfanos históricos.
-- **Alcance:** sin migración, cambios visuales ni escrituras en Supabase. Se reutiliza el servicio transaccional de A05. El historial de migraciones de A11 continúa pendiente.
+- **Alcance:** sin migración, cambios visuales ni escrituras en Supabase. Se reutiliza el servicio transaccional de A05. El historial de migraciones se verificó posteriormente en el cierre A11.
 
 | Comprobación | Resultado |
 | --- | --- |
@@ -323,11 +323,34 @@ La cuenta por cobrar se crea antes del gasto o de la compra MSI. Si falla la seg
 
 ### A11 · P1 · La BD no se reproduce completamente desde Git
 
+**Estado: actividad concluida, implementada y verificada localmente · 17 de octubre de 2026.** El SQL histórico se reconstruyó con checksum idéntico y la reconstrucción completa pasó en PostgreSQL real desechable. Pendiente de aplicar las migraciones nuevas y desplegar con autorización. El texto siguiente conserva el hallazgo original.
+
 **Evidencia:** la base conectada registra `20260518234708_add_payable_loan_support` como aplicada, pero falta en `prisma/migrations`. Hay 13 migraciones aplicadas y 12 archivos SQL locales. Todas las migraciones locales aparecen aplicadas; no hay una migración local pendiente.
 
 Además, RLS está activo en las 16 tablas reales, mientras solo las migraciones de las dos tablas más recientes activan RLS en el repositorio. La configuración anterior parece haberse aplicado fuera de las migraciones versionadas. No se afirma divergencia de columnas sin un diff de esquema completo.
 
 **Impacto:** un entorno nuevo o una recuperación puede diferir de la base actual, incluida la seguridad. **Corrección:** recuperar la migración original del historial/respaldos y verificar su checksum; revisar el esquema en una base desechable; versionar la configuración de seguridad mediante una migración nueva revisada. Evitar reset, db push o reescribir el historial aplicado.
+
+<a id="A11-seguimiento"></a>
+
+#### Actividad concluida · implementación local · 17 de octubre de 2026
+
+- **Recuperación exacta:** no apareció una copia del SQL en Git ni en los respaldos locales consultados. Se reconstruyó con los metadatos de Supabase y `prisma migrate diff` entre modelos; el archivo resultante de [`20260518234708_add_payable_loan_support`](../../prisma/migrations/20260518234708_add_payable_loan_support/migration.sql) tiene exactamente el SHA-256 registrado: `8ef7dcd79b9e4439e96092a131bbb569cb04b405721054e6916e71479a8c40b1`. Se verificaron también los otros doce checksums aplicados, todos idénticos. No se sustituyeron checksums, marcaron migraciones con `resolve` ni modificaron filas del historial compartido.
+- **Drift estructural corregido:** además del archivo ausente, faltaban en `schema.prisma` el enum de tipo de cuenta, nueve campos de préstamo, tres campos de abonos, la relación de reembolso y dos índices. Se incorporaron con sus tipos, defaults y relaciones reales. Los metadatos completos se conservan en el [snapshot de solo lectura](a11-metadata-before.json); no incluye registros financieros ni credenciales. El catálogo reproducido coincide con este snapshot, más la tabla pendiente A02.
+- **Seguridad versionada:** [`20261017020000_enable_application_rls`](../../prisma/migrations/20261017020000_enable_application_rls/migration.sql) activa RLS de forma aditiva y transaccional en las 16 tablas de aplicación y `_prisma_migrations`. Sin políticas públicas, cambios de grants ni `FORCE ROW LEVEL SECURITY`; conserva el acceso del propietario y la autorización de API de A01. Incluye la función `rls_auto_enable()` y el event trigger `ensure_rls` ya existentes, conservados en el [snapshot de automatización](a11-automation-before.json). Requiere permiso para event triggers (superusuario local o `postgres` con Supautils en Supabase). Una segunda ejecución no cambia datos.
+- **Herramientas reproducibles:** [`db:verify`](../../scripts/verify-database-reproduction.cjs) reconstruye dos bases locales efímeras mediante el historial real y comprueba estructura, seguridad y actualización. [`db:audit-history`](../../scripts/audit-migration-history.cjs) compara checksums en una transacción de solo lectura y distingue errores de migraciones pendientes. [Operación y comandos en README](../../README.md#reconstrucción-de-la-bd-desde-git-a11).
+
+[Resumen verificable de resultados](a11-verificacion.json).
+
+| Comprobación | Resultado |
+| --- | --- |
+| Base vacía y actualización | **Dos escenarios correctos**, PostgreSQL 16: 15 migraciones, segundo deploy sin cambios, `migrate status` correcto y `migrate diff --exit-code` sin diferencias con Prisma. La actualización comienza con las 13 migraciones del snapshot y conserva las filas originales de `_prisma_migrations`, préstamo, abono y reembolso. [Log](a11-reconstruccion.log). |
+| Catálogo independiente | Columnas, tipos, defaults, nulabilidad, índices, claves y enums coinciden con los metadatos de Supabase PostgreSQL 17.6, salvo la adición esperada de A02. Se prueba el historial SQL; no se inicializan tablas desde `schema.prisma`. |
+| RLS | **17 tablas con RLS, cero políticas**. Dos roles sin `SUPERUSER`/`BYPASSRLS`, con permisos SQL de lectura/escritura, no pueden leer filas, insertar usuarios ni actualizar/borrar el usuario existente. El propietario sin `BYPASSRLS` sí puede leer y escribir. El automatismo protege nuevas tablas mediante `CREATE TABLE`, `CREATE TABLE AS` y `SELECT INTO`, sin activarse en otro esquema. |
+| Regresiones | **182 pruebas correctas, cero fallos y cero omisiones**, incluidas las cinco integraciones anteriores y tres pruebas nuevas de checksum, archivo ausente, migración incompleta y reconstrucción del historial. PostgreSQL local se inicializó mediante `migrate deploy`; Auth sigue simulado en las integraciones de API. [Log](a11-pruebas.log). |
+| Validación estática | Schema Prisma válido y `git diff --check` correcto. Lint: cero errores y la advertencia previa de `useReactTable`. [Lint](a11-lint.log) · [Schema](a11-schema.log). |
+
+**Cierre:** implementación A11 concluida y verificada. La consulta compartida fue de solo lectura: allí siguen pendientes `20261017000000_add_expense_operations` y `20261017020000_enable_application_rls`; recuperar el SQL antiguo no vuelve a aplicarlo. No se modificó Supabase ni se desplegó. La reproducción cubre el esquema público de AFP y RLS, no el contenido financiero, usuarios de Auth ni configuración/roles administrados de Supabase. Quedan la aplicación autorizada de migraciones y el recorrido autenticado en el ambiente de despliegue.
 
 ---
 
@@ -416,7 +439,7 @@ Para llamar a una cifra «dinero disponible» se necesitan saldos iniciales, cue
 
 ## Orden recomendado
 
-1. **Seguridad:** completar el despliegue autorizado y la validación integrada de A01, cuya implementación local ya está terminada; A10 ya tiene actualización local con cero avisos de producción, un aviso residual de desarrollo y verificación de build predeterminado pendiente en el entorno de despliegue. Continuar con pruebas de aislamiento. Alinear migraciones y RLS versionado (A11) para poder crear un entorno confiable de pruebas.
+1. **Seguridad:** completar el despliegue autorizado y la validación integrada de A01, cuya implementación local ya está terminada; A10 ya tiene actualización local con cero avisos de producción, un aviso residual de desarrollo y verificación de build predeterminado pendiente en el entorno de despliegue. Continuar con pruebas de aislamiento. A11 ya recupera el historial y versiona RLS con reconstrucción verificada; aplicar sus migraciones pendientes en el despliegue autorizado.
 2. **Integridad de registros:** A02, A05 y A06 implementados localmente y verificados con PostgreSQL desechable en el cierre de A06. Completar migración/despliegue autorizado y comprobación autenticada en ese ambiente.
 3. **Exactitud visible:** A03 implementado localmente; continuar con calendario A04, historial completo A07, validaciones A08 y filtros A09.
 4. **Operación diaria:** política offline A12, consultas A13, login A14, recuperación de acceso y CI.

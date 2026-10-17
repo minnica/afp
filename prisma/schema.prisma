@@ -43,6 +43,11 @@ enum PayableAccountStatus {
   CANCELLED
 }
 
+enum PayableAccountType {
+  SIMPLE
+  LOAN
+}
+
 enum ReceivableOriginType {
   MANUAL
   DAILY_EXPENSE
@@ -234,6 +239,9 @@ model DailyExpense {
   receivableAccountId String?
   payableAccountId    String?
   subscriptionId      String?
+  loanBalanceAfterPayment Decimal?
+  loanInterestAmount      Decimal?
+  loanPrincipalAmount     Decimal?
   createdAt           DateTime      @default(now())
   updatedAt           DateTime      @updatedAt
 
@@ -250,6 +258,7 @@ model DailyExpense {
   @@index([cardId])
   @@index([categoryId])
   @@index([payableAccountId])
+  @@index([subscriptionId])
   @@map("daily_expenses")
 }
 
@@ -353,6 +362,7 @@ model ReceivableAccount {
   incomes              Income[]
   dailyExpenses        DailyExpense[]
   installmentPurchases InstallmentPurchase[]
+  reimbursedPayables   PayableAccount[]
 
   @@index([userId])
   @@index([personId])
@@ -375,12 +385,26 @@ model PayableAccount {
   createdAt              DateTime             @default(now())
   updatedAt              DateTime             @updatedAt
 
+  // Campos históricos de préstamos; conservan el contrato ya aplicado en la BD.
+  accountType               PayableAccountType @default(SIMPLE)
+  annualInterestRate        Decimal?
+  currentBalance            Decimal?
+  firstPaymentDate          DateTime?
+  paymentAmount             Decimal?
+  paymentDays               Int[]              @default([])
+  paymentsMade              Int?
+  reimbursementReceivableId String?
+  totalPayments             Int?
+
   user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   person        Person         @relation(fields: [personId], references: [id])
   dailyExpenses DailyExpense[]
 
+  reimbursementReceivable ReceivableAccount? @relation(fields: [reimbursementReceivableId], references: [id], onDelete: SetNull)
+
   @@index([userId])
   @@index([personId])
+  @@index([reimbursementReceivableId])
   @@map("payable_accounts")
 }
 
