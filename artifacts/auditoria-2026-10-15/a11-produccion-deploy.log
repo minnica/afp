@@ -1,0 +1,18 @@
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma/schema.prisma.
+
+15 migrations found in prisma/migrations
+
+Applying migration `20261017000000_add_expense_operations`
+Applying migration `20261017020000_enable_application_rls`
+
+The following migration(s) have been applied:
+
+migrations/
+  └─ 20261017000000_add_expense_operations/
+    └─ migration.sql
+  └─ 20261017020000_enable_application_rls/
+    └─ migration.sql
+
+All migrations have been successfully applied.

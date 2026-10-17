@@ -6,7 +6,7 @@ La aplicación tiene una base funcional sólida para gastos, cortes, MSI, suscri
 
 **14 hallazgos priorizados: 1 P0, 6 P1 y 7 P2.** P0 exige atención inmediata si la app es accesible por terceros; P1 protege datos o decisiones financieras; P2 corrige exactitud, experiencia o crecimiento. Las alertas del gestor de paquetes se agrupan como un hallazgo y no representan 91 fallos explotados en AFP.
 
-**Seguimiento · 17 de octubre de 2026:** 7 hallazgos con implementación local concluida (A01, A02, A03, A05, A06, A10 y A11) y 7 pendientes. A11 permite reconstruir la BD y RLS desde Git, con el checksum original recuperado y verificación en PostgreSQL desechable. A10 deja cero avisos en dependencias de producción y un aviso residual de desarrollo sin parche publicado, documentado en su cierre. El despliegue autorizado y las verificaciones integradas pendientes conservan su alcance; no se declaran resueltos en producción. [A01](#A01-seguimiento) · [A02](#A02-seguimiento) · [A03](#A03-seguimiento) · [A05](#A05-seguimiento) · [A06](#A06-seguimiento) · [A10](#A10-seguimiento) · [A11](#A11-seguimiento).
+**Seguimiento · 17 de octubre de 2026:** 7 hallazgos con implementación local concluida (A01, A02, A03, A05, A06, A10 y A11) y 7 pendientes. A11 permite reconstruir la BD y RLS desde Git, con el checksum original recuperado y verificación en PostgreSQL desechable; las migraciones pendientes de A02/A11 ya se aplicaron a Supabase con autorización del usuario, como se documenta en el seguimiento de producción. A10 deja cero avisos en dependencias de producción y un aviso residual de desarrollo sin parche publicado, documentado en su cierre. El despliegue autorizado y las verificaciones integradas pendientes conservan su alcance; aplicar las migraciones no equivale a publicar y validar las correcciones de la aplicación. [A01](#A01-seguimiento) · [A02](#A02-seguimiento) · [A03](#A03-seguimiento) · [A05](#A05-seguimiento) · [A06](#A06-seguimiento) · [A10](#A10-seguimiento) · [A11](#A11-seguimiento).
 
 **Contenido**
 
@@ -104,7 +104,7 @@ Este seguimiento corresponde a A01. Los ajustes de autenticación de la cola y d
 - **Cola y pestañas:** eliminación por ID confirmado, actualización individual de errores, Web Locks por usuario y avisos BroadcastChannel. Sin Web Locks, la protección definitiva sigue en el servidor. Una nueva captura durante un envío nunca se reemplaza por una instantánea antigua.
 - **Servidor idempotente:** [`expenseOperations.js`](../../src/lib/expenseOperations.js) utiliza una clave única usuario/UUID y una huella del contenido. Repetir la operación devuelve el recibo original; cambiar los datos devuelve 409. Gasto, cuenta vinculada, decisión de suscripción, estado de cuenta por pagar y recibo se confirman juntos o se revierten juntos. El recibo sobrevive a la edición/eliminación del gasto.
 - **Compatibilidad:** importación transaccional de pendientes de localStorage con marcadores por entrada y copia original conservada. Los clientes antiguos sin UUID no adquieren idempotencia; hay que cerrar/recargar sus pestañas al actualizar. Una respuesta perdida antes de esta versión no puede deduplicarse retroactivamente sin evidencia.
-- **Migración aditiva preparada:** [`20261017000000_add_expense_operations`](../../prisma/migrations/20261017000000_add_expense_operations/migration.sql), con RLS activo y sin políticas públicas. No se aplicó a Supabase ni se desplegó producción. [README actualizado](../../README.md#pwa--modo-offline).
+- **Migración aditiva aplicada a Supabase:** [`20261017000000_add_expense_operations`](../../prisma/migrations/20261017000000_add_expense_operations/migration.sql), con RLS activo y sin políticas públicas. Se aplicó con autorización el 17 de octubre de 2026 en el seguimiento de producción de A11; esta operación no desplegó la aplicación. [README actualizado](../../README.md#pwa--modo-offline).
 
 | Verificación | Resultado |
 | --- | --- |
@@ -114,7 +114,7 @@ Este seguimiento corresponde a A01. Los ajustes de autenticación de la cola y d
 | PostgreSQL real | Suite de idempotencia/concurrencia/rollback preparada; omitida junto con la de suscripciones por falta de `AFP_TEST_DATABASE_URL`. Requiere base local `afp_test…` y migraciones aplicadas. |
 | Build / lint | Build correcto con Google Fonts accesible. Lint: cero errores, una advertencia previa de `useReactTable`. |
 
-**Pendiente de operación:** aplicar la migración aditiva y desplegar con autorización explícita. La integración A02 con PostgreSQL aislado se ejecutó posteriormente y pasó en el cierre de A06; no equivale a una validación del formulario autenticado ni a un despliegue. A05 y A06 también están implementados localmente, como se documenta abajo; A12 conserva su alcance pendiente.
+**Pendiente de operación:** desplegar la aplicación con autorización explícita; la migración aditiva ya se aplicó a Supabase en el seguimiento A11. La integración A02 con PostgreSQL aislado se ejecutó posteriormente y pasó en el cierre de A06; no equivale a una validación del formulario autenticado ni a un despliegue. A05 y A06 también están implementados localmente, como se documenta abajo; A12 conserva su alcance pendiente.
 
 
 ---
@@ -323,7 +323,7 @@ La cuenta por cobrar se crea antes del gasto o de la compra MSI. Si falla la seg
 
 ### A11 · P1 · La BD no se reproduce completamente desde Git
 
-**Estado: actividad concluida, implementada y verificada localmente · 17 de octubre de 2026.** El SQL histórico se reconstruyó con checksum idéntico y la reconstrucción completa pasó en PostgreSQL real desechable. Pendiente de aplicar las migraciones nuevas y desplegar con autorización. El texto siguiente conserva el hallazgo original.
+**Estado: actividad concluida, implementada, verificada y migraciones aplicadas a Supabase · 17 de octubre de 2026.** El SQL histórico se reconstruyó con checksum idéntico y la reconstrucción completa pasó en PostgreSQL real desechable. La aplicación autorizada de las dos migraciones pendientes se verificó también en producción; no se publicó la aplicación en esta operación. El texto siguiente conserva el hallazgo original.
 
 **Evidencia:** la base conectada registra `20260518234708_add_payable_loan_support` como aplicada, pero falta en `prisma/migrations`. Hay 13 migraciones aplicadas y 12 archivos SQL locales. Todas las migraciones locales aparecen aplicadas; no hay una migración local pendiente.
 
@@ -350,7 +350,15 @@ Además, RLS está activo en las 16 tablas reales, mientras solo las migraciones
 | Regresiones | **182 pruebas correctas, cero fallos y cero omisiones**, incluidas las cinco integraciones anteriores y tres pruebas nuevas de checksum, archivo ausente, migración incompleta y reconstrucción del historial. PostgreSQL local se inicializó mediante `migrate deploy`; Auth sigue simulado en las integraciones de API. [Log](a11-pruebas.log). |
 | Validación estática | Schema Prisma válido y `git diff --check` correcto. Lint: cero errores y la advertencia previa de `useReactTable`. [Lint](a11-lint.log) · [Schema](a11-schema.log). |
 
-**Cierre:** implementación A11 concluida y verificada. La consulta compartida fue de solo lectura: allí siguen pendientes `20261017000000_add_expense_operations` y `20261017020000_enable_application_rls`; recuperar el SQL antiguo no vuelve a aplicarlo. No se modificó Supabase ni se desplegó. La reproducción cubre el esquema público de AFP y RLS, no el contenido financiero, usuarios de Auth ni configuración/roles administrados de Supabase. Quedan la aplicación autorizada de migraciones y el recorrido autenticado en el ambiente de despliegue.
+#### Aplicación autorizada en producción · 17 de octubre de 2026, 08:23 UTC
+
+Se aplicaron **`20261017000000_add_expense_operations` y `20261017020000_enable_application_rls`** mediante `prisma migrate deploy`, después de confirmar por MCP los 13 checksums originales y un diff limitado a la tabla A02. Se utilizó Prisma para conservar el historial nativo; el MCP verificó antes y después la estructura, RLS y las huellas de los registros existentes.
+
+- **15 migraciones aplicadas, checksums coincidentes y cero pendientes.** [Ejecución](a11-produccion-deploy.log) · [Estado](a11-produccion-status.log).
+- **Diff de esquema vacío**, 17 tablas con RLS y cero políticas; función/event trigger conservados. [Diff](a11-produccion-diff.log).
+- **Registros preexistentes intactos:** coincidieron las huellas de las 15 tablas anteriores y las 13 filas originales de `_prisma_migrations`. No se volvieron a ejecutar migraciones antiguas ni se reescribieron sus checksums. [Resultado de verificación](a11-produccion.json).
+
+**Cierre:** implementación A11 y aplicación de sus migraciones concluidas. La reproducción cubre el esquema público de AFP y RLS, no el contenido financiero, usuarios de Auth ni configuración/roles administrados de Supabase. Esta operación no hizo push ni publicó la aplicación; el despliegue y recorrido autenticado conservan su alcance separado.
 
 ---
 
@@ -439,8 +447,8 @@ Para llamar a una cifra «dinero disponible» se necesitan saldos iniciales, cue
 
 ## Orden recomendado
 
-1. **Seguridad:** completar el despliegue autorizado y la validación integrada de A01, cuya implementación local ya está terminada; A10 ya tiene actualización local con cero avisos de producción, un aviso residual de desarrollo y verificación de build predeterminado pendiente en el entorno de despliegue. Continuar con pruebas de aislamiento. A11 ya recupera el historial y versiona RLS con reconstrucción verificada; aplicar sus migraciones pendientes en el despliegue autorizado.
-2. **Integridad de registros:** A02, A05 y A06 implementados localmente y verificados con PostgreSQL desechable en el cierre de A06. Completar migración/despliegue autorizado y comprobación autenticada en ese ambiente.
+1. **Seguridad:** completar el despliegue autorizado y la validación integrada de A01, cuya implementación local ya está terminada; A10 ya tiene actualización local con cero avisos de producción, un aviso residual de desarrollo y verificación de build predeterminado pendiente en el entorno de despliegue. Continuar con pruebas de aislamiento. A11 ya recupera el historial y versiona RLS con reconstrucción verificada; sus migraciones están aplicadas y comprobadas en Supabase.
+2. **Integridad de registros:** A02, A05 y A06 implementados localmente y verificados con PostgreSQL desechable en el cierre de A06. La migración A02 ya se aplicó en el seguimiento A11; completar despliegue autorizado y comprobación autenticada en ese ambiente.
 3. **Exactitud visible:** A03 implementado localmente; continuar con calendario A04, historial completo A07, validaciones A08 y filtros A09.
 4. **Operación diaria:** política offline A12, consultas A13, login A14, recuperación de acceso y CI.
 5. **Producto:** conciliación revisable, calendario/reservas y presupuestos; después proyección con saldos reales.
