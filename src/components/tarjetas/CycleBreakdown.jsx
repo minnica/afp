@@ -101,6 +101,11 @@ export default function CycleBreakdown({ cycle }) {
       {!isMobile && <p className="text-xs text-muted-foreground">
         {explanation}
       </p>}
+      {Number(cycle.postCutCreditAmount) > 0 && <dl className="flex flex-col gap-2 text-sm">
+        <div className="flex justify-between gap-3"><dt>Devoluciones después del corte</dt><dd className="tabular-nums">{formatMoney(cycle.postCutCreditAmount)}</dd></div>
+        <div className="flex justify-between gap-3"><dt>Pago del período tras devoluciones</dt><dd className="tabular-nums">{formatMoney(cycle.paymentDueAmount)}</dd></div>
+        <div><dt className="text-muted-foreground">Referencia · {formatShortDate(cycle.postCutCreditDate)}</dt><dd className="break-words">{cycle.postCutCreditNotes}</dd></div>
+      </dl>}
       <BreakdownSections isMobile={isMobile} className={cn("grid gap-4", hasCredits ? "lg:grid-cols-2" : "lg:grid-cols-3")}>
         <BreakdownSection
           title="Gastos"

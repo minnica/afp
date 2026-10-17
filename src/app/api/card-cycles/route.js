@@ -19,6 +19,9 @@ const cycleSelect = {
   status: true,
   paidAt: true,
   paidAmount: true,
+  postCutCreditAmount: true,
+  postCutCreditDate: true,
+  postCutCreditNotes: true,
   notes: true,
   createdAt: true,
   updatedAt: true,
@@ -348,6 +351,15 @@ async function updateCycle(userId, id, getData) {
     const current = await tx.cardCycle.findUnique({ where: { id, userId } });
     if (!current) throw new ApiAccessError("Ciclo no encontrado.", 404);
     const data = getData(current);
+    const next = { ...current, ...data };
+    if (Number(next.postCutCreditAmount ?? 0) > 0) {
+      if (next.statementAmount == null || Math.round(Number(next.postCutCreditAmount) * 100) > Math.round(Number(next.statementAmount) * 100)) {
+        throw new ApiAccessError("La devolución aplicada no puede superar el estado de cuenta. Revisa primero las devoluciones de este corte.", 409);
+      }
+      if (new Date(next.postCutCreditDate).toISOString().slice(0, 10) <= new Date(next.cutDate).toISOString().slice(0, 10)) {
+        throw new ApiAccessError("La fecha de aplicación debe ser posterior al corte; los créditos incluidos en el estado de cuenta no se descuentan de nuevo.", 409);
+      }
+    }
     const status = getStoredCycleStatus({ ...current, ...data });
     const cycle = await tx.cardCycle.update({
       where: { id, userId }, data: { ...data, status }, select: cycleSelect,
@@ -446,6 +458,34 @@ export async function PATCH(request) {
           throw new ApiAccessError("Captura el estado de cuenta antes de registrar el total pagado.", 409);
         }
         return { paidAt: paidDate, paidAmount: amount === 0 ? null : amount };
+      });
+      return NextResponse.json({ cycle });
+    }
+
+    if (action === "UPDATE_POST_CUT_CREDIT") {
+      const amount = parseCycleMoney(body.postCutCreditAmount);
+      if (amount === null) {
+        throw new ApiAccessError("La devolución debe ser un importe no negativo con hasta dos decimales.", 400);
+      }
+      let date = null;
+      let notes = null;
+      if (amount > 0) {
+        const value = body.postCutCreditDate;
+        date = typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value)
+          ? new Date(`${value}T12:00:00.000Z`) : new Date(NaN);
+        if (!Number.isFinite(date.getTime()) || date.toISOString().slice(0, 10) !== value || value > new Date().toISOString().slice(0, 10)) {
+          throw new ApiAccessError("Indica una fecha de aplicación válida, que no sea futura.", 400);
+        }
+        if (typeof body.postCutCreditNotes !== "string" || !body.postCutCreditNotes.trim() || body.postCutCreditNotes.length > 2000) {
+          throw new ApiAccessError("Indica el concepto o referencia de las devoluciones (máximo 2000 caracteres).", 400);
+        }
+        notes = body.postCutCreditNotes.trim();
+      }
+      const cycle = await updateCycle(userId, id, (current) => {
+        if (amount > 0 && current.statementAmount == null) {
+          throw new ApiAccessError("Captura el estado de cuenta antes de aplicar una devolución.", 409);
+        }
+        return { postCutCreditAmount: amount, postCutCreditDate: date, postCutCreditNotes: notes };
       });
       return NextResponse.json({ cycle });
     }

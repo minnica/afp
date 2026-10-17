@@ -1,6 +1,7 @@
 "use client";
 
 import { apiFetch } from "@/lib/apiFetch";
+import { useDashboard } from "@/components/dashboard/DashboardProvider";
 
 import CreateRecordSurface from "@/components/ui/create-record-surface";
 
@@ -51,6 +52,7 @@ const MONTH_NAMES = [
 ];
 
 export default function TarjetasContent() {
+  const { refresh: refreshDashboard } = useDashboard();
   const { captureFocus, restoreFocus } = useDialogFocus();
   const router = useRouter();
   const [createError, setCreateError] = useState(null);
@@ -236,6 +238,8 @@ export default function TarjetasContent() {
     if (!response.ok) throw new Error(data.error || "No se pudo guardar el ciclo.");
     // El PATCH ya fue confirmado: actualizar el estado visible incluso si falla el GET.
     setCycles((previous) => previous.map((cycle) => cycle.id === cycleId ? { ...cycle, ...data.cycle } : cycle));
+    // Retira o actualiza el aviso del encabezado con una lectura posterior al PATCH.
+    await refreshDashboard({ force: true });
     try {
       await loadCycles(user.id);
     } catch {
@@ -255,6 +259,10 @@ export default function TarjetasContent() {
     return saveCycleChange(cycleId, { action: "MARK_AS_PAID", ...payment });
   }
 
+  function updatePostCutCredit(cycleId, credit) {
+    return saveCycleChange(cycleId, { action: "UPDATE_POST_CUT_CREDIT", ...credit });
+  }
+
   async function unmarkCycleAsPaid(cycleId) {
     if (!user) return;
     setError("");
@@ -266,6 +274,7 @@ export default function TarjetasContent() {
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "No se pudo deshacer el pago.");
+      await refreshDashboard({ force: true });
       await loadCycles(user.id);
     } catch (err) {
       setError(err.message || "No se pudo deshacer el pago.");
@@ -413,6 +422,7 @@ export default function TarjetasContent() {
               updateCycleDates={updateCycleDates}
               updateStatementAmount={updateStatementAmount}
               markCycleAsPaid={markCycleAsPaid}
+              updatePostCutCredit={updatePostCutCredit}
               unmarkCycleAsPaid={setCycleToUnmark}
               loadCycleBreakdown={loadCycleBreakdown}
             />

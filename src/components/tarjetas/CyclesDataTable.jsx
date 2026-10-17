@@ -149,6 +149,7 @@ function MobileCycleItem({ cycle, openDialog }) {
           <dd className="text-sm font-medium">{formatCompactDate(cycle.dueDate)}</dd>
         </div>
         {cycle.pendingAmount != null && <div className="col-span-2 min-w-0"><dt className="text-xs text-muted-foreground">Saldo pendiente{cycle.paymentStatus === "PARTIALLY_PAID" ? " · Pago parcial" : ""}</dt><dd className="font-semibold tabular-nums">{formatMoney(cycle.pendingAmount)}</dd></div>}
+        {Number(cycle.postCutCreditAmount) > 0 && <div className="col-span-2 min-w-0"><dt className="text-xs text-muted-foreground">Devoluciones después del corte</dt><dd className="tabular-nums">{formatMoney(cycle.postCutCreditAmount)}</dd></div>}
         {cycle.excessAmount > 0 && <div className="col-span-2 min-w-0"><dt className="text-xs text-muted-foreground">Pago excedente del corte</dt><dd>{formatMoney(cycle.excessAmount)}</dd></div>}
       </dl>
 
@@ -178,6 +179,10 @@ function CycleDetails({ cycle }) {
         <div className="col-span-2 min-w-0"><dt className="text-xs text-muted-foreground">Límite de pago</dt><dd>{formatCompactDate(cycle.dueDate)}</dd></div>
         {cycle.paidAt && <div className="min-w-0"><dt className="text-xs text-muted-foreground">Fecha de pago</dt><dd>{format(new Date(toDateInputValue(cycle.paidAt) + "T12:00:00"), "d MMM yyyy", { locale: es })}</dd></div>}
         {cycle.paidAmount != null && <div className="min-w-0 text-right"><dt className="text-xs text-muted-foreground">Monto pagado</dt><dd className="break-words font-medium tabular-nums">{formatMoney(cycle.paidAmount)}</dd></div>}
+        {Number(cycle.postCutCreditAmount) > 0 && <>
+          <div className="col-span-2 min-w-0"><dt className="text-xs text-muted-foreground">Devoluciones después del corte</dt><dd className="font-medium tabular-nums">{formatMoney(cycle.postCutCreditAmount)}</dd><dd className="mt-1 break-words text-xs text-muted-foreground">{toDateInputValue(cycle.postCutCreditDate)} · {cycle.postCutCreditNotes}</dd></div>
+          <div className="col-span-2 min-w-0"><dt className="text-xs text-muted-foreground">Pago del período tras devoluciones</dt><dd className="font-medium tabular-nums">{formatMoney(cycle.paymentDueAmount)}</dd></div>
+        </>}
         {cycle.pendingAmount != null && <div className="col-span-2 min-w-0"><dt className="text-xs text-muted-foreground">Saldo pendiente{cycle.paymentStatus === "PARTIALLY_PAID" ? " · Pago parcial" : ""}</dt><dd className="font-semibold tabular-nums">{formatMoney(cycle.pendingAmount)}</dd></div>}
         {cycle.excessAmount > 0 && <div className="col-span-2 min-w-0"><dt className="text-xs text-muted-foreground">Pago excedente del corte</dt><dd>{formatMoney(cycle.excessAmount)}</dd></div>}
       </dl>
@@ -194,6 +199,7 @@ export default function CyclesDataTable({
   updateStatementAmount,
   unmarkCycleAsPaid,
   markCycleAsPaid,
+  updatePostCutCredit,
   loadCycleBreakdown,
 }) {
   const { captureFocus, restoreFocus } = useDialogFocus();
@@ -215,12 +221,22 @@ export default function CyclesDataTable({
   const [statementAmount, setStatementAmount] = useState("");
   const [paidAt, setPaidAt] = useState("");
   const [paidAmount, setPaidAmount] = useState("");
+  const [postCutCreditAmount, setPostCutCreditAmount] = useState("0");
+  const [postCutCreditDate, setPostCutCreditDate] = useState("");
+  const [postCutCreditNotes, setPostCutCreditNotes] = useState("");
   const [saveError, setSaveError] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const savingRef = useRef(false);
   const previewAmount = parseCycleMoney(paidAmount);
   const paymentPreview = currentCycle && previewAmount !== null
     ? getCyclePaymentState({ ...currentCycle, paidAmount: previewAmount }) : null;
+  const creditAmount = parseCycleMoney(postCutCreditAmount);
+  const creditError = creditAmount === null ? "Indica un importe no negativo con hasta dos decimales."
+    : creditAmount > Number(currentCycle?.statementAmount ?? 0) ? "La parte aplicada a este pago no puede superar el estado de cuenta."
+    : creditAmount > 0 && (!postCutCreditDate || postCutCreditDate <= toDateInputValue(currentCycle?.cutDate) || postCutCreditDate > getTodayInputValue()) ? "La fecha debe ser posterior al corte y no puede ser futura."
+    : creditAmount > 0 && !postCutCreditNotes.trim() ? "Indica el concepto o referencia de la devolución." : "";
+  const creditPreview = currentCycle && !creditError
+    ? getCyclePaymentState({ ...currentCycle, postCutCreditAmount: creditAmount }) : null;
 
   const openDialog = useCallback(async (type, cycle) => {
     setSaveError("");
@@ -233,7 +249,11 @@ export default function CyclesDataTable({
       setStatementAmount(cycle.statementAmount != null ? String(cycle.statementAmount) : "");
     } else if (type === "pay") {
       setPaidAt(cycle.paidAt ? toDateInputValue(cycle.paidAt) : getTodayInputValue());
-      setPaidAmount(String(cycle.paidAmount ?? cycle.statementAmount ?? ""));
+      setPaidAmount(String(cycle.paidAmount ?? cycle.paymentDueAmount ?? cycle.statementAmount ?? ""));
+    } else if (type === "credits") {
+      setPostCutCreditAmount(String(cycle.postCutCreditAmount ?? 0));
+      setPostCutCreditDate(toDateInputValue(cycle.postCutCreditDate) || getTodayInputValue());
+      setPostCutCreditNotes(cycle.postCutCreditNotes || "");
     }
 
     if (type !== "breakdown") {
@@ -294,6 +314,7 @@ export default function CyclesDataTable({
         startDate: editCycleStartDate, cutDate: editCycleCutDate, dueDate: editCycleDueDate,
       });
       if (activeDialog.type === "statement") return updateStatementAmount(currentCycle.id, statementAmount);
+      if (activeDialog.type === "credits") return updatePostCutCredit(currentCycle.id, { postCutCreditAmount, postCutCreditDate, postCutCreditNotes });
       return markCycleAsPaid(currentCycle.id, { paidAt, paidAmount });
     });
   }
@@ -338,7 +359,7 @@ export default function CyclesDataTable({
       {
         accessorKey: "pendingAmount",
         header: "Saldo pendiente",
-        cell: ({ row }) => <div>{row.original.pendingAmount == null ? "Por confirmar" : formatMoney(row.original.pendingAmount)}{row.original.paymentStatus === "PARTIALLY_PAID" && <p className="text-xs text-muted-foreground">Pago parcial</p>}</div>,
+        cell: ({ row }) => <div>{row.original.pendingAmount == null ? "Por confirmar" : formatMoney(row.original.pendingAmount)}{row.original.paymentStatus === "PARTIALLY_PAID" && <p className="text-xs text-muted-foreground">Pago parcial</p>}{Number(row.original.postCutCreditAmount) > 0 && <p className="text-xs text-muted-foreground">Devoluciones: {formatMoney(row.original.postCutCreditAmount)}</p>}</div>,
       },
       {
         accessorKey: "difference",
@@ -380,7 +401,7 @@ export default function CyclesDataTable({
         cell: ({ row }) => {
           const cycle = row.original;
           return (
-            <div className="flex flex-wrap justify-center gap-0.5 md:flex-nowrap">
+            <div className="flex w-44 flex-wrap justify-center gap-1">
               <Button
                 type="button"
                 variant="secondary"
@@ -404,6 +425,9 @@ export default function CyclesDataTable({
                 onClick={() => openDialog("pay", cycle)}
               >
                 Pago
+              </Button>
+              <Button type="button" variant="secondary" size="sm" onClick={() => openDialog("credits", cycle)}>
+                Devoluciones
               </Button>
               <Button
                 type="button"
@@ -462,7 +486,7 @@ export default function CyclesDataTable({
           <DialogContent onCloseAutoFocus={restoreFocus} showCloseButton={false} data-cycle-action={activeDialog.type} className="flex max-h-[90svh] max-w-[calc(100%-1rem)] flex-col md:max-w-md" onOpenAutoFocus={(event) => { event.preventDefault(); dialogTitleRef.current?.focus({ preventScroll: true }); }}>
             <DialogHeader className="shrink-0 pr-12">
               <DialogTitle ref={dialogTitleRef} tabIndex={-1} className="break-words outline-none">
-                {activeDialog.type === "details" ? "Detalles" : activeDialog.type === "dates" ? "Editar fechas reales" : activeDialog.type === "statement" ? "Estado de cuenta" : "Registrar pago"} — {currentCycle.card.name}
+                {activeDialog.type === "details" ? "Detalles" : activeDialog.type === "dates" ? "Editar fechas reales" : activeDialog.type === "statement" ? "Estado de cuenta" : activeDialog.type === "credits" ? "Devoluciones después del corte" : "Registrar pago"} — {currentCycle.card.name}
               </DialogTitle>
               <DialogDescription className="sr-only">Fechas, importes y acciones del ciclo de esta tarjeta.</DialogDescription>
             </DialogHeader>
@@ -553,9 +577,35 @@ export default function CyclesDataTable({
                   </Field>
                 </FieldGroup>
               )}
-              {activeDialog.type === "pay" && currentCycle.statementAmount == null && <Alert><AlertDescription>Captura primero el estado de cuenta para comprobar el saldo.<Button variant="outline" onClick={() => openDialog("statement", currentCycle)}>Capturar estado de cuenta</Button></AlertDescription></Alert>}
-              {activeDialog.type === "pay" && paymentPreview && currentCycle.statementAmount != null && <Alert className="mt-3"><AlertDescription>
-                {paymentPreview.paymentStatus === "NO_PAYMENT_DUE" ? "Sin importe por pagar. Un total de cero no registra un pago ni una fecha ficticia." : paymentPreview.pendingAmount > 0 ? `Saldo pendiente: ${formatMoney(paymentPreview.pendingAmount)}. El corte conservará sus avisos de pago.` : "El total pagado cubre el estado de cuenta."}
+              {activeDialog.type === "credits" && currentCycle.statementAmount != null && (
+                <FieldGroup className="gap-3">
+                  <Field>
+                    <FieldLabel htmlFor="cycle-credit-amount">Total de devoluciones aplicado a este pago</FieldLabel>
+                    <Input id="cycle-credit-amount" type="number" formatNumber min="0" step="0.01" disabled={isSaving} value={postCutCreditAmount} onChange={(event) => setPostCutCreditAmount(event.target.value)} aria-describedby="cycle-credit-help" />
+                    <FieldDescription id="cycle-credit-help">Solo devoluciones que el banco ya aplicó para reducir el pago de este corte. No incluyas las que ya aparecen descontadas en este estado de cuenta. El total sustituye al anterior; cero lo retira.</FieldDescription>
+                  </Field>
+                  <Field>
+                    <FieldLabel htmlFor="cycle-credit-date">Fecha de aplicación de la última devolución</FieldLabel>
+                    <DatePicker id="cycle-credit-date" aria-label="Fecha de aplicación de la última devolución" disabled={isSaving || creditAmount === 0} value={postCutCreditDate} onChange={setPostCutCreditDate} />
+                  </Field>
+                  <Field>
+                    <FieldLabel htmlFor="cycle-credit-notes">Concepto o referencia</FieldLabel>
+                    <Input id="cycle-credit-notes" disabled={isSaving || creditAmount === 0} maxLength={2000} value={postCutCreditNotes} onChange={(event) => setPostCutCreditNotes(event.target.value)} placeholder="Comercio y referencia de la devolución" aria-describedby="cycle-credit-reference-help" />
+                    <FieldDescription id="cycle-credit-reference-help">Si son varias, indica sus importes y fechas. Cuando aparezcan en el siguiente estado, esta parte ya habrá cubierto el pago anterior y no debe descontarse otra vez.</FieldDescription>
+                  </Field>
+                </FieldGroup>
+              )}
+              {["pay", "credits"].includes(activeDialog.type) && currentCycle.statementAmount == null && <Alert><AlertDescription>Captura primero el estado de cuenta para comprobar el saldo.<Button variant="outline" onClick={() => openDialog("statement", currentCycle)}>Capturar estado de cuenta</Button></AlertDescription></Alert>}
+              {activeDialog.type === "credits" && creditError && currentCycle.statementAmount != null && <Alert className="mt-3"><AlertDescription>{creditError}</AlertDescription></Alert>}
+              {activeDialog.type === "credits" && creditPreview && currentCycle.statementAmount != null && <Alert className="mt-3"><AlertDescription className="flex flex-col gap-1">
+                <span>Estado de cuenta: {formatMoney(currentCycle.statementAmount)}. Pagado: {formatMoney(currentCycle.paidAmount)}.</span>
+                <span>Saldo pendiente tras devoluciones: {formatMoney(creditPreview.pendingAmount)}.</span>
+                <span>{creditPreview.isSettled ? "El corte queda cubierto y no tendrá avisos de pago pendiente." : "El saldo restante conservará sus avisos de pago."}</span>
+                {creditPreview.excessAmount > 0 && <span>Pago excedente: {formatMoney(creditPreview.excessAmount)}. No se transfiere a otro corte.</span>}
+              </AlertDescription></Alert>}
+              {activeDialog.type === "pay" && paymentPreview && currentCycle.statementAmount != null && <Alert className="mt-3"><AlertDescription className="flex flex-col gap-1">
+                {Number(currentCycle.postCutCreditAmount) > 0 && <span>Devoluciones aplicadas: {formatMoney(currentCycle.postCutCreditAmount)}.</span>}
+                {paymentPreview.paymentStatus === "NO_PAYMENT_DUE" ? "Sin importe por pagar. Un total de cero no registra un pago ni una fecha ficticia." : paymentPreview.pendingAmount > 0 ? `Saldo pendiente: ${formatMoney(paymentPreview.pendingAmount)}. El corte conservará sus avisos de pago.` : "El pago y las devoluciones aplicadas cubren el estado de cuenta."}
                 {paymentPreview.excessAmount > 0 && ` Excedente: ${formatMoney(paymentPreview.excessAmount)}. No se aplica automáticamente a otros cortes.`}
               </AlertDescription></Alert>}
               {saveError && <Alert variant="destructive" className="mt-3"><AlertDescription>{saveError}</AlertDescription></Alert>}
@@ -566,12 +616,13 @@ export default function CyclesDataTable({
                 <>
                   <Button type="button" variant="secondary" className="h-11" onClick={() => openDialog("dates", currentCycle)}>Fechas</Button>
                   <Button type="button" variant="secondary" className="h-11" onClick={() => openDialog("statement", currentCycle)}>Cuenta</Button>
+                  <Button type="button" variant="secondary" className="col-span-2 h-11" onClick={() => openDialog("credits", currentCycle)}>Devoluciones después del corte</Button>
                   <Button type="button" className="col-span-2 h-11" onClick={() => openDialog("pay", currentCycle)}>{currentCycle.isSettled ? "Revisar pago" : "Registrar pago"}</Button>
                 </>
               ) : (
                 <>
-                  <Button type="button" className="col-span-2 h-11" disabled={isSaving || (activeDialog.type === "pay" && (currentCycle.statementAmount == null || previewAmount === null))} onClick={handleSave}>
-                    {isSaving ? "Guardando…" : activeDialog.type === "dates" ? "Guardar fechas" : activeDialog.type === "statement" ? "Guardar" : "Guardar total pagado"}
+                  <Button type="button" className="col-span-2 h-11" disabled={isSaving || (activeDialog.type === "pay" && (currentCycle.statementAmount == null || previewAmount === null)) || (activeDialog.type === "credits" && (currentCycle.statementAmount == null || !!creditError))} onClick={handleSave}>
+                    {isSaving ? "Guardando…" : activeDialog.type === "dates" ? "Guardar fechas" : activeDialog.type === "statement" ? "Guardar" : activeDialog.type === "credits" ? "Guardar devoluciones" : "Guardar total pagado"}
                   </Button>
                   {activeDialog.type === "pay" && currentCycle.paidAmount != null && (
                     <Button type="button" variant="destructive" disabled={isSaving} className="col-span-2 h-11" onClick={() => { unmarkCycleAsPaid(currentCycle.id); closeDialog(); }}>Deshacer pago</Button>

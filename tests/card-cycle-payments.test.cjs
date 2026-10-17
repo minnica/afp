@@ -190,3 +190,102 @@ test("fallo de escritura revierte el cambio y el estado dentro de la transacció
   assert.equal((await f.patch({ action: "MARK_AS_PAID", paidAmount: 1000, paidAt: "2026-10-20" })).status, 500);
   assert.deepEqual(f.state(), before);
 });
+
+const bbva = {
+  month: 9, startDate: "2026-08-22T12:00:00Z", cutDate: "2026-09-21T12:00:00Z", dueDate: "2026-10-12T12:00:00Z",
+  statementAmount: "8355.209999999999", paidAmount: 6855.71, paidAt: "2026-10-12T12:00:00Z",
+};
+const refund = { action: "UPDATE_POST_CUT_CREDIT", postCutCreditAmount: "1499.50", postCutCreditDate: "2026-10-05", postCutCreditNotes: "Merpago*mercadolibre · devolución confirmada" };
+
+test("BBVA: devolución posterior liquida septiembre sin modificar estado, pago ni cálculo de cargos", async () => {
+  const f = fixture(bbva);
+  const before = await f.get("card-cycles");
+  for (let retry = 0; retry < 2; retry++) {
+    const response = await f.patch(refund);
+    assert.equal(response.status, 200);
+    assert.equal(response.body.cycle.pendingAmount, 0);
+    assert.equal(response.body.cycle.paymentDueAmount, 6855.71);
+    assert.equal(response.body.cycle.isSettled, true);
+    assert.equal(response.body.cycle.excessAmount, 0);
+  }
+  assert.equal(f.state().statementAmount, bbva.statementAmount);
+  assert.equal(f.state().paidAmount, bbva.paidAmount);
+  assert.equal(f.state().paidAt, bbva.paidAt);
+  for (const route of ["card-cycles", "dashboard"]) {
+    const response = await f.get(route);
+    assert.equal(response.status, 200);
+    const cycle = response.body.cycles[0];
+    assert.equal(cycle.paymentStatus, "PAID");
+    assert.equal(cycle.calculatedAmount, before.body.cycles[0].calculatedAmount);
+    assert.equal(getDashboardPayment(cycle, now).amount, 6855.71);
+    if (route === "dashboard") assert.equal(response.body.importantNotices.some(n => n.type === "CARD_PAYMENT"), false);
+  }
+});
+
+test("reducir o retirar devolución reabre el saldo y los avisos; deshacer pago conserva la devolución", async () => {
+  const f = fixture(bbva);
+  await f.patch(refund);
+  assert.equal((await f.patch({ ...refund, postCutCreditAmount: "1499.49" })).body.cycle.pendingAmount, 0.01);
+  const dashboard = await f.get("dashboard");
+  assert.equal(dashboard.body.importantNotices.find(n => n.type === "CARD_PAYMENT").amount, 0.01);
+  await f.patch(refund);
+  const undone = await f.patch({ action: "UNMARK_AS_PAID" });
+  assert.equal(undone.body.cycle.pendingAmount, 6855.71);
+  assert.equal(undone.body.cycle.postCutCreditAmount, 1499.5);
+  const cleared = await f.patch({ action: "UPDATE_POST_CUT_CREDIT", postCutCreditAmount: 0 });
+  assert.equal(cleared.body.cycle.pendingAmount, 8355.21);
+  assert.equal(cleared.body.cycle.postCutCreditDate, null);
+  assert.equal(cleared.body.cycle.postCutCreditNotes, null);
+});
+
+test("devolución total cubre sin pago ficticio; parcial sin pago conserva avisos; excedente se informa", async () => {
+  const f = fixture({ ...bbva, paidAmount: null, paidAt: null });
+  const partial = await f.patch(refund);
+  assert.equal(partial.body.cycle.pendingAmount, 6855.71);
+  assert.equal(partial.body.cycle.isSettled, false);
+  const full = await f.patch({ ...refund, postCutCreditAmount: "8355.21" });
+  assert.equal(full.body.cycle.paymentStatus, "NO_PAYMENT_DUE");
+  assert.equal(full.body.cycle.paidAmount, null);
+  assert.equal(full.body.cycle.paidAt, null);
+  const excess = fixture({ ...bbva, paidAmount: 6885.71 });
+  assert.equal((await excess.patch(refund)).body.cycle.excessAmount, 30);
+});
+
+test("bonificaciones de cargos y otro corte no descuentan de nuevo una devolución del pago", () => {
+  const cycle = { ...base, ...bbva, credits: [{ amount: 1499.5 }] };
+  assert.equal(getCyclePaymentState(cycle, now).pendingAmount, 1499.5);
+  const adjusted = { ...cycle, postCutCreditAmount: 1499.5 };
+  assert.equal(getCyclePaymentState(adjusted, now).pendingAmount, 0);
+  assert.equal(getCyclePaymentState({ ...base, month: 10, statementAmount: 500 }, now).pendingAmount, 500);
+  assert.equal(getCyclePaymentState({ ...adjusted, statementAmount: null }, now).paymentStatus, "UNCONFIRMED");
+  assert.equal(getDashboardPayment({ ...adjusted, calculatedAmount: 700 }, new Date("2026-09-20T12:00:00Z")).amount, 700);
+});
+
+test("devoluciones: validación de importe, evidencia, fecha, corte y propietario sin escrituras", async () => {
+  const f = fixture(bbva);
+  const invalids = [
+    { postCutCreditAmount: -1 }, { postCutCreditAmount: "" }, { postCutCreditAmount: 0.001 },
+    { postCutCreditAmount: "8355.22" }, { postCutCreditDate: "2026-09-21" }, { postCutCreditDate: "2026-09-20" },
+    { postCutCreditDate: "2026-02-30" }, { postCutCreditDate: "2026-10-26" }, { postCutCreditDate: null },
+    { postCutCreditNotes: " " }, { postCutCreditNotes: {} }, { postCutCreditNotes: "a".repeat(2001) },
+  ];
+  for (const fields of invalids) assert.ok([400, 409].includes((await f.patch({ ...refund, ...fields })).status), JSON.stringify(fields));
+  assert.equal((await f.patch({ ...refund, id: "another-owner-cycle" })).status, 404);
+  assert.equal((await fixture({ ...bbva, statementAmount: null }).patch(refund)).status, 409);
+  assert.equal(f.writes(), 0);
+});
+
+test("editar estado o fechas conserva coherencia de la devolución y rollback conserva evidencia", async () => {
+  const f = fixture(bbva);
+  await f.patch(refund);
+  const before = f.state();
+  assert.equal((await f.patch({ action: "UPDATE_STATEMENT", statementAmount: 1000 })).status, 409);
+  assert.equal((await f.patch({ action: "UPDATE_DATES", startDate: "2026-09-01", cutDate: "2026-10-05", dueDate: "2026-10-15" })).status, 409);
+  assert.deepEqual(f.state(), before);
+  const reopened = await f.patch({ action: "UPDATE_STATEMENT", statementAmount: "8356.21" });
+  assert.equal(reopened.body.cycle.pendingAmount, 1);
+  const beforeFailure = f.state();
+  f.fail();
+  assert.equal((await f.patch({ ...refund, postCutCreditAmount: 0 })).status, 500);
+  assert.deepEqual(f.state(), beforeFailure);
+});

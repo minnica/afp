@@ -145,6 +145,9 @@ model CardCycle {
   status          CardCycleStatus @default(OPEN)
   paidAt          DateTime?
   paidAmount      Decimal?
+  postCutCreditAmount Decimal     @default(0)
+  postCutCreditDate DateTime?
+  postCutCreditNotes String?
   notes           String?
   usageReconciliation Json?
   createdAt       DateTime        @default(now())

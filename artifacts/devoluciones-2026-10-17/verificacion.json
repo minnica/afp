@@ -1,0 +1,19 @@
+{
+  "status": "IMPLEMENTACION_VERIFICADA_MIGRACION_APLICADA_PUBLICACION_AUTORIZADA",
+  "tests": { "total": 189, "passed": 189, "failed": 0, "skipped": 0, "database": "PostgreSQL 16 local desechable", "auth": "simulada" },
+  "databaseVerification": { "migrations": 16, "emptyDatabase": "correcto", "historicalUpgrade": "correcto", "schemaDiff": "vacio", "checksums": "correctos", "rls": "conservado", "existingRecords": "conservados" },
+  "creditIntegration": { "concurrentPaymentAndCreditEdits": 8, "duplicateSubmissions": "no acumulan", "ownerIsolation": "404 para otro usuario", "rollbackAfterRealWrite": "correcto", "originalStatementAndPayment": "conservados", "newIncomeOrExpense": false },
+  "browser": {
+    "widths": [390, 1280],
+    "environment": "Componentes de Tarjetas y rutas API reales en una vista aislada, Auth simulada y PostgreSQL local con datos ficticios. No prueba una sesión real ni el encabezado completo de la aplicación.",
+    "saveCredit": "correcto: 8355.21 - 1499.50 - 6855.71 = 0",
+    "noticesAfterSettlement": 0,
+    "lowerCreditByOneCent": "saldo y aviso de 0.01",
+    "reopenSavedCredit": "conserva importe, fecha y referencia",
+    "mobileFocusAfterSave": "Detalles de BBVA prueba",
+    "pageHorizontalOverflow": false
+  },
+  "build": { "webpack": "correcto: pnpm exec next build --webpack", "turbopack": "bloqueado por entorno al abrir un puerto: Operation not permitted" },
+  "lint": { "errors": 0, "existingWarnings": 1, "warning": "TanStack Table useReactTable" },
+  "production": { "authorized": true, "migrationApplied": "20261017030000_add_post_cut_credits", "migrationChecksums": "correctos", "schemaDiff": "vacio", "bbvaCorrectionApplied": true, "otherRecordsUnchanged": true, "rlsPreserved": true, "privateEvidenceDirectory": "estados_cuenta/devoluciones_2026-10-17/", "deployment": "Resultado registrado en la evidencia privada al finalizar la publicación autorizada." }
+}

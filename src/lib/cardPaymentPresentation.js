@@ -4,7 +4,10 @@ export function getDashboardPayment(cycle, today) {
   const cutDay = Date.UTC(cutDate.getUTCFullYear(), cutDate.getUTCMonth(), cutDate.getUTCDate());
   const localDay = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
   const isStatement = localDay >= cutDay && cycle.statementAmount != null;
-  const amount = Number((isStatement ? cycle.statementAmount : cycle.calculatedAmount) ?? 0);
+  // El total del período descuenta devoluciones confirmadas, pero no los pagos.
+  const amount = isStatement
+    ? Math.max(0, Math.round(Number(cycle.statementAmount) * 100) - Math.round(Number(cycle.postCutCreditAmount ?? 0) * 100)) / 100
+    : Number(cycle.calculatedAmount ?? 0);
 
   return { amount: Math.round(amount * 100) / 100, isStatement };
 }

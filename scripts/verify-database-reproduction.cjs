@@ -62,10 +62,16 @@ function runRegressions(url) {
 }
 
 function assertCatalog(actual) {
-  // Las únicas diferencias esperadas respecto a Supabase son la tabla A02 y
-  // las migraciones nuevas. Se comparan tipos, defaults, índices, FKs y enums.
+  // Conserva el snapshot histórico; verifica explícitamente las columnas nuevas.
+  const creditColumns = ['postCutCreditAmount', 'postCutCreditDate', 'postCutCreditNotes'];
+  const expectedCredits = [
+    { ...before.columns.find(row => row.table_name === 'card_cycles' && row.column_name === 'paidAmount'), column_name: 'postCutCreditAmount', is_nullable: 'NO', column_default: '0' },
+    { ...before.columns.find(row => row.table_name === 'card_cycles' && row.column_name === 'paidAt'), column_name: 'postCutCreditDate' },
+    { ...before.columns.find(row => row.table_name === 'card_cycles' && row.column_name === 'notes'), column_name: 'postCutCreditNotes' },
+  ];
+  assert.deepEqual(actual.columns.filter(row => row.table_name === 'card_cycles' && creditColumns.includes(row.column_name)), expectedCredits);
   for (const section of ['columns', 'constraints', 'indexes', 'enums']) {
-    const rows = actual[section].filter(row => (row.table_name || row.tablename) !== 'expense_operations');
+    const rows = actual[section].filter(row => (row.table_name || row.tablename) !== 'expense_operations' && !(section === 'columns' && row.table_name === 'card_cycles' && creditColumns.includes(row.column_name)));
     assert.deepEqual(rows, before[section], `Catálogo distinto en ${section}`);
   }
   assert.equal(actual.security.length, before.security.length + 1);
@@ -219,7 +225,7 @@ async function main() {
         console.log(`OK ${i ? 'actualización desde las 13 migraciones aplicadas' : 'base vacía'}: catálogo equivalente, diff vacío, checksums, deploy repetible, registros intactos y RLS.`);
       } finally { await db.$disconnect(); }
     }
-    console.log('A11: reconstrucción y actualización verificadas; 15 migraciones y 17 tablas con RLS, incluido el historial.');
+    console.log(`Reconstrucción y actualización verificadas; ${localMigrations().length} migraciones y 17 tablas con RLS, incluido el historial.`);
   } finally {
     // Solo elimina bases/roles con sufijo aleatorio creados por esta ejecución.
     for (const name of createdDatabases.reverse()) await admin.$executeRawUnsafe(`DROP DATABASE "${name}" WITH (FORCE)`);

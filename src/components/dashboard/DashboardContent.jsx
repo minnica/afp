@@ -337,7 +337,7 @@ function PaymentsTable({ items, today }) {
                 <dt className="text-xs text-muted-foreground">Pago del período</dt>
                 <dd className="mt-1">
                   <p className="break-words text-xl font-semibold tabular-nums">{formatMoney(payment.amount)}</p>
-                  <p className="mt-1 text-xs text-muted-foreground">{payment.isStatement ? "Estado de cuenta" : "Estimado"}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{payment.isStatement ? Number(cycle.postCutCreditAmount) > 0 ? "Estado de cuenta menos devoluciones" : "Estado de cuenta" : "Estimado"}</p>
                   {cycle.paymentStatus === "PARTIALLY_PAID" && <p className="mt-1 text-xs text-warning">Pago parcial · Pendiente: {formatMoney(cycle.pendingAmount)}</p>}
                 </dd>
               </div>
@@ -371,7 +371,7 @@ function PaymentsTable({ items, today }) {
                 <TableCell className="font-medium">{card.name}</TableCell>
                 <TableCell>
                   <p className="text-base font-semibold tabular-nums">{formatMoney(payment.amount)}</p>
-                  <p className="mt-1 text-xs text-muted-foreground">{payment.isStatement ? "Estado de cuenta" : "Estimado"}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{payment.isStatement ? Number(cycle.postCutCreditAmount) > 0 ? "Estado de cuenta menos devoluciones" : "Estado de cuenta" : "Estimado"}</p>
                   {cycle.paymentStatus === "PARTIALLY_PAID" && <p className="mt-1 text-xs text-warning">Pago parcial · Pendiente: {formatMoney(cycle.pendingAmount)}</p>}
                 </TableCell>
                 <TableCell className="font-semibold">{formatCompactDate(cycle.dueDate)}</TableCell>

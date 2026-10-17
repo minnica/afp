@@ -9,6 +9,7 @@ test('A11: recupera la migración original y conserva los trece checksums aplica
   assert.deepEqual(report.pending, [
     '20261017000000_add_expense_operations',
     '20261017020000_enable_application_rls',
+    '20261017030000_add_post_cut_credits',
   ]);
 });
 

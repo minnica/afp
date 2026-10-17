@@ -33,7 +33,7 @@ export function DashboardProvider({ children }) {
   });
   const notices = partitionNotices(state.dashboard?.importantNotices || [], noticePreferences.entries, noticePreferences.month);
 
-  const refresh = useCallback(async () => {
+  const refresh = useCallback(async (options = {}) => {
     const generation = generationRef.current;
     try {
       const { data: { session }, error } = await supabase.auth.getSession();
@@ -45,7 +45,7 @@ export function DashboardProvider({ children }) {
         return;
       }
       const userId = session.user.id;
-      if (requestRef.current?.userId === userId) return requestRef.current.promise;
+      if (!options.force && requestRef.current?.userId === userId) return requestRef.current.promise;
 
       const request = { userId, controller: new AbortController(), promise: null };
       requestRef.current?.controller.abort();
