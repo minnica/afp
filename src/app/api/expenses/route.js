@@ -1,6 +1,8 @@
-import { apiResponse as NextResponse, requireApiUser, apiAccessErrorResponse, requireOwnedReferences } from "@/lib/apiAuth";
+import { apiResponse as NextResponse, requireApiUser, apiAccessErrorResponse, requireOwnedReferences, ApiAccessError } from "@/lib/apiAuth";
 import { prisma } from "@/lib/prisma";
 import { applySubscriptionCharge, SubscriptionChargeError } from "@/lib/subscriptionChargeService";
+
+import { runExpenseOperation } from "@/lib/expenseOperations";
 
 const expenseSelect = {
   id: true,
@@ -56,18 +58,18 @@ const expenseSelect = {
   },
 };
 
-async function updatePayableStatusIfNeeded(payableAccountId, userId) {
+async function updatePayableStatusIfNeeded(payableAccountId, userId, db = prisma) {
   if (!payableAccountId) return;
 
   const [payable, paid] = await Promise.all([
-    prisma.payableAccount.findUnique({
+    db.payableAccount.findUnique({
       where: { id: payableAccountId, userId },
       select: {
         originalAmount: true,
         status: true,
       },
     }),
-    prisma.dailyExpense.aggregate({
+    db.dailyExpense.aggregate({
       where: { payableAccountId, userId },
       _sum: {
         amount: true,
@@ -83,7 +85,7 @@ async function updatePayableStatusIfNeeded(payableAccountId, userId) {
   const nextStatus = pendingBalance <= 0 ? "PAID_OFF" : "ACTIVE";
 
   if (payable.status !== nextStatus) {
-    await prisma.payableAccount.update({
+    await db.payableAccount.update({
       where: { id: payableAccountId, userId },
       data: {
         status: nextStatus,
@@ -220,120 +222,111 @@ export async function POST(request) {
     const user = await requireApiUser(request);
     const userId = user.id;
     const body = await request.json();
-    await requireOwnedReferences(prisma, userId, body, ["cardId", "categoryId", "personId", "receivableAccountId", "payableAccountId", "subscriptionId"]);
+    const result = await runExpenseOperation(prisma, userId, body, async tx => {
+      await requireOwnedReferences(tx, userId, body, ["cardId", "categoryId", "personId", "receivableAccountId", "payableAccountId", "subscriptionId"]);
 
-    const {
-      date,
-      paymentMethod,
-      cardId,
-      concept,
-      amount,
-      categoryId,
-      notes,
-      personId,
-      receivableAccountId,
-      payableAccountId,
-      subscriptionId,
-      createReceivable,
-    } = body;
+      const {
+        date,
+        paymentMethod,
+        cardId,
+        concept,
+        amount,
+        categoryId,
+        notes,
+        personId,
+        receivableAccountId,
+        payableAccountId,
+        subscriptionId,
+        createReceivable,
+      } = body;
 
-    if (
-      !userId ||
-      !date ||
-      !paymentMethod ||
-      !concept ||
-      !amount ||
-      !categoryId
-    ) {
-      return NextResponse.json(
-        { error: "Faltan datos obligatorios." },
-        { status: 400 },
-      );
-    }
+      if (
+        !userId ||
+        !date ||
+        !paymentMethod ||
+        !concept ||
+        !amount ||
+        !categoryId
+      ) {
+        throw new ApiAccessError("Faltan datos obligatorios.", 400);
+      }
 
-    if (!["CASH", "CARD"].includes(paymentMethod)) {
-      return NextResponse.json(
-        { error: "Método de pago no válido." },
-        { status: 400 },
-      );
-    }
+      if (!["CASH", "CARD"].includes(paymentMethod)) {
+        throw new ApiAccessError("Método de pago no válido.", 400);
+      }
 
-    if (paymentMethod === "CARD" && !cardId) {
-      return NextResponse.json(
-        { error: "Debes seleccionar una tarjeta." },
-        { status: 400 },
-      );
-    }
+      if (paymentMethod === "CARD" && !cardId) {
+        throw new ApiAccessError("Debes seleccionar una tarjeta.", 400);
+      }
 
-    const numericAmount = Number(amount);
+      const numericAmount = Number(amount);
 
-    if (!Number.isFinite(numericAmount) || numericAmount <= 0) {
-      return NextResponse.json(
-        { error: "El monto debe ser mayor a 0." },
-        { status: 400 },
-      );
-    }
+      if (!Number.isFinite(numericAmount) || numericAmount <= 0) {
+        throw new ApiAccessError("El monto debe ser mayor a 0.", 400);
+      }
 
-    const parsedDate = parseDateInput(date);
+      const parsedDate = parseDateInput(date);
 
-    if (!parsedDate || Number.isNaN(parsedDate.getTime())) {
-      return NextResponse.json({ error: "Fecha no válida." }, { status: 400 });
-    }
+      if (!parsedDate || Number.isNaN(parsedDate.getTime())) {
+        throw new ApiAccessError("Fecha no válida.", 400);
+      }
 
-    let finalReceivableAccountId = receivableAccountId || null;
+      let finalReceivableAccountId = receivableAccountId || null;
 
-    if (subscriptionId) {
-      const result = await prisma.$transaction(tx => applySubscriptionCharge(tx, userId, {
-        subscriptionId, month: date.slice(0, 7), date, amount: numericAmount, action: "confirm",
-        today: new Date().toISOString().slice(0, 10), createReceivable,
-        expenseData: { concept: concept.trim(), paymentMethod, cardId: cardId || null, categoryId,
-          notes: notes?.trim() || null, personId: personId || null,
-          receivableAccountId: finalReceivableAccountId, payableAccountId: payableAccountId || null },
-      }));
-      const expense = await prisma.dailyExpense.findUnique({ where: { id: result.expenseId, userId }, select: expenseSelect });
-      if (payableAccountId) await updatePayableStatusIfNeeded(payableAccountId, userId);
-      return NextResponse.json({ expense, alreadyConfirmed: result.alreadyConfirmed });
-    }
+      if (subscriptionId) {
+        const result = await applySubscriptionCharge(tx, userId, {
+          subscriptionId, month: date.slice(0, 7), date, amount: numericAmount, action: "confirm",
+          today: new Date().toISOString().slice(0, 10), createReceivable,
+          expenseData: { concept: concept.trim(), paymentMethod, cardId: cardId || null, categoryId,
+            notes: notes?.trim() || null, personId: personId || null,
+            receivableAccountId: finalReceivableAccountId, payableAccountId: payableAccountId || null },
+        });
+        const expense = await tx.dailyExpense.findUnique({ where: { id: result.expenseId, userId }, select: expenseSelect });
+        if (payableAccountId) await updatePayableStatusIfNeeded(payableAccountId, userId, tx);
+        return { expense, alreadyConfirmed: result.alreadyConfirmed };
+      }
 
-    if (personId && createReceivable) {
-      const receivable = await prisma.receivableAccount.create({
+      if (personId && createReceivable) {
+        const receivable = await tx.receivableAccount.create({
+          data: {
+            userId,
+            personId,
+            concept: concept.trim(),
+            originalAmount: numericAmount,
+            originDate: parsedDate,
+            status: "ACTIVE",
+            originType: "DAILY_EXPENSE",
+          },
+        });
+
+        finalReceivableAccountId = receivable.id;
+      }
+
+      const expense = await tx.dailyExpense.create({
         data: {
           userId,
-          personId,
+          date: parsedDate,
+          paymentMethod,
+          cardId: paymentMethod === "CARD" ? cardId : null,
           concept: concept.trim(),
-          originalAmount: numericAmount,
-          originDate: parsedDate,
-          status: "ACTIVE",
-          originType: "DAILY_EXPENSE",
+          amount: numericAmount,
+          categoryId,
+          notes: notes?.trim() || null,
+          personId: personId || null,
+          receivableAccountId: finalReceivableAccountId,
+          payableAccountId: payableAccountId || null,
+          subscriptionId: subscriptionId || null,
         },
+        select: expenseSelect,
       });
 
-      finalReceivableAccountId = receivable.id;
-    }
+      if (payableAccountId) {
+        await updatePayableStatusIfNeeded(payableAccountId, userId, tx);
+      }
 
-    const expense = await prisma.dailyExpense.create({
-      data: {
-        userId,
-        date: parsedDate,
-        paymentMethod,
-        cardId: paymentMethod === "CARD" ? cardId : null,
-        concept: concept.trim(),
-        amount: numericAmount,
-        categoryId,
-        notes: notes?.trim() || null,
-        personId: personId || null,
-        receivableAccountId: finalReceivableAccountId,
-        payableAccountId: payableAccountId || null,
-        subscriptionId: subscriptionId || null,
-      },
-      select: expenseSelect,
+      return { expense };
     });
-
-    if (payableAccountId) {
-      await updatePayableStatusIfNeeded(payableAccountId, userId);
-    }
-
-    return NextResponse.json({ expense });
+    return NextResponse.json(result);
   } catch (error) {
     const accessResponse = apiAccessErrorResponse(error);
     if (accessResponse) return accessResponse;

@@ -70,6 +70,8 @@ test("cobros: transacción, concurrencia, omisión, restauración, evidencia y a
       "next/server": { NextResponse: { json: (body, options = {}) => ({ body, status: options.status || 200 }) } },
       "@supabase/supabase-js": { createClient: () => ({ auth: { getUser: async () => ({ data: { user } }) } }) },
     })("src/lib/apiAuth.js");
+    ctx.ApiAccessError = access.ApiAccessError;
+    ctx.runExpenseOperation = sourceLoader({ "@/lib/apiAuth": access })("src/lib/expenseOperations.js").runExpenseOperation;
     ctx.requireApiUser = async () => user;
     ctx.requireOwnedReferences = access.requireOwnedReferences;
     ctx.apiAccessErrorResponse = access.apiAccessErrorResponse;

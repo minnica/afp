@@ -1,0 +1,19 @@
+{
+  "date": "2026-10-17",
+  "implementationStatus": "concluida localmente",
+  "productionModified": false,
+  "automatedTests": { "total": 154, "passed": 152, "failed": 0, "skipped": 2, "skipReason": "AFP_TEST_DATABASE_URL no configurada; suites PostgreSQL" },
+  "lint": { "errors": 0, "warnings": 1, "existingWarning": "react-hooks/incompatible-library en data-table.jsx:61" },
+  "build": "correcto; requirió acceso a Google Fonts fuera del sandbox",
+  "browser": {
+    "engine": "Chromium via agent-browser",
+    "fixture": "tests/helpers/offline-browser-server.cjs",
+    "scope": "Módulo de cola real, IndexedDB y Web Locks reales; API y recibos simulados en memoria. No es una prueba integrada con PostgreSQL ni del formulario autenticado.",
+    "scenarios": [
+      { "name": "Respuesta perdida tras guardar", "requests": 2, "uniqueOperations": 1, "persisted": 1, "pending": 0 },
+      { "name": "Dos pestañas y captura durante sincronización retenida", "pending": 2, "cumulativeRequests": 3, "heldResponses": 1 },
+      { "name": "Cerrar pestaña durante POST libera Web Lock y permite reintento", "cumulativeRequests": 5, "cumulativePersisted": 3, "pending": 0 },
+      { "name": "Cerrar tras persistir y antes del POST; recuperar en otra pestaña", "recovered": 1, "cumulativePersisted": 4, "pending": 0 }
+    ]
+  }
+}

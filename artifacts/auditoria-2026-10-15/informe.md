@@ -2,11 +2,11 @@ AFP · Auditoría técnica y propuestas de producto · 15 de octubre de 2026
 
 # Proteger los datos y asegurar los registros antes de ampliar funciones
 
-La aplicación tiene una base funcional sólida para gastos, cortes, MSI, suscripciones y conciliación. La auditoría original detectó como hallazgo prioritario la ausencia de autorización en 12 de sus 14 rutas API; A01 ya tiene una corrección implementada y verificada localmente. Hay también fallos reproducibles de sincronización, estados financieros y consulta del historial.
+La aplicación tiene una base funcional sólida para gastos, cortes, MSI, suscripciones y conciliación. La auditoría original detectó como hallazgo prioritario la ausencia de autorización en 12 de sus 14 rutas API; A01 ya tiene una corrección implementada y verificada localmente. A02 también tiene una corrección local de sincronización; permanecen los hallazgos sobre estados financieros y consulta del historial.
 
 **14 hallazgos priorizados: 1 P0, 6 P1 y 7 P2.** P0 exige atención inmediata si la app es accesible por terceros; P1 protege datos o decisiones financieras; P2 corrige exactitud, experiencia o crecimiento. Las alertas del gestor de paquetes se agrupan como un hallazgo y no representan 91 fallos explotados en AFP.
 
-**Seguimiento · 17 de octubre de 2026:** 1 hallazgo implementado localmente (A01) y 13 pendientes. A01 sigue pendiente de despliegue autorizado y validación integrada en un ambiente aislado; no se declara resuelto en producción. [Ver cambios y verificaciones](#A01-seguimiento).
+**Seguimiento · 17 de octubre de 2026:** 2 hallazgos implementados localmente (A01 y A02) y 12 pendientes. La actividad de implementación de A02 queda **concluida**. El despliegue autorizado y las verificaciones integradas con PostgreSQL siguen pendientes; no se declaran resueltos en producción. [A01](#A01-seguimiento) · [A02](#A02-seguimiento).
 
 **Contenido**
 
@@ -80,7 +80,7 @@ Para repetir las reproducciones desde la raíz: `node artifacts/auditoria-2026-1
 
 **Pendiente para cierre en producción:** desplegar con autorización explícita y comprobar el flujo autenticado con dos cuentas reales y PostgreSQL en un ambiente aislado. Las pruebas de aislamiento actuales usan adaptadores simulados; la comprobación HTTP real cubrió solicitudes anónimas. No se desplegó ni se modificó la base de datos.
 
-Este seguimiento corresponde a A01. Los ajustes de autenticación de la cola y de caché no dan por resueltos A02 ni A12; los otros 13 hallazgos conservan su estado pendiente.
+Este seguimiento corresponde a A01. Los ajustes de autenticación de la cola y de caché no resolvían A02 ni A12. A02 se implementó posteriormente como se documenta abajo; A12 sigue pendiente.
 
 ---
 
@@ -95,6 +95,27 @@ Este seguimiento corresponde a A01. Los ajustes de autenticación de la cola y d
 **Corrección:** UUID estable de operación, enviado desde la primera captura; restricción única por usuario/operación en BD; respuesta idempotente. Cola transaccional en IndexedDB, eliminación por ID confirmado y coordinación entre pestañas. No reemplazar toda la cola con una instantánea vieja.
 
 **Aceptación:** probar respuesta perdida, dos pestañas, nueva captura durante sync y cierre de pestaña: cada gasto persiste una vez y ningún pendiente desaparece.
+
+<a id="A02-seguimiento"></a>
+
+#### Actividad concluida · implementación local · 17 de octubre de 2026
+
+- **Captura durable:** online y offline pasan primero por IndexedDB, con un UUID por operación. El formulario se limpia después del commit local; los fallos de almacenamiento conservan sus datos y no generan POST.
+- **Cola y pestañas:** eliminación por ID confirmado, actualización individual de errores, Web Locks por usuario y avisos BroadcastChannel. Sin Web Locks, la protección definitiva sigue en el servidor. Una nueva captura durante un envío nunca se reemplaza por una instantánea antigua.
+- **Servidor idempotente:** [`expenseOperations.js`](../../src/lib/expenseOperations.js) utiliza una clave única usuario/UUID y una huella del contenido. Repetir la operación devuelve el recibo original; cambiar los datos devuelve 409. Gasto, cuenta vinculada, decisión de suscripción, estado de cuenta por pagar y recibo se confirman juntos o se revierten juntos. El recibo sobrevive a la edición/eliminación del gasto.
+- **Compatibilidad:** importación transaccional de pendientes de localStorage con marcadores por entrada y copia original conservada. Los clientes antiguos sin UUID no adquieren idempotencia; hay que cerrar/recargar sus pestañas al actualizar. Una respuesta perdida antes de esta versión no puede deduplicarse retroactivamente sin evidencia.
+- **Migración aditiva preparada:** [`20261017000000_add_expense_operations`](../../prisma/migrations/20261017000000_add_expense_operations/migration.sql), con RLS activo y sin políticas públicas. No se aplicó a Supabase ni se desplegó producción. [README actualizado](../../README.md#pwa--modo-offline).
+
+| Verificación | Resultado |
+| --- | --- |
+| Regresiones de cola y POST | 13 casos nuevos correctos: UUID estable, concurrencia, captura durante sync, reapertura, migración única, respuesta perdida/truncada, almacenamiento fallido, conflicto de contenido, aislamiento y rollback. Persistencia del servidor simulada. |
+| Chromium, IndexedDB y Web Locks reales | Respuesta perdida: 2 peticiones, 1 operación. Dos pestañas: la segunda espera; cerrar la primera durante el POST libera el bloqueo y recupera el gasto. La captura concurrente permanece. Cerrar antes del POST permite recuperar el pendiente al reabrir. API simulada; [evidencia](a02-verificacion.json) y [fixture reproducible](../../tests/helpers/offline-browser-server.cjs). |
+| Suite completa | `node --test --experimental-test-isolation=none tests/*.test.cjs`: **154 casos, 152 correctos, 2 omitidos**, cero fallos. |
+| PostgreSQL real | Suite de idempotencia/concurrencia/rollback preparada; omitida junto con la de suscripciones por falta de `AFP_TEST_DATABASE_URL`. Requiere base local `afp_test…` y migraciones aplicadas. |
+| Build / lint | Build correcto con Google Fonts accesible. Lint: cero errores, una advertencia previa de `useReactTable`. |
+
+**Pendiente de operación:** aplicar la migración aditiva y desplegar con autorización explícita, y ejecutar las suites integradas en PostgreSQL aislado. La implementación está concluida; la verificación actual no equivale a una validación del formulario autenticado contra una BD real ni a un despliegue. A05, el resto de A06 y A12 conservan su alcance pendiente.
+
 
 ---
 
@@ -296,7 +317,7 @@ Para llamar a una cifra «dinero disponible» se necesitan saldos iniciales, cue
 ## Orden recomendado
 
 1. **Seguridad:** completar el despliegue autorizado y la validación integrada de A01, cuya implementación local ya está terminada; continuar con la actualización controlada A10 y pruebas de aislamiento. Alinear migraciones y RLS versionado (A11) para poder crear un entorno confiable de pruebas.
-2. **Integridad de registros:** A02, A05 y A06; transacciones, claves idempotentes y regresiones de concurrencia.
+2. **Integridad de registros:** A02 implementado localmente; completar su migración/despliegue autorizado y validación PostgreSQL. Continuar con A05 y el resto de A06: transacciones y regresiones de concurrencia.
 3. **Exactitud visible:** A03/A04, historial completo A07, validaciones A08 y filtros A09.
 4. **Operación diaria:** política offline A12, consultas A13, login A14, recuperación de acceso y CI.
 5. **Producto:** conciliación revisable, calendario/reservas y presupuestos; después proyección con saldos reales.

@@ -12,8 +12,8 @@ function sourceLoader(mocks = {}, globals = {}) {
     let source = fs.readFileSync(full, "utf8");
     const bindings = {};
     source = source.replace(/^import\s+\{([\s\S]*?)\}\s+from\s+["']([^"']+)["'];\r?\n/gm, (_, names, specifier) => {
-      const dependency = mocks[specifier] || load(specifier.startsWith("@/")
-        ? `src/${specifier.slice(2)}.js` : path.resolve(path.dirname(full), `${specifier}.js`));
+      const dependency = mocks[specifier] || (specifier.startsWith("node:") ? require(specifier) : load(specifier.startsWith("@/")
+        ? `src/${specifier.slice(2)}.js` : path.resolve(path.dirname(full), `${specifier}.js`)));
       for (const name of names.split(",").map(name => name.trim()).filter(Boolean)) {
         const [original, alias = original] = name.split(/\s+as\s+/);
         bindings[alias] = dependency[original];

@@ -2,13 +2,16 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const vm = require("node:vm");
 const { test } = require("node:test");
+const { IDBFactory } = require("fake-indexeddb");
+const { webcrypto } = require("node:crypto");
 const { sourceLoader } = require("./helpers/load-source.cjs");
 
 function client() {
   let session = { user: { id: "a" }, access_token: "token-1" };
   const requests = [], storage = new Map();
   const load = sourceLoader({ "@/lib/supabase": { supabase: { auth: { getSession: async () => ({ data: { session } }) } } } }, {
-    window: { localStorage: { getItem: key => storage.get(key), setItem: (key, value) => storage.set(key, value) } },
+    indexedDB: new IDBFactory(), crypto: webcrypto, CustomEvent,
+    window: { dispatchEvent() {}, localStorage: { getItem: key => storage.get(key), setItem: (key, value) => storage.set(key, value) } },
     fetch: async (url, options) => { requests.push({ url, options }); return { ok: true, json: async () => ({ expense: { id: "saved" } }) }; },
   });
   return { load, requests, setSession: value => { session = value; } };
@@ -44,16 +47,16 @@ test("apiFetch no envía nada sin sesión ni con una cuenta distinta de la panta
 test("la cola conserva los pendientes si cambia la cuenta y los sincroniza con su propietario", async () => {
   const { load, requests, setSession } = client();
   const offline = load("src/lib/offlineExpenses.js");
-  offline.addOfflineExpense("a", { userId: "a", concept: "Pendiente", amount: 10 });
+  await offline.addOfflineExpense("a", { userId: "a", concept: "Pendiente", amount: 10 });
   setSession({ user: { id: "b" }, access_token: "token-b" });
   const blocked = await offline.syncOfflineExpenses("a");
   assert.equal(blocked.failedExpenses.length, 1);
-  assert.equal(offline.readOfflineExpenses("a").length, 1);
+  assert.equal((await offline.readOfflineExpenses("a")).length, 1);
   assert.equal(requests.length, 0);
   setSession({ user: { id: "a" }, access_token: "renewed-a" });
   const synced = await offline.syncOfflineExpenses("a");
   assert.equal(synced.syncedExpenses.length, 1);
-  assert.equal(offline.readOfflineExpenses("a").length, 0);
+  assert.equal((await offline.readOfflineExpenses("a")).length, 0);
   assert.equal(requests[0].options.headers.get("authorization"), "Bearer renewed-a");
 });
 

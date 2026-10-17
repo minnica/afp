@@ -32,6 +32,7 @@ import {
   addOfflineExpense,
   readOfflineExpenses,
   syncOfflineExpenses,
+  subscribeOfflineExpenses,
 } from "@/lib/offlineExpenses";
 
 import { Button } from "@/components/ui/button";
@@ -423,19 +424,14 @@ export default function GastosContent() {
     setSubscriptionId("NONE");
   }
 
-  function refreshPendingOfflineExpenses(userId) {
-    setPendingOfflineExpenses(readOfflineExpenses(userId));
+  async function refreshPendingOfflineExpenses(userId) {
+    const pending = await readOfflineExpenses(userId);
+    setPendingOfflineExpenses(pending);
+    return pending;
   }
 
   async function syncPendingExpenses({ silent = false } = {}) {
     if (!user || isSyncingOfflineExpenses) return;
-
-    const queuedExpenses = readOfflineExpenses(user.id);
-
-    if (queuedExpenses.length === 0) {
-      setPendingOfflineExpenses([]);
-      return;
-    }
 
     setIsSyncingOfflineExpenses(true);
 
@@ -444,7 +440,7 @@ export default function GastosContent() {
         user.id,
       );
 
-      setPendingOfflineExpenses(failedExpenses);
+      await refreshPendingOfflineExpenses(user.id);
 
       if (syncedExpenses.length > 0) {
         await loadExpenses(user.id, { force: true });
@@ -462,9 +458,8 @@ export default function GastosContent() {
         toast.warning("Quedaron gastos pendientes por sincronizar.");
       }
     } catch (err) {
-      if (!silent) {
-        toast.error(err.message || "No se pudieron sincronizar pendientes.");
-      }
+      setError(err.message || "No se pudieron sincronizar pendientes.");
+      if (!silent) toast.error(err.message || "No se pudieron sincronizar pendientes.");
     } finally {
       setIsSyncingOfflineExpenses(false);
     }
@@ -515,16 +510,32 @@ export default function GastosContent() {
 
   useEffect(() => {
     if (!user) return;
-
-    const timeoutId = window.setTimeout(() => {
-      refreshPendingOfflineExpenses(user.id);
-    }, 0);
-
-    return () => window.clearTimeout(timeoutId);
-  }, [user]);
+    let active = true;
+    let generation = 0;
+    const refresh = async ({ confirmed = false } = {}) => {
+      const current = ++generation;
+      try {
+        const pending = await readOfflineExpenses(user.id);
+        if (active && current === generation) setPendingOfflineExpenses(pending);
+        if (active && confirmed && navigator.onLine) {
+          await Promise.all([
+            loadExpenses(user.id, { force: true }),
+            loadReceivables(user.id),
+            loadPayables(user.id),
+          ]);
+        }
+      } catch (err) {
+        if (active) setError(err.message || "No se pudieron leer los pendientes.");
+      }
+    };
+    const unsubscribe = subscribeOfflineExpenses(user.id, refresh);
+    const timeoutId = window.setTimeout(refresh, 0);
+    return () => { active = false; unsubscribe(); window.clearTimeout(timeoutId); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, filterDate, filterMonth, filterCategoryId, filterConcept, filterCardId, filterAmount, mobileNavigation]);
 
   useEffect(() => {
-    if (!user || !isOnline || pendingOfflineExpenses.length === 0) return;
+    if (!user || !isOnline || isSaving || pendingOfflineExpenses.length === 0) return;
 
     const timeoutId = window.setTimeout(() => {
       syncPendingExpenses({ silent: true });
@@ -532,7 +543,7 @@ export default function GastosContent() {
 
     return () => window.clearTimeout(timeoutId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, isOnline, pendingOfflineExpenses.length]);
+  }, [user, isOnline, isSaving, pendingOfflineExpenses.length]);
 
   useEffect(() => {
     if (!user || isCheckingSession || !didLoadInitialExpensesRef.current) return;
@@ -589,55 +600,42 @@ export default function GastosContent() {
     }
     const shouldQueueOffline =
       typeof navigator !== "undefined" && navigator.onLine === false;
+    let queuedExpense;
     let saved = false;
 
     try {
+      // También online: persistir antes del primer POST permite recuperar un cierre de pestaña.
+      queuedExpense = await addOfflineExpense(user.id, payload);
+      resetCreateExpenseForm();
+      await refreshPendingOfflineExpenses(user.id);
       if (shouldQueueOffline) {
-        const offlineExpense = addOfflineExpense(user.id, payload);
-
-        setPendingOfflineExpenses((current) => [offlineExpense, ...current]);
-        resetCreateExpenseForm();
         return confirmSave("Sin conexión. Gasto guardado como pendiente.", "info");
       }
 
-      const response = await apiFetch("/api/expenses", {
-        method: "POST", expectedUserId: user?.id,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "No se pudo guardar el gasto.");
+      const { failedExpenses, confirmations } = await syncOfflineExpenses(user.id, { onlyClientId: queuedExpense.clientId });
+      const pending = failedExpenses.find(entry => entry.clientId === queuedExpense.clientId);
+      await refreshPendingOfflineExpenses(user.id);
+      if (pending) {
+        return confirmSave(`Gasto guardado como pendiente. ${pending.lastError || "Se reintentará al recuperar conexión."}`, "info");
       }
 
       saved = true;
-      resetCreateExpenseForm();
       await loadExpenses(user.id, { force: true });
       await loadReceivables(user.id);
       await loadPayables(user.id);
-      return confirmSave(data.alreadyConfirmed ? "Este cobro ya estaba registrado." : "Gasto guardado exitosamente.");
+      return confirmSave(confirmations.some(result => result.alreadyConfirmed)
+        ? "Este cobro ya estaba registrado."
+        : "Gasto guardado exitosamente.");
     } catch (err) {
       if (saved) {
-        // Un fallo al refrescar después del POST no debe duplicar el gasto en la cola.
         setError("El gasto se guardó, pero no se pudo actualizar la lista. Recarga para verlo.");
         return confirmSave("Gasto guardado; recarga la lista para verlo.");
       }
-      const wentOffline =
-        typeof navigator !== "undefined" && navigator.onLine === false;
-
-      if (wentOffline || err instanceof TypeError) {
-        const offlineExpense = addOfflineExpense(user.id, payload);
-
-        setPendingOfflineExpenses((current) => [offlineExpense, ...current]);
-        resetCreateExpenseForm();
-        return confirmSave("Sin conexión. Gasto guardado como pendiente.", "info");
+      if (queuedExpense) {
+        setError(err.message || "No se pudo sincronizar el pendiente.");
+        return confirmSave("Gasto guardado en el dispositivo. Reintenta la sincronización desde Pendientes.", "info");
       }
-
-      setCreateError({ message: err.message || "No se pudo guardar el gasto." });
+      setCreateError({ message: err.message || "No se pudo guardar el gasto en este dispositivo. Conserva el formulario." });
       return false;
     } finally {
       setIsSaving(false);

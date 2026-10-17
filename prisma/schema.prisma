@@ -67,6 +67,7 @@ model User {
   people               Person[]
   incomeTypes          IncomeType[]
   dailyExpenses        DailyExpense[]
+  expenseOperations    ExpenseOperation[]
   installmentPurchases InstallmentPurchase[]
   subscriptions        Subscription[]
   subscriptionCharges  SubscriptionCharge[]
@@ -76,6 +77,19 @@ model User {
   noticeDismissals     NoticeDismissal[]
 
   @@map("users")
+}
+
+// Recibo durable: borrar/editar el gasto no permite volver a ejecutar la captura.
+model ExpenseOperation {
+  userId      String
+  operationId String   @db.Uuid
+  requestHash String
+  response    Json
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, operationId])
+  @@map("expense_operations")
 }
 
 model NoticeDismissal {

@@ -1,0 +1,135 @@
+const assert = require("node:assert/strict");
+const { test } = require("node:test");
+const { IDBFactory } = require("fake-indexeddb");
+const { webcrypto } = require("node:crypto");
+const { sourceLoader } = require("./helpers/load-source.cjs");
+
+function fixture() {
+  const indexedDB = new IDBFactory(), storage = new Map(), receipts = new Map(), requests = [];
+  let send = async payload => {
+    const key = payload.operationId;
+    if (!receipts.has(key)) receipts.set(key, { id: key, concept: payload.concept });
+    return { ok: true, json: async () => ({ expense: receipts.get(key) }) };
+  };
+  const globals = { indexedDB, crypto: webcrypto, CustomEvent,
+    window: { dispatchEvent() {}, localStorage: { getItem: key => storage.get(key) } } };
+  const tab = () => sourceLoader({ "@/lib/apiFetch": { apiFetch: async (_url, options) => {
+    const payload = JSON.parse(options.body);
+    requests.push(payload);
+    return send(payload);
+  } } }, globals)("src/lib/offlineExpenses.js");
+  return { tab, storage, receipts, requests, globals, setSend: fn => { send = fn; } };
+}
+const payload = { concept: "Comida", amount: 10, date: "2026-10-17", categoryId: "category-a", paymentMethod: "CASH" };
+function deferred() { let resolve; const promise = new Promise(r => { resolve = r; }); return { promise, resolve }; }
+
+test("respuesta perdida después de guardar: recargar y reintentar conserva el UUID", async () => {
+  const f = fixture(), first = f.tab();
+  const entry = await first.addOfflineExpense("a", payload);
+  let lose = true;
+  f.setSend(async input => {
+    f.receipts.set(input.operationId, { id: input.operationId });
+    if (lose) { lose = false; throw new TypeError("Respuesta perdida"); }
+    return { ok: true, json: async () => ({ expense: f.receipts.get(input.operationId) }) };
+  });
+  assert.equal((await first.syncOfflineExpenses("a")).failedExpenses.length, 1);
+  const reopened = f.tab();
+  assert.equal((await reopened.readOfflineExpenses("a"))[0].clientId, entry.clientId);
+  assert.equal((await reopened.syncOfflineExpenses("a")).syncedExpenses.length, 1);
+  assert.equal(f.receipts.size, 1);
+  assert.equal(new Set(f.requests.map(row => row.operationId)).size, 1);
+  assert.equal((await reopened.readOfflineExpenses("a")).length, 0);
+});
+
+test("dos pestañas sin Web Locks: conservan un mismo UUID y no resucitan un error tardío", async () => {
+  const f = fixture(), a = f.tab(), b = f.tab(), started = deferred(), release = deferred();
+  await a.addOfflineExpense("a", payload);
+  let count = 0;
+  f.setSend(async input => {
+    if (++count === 1) { started.resolve(); await release.promise; throw new Error("Fallo tardío"); }
+    f.receipts.set(input.operationId, { id: input.operationId });
+    return { ok: true, json: async () => ({ expense: f.receipts.get(input.operationId) }) };
+  });
+  const syncing = a.syncOfflineExpenses("a");
+  await started.promise;
+  await b.syncOfflineExpenses("a");
+  release.resolve();
+  await syncing;
+  assert.equal(f.receipts.size, 1);
+  assert.equal(new Set(f.requests.map(row => row.operationId)).size, 1);
+  assert.equal((await a.readOfflineExpenses("a")).length, 0);
+});
+
+test("capturar en otra pestaña durante sync no pierde la nueva entrada ni la de otro usuario", async () => {
+  const f = fixture(), a = f.tab(), b = f.tab(), started = deferred(), release = deferred();
+  const original = await a.addOfflineExpense("a", payload);
+  f.setSend(async () => { started.resolve(); await release.promise; return { ok: true, json: async () => ({ expense: { id: original.clientId } }) }; });
+  const syncing = a.syncOfflineExpenses("a");
+  await started.promise;
+  const [newEntry, other] = await Promise.all([b.addOfflineExpense("a", payload), b.addOfflineExpense("b", payload)]);
+  release.resolve();
+  const result = await syncing;
+  assert.equal(result.failedExpenses.length, 1);
+  assert.equal(result.failedExpenses[0].clientId, newEntry.clientId);
+  assert.equal((await a.readOfflineExpenses("b"))[0].clientId, other.clientId);
+});
+
+test("cerrar tras persistir y antes del POST permite recuperar y sincronizar", async () => {
+  const f = fixture();
+  const entry = await f.tab().addOfflineExpense("a", payload);
+  assert.equal(f.requests.length, 0);
+  const reopened = f.tab();
+  assert.equal((await reopened.readOfflineExpenses("a"))[0].payload.operationId, entry.clientId);
+  await reopened.syncOfflineExpenses("a");
+  assert.equal(f.receipts.size, 1);
+});
+
+test("migración concurrente conserva la copia local y no reimporta confirmados", async () => {
+  const f = fixture(), a = f.tab(), b = f.tab();
+  const legacy = JSON.stringify([{ clientId: "offline-123", createdAt: "2026-01-01", lastError: "Sin conexión", payload }]);
+  f.storage.set("afp:offline-expenses:a", legacy);
+  const [one, two] = await Promise.all([a.readOfflineExpenses("a"), b.readOfflineExpenses("a")]);
+  assert.equal(one.length, 1);
+  assert.equal(one[0].clientId, two[0].clientId);
+  assert.equal(one[0].lastError, "Sin conexión");
+  await a.syncOfflineExpenses("a");
+  assert.equal((await b.readOfflineExpenses("a")).length, 0);
+  assert.equal(f.storage.get("afp:offline-expenses:a"), legacy);
+});
+
+test("JSON corrupto, validación y confirmación incompleta nunca eliminan pendientes", async () => {
+  const f = fixture(), tab = f.tab();
+  const entry = await tab.addOfflineExpense("a", payload);
+  for (const response of [
+    { ok: true, json: async () => { throw new SyntaxError("Respuesta truncada"); } },
+    { ok: false, json: async () => ({ error: "Categoría no válida" }) },
+    { ok: true, json: async () => ({}) },
+  ]) {
+    f.setSend(async () => response);
+    const result = await tab.syncOfflineExpenses("a");
+    assert.equal(result.failedExpenses[0].clientId, entry.clientId);
+    assert.ok(result.failedExpenses[0].lastError);
+  }
+  f.storage.set("afp:offline-expenses:a", "{corrupto");
+  await assert.rejects(tab.readOfflineExpenses("a"), /conserva/);
+  assert.equal(f.storage.get("afp:offline-expenses:a"), "{corrupto");
+});
+
+test("fallo de almacenamiento no confirma una captura ni envía un POST", async () => {
+  const f = fixture();
+  f.globals.indexedDB = undefined;
+  await assert.rejects(f.tab().addOfflineExpense("a", payload), /almacenamiento/);
+  assert.equal(f.requests.length, 0);
+});
+
+test("Web Locks serializa dos pestañas y la segunda relee la cola al obtener el bloqueo", async () => {
+  const f = fixture();
+  let tail = Promise.resolve(), lockRequests = 0;
+  f.globals.navigator = { locks: { request: (_name, run) => { lockRequests++; const result = tail.then(run); tail = result.catch(() => {}); return result; } } };
+  const a = f.tab(), b = f.tab();
+  await a.addOfflineExpense("a", payload);
+  await Promise.all([a.syncOfflineExpenses("a"), b.syncOfflineExpenses("a")]);
+  assert.equal(lockRequests, 2);
+  assert.equal(f.requests.length, 1);
+  assert.equal((await b.readOfflineExpenses("a")).length, 0);
+});
