@@ -1,0 +1,87 @@
+{
+  "checked_at_utc": "2026-10-17 08:23:06 UTC",
+  "applied_migrations": 15,
+  "pending_migrations": 0,
+  "all_checksums_match": true,
+  "existing_data_and_history_unchanged": true,
+  "automation_unchanged": true,
+  "rls_tables": 17,
+  "policies": 0,
+  "production_modified": true,
+  "schema_diff": "empty",
+  "prisma_migrate_status": "up_to_date",
+  "applied_in_this_operation": [
+    {
+      "migration_name": "20261017000000_add_expense_operations",
+      "checksum": "ae45ef363c01fd0fbe514c0f29f6ecdcacb57e3f21039d4aebf8036931e01dcf"
+    },
+    {
+      "migration_name": "20261017020000_enable_application_rls",
+      "checksum": "69325502c6b19dacccf07e518c9f520638b5a3a5f59b8022c71547219952489e"
+    }
+  ],
+  "applied_checksums": [
+    {
+      "name": "20260509070227_init",
+      "sha256": "1ff8bca46c1f428981d455d8f4078194aa7dd47e6c58319c54fc584ae70c2b41"
+    },
+    {
+      "name": "20260517045000_add_payable_accounts",
+      "sha256": "50c239f9c08407ed7107a926a660b785583849dbe729c290b1691ecfb0556e30"
+    },
+    {
+      "name": "20260517222440_add_subscription_frequency",
+      "sha256": "ab2fce6df5b4b14baac3c10e4d83df85ddda1167140c2d0aa321605b885c3f56"
+    },
+    {
+      "name": "20260517235633_replace_receivable_expected_date_with_charge_day",
+      "sha256": "1e1f4decb4b19bc185906545755cbd43b6510c3919408e3d077f88446c77c502"
+    },
+    {
+      "name": "20260518002802_replace_receivable_charge_day_with_charge_days",
+      "sha256": "9a4e80ec04bd471c5f8616da3a38feed07e0d156e128afdcf4c34a0579d9369a"
+    },
+    {
+      "name": "20260518041110_add_expense_subscription_relation",
+      "sha256": "12c4fe245e66a08076d473b58fa48e07431b93e39e440ade52ba10c07c8fa86b"
+    },
+    {
+      "name": "20260518234708_add_payable_loan_support",
+      "sha256": "8ef7dcd79b9e4439e96092a131bbb569cb04b405721054e6916e71479a8c40b1"
+    },
+    {
+      "name": "20260604000000_add_subscription_active_fields",
+      "sha256": "a7a8905cf9facf6135d2b095dff53a0d63392adef65519cfc919f060cd5affb8"
+    },
+    {
+      "name": "20261009000000_add_installment_statement_reconciliations",
+      "sha256": "c5b70602e66ac44fff6f46d7d432e06277d4d5927227c7935383506099216b5b"
+    },
+    {
+      "name": "20261010000000_add_card_cycle_credits",
+      "sha256": "bce78dbd21bdae948e03b1a314ab18586da68d7c7ea63088c39ef34bca349497"
+    },
+    {
+      "name": "20261011000000_add_card_usage_verification",
+      "sha256": "ab7b6a61669a4910c4c6af563e02912944daf58416198f1dbcdb8fddd5032fb3"
+    },
+    {
+      "name": "20261015000000_add_notice_dismissals",
+      "sha256": "8b082a23fdd3e10c8712590b6c0c1529640c9328f386fc7a5902689ac2cded87"
+    },
+    {
+      "name": "20261016000000_add_subscription_charges",
+      "sha256": "fe3d2bdd2e3fe3b495e51c5a8a29e398e47e6ee26595ec7a1b91f156ed5add21"
+    },
+    {
+      "name": "20261017000000_add_expense_operations",
+      "sha256": "ae45ef363c01fd0fbe514c0f29f6ecdcacb57e3f21039d4aebf8036931e01dcf"
+    },
+    {
+      "name": "20261017020000_enable_application_rls",
+      "sha256": "69325502c6b19dacccf07e518c9f520638b5a3a5f59b8022c71547219952489e"
+    }
+  ],
+  "method": "MCP Supabase para preflight/verificación; Prisma migrate deploy para ejecutar el SQL versionado y registrar el historial nativo.",
+  "application_deployed_by_this_operation": false
+}
