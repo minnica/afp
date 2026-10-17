@@ -1,4 +1,5 @@
 import { apiResponse as NextResponse, requireApiUser, apiAccessErrorResponse, requireOwnedReferences } from "@/lib/apiAuth";
+import { runDebtAccountOperation } from "@/lib/debtAccountService";
 import { prisma } from "@/lib/prisma";
 import { getLatestInstallmentStatement } from "@/lib/calculations/installmentStatements";
 
@@ -123,7 +124,7 @@ export async function POST(request) {
     const user = await requireApiUser(request);
     const userId = user.id;
     const body = await request.json();
-    await requireOwnedReferences(prisma, userId, body, ["cardId", "categoryId", "personId"]);
+    await requireOwnedReferences(prisma, userId, body, []);
 
     const {
       cardId,
@@ -216,52 +217,57 @@ export async function POST(request) {
     const status =
       numericInitialPaymentsMade >= numericMonths ? "PAID_OFF" : "ACTIVE";
 
-    let createdReceivable = null;
+    const result = await runDebtAccountOperation(prisma, userId, async tx => {
+      await requireOwnedReferences(tx, userId, body, ["cardId", "categoryId", "personId"]);
+      // Cuenta, compra y referencia de origen se confirman o revierten juntas.
+      let createdReceivable = null;
 
-    if (personId) {
-      createdReceivable = await prisma.receivableAccount.create({
+      if (personId) {
+        createdReceivable = await tx.receivableAccount.create({
+          data: {
+            userId,
+            personId,
+            concept: concept.trim(),
+            originalAmount: numericTotalAmount,
+            originDate: parsedPurchaseDate,
+            expectedMonthlyPayment: monthlyPaymentUsed,
+            status: "ACTIVE",
+            originType: "INSTALLMENT_PURCHASE",
+          },
+        });
+      }
+
+      const purchase = await tx.installmentPurchase.create({
         data: {
           userId,
-          personId,
+          cardId,
+          purchaseDate: parsedPurchaseDate,
           concept: concept.trim(),
-          originalAmount: numericTotalAmount,
-          originDate: parsedPurchaseDate,
-          expectedMonthlyPayment: monthlyPaymentUsed,
-          status: "ACTIVE",
-          originType: "INSTALLMENT_PURCHASE",
+          totalAmount: numericTotalAmount,
+          months: numericMonths,
+          manualMonthlyPayment: numericManualMonthlyPayment,
+          initialPaymentsMade: numericInitialPaymentsMade,
+          personId: personId || null,
+          receivableAccountId: createdReceivable?.id || null,
+          categoryId,
+          notes: notes?.trim() || null,
+          status,
         },
+        select: purchaseSelect,
       });
-    }
 
-    const purchase = await prisma.installmentPurchase.create({
-      data: {
-        userId,
-        cardId,
-        purchaseDate: parsedPurchaseDate,
-        concept: concept.trim(),
-        totalAmount: numericTotalAmount,
-        months: numericMonths,
-        manualMonthlyPayment: numericManualMonthlyPayment,
-        initialPaymentsMade: numericInitialPaymentsMade,
-        personId: personId || null,
-        receivableAccountId: createdReceivable?.id || null,
-        categoryId,
-        notes: notes?.trim() || null,
-        status,
-      },
-      select: purchaseSelect,
+      if (createdReceivable) {
+        await tx.receivableAccount.update({
+          where: { id: createdReceivable.id, userId },
+          data: {
+            originId: purchase.id,
+          },
+        });
+      }
+
+      return { purchase: formatPurchase(purchase) };
     });
-
-    if (createdReceivable) {
-      await prisma.receivableAccount.update({
-        where: { id: createdReceivable.id, userId },
-        data: {
-          originId: purchase.id,
-        },
-      });
-    }
-
-    return NextResponse.json({ purchase: formatPurchase(purchase) });
+    return NextResponse.json(result);
   } catch (error) {
     const accessResponse = apiAccessErrorResponse(error);
     if (accessResponse) return accessResponse;
@@ -307,7 +313,7 @@ export async function PATCH(request) {
     const user = await requireApiUser(request);
     const userId = user.id;
     const body = await request.json();
-    await requireOwnedReferences(prisma, userId, body, ["cardId", "categoryId", "personId"]);
+    await requireOwnedReferences(prisma, userId, body, []);
 
     const {
       id,
@@ -400,24 +406,28 @@ export async function PATCH(request) {
     const status =
       numericInitialPaymentsMade >= numericMonths ? "PAID_OFF" : "ACTIVE";
 
-    const purchase = await prisma.installmentPurchase.update({
-      where: { id, userId },
-      data: {
-        cardId,
-        purchaseDate: parsedPurchaseDate,
-        concept: concept.trim(),
-        totalAmount: numericTotalAmount,
-        months: numericMonths,
-        manualMonthlyPayment: numericManualMonthlyPayment,
-        initialPaymentsMade: numericInitialPaymentsMade,
-        categoryId,
-        notes: notes?.trim() || null,
-        status,
-      },
-      select: purchaseSelect,
-    });
+    const result = await runDebtAccountOperation(prisma, userId, async tx => {
+      await requireOwnedReferences(tx, userId, body, ["cardId", "categoryId", "personId"]);
+      const purchase = await tx.installmentPurchase.update({
+        where: { id, userId },
+        data: {
+          cardId,
+          purchaseDate: parsedPurchaseDate,
+          concept: concept.trim(),
+          totalAmount: numericTotalAmount,
+          months: numericMonths,
+          manualMonthlyPayment: numericManualMonthlyPayment,
+          initialPaymentsMade: numericInitialPaymentsMade,
+          categoryId,
+          notes: notes?.trim() || null,
+          status,
+        },
+        select: purchaseSelect,
+      });
 
-    return NextResponse.json({ purchase: formatPurchase(purchase) });
+      return { purchase: formatPurchase(purchase) };
+    });
+    return NextResponse.json(result);
   } catch (error) {
     const accessResponse = apiAccessErrorResponse(error);
     if (accessResponse) return accessResponse;

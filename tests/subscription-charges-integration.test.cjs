@@ -66,38 +66,29 @@ test("cobros: transacción, concurrencia, omisión, restauración, evidencia y a
     const manual = await db.subscription.create({ data: { userId: user.id, name: "Manual", amount: 99,
       paymentMethod: "CASH", categoryId: category.id, chargeDay: 15, startMonth: 1, startYear: 2026 } });
     const { sourceLoader } = require("./helpers/load-source.cjs");
-    const access = sourceLoader({
+    const expenses = sourceLoader({
+      "@/lib/prisma": { prisma: db },
       "next/server": { NextResponse: { json: (body, options = {}) => ({ body, status: options.status || 200 }) } },
       "@supabase/supabase-js": { createClient: () => ({ auth: { getUser: async () => ({ data: { user } }) } }) },
-    })("src/lib/apiAuth.js");
-    ctx.ApiAccessError = access.ApiAccessError;
-    ctx.runExpenseOperation = sourceLoader({ "@/lib/apiAuth": access })("src/lib/expenseOperations.js").runExpenseOperation;
-    ctx.requireApiUser = async () => user;
-    ctx.requireOwnedReferences = access.requireOwnedReferences;
-    ctx.apiAccessErrorResponse = access.apiAccessErrorResponse;
-    ctx.prisma = db;
-    ctx.URL = URL;
-    ctx.console = console;
-    ctx.NextResponse = { json: (body, options = {}) => ({ body, status: options.status || 200 }) };
-    vm.runInContext(fs.readFileSync(path.join(__dirname, "../src/app/api/expenses/route.js"), "utf8")
-      .replace(/^import .*;\r?\n/gm, "").replace(/^export /gm, ""), ctx);
+    })("src/app/api/expenses/route.js");
+    const request = body => ({ headers: new Headers({ authorization: "Bearer test" }), json: async () => body });
     const payload = { userId: user.id, subscriptionId: manual.id, date: "2026-01-15", amount: 99,
       paymentMethod: "CASH", categoryId: category.id, concept: "Manual" };
     const [posted, confirmed] = await Promise.all([
-      ctx.POST({ json: async () => payload }),
+      expenses.POST(request(payload)),
       apply({ subscriptionId: manual.id, month: "2026-01", amount: 99 }),
     ]);
     assert.equal(posted.status, 200);
     assert.equal(posted.body.expense.id, confirmed.expenseId);
     assert.equal(await db.dailyExpense.count({ where: { subscriptionId: manual.id } }), 1);
-    const edited = await ctx.PATCH({ json: async () => ({ ...payload, id: confirmed.expenseId, date: "2026-02-02", amount: 109 }) });
+    const edited = await expenses.PATCH(request({ ...payload, id: confirmed.expenseId, date: "2026-02-02", amount: 109 }));
     assert.equal(edited.status, 200);
     assert.equal((await ctx.loadSubscriptionCharges(db, user.id, "2026-01", "2026-11-20")).find(row => row.subscriptionId === manual.id).confirmedAmount, 109);
     assert.equal((await ctx.loadSubscriptionCharges(db, user.id, "2026-02", "2026-11-20")).find(row => row.subscriptionId === manual.id).status, "PENDING");
-    assert.equal((await ctx.PATCH({ json: async () => ({ ...payload, id: confirmed.expenseId, subscriptionId: null }) })).status, 400);
+    assert.equal((await expenses.PATCH(request({ ...payload, id: confirmed.expenseId, subscriptionId: null }))).status, 400);
     const duplicate = await db.dailyExpense.create({ data: { userId: user.id, date: new Date("2026-01-15"),
       paymentMethod: "CASH", amount: 99, concept: "Sin vínculo", categoryId: category.id } });
-    assert.equal((await ctx.PATCH({ json: async () => ({ ...payload, id: duplicate.id }) })).status, 409);
+    assert.equal((await expenses.PATCH(request({ ...payload, id: duplicate.id }))).status, 409);
   } finally {
     await db.user.delete({ where: { id: user.id } });
     await db.$disconnect();

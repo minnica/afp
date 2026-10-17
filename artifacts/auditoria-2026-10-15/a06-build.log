@@ -1,0 +1,61 @@
+
+> afp@0.1.0 build
+> prisma generate && next build
+
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma/schema.prisma.
+
+✔ Generated Prisma Client (v7.8.0) to ./node_modules/.pnpm/@prisma+client@7.8.0_prisma@7.8.0_@types+react@19.2.14_react-dom@19.2.4_react@19.2.4__r_25af73f620b776a22254458ace6d4198/node_modules/@prisma/client in 192ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+
+▲ Next.js 16.2.6 (Turbopack)
+- Environments: .env
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 3.9s
+  Running TypeScript ...
+  Finished TypeScript in 174ms ...
+  Collecting page data using 15 workers ...
+  Generating static pages using 15 workers (0/29) ...
+  Generating static pages using 15 workers (7/29) 
+  Generating static pages using 15 workers (14/29) 
+  Generating static pages using 15 workers (21/29) 
+✓ Generating static pages using 15 workers (29/29) in 374ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ○ /analisis
+├ ƒ /api/card-cycles
+├ ƒ /api/cards
+├ ƒ /api/dashboard
+├ ƒ /api/expenses
+├ ƒ /api/gastos/bootstrap
+├ ƒ /api/incomes
+├ ƒ /api/installment-purchases
+├ ƒ /api/notice-dismissals
+├ ƒ /api/payables
+├ ƒ /api/receivables
+├ ƒ /api/settings
+├ ƒ /api/setup-user
+├ ƒ /api/subscription-charges
+├ ƒ /api/subscriptions
+├ ○ /compras-a-meses
+├ ○ /configuracion
+├ ○ /cuentas-por-cobrar
+├ ○ /cuentas-por-pagar
+├ ○ /dashboard
+├ ○ /gastos
+├ ○ /ingresos
+├ ○ /login
+├ ○ /suscripciones
+└ ○ /tarjetas
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

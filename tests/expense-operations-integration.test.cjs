@@ -34,7 +34,7 @@ test("PostgreSQL: unicidad concurrente, rollback y recibo durable de capturas", 
     assert.equal((await post({ ...body, amount: 26 })).status, 409);
     const failedId = randomUUID();
     await assert.rejects(runExpenseOperation(db, user.id, { ...body, operationId: failedId }, async tx => {
-      await tx.receivableAccount.create({ data: { userId: user.id, personId: person.id, concept: "Rollback", originalAmount: 10, originDate: new Date() } });
+      await tx.receivableAccount.create({ data: { userId: user.id, personId: person.id, concept: "Rollback", originalAmount: 10, originDate: new Date(), originType: "MANUAL" } });
       throw new Error("Fallo después de crear relación");
     }), /Fallo/);
     assert.equal(await db.expenseOperation.count({ where: { userId: user.id, operationId: failedId } }), 0);

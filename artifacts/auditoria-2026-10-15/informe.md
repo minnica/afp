@@ -2,7 +2,7 @@ AFP · Auditoría técnica y propuestas de producto · 15 de octubre de 2026
 
 # Proteger los datos y asegurar los registros antes de ampliar funciones
 
-La aplicación tiene una base funcional sólida para gastos, cortes, MSI, suscripciones y conciliación. La auditoría original detectó como hallazgo prioritario la ausencia de autorización en 12 de sus 14 rutas API; A01 ya tiene una corrección implementada y verificada localmente. A02 también tiene una corrección local de sincronización, A03 de liquidación de cortes y A05 de estado de deudas; permanecen otros hallazgos sobre estados financieros y consulta del historial.
+La aplicación tiene una base funcional sólida para gastos, cortes, MSI, suscripciones y conciliación. La auditoría original detectó como hallazgo prioritario la ausencia de autorización en 12 de sus 14 rutas API; A01 ya tiene una corrección implementada y verificada localmente. A02 también tiene una corrección local de sincronización, A03 de liquidación de cortes, A05 de estado de deudas y A06 de operaciones relacionadas; permanecen otros hallazgos sobre estados financieros y consulta del historial.
 
 **14 hallazgos priorizados: 1 P0, 6 P1 y 7 P2.** P0 exige atención inmediata si la app es accesible por terceros; P1 protege datos o decisiones financieras; P2 corrige exactitud, experiencia o crecimiento. Las alertas del gestor de paquetes se agrupan como un hallazgo y no representan 91 fallos explotados en AFP.
 
@@ -114,7 +114,7 @@ Este seguimiento corresponde a A01. Los ajustes de autenticación de la cola y d
 | PostgreSQL real | Suite de idempotencia/concurrencia/rollback preparada; omitida junto con la de suscripciones por falta de `AFP_TEST_DATABASE_URL`. Requiere base local `afp_test…` y migraciones aplicadas. |
 | Build / lint | Build correcto con Google Fonts accesible. Lint: cero errores, una advertencia previa de `useReactTable`. |
 
-**Pendiente de operación:** aplicar la migración aditiva y desplegar con autorización explícita, y ejecutar las suites integradas en PostgreSQL aislado. La implementación está concluida; la verificación actual no equivale a una validación del formulario autenticado contra una BD real ni a un despliegue. A05 se implementó posteriormente como se documenta abajo; el resto de A06 y A12 conservan su alcance pendiente.
+**Pendiente de operación:** aplicar la migración aditiva y desplegar con autorización explícita. La integración A02 con PostgreSQL aislado se ejecutó posteriormente y pasó en el cierre de A06; no equivale a una validación del formulario autenticado ni a un despliegue. A05 y A06 también están implementados localmente, como se documenta abajo; A12 conserva su alcance pendiente.
 
 
 ---
@@ -189,7 +189,7 @@ Al crear o borrar un abono se recalcula la cuenta por pagar, pero al editarlo no
 - **Cálculo único:** [`debtAccounts.js`](../../src/lib/calculations/debtAccounts.js) usa Decimal y redondea individualmente el principal y cada abono a centavos. Gastos, Ingresos, cuentas, bootstrap de Gastos y Dashboard comparten saldo/estado. Los listados derivan la clasificación histórica sin escribir al consultar; modificar un abono o principal corrige el estado persistido.
 - **Mutaciones atómicas:** [`debtAccountService.js`](../../src/lib/debtAccountService.js) coordina las altas, ediciones y eliminaciones de abonos y la edición del principal en `ReadCommitted`, con bloqueo asesor por usuario antes de leer. Cubre operaciones simultáneas y traslados de ingresos entre cuentas. Conserva el recibo idempotente del POST de gastos y la relación existente al editar gastos. Un fallo del estado revierte el movimiento/principal.
 - **Cancelaciones y excedentes:** `CANCELLED` permanece cancelada. Saldo cero o negativo liquida las demás cuentas; el excedente se conserva como `pendingBalance` negativo y `excessAmount` positivo, sin compensaciones ni devoluciones automáticas. Reducir el abono o aumentar el principal reabre la cuenta cuando vuelve a existir saldo.
-- **Alcance:** sin migración ni cambios visuales. No modifica datos de Supabase ni despliega. A06 sigue pendiente para los demás flujos relacionados, especialmente compras a meses; A11 conserva el problema del historial de migraciones.
+- **Alcance:** sin migración ni cambios visuales. No modifica datos de Supabase ni despliega. A06 se completó posteriormente para los demás flujos relacionados, especialmente compras a meses; A11 conserva el problema del historial de migraciones.
 
 | Comprobación | Resultado |
 | --- | --- |
@@ -207,11 +207,35 @@ Al crear o borrar un abono se recalcula la cuenta por pagar, pero al editarlo no
 
 ### A06 · P1 · Operaciones relacionadas sin transacción
 
+**Estado: implementación concluida y verificada localmente · 17 de octubre de 2026.** Incluye PostgreSQL real desechable; despliegue pendiente. El texto siguiente conserva el hallazgo original.
+
 **Ubicación:** `src/app/api/expenses/route.js:296`, `installment-purchases/route.js:222`, y creación/actualización de ingresos vinculados.
 
 La cuenta por cobrar se crea antes del gasto o de la compra MSI. Si falla la segunda escritura, queda una cuenta huérfana; reintentar puede crear otra. La reproducción fuerza el fallo del gasto y conserva una cuenta creada. Otros flujos guardan el movimiento y después actualizan el estado, pudiendo devolver 500 cuando ya se persistió una parte.
 
 **Corrección:** transacciones que abarquen el movimiento, sus relaciones y el saldo; validar relaciones antes de escribir y combinar con idempotencia. El servicio reciente de cobros de suscripciones ya ofrece un patrón aprovechable. Aceptación: fallo de cualquier paso revierte todos los cambios.
+
+
+<a id="A06-seguimiento"></a>
+
+#### Actividad concluida · implementación local · 17 de octubre de 2026
+
+- **MSI atómico:** [`installment-purchases/route.js`](../../src/app/api/installment-purchases/route.js) usa `runDebtAccountOperation` para guardar cuenta por cobrar, compra y referencia de origen en una sola transacción `ReadCommitted`. Una excepción después de cualquiera de las escrituras revierte el conjunto. La compra sin persona conserva el alta normal sin cuenta adicional.
+- **Validación de relaciones:** alta/edición de MSI y edición de gastos comprueban la pertenencia de las referencias dentro de la transacción, antes de escribir y después del bloqueo por usuario. Se conserva la validación del cuerpo y la autorización por Bearer de A01.
+- **Gastos e ingresos:** se verificó la cobertura ya implementada en A02/A05. Gastos incluye recibo idempotente, cuenta opcional, gasto, decisión de suscripción y saldo por pagar; ingresos incluye movimiento y ambas cuentas al trasladar un abono. El fallo de la segunda actualización de saldo revierte también la primera.
+- **Idempotencia y límites:** Gastos conserva el UUID y la respuesta durable; los reintentos concurrentes no duplican registros y el contenido distinto devuelve 409. MSI e Ingresos conservan su contrato sin recibo idempotente: el reintento después de rollback es seguro, pero no se afirma deduplicación si se pierde la respuesta después del commit. No cambia el tratamiento de cuentas independientes al editar/borrar una compra ni se reparan huérfanos históricos.
+- **Alcance:** sin migración, cambios visuales ni escrituras en Supabase. Se reutiliza el servicio transaccional de A05. El historial de migraciones de A11 continúa pendiente.
+
+| Comprobación | Resultado |
+| --- | --- |
+| Regresiones MSI | [3 pruebas nuevas](../../tests/installment-transactions.test.cjs): fallos tras las tres escrituras, reintento, relaciones ajenas, usuario falsificado, compra sin cuenta y edición con rollback. |
+| Suite completa | `node --test --experimental-test-isolation=none tests/*.test.cjs`: **179 casos, 174 correctos, 5 omitidos sin variable de BD**, cero fallos. [Log](a06-pruebas.log). |
+| PostgreSQL real | **5 integraciones correctas, cero omisiones**: A02, A05, A06 y suscripciones. La [nueva prueba A06](../../tests/related-operations-integration.test.cjs) inyecta **24 fallos después de escrituras reales**, verifica rollback exacto de siete tablas y reintenta cada operación. Incluye MSI, gasto con cuenta/saldo/recibo, cobro de suscripción, alta/traslado/borrado de ingreso y cinco reintentos concurrentes del gasto. [Log](a06-postgres.log). |
+| Pruebas anteriores reparadas | La integración de A02 omitía `originType` al preparar una cuenta. La de suscripciones cargaba Gastos sin sus dependencias transaccionales actuales; ahora utiliza el cargador compartido con las dependencias reales. Se corrigieron las pruebas y se repitieron exitosamente. |
+| Entorno | PostgreSQL 16 en contenedor desechable y base local `afp_test_a06`, esquema desde `schema.prisma` mediante `migrate diff --from-empty`, datos ficticios eliminados al finalizar. No valida las migraciones de A11. Auth simulada; Prisma y SQL reales. Advertencia previa del driver `pg` sobre consultas concurrentes, sin fallos. |
+| Build / lint | Compilación de producción correcta con acceso a Google Fonts; lint sin errores, conserva la advertencia previa de `useReactTable`. [Build](a06-build.log) · [Lint](a06-lint.log). |
+
+**Cierre:** implementación y verificación A06 concluidas. Para repetir las integraciones, configurar `AFP_TEST_DATABASE_URL` con una base local desechable `afp_test…` con el esquema actual y ejecutar `node --test --experimental-test-isolation=none tests/*integration.test.cjs`. Falta el despliegue autorizado y la comprobación autenticada en ese ambiente; no se declara resuelto en producción.
 
 ---
 
@@ -361,7 +385,7 @@ Para llamar a una cifra «dinero disponible» se necesitan saldos iniciales, cue
 ## Orden recomendado
 
 1. **Seguridad:** completar el despliegue autorizado y la validación integrada de A01, cuya implementación local ya está terminada; continuar con la actualización controlada A10 y pruebas de aislamiento. Alinear migraciones y RLS versionado (A11) para poder crear un entorno confiable de pruebas.
-2. **Integridad de registros:** A02 y A05 implementados localmente; A05 ya tiene verificación PostgreSQL desechable. Completar migración/despliegue autorizado y validación pendiente de A02; continuar con el resto de A06: transacciones y regresiones de concurrencia.
+2. **Integridad de registros:** A02, A05 y A06 implementados localmente y verificados con PostgreSQL desechable en el cierre de A06. Completar migración/despliegue autorizado y comprobación autenticada en ese ambiente.
 3. **Exactitud visible:** A03 implementado localmente; continuar con calendario A04, historial completo A07, validaciones A08 y filtros A09.
 4. **Operación diaria:** política offline A12, consultas A13, login A14, recuperación de acceso y CI.
 5. **Producto:** conciliación revisable, calendario/reservas y presupuestos; después proyección con saldos reales.

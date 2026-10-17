@@ -1,0 +1,42 @@
+TAP version 13
+(node:364252) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+# Subtest: PostgreSQL A05 payable: abonos simultáneos, principal, cancelación y rollback
+ok 1 - PostgreSQL A05 payable: abonos simultáneos, principal, cancelación y rollback
+  ---
+  duration_ms: 636.537883
+  type: 'test'
+  ...
+# Subtest: PostgreSQL A05 receivable: abonos simultáneos, principal, cancelación y rollback
+ok 2 - PostgreSQL A05 receivable: abonos simultáneos, principal, cancelación y rollback
+  ---
+  duration_ms: 507.357217
+  type: 'test'
+  ...
+# Subtest: PostgreSQL: unicidad concurrente, rollback y recibo durable de capturas
+ok 3 - PostgreSQL: unicidad concurrente, rollback y recibo durable de capturas
+  ---
+  duration_ms: 92.035394
+  type: 'test'
+  ...
+# Subtest: PostgreSQL A06: rollback de cada paso relacionado, reintentos y traslado de ingresos
+ok 4 - PostgreSQL A06: rollback de cada paso relacionado, reintentos y traslado de ingresos
+  ---
+  duration_ms: 444.683987
+  type: 'test'
+  ...
+# Subtest: cobros: transacción, concurrencia, omisión, restauración, evidencia y aislamiento
+ok 5 - cobros: transacción, concurrencia, omisión, restauración, evidencia y aislamiento
+  ---
+  duration_ms: 200.363636
+  type: 'test'
+  ...
+1..5
+# tests 5
+# suites 0
+# pass 5
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1928.709226

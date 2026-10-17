@@ -358,7 +358,7 @@ export async function PATCH(request) {
     const user = await requireApiUser(request);
     const userId = user.id;
     const body = await request.json();
-    await requireOwnedReferences(prisma, userId, body, ["cardId", "categoryId", "personId", "receivableAccountId", "payableAccountId", "subscriptionId"]);
+    await requireOwnedReferences(prisma, userId, body, []);
 
     const {
       id,
@@ -413,6 +413,7 @@ export async function PATCH(request) {
     }
 
     const expense = await runDebtAccountOperation(prisma, userId, async tx => {
+      await requireOwnedReferences(tx, userId, body, ["cardId", "categoryId", "personId", "receivableAccountId", "payableAccountId", "subscriptionId"]);
       const existing = await tx.dailyExpense.findUnique({ where: { id, userId } });
       if (!existing) throw new SubscriptionChargeError("Gasto no encontrado.", 404);
       for (const linkedId of [...new Set([existing.subscriptionId, subscriptionId].filter(Boolean))].sort()) {
