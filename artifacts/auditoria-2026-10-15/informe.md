@@ -6,7 +6,7 @@ La aplicación tiene una base funcional sólida para gastos, cortes, MSI, suscri
 
 **14 hallazgos priorizados: 1 P0, 6 P1 y 7 P2.** P0 exige atención inmediata si la app es accesible por terceros; P1 protege datos o decisiones financieras; P2 corrige exactitud, experiencia o crecimiento. Las alertas del gestor de paquetes se agrupan como un hallazgo y no representan 91 fallos explotados en AFP.
 
-**Seguimiento · 17 de octubre de 2026:** 4 hallazgos implementados localmente (A01, A02, A03 y A05) y 10 pendientes. La actividad A05 queda **concluida**, con regresiones y pruebas reales en PostgreSQL desechable. El despliegue autorizado y las verificaciones integradas pendientes de los otros hallazgos conservan su alcance; no se declaran resueltos en producción. [A01](#A01-seguimiento) · [A02](#A02-seguimiento) · [A03](#A03-seguimiento) · [A05](#A05-seguimiento).
+**Seguimiento · 17 de octubre de 2026:** 6 hallazgos con implementación local concluida (A01, A02, A03, A05, A06 y A10) y 8 pendientes. A10 deja cero avisos en dependencias de producción y un aviso residual de desarrollo sin parche publicado, documentado en su cierre. El despliegue autorizado y las verificaciones integradas pendientes conservan su alcance; no se declaran resueltos en producción. [A01](#A01-seguimiento) · [A02](#A02-seguimiento) · [A03](#A03-seguimiento) · [A05](#A05-seguimiento) · [A06](#A06-seguimiento) · [A10](#A10-seguimiento).
 
 **Contenido**
 
@@ -279,11 +279,43 @@ La cuenta por cobrar se crea antes del gasto o de la compra MSI. Si falla la seg
 
 ### A10 · P1 · Dependencias con avisos de seguridad pendientes
 
+**Estado: actividad de actualización concluida y verificada localmente · 17 de octubre de 2026.** Cero avisos de producción; un aviso residual de desarrollo sin parche, detallado abajo. Despliegue pendiente. El texto siguiente conserva el hallazgo original.
+
 **Evidencia:** `package.json`, lockfile y [auditoría de dependencias](dependencias.json). Next.js instalado: 16.2.6; el registro devuelve 17 avisos únicos para Next. El árbol total contiene 91 avisos únicos, incluidos cuatro críticos.
 
 **Aplicabilidad:** no se encontraron imports de `next/og`, `ImageResponse` ni `next/image`. El aviso de [ImageResponse](https://github.com/vercel/next.js/security/advisories/GHSA-vcvr-r3jv-pc5j) requiere contenido SVG controlable por un atacante; el de [AVIF](https://github.com/vercel/next.js/security/advisories/GHSA-2xp9-vwfh-vxw4) requiere optimizar imágenes afectadas. Otro crítico aplica a Windows, distinto de este entorno Linux. El cuarto crítico, `proxy-addr`, llega mediante `shadcn → MCP SDK → express`, herramienta declarada como dependencia de producción. No se ha demostrado ejecución remota en AFP.
 
 **Corrección:** actualización controlada de Next y eslint-config-next a una versión estable que cubra todos los rangos reportados (el registro consultado señala parches hasta 16.3.8), revisión de sharp y transitivas, y mover la CLI shadcn a desarrollo. Verificar en una rama con build, regresiones y navegador. No aplicar actualizaciones forzadas sin revisar compatibilidad.
+
+
+<a id="A10-seguimiento"></a>
+
+#### Actividad concluida · actualización local · 17 de octubre de 2026
+
+- **Versiones corregidas:** Next.js y `eslint-config-next` **16.3.8** cubren todos los rangos de Next reportados, incluidos los [parches de ImageResponse](https://github.com/vercel/next.js/security/advisories/GHSA-vcvr-r3jv-pc5j) y [AVIF](https://github.com/vercel/next.js/security/advisories/GHSA-2xp9-vwfh-vxw4). Sharp **0.35.5** se resuelve tanto para iconos como para Next. Se mantuvo React/React DOM 19.2.4 y se usaron versiones estables, sin `audit --fix`, overrides ni saltos de versión mayor de las dependencias directas (Sharp pasa de 0.34 a 0.35).
+- **Transitivas:** actualización del lockfile dentro de los rangos compatibles. Prisma, Client y adapter-pg **7.10.1** eliminan la cadena antigua de `deepmerge-ts` (ahora 8.0.2) y actualizan sus herramientas transitivas. La CLI shadcn **4.22.0** utiliza MCP SDK corregido; desaparece el aviso crítico de `proxy-addr`. La auditoría final verifica el árbol completo, no solo Next.
+- **Separación de herramientas:** shadcn se mueve a `devDependencies`. Se conserva `@import "shadcn/tailwind.css"`; instalar dependencias de desarrollo antes de compilar. Prisma permanece en producción para conservar el contrato actual de generación/migraciones. Sharp continúa declarado en desarrollo y Next también lo resuelve como dependencia opcional de producción.
+- **Reproducibilidad:** `packageManager` fija pnpm **10.33.0**, con instalación `--frozen-lockfile`. Se agregan `pnpm test`, `pnpm audit:prod` y `pnpm audit:all`; el [README](../../README.md#dependencias-y-seguridad-a10) documenta el flujo único con pnpm. Trabajo realizado en la rama `fix/a10-dependency-security`.
+
+| Auditoría del 17 de octubre | Antes | Después | Evidencia |
+| --- | --- | --- | --- |
+| Producción (`pnpm audit --prod --json`) | 94 incidencias, 91 GHSA únicos; 4 críticos | **0 avisos**, código de salida 0 | [Antes](a10-audit-prod-antes.json) · [Después](a10-audit-prod-despues.json) |
+| Árbol completo (`pnpm audit --json`) | 100 incidencias, 91 GHSA únicos; 4 críticos | **1 alto**, 0 críticos, 0 moderados, 0 bajos; código de salida 1 | [Antes](a10-audit-antes.json) · [Después](a10-audit-despues.json) |
+
+**Aviso residual de desarrollo:** [GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm), agotamiento de pila con patrones de llaves profundamente anidados en `braces@3.0.3`. El registro devuelve esa versión como última y no publica una versión corregida. `pnpm why braces` lo sitúa bajo `eslint-config-next → @next/eslint-plugin-next → fast-glob → micromatch`, y también bajo shadcn/ts-morph; todas son herramientas de desarrollo. La auditoría JSON enumera una cadena representativa. No se encontró uso desde la aplicación y `pnpm why braces --prod` no devuelve dependientes. Se limita su uso a patrones/configuración de confianza en las herramientas locales. No se suprime el GHSA ni se fuerza una sustitución incompatible. **Seguimiento abierto:** revisar el aviso en la próxima actualización de dependencias y antes de publicar; instalar un parche compatible cuando exista. El cierre de la actualización no significa que el árbol de desarrollo esté libre de avisos.
+
+| Comprobación | Resultado |
+| --- | --- |
+| Instalación fija | `pnpm install --frozen-lockfile --offline` correcto, con generación de Prisma. Node.js 22.23.2 y pnpm 10.33.0. [Log](a10-install.log). |
+| Regresiones | `pnpm test`: **179 casos, 174 correctos, 5 omitidos sin variable de BD, cero fallos**. [Log](a10-pruebas.log). |
+| PostgreSQL real | **5 integraciones correctas, cero omisiones** con Prisma 7.10.1 y PostgreSQL 16 desechable, base `afp_test_a10`. Comprueba idempotencia, concurrencia, abonos, rollback y suscripciones. Auth simulada; Prisma y SQL reales. Esquema generado desde `schema.prisma`, sin validar migraciones de A11. [Log](a10-postgres.log). |
+| Lint | Cero errores; permanece la advertencia previa de compatibilidad de `useReactTable`. [Log](a10-lint.log). |
+| Build de producción | **`pnpm build --webpack` correcto**, generación de Prisma y 29 páginas. [Log](a10-build-webpack.log). `pnpm build` con Turbopack no pudo completarse en este entorno: bloqueo al abrir el puerto interno de procesamiento CSS (`Operation not permitted`), incluso al reintentar fuera del sandbox. El primer intento también falló al acceder a Google Fonts. [Log Turbopack](a10-build.log). No se cambió el bundler predeterminado; repetir ese build en el entorno de despliegue. |
+| HTTP del build Webpack | **42 métodos de 14 rutas API** responden 401 sin sesión, `private, no-store` y `Vary: Authorization`. `/` redirige a `/dashboard`; manifest responde 200. [Resultados](a10-http.json). |
+| Navegador | Chromium: login a 390×844 y 1440×900; cambio entre Entrar/Crear cuenta comprueba hidratación; `/dashboard` vuelve a `/login` sin sesión. Sin errores de consola o página observados. [Móvil](a10-login-mobile.png) · [Escritorio](a10-login-desktop.png). No se enviaron credenciales ni se crearon usuarios. |
+| Herramientas | `shadcn --version` devuelve 4.22.0. Sharp 0.35.5 convierte el SVG existente a PNG 192×192 en memoria. |
+
+**Cierre:** actualización A10 implementada y comprobada localmente, con aviso residual de desarrollo y limitación de Turbopack explícitos. No se modificó Supabase, el esquema ni las migraciones, ni se desplegó. Quedan para el despliegue autorizado el build predeterminado y el recorrido autenticado con datos aislados; no se afirma corrección ya publicada en producción.
 
 ---
 
@@ -384,7 +416,7 @@ Para llamar a una cifra «dinero disponible» se necesitan saldos iniciales, cue
 
 ## Orden recomendado
 
-1. **Seguridad:** completar el despliegue autorizado y la validación integrada de A01, cuya implementación local ya está terminada; continuar con la actualización controlada A10 y pruebas de aislamiento. Alinear migraciones y RLS versionado (A11) para poder crear un entorno confiable de pruebas.
+1. **Seguridad:** completar el despliegue autorizado y la validación integrada de A01, cuya implementación local ya está terminada; A10 ya tiene actualización local con cero avisos de producción, un aviso residual de desarrollo y verificación de build predeterminado pendiente en el entorno de despliegue. Continuar con pruebas de aislamiento. Alinear migraciones y RLS versionado (A11) para poder crear un entorno confiable de pruebas.
 2. **Integridad de registros:** A02, A05 y A06 implementados localmente y verificados con PostgreSQL desechable en el cierre de A06. Completar migración/despliegue autorizado y comprobación autenticada en ese ambiente.
 3. **Exactitud visible:** A03 implementado localmente; continuar con calendario A04, historial completo A07, validaciones A08 y filtros A09.
 4. **Operación diaria:** política offline A12, consultas A13, login A14, recuperación de acceso y CI.
