@@ -1,0 +1,262 @@
+{
+  "base": "http://127.0.0.1:4190",
+  "home": {
+    "status": 307,
+    "location": "/dashboard"
+  },
+  "manifest": 200,
+  "anonymousApi": [
+    {
+      "path": "/api/subscriptions",
+      "method": "GET",
+      "status": 401,
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/subscriptions",
+      "method": "POST",
+      "status": 401,
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/subscriptions",
+      "method": "DELETE",
+      "status": 401,
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/subscriptions",
+      "method": "PATCH",
+      "status": 401,
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/subscription-charges",
+      "method": "GET",
+      "status": 401,
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/subscription-charges",
+      "method": "POST",
+      "status": 401,
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/setup-user",
+      "method": "POST",
+      "status": 401,
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/settings",
+      "method": "GET",
+      "status": 401,
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/settings",
+      "method": "POST",
+      "status": 401,
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/settings",
+      "method": "DELETE",
+      "status": 401,
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/receivables",
+      "method": "GET",
+      "status": 401,
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/receivables",
+      "method": "POST",
+      "status": 401,
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/receivables",
+      "method": "DELETE",
+      "status": 401,
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/receivables",
+      "method": "PATCH",
+      "status": 401,
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/payables",
+      "method": "GET",
+      "status": 401,
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/payables",
+      "method": "POST",
+      "status": 401,
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/payables",
+      "method": "PATCH",
+      "status": 401,
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/payables",
+      "method": "DELETE",
+      "status": 401,
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/notice-dismissals",
+      "method": "GET",
+      "status": 401,
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/notice-dismissals",
+      "method": "POST",
+      "status": 401,
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/notice-dismissals",
+      "method": "DELETE",
+      "status": 401,
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/installment-purchases",
+      "method": "GET",
+      "status": 401,
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/installment-purchases",
+      "method": "POST",
+      "status": 401,
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/installment-purchases",
+      "method": "DELETE",
+      "status": 401,
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/installment-purchases",
+      "method": "PATCH",
+      "status": 401,
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/incomes",
+      "method": "GET",
+      "status": 401,
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/incomes",
+      "method": "POST",
+      "status": 401,
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/incomes",
+      "method": "DELETE",
+      "status": 401,
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/incomes",
+      "method": "PATCH",
+      "status": 401,
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/gastos/bootstrap",
+      "method": "GET",
+      "status": 401,
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/expenses",
+      "method": "GET",
+      "status": 401,
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/expenses",
+      "method": "POST",
+      "status": 401,
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/expenses",
+      "method": "DELETE",
+      "status": 401,
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/expenses",
+      "method": "PATCH",
+      "status": 401,
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/dashboard",
+      "method": "GET",
+      "status": 401,
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/cards",
+      "method": "GET",
+      "status": 401,
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/cards",
+      "method": "POST",
+      "status": 401,
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/cards",
+      "method": "DELETE",
+      "status": 401,
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/cards",
+      "method": "PATCH",
+      "status": 401,
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/card-cycles",
+      "method": "GET",
+      "status": 401,
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/card-cycles",
+      "method": "POST",
+      "status": 401,
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/card-cycles",
+      "method": "PATCH",
+      "status": 401,
+      "cacheControl": "private, no-store"
+    }
+  ]
+}
