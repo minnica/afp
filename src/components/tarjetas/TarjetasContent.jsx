@@ -224,62 +224,35 @@ export default function TarjetasContent() {
     }
   }
 
-  async function updateCycleDates(cycleId, { startDate, cutDate, dueDate }) {
-    if (!user) return;
+  async function saveCycleChange(cycleId, fields) {
+    if (!user) throw new Error("Inicia sesión para continuar.");
     setError("");
+    const response = await apiFetch("/api/card-cycles", {
+      method: "PATCH", expectedUserId: user.id,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: cycleId, ...fields }),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || "No se pudo guardar el ciclo.");
+    // El PATCH ya fue confirmado: actualizar el estado visible incluso si falla el GET.
+    setCycles((previous) => previous.map((cycle) => cycle.id === cycleId ? { ...cycle, ...data.cycle } : cycle));
     try {
-      const response = await apiFetch("/api/card-cycles", {
-        method: "PATCH", expectedUserId: user?.id,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          id: cycleId,
-          action: "UPDATE_DATES",
-          startDate,
-          cutDate,
-          dueDate,
-        }),
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "No se pudieron actualizar las fechas.");
       await loadCycles(user.id);
-    } catch (err) {
-      setError(err.message || "No se pudieron actualizar las fechas.");
+    } catch {
+      setError("El cambio se guardó, pero no se pudo actualizar el listado. Recarga para consultar los cálculos.");
     }
   }
 
-  async function updateStatementAmount(cycleId, amount) {
-    if (!user) return;
-    setError("");
-    try {
-      const response = await apiFetch("/api/card-cycles", {
-        method: "PATCH", expectedUserId: user?.id,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: cycleId, action: "UPDATE_STATEMENT", statementAmount: amount }),
-      });
-      const data = await response.json();
-      if (!response.ok)
-        throw new Error(data.error || "No se pudo guardar el estado de cuenta.");
-      await loadCycles(user.id);
-    } catch (err) {
-      setError(err.message || "No se pudo guardar el estado de cuenta.");
-    }
+  function updateCycleDates(cycleId, dates) {
+    return saveCycleChange(cycleId, { action: "UPDATE_DATES", ...dates });
   }
 
-  async function markCycleAsPaid(cycleId, { paidAt, paidAmount }) {
-    if (!user) return;
-    setError("");
-    try {
-      const response = await apiFetch("/api/card-cycles", {
-        method: "PATCH", expectedUserId: user?.id,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: cycleId, action: "MARK_AS_PAID", paidAt, paidAmount }),
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "No se pudo marcar como pagado.");
-      await loadCycles(user.id);
-    } catch (err) {
-      setError(err.message || "No se pudo marcar como pagado.");
-    }
+  function updateStatementAmount(cycleId, statementAmount) {
+    return saveCycleChange(cycleId, { action: "UPDATE_STATEMENT", statementAmount });
+  }
+
+  function markCycleAsPaid(cycleId, payment) {
+    return saveCycleChange(cycleId, { action: "MARK_AS_PAID", ...payment });
   }
 
   async function unmarkCycleAsPaid(cycleId) {
@@ -391,7 +364,7 @@ export default function TarjetasContent() {
         <AlertDialogContent onCloseAutoFocus={restoreFocus}>
           <AlertDialogHeader>
             <AlertDialogTitle>¿Deshacer el pago de este ciclo?</AlertDialogTitle>
-            <AlertDialogDescription>El ciclo volverá a mostrarse como pendiente de pago.</AlertDialogDescription>
+            <AlertDialogDescription>Se retirará el total pagado registrado y se recalculará el saldo. Un estado de cuenta de cero seguirá sin importe por pagar.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>

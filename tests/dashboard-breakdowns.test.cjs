@@ -9,7 +9,7 @@ const read = (file) => fs.readFileSync(path.join(root, file), "utf8")
   .replace(/^export /gm, "");
 function context(route = "dashboard", globals = {}) {
   const ctx = vm.createContext({ URL, console, requireApiUser: async () => ({ id: "u" }), apiAccessErrorResponse: () => null, ...globals });
-  const helpers = ["../subscriptionCharges", "installmentStatements", "subscriptionStatements", "cardCredits", "cardCycles", "cycleDataQuality", "cardUsageWaivers"]
+  const helpers = ["../subscriptionCharges", "installmentStatements", "subscriptionStatements", "cardCredits", "cardCycles", "cardCyclePayments", "cycleDataQuality", "cardUsageWaivers"]
     .map((name) => read(`src/lib/calculations/${name}.js`)).join("\n");
   vm.runInContext(helpers + "\n" + read(`src/app/api/${route}/route.js`), ctx);
   return ctx;
@@ -24,15 +24,14 @@ const cycle = (month) => ({ id: `cycle-${month}`, cardId: card.id, card, year: 2
 const subscription = { id: "sub", categoryId: "cat1", amount: 100, chargeDay: 20,
   isActive: true, startYear: 2024, startMonth: 1, frequencyMonths: 1, paymentMethod: "CASH" };
 
-test("cero bancario prevalece sobre estimación en comparación y aviso", () => {
+test("cero bancario prevalece sobre estimación y no genera aviso de pago", () => {
   const prev = { ...cycle(6), statementAmount: 30, calculatedAmount: 50 };
   const current = { ...cycle(7), statementAmount: 0, calculatedAmount: 100 };
   const result = ctx.buildCardMonthlyComparison({ cyclesWithAmounts: [prev, current], cards: [card], currentYear: 2024, currentMonth: 7 });
   assert.equal(result.data[0].currAmount, 0);
   assert.equal(result.data[0].currIsStatement, true);
   const notices = ctx.buildCardPaymentNotices([{ card, currentPayment: current }], new Date("2024-07-28T12:00:00Z"));
-  assert.equal(notices[0].amount, 0);
-  assert.match(notices[0].description, /Estado de cuenta: \$0\.00/);
+  assert.equal(notices.length, 0);
 });
 
 test("cuotas mensuales no se acortan con pagos previos ni siguen fuera del plazo", () => {

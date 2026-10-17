@@ -1,3 +1,4 @@
+import { getCyclePaymentState } from "@/lib/calculations/cardCyclePayments";
 import { apiResponse as NextResponse, requireApiUser, apiAccessErrorResponse } from "@/lib/apiAuth";
 import { prisma } from "@/lib/prisma";
 import { buildCardUsageWaivers, buildCurrentCardUsageWaivers, buildCardUsageWaiverHistory } from "@/lib/calculations/cardUsageWaivers";
@@ -174,19 +175,6 @@ function isSubscriptionChargeableInMonth(subscription, year, month) {
   return chargeDate.toISOString().slice(0, 10) <= new Date(subscription.deactivatedAt).toISOString().slice(0, 10);
 }
 
-function getDisplayStatus(cycle) {
-  const today = new Date();
-  const cutDate = new Date(cycle.cutDate);
-  const dueDate = new Date(cycle.dueDate);
-
-  if (cycle.paidAt || cycle.paidAmount) return "PAID";
-  if (today > dueDate) return "OVERDUE";
-  if (today >= cutDate && cycle.statementAmount !== null && cycle.statementAmount !== undefined) return "PAYMENT_PENDING";
-  if (today >= cutDate) return "CUT";
-
-  return "OPEN";
-}
-
 function getReceivableAmounts(receivable) {
   const paidAmount = receivable.incomes.reduce((sum, income) => {
     return sum + Number(income.amount || 0);
@@ -257,7 +245,8 @@ function buildCardPaymentNotices(payments, now) {
     const cycle = item.currentPayment;
 
     if (!cycle) continue;
-    if (cycle.status === "PAID" || cycle.displayStatus === "PAID") continue;
+    const payment = getCyclePaymentState(cycle, now);
+    if (payment.isSettled) continue;
 
     const diffDays = getDaysDifference(cycle.dueDate, now);
 
@@ -275,11 +264,11 @@ function buildCardPaymentNotices(payments, now) {
           : `Pago de tarjeta: ${card.name}`,
       description: `${timing.label}\n${
         cycle.statementAmount !== null && cycle.statementAmount !== undefined
-          ? `Estado de cuenta: ${formatMoneyForNotice(cycle.statementAmount)}`
-          : `Pago calculado: ${formatMoneyForNotice(cycle.calculatedAmount)}`
+          ? `Saldo pendiente: ${formatMoneyForNotice(payment.pendingAmount)}`
+          : `Pago calculado: ${formatMoneyForNotice(cycle.calculatedAmount)} · Estado de cuenta por confirmar`
       }`,
       date: cycle.dueDate,
-      amount: Number(cycle.statementAmount ?? cycle.calculatedAmount ?? 0),
+      amount: payment.pendingAmount ?? Number(cycle.calculatedAmount ?? 0),
     });
   }
 
@@ -713,8 +702,8 @@ function buildCutCycleNotices(cyclesWithAmounts, cards, now) {
   const cardMap = new Map(cards.map((c) => [c.id, c]));
 
   for (const cycle of cyclesWithAmounts) {
-    if (cycle.displayStatus === "PAID") continue;
-    if (cycle.displayStatus === "PAYMENT_PENDING") continue;
+    if (cycle.isSettled) continue;
+    if (cycle.displayStatus === "PAYMENT_PENDING" || cycle.paymentStatus === "PARTIALLY_PAID") continue;
     if (cycle.displayStatus === "OVERDUE") continue;
 
     const card = cardMap.get(cycle.cardId);
@@ -896,7 +885,7 @@ export async function GET(request) {
 
       return {
         ...cycle,
-        displayStatus: getDisplayStatus(cycle),
+        ...getCyclePaymentState(cycle),
         dataWarnings: getCyclePeriodWarnings(cycle, cardCycles),
         ...amounts,
       };
@@ -911,7 +900,7 @@ export async function GET(request) {
     for (const cycle of cyclesWithAmounts) {
       const cutDate = new Date(cycle.cutDate);
       if (cutDate > now) continue;
-      if (cycle.displayStatus === "PAID") continue;
+      if (cycle.isSettled) continue;
 
       if (
         activeBatchYear === null ||

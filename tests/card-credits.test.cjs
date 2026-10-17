@@ -6,7 +6,7 @@ const { test } = require("node:test");
 
 const root = path.resolve(__dirname, "..");
 const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
-const helpers = ["../subscriptionCharges", "installmentStatements", "cardCredits", "subscriptionStatements", "cardCycles", "cycleDataQuality"]
+const helpers = ["../subscriptionCharges", "installmentStatements", "cardCredits", "subscriptionStatements", "cardCycles", "cardCyclePayments", "cycleDataQuality"]
   .map((name) => read(`src/lib/calculations/${name}.js`).replace(/^import[\s\S]*?from\s+["'][^"']+["'];\r?\n/gm, "").replace(/^export /gm, ""))
   .join("\n");
 const routes = ["card-cycles", "dashboard"];

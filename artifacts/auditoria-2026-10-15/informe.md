@@ -2,11 +2,11 @@ AFP · Auditoría técnica y propuestas de producto · 15 de octubre de 2026
 
 # Proteger los datos y asegurar los registros antes de ampliar funciones
 
-La aplicación tiene una base funcional sólida para gastos, cortes, MSI, suscripciones y conciliación. La auditoría original detectó como hallazgo prioritario la ausencia de autorización en 12 de sus 14 rutas API; A01 ya tiene una corrección implementada y verificada localmente. A02 también tiene una corrección local de sincronización; permanecen los hallazgos sobre estados financieros y consulta del historial.
+La aplicación tiene una base funcional sólida para gastos, cortes, MSI, suscripciones y conciliación. La auditoría original detectó como hallazgo prioritario la ausencia de autorización en 12 de sus 14 rutas API; A01 ya tiene una corrección implementada y verificada localmente. A02 también tiene una corrección local de sincronización y A03 de liquidación de cortes; permanecen otros hallazgos sobre estados financieros y consulta del historial.
 
 **14 hallazgos priorizados: 1 P0, 6 P1 y 7 P2.** P0 exige atención inmediata si la app es accesible por terceros; P1 protege datos o decisiones financieras; P2 corrige exactitud, experiencia o crecimiento. Las alertas del gestor de paquetes se agrupan como un hallazgo y no representan 91 fallos explotados en AFP.
 
-**Seguimiento · 17 de octubre de 2026:** 2 hallazgos implementados localmente (A01 y A02) y 12 pendientes. La actividad de implementación de A02 queda **concluida**. El despliegue autorizado y las verificaciones integradas con PostgreSQL siguen pendientes; no se declaran resueltos en producción. [A01](#A01-seguimiento) · [A02](#A02-seguimiento).
+**Seguimiento · 17 de octubre de 2026:** 3 hallazgos implementados localmente (A01, A02 y A03) y 11 pendientes. La actividad de implementación de A03 queda **concluida**. El despliegue autorizado y las verificaciones integradas con PostgreSQL siguen pendientes; no se declaran resueltos en producción. [A01](#A01-seguimiento) · [A02](#A02-seguimiento) · [A03](#A03-seguimiento).
 
 **Contenido**
 
@@ -123,6 +123,8 @@ Este seguimiento corresponde a A01. Los ajustes de autenticación de la cola y d
 
 ### A03 · P1 · Los cortes se dan por pagados sin comprobar el importe
 
+**Estado: actividad concluida, implementada y verificada localmente · 17 de octubre de 2026.** Pendiente de despliegue. La descripción siguiente conserva el hallazgo original.
+
 **Ubicación:** `src/app/api/card-cycles/route.js:104,420,452` y `src/app/api/dashboard/route.js:177`.
 
 Un abono de $1 para un estado de cuenta de $1,000 es aceptado y marca `PAID`. La presentación considera pagado cualquier corte con `paidAt` o `paidAmount`, lo que puede retirar avisos de pago sin liquidar el importe. El formulario de marcar pagado permite capturar libremente ese importe.
@@ -132,6 +134,27 @@ También hay un problema con cero: `statementAmount: 0` numérico se rechaza, au
 **Corrección:** diferenciar pendiente, pago parcial, liquidado y sin importe por pagar. Exigir coherencia con el estado de cuenta o advertir y documentar una excepción explícita. Como evolución, registrar abonos individuales por ciclo. Conservar que el resumen mensual actual representa el total del período, conforme al README.
 
 **Aceptación:** $1 de $1,000 conserva $999 pendientes y sus avisos; cero se puede cerrar sin inventar un gasto o pago; editar el estado de cuenta recalcula la situación.
+
+
+<a id="A03-seguimiento"></a>
+
+#### Actividad concluida · implementación local · 17 de octubre de 2026
+
+- **Saldo y estado compartidos:** [`cardCyclePayments.js`](../../src/lib/calculations/cardCyclePayments.js) compara estado de cuenta y total pagado a centavos. Diferencia pendiente, parcial, liquidado, sin importe por pagar y sin estado confirmado. Las lecturas corrigen la presentación de `PAID` históricos incoherentes sin alterar los registros.
+- **Avisos y Dashboard:** $1 de $1,000 conserva $999 pendientes y el aviso. Se ignora el `PAID` persistido como criterio de exclusión; cero confirmado no genera vencimiento. Los resúmenes mensuales/Q15/Q30 mantienen el total del período y las filas muestran el saldo parcial aparte.
+- **Ediciones coherentes:** guardar estado, pago, fechas o deshacer recalcula la situación dentro de una transacción con bloqueo de la fila por propietario. Un importe mayor reabre un corte antes liquidado. Cero numérico/texto se acepta sin inventar un pago; no hay excepciones que permitan liquidar por debajo del estado.
+- **Formulario:** captura el total acumulado y la fecha del último pago, conserva datos al reabrir, muestra saldo/excedente y exige estado de cuenta previo. Los errores mantienen abierta la captura; el guardado bloquea envíos duplicados. El total sustituye el anterior; no crea un historial de abonos.
+- **Sin migración:** conserva el enum y los campos existentes. El historial individual `CardCyclePayment` queda como evolución separada; A04 conserva su alcance de calendario. [Contrato y operación en README](../../README.md#tarjetas--saldo-y-liquidación-de-cortes-a03).
+
+| Verificación | Resultado |
+| --- | --- |
+| Nuevas regresiones | 9 casos en [`card-cycle-payments.test.cjs`](../../tests/card-cycle-payments.test.cjs): parcial, centavos, exceso, cero, edición, deshacer, reintento, validación, rollback simulado y lecturas de ambas API con avisos. |
+| Suite completa | `node --test --experimental-test-isolation=none tests/*.test.cjs`: **163 casos, 161 correctos, 2 omitidos**, cero fallos. |
+| Navegador | Chromium a 390×844 y 1440×900, formulario real con [fixture de datos/guardado simulados](a03-ui-fixture.jsx): parcial de $1, reapertura con total conservado, error visible sin cerrar, cero sin fecha de pago y bloqueo sin estado. Sin errores de navegador. [Móvil](a03-pago-parcial-mobile.png) · [Escritorio](a03-cero-desktop.png). |
+| Build / lint | Build de producción correcto con Google Fonts accesible. Lint sin errores; conserva la advertencia previa de `useReactTable`. |
+| Persistencia | Autenticación y Prisma simulados; transacción y bloqueo por propietario comprobados en el contrato. Las suites PostgreSQL existentes se omiten sin `AFP_TEST_DATABASE_URL`. No se comprobó concurrencia contra una BD real. |
+
+**Pendiente de operación:** desplegar con autorización explícita y validar contra PostgreSQL aislado. La actividad de implementación está concluida; no se modificó Supabase ni se desplegó producción.
 
 ---
 
@@ -304,7 +327,7 @@ Ordenadas por utilidad para esta app personal. Esfuerzo relativo: S = acotado; M
 | --- | --- | --- | --- |
 | **Conciliación dentro de la app** | Importar CSV/JSON revisado, previsualizar, detectar duplicados, resolver diferencias y conservar evidencia/origen. Reutilizar statementReconciliations, usageReconciliation y CardCycleCredit. PDF automático en una etapa posterior. | L | Reimportar el mismo archivo crea cero duplicados y cada diferencia puede explicarse. |
 | **Calendario financiero y reserva por quincena** | Reunir fechas de pago, suscripciones, cobros y deudas; mostrar confirmado/estimado y cuánto reservar para Q15/Q30. Después, proyección a 30/60/90 días. | M; L con saldos | Los totales se pueden abrir hasta cada movimiento y no duplican compra a crédito y liquidación como consumo. |
-| **Abonos y cierre de tarjetas** | Modelo CardCyclePayment con fecha, importe y referencia; saldo pendiente, parciales y cierre sin importe exigible. Forma parte de resolver A03. | M | Varios abonos cuadran con el corte, con historial y deshacer trazable. |
+| **Abonos y cierre de tarjetas** | Modelo CardCyclePayment con fecha, importe y referencia; saldo pendiente, parciales y cierre sin importe exigible. Evolución posterior a la corrección de A03, que ya valida el total acumulado. | M | Varios abonos cuadran con el corte, con historial y deshacer trazable. |
 | **Presupuestos por categoría** | Límite mensual/quincenal, gasto real, compromisos previstos y disponible del presupuesto. Alertas al 80/100 % configurables. | M | El consumo coincide con Análisis y explica cómo trata MSI y suscripciones. |
 | **Historial de cambios, papelera y exportación** | AuditEvent con operación y cambios, eliminación recuperable y exportación CSV/JSON. Prueba de restauración en entorno local. | M | Recuperar una eliminación mantiene relaciones; ninguna exportación omite registros por paginación. |
 | **Alertas de calendario** | Exportación ICS de vencimientos como primera entrega; después notificaciones push opcionales y por dispositivo. | S → M | Un aviso por evento, zona horaria correcta y acciones para marcar/resolver. |
@@ -318,7 +341,7 @@ Para llamar a una cifra «dinero disponible» se necesitan saldos iniciales, cue
 
 1. **Seguridad:** completar el despliegue autorizado y la validación integrada de A01, cuya implementación local ya está terminada; continuar con la actualización controlada A10 y pruebas de aislamiento. Alinear migraciones y RLS versionado (A11) para poder crear un entorno confiable de pruebas.
 2. **Integridad de registros:** A02 implementado localmente; completar su migración/despliegue autorizado y validación PostgreSQL. Continuar con A05 y el resto de A06: transacciones y regresiones de concurrencia.
-3. **Exactitud visible:** A03/A04, historial completo A07, validaciones A08 y filtros A09.
+3. **Exactitud visible:** A03 implementado localmente; continuar con calendario A04, historial completo A07, validaciones A08 y filtros A09.
 4. **Operación diaria:** política offline A12, consultas A13, login A14, recuperación de acceso y CI.
 5. **Producto:** conciliación revisable, calendario/reservas y presupuestos; después proyección con saldos reales.
 

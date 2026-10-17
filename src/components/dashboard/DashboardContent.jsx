@@ -118,6 +118,8 @@ function getStatusLabel(status) {
     CUT: "Cortado",
     PAYMENT_PENDING: "Pendiente",
     PAID: "Pagado",
+    PARTIALLY_PAID: "Pago parcial",
+    NO_PAYMENT_DUE: "Sin importe por pagar",
     OVERDUE: "Vencido",
   };
 
@@ -126,6 +128,8 @@ function getStatusLabel(status) {
 
 function getStatusBadgeClass(status) {
   const classes = {
+    PARTIALLY_PAID: "border-warning/30 bg-warning/10 text-warning",
+    NO_PAYMENT_DUE: "border-border bg-muted text-muted-foreground",
     PAID: "bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300",
     OVERDUE: "bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-300",
     OPEN: "bg-sky-50 text-sky-700 dark:bg-sky-950 dark:text-sky-300",
@@ -330,10 +334,11 @@ function PaymentsTable({ items, today }) {
             </div>
             <dl className="grid grid-cols-2 gap-3">
               <div className="min-w-0">
-                <dt className="text-xs text-muted-foreground">{cycle.displayStatus === "PAID" ? "Pago del período" : "Pago a realizar"}</dt>
+                <dt className="text-xs text-muted-foreground">Pago del período</dt>
                 <dd className="mt-1">
                   <p className="break-words text-xl font-semibold tabular-nums">{formatMoney(payment.amount)}</p>
                   <p className="mt-1 text-xs text-muted-foreground">{payment.isStatement ? "Estado de cuenta" : "Estimado"}</p>
+                  {cycle.paymentStatus === "PARTIALLY_PAID" && <p className="mt-1 text-xs text-warning">Pago parcial · Pendiente: {formatMoney(cycle.pendingAmount)}</p>}
                 </dd>
               </div>
               <div className="min-w-0 text-right">
@@ -367,6 +372,7 @@ function PaymentsTable({ items, today }) {
                 <TableCell>
                   <p className="text-base font-semibold tabular-nums">{formatMoney(payment.amount)}</p>
                   <p className="mt-1 text-xs text-muted-foreground">{payment.isStatement ? "Estado de cuenta" : "Estimado"}</p>
+                  {cycle.paymentStatus === "PARTIALLY_PAID" && <p className="mt-1 text-xs text-warning">Pago parcial · Pendiente: {formatMoney(cycle.pendingAmount)}</p>}
                 </TableCell>
                 <TableCell className="font-semibold">{formatCompactDate(cycle.dueDate)}</TableCell>
                 <TableCell>{formatCompactDate(cycle.cutDate)}</TableCell>

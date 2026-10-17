@@ -1,4 +1,5 @@
-import { apiResponse as NextResponse, requireApiUser, apiAccessErrorResponse, requireOwnedReferences } from "@/lib/apiAuth";
+import { getCyclePaymentState, getStoredCycleStatus, parseCycleMoney } from "@/lib/calculations/cardCyclePayments";
+import { apiResponse as NextResponse, requireApiUser, apiAccessErrorResponse, requireOwnedReferences, ApiAccessError } from "@/lib/apiAuth";
 import { prisma } from "@/lib/prisma";
 import { cycleCreditSelect } from "@/lib/calculations/cardCredits";
 import { calculateCycleAmount } from "@/lib/calculations/cardCycles";
@@ -99,19 +100,6 @@ function groupBy(items, getKey) {
   }
 
   return map;
-}
-
-function getDisplayStatus(cycle) {
-  const today = new Date();
-  const cutDate = new Date(cycle.cutDate);
-  const dueDate = new Date(cycle.dueDate);
-
-  if (cycle.paidAt || cycle.paidAmount) return "PAID";
-  if (today > dueDate) return "OVERDUE";
-  if (today >= cutDate && cycle.statementAmount !== null && cycle.statementAmount !== undefined) return "PAYMENT_PENDING";
-  if (today >= cutDate) return "CUT";
-
-  return "OPEN";
 }
 
 function getDaysInMonth(year, monthIndex) {
@@ -222,7 +210,7 @@ export async function GET(request) {
 
       return {
         ...cycle,
-        displayStatus: getDisplayStatus(cycle),
+        ...getCyclePaymentState(cycle),
         dataWarnings: getCyclePeriodWarnings(cycle, cycles),
         ...amounts,
       };
@@ -331,7 +319,7 @@ export async function POST(request) {
 
       return {
         ...cycle,
-        displayStatus: getDisplayStatus(cycle),
+        ...getCyclePaymentState(cycle),
         dataWarnings: getCyclePeriodWarnings(cycle, cycles),
         ...amounts,
       };
@@ -351,6 +339,21 @@ export async function POST(request) {
       { status: 500 },
     );
   }
+}
+
+// Serializa cambios de importe, pago y fechas para recalcular sobre la última fila.
+async function updateCycle(userId, id, getData) {
+  return prisma.$transaction(async (tx) => {
+    await tx.$queryRaw`SELECT id FROM card_cycles WHERE id = ${id} AND "userId" = ${userId} FOR UPDATE`;
+    const current = await tx.cardCycle.findUnique({ where: { id, userId } });
+    if (!current) throw new ApiAccessError("Ciclo no encontrado.", 404);
+    const data = getData(current);
+    const status = getStoredCycleStatus({ ...current, ...data });
+    const cycle = await tx.cardCycle.update({
+      where: { id, userId }, data: { ...data, status }, select: cycleSelect,
+    });
+    return { ...cycle, ...getCyclePaymentState(cycle) };
+  });
 }
 
 export async function PATCH(request) {
@@ -408,116 +411,47 @@ export async function PATCH(request) {
         );
       }
 
-      const cycle = await prisma.cardCycle.update({
-        where: { id, userId },
-        data: {
-          startDate: parsedStartDate,
-          cutDate: parsedCutDate,
-          dueDate: parsedDueDate,
-        },
-        select: cycleSelect,
-      });
+      const cycle = await updateCycle(userId, id, () => ({
+        startDate: parsedStartDate, cutDate: parsedCutDate, dueDate: parsedDueDate,
+      }));
 
       return NextResponse.json({ cycle });
     }
 
     if (action === "UPDATE_STATEMENT") {
-      if (!statementAmount) {
-        return NextResponse.json(
-          { error: "Falta monto estado de cuenta." },
-          { status: 400 },
-        );
+      const amount = parseCycleMoney(statementAmount);
+      if (amount === null) {
+        throw new ApiAccessError("El estado de cuenta debe ser un importe no negativo con hasta dos decimales.", 400);
       }
-
-      const numericStatementAmount = Number(statementAmount);
-
-      if (
-        !Number.isFinite(numericStatementAmount) ||
-        numericStatementAmount < 0
-      ) {
-        return NextResponse.json(
-          { error: "El monto estado de cuenta no es válido." },
-          { status: 400 },
-        );
-      }
-
-      const cycle = await prisma.cardCycle.update({
-        where: { id, userId },
-        data: {
-          statementAmount: numericStatementAmount,
-          status: "PAYMENT_PENDING",
-        },
-        select: cycleSelect,
-      });
-
+      const cycle = await updateCycle(userId, id, () => ({ statementAmount: amount }));
       return NextResponse.json({ cycle });
     }
 
     if (action === "MARK_AS_PAID") {
-      if (!paidAt || !paidAmount) {
-        return NextResponse.json(
-          { error: "Faltan fecha de pago o monto pagado." },
-          { status: 400 },
-        );
+      const amount = parseCycleMoney(paidAmount);
+      if (amount === null) {
+        throw new ApiAccessError("El total pagado debe ser un importe no negativo con hasta dos decimales.", 400);
       }
-
-      const numericPaidAmount = Number(paidAmount);
-
-      if (!Number.isFinite(numericPaidAmount) || numericPaidAmount <= 0) {
-        return NextResponse.json(
-          { error: "El monto pagado debe ser mayor a 0." },
-          { status: 400 },
-        );
+      // Cero no crea una fecha ni un movimiento de pago ficticio.
+      let paidDate = null;
+      if (amount > 0) {
+        paidDate = typeof paidAt === "string" && /^\d{4}-\d{2}-\d{2}$/.test(paidAt)
+          ? new Date(`${paidAt}T12:00:00.000Z`) : new Date(NaN);
+        if (!Number.isFinite(paidDate.getTime()) || paidDate.toISOString().slice(0, 10) !== paidAt) {
+          throw new ApiAccessError("Fecha de pago no válida.", 400);
+        }
       }
-
-      const paidDate = new Date(`${paidAt}T12:00:00.000Z`);
-
-      if (Number.isNaN(paidDate.getTime())) {
-        return NextResponse.json(
-          { error: "Fecha de pago no válida." },
-          { status: 400 },
-        );
-      }
-
-      const cycle = await prisma.cardCycle.update({
-        where: { id, userId },
-        data: {
-          paidAt: paidDate,
-          paidAmount: numericPaidAmount,
-          status: "PAID",
-        },
-        select: cycleSelect,
+      const cycle = await updateCycle(userId, id, (current) => {
+        if (current.statementAmount == null) {
+          throw new ApiAccessError("Captura el estado de cuenta antes de registrar el total pagado.", 409);
+        }
+        return { paidAt: paidDate, paidAmount: amount === 0 ? null : amount };
       });
-
       return NextResponse.json({ cycle });
     }
 
     if (action === "UNMARK_AS_PAID") {
-      const currentCycle = await prisma.cardCycle.findUnique({
-        where: { id, userId },
-      });
-
-      if (!currentCycle) {
-        return NextResponse.json(
-          { error: "Ciclo no encontrado." },
-          { status: 404 },
-        );
-      }
-
-      const nextStatus = currentCycle.statementAmount
-        ? "PAYMENT_PENDING"
-        : "OPEN";
-
-      const cycle = await prisma.cardCycle.update({
-        where: { id, userId },
-        data: {
-          paidAt: null,
-          paidAmount: null,
-          status: nextStatus,
-        },
-        select: cycleSelect,
-      });
-
+      const cycle = await updateCycle(userId, id, () => ({ paidAt: null, paidAmount: null }));
       return NextResponse.json({ cycle });
     }
 
