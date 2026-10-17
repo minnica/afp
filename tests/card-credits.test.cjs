@@ -115,7 +115,7 @@ test("la API incluye notas de bonificación y mantiene septiembre y sus pagos", 
   };
   let selection;
   const ctx = context("card-cycles", {
-    URL, console,
+    URL, console, requireApiUser: async () => ({ id: "owner" }), apiAccessErrorResponse: () => null, requireOwnedReferences: async () => {},
     NextResponse: { json: (body, options) => ({ body, status: options?.status || 200 }) },
     prisma: {
       cardCycle: { findMany: async (args) => {
@@ -151,7 +151,7 @@ test("un ingreso aplicado no se borra ni se reduce por debajo de sus aplicacione
     .replace(/^import[\s\S]*?from\s+["'][^"']+["'];\r?\n/gm, "")
     .replace(/^export /gm, "");
   const ctx = vm.createContext({
-    URL, console,
+    URL, console, requireApiUser: async () => ({ id: "owner" }), apiAccessErrorResponse: () => null, requireOwnedReferences: async () => {},
     NextResponse: { json: (body, options) => ({ body, status: options?.status || 200 }) },
     prisma: {
       income: {

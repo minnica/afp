@@ -1,5 +1,7 @@
 "use client";
 
+import { apiFetch } from "@/lib/apiFetch";
+
 import { useCreationDraft } from "@/hooks/use-creation-draft";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -254,7 +256,7 @@ export default function GastosContent() {
     });
 
     try {
-      const response = await fetch(`/api/gastos/bootstrap?${params.toString()}`);
+      const response = await apiFetch(`/api/gastos/bootstrap?${params.toString()}`);
       const data = await response.json();
 
       if (!response.ok) {
@@ -336,7 +338,7 @@ export default function GastosContent() {
     setIsExpensesLoading(true);
 
     try {
-      const response = await fetch(url);
+      const response = await apiFetch(url);
       const data = await response.json();
 
       if (!response.ok) {
@@ -352,7 +354,7 @@ export default function GastosContent() {
   }
 
   async function loadReceivables(userId) {
-    const response = await fetch(`/api/receivables?userId=${userId}`);
+    const response = await apiFetch(`/api/receivables?userId=${userId}`);
     const data = await response.json();
 
     if (!response.ok) {
@@ -365,7 +367,7 @@ export default function GastosContent() {
   }
 
   async function loadPayables(userId) {
-    const response = await fetch(`/api/payables?userId=${userId}`);
+    const response = await apiFetch(`/api/payables?userId=${userId}`);
     const data = await response.json();
 
     if (!response.ok) {
@@ -376,7 +378,7 @@ export default function GastosContent() {
   }
 
   async function loadSubscriptions(userId) {
-    const response = await fetch(`/api/subscriptions?userId=${userId}`);
+    const response = await apiFetch(`/api/subscriptions?userId=${userId}`);
     const data = await response.json();
 
     if (!response.ok) {
@@ -598,8 +600,8 @@ export default function GastosContent() {
         return confirmSave("Sin conexión. Gasto guardado como pendiente.", "info");
       }
 
-      const response = await fetch("/api/expenses", {
-        method: "POST",
+      const response = await apiFetch("/api/expenses", {
+        method: "POST", expectedUserId: user?.id,
         headers: {
           "Content-Type": "application/json",
         },
@@ -684,8 +686,8 @@ export default function GastosContent() {
     setIsUpdating(true);
 
     try {
-      const response = await fetch("/api/expenses", {
-        method: "PATCH",
+      const response = await apiFetch("/api/expenses", {
+        method: "PATCH", expectedUserId: user?.id,
         headers: {
           "Content-Type": "application/json",
         },
@@ -726,8 +728,8 @@ export default function GastosContent() {
     setIsDeleting(true);
 
     try {
-      const response = await fetch(`/api/expenses?id=${expenseId}`, {
-        method: "DELETE",
+      const response = await apiFetch(`/api/expenses?id=${expenseId}`, {
+        method: "DELETE", expectedUserId: user?.id,
       });
 
       const data = await response.json();

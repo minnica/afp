@@ -1,5 +1,7 @@
 "use client";
 
+import { apiFetch } from "@/lib/apiFetch";
+
 import { useCreationDraft } from "@/hooks/use-creation-draft";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -182,9 +184,9 @@ export default function ComprasAMesesContent() {
   async function loadInitialData(userId) {
     const [settingsResponse, cardsResponse, purchasesResponse] =
       await Promise.all([
-        fetch(`/api/settings?userId=${userId}`),
-        fetch(`/api/cards?userId=${userId}`),
-        fetch(`/api/installment-purchases?userId=${userId}`),
+        apiFetch(`/api/settings?userId=${userId}`),
+        apiFetch(`/api/cards?userId=${userId}`),
+        apiFetch(`/api/installment-purchases?userId=${userId}`),
       ]);
 
     const settingsData = await settingsResponse.json();
@@ -212,7 +214,7 @@ export default function ComprasAMesesContent() {
   }
 
   async function loadPurchases(userId) {
-    const response = await fetch(`/api/installment-purchases?userId=${userId}`);
+    const response = await apiFetch(`/api/installment-purchases?userId=${userId}`);
     const data = await response.json();
 
     if (!response.ok) {
@@ -258,8 +260,8 @@ export default function ComprasAMesesContent() {
 
     let saved = false;
     try {
-      const response = await fetch("/api/installment-purchases", {
-        method: "POST",
+      const response = await apiFetch("/api/installment-purchases", {
+        method: "POST", expectedUserId: user?.id,
         headers: {
           "Content-Type": "application/json",
         },
@@ -357,8 +359,8 @@ export default function ComprasAMesesContent() {
     setIsUpdating(true);
 
     try {
-      const response = await fetch("/api/installment-purchases", {
-        method: "PATCH",
+      const response = await apiFetch("/api/installment-purchases", {
+        method: "PATCH", expectedUserId: user?.id,
         headers: {
           "Content-Type": "application/json",
         },
@@ -399,10 +401,10 @@ export default function ComprasAMesesContent() {
     setError("");
 
     try {
-      const response = await fetch(
+      const response = await apiFetch(
         `/api/installment-purchases?id=${purchaseId}`,
         {
-          method: "DELETE",
+          method: "DELETE", expectedUserId: user?.id,
         },
       );
 

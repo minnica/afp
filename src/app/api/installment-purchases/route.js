@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { apiResponse as NextResponse, requireApiUser, apiAccessErrorResponse, requireOwnedReferences } from "@/lib/apiAuth";
 import { prisma } from "@/lib/prisma";
 import { getLatestInstallmentStatement } from "@/lib/calculations/installmentStatements";
 
@@ -94,12 +94,8 @@ function formatPurchase(purchase) {
 
 export async function GET(request) {
   try {
-    const { searchParams } = new URL(request.url);
-    const userId = searchParams.get("userId");
-
-    if (!userId) {
-      return NextResponse.json({ error: "Falta userId." }, { status: 400 });
-    }
+    const user = await requireApiUser(request);
+    const userId = user.id;
 
     const purchases = await prisma.installmentPurchase.findMany({
       where: { userId },
@@ -111,6 +107,8 @@ export async function GET(request) {
 
     return NextResponse.json({ purchases: formatted });
   } catch (error) {
+    const accessResponse = apiAccessErrorResponse(error);
+    if (accessResponse) return accessResponse;
     console.error("Error loading installment purchases:", error);
 
     return NextResponse.json(
@@ -122,10 +120,12 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
+    const user = await requireApiUser(request);
+    const userId = user.id;
     const body = await request.json();
+    await requireOwnedReferences(prisma, userId, body, ["cardId", "categoryId", "personId"]);
 
     const {
-      userId,
       cardId,
       purchaseDate,
       concept,
@@ -254,7 +254,7 @@ export async function POST(request) {
 
     if (createdReceivable) {
       await prisma.receivableAccount.update({
-        where: { id: createdReceivable.id },
+        where: { id: createdReceivable.id, userId },
         data: {
           originId: purchase.id,
         },
@@ -263,6 +263,8 @@ export async function POST(request) {
 
     return NextResponse.json({ purchase: formatPurchase(purchase) });
   } catch (error) {
+    const accessResponse = apiAccessErrorResponse(error);
+    if (accessResponse) return accessResponse;
     console.error("Error creating installment purchase:", error);
 
     return NextResponse.json(
@@ -274,6 +276,8 @@ export async function POST(request) {
 
 export async function DELETE(request) {
   try {
+    const user = await requireApiUser(request);
+    const userId = user.id;
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
 
@@ -282,11 +286,13 @@ export async function DELETE(request) {
     }
 
     await prisma.installmentPurchase.delete({
-      where: { id },
+      where: { id, userId },
     });
 
     return NextResponse.json({ ok: true });
   } catch (error) {
+    const accessResponse = apiAccessErrorResponse(error);
+    if (accessResponse) return accessResponse;
     console.error("Error deleting installment purchase:", error);
 
     return NextResponse.json(
@@ -298,7 +304,10 @@ export async function DELETE(request) {
 
 export async function PATCH(request) {
   try {
+    const user = await requireApiUser(request);
+    const userId = user.id;
     const body = await request.json();
+    await requireOwnedReferences(prisma, userId, body, ["cardId", "categoryId", "personId"]);
 
     const {
       id,
@@ -392,7 +401,7 @@ export async function PATCH(request) {
       numericInitialPaymentsMade >= numericMonths ? "PAID_OFF" : "ACTIVE";
 
     const purchase = await prisma.installmentPurchase.update({
-      where: { id },
+      where: { id, userId },
       data: {
         cardId,
         purchaseDate: parsedPurchaseDate,
@@ -410,6 +419,8 @@ export async function PATCH(request) {
 
     return NextResponse.json({ purchase: formatPurchase(purchase) });
   } catch (error) {
+    const accessResponse = apiAccessErrorResponse(error);
+    if (accessResponse) return accessResponse;
     console.error("Error updating installment purchase:", error);
 
     return NextResponse.json(

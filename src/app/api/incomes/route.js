@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { apiResponse as NextResponse, requireApiUser, apiAccessErrorResponse, requireOwnedReferences } from "@/lib/apiAuth";
 import { prisma } from "@/lib/prisma";
 
 const incomeSelect = {
@@ -38,19 +38,19 @@ function parseDateInput(dateValue) {
   return new Date(`${dateValue}T12:00:00.000Z`);
 }
 
-async function updateReceivableStatusIfNeeded(receivableAccountId) {
+async function updateReceivableStatusIfNeeded(receivableAccountId, userId) {
   if (!receivableAccountId) return;
 
   const [receivable, paid] = await Promise.all([
     prisma.receivableAccount.findUnique({
-      where: { id: receivableAccountId },
+      where: { id: receivableAccountId, userId },
       select: {
         originalAmount: true,
         status: true,
       },
     }),
     prisma.income.aggregate({
-      where: { receivableAccountId },
+      where: { receivableAccountId, userId },
       _sum: {
         amount: true,
       },
@@ -64,7 +64,7 @@ async function updateReceivableStatusIfNeeded(receivableAccountId) {
 
   if (pendingBalance <= 0 && receivable.status !== "PAID_OFF") {
     await prisma.receivableAccount.update({
-      where: { id: receivableAccountId },
+      where: { id: receivableAccountId, userId },
       data: {
         status: "PAID_OFF",
       },
@@ -73,7 +73,7 @@ async function updateReceivableStatusIfNeeded(receivableAccountId) {
 
   if (pendingBalance > 0 && receivable.status === "PAID_OFF") {
     await prisma.receivableAccount.update({
-      where: { id: receivableAccountId },
+      where: { id: receivableAccountId, userId },
       data: {
         status: "ACTIVE",
       },
@@ -83,12 +83,8 @@ async function updateReceivableStatusIfNeeded(receivableAccountId) {
 
 export async function GET(request) {
   try {
-    const { searchParams } = new URL(request.url);
-    const userId = searchParams.get("userId");
-
-    if (!userId) {
-      return NextResponse.json({ error: "Falta userId." }, { status: 400 });
-    }
+    const user = await requireApiUser(request);
+    const userId = user.id;
 
     const incomes = await prisma.income.findMany({
       where: { userId },
@@ -103,6 +99,8 @@ export async function GET(request) {
 
     return NextResponse.json({ incomes, total });
   } catch (error) {
+    const accessResponse = apiAccessErrorResponse(error);
+    if (accessResponse) return accessResponse;
     console.error("Error loading incomes:", error);
 
     return NextResponse.json(
@@ -114,10 +112,12 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
+    const user = await requireApiUser(request);
+    const userId = user.id;
     const body = await request.json();
+    await requireOwnedReferences(prisma, userId, body, ["incomeTypeId", "receivableAccountId"]);
 
     const {
-      userId,
       date,
       incomeTypeId,
       source,
@@ -164,11 +164,13 @@ export async function POST(request) {
     });
 
     if (receivableAccountId) {
-      await updateReceivableStatusIfNeeded(receivableAccountId);
+      await updateReceivableStatusIfNeeded(receivableAccountId, userId);
     }
 
     return NextResponse.json({ income });
   } catch (error) {
+    const accessResponse = apiAccessErrorResponse(error);
+    if (accessResponse) return accessResponse;
     console.error("Error creating income:", error);
 
     return NextResponse.json(
@@ -180,6 +182,8 @@ export async function POST(request) {
 
 export async function DELETE(request) {
   try {
+    const user = await requireApiUser(request);
+    const userId = user.id;
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
 
@@ -188,7 +192,7 @@ export async function DELETE(request) {
     }
 
     const income = await prisma.income.findUnique({
-      where: { id },
+      where: { id, userId },
       include: { _count: { select: { cardCycleCredits: true } } },
     });
 
@@ -209,15 +213,17 @@ export async function DELETE(request) {
     }
 
     await prisma.income.delete({
-      where: { id },
+      where: { id, userId },
     });
 
     if (receivableAccountId) {
-      await updateReceivableStatusIfNeeded(receivableAccountId);
+      await updateReceivableStatusIfNeeded(receivableAccountId, userId);
     }
 
     return NextResponse.json({ ok: true });
   } catch (error) {
+    const accessResponse = apiAccessErrorResponse(error);
+    if (accessResponse) return accessResponse;
     console.error("Error deleting income:", error);
 
     return NextResponse.json(
@@ -229,7 +235,10 @@ export async function DELETE(request) {
 
 export async function PATCH(request) {
   try {
+    const user = await requireApiUser(request);
+    const userId = user.id;
     const body = await request.json();
+    await requireOwnedReferences(prisma, userId, body, ["incomeTypeId", "receivableAccountId"]);
 
     const {
       id,
@@ -254,7 +263,7 @@ export async function PATCH(request) {
     }
 
     const existingIncome = await prisma.income.findUnique({
-      where: { id },
+      where: { id, userId },
     });
 
     if (!existingIncome) {
@@ -284,7 +293,7 @@ export async function PATCH(request) {
     const nextReceivableAccountId = receivableAccountId || null;
 
     const appliedCredits = await prisma.cardCycleCredit.aggregate({
-      where: { incomeId: id },
+      where: { incomeId: id, userId },
       _sum: { amount: true },
     });
     if (numericAmount < Number(appliedCredits._sum.amount || 0)) {
@@ -295,7 +304,7 @@ export async function PATCH(request) {
     }
 
     const income = await prisma.income.update({
-      where: { id },
+      where: { id, userId },
       data: {
         date: parsedDate,
         incomeTypeId,
@@ -309,25 +318,27 @@ export async function PATCH(request) {
     });
 
     if (previousReceivableAccountId) {
-      await updateReceivableStatusIfNeeded(previousReceivableAccountId);
+      await updateReceivableStatusIfNeeded(previousReceivableAccountId, userId);
     }
 
     if (
       nextReceivableAccountId &&
       nextReceivableAccountId !== previousReceivableAccountId
     ) {
-      await updateReceivableStatusIfNeeded(nextReceivableAccountId);
+      await updateReceivableStatusIfNeeded(nextReceivableAccountId, userId);
     }
 
     if (
       nextReceivableAccountId &&
       nextReceivableAccountId === previousReceivableAccountId
     ) {
-      await updateReceivableStatusIfNeeded(nextReceivableAccountId);
+      await updateReceivableStatusIfNeeded(nextReceivableAccountId, userId);
     }
 
     return NextResponse.json({ income });
   } catch (error) {
+    const accessResponse = apiAccessErrorResponse(error);
+    if (accessResponse) return accessResponse;
     console.error("Error updating income:", error);
 
     return NextResponse.json(

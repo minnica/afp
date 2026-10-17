@@ -1,5 +1,7 @@
 "use client";
 
+import { apiFetch } from "@/lib/apiFetch";
+
 import CreateRecordSurface from "@/components/ui/create-record-surface";
 
 import { useDialogFocus } from "@/hooks/use-dialog-focus";
@@ -76,14 +78,14 @@ export default function TarjetasContent() {
   const [isUpdatingCard, setIsUpdatingCard] = useState(false);
 
   async function loadCards(userId) {
-    const response = await fetch(`/api/cards?userId=${userId}`);
+    const response = await apiFetch(`/api/cards?userId=${userId}`);
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || "No se pudieron cargar las tarjetas.");
     setCards(data.cards || []);
   }
 
   async function loadCycles(userId) {
-    const response = await fetch(`/api/card-cycles?userId=${userId}`);
+    const response = await apiFetch(`/api/card-cycles?userId=${userId}`);
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || "No se pudieron cargar los ciclos.");
     setCycles(data.cycles || []);
@@ -92,7 +94,7 @@ export default function TarjetasContent() {
   async function loadCycleBreakdown(cycleId) {
     if (!user) return null;
 
-    const response = await fetch(
+    const response = await apiFetch(
       `/api/card-cycles?userId=${user.id}&cycleId=${cycleId}&includeBreakdown=true`,
     );
     const data = await response.json();
@@ -138,8 +140,8 @@ export default function TarjetasContent() {
     setIsSaving(true);
     let saved = false;
     try {
-      const response = await fetch("/api/cards", {
-        method: "POST",
+      const response = await apiFetch("/api/cards", {
+        method: "POST", expectedUserId: user?.id,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId: user.id, name, usualCutDay, usualDueDay, notes }),
       });
@@ -187,8 +189,8 @@ export default function TarjetasContent() {
     setError("");
     setIsUpdatingCard(true);
     try {
-      const response = await fetch("/api/cards", {
-        method: "PATCH",
+      const response = await apiFetch("/api/cards", {
+        method: "PATCH", expectedUserId: user?.id,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           id: editingCardId,
@@ -213,7 +215,7 @@ export default function TarjetasContent() {
     if (!user) return;
     setError("");
     try {
-      const response = await fetch(`/api/cards?id=${id}`, { method: "DELETE" });
+      const response = await apiFetch(`/api/cards?id=${id}`, { method: "DELETE", expectedUserId: user?.id });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "No se pudo eliminar la tarjeta.");
       await Promise.all([loadCards(user.id), loadCycles(user.id)]);
@@ -226,8 +228,8 @@ export default function TarjetasContent() {
     if (!user) return;
     setError("");
     try {
-      const response = await fetch("/api/card-cycles", {
-        method: "PATCH",
+      const response = await apiFetch("/api/card-cycles", {
+        method: "PATCH", expectedUserId: user?.id,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           id: cycleId,
@@ -249,8 +251,8 @@ export default function TarjetasContent() {
     if (!user) return;
     setError("");
     try {
-      const response = await fetch("/api/card-cycles", {
-        method: "PATCH",
+      const response = await apiFetch("/api/card-cycles", {
+        method: "PATCH", expectedUserId: user?.id,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: cycleId, action: "UPDATE_STATEMENT", statementAmount: amount }),
       });
@@ -267,8 +269,8 @@ export default function TarjetasContent() {
     if (!user) return;
     setError("");
     try {
-      const response = await fetch("/api/card-cycles", {
-        method: "PATCH",
+      const response = await apiFetch("/api/card-cycles", {
+        method: "PATCH", expectedUserId: user?.id,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: cycleId, action: "MARK_AS_PAID", paidAt, paidAmount }),
       });
@@ -284,8 +286,8 @@ export default function TarjetasContent() {
     if (!user) return;
     setError("");
     try {
-      const response = await fetch("/api/card-cycles", {
-        method: "PATCH",
+      const response = await apiFetch("/api/card-cycles", {
+        method: "PATCH", expectedUserId: user?.id,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: cycleId, action: "UNMARK_AS_PAID" }),
       });

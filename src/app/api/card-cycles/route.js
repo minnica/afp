@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { apiResponse as NextResponse, requireApiUser, apiAccessErrorResponse, requireOwnedReferences } from "@/lib/apiAuth";
 import { prisma } from "@/lib/prisma";
 import { cycleCreditSelect } from "@/lib/calculations/cardCredits";
 import { calculateCycleAmount } from "@/lib/calculations/cardCycles";
@@ -172,15 +172,13 @@ function getTargetMonths() {
 
 export async function GET(request) {
   try {
+    const user = await requireApiUser(request);
+    const userId = user.id;
     const { searchParams } = new URL(request.url);
-    const userId = searchParams.get("userId");
     const cycleId = searchParams.get("cycleId");
     const includeBreakdown =
       Boolean(cycleId) || searchParams.get("includeBreakdown") === "true";
 
-    if (!userId) {
-      return NextResponse.json({ error: "Falta userId." }, { status: 400 });
-    }
 
     const [cycles, expenses, subscriptions, purchases] = await Promise.all([
       prisma.cardCycle.findMany({
@@ -236,6 +234,8 @@ export async function GET(request) {
 
     return NextResponse.json({ cycles: cyclesWithAmounts });
   } catch (error) {
+    const accessResponse = apiAccessErrorResponse(error);
+    if (accessResponse) return accessResponse;
     console.error("Error loading card cycles:", error);
 
     return NextResponse.json(
@@ -247,12 +247,10 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
+    const user = await requireApiUser(request);
+    const userId = user.id;
     const body = await request.json();
-    const { userId } = body;
-
-    if (!userId) {
-      return NextResponse.json({ error: "Falta userId." }, { status: 400 });
-    }
+    await requireOwnedReferences(prisma, userId, body, []);
 
     const cards = await prisma.card.findMany({
       where: { userId },
@@ -271,6 +269,7 @@ export async function POST(request) {
 
         await prisma.cardCycle.upsert({
           where: {
+            userId,
             cardId_month_year: {
               cardId: card.id,
               month: target.month,
@@ -343,6 +342,8 @@ export async function POST(request) {
       cycles: cyclesWithAmounts,
     });
   } catch (error) {
+    const accessResponse = apiAccessErrorResponse(error);
+    if (accessResponse) return accessResponse;
     console.error("Error generating card cycles:", error);
 
     return NextResponse.json(
@@ -354,7 +355,10 @@ export async function POST(request) {
 
 export async function PATCH(request) {
   try {
+    const user = await requireApiUser(request);
+    const userId = user.id;
     const body = await request.json();
+    await requireOwnedReferences(prisma, userId, body, []);
 
     const { id, statementAmount, paidAt, paidAmount, action } = body;
 
@@ -405,7 +409,7 @@ export async function PATCH(request) {
       }
 
       const cycle = await prisma.cardCycle.update({
-        where: { id },
+        where: { id, userId },
         data: {
           startDate: parsedStartDate,
           cutDate: parsedCutDate,
@@ -438,7 +442,7 @@ export async function PATCH(request) {
       }
 
       const cycle = await prisma.cardCycle.update({
-        where: { id },
+        where: { id, userId },
         data: {
           statementAmount: numericStatementAmount,
           status: "PAYMENT_PENDING",
@@ -476,7 +480,7 @@ export async function PATCH(request) {
       }
 
       const cycle = await prisma.cardCycle.update({
-        where: { id },
+        where: { id, userId },
         data: {
           paidAt: paidDate,
           paidAmount: numericPaidAmount,
@@ -490,7 +494,7 @@ export async function PATCH(request) {
 
     if (action === "UNMARK_AS_PAID") {
       const currentCycle = await prisma.cardCycle.findUnique({
-        where: { id },
+        where: { id, userId },
       });
 
       if (!currentCycle) {
@@ -505,7 +509,7 @@ export async function PATCH(request) {
         : "OPEN";
 
       const cycle = await prisma.cardCycle.update({
-        where: { id },
+        where: { id, userId },
         data: {
           paidAt: null,
           paidAmount: null,
@@ -522,6 +526,8 @@ export async function PATCH(request) {
       { status: 400 },
     );
   } catch (error) {
+    const accessResponse = apiAccessErrorResponse(error);
+    if (accessResponse) return accessResponse;
     console.error("Error updating card cycle:", error);
 
     return NextResponse.json(

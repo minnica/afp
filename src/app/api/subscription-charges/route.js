@@ -1,17 +1,11 @@
-import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { apiResponse as NextResponse, requireApiUser, apiAccessErrorResponse } from "@/lib/apiAuth";
 import { prisma } from "@/lib/prisma";
 import { validChargeDay, validChargeMonth } from "@/lib/subscriptionCharges";
 import { applySubscriptionCharge, loadSubscriptionCharges, SubscriptionChargeError } from "@/lib/subscriptionChargeService";
 
 async function handle(request, write) {
   try {
-    const token = request.headers.get("authorization")?.match(/^Bearer (.+)$/i)?.[1];
-    if (!token) return NextResponse.json({ error: "Inicia sesión para gestionar tus cobros." }, { status: 401 });
-    const auth = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-      { auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false } });
-    const { data: { user }, error } = await auth.auth.getUser(token);
-    if (error || !user) return NextResponse.json({ error: "La sesión venció. Vuelve a iniciar sesión." }, { status: 401 });
+    const user = await requireApiUser(request);
     const input = write ? await request.json().catch(() => null) : Object.fromEntries(new URL(request.url).searchParams);
     // Acepta el día local solo dentro del margen de las zonas horarias del mundo.
     const utcToday = new Date().toISOString().slice(0, 10);
@@ -27,6 +21,8 @@ async function handle(request, write) {
     const charges = await loadSubscriptionCharges(prisma, user.id, input.month, today);
     return NextResponse.json({ charges }, { headers: { "Cache-Control": "private, no-store" } });
   } catch (error) {
+    const accessResponse = apiAccessErrorResponse(error);
+    if (accessResponse) return accessResponse;
     if (error instanceof SubscriptionChargeError) return NextResponse.json({ error: error.message }, { status: error.status });
     console.error("Error gestionando cobros de suscripciones:", error);
     return NextResponse.json({ error: "No se pudo consultar o actualizar el cobro. Intenta de nuevo." }, { status: 500 });

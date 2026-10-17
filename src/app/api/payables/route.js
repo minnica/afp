@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { apiResponse as NextResponse, requireApiUser, apiAccessErrorResponse, requireOwnedReferences } from "@/lib/apiAuth";
 import { prisma } from "@/lib/prisma";
 
 const payableSelect = {
@@ -53,12 +53,8 @@ function formatPayable(item) {
 
 export async function GET(request) {
   try {
-    const { searchParams } = new URL(request.url);
-    const userId = searchParams.get("userId");
-
-    if (!userId) {
-      return NextResponse.json({ error: "Falta userId." }, { status: 400 });
-    }
+    const user = await requireApiUser(request);
+    const userId = user.id;
 
     const payables = await prisma.payableAccount.findMany({
       where: {
@@ -77,6 +73,8 @@ export async function GET(request) {
 
     return NextResponse.json({ payables: formatted });
   } catch (error) {
+    const accessResponse = apiAccessErrorResponse(error);
+    if (accessResponse) return accessResponse;
     console.error("Error loading payables:", error);
 
     return NextResponse.json(
@@ -88,10 +86,12 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
+    const user = await requireApiUser(request);
+    const userId = user.id;
     const body = await request.json();
+    await requireOwnedReferences(prisma, userId, body, ["personId"]);
 
     const {
-      userId,
       personId,
       concept,
       originalAmount,
@@ -175,6 +175,8 @@ export async function POST(request) {
       payable: formatPayable(payable),
     });
   } catch (error) {
+    const accessResponse = apiAccessErrorResponse(error);
+    if (accessResponse) return accessResponse;
     console.error("Error creating payable:", error);
 
     return NextResponse.json(
@@ -186,7 +188,10 @@ export async function POST(request) {
 
 export async function PATCH(request) {
   try {
+    const user = await requireApiUser(request);
+    const userId = user.id;
     const body = await request.json();
+    await requireOwnedReferences(prisma, userId, body, ["personId"]);
 
     const {
       id,
@@ -258,7 +263,7 @@ export async function PATCH(request) {
     }
 
     const payable = await prisma.payableAccount.update({
-      where: { id },
+      where: { id, userId },
       data: {
         personId,
         concept: concept.trim(),
@@ -275,6 +280,8 @@ export async function PATCH(request) {
       payable: formatPayable(payable),
     });
   } catch (error) {
+    const accessResponse = apiAccessErrorResponse(error);
+    if (accessResponse) return accessResponse;
     console.error("Error updating payable:", error);
 
     return NextResponse.json(
@@ -286,6 +293,8 @@ export async function PATCH(request) {
 
 export async function DELETE(request) {
   try {
+    const user = await requireApiUser(request);
+    const userId = user.id;
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
 
@@ -294,11 +303,13 @@ export async function DELETE(request) {
     }
 
     await prisma.payableAccount.delete({
-      where: { id },
+      where: { id, userId },
     });
 
     return NextResponse.json({ ok: true });
   } catch (error) {
+    const accessResponse = apiAccessErrorResponse(error);
+    if (accessResponse) return accessResponse;
     console.error("Error deleting payable:", error);
 
     return NextResponse.json(

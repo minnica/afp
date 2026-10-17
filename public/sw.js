@@ -1,4 +1,4 @@
-const CACHE_NAME = "afp-shell-v3";
+const CACHE_NAME = "afp-shell-v4";
 const APP_SHELL_URLS = [
   "/",
   "/gastos",
@@ -40,6 +40,10 @@ self.addEventListener("fetch", (event) => {
 
   const url = new URL(request.url);
 
+  // Las respuestas privadas siempre pasan por la autenticación del servidor,
+  // incluso si alguien abre directamente una URL de API en el navegador.
+  if (url.pathname.startsWith("/api/")) return;
+
   if (request.mode === "navigate") {
     event.respondWith(networkFirst(request, "/gastos"));
     return;
@@ -53,8 +57,6 @@ self.addEventListener("fetch", (event) => {
   }
 
   if (
-    url.pathname === "/api/gastos/bootstrap" ||
-    url.pathname === "/api/expenses" ||
     url.pathname === "/manifest.webmanifest" ||
     url.pathname.startsWith("/icons/")
   ) {

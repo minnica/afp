@@ -1,0 +1,128 @@
+{
+  "scope": "Reproducción aislada con código fuente real y mocks de BD/red; ningún dato personal.",
+  "findings": [
+    {
+      "id": "A01",
+      "finding": "Lectura sin sesión",
+      "evidence": {
+        "status": 200,
+        "owner": "victim",
+        "returned": 1
+      }
+    },
+    {
+      "id": "A01b",
+      "finding": "Borrado sin sesión ni filtro de propietario",
+      "evidence": {
+        "status": 200,
+        "where": {
+          "id": "other-users-card"
+        }
+      }
+    },
+    {
+      "id": "A02",
+      "finding": "Sincronización concurrente duplica envíos",
+      "evidence": {
+        "logicalExpenses": 1,
+        "postRequests": 2,
+        "sendsClientId": false
+      }
+    },
+    {
+      "id": "A02b",
+      "finding": "Captura añadida durante sincronización se pierde",
+      "evidence": {
+        "unsentNewExpenses": 1,
+        "remainingQueue": 0
+      }
+    },
+    {
+      "id": "A03",
+      "finding": "Abono insuficiente marca el corte como pagado",
+      "evidence": {
+        "statementAmount": 1000,
+        "paidAmount": 1,
+        "status": "PAID"
+      }
+    },
+    {
+      "id": "A03b",
+      "finding": "Estado de cuenta cero depende del tipo JSON",
+      "evidence": {
+        "numericZeroStatus": 400,
+        "stringZeroStatus": 200
+      }
+    },
+    {
+      "id": "A03c",
+      "finding": "Corte con importe cero no admite cierre mediante pago cero",
+      "evidence": {
+        "paidAmount": "0",
+        "responseStatus": 400
+      }
+    },
+    {
+      "id": "A04",
+      "finding": "Vencido a las 06:01 de Ciudad de México el día límite",
+      "evidence": {
+        "atUTC": "2026-10-15T12:01:00Z",
+        "dueDate": "2026-10-15",
+        "displayed": "OVERDUE"
+      }
+    },
+    {
+      "id": "A05",
+      "finding": "Editar abono no recalcula estado de deuda",
+      "evidence": {
+        "oldPayment": 100,
+        "newPayment": 50,
+        "payableStatusUpdates": 0
+      }
+    },
+    {
+      "id": "A05b",
+      "finding": "Cambiar principal conserva estado liquidado con saldo positivo",
+      "evidence": {
+        "status": "PAID_OFF",
+        "pendingBalance": 100
+      }
+    },
+    {
+      "id": "A06",
+      "finding": "Fallo al crear gasto deja una cuenta por cobrar huérfana",
+      "evidence": {
+        "responseStatus": 500,
+        "persistedReceivables": 1
+      }
+    },
+    {
+      "id": "A07",
+      "finding": "Historial de ingresos truncado sin paginación de servidor",
+      "evidence": {
+        "realCount": 101,
+        "returnedCount": 100,
+        "realTotal": 1010,
+        "returnedTotal": 1000
+      }
+    },
+    {
+      "id": "A08",
+      "finding": "Fecha imposible se acepta y cambia de mes",
+      "evidence": {
+        "supplied": "2026-02-30",
+        "saved": "2026-03-02"
+      }
+    },
+    {
+      "id": "A09",
+      "finding": "Respuesta vieja sobrescribe filtro más reciente",
+      "evidence": {
+        "selectedFilter": "B",
+        "displayedRows": [
+          "A"
+        ]
+      }
+    }
+  ]
+}

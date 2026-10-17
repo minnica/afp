@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { apiResponse as NextResponse, requireApiUser, apiAccessErrorResponse, requireOwnedReferences } from "@/lib/apiAuth";
 import { prisma } from "@/lib/prisma";
 
 const allowedTypes = ["category", "person", "incomeType"];
@@ -35,12 +35,8 @@ function getModel(type) {
 
 export async function GET(request) {
   try {
-    const { searchParams } = new URL(request.url);
-    const userId = searchParams.get("userId");
-
-    if (!userId) {
-      return NextResponse.json({ error: "Falta userId." }, { status: 400 });
-    }
+    const user = await requireApiUser(request);
+    const userId = user.id;
 
     const [categories, people, incomeTypes] = await Promise.all([
       prisma.category.findMany({
@@ -66,6 +62,8 @@ export async function GET(request) {
       incomeTypes,
     });
   } catch (error) {
+    const accessResponse = apiAccessErrorResponse(error);
+    if (accessResponse) return accessResponse;
     console.error("Error loading settings:", error);
 
     return NextResponse.json(
@@ -77,8 +75,11 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
+    const user = await requireApiUser(request);
+    const userId = user.id;
     const body = await request.json();
-    const { userId, type, name, notes } = body;
+    await requireOwnedReferences(prisma, userId, body, []);
+    const { type, name, notes } = body;
 
     if (!userId || !type || !name) {
       return NextResponse.json(
@@ -140,6 +141,8 @@ export async function POST(request) {
       return NextResponse.json({ item: person });
     }
   } catch (error) {
+    const accessResponse = apiAccessErrorResponse(error);
+    if (accessResponse) return accessResponse;
     console.error("Error creating setting:", error);
 
     if (error.code === "P2002") {
@@ -158,6 +161,8 @@ export async function POST(request) {
 
 export async function DELETE(request) {
   try {
+    const user = await requireApiUser(request);
+    const userId = user.id;
     const { searchParams } = new URL(request.url);
     const type = searchParams.get("type");
     const id = searchParams.get("id");
@@ -176,11 +181,13 @@ export async function DELETE(request) {
     }
 
     await model.delete({
-      where: { id },
+      where: { id, userId },
     });
 
     return NextResponse.json({ ok: true });
   } catch (error) {
+    const accessResponse = apiAccessErrorResponse(error);
+    if (accessResponse) return accessResponse;
     console.error("Error deleting setting:", error);
 
     return NextResponse.json(

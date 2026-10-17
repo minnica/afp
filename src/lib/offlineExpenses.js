@@ -1,3 +1,5 @@
+
+import { apiFetch } from "@/lib/apiFetch";
 const STORAGE_PREFIX = "afp:offline-expenses:";
 
 function getStorageKey(userId) {
@@ -50,8 +52,9 @@ export async function syncOfflineExpenses(userId) {
 
   for (const queuedExpense of queuedExpenses) {
     try {
-      const response = await fetch("/api/expenses", {
+      const response = await apiFetch("/api/expenses", {
         method: "POST",
+        expectedUserId: userId,
         headers: {
           "Content-Type": "application/json",
         },
@@ -68,10 +71,10 @@ export async function syncOfflineExpenses(userId) {
       }
 
       syncedExpenses.push(data.expense);
-    } catch {
+    } catch (error) {
       failedExpenses.push({
         ...queuedExpense,
-        lastError: "Sin conexión. Se reintentará al volver internet.",
+        lastError: error.message || "Sin conexión. Se reintentará al volver internet.",
       });
     }
   }

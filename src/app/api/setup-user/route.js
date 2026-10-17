@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { apiResponse as NextResponse, requireApiUser, apiAccessErrorResponse } from "@/lib/apiAuth";
 import { prisma } from "@/lib/prisma";
 
 const defaultCategories = [
@@ -25,12 +25,13 @@ const defaultIncomeTypes = [
 
 export async function POST(request) {
   try {
-    const body = await request.json();
-    const { userId, email } = body;
+    const user = await requireApiUser(request);
+    const userId = user.id;
+    const email = user.email;
 
-    if (!userId || !email) {
+    if (!email) {
       return NextResponse.json(
-        { error: "Faltan userId o email." },
+        { error: "La cuenta autenticada no tiene un correo disponible." },
         { status: 400 },
       );
     }
@@ -68,6 +69,8 @@ export async function POST(request) {
       ok: true,
     });
   } catch (error) {
+    const accessResponse = apiAccessErrorResponse(error);
+    if (accessResponse) return accessResponse;
     console.error("Error setting up user:", error);
 
     return NextResponse.json(

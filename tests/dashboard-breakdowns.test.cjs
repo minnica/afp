@@ -8,7 +8,7 @@ const read = (file) => fs.readFileSync(path.join(root, file), "utf8")
   .replace(/^import[\s\S]*?from\s+["'][^"']+["'];\r?\n/gm, "")
   .replace(/^export /gm, "");
 function context(route = "dashboard", globals = {}) {
-  const ctx = vm.createContext({ URL, console, ...globals });
+  const ctx = vm.createContext({ URL, console, requireApiUser: async () => ({ id: "u" }), apiAccessErrorResponse: () => null, ...globals });
   const helpers = ["../subscriptionCharges", "installmentStatements", "subscriptionStatements", "cardCredits", "cardCycles", "cycleDataQuality", "cardUsageWaivers"]
     .map((name) => read(`src/lib/calculations/${name}.js`)).join("\n");
   vm.runInContext(helpers + "\n" + read(`src/app/api/${route}/route.js`), ctx);

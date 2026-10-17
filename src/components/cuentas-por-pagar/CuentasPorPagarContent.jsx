@@ -1,5 +1,7 @@
 "use client";
 
+import { apiFetch } from "@/lib/apiFetch";
+
 import { useCreationDraft } from "@/hooks/use-creation-draft";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -152,7 +154,7 @@ export default function CuentasPorPagarContent() {
   const [expandedPayableId, setExpandedPayableId] = useState("");
 
   async function loadSettings(userId) {
-    const response = await fetch(`/api/settings?userId=${userId}`);
+    const response = await apiFetch(`/api/settings?userId=${userId}`);
     const data = await response.json();
 
     if (!response.ok) {
@@ -163,7 +165,7 @@ export default function CuentasPorPagarContent() {
   }
 
   async function loadPayables(userId) {
-    const response = await fetch(`/api/payables?userId=${userId}`);
+    const response = await apiFetch(`/api/payables?userId=${userId}`);
     const data = await response.json();
 
     if (!response.ok) {
@@ -212,8 +214,8 @@ export default function CuentasPorPagarContent() {
 
     let saved = false;
     try {
-      const response = await fetch("/api/payables", {
-        method: "POST",
+      const response = await apiFetch("/api/payables", {
+        method: "POST", expectedUserId: user?.id,
         headers: {
           "Content-Type": "application/json",
         },
@@ -291,8 +293,8 @@ export default function CuentasPorPagarContent() {
     setIsUpdating(true);
 
     try {
-      const response = await fetch("/api/payables", {
-        method: "PATCH",
+      const response = await apiFetch("/api/payables", {
+        method: "PATCH", expectedUserId: user?.id,
         headers: {
           "Content-Type": "application/json",
         },
@@ -333,8 +335,8 @@ export default function CuentasPorPagarContent() {
     setError("");
 
     try {
-      const response = await fetch(`/api/payables?id=${id}`, {
-        method: "DELETE",
+      const response = await apiFetch(`/api/payables?id=${id}`, {
+        method: "DELETE", expectedUserId: user?.id,
       });
 
       const data = await response.json();

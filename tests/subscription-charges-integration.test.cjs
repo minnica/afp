@@ -65,6 +65,14 @@ test("cobros: transacción, concurrencia, omisión, restauración, evidencia y a
     // La captura manual y la confirmación rápida usan el mismo bloqueo.
     const manual = await db.subscription.create({ data: { userId: user.id, name: "Manual", amount: 99,
       paymentMethod: "CASH", categoryId: category.id, chargeDay: 15, startMonth: 1, startYear: 2026 } });
+    const { sourceLoader } = require("./helpers/load-source.cjs");
+    const access = sourceLoader({
+      "next/server": { NextResponse: { json: (body, options = {}) => ({ body, status: options.status || 200 }) } },
+      "@supabase/supabase-js": { createClient: () => ({ auth: { getUser: async () => ({ data: { user } }) } }) },
+    })("src/lib/apiAuth.js");
+    ctx.requireApiUser = async () => user;
+    ctx.requireOwnedReferences = access.requireOwnedReferences;
+    ctx.apiAccessErrorResponse = access.apiAccessErrorResponse;
     ctx.prisma = db;
     ctx.URL = URL;
     ctx.console = console;

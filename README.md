@@ -70,6 +70,20 @@ La página inicial es `/dashboard`: `/` redirige allí, el login navega al Dashb
 
 ---
 
+### Autenticación y autorización de API (A01)
+
+Todas las rutas de `src/app/api/`, incluido `/api/gastos/bootstrap` y `/api/setup-user`, exigen `Authorization: Bearer <access_token>`. `src/lib/apiAuth.js` valida el token con `supabase.auth.getUser(token)` antes de leer el cuerpo o consultar Prisma. Sin token o con token inválido/vencido responde **401**. La identidad procede exclusivamente del usuario validado; cualquier `userId` enviado en URL o cuerpo se ignora. `setup-user` también obtiene el correo de esa identidad.
+
+- Las consultas se limitan al propietario. Editar o borrar usa conjuntamente ID y `userId`, también en las actualizaciones indirectas de cuentas. Un registro ajeno o inexistente devuelve **404**; no revela su existencia.
+- Antes de escribir se verifica que tarjeta, categoría, persona, tipo de ingreso, suscripción y cuentas vinculadas pertenezcan al mismo usuario. Los IDs del cuerpo deben ser cadenas, nunca filtros de Prisma. El propietario no es editable desde la API.
+- `src/lib/apiFetch.js` adjunta el token vigente a todas las llamadas del cliente y conserva headers, cuerpo y cancelación. Comprueba la cuenta esperada por la pantalla; la cola offline verifica además su propietario antes de cada envío. Si falta la sesión o cambió la cuenta, conserva los pendientes.
+- Las respuestas de API usan `Cache-Control: private, no-store` y `Vary: Authorization`. El service worker v4 no intercepta rutas `/api/`, ni como navegación, y elimina la caché anterior al activarse. El respaldo local de Gastos sigue separado por usuario.
+- Prisma continúa accediendo desde el servidor; estas comprobaciones son obligatorias aunque RLS esté activo. La corrección no cambia tablas, políticas RLS ni migraciones y conserva la denegación pública existente.
+
+Regresiones: `node --test tests/*.test.cjs`. `tests/api-authorization.test.cjs` ejecuta todas las rutas con Auth y persistencia simulados, verifica acceso anónimo, tokens inválidos, suplantación de identidad, aislamiento entre dos usuarios, CRUD propio y referencias ajenas. `tests/api-fetch.test.cjs` cubre renovación de tokens, cambio de cuenta, cola offline y exclusión de API del service worker. Estas pruebas no escriben en Supabase ni sustituyen una prueba integrada con dos cuentas reales en un ambiente aislado. El despliegue a producción requiere autorización explícita.
+
+---
+
 ## Schema Prisma — Modelos
 
 Archivo: [`prisma/schema.prisma`](prisma/schema.prisma)
@@ -249,7 +263,7 @@ La app puede instalarse como PWA y soporta captura offline de gastos diarios en 
 
 Archivos principales:
 - `public/manifest.webmanifest`: metadata de instalación (`start_url: /dashboard`, `display: standalone`, icono).
-- `public/sw.js`: service worker propio. Cachea shell básico (`/`, `/gastos`, manifest, icono), assets estáticos de Next y respuestas GET relevantes (`/api/gastos/bootstrap`, `/api/expenses`) con estrategia network-first.
+- `public/sw.js`: service worker propio. Cachea shell básico (`/`, `/gastos`, manifest, icono) y assets estáticos de Next con estrategia network-first. Excluye todas las rutas `/api/`; los datos offline de Gastos usan el respaldo local separado por usuario.
 - `src/components/pwa/ServiceWorkerRegistration.jsx`: registra `/sw.js` desde el layout raíz.
 - `src/lib/offlineExpenses.js`: cola local por usuario en `localStorage` (`afp:offline-expenses:{userId}`).
 - `src/components/gastos/GastosContent.jsx`: integra lectura de cache, alta offline, visualización de pendientes y sincronización.
@@ -456,7 +470,20 @@ npx prisma studio          # explorador visual de BD
 
 ## Deploy
 
-Pendiente por confirmar: plataforma de deploy (Vercel u otra), pipeline CI/CD, ambientes dev vs prod.
+Producción en Vercel, proyecto `afp`. La dirección personalizada es `https://finanzas.garatachia.com`; `https://afp-virid.vercel.app` sigue disponible.
+
+El subdominio `finanzas.garatachia.com` está agregado al proyecto de producción en Vercel. En Namecheap se creó el CNAME de `finanzas` hacia `767214e385092158.vercel-dns-017.com`, confirmado mediante consulta al DNS autoritativo y validación de Vercel (`misconfigured: false`). HTTPS y las respuestas de `/login`, `/dashboard`, `/gastos` y el manifest se verificaron usando la IP de Vercel; `/` redirige a `/dashboard` en el nuevo dominio. El usuario confirmó posteriormente el acceso desde el nuevo dominio. Los DNS del dominio se administran fuera de Vercel.
+
+El nuevo dominio conserva todas las rutas (`/login`, `/dashboard`, `/gastos`, etc.); no requiere `basePath`. En Supabase Auth, la captura del panel proporcionada por el usuario muestra **Site URL** como `https://finanzas.garatachia.com` y estas **Redirect URLs**:
+
+- `http://localhost:3000/`
+- `https://finanzas.garatachia.com`
+- `https://finanzas.garatachia.com/login`
+- `https://finanzas.garatachia.com/dashboard`
+
+La configuración se revisó visualmente; no se enviaron correos ni se probó un enlace de confirmación. El login actual con correo y contraseña utiliza navegación relativa. La sesión y los datos locales de la PWA pertenecen a cada origen; será necesario iniciar sesión de nuevo en el subdominio.
+
+Pendiente por documentar: pipeline CI/CD y separación de ambientes dev vs prod.
 
 ---
 

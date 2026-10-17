@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { apiResponse as NextResponse, requireApiUser, apiAccessErrorResponse, requireOwnedReferences } from "@/lib/apiAuth";
 import { prisma } from "@/lib/prisma";
 
 const receivableSelect = {
@@ -83,12 +83,8 @@ function formatReceivable(item) {
 
 export async function GET(request) {
   try {
-    const { searchParams } = new URL(request.url);
-    const userId = searchParams.get("userId");
-
-    if (!userId) {
-      return NextResponse.json({ error: "Falta userId." }, { status: 400 });
-    }
+    const user = await requireApiUser(request);
+    const userId = user.id;
 
     const receivables = await prisma.receivableAccount.findMany({
       where: {
@@ -106,6 +102,8 @@ export async function GET(request) {
 
     return NextResponse.json({ receivables: formatted });
   } catch (error) {
+    const accessResponse = apiAccessErrorResponse(error);
+    if (accessResponse) return accessResponse;
     console.error("Error loading receivables:", error);
 
     return NextResponse.json(
@@ -117,10 +115,12 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
+    const user = await requireApiUser(request);
+    const userId = user.id;
     const body = await request.json();
+    await requireOwnedReferences(prisma, userId, body, ["personId"]);
 
     const {
-      userId,
       personId,
       concept,
       originalAmount,
@@ -201,6 +201,8 @@ export async function POST(request) {
       receivable: formatReceivable(receivable),
     });
   } catch (error) {
+    const accessResponse = apiAccessErrorResponse(error);
+    if (accessResponse) return accessResponse;
     console.error("Error creating receivable:", error);
 
     return NextResponse.json(
@@ -212,6 +214,8 @@ export async function POST(request) {
 
 export async function DELETE(request) {
   try {
+    const user = await requireApiUser(request);
+    const userId = user.id;
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
 
@@ -220,11 +224,13 @@ export async function DELETE(request) {
     }
 
     await prisma.receivableAccount.delete({
-      where: { id },
+      where: { id, userId },
     });
 
     return NextResponse.json({ ok: true });
   } catch (error) {
+    const accessResponse = apiAccessErrorResponse(error);
+    if (accessResponse) return accessResponse;
     console.error("Error deleting receivable:", error);
 
     return NextResponse.json(
@@ -239,7 +245,10 @@ export async function DELETE(request) {
 
 export async function PATCH(request) {
   try {
+    const user = await requireApiUser(request);
+    const userId = user.id;
     const body = await request.json();
+    await requireOwnedReferences(prisma, userId, body, ["personId"]);
 
     const {
       id,
@@ -308,7 +317,7 @@ export async function PATCH(request) {
     }
 
     const receivable = await prisma.receivableAccount.update({
-      where: { id },
+      where: { id, userId },
       data: {
         personId,
         concept: concept.trim(),
@@ -325,6 +334,8 @@ export async function PATCH(request) {
       receivable: formatReceivable(receivable),
     });
   } catch (error) {
+    const accessResponse = apiAccessErrorResponse(error);
+    if (accessResponse) return accessResponse;
     console.error("Error updating receivable:", error);
 
     return NextResponse.json(

@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { apiResponse as NextResponse, requireApiUser, apiAccessErrorResponse, requireOwnedReferences } from "@/lib/apiAuth";
 import { prisma } from "@/lib/prisma";
 
 const cardSelect = {
@@ -14,12 +14,8 @@ const cardSelect = {
 
 export async function GET(request) {
   try {
-    const { searchParams } = new URL(request.url);
-    const userId = searchParams.get("userId");
-
-    if (!userId) {
-      return NextResponse.json({ error: "Falta userId." }, { status: 400 });
-    }
+    const user = await requireApiUser(request);
+    const userId = user.id;
 
     const cards = await prisma.card.findMany({
       where: { userId },
@@ -29,6 +25,8 @@ export async function GET(request) {
 
     return NextResponse.json({ cards });
   } catch (error) {
+    const accessResponse = apiAccessErrorResponse(error);
+    if (accessResponse) return accessResponse;
     console.error("Error loading cards:", error);
 
     return NextResponse.json(
@@ -40,9 +38,12 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
+    const user = await requireApiUser(request);
+    const userId = user.id;
     const body = await request.json();
+    await requireOwnedReferences(prisma, userId, body, []);
 
-    const { userId, name, usualCutDay, usualDueDay, notes } = body;
+    const { name, usualCutDay, usualDueDay, notes } = body;
 
     if (!userId || !name || !usualCutDay || !usualDueDay) {
       return NextResponse.json(
@@ -82,6 +83,8 @@ export async function POST(request) {
 
     return NextResponse.json({ card });
   } catch (error) {
+    const accessResponse = apiAccessErrorResponse(error);
+    if (accessResponse) return accessResponse;
     console.error("Error creating card:", error);
 
     if (error.code === "P2002") {
@@ -100,6 +103,8 @@ export async function POST(request) {
 
 export async function DELETE(request) {
   try {
+    const user = await requireApiUser(request);
+    const userId = user.id;
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
 
@@ -108,11 +113,13 @@ export async function DELETE(request) {
     }
 
     await prisma.card.delete({
-      where: { id },
+      where: { id, userId },
     });
 
     return NextResponse.json({ ok: true });
   } catch (error) {
+    const accessResponse = apiAccessErrorResponse(error);
+    if (accessResponse) return accessResponse;
     console.error("Error deleting card:", error);
 
     return NextResponse.json(
@@ -127,7 +134,10 @@ export async function DELETE(request) {
 
 export async function PATCH(request) {
   try {
+    const user = await requireApiUser(request);
+    const userId = user.id;
     const body = await request.json();
+    await requireOwnedReferences(prisma, userId, body, []);
 
     const { id, name, usualCutDay, usualDueDay, notes } = body;
 
@@ -161,7 +171,7 @@ export async function PATCH(request) {
     }
 
     const card = await prisma.card.update({
-      where: { id },
+      where: { id, userId },
       data: {
         name: cleanName,
         usualCutDay: cutDay,
@@ -173,6 +183,8 @@ export async function PATCH(request) {
 
     return NextResponse.json({ card });
   } catch (error) {
+    const accessResponse = apiAccessErrorResponse(error);
+    if (accessResponse) return accessResponse;
     console.error("Error updating card:", error);
 
     if (error.code === "P2002") {

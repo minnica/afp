@@ -9,14 +9,14 @@ function api() {
   const source = file => fs.readFileSync(path.join(__dirname, "..", file), "utf8")
     .replace(/^import .*;\n/gm, "").replace(/^export /gm, "");
   class SubscriptionChargeError extends Error {}
-  const route = vm.createContext({ Date, URL, process: { env: {} }, console, SubscriptionChargeError,
+  const route = vm.createContext({ Headers, Date, URL, process: { env: {} }, console, SubscriptionChargeError,
     createClient: () => ({ auth: { getUser: async token => ({ data: { user: token === "valid" ? { id: "owner" } : null } }) } }),
     NextResponse: { json: (body, options = {}) => ({ body, status: options.status || 200, headers: options.headers }) },
     prisma: { $transaction: async run => run("transaction") },
     loadSubscriptionCharges: async (...args) => { calls.push(args); return []; },
     applySubscriptionCharge: async (...args) => { calls.push(args); return { expenseId: "expense" }; },
   });
-  vm.runInContext(source("src/lib/subscriptionCharges.js") + "\n" + source("src/app/api/subscription-charges/route.js"), route);
+  vm.runInContext(source("src/lib/apiAuth.js") + "\n" + source("src/lib/subscriptionCharges.js") + "\n" + source("src/app/api/subscription-charges/route.js"), route);
   const request = (token, body) => ({ url: "http://localhost/api/subscription-charges?month=2026-10&userId=other",
     headers: new Map(token ? [["authorization", `Bearer ${token}`]] : []), json: async () => body });
   return { route, calls, request };

@@ -1,5 +1,7 @@
 "use client";
 
+import { apiFetch } from "@/lib/apiFetch";
+
 import { useCreationDraft } from "@/hooks/use-creation-draft";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -134,7 +136,7 @@ export default function IngresosContent() {
   });
 
   async function loadSettings(userId) {
-    const response = await fetch(`/api/settings?userId=${userId}`);
+    const response = await apiFetch(`/api/settings?userId=${userId}`);
     const data = await response.json();
 
     if (!response.ok) {
@@ -145,7 +147,7 @@ export default function IngresosContent() {
   }
 
   async function loadReceivables(userId) {
-    const response = await fetch(`/api/receivables?userId=${userId}`);
+    const response = await apiFetch(`/api/receivables?userId=${userId}`);
     const data = await response.json();
 
     if (!response.ok) {
@@ -162,7 +164,7 @@ export default function IngresosContent() {
   }
 
   async function loadIncomes(userId) {
-    const response = await fetch(`/api/incomes?userId=${userId}`);
+    const response = await apiFetch(`/api/incomes?userId=${userId}`);
     const data = await response.json();
 
     if (!response.ok) {
@@ -212,8 +214,8 @@ export default function IngresosContent() {
 
     let saved = false;
     try {
-      const response = await fetch("/api/incomes", {
-        method: "POST",
+      const response = await apiFetch("/api/incomes", {
+        method: "POST", expectedUserId: user?.id,
         headers: {
           "Content-Type": "application/json",
         },
@@ -299,8 +301,8 @@ export default function IngresosContent() {
     setIsUpdating(true);
 
     try {
-      const response = await fetch("/api/incomes", {
-        method: "PATCH",
+      const response = await apiFetch("/api/incomes", {
+        method: "PATCH", expectedUserId: user?.id,
         headers: {
           "Content-Type": "application/json",
         },
@@ -340,8 +342,8 @@ export default function IngresosContent() {
     setError("");
 
     try {
-      const response = await fetch(`/api/incomes?id=${id}`, {
-        method: "DELETE",
+      const response = await apiFetch(`/api/incomes?id=${id}`, {
+        method: "DELETE", expectedUserId: user?.id,
       });
 
       const data = await response.json();

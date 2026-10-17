@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { apiResponse as NextResponse, requireApiUser, apiAccessErrorResponse } from "@/lib/apiAuth";
 import { prisma } from "@/lib/prisma";
 import { buildCardUsageWaivers, buildCurrentCardUsageWaivers, buildCardUsageWaiverHistory } from "@/lib/calculations/cardUsageWaivers";
 import { cycleCreditSelect } from "@/lib/calculations/cardCredits";
@@ -764,12 +764,10 @@ function buildCutCycleNotices(cyclesWithAmounts, cards, now) {
 
 export async function GET(request) {
   try {
+    const user = await requireApiUser(request);
+    const userId = user.id;
     const { searchParams } = new URL(request.url);
-    const userId = searchParams.get("userId");
 
-    if (!userId) {
-      return NextResponse.json({ error: "Falta userId." }, { status: 400 });
-    }
 
     const clientDate = searchParams.get("clientDate");
     const now = clientDate ? new Date(`${clientDate}T12:00:00Z`) : new Date();
@@ -1183,6 +1181,8 @@ export async function GET(request) {
       importantNotices,
     });
   } catch (error) {
+    const accessResponse = apiAccessErrorResponse(error);
+    if (accessResponse) return accessResponse;
     console.error("Error loading dashboard:", error);
 
     return NextResponse.json(

@@ -1,7 +1,8 @@
 "use client";
 
+import { apiFetch } from "@/lib/apiFetch";
+
 import { useCallback, useEffect, useRef, useState } from "react";
-import { supabase } from "@/lib/supabase";
 import { getNoticeKey, getNoticeMonth } from "@/lib/noticeDismissals";
 
 export function useNoticeDismissals({ userId, month, enabled }) {
@@ -12,11 +13,9 @@ export function useNoticeDismissals({ userId, month, enabled }) {
   const savingRef = useRef(false);
 
   const request = useCallback(async (method, noticeKey) => {
-    const { data: { session }, error } = await supabase.auth.getSession();
-    if (error || !session || session.user.id !== userId) throw new Error("Vuelve a iniciar sesión para gestionar tus avisos.");
-    const response = await fetch(`/api/notice-dismissals${method === "GET" ? `?month=${month}` : ""}`, {
-      method,
-      headers: { Authorization: `Bearer ${session.access_token}`, "Content-Type": "application/json" },
+    const response = await apiFetch(`/api/notice-dismissals${method === "GET" ? `?month=${month}` : ""}`, {
+      method, expectedUserId: userId,
+      headers: { "Content-Type": "application/json" },
       ...(method === "GET" ? { cache: "no-store" } : { body: JSON.stringify({ month, noticeKey }) }),
     });
     const result = await response.json();

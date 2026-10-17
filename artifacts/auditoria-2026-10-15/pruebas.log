@@ -1,0 +1,634 @@
+TAP version 13
+# Subtest: Análisis conserva cero e importes a centavos al mostrarlos
+ok 1 - Análisis conserva cero e importes a centavos al mostrarlos
+  ---
+  duration_ms: 1.502368
+  type: 'test'
+  ...
+# Subtest: enero compara diciembre anterior y conserva categorías sin gasto actual
+ok 2 - enero compara diciembre anterior y conserva categorías sin gasto actual
+  ---
+  duration_ms: 0.915149
+  type: 'test'
+  ...
+# Subtest: categorías se unen por ID aunque cambien nombre, sin mutar importes
+ok 3 - categorías se unen por ID aunque cambien nombre, sin mutar importes
+  ---
+  duration_ms: 0.301199
+  type: 'test'
+  ...
+# Subtest: Santander agosto descuenta solo la aplicación al corte en ambas rutas
+ok 4 - Santander agosto descuenta solo la aplicación al corte en ambas rutas
+  ---
+  duration_ms: 9.401327
+  type: 'test'
+  ...
+# Subtest: sin aplicación se conserva la diferencia y no se descuentan ingresos generales
+ok 5 - sin aplicación se conserva la diferencia y no se descuentan ingresos generales
+  ---
+  duration_ms: 5.270102
+  type: 'test'
+  ...
+# Subtest: un estado de cero con bonificación completa concilia correctamente
+ok 6 - un estado de cero con bonificación completa concilia correctamente
+  ---
+  duration_ms: 2.763417
+  type: 'test'
+  ...
+# Subtest: se rechazan aplicaciones duplicadas, de otro usuario/ciclo e importes inválidos
+ok 7 - se rechazan aplicaciones duplicadas, de otro usuario/ciclo e importes inválidos
+  ---
+  duration_ms: 1.592437
+  type: 'test'
+  ...
+# Subtest: la API incluye notas de bonificación y mantiene septiembre y sus pagos
+ok 8 - la API incluye notas de bonificación y mantiene septiembre y sus pagos
+  ---
+  duration_ms: 1.651958
+  type: 'test'
+  ...
+# Subtest: un ingreso aplicado no se borra ni se reduce por debajo de sus aplicaciones
+ok 9 - un ingreso aplicado no se borra ni se reduce por debajo de sus aplicaciones
+  ---
+  duration_ms: 1.047539
+  type: 'test'
+  ...
+# Subtest: cuotas independientes del listado/detalle y sin mensualidad adicional al liquidar
+ok 10 - cuotas independientes del listado/detalle y sin mensualidad adicional al liquidar
+  ---
+  duration_ms: 4.176805
+  type: 'test'
+  ...
+# Subtest: la fecha de corte incluye todo el día y la cuota siguiente empieza después
+ok 11 - la fecha de corte incluye todo el día y la cuota siguiente empieza después
+  ---
+  duration_ms: 0.38336
+  type: 'test'
+  ...
+# Subtest: cuotas cruzan año y febrero corto; una compra liquidada no proyecta pagos futuros
+ok 12 - cuotas cruzan año y febrero corto; una compra liquidada no proyecta pagos futuros
+  ---
+  duration_ms: 0.322629
+  type: 'test'
+  ...
+# Subtest: gastos incluidos por día completo, sin huecos ni duplicación entre cortes
+ok 13 - gastos incluidos por día completo, sin huecos ni duplicación entre cortes
+  ---
+  duration_ms: 0.3747
+  type: 'test'
+  ...
+# Subtest: frecuencia anual usa mes del cobro, nunca un mes previo al inicio
+ok 14 - frecuencia anual usa mes del cobro, nunca un mes previo al inicio
+  ---
+  duration_ms: 0.656449
+  type: 'test'
+  ...
+# Subtest: recorre meses intermedios y ajusta día31 a febrero bisiesto
+ok 15 - recorre meses intermedios y ajusta día31 a febrero bisiesto
+  ---
+  duration_ms: 0.251009
+  type: 'test'
+  ...
+# Subtest: baja conserva cargo del mismo día, excluye posteriores
+ok 16 - baja conserva cargo del mismo día, excluye posteriores
+  ---
+  duration_ms: 0.38854
+  type: 'test'
+  ...
+# Subtest: gasto vinculado sustituye previsión y conserva importe real, incluso en otro ciclo
+ok 17 - gasto vinculado sustituye previsión y conserva importe real, incluso en otro ciclo
+  ---
+  duration_ms: 0.465079
+  type: 'test'
+  ...
+# Subtest: arrays sin mapas no mezclan tarjetas y otro plástico no elimina una previsión
+ok 18 - arrays sin mapas no mezclan tarjetas y otro plástico no elimina una previsión
+  ---
+  duration_ms: 0.452099
+  type: 'test'
+  ...
+# Subtest: referencia verificada prevalece en cuota e importe y termina al completar meses
+ok 19 - referencia verificada prevalece en cuota e importe y termina al completar meses
+  ---
+  duration_ms: 0.808009
+  type: 'test'
+  ...
+# Subtest: partidas a centavos suman exactamente los subtotales mostrados y respetan estado cero
+ok 20 - partidas a centavos suman exactamente los subtotales mostrados y respetan estado cero
+  ---
+  duration_ms: 0.543489
+  type: 'test'
+  ...
+# Subtest: bonificación se descuenta una sola vez y estado cero concilia
+ok 21 - bonificación se descuenta una sola vez y estado cero concilia
+  ---
+  duration_ms: 0.28529
+  type: 'test'
+  ...
+# Subtest: omitir una suscripción retira solo su período y confirmar en otro mes sustituye la previsión
+ok 22 - omitir una suscripción retira solo su período y confirmar en otro mes sustituye la previsión
+  ---
+  duration_ms: 0.443749
+  type: 'test'
+  ...
+# Subtest: antes del corte usa el calculado incluso con estado capturado anticipadamente
+ok 23 - antes del corte usa el calculado incluso con estado capturado anticipadamente
+  ---
+  duration_ms: 1.109459
+  type: 'test'
+  ...
+# Subtest: desde el día de corte usa el estado registrado, incluido cero
+ok 24 - desde el día de corte usa el estado registrado, incluido cero
+  ---
+  duration_ms: 0.209609
+  type: 'test'
+  ...
+# Subtest: corte sin estado conserva el estimado; pagos no modifican el importe del período
+ok 25 - corte sin estado conserva el estimado; pagos no modifican el importe del período
+  ---
+  duration_ms: 0.21335
+  type: 'test'
+  ...
+# Subtest: respeta cambios de mes/año, no muta ciclos y maneja importes a centavos
+ok 26 - respeta cambios de mes/año, no muta ciclos y maneja importes a centavos
+  ---
+  duration_ms: 0.350539
+  type: 'test'
+  ...
+# Subtest: las leyendas conservan el día bancario y la opción de fecha larga
+ok 27 - las leyendas conservan el día bancario y la opción de fecha larga
+  ---
+  duration_ms: 18.783905
+  type: 'test'
+  ...
+# Subtest: el corte compacto omite la fecha sin alterar las leyendas ni sus otros consumidores
+ok 28 - el corte compacto omite la fecha sin alterar las leyendas ni sus otros consumidores
+  ---
+  duration_ms: 0.396779
+  type: 'test'
+  ...
+# Subtest: cortes próximos primero, fechas ausentes al final y empates por nombre
+ok 29 - cortes próximos primero, fechas ausentes al final y empates por nombre
+  ---
+  duration_ms: 10.708606
+  type: 'test'
+  ...
+# Subtest: historial distingue años, deduplica períodos y ofrece el más reciente primero
+ok 30 - historial distingue años, deduplica períodos y ofrece el más reciente primero
+  ---
+  duration_ms: 9.090517
+  type: 'test'
+  ...
+# Subtest: fecha de corte respeta el día almacenado y hoy, mañana y días restantes
+ok 31 - fecha de corte respeta el día almacenado y hoy, mañana y días restantes
+  ---
+  duration_ms: 0.727739
+  type: 'test'
+  ...
+# Subtest: en curso reúne octubre y noviembre según el período de cada tarjeta
+ok 32 - en curso reúne octubre y noviembre según el período de cada tarjeta
+  ---
+  duration_ms: 3.526746
+  type: 'test'
+  ...
+# Subtest: el día de corte completo sigue vigente y al día siguiente cambia de período
+ok 33 - el día de corte completo sigue vigente y al día siguiente cambia de período
+  ---
+  duration_ms: 0.4116
+  type: 'test'
+  ...
+# Subtest: cortes terminados salen de en curso aunque hayan cumplido o tengan cargos por confirmar
+ok 34 - cortes terminados salen de en curso aunque hayan cumplido o tengan cargos por confirmar
+  ---
+  duration_ms: 0.28261
+  type: 'test'
+  ...
+# Subtest: la selección vigente usa el período bancario verificado
+ok 35 - la selección vigente usa el período bancario verificado
+  ---
+  duration_ms: 0.731599
+  type: 'test'
+  ...
+# Subtest: diciembre selecciona enero del siguiente año y no arrastra la meta anterior
+ok 36 - diciembre selecciona enero del siguiente año y no arrastra la meta anterior
+  ---
+  duration_ms: 0.527029
+  type: 'test'
+  ...
+# Subtest: sin período vigente conserva la tarjeta sin seleccionar ciclos futuros ni inválidos
+ok 37 - sin período vigente conserva la tarjeta sin seleccionar ciclos futuros ni inválidos
+  ---
+  duration_ms: 0.33144
+  type: 'test'
+  ...
+# Subtest: períodos superpuestos requieren revisión y no acreditan una meta ambigua
+ok 38 - períodos superpuestos requieren revisión y no acreditan una meta ambigua
+  ---
+  duration_ms: 0.396969
+  type: 'test'
+  ...
+# Subtest: historial incluye cortes terminados de años distintos y excluye vigentes y futuros
+ok 39 - historial incluye cortes terminados de años distintos y excluye vigentes y futuros
+  ---
+  duration_ms: 3.238566
+  type: 'test'
+  ...
+# Subtest: HSBC octubre: comisiones e IVA no completan los $300
+ok 40 - HSBC octubre: comisiones e IVA no completan los $300
+  ---
+  duration_ms: 0.855499
+  type: 'test'
+  ...
+# Subtest: Banamex octubre: la inactividad no convierte $272.95 en meta cumplida
+ok 41 - Banamex octubre: la inactividad no convierte $272.95 en meta cumplida
+  ---
+  duration_ms: 0.59171
+  type: 'test'
+  ...
+# Subtest: la regla depende del producto verificado y sobrevive a renombrar una tarjeta
+ok 42 - la regla depende del producto verificado y sobrevive a renombrar una tarjeta
+  ---
+  duration_ms: 0.351389
+  type: 'test'
+  ...
+# Subtest: las fechas bancarias verificadas incluyen compras omitidas por el rango estimado
+ok 43 - las fechas bancarias verificadas incluyen compras omitidas por el rango estimado
+  ---
+  duration_ms: 0.24237
+  type: 'test'
+  ...
+# Subtest: una nota bancaria o evidencia conserva la exclusión al cambiar el concepto
+ok 44 - una nota bancaria o evidencia conserva la exclusión al cambiar el concepto
+  ---
+  duration_ms: 0.268369
+  type: 'test'
+  ...
+# Subtest: una comisión comercial no se confunde con una comisión del banco
+ok 45 - una comisión comercial no se confunde con una comisión del banco
+  ---
+  duration_ms: 0.18744
+  type: 'test'
+  ...
+# Subtest: futuras y vencidas sin evidencia siguen siendo proyecciones
+ok 46 - futuras y vencidas sin evidencia siguen siendo proyecciones
+  ---
+  duration_ms: 0.29071
+  type: 'test'
+  ...
+# Subtest: una suscripción confirmada conserva importe y fecha históricos
+ok 47 - una suscripción confirmada conserva importe y fecha históricos
+  ---
+  duration_ms: 0.405019
+  type: 'test'
+  ...
+# Subtest: gasto vinculado, recibo y calendario no triplican una suscripción
+ok 48 - gasto vinculado, recibo y calendario no triplican una suscripción
+  ---
+  duration_ms: 0.444879
+  type: 'test'
+  ...
+# Subtest: frecuencia bimestral usa el mes real del cobro y respeta desactivación
+ok 49 - frecuencia bimestral usa el mes real del cobro y respeta desactivación
+  ---
+  duration_ms: 0.24775
+  type: 'test'
+  ...
+# Subtest: dos cargos reales iguales conservan su multiplicidad al emparejar un gasto vinculado
+ok 50 - dos cargos reales iguales conservan su multiplicidad al emparejar un gasto vinculado
+  ---
+  duration_ms: 0.32398
+  type: 'test'
+  ...
+# Subtest: un estado revisado no inventa una suscripción ausente
+ok 51 - un estado revisado no inventa una suscripción ausente
+  ---
+  duration_ms: 0.200929
+  type: 'test'
+  ...
+# Subtest: MSI nueva cuenta una vez aunque ya esté liquidada; cuotas antiguas y canceladas no
+ok 52 - MSI nueva cuenta una vez aunque ya esté liquidada; cuotas antiguas y canceladas no
+  ---
+  duration_ms: 0.2346
+  type: 'test'
+  ...
+# Subtest: MSI y gastos de fecha futura no marcan cumplimiento; centavos exactos
+ok 53 - MSI y gastos de fecha futura no marcan cumplimiento; centavos exactos
+  ---
+  duration_ms: 2.647416
+  type: 'test'
+  ...
+# Subtest: sin ciclo y evidencia inválida nunca producen un cumplimiento inventado
+ok 54 - sin ciclo y evidencia inválida nunca producen un cumplimiento inventado
+  ---
+  duration_ms: 0.2263
+  type: 'test'
+  ...
+# Subtest: fechas bancarias malformadas conservan el período previsto y sus movimientos
+ok 55 - fechas bancarias malformadas conservan el período previsto y sus movimientos
+  ---
+  duration_ms: 0.536249
+  type: 'test'
+  ...
+# Subtest: fechas imposibles no se normalizan como fechas bancarias verificadas
+ok 56 - fechas imposibles no se normalizan como fechas bancarias verificadas
+  ---
+  duration_ms: 0.16328
+  type: 'test'
+  ...
+# Subtest: recibos nulos o malformados no interrumpen el cálculo ni suman consumo
+ok 57 - recibos nulos o malformados no interrumpen el cálculo ni suman consumo
+  ---
+  duration_ms: 0.346029
+  type: 'test'
+  ...
+# Subtest: un nombre malformado conserva el importe válido sin romper el desglose
+ok 58 - un nombre malformado conserva el importe válido sin romper el desglose
+  ---
+  duration_ms: 0.22069
+  type: 'test'
+  ...
+# Subtest: un gasto distinto al comprobante queda por revisar sin acreditar una meta falsa
+ok 59 - un gasto distinto al comprobante queda por revisar sin acreditar una meta falsa
+  ---
+  duration_ms: 0.407699
+  type: 'test'
+  ...
+# Subtest: grupos ambiguos conservan multiplicidad e importes fuera del consumo confirmado
+ok 60 - grupos ambiguos conservan multiplicidad e importes fuera del consumo confirmado
+  ---
+  duration_ms: 0.908239
+  type: 'test'
+  ...
+# Subtest: emparejamientos exactos con distinta posición no crean discrepancias
+ok 61 - emparejamientos exactos con distinta posición no crean discrepancias
+  ---
+  duration_ms: 0.36551
+  type: 'test'
+  ...
+# Subtest: un comprobante adicional no consume la coincidencia exacta de otro cargo
+ok 62 - un comprobante adicional no consume la coincidencia exacta de otro cargo
+  ---
+  duration_ms: 1.061368
+  type: 'test'
+  ...
+# Subtest: omitir no cuenta como consumo y elimina la previsión del período
+ok 63 - omitir no cuenta como consumo y elimina la previsión del período
+  ---
+  duration_ms: 0.2112
+  type: 'test'
+  ...
+# Subtest: cero bancario prevalece sobre estimación en comparación y aviso
+ok 64 - cero bancario prevalece sobre estimación en comparación y aviso
+  ---
+  duration_ms: 14.187111
+  type: 'test'
+  ...
+# Subtest: cuotas mensuales no se acortan con pagos previos ni siguen fuera del plazo
+ok 65 - cuotas mensuales no se acortan con pagos previos ni siguen fuera del plazo
+  ---
+  duration_ms: 0.693679
+  type: 'test'
+  ...
+# Subtest: gasto vinculado sustituye previsión también al cambiar categoría o método
+ok 66 - gasto vinculado sustituye previsión también al cambiar categoría o método
+  ---
+  duration_ms: 1.872728
+  type: 'test'
+  ...
+# Subtest: baja en el mismo día conserva cargo en resúmenes y desglose
+ok 67 - baja en el mismo día conserva cargo en resúmenes y desglose
+  ---
+  duration_ms: 0.2387
+  type: 'test'
+  ...
+# Subtest: descuento conciliado conserva importe en categorías, semanas y ciclo
+ok 68 - descuento conciliado conserva importe en categorías, semanas y ciclo
+  ---
+  duration_ms: 1.590068
+  type: 'test'
+  ...
+# Subtest: fechas consecutivas, solapadas y con huecos se distinguen sin mutar ciclos
+ok 69 - fechas consecutivas, solapadas y con huecos se distinguen sin mutar ciclos
+  ---
+  duration_ms: 0.347119
+  type: 'test'
+  ...
+# Subtest: API listado/detalle devuelve mismos importes y obtiene vínculos de gastos
+ok 70 - API listado/detalle devuelve mismos importes y obtiene vínculos de gastos
+  ---
+  duration_ms: 6.531331
+  type: 'test'
+  ...
+# Subtest: API conserva diciembre anterior para enero sin mezclar diciembre futuro
+ok 71 - API conserva diciembre anterior para enero sin mezclar diciembre futuro
+  ---
+  duration_ms: 4.696514
+  type: 'test'
+  ...
+# Subtest: API separa consumo vigente e historial sin cambiar los cortes financieros
+ok 72 - API separa consumo vigente e historial sin cambiar los cortes financieros
+  ---
+  duration_ms: 4.590374
+  type: 'test'
+  ...
+# Subtest: omitir o confirmar por período retira la previsión y el aviso de efectivo
+ok 73 - omitir o confirmar por período retira la previsión y el aviso de efectivo
+  ---
+  duration_ms: 0.574349
+  type: 'test'
+  ...
+# Subtest: varias categorías y pagos son alternativas, y los campos distintos se intersectan
+ok 74 - varias categorías y pagos son alternativas, y los campos distintos se intersectan
+  ---
+  duration_ms: 1.856758
+  type: 'test'
+  ...
+# Subtest: conceptos ignoran mayúsculas y acentos, permitiendo alternativas y búsquedas parciales
+ok 75 - conceptos ignoran mayúsculas y acentos, permitiendo alternativas y búsquedas parciales
+  ---
+  duration_ms: 0.937799
+  type: 'test'
+  ...
+# Subtest: montos comparan centavos y aplican igual a guardados y pendientes
+ok 76 - montos comparan centavos y aplican igual a guardados y pendientes
+  ---
+  duration_ms: 0.362449
+  type: 'test'
+  ...
+# Subtest: la entrada de montos acepta MXN y rechaza números ambiguos o incompletos
+ok 77 - la entrada de montos acepta MXN y rechaza números ambiguos o incompletos
+  ---
+  duration_ms: 0.45433
+  type: 'test'
+  ...
+# Subtest: el corte bancario prevalece en tarjetas y dashboard, sin cambiar fecha de compra
+ok 78 - el corte bancario prevalece en tarjetas y dashboard, sin cambiar fecha de compra
+  ---
+  duration_ms: 7.46083
+  type: 'test'
+  ...
+# Subtest: la manta conserva 9/12 aunque falte el primer ciclo en la base
+ok 79 - la manta conserva 9/12 aunque falte el primer ciclo en la base
+  ---
+  duration_ms: 1.101869
+  type: 'test'
+  ...
+# Subtest: la lista de compras muestra saldo y progreso del último documento verificado
+ok 80 - la lista de compras muestra saldo y progreso del último documento verificado
+  ---
+  duration_ms: 1.657787
+  type: 'test'
+  ...
+# Subtest: los resúmenes mensuales usan la cuota verificada y terminan en el ciclo 12
+ok 81 - los resúmenes mensuales usan la cuota verificada y terminan en el ciclo 12
+  ---
+  duration_ms: 2.638477
+  type: 'test'
+  ...
+# Subtest: referencias inválidas se ignoran; varios cortes siguen la referencia más reciente
+ok 82 - referencias inválidas se ignoran; varios cortes siguen la referencia más reciente
+  ---
+  duration_ms: 1.350188
+  type: 'test'
+  ...
+# Subtest: solo oculta la ocurrencia seleccionada durante el mes de confirmación
+ok 83 - solo oculta la ocurrencia seleccionada durante el mes de confirmación
+  ---
+  duration_ms: 2.039118
+  type: 'test'
+  ...
+# Subtest: un corte oculto no oculta el pago y los cambios de importe/fecha lo hacen reaparecer
+ok 84 - un corte oculto no oculta el pago y los cambios de importe/fecha lo hacen reaparecer
+  ---
+  duration_ms: 0.44548
+  type: 'test'
+  ...
+# Subtest: los avisos desconocidos o inválidos no se pueden ocultar
+ok 85 - los avisos desconocidos o inválidos no se pueden ocultar
+  ---
+  duration_ms: 0.348359
+  type: 'test'
+  ...
+# Subtest: la API exige sesión validada e ignora userId del cliente
+ok 86 - la API exige sesión validada e ignora userId del cliente
+  ---
+  duration_ms: 3.899895
+  type: 'test'
+  ...
+# Subtest: ocultar y recuperar son idempotentes y no aceptan identidades inválidas
+ok 87 - ocultar y recuperar son idempotentes y no aceptan identidades inválidas
+  ---
+  duration_ms: 1.894847
+  type: 'test'
+  ...
+# Subtest: cobros API: exige sesión y obtiene el usuario del token
+ok 88 - cobros API: exige sesión y obtiene el usuario del token
+  ---
+  duration_ms: 5.012853
+  type: 'test'
+  ...
+# Subtest: cobros API: rechaza meses, días y cuerpos inválidos antes de escribir
+ok 89 - cobros API: rechaza meses, días y cuerpos inválidos antes de escribir
+  ---
+  duration_ms: 1.032639
+  type: 'test'
+  ...
+# Subtest: cobros: transacción, concurrencia, omisión, restauración, evidencia y aislamiento
+ok 90 - cobros: transacción, concurrencia, omisión, restauración, evidencia y aislamiento # SKIP
+  ---
+  duration_ms: 0.542079
+  type: 'test'
+  ...
+# Subtest: aparece el día del cobro, sin generar gastos ni modificar los datos
+ok 91 - aparece el día del cobro, sin generar gastos ni modificar los datos
+  ---
+  duration_ms: 1.460518
+  type: 'test'
+  ...
+# Subtest: frecuencia, inicio, años y último día del mes
+ok 92 - frecuencia, inicio, años y último día del mes
+  ---
+  duration_ms: 0.21921
+  type: 'test'
+  ...
+# Subtest: desactivar conserva los cobros hasta el día de baja
+ok 93 - desactivar conserva los cobros hasta el día de baja
+  ---
+  duration_ms: 0.20693
+  type: 'test'
+  ...
+# Subtest: un gasto vinculado sustituye automáticamente el previsto
+ok 94 - un gasto vinculado sustituye automáticamente el previsto
+  ---
+  duration_ms: 0.18593
+  type: 'test'
+  ...
+# Subtest: la decisión identifica el período aunque el gasto se contabilice en otro mes
+ok 95 - la decisión identifica el período aunque el gasto se contabilice en otro mes
+  ---
+  duration_ms: 0.263799
+  type: 'test'
+  ...
+# Subtest: omitir afecta solo ese mes y borrar el gasto confirmado devuelve el pendiente
+ok 96 - omitir afecta solo ese mes y borrar el gasto confirmado devuelve el pendiente
+  ---
+  duration_ms: 0.817139
+  type: 'test'
+  ...
+# Subtest: evidencia bancaria válida reconoce el cobro sin crear otro gasto
+ok 97 - evidencia bancaria válida reconoce el cobro sin crear otro gasto
+  ---
+  duration_ms: 0.443209
+  type: 'test'
+  ...
+# Subtest: rechaza fechas y meses inválidos
+ok 98 - rechaza fechas y meses inválidos
+  ---
+  duration_ms: 0.12967
+  type: 'test'
+  ...
+# Subtest: descuento temporal concilia ambas rutas sin cambiar la tarifa ni duplicar cargos
+ok 99 - descuento temporal concilia ambas rutas sin cambiar la tarifa ni duplicar cargos
+  ---
+  duration_ms: 2.027497
+  type: 'test'
+  ...
+# Subtest: otros cortes y otra suscripción conservan su importe
+ok 100 - otros cortes y otra suscripción conservan su importe
+  ---
+  duration_ms: 0.260619
+  type: 'test'
+  ...
+# Subtest: evidencia histórica solo de consumo mínimo no cambia cálculos financieros
+ok 101 - evidencia histórica solo de consumo mínimo no cambia cálculos financieros
+  ---
+  duration_ms: 0.12822
+  type: 'test'
+  ...
+# Subtest: rechaza referencias inválidas, fechas imposibles e importes que no son cargos
+ok 102 - rechaza referencias inválidas, fechas imposibles e importes que no son cargos
+  ---
+  duration_ms: 0.336789
+  type: 'test'
+  ...
+# Subtest: no colapsa cargos múltiples ambiguos del mismo mes
+ok 103 - no colapsa cargos múltiples ambiguos del mismo mes
+  ---
+  duration_ms: 0.16198
+  type: 'test'
+  ...
+# Subtest: la baja de una suscripción conserva las reglas de inclusión del corte
+ok 104 - la baja de una suscripción conserva las reglas de inclusión del corte
+  ---
+  duration_ms: 0.2839
+  type: 'test'
+  ...
+1..104
+# tests 104
+# suites 0
+# pass 103
+# fail 0
+# cancelled 0
+# skipped 1
+# todo 0
+# duration_ms 114.822664

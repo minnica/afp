@@ -1,5 +1,7 @@
 "use client";
 
+import { apiFetch } from "@/lib/apiFetch";
+
 import { toast } from "@/components/ui/sonner";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { FloppyDiskIcon } from "@hugeicons/core-free-icons";
@@ -60,7 +62,7 @@ export default function SettingsContent() {
   const [error, setError] = useState("");
 
   async function loadSettings(userId) {
-    const response = await fetch(`/api/settings?userId=${userId}`);
+    const response = await apiFetch(`/api/settings?userId=${userId}`);
 
     if (!response.ok) {
       throw new Error("No se pudo cargar configuración.");
@@ -132,8 +134,8 @@ export default function SettingsContent() {
         payload.name = incomeTypeName;
       }
 
-      const response = await fetch("/api/settings", {
-        method: "POST",
+      const response = await apiFetch("/api/settings", {
+        method: "POST", expectedUserId: user?.id,
         headers: {
           "Content-Type": "application/json",
         },
@@ -177,8 +179,8 @@ export default function SettingsContent() {
     setError("");
 
     try {
-      const response = await fetch(`/api/settings?type=${type}&id=${id}`, {
-        method: "DELETE",
+      const response = await apiFetch(`/api/settings?type=${type}&id=${id}`, {
+        method: "DELETE", expectedUserId: user?.id,
       });
 
       const data = await response.json();

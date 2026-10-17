@@ -1,5 +1,7 @@
 "use client";
 
+import { apiFetch } from "@/lib/apiFetch";
+
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowLeft02Icon, Cancel01Icon, CheckmarkCircle02Icon, MoreHorizontalIcon, RepeatIcon, Tick02Icon } from "@hugeicons/core-free-icons";
@@ -21,7 +23,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useDashboard } from "@/components/dashboard/DashboardProvider";
-import { supabase } from "@/lib/supabase";
 import { validChargeDay, validChargeMonth } from "@/lib/subscriptionCharges";
 
 const money = value => new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" }).format(value);
@@ -87,12 +88,11 @@ export default function SubscriptionCharges({ userId, isOnline, onChanged, refre
   const scope = `${userId}:${month}`;
 
   const request = useCallback(async (body, signal) => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session || session.user.id !== userId) throw new Error("Vuelve a iniciar sesión para consultar tus cobros.");
     const params = new URLSearchParams({ month, today: localDay() });
-    const response = await fetch(`/api/subscription-charges${body ? "" : `?${params}`}`, {
+    const response = await apiFetch(`/api/subscription-charges${body ? "" : `?${params}`}`, {
+      expectedUserId: userId,
       method: body ? "POST" : "GET", cache: "no-store", signal,
-      headers: { Authorization: `Bearer ${session.access_token}`, "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json" },
       ...(body ? { body: JSON.stringify({ ...body, month, today: localDay() }) } : {}),
     });
     const result = await response.json();

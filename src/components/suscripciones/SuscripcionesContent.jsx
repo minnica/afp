@@ -1,5 +1,7 @@
 "use client";
 
+import { apiFetch } from "@/lib/apiFetch";
+
 import { useCreationDraft } from "@/hooks/use-creation-draft";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -148,9 +150,9 @@ export default function SuscripcionesContent() {
   async function loadInitialData(userId) {
     const [settingsResponse, cardsResponse, subscriptionsResponse] =
       await Promise.all([
-        fetch(`/api/settings?userId=${userId}`),
-        fetch(`/api/cards?userId=${userId}`),
-        fetch(`/api/subscriptions?userId=${userId}`),
+        apiFetch(`/api/settings?userId=${userId}`),
+        apiFetch(`/api/cards?userId=${userId}`),
+        apiFetch(`/api/subscriptions?userId=${userId}`),
       ]);
 
     const settingsData = await settingsResponse.json();
@@ -179,7 +181,7 @@ export default function SuscripcionesContent() {
   }
 
   async function loadSubscriptions(userId) {
-    const response = await fetch(`/api/subscriptions?userId=${userId}`);
+    const response = await apiFetch(`/api/subscriptions?userId=${userId}`);
     const data = await response.json();
 
     if (!response.ok) {
@@ -225,8 +227,8 @@ export default function SuscripcionesContent() {
 
     let saved = false;
     try {
-      const response = await fetch("/api/subscriptions", {
-        method: "POST",
+      const response = await apiFetch("/api/subscriptions", {
+        method: "POST", expectedUserId: user?.id,
         headers: {
           "Content-Type": "application/json",
         },
@@ -308,8 +310,8 @@ export default function SuscripcionesContent() {
     setIsUpdating(true);
 
     try {
-      const response = await fetch("/api/subscriptions", {
-        method: "PATCH",
+      const response = await apiFetch("/api/subscriptions", {
+        method: "PATCH", expectedUserId: user?.id,
         headers: {
           "Content-Type": "application/json",
         },
@@ -364,8 +366,8 @@ export default function SuscripcionesContent() {
     setIsToggling(true);
 
     try {
-      const response = await fetch("/api/subscriptions", {
-        method: "PATCH",
+      const response = await apiFetch("/api/subscriptions", {
+        method: "PATCH", expectedUserId: user?.id,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           id: subscriptionToDeactivate.id,
@@ -400,8 +402,8 @@ export default function SuscripcionesContent() {
     setIsToggling(true);
 
     try {
-      const response = await fetch("/api/subscriptions", {
-        method: "PATCH",
+      const response = await apiFetch("/api/subscriptions", {
+        method: "PATCH", expectedUserId: user?.id,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           id: subscription.id,
@@ -431,8 +433,8 @@ export default function SuscripcionesContent() {
     setError("");
 
     try {
-      const response = await fetch(`/api/subscriptions?id=${id}`, {
-        method: "DELETE",
+      const response = await apiFetch(`/api/subscriptions?id=${id}`, {
+        method: "DELETE", expectedUserId: user?.id,
       });
 
       const data = await response.json();

@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { apiResponse as NextResponse, requireApiUser, apiAccessErrorResponse } from "@/lib/apiAuth";
 import { prisma } from "@/lib/prisma";
 
 const expenseSelect = {
@@ -204,14 +204,12 @@ function formatPayable(item) {
 
 export async function GET(request) {
   try {
+    const user = await requireApiUser(request);
+    const userId = user.id;
     const { searchParams } = new URL(request.url);
-    const userId = searchParams.get("userId");
     const startDate = searchParams.get("startDate");
     const endDate = searchParams.get("endDate");
 
-    if (!userId) {
-      return NextResponse.json({ error: "Falta userId." }, { status: 400 });
-    }
 
     const expensesWhere = { userId };
 
@@ -321,6 +319,8 @@ export async function GET(request) {
       subscriptions,
     });
   } catch (error) {
+    const accessResponse = apiAccessErrorResponse(error);
+    if (accessResponse) return accessResponse;
     console.error("Error loading expenses bootstrap:", error);
 
     return NextResponse.json(

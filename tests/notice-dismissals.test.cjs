@@ -45,7 +45,7 @@ test("los avisos desconocidos o inválidos no se pueden ocultar", () => {
 function api() {
   const entries = [];
   const calls = [];
-  const route = vm.createContext({ URL, Date, Set, JSON, process: { env: {} }, console: { error() {} },
+  const route = vm.createContext({ Headers, URL, Date, Set, JSON, process: { env: {} }, console: { error() {} },
     createClient: () => ({ auth: { getUser: async (token) => ({ data: { user: token === "valid-a" ? { id: "a" } : token === "valid-b" ? { id: "b" } : null }, error: token.startsWith("valid-") ? null : new Error("invalid") }) } }),
     NextResponse: { json: (body, options = {}) => ({ body: plain(body), status: options.status || 200 }) },
     prisma: { noticeDismissal: {
@@ -54,7 +54,7 @@ function api() {
       findMany: async ({ where }) => { calls.push(where); return entries.filter((entry) => entry.userId === where.userId && entry.month === where.month).map(({ month, noticeKey }) => ({ month, noticeKey })); },
     } },
   });
-  vm.runInContext(helpers + "\n" + source("src/app/api/notice-dismissals/route.js"), route);
+  vm.runInContext(source("src/lib/apiAuth.js") + "\n" + helpers + "\n" + source("src/app/api/notice-dismissals/route.js"), route);
   const request = (token, body = {}) => ({ url: "http://localhost/api/notice-dismissals?month=2026-10&userId=b", headers: new Map(token ? [["authorization", `Bearer ${token}`]] : []), json: async () => body });
   return { route, calls, request };
 }

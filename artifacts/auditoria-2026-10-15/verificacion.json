@@ -1,0 +1,44 @@
+{
+  "rls_enabled_tables": 16,
+  "policies": 0,
+  "connection_role": [
+    {
+      "rolsuper": false,
+      "rolbypassrls": true,
+      "owns_expenses": true
+    }
+  ],
+  "applied_migrations": 13,
+  "local_migrations": 12,
+  "database_only_migrations": [
+    "20260518234708_add_payable_loan_support"
+  ],
+  "unauthenticated_http": {
+    "expenses_for_nonexistent_user": 200,
+    "subscription_charges": 401
+  },
+  "browser": {
+    "authenticated": false,
+    "viewports": [
+      [
+        390,
+        844
+      ],
+      [
+        1440,
+        900
+      ]
+    ],
+    "login_input_height": 28,
+    "login_submit_height": 28,
+    "signup_height": 22,
+    "console_errors": 0
+  },
+  "checks": {
+    "tests": 104,
+    "passed": 103,
+    "skipped_local_postgres_integration": 1,
+    "lint": "0 errors, 1 warning: react-hooks/incompatible-library in data-table.jsx:61",
+    "production_build": "passed"
+  }
+}

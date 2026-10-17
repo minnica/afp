@@ -1,5 +1,7 @@
 "use client";
 
+import { apiFetch } from "@/lib/apiFetch";
+
 import { useCreationDraft } from "@/hooks/use-creation-draft";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -160,7 +162,7 @@ export default function CuentasPorCobrarContent() {
   const [filterConcept, setFilterConcept] = useState("");
 
   async function loadSettings(userId) {
-    const response = await fetch(`/api/settings?userId=${userId}`);
+    const response = await apiFetch(`/api/settings?userId=${userId}`);
     const data = await response.json();
 
     if (!response.ok) {
@@ -171,7 +173,7 @@ export default function CuentasPorCobrarContent() {
   }
 
   async function loadReceivables(userId) {
-    const response = await fetch(`/api/receivables?userId=${userId}`);
+    const response = await apiFetch(`/api/receivables?userId=${userId}`);
     const data = await response.json();
 
     if (!response.ok) {
@@ -222,8 +224,8 @@ export default function CuentasPorCobrarContent() {
 
     let saved = false;
     try {
-      const response = await fetch("/api/receivables", {
-        method: "POST",
+      const response = await apiFetch("/api/receivables", {
+        method: "POST", expectedUserId: user?.id,
         headers: {
           "Content-Type": "application/json",
         },
@@ -316,8 +318,8 @@ export default function CuentasPorCobrarContent() {
     setIsUpdating(true);
 
     try {
-      const response = await fetch("/api/receivables", {
-        method: "PATCH",
+      const response = await apiFetch("/api/receivables", {
+        method: "PATCH", expectedUserId: user?.id,
         headers: {
           "Content-Type": "application/json",
         },
@@ -357,8 +359,8 @@ export default function CuentasPorCobrarContent() {
     setError("");
 
     try {
-      const response = await fetch(`/api/receivables?id=${id}`, {
-        method: "DELETE",
+      const response = await apiFetch(`/api/receivables?id=${id}`, {
+        method: "DELETE", expectedUserId: user?.id,
       });
 
       const data = await response.json();

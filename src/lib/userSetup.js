@@ -1,3 +1,5 @@
+
+import { apiFetch } from "@/lib/apiFetch";
 const setupCache = new Set();
 
 export async function ensureUserSetup(user) {
@@ -20,8 +22,9 @@ export async function ensureUserSetup(user) {
     if (navigator.onLine === false) return;
   }
 
-  const response = await fetch("/api/setup-user", {
+  const response = await apiFetch("/api/setup-user", {
     method: "POST",
+    expectedUserId: user.id,
     headers: {
       "Content-Type": "application/json",
     },

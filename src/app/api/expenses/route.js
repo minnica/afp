@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { apiResponse as NextResponse, requireApiUser, apiAccessErrorResponse, requireOwnedReferences } from "@/lib/apiAuth";
 import { prisma } from "@/lib/prisma";
 import { applySubscriptionCharge, SubscriptionChargeError } from "@/lib/subscriptionChargeService";
 
@@ -56,19 +56,19 @@ const expenseSelect = {
   },
 };
 
-async function updatePayableStatusIfNeeded(payableAccountId) {
+async function updatePayableStatusIfNeeded(payableAccountId, userId) {
   if (!payableAccountId) return;
 
   const [payable, paid] = await Promise.all([
     prisma.payableAccount.findUnique({
-      where: { id: payableAccountId },
+      where: { id: payableAccountId, userId },
       select: {
         originalAmount: true,
         status: true,
       },
     }),
     prisma.dailyExpense.aggregate({
-      where: { payableAccountId },
+      where: { payableAccountId, userId },
       _sum: {
         amount: true,
       },
@@ -84,7 +84,7 @@ async function updatePayableStatusIfNeeded(payableAccountId) {
 
   if (payable.status !== nextStatus) {
     await prisma.payableAccount.update({
-      where: { id: payableAccountId },
+      where: { id: payableAccountId, userId },
       data: {
         status: nextStatus,
       },
@@ -125,9 +125,10 @@ function getAvailableMonths(expenseDates) {
 
 export async function GET(request) {
   try {
+    const user = await requireApiUser(request);
+    const userId = user.id;
     const { searchParams } = new URL(request.url);
 
-    const userId = searchParams.get("userId");
     const startDate = searchParams.get("startDate");
     const endDate = searchParams.get("endDate");
     const categoryId = searchParams.get("categoryId");
@@ -136,9 +137,6 @@ export async function GET(request) {
     const concept = searchParams.get("concept");
     const amount = searchParams.get("amount");
 
-    if (!userId) {
-      return NextResponse.json({ error: "Falta userId." }, { status: 400 });
-    }
 
     const where = { userId };
 
@@ -206,6 +204,8 @@ export async function GET(request) {
       availableMonths: getAvailableMonths(expenseDates),
     });
   } catch (error) {
+    const accessResponse = apiAccessErrorResponse(error);
+    if (accessResponse) return accessResponse;
     console.error("Error loading expenses:", error);
 
     return NextResponse.json(
@@ -217,10 +217,12 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
+    const user = await requireApiUser(request);
+    const userId = user.id;
     const body = await request.json();
+    await requireOwnedReferences(prisma, userId, body, ["cardId", "categoryId", "personId", "receivableAccountId", "payableAccountId", "subscriptionId"]);
 
     const {
-      userId,
       date,
       paymentMethod,
       cardId,
@@ -288,8 +290,8 @@ export async function POST(request) {
           notes: notes?.trim() || null, personId: personId || null,
           receivableAccountId: finalReceivableAccountId, payableAccountId: payableAccountId || null },
       }));
-      const expense = await prisma.dailyExpense.findUnique({ where: { id: result.expenseId }, select: expenseSelect });
-      if (payableAccountId) await updatePayableStatusIfNeeded(payableAccountId);
+      const expense = await prisma.dailyExpense.findUnique({ where: { id: result.expenseId, userId }, select: expenseSelect });
+      if (payableAccountId) await updatePayableStatusIfNeeded(payableAccountId, userId);
       return NextResponse.json({ expense, alreadyConfirmed: result.alreadyConfirmed });
     }
 
@@ -328,11 +330,13 @@ export async function POST(request) {
     });
 
     if (payableAccountId) {
-      await updatePayableStatusIfNeeded(payableAccountId);
+      await updatePayableStatusIfNeeded(payableAccountId, userId);
     }
 
     return NextResponse.json({ expense });
   } catch (error) {
+    const accessResponse = apiAccessErrorResponse(error);
+    if (accessResponse) return accessResponse;
     if (error instanceof SubscriptionChargeError) return NextResponse.json({ error: error.message }, { status: error.status });
     console.error("Error creating expense:", error);
 
@@ -345,6 +349,8 @@ export async function POST(request) {
 
 export async function DELETE(request) {
   try {
+    const user = await requireApiUser(request);
+    const userId = user.id;
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
 
@@ -353,7 +359,7 @@ export async function DELETE(request) {
     }
 
     const existingExpense = await prisma.dailyExpense.findUnique({
-      where: { id },
+      where: { id, userId },
     });
 
     if (!existingExpense) {
@@ -366,15 +372,17 @@ export async function DELETE(request) {
     const previousPayableAccountId = existingExpense.payableAccountId;
 
     await prisma.dailyExpense.delete({
-      where: { id },
+      where: { id, userId },
     });
 
     if (previousPayableAccountId) {
-      await updatePayableStatusIfNeeded(previousPayableAccountId);
+      await updatePayableStatusIfNeeded(previousPayableAccountId, userId);
     }
 
     return NextResponse.json({ ok: true });
   } catch (error) {
+    const accessResponse = apiAccessErrorResponse(error);
+    if (accessResponse) return accessResponse;
     console.error("Error deleting expense:", error);
 
     return NextResponse.json(
@@ -386,7 +394,10 @@ export async function DELETE(request) {
 
 export async function PATCH(request) {
   try {
+    const user = await requireApiUser(request);
+    const userId = user.id;
     const body = await request.json();
+    await requireOwnedReferences(prisma, userId, body, ["cardId", "categoryId", "personId", "receivableAccountId", "payableAccountId", "subscriptionId"]);
 
     const {
       id,
@@ -441,28 +452,28 @@ export async function PATCH(request) {
     }
 
     const expense = await prisma.$transaction(async tx => {
-      const existing = await tx.dailyExpense.findUnique({ where: { id } });
+      const existing = await tx.dailyExpense.findUnique({ where: { id, userId } });
       if (!existing) throw new SubscriptionChargeError("Gasto no encontrado.", 404);
       for (const linkedId of [...new Set([existing.subscriptionId, subscriptionId].filter(Boolean))].sort()) {
         const rows = await tx.$queryRaw`SELECT "id" FROM "subscriptions" WHERE "id" = ${linkedId} AND "userId" = ${existing.userId} FOR UPDATE`;
         if (!rows.length) throw new SubscriptionChargeError("La suscripción no está disponible.", 404);
       }
-      const linkedCharge = await tx.subscriptionCharge.findUnique({ where: { expenseId: id } });
+      const linkedCharge = await tx.subscriptionCharge.findUnique({ where: { expenseId: id, userId } });
       if (linkedCharge && subscriptionId !== linkedCharge.subscriptionId) {
         throw new SubscriptionChargeError("Este gasto confirma una suscripción. Conserva su vínculo al editarlo.");
       }
       if (subscriptionId) {
         const month = linkedCharge?.month || date.slice(0, 7);
-        const decision = await tx.subscriptionCharge.findUnique({ where: { subscriptionId_month: { subscriptionId, month } } });
+        const decision = await tx.subscriptionCharge.findUnique({ where: { subscriptionId_month: { subscriptionId, month }, userId } });
         if (decision?.status === "SKIPPED") throw new SubscriptionChargeError("Restaura el cobro omitido antes de vincularlo.", 409);
-        const candidates = await tx.dailyExpense.findMany({ where: { subscriptionId, id: { not: id } },
+        const candidates = await tx.dailyExpense.findMany({ where: { subscriptionId, userId, id: { not: id } },
           select: { date: true, subscriptionCharge: { select: { month: true } } } });
         if (candidates.some(item => (item.subscriptionCharge?.month || item.date.toISOString().slice(0, 7)) === month)) {
           throw new SubscriptionChargeError("Ya existe un gasto para esta suscripción y mes.", 409);
         }
       }
       return tx.dailyExpense.update({
-        where: { id },
+        where: { id, userId },
         data: {
           date: parsedDate, paymentMethod, cardId: paymentMethod === "CARD" ? cardId : null,
           concept: concept.trim(), amount: numericAmount, categoryId, notes: notes?.trim() || null,
@@ -474,6 +485,8 @@ export async function PATCH(request) {
 
     return NextResponse.json({ expense });
   } catch (error) {
+    const accessResponse = apiAccessErrorResponse(error);
+    if (accessResponse) return accessResponse;
     if (error instanceof SubscriptionChargeError) return NextResponse.json({ error: error.message }, { status: error.status });
     console.error("Error updating expense:", error);
 

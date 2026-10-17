@@ -1,5 +1,7 @@
 "use client";
 
+import { apiFetch } from "@/lib/apiFetch";
+
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
@@ -63,7 +65,7 @@ export function DashboardProvider({ children }) {
           if (request.controller.signal.aborted) return;
           const requestDate = new Date();
           const params = new URLSearchParams({ userId, clientDate: requestDate.toLocaleDateString("en-CA") });
-          const response = await fetch(`/api/dashboard?${params}`, { signal: request.controller.signal });
+          const response = await apiFetch(`/api/dashboard?${params}`, { signal: request.controller.signal });
           const dashboard = await response.json();
           if (!response.ok) throw new Error(dashboard.error || "No se pudo cargar la información.");
           if (!request.controller.signal.aborted) {

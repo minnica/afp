@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { apiResponse as NextResponse, requireApiUser, apiAccessErrorResponse, requireOwnedReferences } from "@/lib/apiAuth";
 import { prisma } from "@/lib/prisma";
 
 const subscriptionSelect = {
@@ -33,12 +33,8 @@ const subscriptionSelect = {
 
 export async function GET(request) {
   try {
-    const { searchParams } = new URL(request.url);
-    const userId = searchParams.get("userId");
-
-    if (!userId) {
-      return NextResponse.json({ error: "Falta userId." }, { status: 400 });
-    }
+    const user = await requireApiUser(request);
+    const userId = user.id;
 
     const subscriptions = await prisma.subscription.findMany({
       where: { userId },
@@ -52,6 +48,8 @@ export async function GET(request) {
 
     return NextResponse.json({ subscriptions, total });
   } catch (error) {
+    const accessResponse = apiAccessErrorResponse(error);
+    if (accessResponse) return accessResponse;
     console.error("Error loading subscriptions:", error);
 
     return NextResponse.json(
@@ -63,10 +61,12 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
+    const user = await requireApiUser(request);
+    const userId = user.id;
     const body = await request.json();
+    await requireOwnedReferences(prisma, userId, body, ["cardId", "categoryId"]);
 
     const {
-      userId,
       name,
       amount,
       paymentMethod,
@@ -178,6 +178,8 @@ export async function POST(request) {
 
     return NextResponse.json({ subscription });
   } catch (error) {
+    const accessResponse = apiAccessErrorResponse(error);
+    if (accessResponse) return accessResponse;
     console.error("Error creating subscription:", error);
 
     return NextResponse.json(
@@ -189,6 +191,8 @@ export async function POST(request) {
 
 export async function DELETE(request) {
   try {
+    const user = await requireApiUser(request);
+    const userId = user.id;
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
 
@@ -197,11 +201,13 @@ export async function DELETE(request) {
     }
 
     await prisma.subscription.delete({
-      where: { id },
+      where: { id, userId },
     });
 
     return NextResponse.json({ ok: true });
   } catch (error) {
+    const accessResponse = apiAccessErrorResponse(error);
+    if (accessResponse) return accessResponse;
     console.error("Error deleting subscription:", error);
 
     return NextResponse.json(
@@ -213,7 +219,10 @@ export async function DELETE(request) {
 
 export async function PATCH(request) {
   try {
+    const user = await requireApiUser(request);
+    const userId = user.id;
     const body = await request.json();
+    await requireOwnedReferences(prisma, userId, body, ["cardId", "categoryId"]);
 
     const {
       id,
@@ -249,7 +258,7 @@ export async function PATCH(request) {
       }
 
       const subscription = await prisma.subscription.update({
-        where: { id },
+        where: { id, userId },
         data,
         select: subscriptionSelect,
       });
@@ -333,7 +342,7 @@ export async function PATCH(request) {
     }
 
     const subscription = await prisma.subscription.update({
-      where: { id },
+      where: { id, userId },
       data: {
         name: name.trim(),
         amount: numericAmount,
@@ -350,6 +359,8 @@ export async function PATCH(request) {
 
     return NextResponse.json({ subscription });
   } catch (error) {
+    const accessResponse = apiAccessErrorResponse(error);
+    if (accessResponse) return accessResponse;
     console.error("Error updating subscription:", error);
 
     return NextResponse.json(
