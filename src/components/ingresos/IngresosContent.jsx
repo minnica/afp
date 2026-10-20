@@ -146,8 +146,8 @@ export default function IngresosContent() {
     setIncomeTypes(data.incomeTypes || []);
   }
 
-  async function loadReceivables(userId) {
-    const response = await apiFetch(`/api/receivables?userId=${userId}`);
+  async function loadReceivables(userId, { mutationCompleted = false } = {}) {
+    const response = await apiFetch(`/api/receivables?userId=${userId}`, { mutationCompleted });
     const data = await response.json();
 
     if (!response.ok) {
@@ -163,8 +163,8 @@ export default function IngresosContent() {
     setReceivables(data.receivables || []);
   }
 
-  async function loadIncomes(userId) {
-    const response = await apiFetch(`/api/incomes?userId=${userId}`);
+  async function loadIncomes(userId, { mutationCompleted = false } = {}) {
+    const response = await apiFetch(`/api/incomes?userId=${userId}`, { mutationCompleted });
     const data = await response.json();
 
     if (!response.ok) {
@@ -245,7 +245,7 @@ export default function IngresosContent() {
       setReceivableAccountId("NONE");
       setNotes("");
 
-      await Promise.all([loadIncomes(user.id), loadReceivables(user.id)]);
+      await Promise.all([loadIncomes(user.id, { mutationCompleted: true }), loadReceivables(user.id, { mutationCompleted: true })]);
       if (!compactEntry) toast.success("Ingreso guardado exitosamente.");
       return { message: "Ingreso guardado exitosamente.", type: "success" };
     } catch (err) {
@@ -327,7 +327,7 @@ export default function IngresosContent() {
 
       cancelEditingIncome();
 
-      await Promise.all([loadIncomes(user.id), loadReceivables(user.id)]);
+      await Promise.all([loadIncomes(user.id, { mutationCompleted: true }), loadReceivables(user.id, { mutationCompleted: true })]);
     } catch (err) {
       setError(err.message || "No se pudo actualizar el ingreso.");
     } finally {
@@ -352,7 +352,7 @@ export default function IngresosContent() {
         throw new Error(data.error || "No se pudo eliminar.");
       }
 
-      await Promise.all([loadIncomes(user.id), loadReceivables(user.id)]);
+      await Promise.all([loadIncomes(user.id, { mutationCompleted: true }), loadReceivables(user.id, { mutationCompleted: true })]);
     } catch (err) {
       setError(err.message || "No se pudo eliminar el ingreso.");
     }

@@ -91,6 +91,7 @@ export default function SubscriptionCharges({ userId, isOnline, onChanged, refre
     const params = new URLSearchParams({ month, today: localDay() });
     const response = await apiFetch(`/api/subscription-charges${body ? "" : `?${params}`}`, {
       expectedUserId: userId,
+      errorMode: body ? "dialog" : "inline",
       method: body ? "POST" : "GET", cache: "no-store", signal,
       headers: { "Content-Type": "application/json" },
       ...(body ? { body: JSON.stringify({ ...body, month, today: localDay() }) } : {}),

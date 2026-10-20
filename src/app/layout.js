@@ -2,6 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import { ServiceWorkerRegistration } from "@/components/pwa/ServiceWorkerRegistration";
 import { DashboardProvider } from "@/components/dashboard/DashboardProvider";
+import { RequestErrorDialog } from "@/components/ui/request-error-dialog";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -39,6 +40,7 @@ export default function RootLayout({ children }) {
       <body className="min-h-full flex flex-col">
         <ServiceWorkerRegistration />
         <DashboardProvider>{children}</DashboardProvider>
+        <RequestErrorDialog />
         <Toaster richColors position="bottom-center" />
       </body>
     </html>

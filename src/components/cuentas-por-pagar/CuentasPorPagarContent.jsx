@@ -164,8 +164,8 @@ export default function CuentasPorPagarContent() {
     setPeople(data.people || []);
   }
 
-  async function loadPayables(userId) {
-    const response = await apiFetch(`/api/payables?userId=${userId}`);
+  async function loadPayables(userId, { mutationCompleted = false } = {}) {
+    const response = await apiFetch(`/api/payables?userId=${userId}`, { mutationCompleted });
     const data = await response.json();
 
     if (!response.ok) {
@@ -244,7 +244,7 @@ export default function CuentasPorPagarContent() {
       setExpectedDate("");
       setNotes("");
 
-      await loadPayables(user.id);
+      await loadPayables(user.id, { mutationCompleted: true });
       if (!compactEntry) toast.success("Cuenta por pagar guardada exitosamente.");
       return { message: "Cuenta por pagar guardada exitosamente.", type: "success" };
     } catch (err) {
@@ -319,7 +319,7 @@ export default function CuentasPorPagarContent() {
       }
 
       cancelEditingPayable();
-      await loadPayables(user.id);
+      await loadPayables(user.id, { mutationCompleted: true });
       toast.success("Cambios guardados exitosamente.");
     } catch (err) {
       setError(err.message || "No se pudo actualizar la cuenta por pagar.");
@@ -346,7 +346,7 @@ export default function CuentasPorPagarContent() {
       }
 
       setPayableToDelete(null);
-      await loadPayables(user.id);
+      await loadPayables(user.id, { mutationCompleted: true });
       toast.success("Cuenta por pagar eliminada exitosamente.");
     } catch (err) {
       setError(err.message || "No se pudo eliminar la cuenta por pagar.");

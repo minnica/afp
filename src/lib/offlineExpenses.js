@@ -128,13 +128,15 @@ async function settleExpense(userId, clientId, error) {
   notifyChanges(userId, !error);
 }
 
-async function synchronize(userId, onlyClientId) {
+async function synchronize(userId, onlyClientId, errorMode) {
   const queued = await readOfflineExpenses(userId);
   const syncedExpenses = [];
   const confirmations = [];
   for (const entry of queued.filter(row => !onlyClientId || row.clientId === onlyClientId)) {
     try {
       const response = await apiFetch("/api/expenses", {
+        errorMode,
+        recoveryHint: "Tu gasto está guardado aquí, pendiente de enviar.",
         method: "POST", expectedUserId: userId,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(entry.payload),
@@ -152,8 +154,8 @@ async function synchronize(userId, onlyClientId) {
   return { syncedExpenses, confirmations, failedExpenses: await readOfflineExpenses(userId) };
 }
 
-export async function syncOfflineExpenses(userId, { onlyClientId } = {}) {
-  const run = () => synchronize(userId, onlyClientId);
+export async function syncOfflineExpenses(userId, { onlyClientId, errorMode = "inline" } = {}) {
+  const run = () => synchronize(userId, onlyClientId, errorMode);
   if (typeof navigator !== "undefined" && navigator.locks) {
     return navigator.locks.request(`${DATABASE}:${userId}`, run);
   }

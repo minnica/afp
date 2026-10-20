@@ -61,11 +61,15 @@ export function DashboardProvider({ children }) {
 
       request.promise = (async () => {
         try {
-          await ensureUserSetup(session.user);
+          const errorMode = options.silent || (pathname !== "/dashboard" && pathname !== "/analisis") ? "inline" : "dialog";
+          await ensureUserSetup(session.user, { errorMode });
           if (request.controller.signal.aborted) return;
           const requestDate = new Date();
           const params = new URLSearchParams({ userId, clientDate: requestDate.toLocaleDateString("en-CA") });
-          const response = await apiFetch(`/api/dashboard?${params}`, { signal: request.controller.signal });
+          const response = await apiFetch(`/api/dashboard?${params}`, {
+            signal: request.controller.signal,
+            errorMode,
+          });
           const dashboard = await response.json();
           if (!response.ok) throw new Error(dashboard.error || "No se pudo cargar la información.");
           if (!request.controller.signal.aborted) {
@@ -86,7 +90,7 @@ export function DashboardProvider({ children }) {
         setState((previous) => ({ ...previous, isLoading: false, error: err.message || "No se pudo cargar la información." }));
       }
     }
-  }, [router]);
+  }, [router, pathname]);
 
   useEffect(() => {
     if (!appRoutes.has(pathname) || (!mobile && pathname !== "/dashboard" && pathname !== "/analisis")) return;
@@ -94,7 +98,7 @@ export function DashboardProvider({ children }) {
     nextDay.setHours(24, 0, 0, 0);
     const timer = window.setTimeout(() => {
       setToday(new Date());
-      refresh();
+      refresh({ silent: true });
     }, nextDay.getTime() - Date.now() + 100);
     return () => window.clearTimeout(timer);
   }, [pathname, mobile, today, refresh]);
@@ -105,7 +109,7 @@ export function DashboardProvider({ children }) {
       loadedRouteRef.current = pathname;
       refresh();
     }
-    const onFocus = () => { if (document.visibilityState === "visible") refresh(); };
+    const onFocus = () => { if (document.visibilityState === "visible") refresh({ silent: true }); };
     window.addEventListener("focus", onFocus);
     window.addEventListener("online", onFocus);
     document.addEventListener("visibilitychange", onFocus);

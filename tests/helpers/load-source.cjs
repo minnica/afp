@@ -22,7 +22,10 @@ function sourceLoader(mocks = {}, globals = {}) {
     });
     const exported = [...source.matchAll(/^export (?:async )?(?:function|class|const) (\w+)/gm)].map(match => match[1]);
     source = source.replace(/^export /gm, "");
-    const context = vm.createContext({ URL, Headers, Date, console, process: { env: {} }, ...globals, ...bindings });
+    const context = vm.createContext({
+      URL, Headers, Date, AbortController, DOMException, setTimeout, clearTimeout,
+      console, process: { env: {} }, ...globals, ...bindings,
+    });
     const result = vm.runInContext(`${source}\n;({${exported.join(",")}})`, context, { filename: full });
     cache.set(full, result);
     return result;

@@ -79,15 +79,15 @@ export default function TarjetasContent() {
   const [editCardNotes, setEditCardNotes] = useState("");
   const [isUpdatingCard, setIsUpdatingCard] = useState(false);
 
-  async function loadCards(userId) {
-    const response = await apiFetch(`/api/cards?userId=${userId}`);
+  async function loadCards(userId, { mutationCompleted = false } = {}) {
+    const response = await apiFetch(`/api/cards?userId=${userId}`, { mutationCompleted });
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || "No se pudieron cargar las tarjetas.");
     setCards(data.cards || []);
   }
 
-  async function loadCycles(userId) {
-    const response = await apiFetch(`/api/card-cycles?userId=${userId}`);
+  async function loadCycles(userId, { mutationCompleted = false } = {}) {
+    const response = await apiFetch(`/api/card-cycles?userId=${userId}`, { mutationCompleted });
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || "No se pudieron cargar los ciclos.");
     setCycles(data.cycles || []);
@@ -154,7 +154,7 @@ export default function TarjetasContent() {
       setUsualCutDay("");
       setUsualDueDay("");
       setNotes("");
-      await Promise.all([loadCards(user.id), loadCycles(user.id)]);
+      await Promise.all([loadCards(user.id, { mutationCompleted: true }), loadCycles(user.id, { mutationCompleted: true })]);
       toast.success("Tarjeta guardada exitosamente.");
       return true;
     } catch (err) {
@@ -205,7 +205,7 @@ export default function TarjetasContent() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "No se pudo actualizar la tarjeta.");
       cancelEditingCard();
-      await Promise.all([loadCards(user.id), loadCycles(user.id)]);
+      await Promise.all([loadCards(user.id, { mutationCompleted: true }), loadCycles(user.id, { mutationCompleted: true })]);
     } catch (err) {
       setError(err.message || "No se pudo actualizar la tarjeta.");
     } finally {
@@ -220,7 +220,7 @@ export default function TarjetasContent() {
       const response = await apiFetch(`/api/cards?id=${id}`, { method: "DELETE", expectedUserId: user?.id });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "No se pudo eliminar la tarjeta.");
-      await Promise.all([loadCards(user.id), loadCycles(user.id)]);
+      await Promise.all([loadCards(user.id, { mutationCompleted: true }), loadCycles(user.id, { mutationCompleted: true })]);
     } catch (err) {
       setError(err.message || "No se pudo eliminar la tarjeta.");
     }
@@ -241,7 +241,7 @@ export default function TarjetasContent() {
     // Retira o actualiza el aviso del encabezado con una lectura posterior al PATCH.
     await refreshDashboard({ force: true });
     try {
-      await loadCycles(user.id);
+      await loadCycles(user.id, { mutationCompleted: true });
     } catch {
       setError("El cambio se guardó, pero no se pudo actualizar el listado. Recarga para consultar los cálculos.");
     }
@@ -275,7 +275,7 @@ export default function TarjetasContent() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "No se pudo deshacer el pago.");
       await refreshDashboard({ force: true });
-      await loadCycles(user.id);
+      await loadCycles(user.id, { mutationCompleted: true });
     } catch (err) {
       setError(err.message || "No se pudo deshacer el pago.");
     }

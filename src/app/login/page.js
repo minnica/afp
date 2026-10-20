@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { ensureUserSetup } from "@/lib/userSetup";
+import { RequestError } from "@/lib/requestErrors";
+import { getRecoveryScope, recoverRequest } from "@/lib/requestRecovery";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,6 +26,8 @@ export default function LoginPage() {
 
   async function handleSubmit(event) {
     event.preventDefault();
+    if (isLoading) return;
+    const requestScope = getRecoveryScope();
 
     setIsLoading(true);
     setMessage("");
@@ -31,12 +35,27 @@ export default function LoginPage() {
 
     try {
       if (mode === "login") {
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-
-        if (error) throw error;
+        const signIn = async () => {
+          const result = await supabase.auth.signInWithPassword({ email, password });
+          if (result.error) {
+            if (!result.error.status || result.error.status >= 500 || result.error.status === 429) {
+              throw new RequestError("Revisa tu conexión e inténtalo de nuevo.", {
+                title: "No pudimos iniciar sesión", retryable: true,
+              });
+            }
+            throw new Error(result.error.code === "invalid_credentials"
+              ? "El correo o la contraseña no son correctos." : result.error.message);
+          }
+          return result;
+        };
+        let result;
+        try {
+          result = await signIn();
+        } catch (error) {
+          if (!error.retryable) throw error;
+          result = await recoverRequest(error, signIn, { requestScope });
+        }
+        const { data } = result;
 
         await ensureUserSetup(data.user);
 
@@ -85,6 +104,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
                 required
+                disabled={isLoading}
               />
             </div>
 
@@ -98,6 +118,7 @@ export default function LoginPage() {
                 onChange={(event) => setPassword(event.target.value)}
                 required
                 minLength={6}
+                disabled={isLoading}
               />
             </div>
 
@@ -131,6 +152,7 @@ export default function LoginPage() {
                   type="button"
                   variant="link"
                   className="h-auto p-0 text-sm"
+                  disabled={isLoading}
                   onClick={() => {
                     setMode("register");
                     setError("");
@@ -147,6 +169,7 @@ export default function LoginPage() {
                   type="button"
                   variant="link"
                   className="h-auto p-0 text-sm"
+                  disabled={isLoading}
                   onClick={() => {
                     setMode("login");
                     setError("");

@@ -180,8 +180,8 @@ export default function SuscripcionesContent() {
     setSubscriptions(subscriptionsData.subscriptions || []);
   }
 
-  async function loadSubscriptions(userId) {
-    const response = await apiFetch(`/api/subscriptions?userId=${userId}`);
+  async function loadSubscriptions(userId, { mutationCompleted = false } = {}) {
+    const response = await apiFetch(`/api/subscriptions?userId=${userId}`, { mutationCompleted });
     const data = await response.json();
 
     if (!response.ok) {
@@ -257,7 +257,7 @@ export default function SuscripcionesContent() {
       setAmount("");
       setChargeDay("");
 
-      await loadSubscriptions(user.id);
+      await loadSubscriptions(user.id, { mutationCompleted: true });
       if (!compactEntry) toast.success("Suscripción guardada exitosamente.");
       return { message: "Suscripción guardada exitosamente.", type: "success" };
     } catch (err) {
@@ -336,7 +336,7 @@ export default function SuscripcionesContent() {
       }
 
       cancelEditingSubscription();
-      await loadSubscriptions(user.id);
+      await loadSubscriptions(user.id, { mutationCompleted: true });
       toast.success("Cambios guardados exitosamente.");
     } catch (err) {
       setError(err.message || "No se pudo actualizar la suscripción.");
@@ -387,7 +387,7 @@ export default function SuscripcionesContent() {
 
       setDeactivateDialogOpen(false);
       setSubscriptionToDeactivate(null);
-      await loadSubscriptions(user.id);
+      await loadSubscriptions(user.id, { mutationCompleted: true });
       toast.success("Suscripción desactivada.");
     } catch (err) {
       toast.error(err.message || "No se pudo desactivar la suscripción.");
@@ -418,7 +418,7 @@ export default function SuscripcionesContent() {
         throw new Error(data.error || "No se pudo reactivar la suscripción.");
       }
 
-      await loadSubscriptions(user.id);
+      await loadSubscriptions(user.id, { mutationCompleted: true });
       toast.success("Suscripción reactivada.");
     } catch (err) {
       toast.error(err.message || "No se pudo reactivar la suscripción.");
@@ -444,7 +444,7 @@ export default function SuscripcionesContent() {
       }
 
       setSubscriptionToDelete(null);
-      await loadSubscriptions(user.id);
+      await loadSubscriptions(user.id, { mutationCompleted: true });
       toast.success("Suscripción eliminada exitosamente.");
     } catch (err) {
       setError(err.message || "No se pudo eliminar la suscripción.");

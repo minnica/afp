@@ -172,8 +172,8 @@ export default function CuentasPorCobrarContent() {
     setPeople(data.people || []);
   }
 
-  async function loadReceivables(userId) {
-    const response = await apiFetch(`/api/receivables?userId=${userId}`);
+  async function loadReceivables(userId, { mutationCompleted = false } = {}) {
+    const response = await apiFetch(`/api/receivables?userId=${userId}`, { mutationCompleted });
     const data = await response.json();
 
     if (!response.ok) {
@@ -254,7 +254,7 @@ export default function CuentasPorCobrarContent() {
       setExpectedChargeDays("");
       setNotes("");
 
-      await loadReceivables(user.id);
+      await loadReceivables(user.id, { mutationCompleted: true });
       if (!compactEntry) toast.success("Cuenta por cobrar guardada exitosamente.");
       return { message: "Cuenta por cobrar guardada exitosamente.", type: "success" };
     } catch (err) {
@@ -344,7 +344,7 @@ export default function CuentasPorCobrarContent() {
       }
 
       cancelEditingReceivable();
-      await loadReceivables(user.id);
+      await loadReceivables(user.id, { mutationCompleted: true });
     } catch (err) {
       setError(err.message || "No se pudo actualizar la cuenta por cobrar.");
     } finally {
@@ -369,7 +369,7 @@ export default function CuentasPorCobrarContent() {
         throw new Error(data.error || "No se pudo eliminar.");
       }
 
-      await loadReceivables(user.id);
+      await loadReceivables(user.id, { mutationCompleted: true });
     } catch (err) {
       setError(err.message || "No se pudo eliminar la cuenta por cobrar.");
     }

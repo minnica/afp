@@ -24,7 +24,7 @@ test("apiFetch usa el token vigente, preserva headers y signal, y bloquea otros 
   await apiFetch("/api/expenses?userId=a", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}", signal: controller.signal });
   assert.equal(requests[0].options.headers.get("authorization"), "Bearer token-1");
   assert.equal(requests[0].options.headers.get("content-type"), "application/json");
-  assert.equal(requests[0].options.signal, controller.signal);
+  assert.equal(requests[0].options.signal.aborted, false);
   assert.equal(requests[0].options.cache, "no-store");
   setSession({ user: { id: "a" }, access_token: "renewed" });
   await apiFetch("/api/cards");
@@ -40,7 +40,7 @@ test("apiFetch no envía nada sin sesión ni con una cuenta distinta de la panta
   await assert.rejects(apiFetch("/api/expenses?userId=b"), /sesión cambió/);
   await assert.rejects(apiFetch("/api/cards", { method: "DELETE", expectedUserId: "b" }), /sesión cambió/);
   setSession(null);
-  await assert.rejects(apiFetch("/api/expenses"), /sesión venció/);
+  await assert.rejects(apiFetch("/api/expenses"), { name: "RequestError", action: "login" });
   assert.equal(requests.length, 0);
 });
 

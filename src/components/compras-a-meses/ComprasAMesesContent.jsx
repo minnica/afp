@@ -213,8 +213,8 @@ export default function ComprasAMesesContent() {
     setPurchases(purchasesData.purchases || []);
   }
 
-  async function loadPurchases(userId) {
-    const response = await apiFetch(`/api/installment-purchases?userId=${userId}`);
+  async function loadPurchases(userId, { mutationCompleted = false } = {}) {
+    const response = await apiFetch(`/api/installment-purchases?userId=${userId}`, { mutationCompleted });
     const data = await response.json();
 
     if (!response.ok) {
@@ -295,7 +295,7 @@ export default function ComprasAMesesContent() {
       setPersonId("NONE");
       setNotes("");
 
-      await loadPurchases(user.id);
+      await loadPurchases(user.id, { mutationCompleted: true });
       if (!compactEntry) toast.success("Compra guardada exitosamente.");
       return { message: "Compra guardada exitosamente.", type: "success" };
     } catch (err) {
@@ -385,7 +385,7 @@ export default function ComprasAMesesContent() {
       }
 
       cancelEditingPurchase();
-      await loadPurchases(user.id);
+      await loadPurchases(user.id, { mutationCompleted: true });
       toast.success("Cambios guardados exitosamente.");
     } catch (err) {
       setError(err.message || "No se pudo actualizar la compra.");
@@ -415,7 +415,7 @@ export default function ComprasAMesesContent() {
       }
 
       setPurchaseToDelete(null);
-      await loadPurchases(user.id);
+      await loadPurchases(user.id, { mutationCompleted: true });
 
       toast.success("Compra eliminada exitosamente.");
     } catch (err) {

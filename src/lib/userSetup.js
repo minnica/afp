@@ -2,7 +2,7 @@
 import { apiFetch } from "@/lib/apiFetch";
 const setupCache = new Set();
 
-export async function ensureUserSetup(user) {
+export async function ensureUserSetup(user, { errorMode = "dialog" } = {}) {
   if (!user?.id || !user?.email) return;
 
   const cacheKey = `afp:user-setup:${user.id}`;
@@ -23,6 +23,7 @@ export async function ensureUserSetup(user) {
   }
 
   const response = await apiFetch("/api/setup-user", {
+    errorMode,
     method: "POST",
     expectedUserId: user.id,
     headers: {

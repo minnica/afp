@@ -82,6 +82,20 @@ Todas las rutas de `src/app/api/`, incluido `/api/gastos/bootstrap` y `/api/setu
 
 Regresiones: `node --test tests/*.test.cjs`. `tests/api-authorization.test.cjs` ejecuta todas las rutas con Auth y persistencia simulados, verifica acceso anónimo, tokens inválidos, suplantación de identidad, aislamiento entre dos usuarios, CRUD propio y referencias ajenas. `tests/api-fetch.test.cjs` cubre renovación de tokens, cambio de cuenta, cola offline y exclusión de API del service worker. Estas pruebas no escriben en Supabase ni sustituyen una prueba integrada con dos cuentas reales en un ambiente aislado. El despliegue a producción requiere autorización explícita.
 
+### Errores y recuperación de interacciones
+
+`RequestErrorDialog`, montado en el layout raíz, compone el `AlertDialog` local de shadcn. `apiFetch` detecta fallos de conexión, respuestas HTTP fallidas o JSON incompleto y limita cada intento de red a 20 segundos. `requestErrors.js` convierte los fallos en mensajes en español sin mostrar detalles internos del servidor; `requestRecovery.js` mantiene una sola superficie para fallos concurrentes.
+
+- **Reintentar** vuelve a ejecutar únicamente la petición fallida y continúa la interacción original. Conserva cuerpo, propietario y cancelación, y consulta el token vigente en cada intento. Durante el reintento muestra progreso y bloquea clics repetidos. **Ahora no** libera la interacción y deja su error en el formulario o sección, conservando el borrador.
+- La sesión vencida ofrece **Iniciar sesión**. Permisos insuficientes, registros ausentes, conflictos y restricciones al eliminar explican el bloqueo. La validación 400/422 de altas y ediciones permanece junto al formulario. Un 429 respeta `Retry-After`, con cuenta regresiva.
+- Las altas sin garantía idempotente no se reenvían después de perder la respuesta o recibir un 5xx: el diálogo pide revisar la lista antes de guardar otra vez. Si el navegador detectó desconexión antes de enviar, sí admite reintentar. Gastos conserva el UUID de su cola; cobros de suscripciones, preferencias de avisos y preparación de cuenta mantienen sus contratos repetibles.
+- Las lecturas posteriores a una mutación usan `mutationCompleted`: si solo quedan lecturas recuperables, el diálogo muestra **«Cambio guardado»** y **Actualizar**. Su reintento solo actualiza los datos; nunca repite el alta. Si además hay un bloqueo, conserva su mensaje y la confirmación del guardado. El inicio de sesión también permite recuperar fallos de conexión sin borrar correo y contraseña.
+- Los diálogos usan títulos breves y una indicación de recuperación. `AlertDialogMedia` ofrece variantes semánticas: círculo rojo para errores y triángulo ámbar para advertencias (sesión, permisos, restricciones, espera o guardado incierto). Conservan los tokens del tema y los botones habituales. La cuenta regresiva vive en el botón; el estado de reintento se anuncia al lector de pantalla sin añadir párrafos repetidos.
+- `errorMode: "inline"` reserva los fallos de fondo a su aviso local: sincronización automática de pendientes, preferencias de avisos, consultas automáticas de cobros y actualizaciones de dashboard por foco/conexión. Gastos usa su respaldo local cuando existe; la captura sin conexión continúa funcionando. Los envíos manuales y la captura online muestran recuperación, indicando que el gasto sigue en el dispositivo. Si falla IndexedDB antes de capturar, el diálogo conserva el formulario y permite reintentar el almacenamiento.
+- Navegar, salir de la sesión o abortar una consulta retira sus recuperaciones pendientes. El diálogo enfoca el título sin abrir el teclado, conserva el foco de retorno y ofrece controles de al menos 44 px, con desplazamiento en pantallas pequeñas.
+
+`tests/request-recovery.test.cjs` verifica reintentos, concurrencia, token renovado, cambio de propietario, cancelación, desconexión, timeout, JSON inválido, permisos, conflictos, `Retry-After` y refrescos tras un alta confirmada. Estas pruebas usan red y sesión simuladas. No hay cambios de esquema, migraciones ni despliegue.
+
 ---
 
 ## Schema Prisma — Modelos
@@ -485,7 +499,7 @@ afp/
 
 Todos en `src/components/ui/`. No importar desde paquete externo — son locales.
 
-Disponibles: `button`, `field`, `input`, `number-input`, `create-record-surface`, `input-group`, `label`, `select`, `radio-group`, `command`, `responsive-select`, `searchable-select`, `payment-method-selector`, `textarea`, `calendar`, `popover`, `date-picker`, `card`, `tabs`, `badge`, `table`, `data-table`, `record-card`, `dropdown-menu`, `separator`, `dialog`, `header-dialog`, `alert-dialog`, `sonner`, `spinner`, `tooltip`, `skeleton`, `sheet`, `sidebar`, `alert`, `chart`, `collapsible`, `progress`, `empty`, `item`.
+Disponibles: `button`, `field`, `input`, `number-input`, `create-record-surface`, `input-group`, `label`, `select`, `radio-group`, `command`, `responsive-select`, `searchable-select`, `payment-method-selector`, `textarea`, `calendar`, `popover`, `date-picker`, `card`, `tabs`, `badge`, `table`, `data-table`, `record-card`, `dropdown-menu`, `separator`, `dialog`, `header-dialog`, `alert-dialog`, `request-error-dialog`, `sonner`, `spinner`, `tooltip`, `skeleton`, `sheet`, `sidebar`, `alert`, `chart`, `collapsible`, `progress`, `empty`, `item`.
 
 Los componentes base corresponden al registro oficial de shadcn con el estilo `radix-mira` de `components.json`. Mantener JavaScript, los alias locales y la librería de iconos configurada al incorporar actualizaciones. La revisión y sus comprobaciones están en [`docs/shadcn-audit.md`](docs/shadcn-audit.md).
 

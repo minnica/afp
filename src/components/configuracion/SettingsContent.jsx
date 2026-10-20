@@ -61,8 +61,8 @@ export default function SettingsContent() {
   const [itemToDelete, setItemToDelete] = useState(null);
   const [error, setError] = useState("");
 
-  async function loadSettings(userId) {
-    const response = await apiFetch(`/api/settings?userId=${userId}`);
+  async function loadSettings(userId, { mutationCompleted = false } = {}) {
+    const response = await apiFetch(`/api/settings?userId=${userId}`, { mutationCompleted });
 
     if (!response.ok) {
       throw new Error("No se pudo cargar configuración.");
@@ -156,7 +156,7 @@ export default function SettingsContent() {
       }
       if (type === "incomeType") setIncomeTypeName("");
 
-      await loadSettings(user.id);
+      await loadSettings(user.id, { mutationCompleted: true });
       toast.success("Registro guardado exitosamente.");
       return true;
     } catch (err) {
@@ -189,7 +189,7 @@ export default function SettingsContent() {
         throw new Error(data.error || "No se pudo eliminar.");
       }
 
-      await loadSettings(user.id);
+      await loadSettings(user.id, { mutationCompleted: true });
     } catch (err) {
       setError(err.message || "No se pudo eliminar.");
     }

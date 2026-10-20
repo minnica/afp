@@ -1,6 +1,8 @@
 "use client";
 
 import { apiFetch } from "@/lib/apiFetch";
+import { RequestError } from "@/lib/requestErrors";
+import { getRecoveryScope, recoverRequest } from "@/lib/requestRecovery";
 
 import { useCreationDraft } from "@/hooks/use-creation-draft";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -257,7 +259,9 @@ export default function GastosContent() {
     });
 
     try {
-      const response = await apiFetch(`/api/gastos/bootstrap?${params.toString()}`);
+      const response = await apiFetch(`/api/gastos/bootstrap?${params.toString()}`, {
+        errorMode: readCachedBootstrap(userId) ? "inline" : "dialog",
+      });
       const data = await response.json();
 
       if (!response.ok) {
@@ -331,7 +335,7 @@ export default function GastosContent() {
     return `/api/expenses?${params.toString()}`;
   }
 
-  async function loadExpenses(userId, { force = false } = {}) {
+  async function loadExpenses(userId, { force = false, errorMode = "dialog", mutationCompleted = false } = {}) {
     const url = buildExpensesUrl(userId);
 
     if (!force && url === lastExpensesUrlRef.current) return;
@@ -339,7 +343,10 @@ export default function GastosContent() {
     setIsExpensesLoading(true);
 
     try {
-      const response = await apiFetch(url);
+      const response = await apiFetch(url, {
+        mutationCompleted,
+        errorMode: typeof navigator !== "undefined" && !navigator.onLine ? "inline" : errorMode,
+      });
       const data = await response.json();
 
       if (!response.ok) {
@@ -354,8 +361,8 @@ export default function GastosContent() {
     }
   }
 
-  async function loadReceivables(userId) {
-    const response = await apiFetch(`/api/receivables?userId=${userId}`);
+  async function loadReceivables(userId, { mutationCompleted = false, errorMode = "dialog" } = {}) {
+    const response = await apiFetch(`/api/receivables?userId=${userId}`, { mutationCompleted, errorMode });
     const data = await response.json();
 
     if (!response.ok) {
@@ -367,8 +374,8 @@ export default function GastosContent() {
     setReceivables(data.receivables || []);
   }
 
-  async function loadPayables(userId) {
-    const response = await apiFetch(`/api/payables?userId=${userId}`);
+  async function loadPayables(userId, { mutationCompleted = false, errorMode = "dialog" } = {}) {
+    const response = await apiFetch(`/api/payables?userId=${userId}`, { mutationCompleted, errorMode });
     const data = await response.json();
 
     if (!response.ok) {
@@ -437,15 +444,15 @@ export default function GastosContent() {
 
     try {
       const { failedExpenses, syncedExpenses } = await syncOfflineExpenses(
-        user.id,
+        user.id, { errorMode: silent ? "inline" : "dialog" },
       );
 
       await refreshPendingOfflineExpenses(user.id);
 
       if (syncedExpenses.length > 0) {
-        await loadExpenses(user.id, { force: true });
-        await loadReceivables(user.id);
-        await loadPayables(user.id);
+        await loadExpenses(user.id, { force: true, mutationCompleted: true, errorMode: silent ? "inline" : "dialog" });
+        await loadReceivables(user.id, { mutationCompleted: true, errorMode: silent ? "inline" : "dialog" });
+        await loadPayables(user.id, { mutationCompleted: true, errorMode: silent ? "inline" : "dialog" });
 
         toast.success(
           syncedExpenses.length === 1
@@ -519,9 +526,9 @@ export default function GastosContent() {
         if (active && current === generation) setPendingOfflineExpenses(pending);
         if (active && confirmed && navigator.onLine) {
           await Promise.all([
-            loadExpenses(user.id, { force: true }),
-            loadReceivables(user.id),
-            loadPayables(user.id),
+            loadExpenses(user.id, { force: true, mutationCompleted: true, errorMode: "inline" }),
+            loadReceivables(user.id, { mutationCompleted: true, errorMode: "inline" }),
+            loadPayables(user.id, { mutationCompleted: true, errorMode: "inline" }),
           ]);
         }
       } catch (err) {
@@ -602,17 +609,33 @@ export default function GastosContent() {
       typeof navigator !== "undefined" && navigator.onLine === false;
     let queuedExpense;
     let saved = false;
+    const requestScope = getRecoveryScope();
 
     try {
       // También online: persistir antes del primer POST permite recuperar un cierre de pestaña.
-      queuedExpense = await addOfflineExpense(user.id, payload);
+      const persist = async () => {
+        try {
+          return await addOfflineExpense(user.id, payload);
+        } catch {
+          throw new RequestError("Tus datos siguen en el formulario. Libera espacio o permite guardar datos en este navegador.", {
+            title: "No se pudo guardar el gasto", retryable: true,
+          });
+        }
+      };
+      try {
+        queuedExpense = await persist();
+      } catch (error) {
+        queuedExpense = await recoverRequest(error, persist, { requestScope });
+      }
       resetCreateExpenseForm();
       await refreshPendingOfflineExpenses(user.id);
       if (shouldQueueOffline) {
         return confirmSave("Sin conexión. Gasto guardado como pendiente.", "info");
       }
 
-      const { failedExpenses, confirmations } = await syncOfflineExpenses(user.id, { onlyClientId: queuedExpense.clientId });
+      const { failedExpenses, confirmations } = await syncOfflineExpenses(user.id, {
+        onlyClientId: queuedExpense.clientId, errorMode: "dialog",
+      });
       const pending = failedExpenses.find(entry => entry.clientId === queuedExpense.clientId);
       await refreshPendingOfflineExpenses(user.id);
       if (pending) {
@@ -620,9 +643,9 @@ export default function GastosContent() {
       }
 
       saved = true;
-      await loadExpenses(user.id, { force: true });
-      await loadReceivables(user.id);
-      await loadPayables(user.id);
+      await loadExpenses(user.id, { force: true, mutationCompleted: true });
+      await loadReceivables(user.id, { mutationCompleted: true });
+      await loadPayables(user.id, { mutationCompleted: true });
       return confirmSave(confirmations.some(result => result.alreadyConfirmed)
         ? "Este cobro ya estaba registrado."
         : "Gasto guardado exitosamente.");
@@ -710,7 +733,7 @@ export default function GastosContent() {
       }
 
       cancelEditingExpense();
-      await loadExpenses(user.id, { force: true });
+      await loadExpenses(user.id, { force: true, mutationCompleted: true });
       toast.success("Cambios guardados exitosamente.");
     } catch (err) {
       setError(err.message || "No se pudo actualizar el gasto.");
@@ -737,7 +760,7 @@ export default function GastosContent() {
       }
 
       setExpenseToDelete(null);
-      await loadExpenses(user.id, { force: true });
+      await loadExpenses(user.id, { force: true, mutationCompleted: true });
 
       toast.success("Gasto eliminado exitosamente.");
     } catch (err) {
@@ -1557,7 +1580,7 @@ export default function GastosContent() {
                       </Button>
                     ) : null}
                     <SubscriptionCharges userId={user?.id} isOnline={isOnline} refreshKey={expenses}
-                      onChanged={() => loadExpenses(user.id, { force: true })} />
+                      onChanged={() => loadExpenses(user.id, { force: true, mutationCompleted: true })} />
                   </CardAction>
                 </CardHeader>
 

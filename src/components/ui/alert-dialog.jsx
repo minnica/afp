@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { AlertDialog as AlertDialogPrimitive } from "radix-ui"
+import { cva } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -89,17 +90,30 @@ function AlertDialogFooter({
   );
 }
 
+const alertDialogMediaVariants = cva(
+  "mb-2 inline-flex size-8 items-center justify-center rounded-md sm:group-data-[size=default]/alert-dialog-content:row-span-2 *:[svg:not([class*='size-'])]:size-4",
+  {
+    variants: {
+      variant: {
+        default: "bg-muted",
+        destructive: "bg-destructive/10 text-destructive",
+        warning: "bg-warning/10 text-warning",
+      },
+    },
+    defaultVariants: { variant: "default" },
+  }
+)
+
 function AlertDialogMedia({
   className,
+  variant = "default",
   ...props
 }) {
   return (
     <div
       data-slot="alert-dialog-media"
-      className={cn(
-        "mb-2 inline-flex size-8 items-center justify-center rounded-md bg-muted sm:group-data-[size=default]/alert-dialog-content:row-span-2 *:[svg:not([class*='size-'])]:size-4",
-        className
-      )}
+      data-variant={variant}
+      className={cn(alertDialogMediaVariants({ variant }), className)}
       {...props} />
   );
 }

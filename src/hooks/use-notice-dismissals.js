@@ -15,6 +15,7 @@ export function useNoticeDismissals({ userId, month, enabled }) {
   const request = useCallback(async (method, noticeKey) => {
     const response = await apiFetch(`/api/notice-dismissals${method === "GET" ? `?month=${month}` : ""}`, {
       method, expectedUserId: userId,
+      errorMode: method === "GET" ? "inline" : "dialog",
       headers: { "Content-Type": "application/json" },
       ...(method === "GET" ? { cache: "no-store" } : { body: JSON.stringify({ month, noticeKey }) }),
     });
