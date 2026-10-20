@@ -10,6 +10,8 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import ExpenseCreateSurface, { useExpenseDialogMode } from "@/components/gastos/ExpenseCreateSurface";
 import DailyExpenseCards, { DailyExpenseCardsSkeleton } from "@/components/gastos/DailyExpenseCards";
 import SubscriptionCharges from "@/components/gastos/SubscriptionCharges";
+import SharedExpenseFields from "@/components/gastos/SharedExpenseFields";
+import { getCashContributionError, getPersonalExpenseAmount, sumPersonalExpenses } from "@/lib/sharedExpenses";
 
 import { ResponsiveSelect } from "@/components/ui/responsive-select";
 import { PaymentMethodSelector } from "@/components/ui/payment-method-selector";
@@ -190,6 +192,8 @@ export default function GastosContent() {
   const [cardId, setCardId] = useState("");
   const [concept, setConcept] = useState("");
   const [amount, setAmount] = useState("");
+  const [isSharedExpense, setIsSharedExpense] = useState(false);
+  const [cashContributionAmount, setCashContributionAmount] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [notes, setNotes] = useState("");
 
@@ -219,8 +223,8 @@ export default function GastosContent() {
     name: "gastos",
     userId: user?.id,
     enabled: mobileNavigation,
-    values: { date, paymentMethod, cardId, concept, amount, categoryId, notes, showMoreOptions, personId, receivableMode, receivableAccountId, payableAccountId, subscriptionId },
-    setters: { date: setDate, paymentMethod: setPaymentMethod, cardId: setCardId, concept: setConcept, amount: setAmount, categoryId: setCategoryId, notes: setNotes, showMoreOptions: setShowMoreOptions, personId: setPersonId, receivableMode: setReceivableMode, receivableAccountId: setReceivableAccountId, payableAccountId: setPayableAccountId, subscriptionId: setSubscriptionId },
+    values: { date, paymentMethod, cardId, concept, amount, isSharedExpense, cashContributionAmount, categoryId, notes, showMoreOptions, personId, receivableMode, receivableAccountId, payableAccountId, subscriptionId },
+    setters: { date: setDate, paymentMethod: setPaymentMethod, cardId: setCardId, concept: setConcept, amount: setAmount, isSharedExpense: setIsSharedExpense, cashContributionAmount: setCashContributionAmount, categoryId: setCategoryId, notes: setNotes, showMoreOptions: setShowMoreOptions, personId: setPersonId, receivableMode: setReceivableMode, receivableAccountId: setReceivableAccountId, payableAccountId: setPayableAccountId, subscriptionId: setSubscriptionId },
   });
 
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -230,6 +234,10 @@ export default function GastosContent() {
   const [editCardId, setEditCardId] = useState("");
   const [editConcept, setEditConcept] = useState("");
   const [editAmount, setEditAmount] = useState("");
+  const [editIsSharedExpense, setEditIsSharedExpense] = useState(false);
+  const [editCashContributionAmount, setEditCashContributionAmount] = useState("");
+  const [editLinkedAccount, setEditLinkedAccount] = useState(false);
+  const [editError, setEditError] = useState("");
   const [editCategoryId, setEditCategoryId] = useState("");
   const [editNotes, setEditNotes] = useState("");
   const [editSubscriptionId, setEditSubscriptionId] = useState("NONE");
@@ -404,6 +412,7 @@ export default function GastosContent() {
       cardId,
       concept,
       amount,
+      cashContributionAmount: isSharedExpense ? cashContributionAmount : 0,
       categoryId,
       notes,
       personId,
@@ -422,6 +431,8 @@ export default function GastosContent() {
   function resetCreateExpenseForm() {
     setConcept("");
     setAmount("");
+    setIsSharedExpense(false);
+    setCashContributionAmount("");
     setNotes("");
     setShowMoreOptions(false);
     setPersonId("");
@@ -595,6 +606,14 @@ export default function GastosContent() {
       return false;
     }
 
+    const contributionError = isSharedExpense && !(Number(cashContributionAmount) > 0)
+      ? "Ingresa lo que recibiste en efectivo."
+      : getCashContributionError(getCreateExpensePayload());
+    if (contributionError) {
+      setCreateError({ field: "cashContributionAmount", message: contributionError });
+      return false;
+    }
+
     setCreateError(null);
     setError("");
     setIsSaving(true);
@@ -681,6 +700,10 @@ export default function GastosContent() {
     setEditCardId(expense.cardId || "");
     setEditConcept(expense.concept || "");
     setEditAmount(String(expense.amount || ""));
+    setEditIsSharedExpense(Number(expense.cashContributionAmount) > 0);
+    setEditCashContributionAmount(Number(expense.cashContributionAmount) > 0 ? String(expense.cashContributionAmount) : "");
+    setEditLinkedAccount(Boolean(expense.receivableAccountId || expense.payableAccountId));
+    setEditError("");
     setEditCategoryId(expense.categoryId || "");
     setEditNotes(expense.notes || "");
     setEditSubscriptionId(expense.subscriptionId || "NONE");
@@ -701,10 +724,17 @@ export default function GastosContent() {
   }
 
   async function updateExpense() {
-    if (!user || !editingExpenseId) return;
+    if (!user || !editingExpenseId || isUpdating) return;
+
+    const contributionError = editIsSharedExpense && !(Number(editCashContributionAmount) > 0)
+      ? "Ingresa lo que recibiste en efectivo."
+      : getCashContributionError({ amount: editAmount, cashContributionAmount: editIsSharedExpense ? editCashContributionAmount : 0 });
+    if (contributionError) { setEditError(contributionError); return; }
 
     setError("");
+    setEditError("");
     setIsUpdating(true);
+    let saved = false;
 
     try {
       const response = await apiFetch("/api/expenses", {
@@ -719,6 +749,7 @@ export default function GastosContent() {
           cardId: editCardId,
           concept: editConcept,
           amount: editAmount,
+          cashContributionAmount: editIsSharedExpense ? editCashContributionAmount : 0,
           categoryId: editCategoryId,
           notes: editNotes,
           subscriptionId:
@@ -732,11 +763,13 @@ export default function GastosContent() {
         throw new Error(data.error || "No se pudo actualizar el gasto.");
       }
 
+      saved = true;
       cancelEditingExpense();
       await loadExpenses(user.id, { force: true, mutationCompleted: true });
       toast.success("Cambios guardados exitosamente.");
     } catch (err) {
-      setError(err.message || "No se pudo actualizar el gasto.");
+      if (saved) setError("Los cambios se guardaron, pero no se pudo actualizar la lista. Recarga para verlos.");
+      else setEditError(err.message || "No se pudo actualizar el gasto.");
     } finally {
       setIsUpdating(false);
     }
@@ -795,6 +828,7 @@ export default function GastosContent() {
       cardId: payload.paymentMethod === "CARD" ? payload.cardId : null,
       concept: payload.concept,
       amount: Number(payload.amount || 0),
+      cashContributionAmount: Number(payload.cashContributionAmount || 0),
       categoryId: payload.categoryId,
       notes: payload.notes,
       personId: payload.personId || null,
@@ -983,11 +1017,15 @@ export default function GastosContent() {
       },
       {
         accessorKey: "amount",
-        header: "Monto",
+        header: "Total pagado",
         cell: ({ row }) => (
-          <span className="whitespace-nowrap font-semibold tabular-nums">
-            {formatMoney(row.original.amount)}
-          </span>
+          <div className="flex flex-col gap-1 tabular-nums">
+            <span className="whitespace-nowrap font-semibold">{formatMoney(row.original.amount)}</span>
+            {Number(row.original.cashContributionAmount) > 0 ? <>
+              <Badge variant="success">Efectivo {formatMoney(row.original.cashContributionAmount)}</Badge>
+              <span className="text-xs">Tu parte <strong>{formatMoney(getPersonalExpenseAmount(row.original))}</strong></span>
+            </> : null}
+          </div>
         ),
       },
       {
@@ -1173,6 +1211,20 @@ export default function GastosContent() {
 
   const createOptionalFields = (
     <>
+      <SharedExpenseFields
+        id="cashContributionAmount" enabled={isSharedExpense} amount={amount}
+        contribution={cashContributionAmount} onContributionChange={(value) => {
+          setCashContributionAmount(value);
+          if (createError?.field === "cashContributionAmount") setCreateError(null);
+        }}
+        onEnabledChange={(enabled) => {
+          setIsSharedExpense(enabled);
+          setCreateError(null);
+          if (enabled) { setReceivableMode("NONE"); setReceivableAccountId(""); setPayableAccountId("NONE"); }
+        }}
+        disabled={isSaving}
+        error={createError?.field === "cashContributionAmount" ? createError.message : null}
+      />
       <div className="space-y-2">
         <Label htmlFor="notes">Notas (opcional)</Label>
         <Textarea
@@ -1206,7 +1258,7 @@ export default function GastosContent() {
                   const nextValue = value === "NONE" ? "" : value;
                   setPersonId(nextValue);
                   if (!nextValue) {
-                    setReceivableMode("CREATE");
+                    setReceivableMode(isSharedExpense ? "NONE" : "CREATE");
                     setReceivableAccountId("");
                   }
                 }}
@@ -1237,6 +1289,7 @@ export default function GastosContent() {
                   <Label htmlFor="receivableMode">Cuenta por cobrar</Label>
                   <ResponsiveSelect
                     value={receivableMode}
+                    disabled={isSharedExpense}
                     onValueChange={value => {
                       setReceivableMode(value);
                       if (value === "CREATE") {
@@ -1247,6 +1300,9 @@ export default function GastosContent() {
                     title="Seleccionar opción"
                     placeholder="Selecciona opción"
                     options={[{
+                      value: "NONE",
+                      label: "Solo referencia, sin cuenta"
+                    }, {
                       value: "CREATE",
                       label: "Crear nueva autom\xE1ticamente"
                     }, {
@@ -1287,6 +1343,7 @@ export default function GastosContent() {
                   <Label htmlFor="payableAccountId">Cuenta por pagar relacionada</Label>
                   <SearchableSelect
                     value={payableAccountId}
+                    disabled={isSharedExpense}
                     onValueChange={setPayableAccountId}
                     id="payableAccountId"
                     title="Seleccionar cuenta por pagar"
@@ -1364,14 +1421,14 @@ export default function GastosContent() {
         </AlertDialogContent>
       </AlertDialog>
 
-      <Dialog open={editDialogOpen} onOpenChange={(open) => { if (!open) cancelEditingExpense(); }}>
+      <Dialog open={editDialogOpen} onOpenChange={(open) => { if (!open && !isUpdating) cancelEditingExpense(); }}>
         <DialogContent onCloseAutoFocus={restoreFocus} className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle>Editar gasto</DialogTitle>
             <DialogDescription className="sr-only">Actualiza los datos y guarda los cambios.</DialogDescription>
           </DialogHeader>
 
-          <div className="grid gap-4 md:grid-cols-2">
+          <fieldset disabled={isUpdating} className="grid min-w-0 gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="edit-date">Fecha</Label>
               <DatePicker
@@ -1472,6 +1529,10 @@ export default function GastosContent() {
               />
             </div>
 
+            <div className="md:col-span-2">
+              <SharedExpenseFields id="edit-cashContributionAmount" enabled={editIsSharedExpense} onEnabledChange={(enabled) => { setEditIsSharedExpense(enabled); setEditError(""); }} amount={editAmount} contribution={editCashContributionAmount} onContributionChange={(value) => { setEditCashContributionAmount(value); setEditError(""); }} disabled={isUpdating} linkedAccount={editLinkedAccount} />
+            </div>
+
             <div className="space-y-2 md:col-span-2">
               <Label htmlFor="edit-notes">Notas</Label>
               <Textarea
@@ -1480,13 +1541,16 @@ export default function GastosContent() {
                 onChange={(event) => setEditNotes(event.target.value)}
               />
             </div>
-          </div>
+          </fieldset>
+
+          {editError ? <Alert variant="destructive"><AlertDescription>{editError}</AlertDescription></Alert> : null}
 
           <DialogFooter className="gap-2">
             <Button
               type="button"
               variant="secondary"
               onClick={cancelEditingExpense}
+              disabled={isUpdating}
             >
               Cancelar
             </Button>
@@ -1737,10 +1801,11 @@ export default function GastosContent() {
                         return (
                           <TableRow>
                             <TableCell colSpan={4} className="text-right text-sm font-medium text-muted-foreground">
-                              Total
+                              Total pagado
                             </TableCell>
                             <TableCell className="font-semibold tabular-nums">
                               {formatMoney(total)}
+                              {table.getFilteredRowModel().rows.some(row => Number(row.original.cashContributionAmount) > 0) ? <p className="text-xs font-normal">Tu parte {formatMoney(sumPersonalExpenses(table.getFilteredRowModel().rows.map(row => row.original)))}</p> : null}
                             </TableCell>
                             <TableCell />
                           </TableRow>

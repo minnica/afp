@@ -9,7 +9,7 @@ const read = (file) => fs.readFileSync(path.join(root, file), "utf8")
   .replace(/^export /gm, "");
 function context(route = "dashboard", globals = {}) {
   const ctx = vm.createContext({ URL, console, requireApiUser: async () => ({ id: "u" }), apiAccessErrorResponse: () => null, ...globals });
-  const helpers = ["../subscriptionCharges", "installmentStatements", "subscriptionStatements", "cardCredits", "cardCycles", "cardCyclePayments", "cycleDataQuality", "cardUsageWaivers"]
+  const helpers = ["../sharedExpenses", "../subscriptionCharges", "installmentStatements", "subscriptionStatements", "cardCredits", "cardCycles", "cardCyclePayments", "cycleDataQuality", "cardUsageWaivers"]
     .map((name) => read(`src/lib/calculations/${name}.js`)).join("\n");
   vm.runInContext(helpers + "\n" + read(`src/app/api/${route}/route.js`), ctx);
   return ctx;
@@ -23,6 +23,53 @@ const cycle = (month) => ({ id: `cycle-${month}`, cardId: card.id, card, year: 2
 });
 const subscription = { id: "sub", categoryId: "cat1", amount: 100, chargeDay: 20,
   isActive: true, startYear: 2024, startMonth: 1, frequencyMonths: 1, paymentMethod: "CASH" };
+
+test("gastos compartidos: semanas, categorías y tarjetas usan la parte personal y el banco conserva el cargo", () => {
+  const sharedCard = { ...card, usagePolicy: { productKey: "HSBC_ZERO" } };
+  const sharedCycle = { ...cycle(10), year: 2026, startDate: "2026-10-01", cutDate: "2026-10-31", dueDate: "2026-11-20", card: sharedCard };
+  const expenses = [
+    { id: "18", date: "2026-10-18T12:00:00Z", amount: 600, cashContributionAmount: 500, categoryId: "food", cardId: card.id, paymentMethod: "CARD", concept: "Restaurante" },
+    { id: "19", date: "2026-10-19T12:00:00Z", amount: 250.50, cashContributionAmount: 100, categoryId: "food", cardId: card.id, paymentMethod: "CARD", concept: "Cena" },
+  ];
+  const args = { expenses, currentYear: 2026, currentMonth: 10 };
+  const weekly = ctx.buildWeeklyComparison(args);
+  assert.equal(weekly.currMonthTotal, 250.50);
+  assert.equal(weekly.weeks[2].currTotal, 250.50);
+  assert.equal(ctx.buildWeeklyComparison({ ...args, categoryId: "food" }).currMonthTotal, 250.50);
+  const categories = ctx.buildCategoryBreakdown({ expenses, categories: [{ id: "food", name: "Comida" }], subscriptions: [], purchases: [], year: 2026, month: 10 });
+  assert.equal(categories[0].total, 250.50);
+  assert.equal(categories[0].percentage, 100);
+  const amounts = ctx.calculateCycleAmount({ cycle: sharedCycle, expenses });
+  assert.equal(amounts.calculatedAmount, 850.50);
+  assert.equal(amounts.expensesAmount, 850.50);
+  assert.equal(amounts.cashContributionsAmount, 600);
+  const comparison = ctx.buildCardMonthlyComparison({ cyclesWithAmounts: [{ ...sharedCycle, ...amounts }], cards: [card], currentYear: 2026, currentMonth: 10 });
+  assert.equal(comparison.data[0].currAmount, 250.50);
+  assert.equal(comparison.data[0].currGrossAmount, 850.50);
+  assert.equal(comparison.data[0].currCashContribution, 600);
+  const usage = ctx.buildCurrentCardUsageWaivers({ cards: [sharedCard], cyclesWithAmounts: [sharedCycle], expenses, subscriptions: [], purchases: [], now: new Date("2026-10-20T12:00:00Z") });
+  assert.equal(usage[0].eligibleSpend, 850.50);
+});
+
+test("aportaciones: respeta el día UTC del corte, el estado cero y la cobertura completa", () => {
+  const sharedCycle = { ...cycle(1), year: 2026, startDate: "2025-12-11T12:00:00Z", cutDate: "2026-01-10T12:00:00Z" };
+  const expenses = [
+    { id: "edge", cardId: card.id, date: "2026-01-10T23:59:59.999Z", amount: "0.30", cashContributionAmount: "0.20", categoryId: "cat" },
+    { id: "before", cardId: card.id, date: "2025-12-11T00:00:00.000Z", amount: "0.30", cashContributionAmount: "0.10", categoryId: "cat" },
+    { id: "after", cardId: card.id, date: "2026-01-11T00:00:00.000Z", amount: 600, cashContributionAmount: 600, categoryId: "cat" },
+  ];
+  const amounts = ctx.calculateCycleAmount({ cycle: sharedCycle, expenses });
+  assert.equal(amounts.cashContributionsAmount, 0.30);
+  assert.equal(amounts.calculatedAmount, 0.60);
+  const args = { cyclesWithAmounts: [{ ...sharedCycle, ...amounts, statementAmount: 1 }], cards: [card], currentYear: 2026, currentMonth: 1 };
+  assert.equal(ctx.buildCardMonthlyComparison(args).data[0].currAmount, 0.70);
+  args.cyclesWithAmounts[0].statementAmount = 0;
+  assert.equal(ctx.buildCardMonthlyComparison(args).data.length, 0);
+  const weekly = ctx.buildWeeklyComparison({ expenses, currentYear: 2026, currentMonth: 1 });
+  assert.equal(weekly.prevMonthTotal, 0.20);
+  assert.equal(weekly.currMonthTotal, 0.10);
+  assert.equal(weekly.weeks[1].currTotal, 0.10);
+});
 
 test("cero bancario prevalece sobre estimación y no genera aviso de pago", () => {
   const prev = { ...cycle(6), statementAmount: 30, calculatedAmount: 50 };

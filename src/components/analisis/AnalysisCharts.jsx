@@ -21,7 +21,9 @@ function ComparisonTooltip({ previousLabel, currentLabel, ...props }) {
     <ChartTooltipContent {...props} className="max-w-[calc(100vw-2rem)]" formatter={(value, name, item) => {
       const previous = item.dataKey === "previous";
       const statement = previous ? item.payload.prevIsStatement : item.payload.currIsStatement;
-      return <div className="flex w-full items-start justify-between gap-4"><span className="min-w-0 flex-1 break-words text-muted-foreground">{previous ? previousLabel : currentLabel}{statement === false ? " · estimado" : ""}</span><span className="min-w-0 max-w-[55%] break-words text-right font-mono font-medium tabular-nums">{formatMoney(value)}</span></div>;
+      const contribution = previous ? item.payload.prevCashContribution : item.payload.currCashContribution;
+      const gross = previous ? item.payload.prevGrossAmount : item.payload.currGrossAmount;
+      return <div className="flex w-full flex-col gap-1"><div className="flex items-start justify-between gap-4"><span className="min-w-0 flex-1 break-words text-muted-foreground">{previous ? previousLabel : currentLabel}{statement === false ? " · estimado" : ""}</span><span className="min-w-0 max-w-[55%] break-words text-right font-mono font-medium tabular-nums">{formatMoney(value)}</span></div>{contribution > 0 ? <span className="text-xs text-muted-foreground">Base: {formatMoney(gross)} · Recibido: {formatMoney(contribution)}</span> : null}</div>;
     }} />
   );
 }
@@ -57,6 +59,7 @@ export function WeeklyComparison({ comparison, categories, categoryId, onCategor
       <CardContent className="flex flex-col gap-5">
         <FieldGroup className="md:max-w-72"><Field><FieldLabel htmlFor={categorySelectId}>Categoría</FieldLabel><SearchableSelect id={categorySelectId} value={categoryId} onValueChange={onCategoryChange} aria-label="Categoría del comparativo semanal" title="Categoría del comparativo semanal" className="h-11 md:h-9" options={[{ value: "all", label: "Todas las categorías", pinned: true }, ...categories.map((category) => ({ value: category.id, label: category.name }))]} /></Field></FieldGroup>
         {comparison ? <Summary previous={comparison.prevMonthTotal} current={comparison.currMonthTotal} previousLabel={comparison.prevMonthLabel} currentLabel={comparison.currMonthLabel} /> : null}
+        <p className="text-sm text-muted-foreground">Tu gasto después de descontar las aportaciones en efectivo recibidas.</p>
         {hasData ? (
           <ChartContainer config={comparisonConfig(comparison.prevMonthLabel, comparison.currMonthLabel)} className="h-72 w-full aspect-auto">
             <BarChart accessibilityLayer data={rows} margin={{ top: 8, right: 4, left: 0, bottom: 0 }}>
@@ -99,12 +102,12 @@ function HorizontalComparison({ rows, previousLabel, currentLabel, id }) {
 }
 
 export function CardComparison({ comparison }) {
-  const rows = (comparison?.data || []).map((card) => ({ name: card.cardName, previous: card.prevAmount, current: card.currAmount, prevIsStatement: card.prevIsStatement, currIsStatement: card.currIsStatement })).sort((a, b) => b.current - a.current);
-  if (!rows.length) return <EmptyComparison title="Pagos por tarjeta" />;
+  const rows = (comparison?.data || []).map((card) => ({ ...card, name: card.cardName, previous: card.prevAmount, current: card.currAmount })).sort((a, b) => b.current - a.current);
+  if (!rows.length) return <EmptyComparison title="Gasto personal por tarjeta" />;
   return (
     <Card data-card-comparison>
-      <CardHeader><CardTitle><h2>Pagos por tarjeta</h2></CardTitle><CardDescription>{comparison.prevMonthLabel} vs {comparison.currMonthLabel} · meses de corte</CardDescription></CardHeader>
-      <CardContent className="flex flex-col gap-4"><HorizontalComparison rows={rows} previousLabel={comparison.prevMonthLabel} currentLabel={comparison.currMonthLabel} /><p className="text-sm text-muted-foreground">Se usa el estado de cuenta cuando está registrado. Los demás importes son estimados.</p></CardContent>
+      <CardHeader><CardTitle><h2>Gasto personal por tarjeta</h2></CardTitle><CardDescription>{comparison.prevMonthLabel} vs {comparison.currMonthLabel} · meses de corte</CardDescription></CardHeader>
+      <CardContent className="flex flex-col gap-4"><HorizontalComparison rows={rows} previousLabel={comparison.prevMonthLabel} currentLabel={comparison.currMonthLabel} /><p className="text-sm text-muted-foreground">Estado de cuenta, o estimación, menos las aportaciones en efectivo de los gastos del corte. El pago al banco se consulta completo en Tarjetas. Semanas y Categorías agrupan por fecha del gasto.</p></CardContent>
     </Card>
   );
 }
@@ -121,6 +124,7 @@ export function CategoryComparison({ byMonth, monthIndex, year }) {
     <Card data-category-comparison>
       <CardHeader><CardTitle><h2>Gastos por categoría</h2></CardTitle><CardDescription>{showAll || rows.length <= 5 ? "Todas las categorías" : "Las cinco categorías con mayor gasto este mes"}</CardDescription></CardHeader>
       <CardContent className="flex flex-col gap-4">
+        <p className="text-sm text-muted-foreground">Tu gasto después de descontar las aportaciones en efectivo recibidas.</p>
         <HorizontalComparison id={chartId} rows={displayedRows} previousLabel={previousLabel} currentLabel={currentLabel} />
         {rows.length > 5 ? <Button variant="outline" className="h-11 w-full md:w-fit" aria-expanded={showAll} aria-controls={chartId} onClick={() => setShowAll((value) => !value)}>{showAll ? "Mostrar las cinco principales" : `Ver todas las categorías (${rows.length})`}</Button> : null}
       </CardContent>

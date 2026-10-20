@@ -104,3 +104,27 @@ test("editar o eliminar un gasto confirmado no permite recrearlo mediante un rei
   assert.equal(f.state().expenses.length, 0);
   assert.equal(f.state().receivables.length, 1);
 });
+
+test("aportación recibida: guarda el cargo y el efectivo una vez, sin crear cuentas", async () => {
+  const f = fixture();
+  const body = { ...input(), amount: 600, cashContributionAmount: 500, createReceivable: false };
+  const responses = await Promise.all(Array.from({ length: 5 }, () => f.post(body)));
+  assert.ok(responses.every(response => response.status === 200));
+  assert.equal(f.state().expenses.length, 1);
+  assert.equal(f.state().expenses[0].amount, 600);
+  assert.equal(f.state().expenses[0].cashContributionAmount, 500);
+  assert.equal(f.state().receivables.length, 0);
+  assert.equal((await f.post({ ...body, cashContributionAmount: 100 })).status, 409);
+  assert.deepEqual((await f.post(body)).body, responses[0].body);
+});
+
+test("aportación inválida o cuenta duplicada no consume recibo ni crea gasto", async () => {
+  const f = fixture();
+  const body = { ...input(), amount: 600, createReceivable: false };
+  for (const value of [601, -1, "500.001", false, null, [], {}]) {
+    assert.equal((await f.post({ ...body, cashContributionAmount: value })).status, 400);
+  }
+  assert.equal((await f.post({ ...body, cashContributionAmount: 500, createReceivable: true })).status, 400);
+  assert.deepEqual(f.state(), { operations: [], expenses: [], receivables: [] });
+  assert.equal((await f.post({ ...body, cashContributionAmount: 500 })).status, 200);
+});

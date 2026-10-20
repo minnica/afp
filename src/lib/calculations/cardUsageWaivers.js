@@ -221,7 +221,7 @@ export function buildCardUsageWaivers({ cards, cyclesWithAmounts, expenses, subs
         const reviewReason = reviewReasons.get(receiptKey(receipt.subscriptionId, receipt.date));
         if (reviewReason) projected.push({ ...item, reason: reviewReason });
         else if (usageDay(receipt.date) <= today) confirmedSubscriptions.push(item);
-        else projected.push({ ...item, reason: "Cargo con fecha futura" });
+        else projected.push({ ...item, subscriptionProjection: "upcoming", reason: "Cargo con fecha futura" });
       }
 
       for (const subscription of subscriptions.filter((item) => item.cardId === card.id && item.paymentMethod === "CARD")) {
@@ -233,6 +233,7 @@ export function buildCardUsageWaivers({ cards, cyclesWithAmounts, expenses, subs
           // Un estado ya revisado es la fuente de verdad sobre los cargos de ese corte.
           if (recorded || confirmed || evidence) continue;
           projected.push({ id: `${subscription.id}-${chargeDate}`, name: subscription.name, amount: usageMoney(subscription.amount), chargeDate, categoryName: subscription.category?.name || null,
+            subscriptionProjection: usageDay(chargeDate) > today ? "upcoming" : "unconfirmed",
             reason: usageDay(chargeDate) > today ? "Suscripción programada" : "Cargo estimado por confirmar" });
         }
       }
@@ -250,6 +251,8 @@ export function buildCardUsageWaivers({ cards, cyclesWithAmounts, expenses, subs
     const installmentPurchasesAmount = usageSum(newPurchases);
     const eligibleSpend = usageMoney(dailyExpensesAmount + subscriptionsAmount + installmentPurchasesAmount);
     const projectedAmount = usageSum(projected);
+    const upcomingSubscriptions = projected.filter((item) => item.subscriptionProjection === "upcoming");
+    const unconfirmedSubscriptions = projected.filter((item) => item.subscriptionProjection === "unconfirmed");
     const remainingAmount = usageMoney(Math.max(rule.minimumAmount - eligibleSpend, 0));
     const isFuture = Boolean(cycle && usageDay(cycle.startDate) > today);
     const isClosed = Boolean(cycle && usageDay(cycle.cutDate) < today);
@@ -258,6 +261,10 @@ export function buildCardUsageWaivers({ cards, cyclesWithAmounts, expenses, subs
       policyVerifiedAt: card.usagePolicy.verifiedAt, minimumAmount: rule.minimumAmount,
       eligibleSpend, remainingAmount, progress: Math.min(eligibleSpend / rule.minimumAmount * 100, 100), isExempt, confirmationPending,
       projectedAmount, projectedTotal: usageMoney(eligibleSpend + projectedAmount),
+      subscriptionForecast: {
+        upcomingCount: upcomingSubscriptions.length, upcomingAmount: usageSum(upcomingSubscriptions),
+        unconfirmedCount: unconfirmedSubscriptions.length, unconfirmedAmount: usageSum(unconfirmedSubscriptions),
+      },
       status: !cycle ? "NO_CYCLE" : isFuture ? "FUTURE" : isExempt ? "MET" : confirmationPending || projectedAmount > 0 ? "UNCONFIRMED" : isClosed ? "NOT_MET" : "IN_PROGRESS",
       periodVerified: Boolean(evidence), statementSource: evidence?.source || null,
       selectedCycle: cycle ? { id: cycle.id, startDate: cycle.startDate, cutDate: cycle.cutDate, dueDate: cycle.dueDate, month, year, displayStatus: cycle.displayStatus } : null,

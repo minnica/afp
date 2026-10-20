@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { applySubscriptionCharge, SubscriptionChargeError } from "@/lib/subscriptionChargeService";
 
 import { runExpenseOperation } from "@/lib/expenseOperations";
+import { getCashContributionError, sumPersonalExpenses } from "@/lib/sharedExpenses";
 
 const expenseSelect = {
   id: true,
@@ -13,6 +14,7 @@ const expenseSelect = {
   cardId: true,
   concept: true,
   amount: true,
+  cashContributionAmount: true,
   categoryId: true,
   notes: true,
   personId: true,
@@ -168,6 +170,7 @@ export async function GET(request) {
     return NextResponse.json({
       expenses,
       total,
+      personalTotal: sumPersonalExpenses(expenses),
       availableMonths: getAvailableMonths(expenseDates),
     });
   } catch (error) {
@@ -231,6 +234,10 @@ export async function POST(request) {
         throw new ApiAccessError("El monto debe ser mayor a 0.", 400);
       }
 
+      const contributionError = getCashContributionError(body);
+      if (contributionError) throw new ApiAccessError(contributionError, 400);
+      const cashContributionAmount = Number(body.cashContributionAmount ?? 0);
+
       const parsedDate = parseDateInput(date);
 
       if (!parsedDate || Number.isNaN(parsedDate.getTime())) {
@@ -243,11 +250,14 @@ export async function POST(request) {
         const result = await applySubscriptionCharge(tx, userId, {
           subscriptionId, month: date.slice(0, 7), date, amount: numericAmount, action: "confirm",
           today: new Date().toISOString().slice(0, 10), createReceivable,
-          expenseData: { concept: concept.trim(), paymentMethod, cardId: cardId || null, categoryId,
+          expenseData: { concept: concept.trim(), paymentMethod, cardId: cardId || null, categoryId, cashContributionAmount,
             notes: notes?.trim() || null, personId: personId || null,
             receivableAccountId: finalReceivableAccountId, payableAccountId: payableAccountId || null },
         });
         const expense = await tx.dailyExpense.findUnique({ where: { id: result.expenseId, userId }, select: expenseSelect });
+        if (result.alreadyConfirmed && cashContributionAmount !== Number(expense.cashContributionAmount ?? 0)) {
+          throw new ApiAccessError("Este cobro ya existe con otra aportación. Edita el gasto registrado para actualizarla.", 409);
+        }
         if (payableAccountId) await refreshDebtAccount(tx, userId, "payable", payableAccountId);
         return { expense, alreadyConfirmed: result.alreadyConfirmed };
       }
@@ -276,6 +286,7 @@ export async function POST(request) {
           cardId: paymentMethod === "CARD" ? cardId : null,
           concept: concept.trim(),
           amount: numericAmount,
+          cashContributionAmount,
           categoryId,
           notes: notes?.trim() || null,
           personId: personId || null,
@@ -416,6 +427,14 @@ export async function PATCH(request) {
       await requireOwnedReferences(tx, userId, body, ["cardId", "categoryId", "personId", "receivableAccountId", "payableAccountId", "subscriptionId"]);
       const existing = await tx.dailyExpense.findUnique({ where: { id, userId } });
       if (!existing) throw new SubscriptionChargeError("Gasto no encontrado.", 404);
+      // Los clientes anteriores conservan la aportación al omitir el campo.
+      const cashContributionAmount = body.cashContributionAmount === undefined
+        ? String(existing.cashContributionAmount ?? 0) : body.cashContributionAmount;
+      const contributionError = getCashContributionError({
+        amount, cashContributionAmount,
+        receivableAccountId: existing.receivableAccountId, payableAccountId: existing.payableAccountId,
+      });
+      if (contributionError) throw new ApiAccessError(contributionError, 400);
       for (const linkedId of [...new Set([existing.subscriptionId, subscriptionId].filter(Boolean))].sort()) {
         const rows = await tx.$queryRaw`SELECT "id" FROM "subscriptions" WHERE "id" = ${linkedId} AND "userId" = ${existing.userId} FOR UPDATE`;
         if (!rows.length) throw new SubscriptionChargeError("La suscripción no está disponible.", 404);
@@ -439,6 +458,7 @@ export async function PATCH(request) {
         data: {
           date: parsedDate, paymentMethod, cardId: paymentMethod === "CARD" ? cardId : null,
           concept: concept.trim(), amount: numericAmount, categoryId, notes: notes?.trim() || null,
+          cashContributionAmount: Number(cashContributionAmount),
           subscriptionId: subscriptionId || null,
         },
         select: expenseSelect,

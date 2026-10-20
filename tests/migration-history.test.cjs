@@ -10,6 +10,7 @@ test('A11: recupera la migración original y conserva los trece checksums aplica
     '20261017000000_add_expense_operations',
     '20261017020000_enable_application_rls',
     '20261017030000_add_post_cut_credits',
+    '20261020000000_add_cash_expense_contributions',
   ]);
 });
 

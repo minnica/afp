@@ -23,6 +23,22 @@ function fixture() {
 const payload = { concept: "Comida", amount: 10, date: "2026-10-17", categoryId: "category-a", paymentMethod: "CASH" };
 function deferred() { let resolve; const promise = new Promise(r => { resolve = r; }); return { promise, resolve }; }
 
+test("aportación offline: recarga, error y reintento conservan el importe y UUID", async () => {
+  const f = fixture(), first = f.tab();
+  const entry = await first.addOfflineExpense("a", { ...payload, amount: "600", cashContributionAmount: "500" });
+  f.setSend(async () => { throw new TypeError("Sin conexión"); });
+  await first.syncOfflineExpenses("a");
+  const reopened = f.tab();
+  const pending = (await reopened.readOfflineExpenses("a"))[0];
+  assert.equal(pending.payload.cashContributionAmount, "500");
+  assert.equal(pending.clientId, entry.clientId);
+  f.setSend(async input => ({ ok: true, json: async () => ({ expense: { id: input.operationId, ...input } }) }));
+  const result = await reopened.syncOfflineExpenses("a");
+  assert.equal(result.syncedExpenses[0].cashContributionAmount, "500");
+  assert.equal((await reopened.readOfflineExpenses("a")).length, 0);
+  assert.ok(f.requests.every(input => input.cashContributionAmount === "500" && input.amount === "600" && input.operationId === entry.clientId));
+});
+
 test("respuesta perdida después de guardar: recargar y reintentar conserva el UUID", async () => {
   const f = fixture(), first = f.tab();
   const entry = await first.addOfflineExpense("a", payload);

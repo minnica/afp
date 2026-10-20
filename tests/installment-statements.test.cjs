@@ -12,7 +12,7 @@ const helper = fs.readFileSync(
 const creditHelper = fs.readFileSync(
   path.join(root, "src/lib/calculations/cardCredits.js"), "utf8",
 ).replace(/^export /gm, "");
-const cycleHelpers = ["subscriptionStatements", "cardCycles"]
+const cycleHelpers = ["../sharedExpenses", "subscriptionStatements", "cardCycles"]
   .map((name) => fs.readFileSync(path.join(root, `src/lib/calculations/${name}.js`), "utf8")
     .replace(/^import[\s\S]*?from\s+["'][^"']+["'];\r?\n/gm, "")
     .replace(/^export /gm, ""))

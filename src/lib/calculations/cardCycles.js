@@ -110,6 +110,7 @@ export function calculateCycleAmount({
       id: expense.id,
       concept: expense.concept,
       amount: cycleMoney(expense.amount),
+      cashContributionAmount: cycleMoney(expense.cashContributionAmount),
       date: expense.date,
       categoryName: expense.category?.name || null,
     }));
@@ -147,6 +148,7 @@ export function calculateCycleAmount({
     }));
 
   const expensesAmount = cycleSum(includedExpenses);
+  const cashContributionsAmount = cycleSum(includedExpenses.map(expense => ({ amount: expense.cashContributionAmount })));
   const subscriptionsAmount = cycleSum(includedSubscriptions);
   const purchasesAmount = cycleSum(includedPurchases);
   const { grossCalculatedAmount, creditsAmount, calculatedAmount, includedCredits } =
@@ -157,6 +159,7 @@ export function calculateCycleAmount({
     ? Number(cycle.statementAmount) : null;
   return {
     expensesAmount,
+    cashContributionsAmount,
     subscriptionsAmount,
     purchasesAmount,
     grossCalculatedAmount,

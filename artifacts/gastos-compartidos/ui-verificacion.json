@@ -1,0 +1,64 @@
+{
+  "date": "2026-10-20",
+  "scope": "Copy y presentación de aportaciones recibidas en efectivo",
+  "environment": "Componentes reales de la app; Auth y API locales simulados con datos en memoria",
+  "productionChanged": false,
+  "copy": {
+    "option": "Gasto compartido",
+    "badge": "Efectivo",
+    "input": "Efectivo recibido",
+    "result": "Tu parte",
+    "removed": "Párrafo de ayuda y resta visible repetida; ayudas accesibles conservadas"
+  },
+  "browser": {
+    "viewports": [
+      1280,
+      390,
+      320
+    ],
+    "create": {
+      "amount": 600,
+      "contribution": 500,
+      "personal": 100
+    },
+    "fullContribution": {
+      "amount": 600,
+      "contribution": 600,
+      "personal": 0
+    },
+    "invalidContribution": {
+      "amount": 600,
+      "contribution": 700,
+      "errorVisible": true,
+      "previewHidden": true
+    },
+    "edit": "Importes y presentación correctos con 600/500/100",
+    "keyboard": "Espacio activa y desactiva la opción; restaura el importe capturado",
+    "mobileHorizontalOverflow": false,
+    "checkboxLabelHeightPx": 44,
+    "ariaDescriptionsValid": true,
+    "contrastRatios": {
+      "dark": 7.8,
+      "light": 4.64
+    },
+    "contrastStandard": "WCAG AA >= 4.5:1 para texto normal",
+    "browserErrors": [
+      "El navegador conservó un registro de error sin mensaje tras la inspección temporal del DOM y Fast Refresh."
+    ],
+    "limits": "Prueba de UI con API/Auth simuladas; no sustituye una prueba productiva de persistencia. Una inspección temporal del DOM seguida de Fast Refresh produjo un error removeChild en el entorno de desarrollo. La revisión final se realizó tras recargar la página; se corrigió el ancho de la ayuda accesible para evitar el desbordamiento del diálogo.",
+    "editDialogHorizontalOverflow": false,
+    "editDialogWidthPx": 343,
+    "editDialogScrollWidthPx": 343
+  },
+  "screenshots": [
+    "ui-desktop.png",
+    "ui-mobile.png",
+    "ui-listado-mobile.png",
+    "ui-edicion-mobile.png"
+  ],
+  "checks": {
+    "targetedLint": "passed",
+    "sharedExpenseRegression": "passed",
+    "build": "pnpm exec next build --webpack: passed"
+  }
+}

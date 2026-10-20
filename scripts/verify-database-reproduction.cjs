@@ -70,8 +70,17 @@ function assertCatalog(actual) {
     { ...before.columns.find(row => row.table_name === 'card_cycles' && row.column_name === 'notes'), column_name: 'postCutCreditNotes' },
   ];
   assert.deepEqual(actual.columns.filter(row => row.table_name === 'card_cycles' && creditColumns.includes(row.column_name)), expectedCredits);
+  assert.deepEqual(actual.columns.filter(row => row.table_name === 'daily_expenses' && row.column_name === 'cashContributionAmount'), [
+    { ...before.columns.find(row => row.table_name === 'daily_expenses' && row.column_name === 'amount'), column_name: 'cashContributionAmount', column_default: '0' },
+  ]);
+  const contributionConstraint = actual.constraints.filter(row => row.table_name === 'daily_expenses' && row.name === 'daily_expenses_cash_contribution_check');
+  assert.equal(contributionConstraint.length, 1);
+  assert.match(contributionConstraint[0].definition, /CHECK.*cashContributionAmount/);
   for (const section of ['columns', 'constraints', 'indexes', 'enums']) {
-    const rows = actual[section].filter(row => (row.table_name || row.tablename) !== 'expense_operations' && !(section === 'columns' && row.table_name === 'card_cycles' && creditColumns.includes(row.column_name)));
+    const rows = actual[section].filter(row => (row.table_name || row.tablename) !== 'expense_operations'
+      && !(section === 'columns' && row.table_name === 'card_cycles' && creditColumns.includes(row.column_name))
+      && !(section === 'columns' && row.table_name === 'daily_expenses' && row.column_name === 'cashContributionAmount')
+      && !(section === 'constraints' && row.name === 'daily_expenses_cash_contribution_check'));
     assert.deepEqual(rows, before[section], `Catálogo distinto en ${section}`);
   }
   assert.equal(actual.security.length, before.security.length + 1);
@@ -98,17 +107,18 @@ async function seed(db) {
     reimbursementReceivableId: receivable.id,
   } });
   const category = await db.category.create({ data: { id: 'a11-category', userId: user.id, name: 'Abono' } });
-  await db.dailyExpense.create({ data: {
-    id: 'a11-payment', userId: user.id, categoryId: category.id, payableAccountId: 'a11-loan',
-    date: new Date('2026-10-17'), paymentMethod: 'CASH', concept: 'Abono de prueba', amount: '125.50',
-    loanBalanceAfterPayment: '875.00', loanInterestAmount: '12.50', loanPrincipalAmount: '113.00',
-  } });
+  // La semilla también se inserta antes de las migraciones nuevas: solo columnas históricas.
+  await db.$executeRaw`INSERT INTO daily_expenses
+    (id, "userId", "categoryId", "payableAccountId", date, "paymentMethod", concept, amount,
+     "loanBalanceAfterPayment", "loanInterestAmount", "loanPrincipalAmount", "updatedAt")
+    VALUES ('a11-payment', ${user.id}, ${category.id}, 'a11-loan', '2026-10-17', 'CASH', 'Abono de prueba', 125.50,
+      875.00, 12.50, 113.00, CURRENT_TIMESTAMP)`;
 }
 
 async function records(db) {
   return {
     loan: await db.payableAccount.findUnique({ where: { id: 'a11-loan' } }),
-    payment: await db.dailyExpense.findUnique({ where: { id: 'a11-payment' } }),
+    payment: await db.dailyExpense.findUnique({ where: { id: 'a11-payment' }, omit: { cashContributionAmount: true } }),
     receivable: await db.receivableAccount.findUnique({ where: { id: 'a11-receivable' } }),
   };
 }
@@ -214,6 +224,7 @@ async function main() {
         }
         runPrisma(['db', 'execute', '--file', path.join(root, 'prisma/migrations', securityMigration, 'migration.sql')], dbUrl);
         assert.deepEqual(await records(db), savedRecords);
+        assert.equal(String((await db.dailyExpense.findUnique({ where: { id: 'a11-payment' } })).cashContributionAmount), '0');
         if (savedHistory) {
           const currentHistory = await db.$queryRawUnsafe('SELECT * FROM public._prisma_migrations ORDER BY migration_name');
           assert.deepEqual(currentHistory.filter(row => before.migrations.some(old => old.migration_name === row.migration_name)), savedHistory);

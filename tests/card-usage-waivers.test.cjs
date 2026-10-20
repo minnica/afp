@@ -166,11 +166,34 @@ test("futuras y vencidas sin evidencia siguen siendo proyecciones", () => {
   }
 });
 
+test("distingue suscripciones por cobrar y por confirmar de otros movimientos previstos", () => {
+  const activeCycle = { ...cycle, id: "nov", month: 11, startDate: "2026-10-11", cutDate: "2026-11-10" };
+  const upcoming = { ...subscription, id: "upcoming", chargeDay: 3, amount: 120 };
+  const unconfirmed = { ...subscription, id: "unconfirmed", chargeDay: 15, amount: 80 };
+  const [result] = run({
+    cyclesWithAmounts: [activeCycle], month: 11, now: new Date("2026-10-20T12:00:00Z"),
+    subscriptions: [upcoming, unconfirmed],
+    expenses: [expense("future", 50, "Compra futura", "2026-10-25T12:00:00Z")],
+  });
+  assert.equal(result.projectedAmount, 250);
+  assert.equal(result.subscriptionForecast.upcomingCount, 1);
+  assert.equal(result.subscriptionForecast.upcomingAmount, 120);
+  assert.equal(result.subscriptionForecast.unconfirmedCount, 1);
+  assert.equal(result.subscriptionForecast.unconfirmedAmount, 80);
+
+  const [withoutCharge] = run({ cyclesWithAmounts: [activeCycle], month: 11,
+    now: new Date("2026-10-20T12:00:00Z"), subscriptions: [{ ...upcoming, frequencyMonths: 2, startMonth: 10 }] });
+  assert.equal(withoutCharge.subscriptionForecast.upcomingCount, 0);
+  assert.equal(withoutCharge.subscriptionForecast.unconfirmedCount, 0);
+});
+
 test("una suscripción confirmada conserva importe y fecha históricos", () => {
   const confirmed = { ...evidence, subscriptionCharges: [{ subscriptionId: "sub", name: "Servicio", date: "2026-10-03", amount: "379.00" }] };
   const [result] = run({ cyclesWithAmounts: [{ ...cycle, usageReconciliation: confirmed }], subscriptions: [{ ...subscription, amount: 499, isActive: false, deactivatedAt: "2026-10-05" }] });
   assert.equal(result.eligibleSpend, 379);
   assert.equal(result.projectedAmount, 0);
+  assert.equal(result.subscriptionForecast.upcomingCount, 0);
+  assert.equal(result.subscriptionForecast.unconfirmedCount, 0);
   assert.equal(result.isExempt, true);
 });
 
@@ -201,6 +224,8 @@ test("dos cargos reales iguales conservan su multiplicidad al emparejar un gasto
 test("un estado revisado no inventa una suscripción ausente", () => {
   const [result] = run({ cyclesWithAmounts: [{ ...cycle, usageReconciliation: evidence }], subscriptions: [subscription] });
   assert.equal(result.projectedAmount, 0);
+  assert.equal(result.subscriptionForecast.upcomingCount, 0);
+  assert.equal(result.subscriptionForecast.unconfirmedCount, 0);
   assert.equal(result.eligibleSpend, 0);
 });
 
@@ -350,5 +375,7 @@ test("omitir no cuenta como consumo y elimina la previsión del período", () =>
   const skipped = { ...subscription, charges: [{ month: "2026-10", status: "SKIPPED", expenseId: null }] };
   const result = run({ subscriptions: [skipped] })[0];
   assert.equal(result.projectedAmount, 0);
+  assert.equal(result.subscriptionForecast.upcomingCount, 0);
+  assert.equal(result.subscriptionForecast.unconfirmedCount, 0);
   assert.equal(result.eligibleSpend, 0);
 });

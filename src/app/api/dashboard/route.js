@@ -1,4 +1,5 @@
 import { getDebtAccountState } from "@/lib/calculations/debtAccounts";
+import { sumPersonalExpenses, expenseCents } from "@/lib/sharedExpenses";
 import { getCyclePaymentState } from "@/lib/calculations/cardCyclePayments";
 import { apiResponse as NextResponse, requireApiUser, apiAccessErrorResponse } from "@/lib/apiAuth";
 import { prisma } from "@/lib/prisma";
@@ -59,6 +60,7 @@ const dashboardExpenseSelect = {
   concept: true,
   date: true,
   amount: true,
+  cashContributionAmount: true,
   cardId: true,
   categoryId: true,
   category: {
@@ -481,14 +483,12 @@ function buildCategoryBreakdown({ categories, expenses, subscriptions, purchases
     0,
   );
 
-  const dailyExpensesTotal = monthlyExpenses.reduce((sum, e) => sum + Number(e.amount || 0), 0);
+  const dailyExpensesTotal = sumPersonalExpenses(monthlyExpenses);
   const monthlyExpenseTotal = dailyExpensesTotal + subscriptionsTotal + installmentPurchasesTotal;
 
   return categories
     .map((category) => {
-      const catDaily = monthlyExpenses
-        .filter((e) => e.categoryId === category.id)
-        .reduce((sum, e) => sum + Number(e.amount || 0), 0);
+      const catDaily = sumPersonalExpenses(monthlyExpenses.filter((e) => e.categoryId === category.id));
 
       const catSubs = subscriptions
         .filter((s) => s.categoryId === category.id)
@@ -553,16 +553,12 @@ function buildWeeklyComparison({ expenses, subscriptions = [], purchases = [], c
     .reduce((sum, p) => sum + getMonthlyPaymentUsed(p, { year: currentYear, month: currentMonth }), 0);
 
   const prevMonthTotal =
-    filteredExpenses
-      .filter((e) => isDateInsideRange(e.date, prevMonthStart, prevMonthEnd))
-      .reduce((sum, e) => sum + Number(e.amount || 0), 0) +
+    sumPersonalExpenses(filteredExpenses.filter((e) => isDateInsideRange(e.date, prevMonthStart, prevMonthEnd))) +
     prevSubsTotal +
     prevPurchasesTotal;
 
   const currMonthTotal =
-    filteredExpenses
-      .filter((e) => isDateInsideRange(e.date, currMonthStart, currMonthEnd))
-      .reduce((sum, e) => sum + Number(e.amount || 0), 0) +
+    sumPersonalExpenses(filteredExpenses.filter((e) => isDateInsideRange(e.date, currMonthStart, currMonthEnd))) +
     currSubsTotal +
     currPurchasesTotal;
 
@@ -580,28 +576,26 @@ function buildWeeklyComparison({ expenses, subscriptions = [], purchases = [], c
 
     const prevDailyTotal =
       startDay <= prevMonthDays
-        ? filteredExpenses
+        ? sumPersonalExpenses(filteredExpenses
             .filter((e) =>
               isDateInsideRange(
                 e.date,
                 new Date(Date.UTC(prevYear, prevMonth - 1, startDay, 0, 0, 0)),
                 new Date(Date.UTC(prevYear, prevMonth - 1, prevEnd, 23, 59, 59)),
               ),
-            )
-            .reduce((sum, e) => sum + Number(e.amount || 0), 0)
+            ))
         : 0;
 
     const currDailyTotal =
       startDay <= currMonthDays
-        ? filteredExpenses
+        ? sumPersonalExpenses(filteredExpenses
             .filter((e) =>
               isDateInsideRange(
                 e.date,
                 new Date(Date.UTC(currentYear, currentMonth - 1, startDay, 0, 0, 0)),
                 new Date(Date.UTC(currentYear, currentMonth - 1, currEnd, 23, 59, 59)),
               ),
-            )
-            .reduce((sum, e) => sum + Number(e.amount || 0), 0)
+            ))
         : 0;
 
     const prevSubsWeekTotal = prevSubscriptions
@@ -667,18 +661,27 @@ function buildCardMonthlyComparison({ cyclesWithAmounts, cards, currentYear, cur
         return d.getUTCFullYear() === currentYear && d.getUTCMonth() + 1 === currentMonth;
       });
 
-      const prevAmount = prevCycle
+      const prevGrossAmount = prevCycle
         ? Number(prevCycle.statementAmount ?? prevCycle.calculatedAmount ?? 0)
         : 0;
-      const currAmount = currCycle
+      const currGrossAmount = currCycle
         ? Number(currCycle.statementAmount ?? currCycle.calculatedAmount ?? 0)
         : 0;
+
+      const prevCashContribution = Number(prevCycle?.cashContributionsAmount || 0);
+      const currCashContribution = Number(currCycle?.cashContributionsAmount || 0);
+      const prevAmount = Math.max(0, expenseCents(prevGrossAmount) - expenseCents(prevCashContribution)) / 100;
+      const currAmount = Math.max(0, expenseCents(currGrossAmount) - expenseCents(currCashContribution)) / 100;
 
       return {
         cardId: card.id,
         cardName: card.name,
         prevAmount,
         currAmount,
+        prevGrossAmount,
+        currGrossAmount,
+        prevCashContribution,
+        currCashContribution,
         prevIsStatement: prevCycle?.statementAmount !== null && prevCycle?.statementAmount !== undefined,
         currIsStatement: currCycle?.statementAmount !== null && currCycle?.statementAmount !== undefined,
       };
@@ -962,9 +965,7 @@ export async function GET(request) {
 
     const monthlyExpenses = getExpensesForMonth(currentYear, currentMonth);
 
-    const dailyExpensesTotal = monthlyExpenses.reduce((sum, expense) => {
-      return sum + Number(expense.amount || 0);
-    }, 0);
+    const dailyExpensesTotal = sumPersonalExpenses(monthlyExpenses);
 
     const subscriptionsTotal = getMonthlySubscriptions(subscriptions, expenses, cardCycles, currentYear, currentMonth)
       .reduce((sum, subscription) => sum + Number(subscription.amount || 0), 0);

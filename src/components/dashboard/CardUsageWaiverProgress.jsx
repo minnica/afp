@@ -31,6 +31,24 @@ export function CardUsageWaiverTabs({ inHeader = false }) {
   );
 }
 
+function SubscriptionForecast({ item }) {
+  const { upcomingCount = 0, upcomingAmount = 0, unconfirmedCount = 0, unconfirmedAmount = 0 } = item.subscriptionForecast || {};
+  const upcomingLabel = `${upcomingCount} ${upcomingCount === 1 ? "suscripción prevista" : "suscripciones previstas"} · ${formatMoney(upcomingAmount)}`;
+  const unconfirmedLabel = `${unconfirmedCount} ${unconfirmedCount === 1 ? "suscripción por confirmar" : "suscripciones por confirmar"} · ${formatMoney(unconfirmedAmount)}`;
+  const state = upcomingCount ? "upcoming" : unconfirmedCount ? "unconfirmed" : "none";
+
+  return (
+    <div className="flex flex-wrap gap-1.5" data-usage-subscription-state={state}>
+      <Badge variant={state === "none" ? "warning" : "secondary"} className="h-auto max-w-full whitespace-normal py-1 text-left text-xs leading-4">
+        {upcomingCount ? upcomingLabel : unconfirmedCount ? unconfirmedLabel : "Sin suscripciones previstas"}
+      </Badge>
+      {upcomingCount > 0 && unconfirmedCount > 0 ? (
+        <Badge variant="outline" className="h-auto max-w-full whitespace-normal py-1 text-left text-xs leading-4">{unconfirmedLabel}</Badge>
+      ) : null}
+    </div>
+  );
+}
+
 function MobileCurrentUsageList({ items, today, onBreakdown }) {
   const listId = useId();
   return (
@@ -53,6 +71,7 @@ function MobileCurrentUsageList({ items, today, onBreakdown }) {
             </ItemHeader>
             {hasCycle ? (
               <>
+                {!item.isExempt ? <SubscriptionForecast item={item} /> : null}
                 <p className="text-sm font-normal">Corte: {formatPaymentDeadline(item.selectedCycle.cutDate, today, { includeDate: false })}</p>
                 {!needsReview ? (
                   <Progress
@@ -110,6 +129,7 @@ function UsageList({ items, today, historical = false, compact = false, onBreakd
                 </p>
               ) : null}
             </ItemHeader>
+            {!historical && item.selectedCycle && !item.isExempt ? <SubscriptionForecast item={item} /> : null}
             <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
               <p className={cn("text-xs text-muted-foreground", relativeCut && "text-sm text-foreground")}>
                 {relativeCut ? (
@@ -186,6 +206,9 @@ export default function CardUsageWaiverProgress({
   const panels = (
     <>
       <TabsContent value="current" className="flex min-w-0 flex-col gap-3 data-[state=inactive]:hidden">
+        {pending.some((item) => item.subscriptionForecast?.upcomingCount || item.subscriptionForecast?.unconfirmedCount) ? (
+          <p className="text-xs text-muted-foreground">Las suscripciones previstas cuentan cuando se confirma el cobro.</p>
+        ) : null}
         {pending.length ? <CurrentList items={pending} {...listProps} /> : current.length === completed.length && completed.length ? (
           <Empty className="px-0 py-4"><EmptyDescription>Todas tus metas en curso están alcanzadas.</EmptyDescription></Empty>
         ) : null}

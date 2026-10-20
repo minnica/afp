@@ -47,6 +47,7 @@ const cycleExpenseSelect = {
   cardId: true,
   concept: true,
   amount: true,
+  cashContributionAmount: true,
   date: true,
   category: {
     select: {

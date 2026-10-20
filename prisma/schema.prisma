@@ -236,6 +236,7 @@ model DailyExpense {
   cardId              String?
   concept             String
   amount              Decimal
+  cashContributionAmount Decimal    @default(0)
   categoryId          String
   notes               String?
   personId            String?

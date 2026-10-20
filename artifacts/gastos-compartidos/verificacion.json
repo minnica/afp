@@ -1,0 +1,38 @@
+{
+  "date": "2026-10-20",
+  "feature": "Aportaciones recibidas en efectivo para gastos compartidos",
+  "environment": "PostgreSQL 16 local desechable, API real, Supabase Auth simulado",
+  "productionChanged": false,
+  "automated": {
+    "command": "AFP_MIGRATION_TEST_DATABASE_URL=<PostgreSQL local afp_test…> node scripts/verify-database-reproduction.cjs",
+    "passed": 212,
+    "failed": 0,
+    "skipped": 0,
+    "migrations": 17,
+    "freshInstall": "correcta",
+    "upgradeFromHistoricalSchema": "correcta; datos y checksums preservados",
+    "schemaDiff": "vacío",
+    "rls": "preservado",
+    "databaseConstraints": "rechazan aportación negativa, mayor al cargo o con fracciones de centavo"
+  },
+  "build": { "command": "pnpm exec next build --webpack", "result": "correcto" },
+  "lint": { "command": "pnpm lint", "errors": 0, "existingWarnings": ["react-hooks/incompatible-library en src/components/ui/data-table.jsx"] },
+  "browser": {
+    "viewports": [[1280, 900], [390, 844]],
+    "create": { "amount": 600, "cashContributionAmount": 500, "personalExpense": 100, "incomesCreated": 0, "receivablesCreated": 0 },
+    "analysis": { "weekly": 100, "categoryComida": 100, "cardSantander": 100 },
+    "edit": "Aportación corregida de 500 a 100 y verificada en PostgreSQL; cargo original de 600 preservado",
+    "validation": "Cargo de 400 con aportación de 500 muestra error asociado y aria-invalid=true",
+    "draft": "Cerrar y reabrir conserva importe y aportación",
+    "offline": { "amount": 250.5, "cashContributionAmount": 100, "personalExpense": 150.5, "queued": 1, "persistedAfterReconnect": 1, "remainingQueue": 0 },
+    "horizontalOverflow": false,
+    "limits": "Datos ficticios. No prueba Supabase Auth real ni un despliegue productivo. Se recargó el entorno dev tras un error transitorio de Fast Refresh."
+  },
+  "screenshots": [
+    "captura-desktop.png", "captura-mobile.png", "listado-desktop.png", "listado-mobile.png",
+    "edicion-mobile.png", "pendiente-mobile.png", "analisis-semanas-desktop.png",
+    "analisis-tarjetas-desktop.png", "analisis-categorias-mobile.png"
+  ],
+  "productionMigrationVerification": "produccion.json; aplicación autorizada y verificada el 20 de octubre de 2026, posterior a estas pruebas locales",
+  "pending": "Publicación de la app no realizada."
+}

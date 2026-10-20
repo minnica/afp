@@ -12,6 +12,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Empty, EmptyHeader, EmptyTitle } from "@/components/ui/empty";
 import { Item, ItemActions, ItemContent, ItemGroup, ItemSeparator } from "@/components/ui/item";
 import { Skeleton } from "@/components/ui/skeleton";
+import { expenseCents, getPersonalExpenseAmount, sumPersonalExpenses } from "@/lib/sharedExpenses";
 
 const DAYS_PER_BATCH = 7;
 const money = new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" });
@@ -28,10 +29,11 @@ export default function DailyExpenseCards({ expenses, isOnline, onEdit, onDelete
     const groups = new Map();
     for (const expense of expenses) {
       const date = String(expense.date).split("T")[0];
-      if (!groups.has(date)) groups.set(date, { date, expenses: [], cents: 0, pending: 0 });
+      if (!groups.has(date)) groups.set(date, { date, expenses: [], cents: 0, contributionCents: 0, pending: 0 });
       const group = groups.get(date);
       group.expenses.push(expense);
       group.cents += Math.round(Number(expense.amount || 0) * 100);
+      group.contributionCents += expenseCents(expense.cashContributionAmount);
       if (expense._offlineStatus === "pending") group.pending += 1;
     }
     return [...groups.values()].sort((a, b) => b.date.localeCompare(a.date));
@@ -53,7 +55,10 @@ export default function DailyExpenseCards({ expenses, isOnline, onEdit, onDelete
       {days.length > 1 ? (
         <div className="flex flex-wrap items-center justify-between gap-2 text-sm" role="status">
           <span className="text-muted-foreground">{expenses.length} gastos · {days.length} días</span>
-          <span>Total filtrado <strong className="tabular-nums">{money.format(totalCents / 100)}</strong></span>
+          <div className="flex flex-col gap-1 text-right">
+            <span>Total pagado <strong className="tabular-nums">{money.format(totalCents / 100)}</strong></span>
+            {days.some(day => day.contributionCents > 0) ? <span>Tu parte <strong className="tabular-nums">{money.format(sumPersonalExpenses(expenses))}</strong></span> : null}
+          </div>
         </div>
       ) : null}
       {days.slice(0, visibleDays).map((day) => (
@@ -67,8 +72,9 @@ export default function DailyExpenseCards({ expenses, isOnline, onEdit, onDelete
               </CardDescription>
             </div>
             <div className="flex flex-col gap-1">
-              <span className="text-sm text-muted-foreground">Total del día</span>
+              <span className="text-sm text-muted-foreground">Total pagado del día</span>
               <strong className="text-xl tabular-nums" data-day-total>{money.format(day.cents / 100)}</strong>
+              {day.contributionCents > 0 ? <span className="text-sm">Tu parte <strong className="tabular-nums">{money.format((day.cents - day.contributionCents) / 100)}</strong></span> : null}
             </div>
           </CardHeader>
           <CardContent>
@@ -100,6 +106,15 @@ export default function DailyExpenseCards({ expenses, isOnline, onEdit, onDelete
                           </ItemActions>
                         ) : null}
                       </div>
+                      {Number(expense.cashContributionAmount) > 0 ? (
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm">
+                          <span className="inline-flex items-center gap-1.5 text-success">
+                            <Badge variant="success">Efectivo</Badge>
+                            <span className="tabular-nums">{money.format(Number(expense.cashContributionAmount))}</span>
+                          </span>
+                          <span>Tu parte <strong className="tabular-nums">{money.format(getPersonalExpenseAmount(expense))}</strong></span>
+                        </div>
+                      ) : null}
                       {expense.notes ? <p className="break-words text-sm text-muted-foreground">{expense.notes}</p> : null}
                       {expense.person ? <p className="break-words text-sm text-muted-foreground">{expense.person.name}{expense.receivableAccount ? ` · ${expense.receivableAccount.concept}` : ""}</p> : null}
                       {expense.payableAccount ? <p className="break-words text-sm text-muted-foreground">Pagar: {expense.payableAccount.concept}</p> : null}
