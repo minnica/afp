@@ -109,9 +109,11 @@
   "production": {
     "unexpectedMigrationRecovered": true,
     "evidence": "production-recovery.json",
-    "webDeployed": false,
+    "webDeployed": true,
     "bankAutomationActivated": false,
-    "pendingMigration": "20261021020000_capture_installment_reconciliation",
+    "pendingMigration": null,
+    "appliedMigrations": 20,
+    "deploymentEvidence": "production-deployment.json",
     "personalAliasesConfigured": true,
     "personalAliasImportEvidence": "personal-alias-import.json"
   },

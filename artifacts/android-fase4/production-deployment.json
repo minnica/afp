@@ -1,0 +1,41 @@
+{
+  "verifiedAt": "2026-10-21T09:19:35.206Z",
+  "migration": "20261021020000_capture_installment_reconciliation",
+  "appliedMigrations": 20,
+  "pendingMigrations": [],
+  "checksumsMatch": true,
+  "schemaDiff": "empty",
+  "prismaClientRegenerated": true,
+  "previousHistoryPreserved": true,
+  "previousPublicRowsPreserved": true,
+  "existingInstallmentsConfirmed": true,
+  "prismaReadWithNewColumn": "passed",
+  "existingSchemaPreserved": true,
+  "rlsTables": 26,
+  "publicPolicies": 0,
+  "grantsAndAutomationPreserved": true,
+  "bankAutomationActivated": false,
+  "web": {
+    "project": "afp",
+    "environment": "production",
+    "deploymentId": "dpl_FLc1xUkTxxwG5Xa4WfLCtARgSHwP",
+    "commit": "3af06edd9b29da5acdc8b4d084ac343abc5b8edf",
+    "state": "READY",
+    "origin": "https://finanzas.garatachia.com",
+    "publishedBy": "user Git push",
+    "redeployedDuringDatabaseMigration": false,
+    "anonymousHttpChecks": {
+      "/login": 200,
+      "/api/installment-purchases": 401,
+      "/api/captures/configuration": 401,
+      "/api/captures/movements": 401
+    },
+    "authenticatedFinancialBrowserFlowRetested": false
+  },
+  "android": {
+    "apkUpdateRequired": false,
+    "version": "0.3.0 / versionCode 5"
+  },
+  "backupStoredPrivately": true,
+  "privateBackupScope": "AFP public rows, schema metadata, grants and automation; excludes Supabase Auth"
+}
