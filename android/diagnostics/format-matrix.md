@@ -1,6 +1,6 @@
 # Matriz de fuentes y formatos · Fase 1
 
-Actualización: **21 de octubre de 2026**. Inventario vigente contrastado mediante una transacción PostgreSQL **READ ONLY**, limitada a los nombres de tarjetas del único propietario de AFP. Resultado: **9 tarjetas, 7 emisores y 8 aplicaciones de diagnóstico incluyendo Wallet**. No se consultaron movimientos ni se modificaron registros. Los nombres siguientes son los existentes; no se renombraron tarjetas ni se dedujo su producto comercial.
+Actualización: **21 de octubre de 2026**. Inventario vigente contrastado mediante una transacción PostgreSQL **READ ONLY**, limitada a los nombres de tarjetas del único propietario de AFP. Resultado: **9 tarjetas, 7 emisores y 8 aplicaciones de diagnóstico incluyendo Wallet**. Esa consulta inicial no leyó movimientos; el seguimiento de avisos reales posterior se documenta al final. No se renombraron tarjetas ni se dedujo su producto comercial.
 
 ## Inventario y aplicaciones verificadas
 
@@ -8,12 +8,12 @@ Todas las aplicaciones de esta tabla están instaladas en el perfil actual del S
 
 | Fuente / ficha oficial | Paquete | Versión instalada | Tarjetas actuales de AFP / alcance | Formato real |
 |---|---|---|---|---|
-| [BBVA México](https://play.google.com/store/apps/details?id=com.bancomer.mbanking) | `com.bancomer.mbanking` | `26.90.14` | BBVA | Pendiente de muestra |
+| [BBVA México](https://play.google.com/store/apps/details?id=com.bancomer.mbanking) | `com.bancomer.mbanking` | `26.90.14` | BBVA | Sin aviso de crédito; aviso de cuenta de débito excluido |
 | [Google Wallet](https://play.google.com/store/apps/details?id=com.google.android.apps.walletnfcrel) | `com.google.android.apps.walletnfcrel` | `26.41.996630916` (reconsulta Fase 7) | Alias de seis tarjetas configurados; falta observar sus compras | Pendiente de muestra |
 | [HSBC México](https://play.google.com/store/apps/details?id=mx.hsbc.hsbcmexico) | `mx.hsbc.hsbcmexico` | `3.75.14` | HSBC 1 y HSBC 2 | Pendiente; distinguir ambas |
 | [Banamex](https://play.google.com/store/apps/details?id=com.citibanamex.banamexmobile) | `com.citibanamex.banamexmobile` | `136.0.0` | BANAMEX 1 y BANAMEX 2 | Pendiente; distinguir ambas |
 | [Santander México](https://play.google.com/store/apps/details?id=mx.bancosantander.supermovil) | `mx.bancosantander.supermovil` | `12.2` | SANTANDER | Pendiente de muestra |
-| [Nu](https://play.google.com/store/apps/details?id=com.nu.production) | `com.nu.production` | `10.8.43-minApi28` | NU | Pendiente de muestra |
+| [Nu](https://play.google.com/store/apps/details?id=com.nu.production) | `com.nu.production` | `10.8.43-minApi28` | NU | Pago CFE real parcial; no activable |
 | [DiDi Finanzas](https://play.google.com/store/apps/details?id=com.didiglobal.cashloan) | `com.didiglobal.cashloan` | `3.2.2` | DIDI | Pendiente de muestra |
 | [Mercado Pago](https://play.google.com/store/apps/details?id=com.mercadopago.wallet) | `com.mercadopago.wallet` | `2.458.2` (reconsulta Fase 7) | MERCADOPAGO | Pendiente de muestra |
 
@@ -23,7 +23,7 @@ Las fuentes añadidas no se activan al actualizar la APK. Se conserva la selecci
 
 ## Campos y resolución por tarjeta
 
-Los campos siguientes se refieren a **compras de crédito**. El aviso BBVA de cargo a cuenta recibido durante la preparación de Fase 6 fue confirmado por el propietario como transferencia de débito; no completa estos campos ni acredita cobertura de crédito.
+Los campos siguientes se refieren a **compras o pagos con crédito**. El aviso BBVA de cargo a cuenta recibido durante la preparación de Fase 6 fue confirmado por el propietario como transferencia de débito; no completa estos campos ni acredita cobertura de crédito. En Nu se observó un pago CFE que el propietario confirmó como financiado con crédito; esa confirmación no forma parte del contenido del aviso.
 
 | Fuente | Importe | Moneda | Comercio | Fecha de operación | Identidad de tarjeta | Referencia |
 |---|---|---|---|---|---|---|
@@ -32,7 +32,7 @@ Los campos siguientes se refieren a **compras de crédito**. El aviso BBVA de ca
 | HSBC | Sin observar | Sin observar | Sin observar | Sin observar | Alias de ambas configurados; falta muestra de compra | Sin observar |
 | Banamex | Sin observar | Sin observar | Sin observar | Sin observar | Alias de ambas configurados; falta muestra de compra | Sin observar |
 | Santander | Sin observar | Sin observar | Sin observar | Sin observar | Alias configurado; campo del aviso sin observar | Sin observar |
-| Nu | Sin observar | Sin observar | Sin observar | Sin observar | Alias configurado; campo del aviso sin observar | Sin observar |
+| Nu (pago CFE) | Presente | Ausente; solo símbolo `$` | Presente: CFE | Ausente | Ausente; no basta la fuente Nu | Ausente |
 | DiDi Finanzas | Sin observar | Sin observar | Sin observar | Sin observar | Alias configurado; campo del aviso sin observar | Sin observar |
 | Mercado Pago | Sin observar | Sin observar | Sin observar | Sin observar | Tarjeta frente a cuenta/saldo pendiente | Sin observar |
 
@@ -66,7 +66,7 @@ Las pruebas instrumentadas de captura usan exclusivamente **notificaciones sint�
 4. Preparar una copia revisada que conserve las palabras y estructura bancarias y sustituya comercio, importe, fechas, nombres, terminaciones y referencias por valores ficticios coherentes. Marcar la muestra como derivada de un aviso real y la revisión realizada, sin convertir esos valores ficticios en hechos financieros.
 5. Verificar si la evidencia distingue cada tarjeta. Un campo ausente o ambiguo permanece así; no completar por deducción.
 
-La exportación `anonymous-shape-only` oculta letras y cifras y sirve para inspeccionar estructura. **No constituye una muestra de lenguaje bancario para desarrollar un analizador.** Todavía no existen fixtures bancarios reales revisados en el repositorio. La fase permanece abierta hasta validar la captura real del piloto; otras fuentes pueden continuar identificadas como pendientes.
+La exportación `anonymous-shape-only` oculta letras y cifras y sirve para inspeccionar estructura. **No constituye una muestra de lenguaje bancario para desarrollar un analizador.** El repositorio incluye ahora una [muestra real revisada y anonimizada de Nu/CFE](../../tests/fixtures/captures/nu-cfe-service-payment.es.v1.json): conserva el lenguaje y sustituye importe y fechas por valores ficticios. Sus campos ausentes se mantienen ausentes y su analizador sigue sin habilitar automatización. Otros avisos de Nu continúan sin validar. La fase permanece abierta hasta validar la captura real del piloto; otras fuentes pueden continuar identificadas como pendientes.
 
 ## Observación del piloto de crédito · Fase 6
 
@@ -78,8 +78,22 @@ Presencial, en línea, Wallet, Amazon, Mercado Libre y suscripciones de crédito
 
 Reconsulta ADB del **21 de octubre de 2026**: ocho fuentes instaladas, permiso de notificaciones y batería exenta conservados en AFP personal **0.5.0 / 7**. Wallet pasó a `26.41.996630916` y Mercado Pago a `2.458.2`; las otras seis versiones siguen iguales. [Consulta técnica sin avisos ni identificadores del teléfono](../../artifacts/android-fase7/device.json).
 
-El propietario confirmó que todavía no tiene avisos nuevos de compras de crédito. BBVA, HSBC 1/2, BANAMEX 1/2, SANTANDER, NU, DIDI y MERCADOPAGO siguen **sin muestras de compra verificadas ni analizadores activables**. Se reutilizan los 24 alias verificados de Fase 4, sin publicar cifras. Física/digital están configuradas en las nueve tarjetas; Wallet en BBVA, BANAMEX 1/2, SANTANDER, NU y DIDI. HSBC 1/2 y MERCADOPAGO conservan Wallet vacío por incompatibilidad declarada por el propietario.
+Al iniciar la fase no había avisos nuevos de compras de crédito. El seguimiento posterior añade una muestra parcial Nu/CFE; BBVA, HSBC 1/2, BANAMEX 1/2, SANTANDER, NU, DIDI y MERCADOPAGO siguen **sin analizadores de crédito activables**. Se conservan 24 alias, sin publicar cifras: física/digital en las nueve tarjetas y Wallet en BBVA, BANAMEX 1/2, SANTANDER, NU y DIDI. Los seis Wallet inicialmente declarados correspondían al título de la tarjeta y se corrigieron contrastando el campo **Número de cuenta virtual** en cada tarjeta del teléfono. HSBC 1/2 y MERCADOPAGO conservan Wallet vacío por incompatibilidad declarada por el propietario.
 
 Los canales presencial, en línea, parciales y suscripciones reales están pendientes **en cada tarjeta**; Wallet real sigue pendiente en las seis aplicables. La nueva vista de cobertura y los requisitos de activación están implementados en local: un analizador verificado y un alias no bastan, también se exige una propuesta propia del mismo formato en observación, revisada, registrada/vinculada y cotejada sin corregir sus datos interpretados. No se atribuye el canal ni la compra a partir de la aplicación instalada.
 
-Hay 329 regresiones web correctas sin omisiones, con pruebas propias de las nueve tarjetas y seis Wallet mediante contratos ficticios del cargador aislado. No son fixtures reales de los emisores ni permiten habilitar los analizadores del producto. La pausa por fuente y vuelta a observación conservan datos; también se puede desactivar una configuración de formato retirado. [Guía, matriz por tarjeta y recuperación](../../docs/android-captura.md#activación-gradual-por-tarjeta--fase-7), [evidencia Fase 7](../../artifacts/android-fase7/verification.json). La fase permanece abierta; no se publicó esta implementación ni se modificó Supabase.
+La aceptación inicial tuvo 329 regresiones web correctas sin omisiones, con pruebas propias de las nueve tarjetas y seis Wallet mediante contratos ficticios del cargador aislado. No son fixtures reales de los emisores ni permiten habilitar los analizadores del producto. La pausa por fuente y vuelta a observación conservan datos; también se puede desactivar una configuración de formato retirado. [Guía, matriz por tarjeta y recuperación](../../docs/android-captura.md#activación-gradual-por-tarjeta--fase-7), [evidencia Fase 7](../../artifacts/android-fase7/verification.json). Esa aceptación inicial no publicó esta implementación ni modificó Supabase; la corrección posterior de alias se detalla a continuación. La fase permanece abierta.
+
+## Primeros movimientos reales revisados · 21 de octubre de 2026
+
+**Nu/CFE:** se revisaron `android.title`, `android.text` y `android.bigText`. La entrega al servidor tardó aproximadamente cinco segundos desde la captura; el teléfono estaba desbloqueado. La propuesta parcial local conserva importe y CFE, sin inferir moneda, tarjeta ni fecha de operación a partir de la fuente o de las fechas Android. `nu.cfe-service-payment.es.v1` tiene evidencia `REAL_REVIEWED_PARTIAL` y `verified: false`. El evento ya recibido mantiene su recibo y estado original `REVIEW / UNKNOWN_FORMAT`; no se reinterpreta ni se registró un gasto. La nueva interpretación aún no se publicó.
+
+**Compra BBVA/Wallet:** el comprobante facilitado acredita un pago aprobado NFC en una terminal Mercado Pago y su terminación coincide con el número virtual de la BBVA consultada. Se corrigió un dígito mal leído inicialmente del comprobante. El propietario solo vio la terminal y la palomita de Wallet, sin notificación. No se encontró un aviso asociado en AFP; Wallet tenía cero muestras de diagnóstico y cero eventos en el servidor. El historial Wallet consultado mostraba operaciones anteriores, sin identificar el cargo comunicado. Una terminal Mercado Pago no convierte la operación en un cargo de la tarjeta MERCADOPAGO.
+
+**Corrección de alias Wallet:** el propietario aclaró que las seis entradas originales copiaban la terminación del título. Se leyeron los seis números de cuenta virtual en los detalles de BBVA, NU, DIDI, SANTANDER y BANAMEX 1/2, vinculando cada título con su tarjeta existente sin inferir por marca. Se sustituyeron las seis entradas incorrectas en AFP mediante el servicio de configuración en una transacción y se actualizó el archivo privado. La lectura posterior confirmó los 24 alias y cero ambigüedades; los otros 18 alias y las huellas de 20 modelos permanecieron idénticos. Los números y respaldos quedan fuera de Git. Esta corrección no aporta una notificación de compra ni activa formatos.
+
+En la consulta actual, BBVA, Wallet y Nu tenían permiso para publicar notificaciones y los canales consultados de BBVA/Wallet no estaban bloqueados. El reporte AFP mostraba lector/acceso/captura activos, envíos habilitados, ocho fuentes y ninguna pausa remota. Estos estados actuales no permiten concluir si se publicó una notificación en el momento del pago. Un comprobante y una confirmación dentro de Wallet son evidencias distintas de una notificación accesible al lector.
+
+Google documenta que los pagos en tienda pueden usar un número virtual consultable en los detalles de la tarjeta; debe verificarse allí, sin asumir que coincide con la terminación física o con un comprobante concreto. [Ayuda oficial de Google Wallet](https://support.google.com/wallet/answer/7643925?hl=es).
+
+La regresión completa pasó a **337 pruebas web correctas sin omisiones** en PostgreSQL desechable; lint y build correctos, con el aviso previo de TanStack. No hubo cambios nativos, activaciones, gastos creados ni despliegue. Los originales y las terminaciones permanecen fuera de Git. [Evidencia del seguimiento](../../artifacts/android-muestras-2026-10-21/verification.json).

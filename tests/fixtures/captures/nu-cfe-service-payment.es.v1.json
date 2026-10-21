@@ -1,0 +1,16 @@
+{
+  "kind": "ANONYMIZED_REAL_NOTIFICATION",
+  "reviewedOn": "2026-10-21",
+  "scope": "El propietario confirmó un pago de CFE desde la app Nu con crédito Nu. El importe y las fechas de este fixture son ficticios; el lenguaje y los campos conservan la estructura revisada.",
+  "limitations": ["Sin moneda explícita", "Sin identificación de tarjeta", "Sin fecha bancaria de operación", "No valida otros pagos o compras de Nu"],
+  "event": {
+    "sourcePackage": "com.nu.production",
+    "postedAt": "2026-10-20T18:00:00.000Z",
+    "receivedAt": "2026-10-20T18:00:00.300Z",
+    "fields": {
+      "android.title": "Tu pago a CFE fue exitoso",
+      "android.text": "El pago de $123.45 a CFE fue exitoso.",
+      "android.bigText": "El pago de $123.45 a CFE fue exitoso."
+    }
+  }
+}

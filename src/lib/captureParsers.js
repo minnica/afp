@@ -1,10 +1,11 @@
-// Los formatos de compra de arranque son SINTÉTICOS. El aviso real de cargo
-// a cuenta corresponde a débito, fuera del piloto de tarjetas de crédito.
+// Los formatos de compra de arranque son SINTÉTICOS. Los avisos reales de
+// débito y pago CFE no aportan una compra de crédito completa automatizable.
 // verified solo cambia tras incorporar evidencia real anonimizada y sus regresiones.
 export const captureParsers = [
   { key: "bbva.purchase.es.v1", sourcePackage: "com.bancomer.mbanking", title: "Compra aprobada", verified: false },
   { key: "wallet.purchase.es.v1", sourcePackage: "com.google.android.apps.walletnfcrel", title: "Pago realizado", verified: false },
   { key: "bbva.account-charge.es.v1", sourcePackage: "com.bancomer.mbanking", verified: false, evidence: "REAL_OUT_OF_SCOPE" },
+  { key: "nu.cfe-service-payment.es.v1", sourcePackage: "com.nu.production", verified: false, evidence: "REAL_REVIEWED_PARTIAL" },
 ];
 
 export function normalizeMerchant(value) {
@@ -50,6 +51,23 @@ export function interpretCapture(event) {
       return { parserKey: "bbva.account-charge.es.v1", verified: false,
         reason: conflicting ? "CONFLICTING_FIELDS" : "NON_CREDIT_ACCOUNT", proposal: {} };
     }
+  }
+  // Muestra real confirmada como pago CFE desde Nu. El símbolo $ no fija la
+  // moneda; publicación/recepción no sustituyen la fecha de operación y el
+  // paquete Nu no identifica una tarjeta. Conservar lo disponible para revisión.
+  if (event.sourcePackage === "com.nu.production" && event.fields?.["android.title"] === "Tu pago a CFE fue exitoso") {
+    const parserKey = "nu.cfe-service-payment.es.v1";
+    const body = event.fields["android.bigText"] || event.fields["android.text"] || "";
+    if (event.fields["android.bigText"] && event.fields["android.text"] && !body.startsWith(event.fields["android.text"])) {
+      return { parserKey, verified: false, reason: "CONFLICTING_FIELDS", proposal: {} };
+    }
+    const match = body.match(/^El pago de \$([\d,.]+) a CFE fue exitoso\.$/);
+    if (!match) return { parserKey, verified: false, reason: "INCOMPLETE_FORMAT", proposal: {} };
+    const amount = captureAmount(match[1]);
+    if (!amount) return { parserKey, verified: false, reason: "INVALID_FIELDS", proposal: {} };
+    return { parserKey, verified: false, reason: "INCOMPLETE_FORMAT", proposal: {
+      amount, merchant: "CFE", movementType: "SERVICE_PAYMENT", missingFields: ["currency", "card", "operationDate"],
+    } };
   }
   const parsers = captureParsers.filter(parser => typeof parser.title === "string" && parser.sourcePackage === event.sourcePackage && parser.title === event.fields?.["android.title"]);
   if (parsers.length !== 1) return { reason: "UNKNOWN_FORMAT", proposal: {} };
