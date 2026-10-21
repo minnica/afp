@@ -1,0 +1,158 @@
+{
+  "reviewDate": "2026-10-21",
+  "commit": "83be8f08d967304059718ebd9785c9463233b902",
+  "scope": "Revisión documental y de código; pruebas locales y auditorías de dependencias. Sin cambios funcionales ni operaciones de producción.",
+  "executed": {
+    "tests": {
+      "command": "pnpm test",
+      "exitCode": 0,
+      "tests": 246,
+      "pass": 233,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 13,
+      "todo": 0,
+      "integrationDatabaseConfigured": false,
+      "skippedTests": [
+        "Captura PostgreSQL: vinculación, recepción y autorización completa",
+        "Fase 6 PostgreSQL: seguimiento del piloto sin atribuir cobertura ni crear gastos al observar",
+        "Fase 4 PostgreSQL: interpretación, resoluciones y escritura financiera atómica",
+        "Nu CFE PostgreSQL: aviso real anonimizado conserva recepción y exige revisión financiera explícita",
+        "Fase 5 PostgreSQL: revisión, fuentes y cotejo manual sin alterar decisiones personales",
+        "Fase 7 PostgreSQL: activación gradual, evidencia propia y recuperación de nueve tarjetas",
+        "PostgreSQL: devoluciones y pagos concurrentes, aislamiento, rollback y avisos",
+        "PostgreSQL A05 payable: abonos simultáneos, principal, cancelación y rollback",
+        "PostgreSQL A05 receivable: abonos simultáneos, principal, cancelación y rollback",
+        "PostgreSQL: unicidad concurrente, rollback y recibo durable de capturas",
+        "PostgreSQL A06: rollback de cada paso relacionado, reintentos y traslado de ingresos",
+        "PostgreSQL: gastos compartidos en CRUD, análisis, cortes, idempotencia y aislamiento",
+        "cobros: transacción, concurrencia, omisión, restauración, evidencia y aislamiento"
+      ],
+      "summary": "1..246\n# tests 246\n# suites 0\n# pass 233\n# fail 0\n# cancelled 0\n# skipped 13\n# todo 0\n# duration_ms 768.581781"
+    },
+    "lint": {
+      "command": "pnpm lint",
+      "exitCode": 0,
+      "errors": 0,
+      "warnings": 1,
+      "diagnostic": "src/components/ui/data-table.jsx:61 react-hooks/incompatible-library (useReactTable)"
+    },
+    "dependencyAudits": {
+      "prod": {
+        "command": "pnpm audit --prod --json",
+        "exitCode": 0,
+        "evidence": "revision-2026-10-21-audit-prod.json",
+        "vulnerabilities": {
+          "info": 0,
+          "low": 0,
+          "moderate": 0,
+          "high": 0,
+          "critical": 0
+        }
+      },
+      "all": {
+        "command": "pnpm audit --json",
+        "exitCode": 1,
+        "evidence": "revision-2026-10-21-audit-all.json",
+        "vulnerabilities": {
+          "info": 0,
+          "low": 0,
+          "moderate": 0,
+          "high": 1,
+          "critical": 0
+        }
+      }
+    }
+  },
+  "deploymentComparison": {
+    "deploymentEvidence": "../android-fase6/production-deployment.json",
+    "manifest": "../android-fase6/source-manifest.json",
+    "method": "SHA-1 de los bytes de cada archivo, comparado con el campo sha del manifiesto registrado al publicar; no consulta de producción en vivo.",
+    "filesInPublishedManifest": 230,
+    "identical": 227,
+    "modified": [
+      "src/components/configuracion/CaptureConfigurationPanel.jsx",
+      "src/lib/captureConfiguration.js",
+      "src/lib/captureParsers.js"
+    ],
+    "missing": [],
+    "additionalPhase7SourceFiles": [
+      "src/components/configuracion/CaptureRolloutStatus.jsx",
+      "src/lib/captureRollout.js"
+    ],
+    "matchedRelevantFiles": [
+      "package.json",
+      "pnpm-lock.yaml",
+      "prisma/schema.prisma",
+      "public/sw.js",
+      "src/app/api/card-cycles/route.js",
+      "src/app/api/expenses/route.js",
+      "src/app/api/incomes/route.js",
+      "src/app/api/installment-purchases/route.js",
+      "src/app/api/payables/route.js",
+      "src/app/api/receivables/route.js",
+      "src/components/gastos/GastosContent.jsx",
+      "src/lib/apiAuth.js",
+      "src/lib/apiFetch.js",
+      "src/lib/calculations/cardCyclePayments.js",
+      "src/lib/calculations/debtAccounts.js",
+      "src/lib/debtAccountService.js",
+      "src/lib/expenseOperations.js",
+      "src/lib/expenseService.js",
+      "src/lib/offlineExpenses.js"
+    ]
+  },
+  "findings": {
+    "covered": [
+      "A01",
+      "A02",
+      "A03",
+      "A05",
+      "A06",
+      "A11"
+    ],
+    "partial": [
+      "A10"
+    ],
+    "pendingCorrection": [
+      "A04",
+      "A07",
+      "A08",
+      "A09",
+      "A12",
+      "A13",
+      "A14"
+    ],
+    "realSupabaseTwoUserAcceptanceStillPending": true
+  },
+  "androidPhases": {
+    "covered": [
+      2,
+      3,
+      5
+    ],
+    "partial": [
+      1,
+      4,
+      6,
+      7
+    ],
+    "realCreditAutomationEnabled": false,
+    "basis": "Plan y evidencias guardadas; no se repitió inspección del teléfono."
+  },
+  "historicalEvidence": {
+    "latestFullWebSuite": "../android-muestras-2026-10-21/verification.json",
+    "webPassed": 337,
+    "database": "PostgreSQL local desechable; Auth simulada",
+    "nativeAcceptance": "../android-fase7/verification.json",
+    "jvmPassed": 18,
+    "instrumentedPassed": 29
+  },
+  "notRepeated": [
+    "Build web",
+    "Reconstrucción de BD y pruebas de integración PostgreSQL",
+    "Pruebas de navegador",
+    "Pruebas Android",
+    "Inspección remota de despliegue o base de producción"
+  ]
+}
