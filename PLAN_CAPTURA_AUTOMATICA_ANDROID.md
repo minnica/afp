@@ -1,7 +1,7 @@
 # AFP Android: plan por fases para capturar compras automáticamente
 
 **Archivo:** `PLAN_CAPTURA_AUTOMATICA_ANDROID.md`, en la raíz del proyecto.\
-**Estado:** Fases 2, 3 y 5 concluidas. Fases 1 y 4 mantienen pendientes las muestras y validación real de compras de crédito. Fase 6 preparada, publicada y en observación: cinco de ocho actividades concluidas; 298 pruebas web, 18 JVM, 29 instrumentadas y dos comprobaciones de actualización correctas, sin omisiones. Supabase actualizado a 21 migraciones y APK personal 0.5.0 / versionCode 7 instalada. El aviso BBVA disponible fue una transferencia de débito confirmada por el propietario y queda fuera del piloto. Falta validar compras reales de crédito, activar solo formatos comprobados y observar/conciliar un corte completo. Fase 7 pendiente.\
+**Estado:** Fases 2, 3 y 5 concluidas. Fases 1 y 4 mantienen pendientes las muestras y validación real de compras de crédito. Fase 6 preparada, publicada y en observación: cinco de ocho actividades concluidas; 298 pruebas web, 18 JVM, 29 instrumentadas y dos comprobaciones de actualización correctas, sin omisiones. Supabase actualizado a 21 migraciones y APK personal 0.5.0 / versionCode 7 instalada. El aviso BBVA disponible fue una transferencia de débito confirmada por el propietario y queda fuera del piloto. Falta validar compras reales de crédito, activar solo formatos comprobados y observar/conciliar un corte completo. Fase 7 implementada técnicamente en local, con dos de cinco actividades concluidas y 329 regresiones web correctas sin omisiones; continúa abierta por falta de muestras y cobertura bancaria real.\
 **Dispositivo inicial:** Samsung S24 Ultra, Android 16 y One UI 8.5.\
 **Cobertura prevista:** todas las tarjetas existentes en AFP, conservando sus identidades e historiales.\
 **Primer piloto de registro automático:** BBVA Platinum; los demás bancos se preparan desde el diagnóstico y se activan gradualmente.
@@ -313,10 +313,33 @@ Para cerrar: recopilar avisos normales del uso real, revisar y anonimizar muestr
 - [ ] Completar las muestras, analizadores versionados y alias que sigan pendientes para cada tarjeta. Reutilizar el inventario y la evidencia recogidos desde la Fase 1; un banco sin evidencia suficiente permanecerá en diagnóstico u observación.
 - [ ] Verificar resultados en observación y activar gradualmente por tarjeta y formato. Una validación de banco o de Wallet no habilitará automáticamente las demás tarjetas.
 - [ ] Repetir los escenarios de comercios físicos, compras en línea, Wallet, cargos parciales y suscripciones.
-- [ ] Actualizar README, guía de instalación y este documento con la cobertura comprobada de cada fuente.
-- [ ] Mantener la posibilidad de pausar una fuente o regresar a observación sin borrar información.
+- [x] Actualizar README, guía de instalación y este documento con la cobertura comprobada de cada fuente.
+- [x] Mantener la posibilidad de pausar una fuente o regresar a observación sin borrar información.
 
 **Criterio de salida:** cada tarjeta habilitada tiene cobertura documentada, pruebas propias y un procedimiento de recuperación.
+
+**Implementación técnica local · 21 de octubre de 2026; fase abierta por evidencia real pendiente.** El usuario confirmó durante esta fase que todavía no hay avisos nuevos de compras de crédito. Se reutilizan el inventario de nueve tarjetas, ocho fuentes y los 24 alias de Fase 4; no se inventan analizadores ni se marca `verified` a partir de ejemplos sintéticos. Las tres actividades que requieren compras reales permanecen sin concluir.
+
+- [x] Añadir **Cobertura y activación** en Configuración → Captura automática → Tarjetas y reglas. Cada tarjeta muestra sus fuentes explícitas, terminaciones verificadas, versiones de formato, propuestas revisadas/conciliadas y requisitos pendientes. Las fuentes sin analizador siguen visibles en diagnóstico. Wallet sin alias no se presenta como compatible ni incompatible por inferencia. El nombre editable de una tarjeta nunca determina el banco.
+- [x] Reforzar la habilitación transaccional por tarjeta/formato: además de un analizador real verificado, exigir alias sin colisiones y una propuesta de observación del mismo formato, fuente y tarjeta registrada o vinculada y cotejada explícitamente. Importe, moneda, fecha, tarjeta y comercio interpretados deben conservarse; elegir categoría o editar datos personales no invalida la comprobación. Completar avisos desconocidos no valida un analizador. La comprobación se repite en cada petición de habilitación, bajo el bloqueo financiero; la interfaz solo muestra su resultado orientativo.
+- [x] Conservar recuperación para formatos retirados: se puede regresar a observación una configuración propia existente aunque su analizador desaparezca del catálogo. No permite reactivarla ni crear formatos arbitrarios. El cambio se aplica a avisos nuevos y conserva eventos, recibos, gastos y cotejos previos. La pausa por fuente reutiliza la configuración nativa de Fase 5 y conserva pendientes anteriores.
+- [x] Repetir los escenarios técnicos con datos ficticios: **329 pruebas web correctas, cero fallos y cero omisiones** contra PostgreSQL 16 desechable con las 21 migraciones. Incluyen 25 escenarios nuevos de integración y cinco unitarios; se actualizó la preparación de dos pruebas antiguas para pasar por observación/revisión/cotejo antes de habilitar. Las nueve tarjetas tienen pruebas bancarias propias y las seis con alias Wallet, pruebas separadas de ese canal. Cubren presencial, digital/en línea, cargos parciales, descriptor Mercado Pago, suscripciones, reintentos, dos tarjetas del mismo banco, colisiones, aislamiento, versiones nuevas y vuelta a observación. Son contratos ficticios inyectados solo en el cargador de pruebas; **no acreditan ninguno de esos canales reales**.
+
+| Tarjeta existente | Alias comprobados (Fase 4) | Compra de crédito real / analizador activable | Estado de Fase 7 |
+|---|---|---|---|
+| BBVA | Física, digital y Wallet | Sin muestra verificada | Diagnóstico; piloto previo aún abierto |
+| HSBC 1 | Física y digital; Wallet incompatible según propietario | Sin muestra verificada | Diagnóstico |
+| HSBC 2 | Física y digital; Wallet incompatible según propietario | Sin muestra verificada | Diagnóstico |
+| BANAMEX 1 | Física, digital y Wallet | Sin muestra verificada | Diagnóstico |
+| BANAMEX 2 | Física, digital y Wallet | Sin muestra verificada | Diagnóstico |
+| SANTANDER | Física, digital y Wallet | Sin muestra verificada | Diagnóstico |
+| NU | Física, digital y Wallet | Sin muestra verificada | Diagnóstico |
+| DIDI | Física, digital y Wallet | Sin muestra verificada | Diagnóstico |
+| MERCADOPAGO | Física y digital; Wallet incompatible según propietario | Sin muestra verificada | Diagnóstico; distinguir crédito de cuenta/saldo |
+
+**Aceptación nativa repetida:** 18 pruebas JVM y 29 instrumentadas correctas en el S24 Ultra, sin omisiones, con HTTPS/API/PostgreSQL locales y Auth/avisos ficticios. La pantalla real volvió a verificar pausa/reanudación de BBVA, selección Wallet conservada y reportes del teléfono. Se retiraron las APK dev/pruebas y el certificado temporal creados para esta aceptación; la instalación personal no se reemplazó. ADB volvió a comprobar el S24 Ultra, Android 16/One UI 8.5, las ocho aplicaciones instaladas, acceso a notificaciones y batería exenta. Wallet tiene versión `26.41.996630916` y Mercado Pago `2.458.2`; las otras seis versiones coinciden con el inventario anterior. Esa consulta técnica no lee avisos ni demuestra cobertura de compras. No se necesita migración, modificación del contrato nativo ni nueva APK personal para estos cambios web. La instalación personal conserva **0.5.0 / 7**. No se modificó Supabase ni se publicó esta fase.
+
+Procedimiento por tarjeta, canales pendientes y recuperación: [guía Fase 7](docs/android-captura.md#activación-gradual-por-tarjeta--fase-7). Evidencia y límites de la aceptación: [verificación](artifacts/android-fase7/verification.json). La fase se cerrará solo cuando haya tarjetas adicionales habilitadas con evidencia propia y cobertura real documentada; tener cero tarjetas habilitadas no satisface el criterio por vacuidad.
 
 ## 4. Pruebas y aceptación
 

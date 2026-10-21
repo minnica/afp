@@ -45,7 +45,23 @@ test('Fase 4 PostgreSQL: interpretación, resoluciones y escritura financiera at
   const stored=await db.captureEvent.findUnique({where:{deviceId_eventId:{deviceId:device.id,eventId:input.eventId}},include:{movement:true}});
   return {response,movement:stored.movement,stored};
  };
- const enable=async(cardId=card.id,parserKey='bbva.purchase.es.v1')=>configuration.configureCapture(db,user.id,{action:'automation',cardId,parserKey,mode:'AUTOMATIC'});
+ const enable=async(cardId=card.id,parserKey='bbva.purchase.es.v1')=>{
+  const rollout=load('src/lib/captureRollout.js');
+  const aliases=await db.captureCardAlias.findMany({where:{userId:user.id}});
+  const reviewed=await rollout.captureRolloutMovements(db,user.id,{cardId,parserKey});
+  if(!rollout.captureFormatReadiness({key:parserKey,sourcePackage:parserKey.startsWith('wallet.')?'com.google.android.apps.walletnfcrel':'com.bancomer.mbanking',verified:true},cardId,aliases,reviewed).canEnable){
+   const input=event(parserKey.startsWith('wallet.')?{source:'com.google.android.apps.walletnfcrel',alias:'0789'}:{});
+   const {movement}=await send(input);
+   const p=movement.proposal;
+   await processing.resolveCaptureMovement(db,user.id,{id:movement.id,action:'correct',expectedCorrection:'null',correction:{cardId,date:p.date,amount:p.amount,currency:p.currency,merchant:p.merchant,categoryId:category.id}});
+   const registered=await processing.resolveCaptureMovement(db,user.id,{id:movement.id,action:'register'});
+   const reconciliation=load('src/lib/captureReconciliation.js');
+   const period={cardId,startDate:'2026-10-01',endDate:'2026-10-25'};
+   const row=(await reconciliation.captureStatement(db,user.id,period)).records.find(row=>row.id===registered.expenseId);
+   await reconciliation.reconcileCaptureStatement(db,user.id,{...period,action:'confirm',type:row.type,recordId:row.id,fingerprint:row.fingerprint});
+  }
+  return configuration.configureCapture(db,user.id,{action:'automation',cardId,parserKey,mode:'AUTOMATIC'});
+ };
  const inventory=alias=>({version:1,cards:[{name:'BBVA',bankPackage:'com.bancomer.mbanking',physical:[alias],digital:['0456'],wallet:['0789'],verified:true,evidence:'Ejemplo ficticio revisado por test'}]});
  let autoExpense;
  try {

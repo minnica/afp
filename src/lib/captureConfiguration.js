@@ -3,6 +3,7 @@ import { ApiAccessError, requireOwnedReferences } from "@/lib/apiAuth";
 import { capturePackages } from "@/lib/captureProtocol";
 import { captureParsers, normalizeMerchant } from "@/lib/captureParsers";
 import { lockDebtAccounts } from "@/lib/debtAccountService";
+import { buildCaptureRollout, captureRolloutMovements, captureFormatReadiness, captureActivationReasons } from "@/lib/captureRollout";
 
 const bankPackages = capturePackages.filter(value => value !== "com.google.android.apps.walletnfcrel");
 const lastFour = z.string().regex(/^\d{4}$/);
@@ -62,11 +63,19 @@ export async function configureCapture(db, userId, input) {
     await requireOwnedReferences(tx, userId, data, ["cardId", "categoryId", "subscriptionId"]);
     if (data.action === "automation") {
       const parser = captureParsers.find(parser => parser.key === data.parserKey);
-      if (!parser) throw new ApiAccessError("Formato no disponible.", 400);
+      if (!parser) {
+        // Retirar un analizador nunca debe impedir detener su automatización.
+        const identity = { userId, cardId: data.cardId, parserKey: data.parserKey };
+        const existing = await tx.captureAutomation.findUnique({ where: { userId_cardId_parserKey: identity } });
+        if (!existing || data.mode !== "OBSERVATION") throw new ApiAccessError("Formato no disponible.", 400);
+        return tx.captureAutomation.update({ where: { id: existing.id }, data: { mode: "OBSERVATION" } });
+      }
       if (data.mode === "AUTOMATIC") {
         if (!parser.verified) throw new ApiAccessError("Este formato aún no tiene muestras reales verificadas. Conserva observación.", 409);
-        const aliases = await tx.captureCardAlias.findMany({ where: { userId, cardId: data.cardId, sourcePackage: parser.sourcePackage, verifiedAt: { not: null } } });
-        if (!aliases.length) throw new ApiAccessError("Verifica primero un alias de esta tarjeta y fuente.", 409);
+        const aliases = await tx.captureCardAlias.findMany({ where: { userId, sourcePackage: parser.sourcePackage } });
+        const movements = await captureRolloutMovements(tx, userId, { cardId: data.cardId, parserKey: parser.key });
+        const readiness = captureFormatReadiness(parser, data.cardId, aliases, movements);
+        if (!readiness.canEnable) throw new ApiAccessError(captureActivationReasons[readiness.blockers[0]], 409);
       }
       const identity = { userId, cardId: data.cardId, parserKey: data.parserKey };
       return tx.captureAutomation.upsert({ where: { userId_cardId_parserKey: identity }, create: { ...identity, mode: data.mode }, update: { mode: data.mode } });
@@ -90,5 +99,8 @@ export async function captureConfiguration(db, userId) {
     db.category.findMany({ where: { userId }, select: { id: true, name: true }, orderBy: { name: "asc" } }),
     db.subscription.findMany({ where: { userId, paymentMethod: "CARD" }, select: { id: true, name: true, cardId: true }, orderBy: { name: "asc" } }),
   ]);
-  return { cards, aliases, automations, rules, categories, subscriptions, parsers: captureParsers.filter(parser => parser.evidence !== "REAL_OUT_OF_SCOPE").map(({ key, sourcePackage, verified }) => ({ key, sourcePackage, verified })) };
+  const movements = await captureRolloutMovements(db, userId);
+  return { cards, aliases, automations, rules, categories, subscriptions,
+    rollout: buildCaptureRollout(cards, aliases, automations, captureParsers, movements),
+    parsers: captureParsers.filter(parser => parser.evidence !== "REAL_OUT_OF_SCOPE").map(({ key, sourcePackage, verified }) => ({ key, sourcePackage, verified })) };
 }

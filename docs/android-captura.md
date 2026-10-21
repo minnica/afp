@@ -1,6 +1,6 @@
 # AFP Android · diagnóstico, vinculación y sincronización
 
-**Versión personal instalada: 0.5.0 / versionCode 7**, actualizada y verificada el 21 de octubre de 2026. Web/backend publicados y Supabase actualizado. Piloto de tarjetas de crédito en observación; compras reales y corte completo pendientes.
+**Versión personal instalada: 0.5.0 / versionCode 7**, actualizada y verificada el 21 de octubre de 2026. Web/backend de Fase 6 publicados y Supabase actualizado. Fase 7 implementada y verificada en local, pendiente de publicación y de muestras reales para activar tarjetas. Piloto de tarjetas de crédito en observación; compras reales y corte completo pendientes.
 
 La Fase 1 añade una APK Kotlin/Compose en `android/`. Abre la interfaz financiera actual mediante Trusted Web Activity (TWA) y permite comprobar qué notificaciones entregan BBVA México, Google Wallet, HSBC, Banamex, Santander, Nu, DiDi Finanzas y Mercado Pago. La pantalla nativa incluye activación, selección de fuentes, estado del permiso y del lector, muestras locales e instrucciones para Samsung.
 
@@ -525,3 +525,62 @@ Con la autorización de esta tarea se respaldaron AFP en `public`, metadatos, pe
 **Publicación y actualización verificadas:** Vercel `dpl_4vn4oDLnajjHffjUVAi7mKyKrCaC`, estado `READY`, producción en `https://finanzas.garatachia.com`. Se publicaron 230 archivos web/Prisma públicos desde el árbol de trabajo, sobre la base `3ef6ae2`, sin commit ni push. El manifiesto SHA-256 `0c4ed9b037f209574632fbcac0601d1ea9f44b302b6756560639e187490d4bcb` identifica esas fuentes; claves, APK, `.env`, alias y datos privados quedaron excluidos. El bundle contiene el nuevo seguimiento; páginas, manifest y certificado responden 200 y las API consultadas sin sesión responden 401. La consulta inmediata de errores de runtime desde la publicación no devolvió grupos; no acredita todos los flujos autenticados.
 
 **APK personal 0.5.0 / versionCode 7 instalada** mediante `adb install -r` con la firma existente. Se conservaron fecha inicial de instalación, acceso a notificaciones, autorización, batería exenta, ocho fuentes seleccionadas y seis recibos, con cero pendientes y cero errores de cola. Las muestras de diagnóstico pasaron de seis a nueve al reconectar; no aumentaron los eventos ni recibos del servidor. Android conserva el dominio como `verified`. El reporte real recibido confirma lector/acceso/captura activos, envíos habilitados, ocho fuentes y ninguna pausa remota. Las identidades y hashes de credencial, los seis eventos previos y las filas de 17 tablas financieras/de aplicación permanecen intactos. El aviso de débito existente quedó descartado por la confirmación del usuario, conservando su evento y recibo. Solo quedó la APK personal en el perfil Android actual. Mantener observación hasta disponer de formatos de crédito comprobados; no modificar `verified` para iniciar artificialmente el piloto. [Plan y pendientes](../PLAN_CAPTURA_AUTOMATICA_ANDROID.md#fase-6-piloto-completo-con-bbva-platinum), [evidencia](../artifacts/android-fase6/verification.json).
+
+## Activación gradual por tarjeta — Fase 7
+
+**Implementada en local el 21 de octubre de 2026; cobertura real pendiente.** El usuario confirmó que no tiene nuevos avisos de crédito. Se conservan las nueve tarjetas, sus IDs, los 24 alias verificados en Fase 4 y el diagnóstico de ocho aplicaciones. No se habilitaron formatos, se inventaron muestras ni se modificó el piloto BBVA pendiente. Esta fase añade controles web y reutiliza el contrato nativo v1: no requiere migración ni actualizar la APK personal 0.5.0 / 7. La publicación de esta implementación sigue pendiente.
+
+### Cobertura comprobada y pendiente
+
+| Tarjeta | Alias configurados y verificados por el propietario | Muestras reales de crédito / formato activable |
+|---|---|---|
+| BBVA | Física, digital, Wallet | Ninguna; solo existe el aviso de débito excluido |
+| HSBC 1 | Física, digital | Ninguna; Wallet incompatible según propietario |
+| HSBC 2 | Física, digital | Ninguna; Wallet incompatible según propietario |
+| BANAMEX 1 | Física, digital, Wallet | Ninguna |
+| BANAMEX 2 | Física, digital, Wallet | Ninguna |
+| SANTANDER | Física, digital, Wallet | Ninguna |
+| NU | Física, digital, Wallet | Ninguna |
+| DIDI | Física, digital, Wallet | Ninguna |
+| MERCADOPAGO | Física, digital | Ninguna; Wallet incompatible según propietario; distinguir crédito de cuenta/saldo |
+
+**Para cada tarjeta**, los canales presencial, en línea, cargos parciales y suscripciones continúan pendientes de comprobación real. Wallet también está pendiente para las seis tarjetas con alias; sus alias por sí solos no demuestran una compra. Amazon y Mercado Libre/Mercado Pago se revisan por los cargos efectivos a la tarjeta identificada, conservando los parciales; avisos de pedido/envío no crean gastos. Validar una aplicación no valida todas las tarjetas de su banco ni todas las de Wallet.
+
+El S24 Ultra mantiene Android 16/API 36, One UI 8.5, acceso a notificaciones y batería exenta. ADB comprobó las ocho fuentes instaladas: Wallet actualizó a `26.41.996630916` y Mercado Pago a `2.458.2`; las demás versiones coinciden con la matriz anterior. La consulta no leyó avisos ni acredita recepción con pantalla bloqueada.
+
+### Validar y habilitar una tarjeta y formato
+
+1. Mantener BBVA como primer piloto y observar las fuentes autorizadas. Esperar avisos del uso normal; no realizar compras exclusivamente para probar. Revisar la fuente, versión, tarjeta, canal y disponibilidad real de los campos en el teléfono o la bandeja. No publicar texto bancario, credenciales ni terminaciones personales.
+2. Para incorporar un formato, preparar una muestra anonimizada y revisada que preserve su lenguaje y estructura, y sus regresiones positivas y negativas. Añadir un analizador determinista con una clave versionada y la fuente exacta en `captureParsers.js`, y marcarlo comprobado solo después de validar esa evidencia real. Un cambio de formato usa otra versión. No copiar los contratos sintéticos de los tests como formatos del banco.
+3. Tras publicar el analizador comprobado, dejar la tarjeta en observación y esperar un aviso nuevo que lo use. Los eventos antiguos no se reinterpretan automáticamente; corregir manualmente un formato desconocido no lo convierte en una muestra de acierto del analizador nuevo. En **Bandeja**, revisar la propuesta original, registrar o vincular la compra correcta y cotejarla explícitamente en **Conciliar**.
+4. Abrir **Tarjetas y reglas → Cobertura y activación**. La fuente bancaria procede de los alias configurados, no del nombre editable de la tarjeta. La pantalla muestra versiones, terminaciones verificadas, propuestas de observación cotejadas y bloqueos. Las aplicaciones sin analizador siguen en diagnóstico; Wallet sin alias muestra esa limitación, sin inferir compatibilidad.
+5. Para habilitar se exige un analizador real verificado, terminaciones verificadas sin colisiones y al menos una propuesta de observación cotejada de esa misma tarjeta, fuente y versión. Debe conservar importe, moneda MXN, día, tarjeta y comercio interpretados; elegir categoría, cambiar notas, concepto del gasto o aportaciones personales no invalida la evidencia. Corregir los datos interpretados exige comprobar el analizador y una muestra nueva. Un histórico `CONFIRMED` sin cotejo explícito no sirve.
+6. Pulsar **Habilitar** y confirmar la tarjeta y formato. La API consulta nuevamente la evidencia bajo el bloqueo financiero; no confía en el resultado mostrado por la pantalla ni admite `verified` del cliente. La acción no habilita otra tarjeta, otra fuente ni una versión nueva. Los avisos anteriores conservan su resolución y no se registran retroactivamente.
+7. Comprobar las nuevas compras de cada canal disponible con el seguimiento de Fase 6 y conciliar el período. Documentar por tarjeta/fuente/versión las muestras revisadas y los canales comprobados o pendientes. Una activación técnica no acredita por sí sola todos los canales ni un corte completo. No ampliar las otras tarjetas antes de validar el piloto común y su propia evidencia.
+
+La comprobación se hace al **habilitar o reactivar**. Editar o eliminar después un gasto o evidencia conserva las decisiones financieras y la configuración ya guardada; no deshace la automatización. Para reactivar tras volver a observación se exige evidencia vigente. Los alias ambiguos, campos incompletos y posibles duplicados siguen bloqueando el registro de cada nuevo aviso mediante el motor de Fase 4.
+
+### Pausa, recuperación y cambio de versión
+
+- **Volver a observación**, junto al formato, detiene la creación automática para avisos nuevos de esa tarjeta/versión. Conserva eventos, recibos, gastos, reglas, correcciones y cotejos. Volver a pulsar Habilitar comprueba de nuevo sus requisitos. Un formato retirado aparece separado y permite regresar a observación, aunque ya no exista su analizador; no permite reactivarlo ni crear claves arbitrarias.
+- **Pausar una fuente** en Dispositivos y fuentes detiene nuevas capturas de esa aplicación cuando Android recibe la preferencia. Afecta a las tarjetas que comparten esa aplicación, conservando las demás fuentes; no elimina los avisos ya guardados. Reanudar respeta la selección local. El reporte distingue lo solicitado y lo aplicado; sin conexión no se promete un cambio inmediato.
+- **Pausar envíos** en Android conserva nuevas capturas en la cola. Al recuperar permisos o conexión, consultar autorización y reintentar: se conservan UUID y propietario. No borrar datos ni reinstalar para solucionar una demora de sincronización.
+- **Cambió el texto del banco:** mantener la fuente en diagnóstico/observación hasta revisar la muestra y preparar una versión nueva. Esa versión no hereda la habilitación ni la observación de la anterior. Resolver los avisos desconocidos desde la bandeja y conciliar faltantes; no modificar ni eliminar evidencias antiguas para forzar una activación.
+- **Importe o tarjeta incorrectos:** volver a observación, revisar la propuesta y el gasto conservando las correcciones personales, comprobar alias y cotejar cada ID. Varios avisos no equivalen a varios cargos; dos cargos legítimos iguales conservan su multiplicidad.
+
+### Verificación reproducible y límites
+
+`captureRollout.js` deriva la preparación desde las tablas existentes; no guarda textos nuevos ni publica terminaciones en el resumen. `GET /api/captures/configuration` incluye `rollout` y mantiene los campos anteriores; `PATCH` conserva el contrato de automatización y aplica los requisitos adicionales. No hay cambios de esquema, RLS, migraciones ni contrato Android.
+
+Pruebas nuevas: `tests/capture-rollout.test.cjs` y `tests/capture-rollout-integration.test.cjs`. Ejecutar con `AFP_TEST_DATABASE_URL` apuntando exclusivamente a localhost y una base `afp_test…` que tenga las 21 migraciones, por ejemplo el puerto 55447 usado en esta aceptación:
+
+```bash
+AFP_TEST_DATABASE_URL=postgresql://postgres:afp_test_only@127.0.0.1:55447/afp_test_phase7 \
+  node --test --experimental-test-isolation=none tests/*.test.cjs
+pnpm lint
+pnpm exec next build --webpack
+```
+
+Resultado web: **329 pruebas correctas sin omisiones**, incluidos 25 escenarios nuevos de integración y cinco unitarios. El registro real de analizadores sigue bloqueado; un cargador de pruebas aislado inyecta contratos ficticios para siete emisores y Wallet, con nueve tarjetas separadas y seis Wallet. Repite presencial, digital/en línea, parciales, suscripción explícita, reintentos, colisiones, aislamiento, versiones nuevas y recuperación. Esas pruebas no acreditan formatos ni canales reales. La preparación de navegador `tests/helpers/seed-capture-review.cjs` crea nueve tarjetas y 24 alias exclusivamente ficticios en la base local y se niega a usar una conexión remota.
+
+La regresión nativa también pasó con **18 pruebas JVM y 29 instrumentadas correctas, sin omisiones**, contra HTTPS/API/PostgreSQL locales y Auth ficticia. La prueba Compose comprobó nuevamente pausa/reanudación por fuente y reporte real del teléfono. Las APK de desarrollo y pruebas se retiraron al terminar; la personal se conserva en 0.5.0 / 7. La evidencia de compilación, navegador y regresión nativa está en [artifacts/android-fase7/verification.json](../artifacts/android-fase7/verification.json). El [plan](../PLAN_CAPTURA_AUTOMATICA_ANDROID.md#fase-7-activación-gradual-de-las-demás-tarjetas) marca solo lo concluido: documentación, controles, pruebas técnicas y recuperación. Recopilar avisos, validar formatos y canales, completar el piloto y habilitar tarjetas con evidencia propia continúan pendientes. No se modificó Supabase ni se publicó esta fase.

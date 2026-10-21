@@ -1,0 +1,84 @@
+import { Prisma } from "@prisma/client";
+import { normalizeMerchant } from "@/lib/captureParsers";
+import { capturePackages } from "@/lib/captureProtocol";
+
+export const captureActivationReasons = {
+  UNVERIFIED_FORMAT: "Faltan muestras reales verificadas de este formato.",
+  NO_VERIFIED_ALIAS: "Falta una terminación verificada de esta tarjeta y fuente.",
+  AMBIGUOUS_ALIAS: "Una terminación de esta fuente también pertenece a otra tarjeta. Revisa los alias.",
+  NO_REVIEWED_CAPTURE: "Revisa, registra o vincula y concilia una propuesta de esta tarjeta y formato, sin corregir los datos interpretados.",
+};
+
+function matchingAlias(alias, proposal, sourcePackage) {
+  return alias.cardId === proposal.cardId && alias.sourcePackage === sourcePackage
+    && alias.kind === proposal.alias?.kind && alias.value === proposal.alias?.value && alias.verifiedAt;
+}
+
+// El cotejo debe respaldar la propuesta original. Completar/corregir un aviso
+// desconocido no valida el analizador; editar datos personales sí se permite.
+export function isReviewedCapture(movement, parser, aliases) {
+  const p = movement.proposal, expense = movement.expense;
+  if (!p || movement.parserKey !== parser.key || !["REGISTERED", "LINKED"].includes(movement.status)
+    || !movement.resolvedAt || !expense?.reconciledAt || expense.paymentMethod !== "CARD"
+    || p.currency !== "MXN" || !p.amount || !p.date || !p.merchant || !p.operationAt
+    || p.cardId !== movement.cardId || p.cardId !== expense.cardId) return false;
+  if (!aliases.some(alias => matchingAlias(alias, p, parser.sourcePackage))) return false;
+  if (!movement.events.some(event => event.sourcePackage === parser.sourcePackage
+    && event.interpretation?.parserKey === parser.key && event.interpretation?.proposal?.cardId === p.cardId
+    && ["OBSERVATION", "UNVERIFIED_FORMAT"].includes(event.interpretation?.reason))) return false;
+  const correction = movement.correction;
+  if (correction && (correction.cardId !== p.cardId || correction.date !== p.date || correction.currency !== p.currency
+    || normalizeMerchant(correction.merchant) !== normalizeMerchant(p.merchant))) return false;
+  try {
+    return new Date(expense.date).toISOString().slice(0, 10) === p.date
+      && new Prisma.Decimal(p.amount).equals(expense.amount)
+      && (!correction || new Prisma.Decimal(correction.amount).equals(p.amount));
+  } catch { return false; }
+}
+
+export function captureFormatReadiness(parser, cardId, aliases, movements) {
+  const own = aliases.filter(alias => alias.cardId === cardId && alias.sourcePackage === parser.sourcePackage);
+  const verified = own.filter(alias => alias.verifiedAt);
+  const ambiguous = own.filter(alias => aliases.some(other => other.cardId !== cardId
+    && other.sourcePackage === alias.sourcePackage && other.kind === alias.kind && other.value === alias.value));
+  const reviewed = movements.filter(movement => movement.cardId === cardId && isReviewedCapture(movement, parser, aliases));
+  const blockers = [];
+  if (!parser.verified || parser.evidence === "REAL_OUT_OF_SCOPE") blockers.push("UNVERIFIED_FORMAT");
+  if (!verified.length) blockers.push("NO_VERIFIED_ALIAS");
+  if (ambiguous.length) blockers.push("AMBIGUOUS_ALIAS");
+  if (!reviewed.length) blockers.push("NO_REVIEWED_CAPTURE");
+  return { parserKey: parser.key, sourcePackage: parser.sourcePackage, verified: Boolean(parser.verified),
+    verifiedAliases: verified.length, ambiguousAliases: ambiguous.length, reviewedCaptures: reviewed.length,
+    blockers, canEnable: blockers.length === 0 };
+}
+
+export async function captureRolloutMovements(db, userId, filter = {}) {
+  return db.captureMovement.findMany({ where: { userId, ...filter, status: { in: ["REGISTERED", "LINKED"] },
+    expense: { userId, reconciledAt: { not: null } } }, select: {
+    cardId: true, parserKey: true, status: true, proposal: true, correction: true, resolvedAt: true,
+    expense: { select: { cardId: true, date: true, amount: true, paymentMethod: true, reconciledAt: true } },
+    events: { where: { userId }, select: { sourcePackage: true, interpretation: true } },
+  } });
+}
+
+export function buildCaptureRollout(cards, aliases, automations, parsers, movements) {
+  const formats = parsers.filter(parser => parser.evidence !== "REAL_OUT_OF_SCOPE");
+  return cards.map(card => {
+    // Las fuentes proceden de alias explícitos, nunca del nombre editable.
+    // Wallet se muestra también sin alias para hacer visible esa limitación.
+    const sources = capturePackages.filter(sourcePackage => sourcePackage === "com.google.android.apps.walletnfcrel"
+      || aliases.some(alias => alias.cardId === card.id && alias.sourcePackage === sourcePackage)
+      || automations.some(mode => mode.cardId === card.id && formats.some(parser => parser.key === mode.parserKey && parser.sourcePackage === sourcePackage)));
+    sources.sort((a, b) => Number(a === "com.google.android.apps.walletnfcrel") - Number(b === "com.google.android.apps.walletnfcrel"));
+    return { cardId: card.id,
+      retiredFormats: automations.filter(mode => mode.cardId === card.id && !formats.some(parser => parser.key === mode.parserKey))
+        .map(mode => ({ parserKey: mode.parserKey, mode: mode.mode })),
+      sources: sources.map(sourcePackage => ({ sourcePackage,
+      verifiedAliases: aliases.filter(alias => alias.cardId === card.id && alias.sourcePackage === sourcePackage && alias.verifiedAt).length,
+      formats: formats.filter(parser => parser.sourcePackage === sourcePackage).map(parser => ({
+        ...captureFormatReadiness(parser, card.id, aliases, movements),
+        mode: automations.find(mode => mode.cardId === card.id && mode.parserKey === parser.key)?.mode || "OBSERVATION",
+      })),
+    })) };
+  });
+}

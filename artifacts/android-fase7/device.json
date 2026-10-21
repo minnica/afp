@@ -1,0 +1,60 @@
+{
+  "kind": "device-package-check",
+  "notificationFormatsVerified": false,
+  "manufacturer": "samsung",
+  "model": "SM-S928B",
+  "androidRelease": "16",
+  "apiLevel": "36",
+  "oneUiBuild": "80500",
+  "sources": [
+    {
+      "packageName": "com.bancomer.mbanking",
+      "installed": true,
+      "versionName": "26.90.14"
+    },
+    {
+      "packageName": "com.google.android.apps.walletnfcrel",
+      "installed": true,
+      "versionName": "26.41.996630916"
+    },
+    {
+      "packageName": "mx.hsbc.hsbcmexico",
+      "installed": true,
+      "versionName": "3.75.14"
+    },
+    {
+      "packageName": "com.citibanamex.banamexmobile",
+      "installed": true,
+      "versionName": "136.0.0"
+    },
+    {
+      "packageName": "mx.bancosantander.supermovil",
+      "installed": true,
+      "versionName": "12.2"
+    },
+    {
+      "packageName": "com.nu.production",
+      "installed": true,
+      "versionName": "10.8.43-minApi28"
+    },
+    {
+      "packageName": "com.didiglobal.cashloan",
+      "installed": true,
+      "versionName": "3.2.2"
+    },
+    {
+      "packageName": "com.mercadopago.wallet",
+      "installed": true,
+      "versionName": "2.458.2"
+    }
+  ],
+  "afp": {
+    "applicationId": "com.garatachia.afp",
+    "versionName": "0.5.0",
+    "notificationAccessGranted": true,
+    "batteryOptimizationExempt": true,
+    "standbyBucket": "5",
+    "runAnyInBackground": "RUN_ANY_IN_BACKGROUND: allow",
+    "samsungSleepListsCheck": "requires-manual-settings-inspection"
+  }
+}

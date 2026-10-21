@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { apiFetch } from "@/lib/apiFetch";
 import { captureSources } from "@/lib/capturePresentation";
+import CaptureRolloutStatus from "@/components/configuracion/CaptureRolloutStatus";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
@@ -38,6 +39,8 @@ export default function CaptureConfigurationPanel({ configuration, userId, refre
     <div role="status">{notice}</div>
     <Field><FieldLabel htmlFor="capture-config-card">Tarjeta a configurar</FieldLabel><ResponsiveSelect id="capture-config-card" value={cardId} disabled={busy} onValueChange={value => { setCardId(value); ruleForm.reset(); }} options={configuration.cards.map(row => ({ value: row.id, label: row.name }))} searchable="auto" /></Field>
     {!cardId ? <p className="text-sm text-muted-foreground">Añade una tarjeta en Tarjetas para configurar sus avisos.</p> : <>
+      <CaptureRolloutStatus coverage={configuration.rollout?.find(row => row.cardId === cardId)} cardId={cardId} busy={busy} onAutomation={setConfirmation} />
+      <Separator />
       <h3 className="font-medium">Terminaciones de la tarjeta</h3>
       <ItemGroup>{configuration.aliases.filter(row => row.cardId === cardId).map(alias => <Item key={alias.id} className="flex-wrap"><ItemContent>
         <ItemTitle>{kinds[alias.kind]} · •{alias.value}<Badge variant={alias.verifiedAt ? "secondary" : "warning"}>{alias.verifiedAt ? "Verificada" : "Por verificar"}</Badge></ItemTitle>
@@ -56,17 +59,6 @@ export default function CaptureConfigurationPanel({ configuration, userId, refre
         <Button type="submit" className="min-h-11 self-start" disabled={busy}>Guardar terminación</Button>
       </form>
       <p className="text-sm text-muted-foreground">Guardar la misma fuente, tipo y terminación actualiza su verificación. Para cambiar las cifras, añade la correcta y elimina la anterior. Las coincidencias entre tarjetas requieren revisión.</p>
-      <Separator />
-      <h3 className="font-medium">Registro por formato</h3>
-      <ItemGroup>{configuration.parsers.map(parser => {
-        const mode = configuration.automations.find(row => row.cardId === cardId && row.parserKey === parser.key)?.mode || 'OBSERVATION';
-        const verifiedAlias = configuration.aliases.some(alias => alias.cardId === cardId && alias.sourcePackage === parser.sourcePackage && alias.verifiedAt);
-        return <Item key={parser.key} className="flex-wrap"><ItemContent className="min-w-0"><ItemTitle>{captureSources[parser.sourcePackage]}<Badge variant="secondary">{parser.verified ? mode === 'AUTOMATIC' ? 'Automático' : 'Observación' : 'Diagnóstico'}</Badge></ItemTitle>
-          <ItemDescription className="break-all">{parser.key}</ItemDescription><ItemDescription>{!parser.verified ? "Faltan muestras reales verificadas para habilitar este formato." : !verifiedAlias ? "Falta una terminación verificada de esta fuente." : "Automatización exclusiva de esta tarjeta y formato."}</ItemDescription></ItemContent>
-          <ItemActions><Button variant="outline" className="min-h-11" disabled={busy || (mode !== 'AUTOMATIC' && (!parser.verified || !verifiedAlias))} onClick={() => setConfirmation({ action: 'automation', cardId, parserKey: parser.key, mode: mode === 'AUTOMATIC' ? 'OBSERVATION' : 'AUTOMATIC', label: mode === 'AUTOMATIC' ? 'Volver a observación' : 'Habilitar registro automático' })}>{mode === 'AUTOMATIC' ? 'Volver a observación' : 'Habilitar'}</Button></ItemActions>
-        </Item>;
-      })}</ItemGroup>
-      <p className="text-sm text-muted-foreground">Las otras fuentes siguen en diagnóstico hasta disponer de un analizador comprobado.</p>
       <Separator />
       <h3 className="font-medium">Reglas por comercio exacto</h3>
       <ItemGroup>{configuration.rules.filter(row => row.cardId === cardId).map(rule => <Item key={rule.id} className="flex-wrap"><ItemContent><ItemTitle className="break-words">{rule.merchant}</ItemTitle><ItemDescription>{configuration.categories.find(row => row.id === rule.categoryId)?.name || 'Categoría no disponible'}{rule.subscriptionId ? ` · ${configuration.subscriptions.find(row => row.id === rule.subscriptionId)?.name || 'Suscripción no disponible'}` : ''}</ItemDescription></ItemContent><ItemActions>

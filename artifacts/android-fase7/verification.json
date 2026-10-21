@@ -1,0 +1,260 @@
+{
+  "date": "2026-10-21",
+  "phase": 7,
+  "status": "Implementación técnica local verificada; muestras y activación real pendientes",
+  "complete": false,
+  "planActivities": {
+    "completed": 2,
+    "total": 5,
+    "completedItems": [
+      "Documentación y cobertura comprobada/pendiente por fuente y tarjeta",
+      "Pausa por fuente y recuperación a observación sin borrar información"
+    ],
+    "pendingItems": [
+      "Muestras reales y analizadores versionados de compras de crédito",
+      "Validación en observación y activación gradual real por tarjeta/formato",
+      "Repetición real de canales presencial/en línea/Wallet/parciales/suscripciones"
+    ]
+  },
+  "userConfirmedNoNewCreditNotices": true,
+  "implementation": {
+    "newModule": "src/lib/captureRollout.js",
+    "configurationResponseIncludesRollout": true,
+    "newTables": 0,
+    "newMigrations": 0,
+    "androidContractChanged": false,
+    "activationChecks": [
+      "Analizador verificado con muestras reales",
+      "Alias de esa tarjeta/fuente verificados sin colisiones con otras tarjetas del propietario",
+      "Propuesta de observación del mismo formato/fuente/tarjeta registrada o vinculada y cotejada explícitamente",
+      "Datos interpretados de tarjeta/fecha/importe/moneda/comercio conservados",
+      "Revalidación en el servidor bajo bloqueo financiero al habilitar"
+    ],
+    "recovery": [
+      "Pausa por fuente con preferencias/reportes nativos existentes",
+      "Volver a observación para tarjeta y versión",
+      "Retorno a observación también de formatos retirados sin permitir reactivarlos",
+      "Eventos anteriores conservan resolución; no se reprocesan"
+    ],
+    "qualificationLifetime": "La evidencia se comprueba al habilitar/reactivar. Editar/borrar posteriormente no revierte la configuración persistida; una futura reactivación exige evidencia vigente."
+  },
+  "web": {
+    "regression": {
+      "tests": 329,
+      "pass": 329,
+      "fail": 0,
+      "skipped": 0
+    },
+    "newIntegrationScenarios": 25,
+    "newUnitTests": 5,
+    "build": "next build --webpack correcto",
+    "lintErrors": 0,
+    "lintWarnings": [
+      "Advertencia previa de TanStack Table react-hooks/incompatible-library"
+    ]
+  },
+  "database": {
+    "engine": "PostgreSQL 16 desechable localhost",
+    "name": "afp_test_phase7",
+    "port": 55447,
+    "initializedWith": "21 migraciones existentes mediante prisma migrate deploy",
+    "auth": "Ficticia; Prisma/PostgreSQL reales",
+    "productionOperations": 0
+  },
+  "android": {
+    "jvm": {
+      "tests": 18,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "instrumented": {
+      "tests": 29,
+      "passed": 29,
+      "failed": 0,
+      "skipped": 0,
+      "device": "S24 Ultra / Android 16 API 36",
+      "api": "HTTPS localhost → API real → PostgreSQL local",
+      "screenFlow": "Pausa/reanudación por fuente, selección Wallet y reporte real del teléfono"
+    },
+    "debugApkAndInstrumentationBuild": "Correcto; tareas al día",
+    "temporaryDevelopmentPackagesRemoved": true,
+    "temporaryCertificateAndReverseRemoved": true,
+    "personalApkReplaced": false,
+    "personalVersion": "0.5.0 / 7",
+    "deviceTechnicalCheck": "device.json"
+  },
+  "syntheticScenarioCoverage": {
+    "cards": [
+      "BBVA",
+      "HSBC 1",
+      "HSBC 2",
+      "BANAMEX 1",
+      "BANAMEX 2",
+      "SANTANDER",
+      "NU",
+      "DIDI",
+      "MERCADOPAGO"
+    ],
+    "walletCards": [
+      "BBVA",
+      "BANAMEX 1",
+      "BANAMEX 2",
+      "SANTANDER",
+      "NU",
+      "DIDI"
+    ],
+    "bankAndDigitalCards": 9,
+    "physicalAndDigitalAliases": 18,
+    "walletAliases": 6,
+    "cases": [
+      "Observación sin crear gasto",
+      "Revisión/registro y cotejo por tarjeta/formato",
+      "Activación concurrente repetible",
+      "Dos tarjetas del mismo banco no comparten habilitación",
+      "Wallet no hereda validación bancaria ni de otras tarjetas",
+      "Presencial, digital/en línea y descriptor Mercado Pago",
+      "Cargos parciales separados y avisos de pedido sin crear compras",
+      "Suscripción explícita y conflicto de ocurrencia",
+      "Alias ambiguos incluso sin verificar",
+      "Aislamiento entre propietarios",
+      "Correcciones/desconocidos no validan analizador",
+      "Versión nueva no hereda prueba",
+      "Fuente pausada conserva entrega de eventos anteriores",
+      "Reintentos no recrean gastos",
+      "Retorno a observación conserva registros y otras tarjetas",
+      "Formato retirado puede desactivarse"
+    ],
+    "limitation": "Contratos ficticios inyectados exclusivamente en sourceLoader de tests. Ninguno se incorpora al catálogo de producción ni acredita un formato/canal real."
+  },
+  "realCoverage": {
+    "creditFixturesReviewed": 0,
+    "newVerifiedParsers": 0,
+    "formatsActivatedByThisTask": 0,
+    "aliasesReusedFromPhase4": 24,
+    "bankCoverage": "Todas las tarjetas pendientes de muestra real",
+    "walletIncompatibilitiesDeclaredByOwner": [
+      "HSBC 1",
+      "HSBC 2",
+      "MERCADOPAGO"
+    ]
+  },
+  "production": {
+    "webDeployed": false,
+    "databaseModified": false,
+    "personalApkModified": false,
+    "commitOrPush": false
+  },
+  "limits": [
+    "El piloto BBVA de Fase 6 sigue abierto por muestra/activación/corte real pendientes.",
+    "Las pruebas técnicas no demuestran compras bancarias reales ni entrega del piloto con pantalla bloqueada.",
+    "Los alias y los paquetes instalados no acreditan canales de compra.",
+    "La pausa remota depende de comunicación con Android; no se promete efecto inmediato sin conexión.",
+    "Esta implementación web requiere publicación antes de estar disponible en el dominio personal."
+  ],
+  "browser": {
+    "tool": "Agent Browser / Chromium",
+    "finalVisualFixture": "Componentes y API reales en Next dev aislado con PostgreSQL localhost y Auth ficticia. Build de producción final correcto por separado.",
+    "viewports": [
+      {
+        "blockerLines": [
+          {
+            "clipped": false,
+            "lineClamp": "none"
+          }
+        ],
+        "buttons": [
+          {
+            "disabled": true,
+            "height": 44,
+            "label": "Habilitar"
+          }
+        ],
+        "documentWidth": 305,
+        "horizontalOverflow": false,
+        "sourceOrder": [
+          "BanamexDiagnóstico",
+          "Google Wallet"
+        ],
+        "width": 320
+      },
+      {
+        "blockerLines": [
+          {
+            "clipped": false,
+            "lineClamp": "none"
+          }
+        ],
+        "buttons": [
+          {
+            "disabled": true,
+            "height": 44,
+            "label": "Habilitar"
+          }
+        ],
+        "documentWidth": 375,
+        "horizontalOverflow": false,
+        "sourceOrder": [
+          "BanamexDiagnóstico",
+          "Google Wallet"
+        ],
+        "width": 390
+      },
+      {
+        "blockerLines": [
+          {
+            "clipped": false,
+            "lineClamp": "none"
+          }
+        ],
+        "buttons": [
+          {
+            "disabled": true,
+            "height": 44,
+            "label": "Habilitar"
+          }
+        ],
+        "documentWidth": 1265,
+        "horizontalOverflow": false,
+        "sourceOrder": [
+          "BanamexDiagnóstico",
+          "Google Wallet"
+        ],
+        "width": 1280
+      }
+    ],
+    "pageErrors": 0,
+    "flows": [
+      "Inicio de sesión ficticio desde el formulario",
+      "Abrir Captura automática → Tarjetas y reglas",
+      "Selector conserva las nueve tarjetas separadas",
+      "Banamex en diagnóstico y Wallet no habilitable sin prueba propia",
+      "Selección explícita de HSBC 2 y BBVA",
+      "Formato retirado ficticio: abrir confirmación con teclado, confirmar y verificar OBSERVATION persistido por la API local",
+      "Ratón y teclado; acciones de 44 px",
+      "Texto completo de requisitos y fuente bancaria antes de Wallet"
+    ],
+    "screenshots": [
+      "cobertura-320.png",
+      "cobertura-390.png",
+      "cobertura-1280.png",
+      "recuperacion-320.png"
+    ],
+    "incidents": [
+      "Una pestaña conservada durante el reinicio del fixture encontró un chunk anterior. Se cerró esa sesión y se repitió la aceptación en una sesión limpia; cero errores en la compilación final.",
+      "Se corrigió el recorte de requisitos largos observado inicialmente; las capturas finales y medidas acreditan line-clamp none sin desbordamiento."
+    ],
+    "finalRetiredState": "Formato retirado · Observación, confirmado en la captura final a 320 px; la API había confirmado OBSERVATION."
+  },
+  "sourceSha256": {
+    "src/lib/captureRollout.js": "7bfb99e5349f0a2686086308a0dbe81cca290a42fe9a826c090d864e28d89899",
+    "src/lib/captureConfiguration.js": "2cdc71f82567e1e9222f8693f45d52a3a2e5644e2e616994bff041d17135957c",
+    "src/components/configuracion/CaptureRolloutStatus.jsx": "7802ed5003ac9f4de44900e7188af3a9c4114530ddf47d8fcf248b8ade23e681",
+    "src/components/configuracion/CaptureConfigurationPanel.jsx": "fc24662247ac5f49268db341c62c84b7f77a21e43fa0657f77e884310c079dfa",
+    "tests/capture-rollout.test.cjs": "4b0a476ed059c38c17c5ca506a361d04d9376b238ff2918d480c98072ded5d46",
+    "tests/capture-rollout-integration.test.cjs": "09e7ef670b1fba4900502c0dc7a3f7c84455317403bb3ed8c66eb6741062f739",
+    "tests/capture-processing-integration.test.cjs": "8d26e71c096b18e6dcd4c9221f777a2eca3062a8e4c4ae96cc0c3aa4f7863a01",
+    "tests/helpers/seed-capture-review.cjs": "799d35d19b43eaf3af3a83e9b34e581b627135986cb8afd9b2412c38ea86c7ec"
+  },
+  "testServicesStopped": true
+}
