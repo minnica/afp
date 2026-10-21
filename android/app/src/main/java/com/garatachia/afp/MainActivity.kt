@@ -124,7 +124,7 @@ class MainActivity : ComponentActivity() {
                 contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 item {
                     Text("Captura automática", style = MaterialTheme.typography.headlineMedium)
-                    Text("Diagnóstico · Fase 1", color = MaterialTheme.colorScheme.primary)
+                    Text("Diagnóstico y vinculación", color = MaterialTheme.colorScheme.primary)
                     Text("Comprueba los avisos disponibles en este teléfono. Esta versión todavía no registra gastos.",
                         modifier = Modifier.padding(top = 8.dp))
                 }
@@ -137,6 +137,13 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.fillMaxWidth()) { Text("Abrir AFP") }
                     Text("La sesión financiera se inicia en AFP. La captura se controla desde esta pantalla.",
                         style = MaterialTheme.typography.bodySmall)
+                }
+                item {
+                    BindingSection(app.bindingController) {
+                        startActivity(Intent(this@MainActivity, LauncherActivity::class.java)
+                            .setData("${getString(R.string.capture_origin)}/configuracion?tab=capture".toUri())
+                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP))
+                    }
                 }
                 item {
                     Section("Activación") {

@@ -39,6 +39,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Item, ItemActions, ItemContent, ItemDescription, ItemGroup, ItemTitle } from "@/components/ui/item";
 import PageSkeleton from "@/components/layout/PageSkeleton";
+import CaptureDevices from "@/components/configuracion/CaptureDevices";
 
 export default function SettingsContent() {
   const { captureFocus, restoreFocus } = useDialogFocus();
@@ -60,6 +61,7 @@ export default function SettingsContent() {
 
   const [itemToDelete, setItemToDelete] = useState(null);
   const [error, setError] = useState("");
+  const [initialTab, setInitialTab] = useState("categories");
 
   async function loadSettings(userId, { mutationCompleted = false } = {}) {
     const response = await apiFetch(`/api/settings?userId=${userId}`, { mutationCompleted });
@@ -88,6 +90,7 @@ export default function SettingsContent() {
         }
 
         setUser(session.user);
+        if (new URLSearchParams(window.location.search).get("tab") === "capture") setInitialTab("capture");
 
         await ensureUserSetup(session.user);
 
@@ -246,12 +249,17 @@ export default function SettingsContent() {
           </Alert>
         ) : null}
 
-        <Tabs defaultValue="categories" className="w-full">
-          <TabsList className="mb-6">
-            <TabsTrigger value="categories">Categorías</TabsTrigger>
-            <TabsTrigger value="people">Personas</TabsTrigger>
-            <TabsTrigger value="incomeTypes">Tipos de ingreso</TabsTrigger>
+        <Tabs defaultValue={initialTab} className="w-full">
+          <TabsList className="mb-6 max-w-full flex-wrap group-data-horizontal/tabs:h-auto">
+            <TabsTrigger value="categories" className="min-h-11">Categorías</TabsTrigger>
+            <TabsTrigger value="people" className="min-h-11">Personas</TabsTrigger>
+            <TabsTrigger value="incomeTypes" className="min-h-11">Tipos de ingreso</TabsTrigger>
+            <TabsTrigger value="capture" className="min-h-11">Captura automática</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="capture">
+            {user && <CaptureDevices key={user.id} userId={user.id} />}
+          </TabsContent>
 
           <TabsContent value="categories">
             <CatalogCard

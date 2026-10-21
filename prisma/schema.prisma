@@ -80,6 +80,8 @@ model User {
   receivableAccounts   ReceivableAccount[]
   payableAccounts      PayableAccount[]
   noticeDismissals     NoticeDismissal[]
+  captureDevices       CaptureDevice[]
+  captureEvents        CaptureEvent[]
 
   @@map("users")
 }
@@ -434,4 +436,67 @@ model Income {
   @@index([incomeTypeId])
   @@index([receivableAccountId])
   @@map("incomes")
+}
+
+// Una identidad se autoriza una sola vez; nunca se reasigna a otra cuenta.
+model CaptureDevice {
+  id         String          @id @default(uuid()) @db.Uuid
+  secretHash String          @unique
+  name       String
+  userId     String?
+  createdAt  DateTime        @default(now())
+  approvedAt DateTime?
+  pausedAt   DateTime?
+  revokedAt  DateTime?
+  lastSeenAt DateTime?
+  user       User?           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pairing    CapturePairing?
+  events     CaptureEvent[]
+
+  @@unique([id, userId])
+  @@index([userId, createdAt])
+  @@map("capture_devices")
+}
+
+model CapturePairing {
+  id         String        @id @default(uuid()) @db.Uuid
+  deviceId   String        @unique @db.Uuid
+  codeHash   String        @unique
+  expiresAt  DateTime
+  consumedAt DateTime?
+  device     CaptureDevice @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+
+  @@index([expiresAt])
+  @@map("capture_pairings")
+}
+
+model CaptureEvent {
+  id                  String        @id @default(uuid()) @db.Uuid
+  deviceId            String        @db.Uuid
+  userId              String
+  eventId             String        @db.Uuid
+  contractVersion     Int
+  sourcePackage       String
+  notificationKeyHash String
+  postedAt            DateTime
+  receivedAt          DateTime
+  fields              Json
+  requestHash         String
+  createdAt           DateTime      @default(now())
+  user                User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  device              CaptureDevice @relation(fields: [deviceId, userId], references: [id, userId], onDelete: Cascade, onUpdate: Restrict)
+
+  @@unique([deviceId, eventId])
+  @@index([userId, createdAt])
+  @@map("capture_events")
+}
+
+// Ventanas persistentes: los límites no dependen de la memoria de una función.
+model CaptureRateLimit {
+  key       String   @id
+  count     Int
+  expiresAt DateTime
+
+  @@index([expiresAt])
+  @@map("capture_rate_limits")
 }

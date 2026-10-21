@@ -1,8 +1,8 @@
-# AFP Android · diagnóstico de notificaciones
+# AFP Android · diagnóstico, vinculación y recepción segura
 
 La Fase 1 añade una APK Kotlin/Compose en `android/`. Abre la interfaz financiera actual mediante Trusted Web Activity (TWA) y permite comprobar qué notificaciones entregan BBVA México, Google Wallet, HSBC, Banamex, Santander, Nu, DiDi Finanzas y Mercado Pago. La pantalla nativa incluye activación, selección de fuentes, estado del permiso y del lector, muestras locales e instrucciones para Samsung.
 
-La captura está **pausada por defecto**. No hay vinculación con la cuenta ni peticiones de eventos al servidor en esta fase. El inicio de sesión de la web permanece en el navegador que proporciona la TWA.
+El diagnóstico está **pausado por defecto**. La Fase 2 añade vinculación independiente, cifrada y revocable, y recepción segura de eventos. El inicio de sesión web permanece en el navegador de la TWA; el componente nativo no lo lee. El lector continúa guardando únicamente muestras locales: su envío automático mediante Room/WorkManager corresponde a la Fase 3.
 
 El plan se ajustó el 21 de octubre de 2026 para preparar el diagnóstico de todas las tarjetas desde la Fase 1 y conservar la activación automática gradual por tarjeta/formato, empezando por BBVA. La APK **0.1.2 / versionCode 3** amplía el diagnóstico a ocho paquetes verificados y está instalada en el S24 Ultra. El inventario actual, leído mediante una transacción de solo lectura, contiene nueve tarjetas de siete emisores. La [matriz de fuentes](../android/diagnostics/format-matrix.md) relaciona esos nombres existentes con las aplicaciones y mantiene separados los paquetes verificados de los formatos aún sin muestras reales.
 
@@ -93,7 +93,7 @@ El búfer conserva como máximo las **100 muestras más recientes** en `noBackup
 
 Las muestras incluyen paquete, UUID, hash de clave de notificación, publicación, recepción, `Notification.when`, bloqueo y campos de texto estándar disponibles: título, texto, texto ampliado, subtítulo, resumen y líneas. `Notification.when` es un valor de presentación de Android: **no se asume que sea la fecha de operación bancaria**. Cada campo se limita a 4096 caracteres y las líneas a doce. Las fechas visibles usan `America/Mexico_City`.
 
-El texto original solo se revela expresamente dentro de la pantalla nativa, protegida contra capturas de pantalla. No se escribe en Logcat, Git ni el servidor. La app excluye copias de seguridad y transferencia de datos; pausar conserva las muestras y borrarlas requiere confirmación. Eliminar datos o desinstalar la app elimina el diagnóstico local.
+El texto original solo se revela expresamente dentro de la pantalla nativa, protegida contra capturas de pantalla. El diagnóstico no se escribe en Logcat, Git ni el servidor. Los eventos que un cliente autorizado entrega expresamente al endpoint de Fase 2 sí se persisten en el servidor; el lector de diagnóstico no los envía. La app excluye copias de seguridad y transferencia de datos; pausar conserva las muestras y borrarlas requiere confirmación. Eliminar datos o desinstalar la app elimina el diagnóstico local.
 
 **Exportar estructura anonimizada** usa el selector de documentos de Android. Sustituye letras por `x`, cifras por `0` y símbolos no admitidos por `·`; omite fechas, UUID y claves. Conserva paquete, nombres de campos, disponibilidad de texto y bloqueo. La exportación se identifica como `anonymous-shape-only` y `realFormatVerified: false`: permite inspeccionar estructura, pero no sustituye una muestra de lenguaje bancario revisada para desarrollar analizadores. No existe exportación del texto original en esta fase.
 
@@ -114,3 +114,98 @@ Las pruebas instrumentadas de Gradle instalan y retiran sus paquetes al terminar
 Desde la raíz, `node --test tests/android-assetlinks.test.cjs tests/android-sources.test.cjs` verifica Digital Asset Links y la coincidencia exacta entre fuentes del lector y paquetes visibles del manifest; prohíbe `QUERY_ALL_PACKAGES`. Tres casos correctos el 21 de octubre. `pnpm test` incluye estas regresiones. Lint y build web deben seguir pasando. Los resultados y las comprobaciones físicas pendientes se registran en [el plan](../PLAN_CAPTURA_AUTOMATICA_ANDROID.md) y la [evidencia de ocho fuentes](../artifacts/android-fase1/multi-source-verification.json). La evidencia inicial y el despliegue web de 0.1.1 se conservan como historial; esta actualización no requiere desplegar de nuevo la web.
 
 Fuentes técnicas: [TWA](https://developer.chrome.com/docs/android/trusted-web-activity/), [Android Browser Helper](https://github.com/GoogleChrome/android-browser-helper), [NotificationListenerService](https://developer.android.com/reference/android/service/notification/NotificationListenerService), [compatibilidad de AGP 9.1.1](https://developer.android.com/build/releases/agp-9-1-0-release-notes) y [Kotlin incorporado](https://developer.android.com/build/migrate-to-built-in-kotlin).
+
+## Vinculación y recepción segura — Fase 2
+
+Implementada el **21 de octubre de 2026**, APK **0.2.0 / versionCode 4**. Ambas variantes compilan con las mismas firmas existentes. La APK de producción del S24 Ultra sigue en 0.1.2 y conserva su permiso de notificaciones; las cuatro pruebas nuevas se ejecutaron en la variante de desarrollo, contra HTTPS y PostgreSQL locales, con cuenta y eventos ficticios. No se modificó Supabase ni se desplegó la web.
+
+### Uso después de publicar la Fase 2
+
+1. En la pantalla nativa, pulsa **Generar código de vinculación**. El teléfono genera y persiste 32 bytes aleatorios antes de contactar al servidor. Si pierde la respuesta, **Recuperar código** utiliza el mismo secreto.
+2. Pulsa **Autorizar desde AFP**, o abre **Configuración → Captura automática** en otro navegador con tu sesión. Escribe los doce caracteres del código y confirma que corresponden a tu teléfono. El código vence a los cinco minutos; reintentarlo no prolonga su vigencia. Si la respuesta de autorización se pierde, actualiza la lista antes de intentar otro código.
+3. Vuelve a la APK y pulsa **Consultar estado**. Mostrará autorizado, pendiente, vencido, pausado o revocado. Un código vencido o una identidad revocada permite generar otra identidad; se conserva el historial cifrado anterior con su propietario.
+4. **Pausar recepción/Reanudar recepción** y **Desvincular teléfono** son acciones explícitas con conexión. La web permite las mismas acciones sobre tus dispositivos; revocar es irreversible para esa identidad. Cerrar la pantalla o salir de la sesión web conserva la autorización del teléfono.
+
+La recepción permite conservar avisos, pero todavía no activa la captura sincronizada ni crea gastos. El diagnóstico y su selección de fuentes siguen siendo independientes. La configuración inicial del servidor es `OBSERVATION`, `automaticExpenses: false`; disponer de un paquete conocido nunca habilita una tarjeta ni un formato bancario.
+
+### Contrato de API
+
+| Endpoint | Autenticación | Función |
+|---|---|---|
+| `POST /api/captures/pairings` | Sin sesión; límites persistentes | `{secret, name}` → `{deviceId, code, expiresAt}`. Solo conserva los hashes. |
+| `PATCH /api/captures/pairings` | Supabase Bearer | `{code}` autoriza una vez la identidad que inició el proceso. El usuario procede de la sesión. |
+| `GET /api/captures/devices` | Supabase Bearer | Lista propia sin hashes ni credenciales. |
+| `PATCH /api/captures/devices` | Supabase Bearer | `{deviceId, action: pause/resume/revoke}`; exige propietario. |
+| `GET /api/captures/device` | `Capture <deviceId>.<secret>` | Estado propio, propietario original y configuración de captura; nunca datos financieros. Una identidad pendiente o revocada puede comprobar únicamente su propio estado/configuración. |
+| `POST /api/captures/device` | La misma credencial | `{action: pause/resume}`, solo para la propia identidad autorizada. |
+| `DELETE /api/captures/device` | La misma credencial | Revoca la propia identidad; repetir conserva la revocación. |
+| `POST /api/captures/events` | Credencial autorizada y activa | Persiste el evento antes de devolver su recibo. |
+
+El secreto tiene 256 bits, codificado en base64url sin relleno. El código temporal son doce caracteres hexadecimales derivados con un dominio distinto; el servidor guarda su hash y el hash del secreto, nunca la credencial en claro. La autorización consume el código y fija el propietario dentro de una transacción con bloqueo. Una segunda cuenta o una autorización tardía no puede apropiarse de la identidad. La credencial `Capture` no funciona como sesión Supabase y se rechaza en las API financieras.
+
+Los límites son ventanas persistentes de cinco minutos: 120 inicios globales, 10 por origen de red, 10 autorizaciones por cuenta y 600 consultas/envíos por dispositivo autenticado. Un exceso devuelve 429 y `Retry-After`; la ventana no se amplía al reintentar. El límite global y los 48 bits del código mantienen protección aunque el origen de red no esté disponible. El cliente nativo ofrece reintento manual y no sigue redirecciones ni deshabilita TLS. Las respuestas usan `private, no-store` y `Vary: Authorization`.
+
+El contrato de evento v1 admite estos campos, sin propietario o datos financieros añadidos por el cliente:
+
+```json
+{
+  "contractVersion": 1,
+  "eventId": "00000000-0000-4000-8000-000000000001",
+  "sourcePackage": "com.bancomer.mbanking",
+  "notificationKeyHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "postedAt": "2026-10-21T12:00:00Z",
+  "receivedAt": "2026-10-21T12:00:01Z",
+  "fields": { "android.title": "Ejemplo sintético", "android.text": "Aviso ficticio" }
+}
+```
+
+Solo se admiten los ocho paquetes verificados; las fechas tienen zona explícita. `fields` usa los nombres estándar del diagnóstico: `android.title`, `android.text`, `android.bigText`, `android.subText`, `android.title.big`, `android.summaryText` y `android.textLines.0` a `.11`. Cada valor tiene un máximo de 4096 caracteres, con un límite total de petición de 128 KiB. El resto de operaciones recibe hasta 4096 bytes. Estos límites también se aplican cuando falta `Content-Length`.
+
+La respuesta tiene `{event: {id, eventId, status: "RECEIVED", receivedAt}}`. `receivedAt` del recibo es la fecha de persistencia del servidor; se conservan aparte publicación y recepción del teléfono. El mismo dispositivo/UUID y contenido normalizado devuelve el recibo original; cambiar el contenido da 409. El orden de claves y las representaciones equivalentes de fecha no crean otro evento. No se deduplican compras diferentes por importe o comercio. Se autentica antes de leer texto y se vuelve a comprobar la autorización bajo el mismo bloqueo transaccional que pausa/revocación: pendiente, vencido y pausado reciben 403; revocado recibe 401 al enviar. No se confirma un evento si falla el commit.
+
+`BindingStore` usa AES-GCM, una clave no exportable de Android Keystore, archivos atómicos en `noBackupFilesDir` y exclusión de backups/transferencia declarada en el manifest. Reabrir conserva identidad y propietario; una alteración del cifrado produce un error visible y no sobrescribe el archivo. Una nueva vinculación archiva la identidad anterior. La BD protege además el propietario autorizado con trigger y una relación compuesta dispositivo/usuario para los eventos. La futura cola Room deberá guardar el dispositivo y propietario originales por pendiente y nunca reutilizar la credencial de otra cuenta para enviarlos. Las muestras antiguas del diagnóstico no se convierten automáticamente en eventos de ninguna cuenta.
+
+### Migración y activación
+
+`20261021000000_add_android_capture_linking` añade cuatro tablas e índices, claves foráneas, RLS explícito sin políticas públicas y el trigger de propietario inmutable. Conserva tablas y registros financieros. Se verificaron las 18 migraciones desde cero y desde el historial anterior, checksums, diff vacío, datos históricos y RLS en 21 tablas incluyendo el historial.
+
+La migración y la publicación **siguen pendientes en producción**. Para activarlas: revisar respaldo e historial con autorización explícita del proyecto, aplicar `prisma migrate deploy`, regenerar Prisma, publicar servidor/interfaz compatibles y distribuir la APK firmada. El dominio de producción todavía no ofrece el flujo nuevo. La TWA y su firma conservan Digital Asset Links; no hace falta modificar ese archivo.
+
+### Verificación reproducible
+
+- `pnpm test`: protocolos, rechazo de ámbitos de autorización y regresiones existentes. Sin `AFP_TEST_DATABASE_URL` omite las integraciones PostgreSQL.
+- `AFP_TEST_DATABASE_URL=<PostgreSQL local afp_test…> pnpm test`: **234 pruebas correctas, sin omisiones**. Las pruebas de captura cubren dos cuentas, expiración, límites, vinculación concurrente, recibos concurrentes, rollback, respuesta perdida, pausa, cierre de sesión y revocación. Auth es ficticia, Prisma/PostgreSQL son reales.
+- `AFP_MIGRATION_TEST_DATABASE_URL=<PostgreSQL local afp_test…> pnpm db:verify`: reconstrucción/actualización, permisos y todas las regresiones. No usar Supabase ni una base personal.
+- `./gradlew :app:testDebugUnitTest :app:assembleDebug :app:assembleRelease :app:lint`: lógica Kotlin, compilaciones y lint. La entrega JVM se omite salvo que se configure el fixture HTTPS local.
+
+Para repetir el recorrido HTTPS con el cliente Kotlin real, preparar un certificado de pruebas para `localhost` (SAN `DNS:localhost,IP:127.0.0.1`) y ejecutar desde la raíz:
+
+```bash
+AFP_TEST_DATABASE_URL=<PostgreSQL local afp_test…> \
+AFP_CAPTURE_TEST_KEY=<clave TLS local> \
+AFP_CAPTURE_TEST_CERTIFICATE=<certificado TLS local> \
+node tests/helpers/capture-browser-server.cjs
+```
+
+El fixture se niega a usar una base remota o cuyo nombre no empiece por `afp_test`. Copia el código a un directorio temporal, no carga `.env`, sirve la interfaz/API reales en `127.0.0.1:4208` y HTTPS en `127.0.0.1:4209`, y simula Supabase Auth. Para entrar en la UI usa el correo ficticio `capture-qa@example.test` y cualquier contraseña de prueba; no usar datos personales. Los demás módulos se simulan para que no se consulten finanzas reales. Su certificado privado queda fuera del repositorio.
+
+Desde `android/`, configurar `AFP_CAPTURE_TEST_ORIGIN=https://localhost:4209` y `AFP_CAPTURE_TEST_CERTIFICATE=<certificado TLS local>` al ejecutar `:app:testDebugUnitTest`. Se verificaron **14 pruebas JVM sin omisiones**, incluida vinculación, envío, recibo repetido, conflicto, pausa/reanudación y revocación contra HTTPS y PostgreSQL reales.
+
+Para la instrumentación, usar un dispositivo de desarrollo sin datos propios en `com.garatachia.afp.dev`: Gradle instala y retira esa variante al terminar. No afecta `com.garatachia.afp`. En el dispositivo autorizado:
+
+```bash
+adb reverse tcp:4209 tcp:4209
+adb push <certificado TLS local> /data/local/tmp/afp-capture-test.crt
+cd android
+./gradlew :app:connectedDebugAndroidTest \
+  -Pandroid.testInstrumentationRunnerArguments.class=com.garatachia.afp.BindingStoreTest,com.garatachia.afp.CaptureDeliveryTest \
+  -Pandroid.testInstrumentationRunnerArguments.captureTestOrigin=https://localhost:4209 \
+  -Pandroid.testInstrumentationRunnerArguments.captureTestCertificate=/data/local/tmp/afp-capture-test.crt
+adb reverse --remove tcp:4209
+```
+
+**Cuatro instrumentadas nuevas correctas en el S24 Ultra, Android 16/API 36, el 21 de octubre.** Validan Keystore real, reapertura, rechazo de alteraciones, identidad/propietario archivados y el recorrido completo teléfono → HTTPS → API → PostgreSQL. Solo la conexión creada por la prueba confía en el certificado local; no se instala una CA en el teléfono ni se cambia la confianza de la APK. La prueba HTTPS se omite si no recibe origen/certificado locales. Las diez instrumentadas históricas de Fase 1 mantienen su evidencia anterior; no se contabilizan como repetidas aquí.
+
+Durante la primera ejecución física, el servidor de desarrollo respondió 500 por un manifiesto JSON transitorio de Next mientras recompilaba. Se repitieron las cuatro pruebas con la compilación estable y todas pasaron. Los intentos de emulador no completaron el arranque; no se presentan como evidencia de ejecución. La APK de producción y su acceso a notificaciones se verificaron conservados después de las pruebas. [Evidencia agregada de Fase 2](../artifacts/android-fase2/verification.json).
+
+Referencias: [Android Keystore](https://developer.android.com/privacy-and-security/keystore) y [consideraciones de seguridad de autorización por dispositivo](https://www.rfc-editor.org/rfc/rfc8628.html#section-5). AFP implementa su propio protocolo de vinculación; no declara compatibilidad OAuth Device Grant.

@@ -17,6 +17,8 @@ class CaptureApplication : Application() {
     val samples = mutableSamples.asStateFlow()
     val connected = MutableStateFlow(false)
     val storageError = MutableStateFlow(false)
+    private val bindingScope = CoroutineScope(SupervisorJob() + Dispatchers.IO.limitedParallelism(1))
+    val bindingController by lazy { BindingController(this, bindingScope) }
     var active: Boolean
         get() = preferences.getBoolean("active", false)
         set(value) { preferences.edit { putBoolean("active", value) } }

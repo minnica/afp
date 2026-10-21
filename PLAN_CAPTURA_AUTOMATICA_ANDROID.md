@@ -1,7 +1,7 @@
 # AFP Android: plan por fases para capturar compras automáticamente
 
 **Archivo:** `PLAN_CAPTURA_AUTOMATICA_ANDROID.md`, en la raíz del proyecto.\
-**Estado:** Fase 1 con implementación terminada y validación real pendiente: APK 0.1.2 instalada, ocho fuentes verificadas y seleccionadas, nueve tarjetas inventariadas, batería Samsung revisada, TWA comprobada y Digital Asset Links publicado. Solo quedan las muestras bancarias reales, su anonimización revisada y la captura real con pantalla bloqueada. El usuario avisará al recibir un cargo. Fases 2–7 sin iniciar.\
+**Estado:** Fase 1 con implementación terminada y validación real pendiente: APK 0.1.2 instalada, ocho fuentes verificadas y seleccionadas, nueve tarjetas inventariadas, batería Samsung revisada, TWA comprobada y Digital Asset Links publicado. Solo quedan las muestras bancarias reales, su anonimización revisada y la captura real con pantalla bloqueada. El usuario avisará al recibir un cargo. Fase 2 implementada y verificada con PostgreSQL local, cliente Kotlin y cuatro pruebas nuevas en el S24 Ultra; migración y publicación de producción pendientes. Fases 3–7 sin iniciar.\
 **Dispositivo inicial:** Samsung S24 Ultra, Android 16 y One UI 8.5.\
 **Cobertura prevista:** todas las tarjetas existentes en AFP, conservando sus identidades e historiales.\
 **Primer piloto de registro automático:** BBVA Platinum; los demás bancos se preparan desde el diagnóstico y se activan gradualmente.
@@ -140,16 +140,28 @@ Evidencia de esta ampliación: [verificación de ocho fuentes](artifacts/android
 
 **Objetivo:** conectar el componente nativo con la cuenta personal de AFP.
 
-- [ ] Crear los modelos y endpoints de dispositivos, vinculaciones y eventos.
-- [ ] Implementar una vinculación de un solo uso: el teléfono genera su secreto, el servidor conserva su hash y presenta un código temporal; el usuario autoriza ese código desde AFP con su sesión Supabase.
-- [ ] Hacer que el código expire a los cinco minutos y limitar los intentos. La autorización quedará asociada al dispositivo que inició el proceso.
-- [ ] Limitar la credencial del dispositivo al envío de eventos y consulta de su configuración y estado. Permitir revocarla desde AFP.
-- [ ] Separar esta autorización de la sesión web: cerrar la pantalla o vencer la sesión del navegador no interrumpirá la captura. Pausar o desvincular el dispositivo será una acción explícita.
-- [ ] Mantener cada pendiente asociado a su propietario original; nunca trasladarlo automáticamente a otra cuenta.
+- [x] Crear los modelos y endpoints de dispositivos, vinculaciones y eventos.
+- [x] Implementar una vinculación de un solo uso: el teléfono genera su secreto, el servidor conserva su hash y presenta un código temporal; el usuario autoriza ese código desde AFP con su sesión Supabase.
+- [x] Hacer que el código expire a los cinco minutos y limitar los intentos. La autorización quedará asociada al dispositivo que inició el proceso.
+- [x] Limitar la credencial del dispositivo al envío de eventos y consulta de su configuración y estado. Permitir revocarla desde AFP.
+- [x] Separar esta autorización de la sesión web: cerrar la pantalla o vencer la sesión del navegador no interrumpirá la captura. Pausar o desvincular el dispositivo será una acción explícita.
+- [x] Mantener cada pendiente asociado a su propietario original; nunca trasladarlo automáticamente a otra cuenta.
 
 La TWA no permite al componente nativo leer directamente las cookies o el almacenamiento de la web. La vinculación evita depender de ese acceso. [Documentación de TWA](https://developer.chrome.com/docs/android/trusted-web-activity/).
 
 **Criterio de salida:** un dispositivo autorizado puede enviar eventos; uno pendiente o revocado no puede registrar movimientos ni consultar datos financieros ajenos.
+
+**Implementación concluida y criterio de salida verificado · 21 de octubre de 2026.**
+
+- Se añadieron `CaptureDevice`, `CapturePairing`, `CaptureEvent` y `CaptureRateLimit`, y los endpoints `/api/captures/pairings`, `/devices`, `/device` y `/events`. La migración `20261021000000_add_android_capture_linking` es aditiva, con RLS explícito sin políticas públicas, propietario inmutable y relación compuesta para conservar la pertenencia de los eventos. No crea ni modifica gastos.
+- La APK 0.2.0 / versionCode 4 genera y persiste el secreto antes de la petición. Conserva credenciales e identidades anteriores cifradas con Keystore y fuera de copias de seguridad. Recupera el inicio después de una respuesta perdida, sin prolongar el código. La web autoriza el código con sesión Supabase y permite pausar, reanudar y revocar los dispositivos propios. El teléfono consulta estado/configuración y permite pausar/reanudar o desvincular su propia identidad.
+- La autorización dura independientemente de la sesión del navegador. Pendientes, vencidos, pausados y revocados no pueden entregar eventos; la credencial tampoco accede a las API financieras. Los eventos se guardan y confirman transaccionalmente, con recibo repetible por dispositivo/UUID y conflicto de contenido. Revocar y recibir se serializan sobre la misma fila.
+- **234 regresiones web correctas, cero fallos y cero omisiones**, con PostgreSQL 16 local, Auth ficticia y datos sintéticos. Se verificaron expiración, límites persistentes, dos cuentas, autorizaciones y envíos concurrentes, rollback, respuesta perdida, cierre de sesión y revocación concurrente. La reconstrucción prueba las 18 migraciones, actualización histórica, checksums, diff vacío, datos preservados y 21 tablas con RLS.
+- **14 pruebas Kotlin/JVM y cuatro instrumentadas nuevas correctas en el S24 Ultra (Android 16/API 36)**. Las instrumentadas comprueban cifrado/reapertura real, rechazo de alteraciones, identidades/propietarios conservados y entrega completa por HTTPS a la API/PostgreSQL locales. Incluyen rechazo antes de autorizar, recibo repetido, conflicto, pausa, reanudación y revocación. Build web, ambas APK firmadas y lint correctos, con los avisos previos documentados. La firma de producción coincide con Digital Asset Links.
+- La comprobación en Chromium usa componentes y API reales con la cuenta ficticia de la base local. La documentación separa la recepción segura de las fases siguientes: el lector continúa guardando diagnóstico local; no hay todavía cola Room/WorkManager ni interpretación o creación automática de gastos. Los pendientes de esa futura cola deberán conservar siempre el propietario y la identidad originales.
+- **Puesta en producción pendiente:** no se aplicó la migración ni se publicó la web; tampoco se actualizó la APK de producción del teléfono. Las pruebas instalaron únicamente desarrollo y se comprobó que la APK de producción y su permiso de notificaciones permanecen. Requiere la autorización explícita del proyecto para activar estos cambios en el entorno personal. La Fase 1 conserva sus muestras bancarias reales pendientes.
+
+Evidencia agregada sin secretos, códigos temporales, textos bancarios ni identificadores del teléfono: [verificación de Fase 2](artifacts/android-fase2/verification.json). Contrato, límites y repetición de pruebas: [guía Android](docs/android-captura.md#vinculación-y-recepción-segura--fase-2).
 
 ### Fase 3. Cola local y sincronización resistente a fallos
 

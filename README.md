@@ -67,12 +67,16 @@ La página inicial es `/dashboard`: `/` redirige allí, el login navega al Dashb
 | `GET/POST/DELETE /api/notice-dismissals` | `src/app/api/notice-dismissals/route.js` | Preferencias mensuales de avisos ocultos; exige sesión Supabase mediante Bearer y obtiene el usuario del token |
 | `GET /api/settings` | `src/app/api/settings/route.js` |
 | `POST /api/setup-user` | `src/app/api/setup-user/route.js` |
+| `POST/PATCH /api/captures/pairings` | Iniciar vinculación / autorizar código con sesión Supabase |
+| `GET/PATCH /api/captures/devices` | Listar dispositivos propios; pausar, reanudar y revocar con sesión Supabase |
+| `GET/POST/DELETE /api/captures/device` | Estado/configuración, pausa/reanudación y desvinculación de la propia identidad; credencial `Capture` |
+| `POST /api/captures/events` | Recepción persistente e idempotente; credencial `Capture` activa |
 
 ---
 
 ### Autenticación y autorización de API (A01)
 
-Todas las rutas de `src/app/api/`, incluido `/api/gastos/bootstrap` y `/api/setup-user`, exigen `Authorization: Bearer <access_token>`. `src/lib/apiAuth.js` valida el token con `supabase.auth.getUser(token)` antes de leer el cuerpo o consultar Prisma. Sin token o con token inválido/vencido responde **401**. La identidad procede exclusivamente del usuario validado; cualquier `userId` enviado en URL o cuerpo se ignora. `setup-user` también obtiene el correo de esa identidad.
+Las rutas financieras de `src/app/api/`, incluido `/api/gastos/bootstrap` y `/api/setup-user`, exigen `Authorization: Bearer <access_token>`. `src/lib/apiAuth.js` valida el token con `supabase.auth.getUser(token)` antes de leer el cuerpo o consultar Prisma. Sin token o con token inválido/vencido responde **401**. La identidad procede exclusivamente del usuario validado; cualquier `userId` enviado en URL o cuerpo se ignora. `setup-user` también obtiene el correo de esa identidad.
 
 - Las consultas se limitan al propietario. Editar o borrar usa conjuntamente ID y `userId`, también en las actualizaciones indirectas de cuentas. Un registro ajeno o inexistente devuelve **404**; no revela su existencia.
 - Antes de escribir se verifica que tarjeta, categoría, persona, tipo de ingreso, suscripción y cuentas vinculadas pertenezcan al mismo usuario. Los IDs del cuerpo deben ser cadenas, nunca filtros de Prisma. El propietario no es editable desde la API.
@@ -81,6 +85,8 @@ Todas las rutas de `src/app/api/`, incluido `/api/gastos/bootstrap` y `/api/setu
 - Prisma continúa accediendo desde el servidor; estas comprobaciones son obligatorias aunque RLS esté activo. La corrección no cambia tablas, políticas RLS ni migraciones y conserva la denegación pública existente.
 
 Regresiones: `node --test tests/*.test.cjs`. `tests/api-authorization.test.cjs` ejecuta todas las rutas con Auth y persistencia simulados, verifica acceso anónimo, tokens inválidos, suplantación de identidad, aislamiento entre dos usuarios, CRUD propio y referencias ajenas. `tests/api-fetch.test.cjs` cubre renovación de tokens, cambio de cuenta, cola offline y exclusión de API del service worker. Estas pruebas no escriben en Supabase ni sustituyen una prueba integrada con dos cuentas reales en un ambiente aislado. El despliegue a producción requiere autorización explícita.
+
+La captura Android tiene un ámbito separado: el inicio de vinculación es público y limitado; su autorización y administración exigen la sesión Supabase. Solo los endpoints nativos bajo `/api/captures` aceptan la credencial `Capture`. Esa credencial no permite consultar las API financieras. La identidad y el propietario nunca proceden del cuerpo de un evento. Véase [Fase 2](#vinculación-y-recepción--fase-2).
 
 ### Errores y recuperación de interacciones
 
@@ -120,6 +126,10 @@ Archivo: [`prisma/schema.prisma`](prisma/schema.prisma)
 | `PayableAccount` | `payable_accounts` | Cuentas por pagar (simple o préstamo) |
 | `Income` | `incomes` | Ingresos registrados |
 | `NoticeDismissal` | `notice_dismissals` | Aviso concreto oculto por usuario y mes calendario; no modifica registros financieros |
+| `CaptureDevice` | `capture_devices` | Identidad nativa revocable y propietario inmutable tras autorizar |
+| `CapturePairing` | `capture_pairings` | Código temporal de un solo uso, conservado como hash |
+| `CaptureEvent` | `capture_events` | Aviso recibido y recibo durable por dispositivo/UUID; todavía no crea gastos |
+| `CaptureRateLimit` | `capture_rate_limits` | Límites de intentos persistentes entre instancias del servidor |
 
 ### Enums relevantes
 
@@ -430,13 +440,27 @@ La reconstrucción cubre el esquema `public` de AFP y su RLS, no usuarios/datos 
 
 `android/` contiene una aplicación Kotlin/Compose con variantes `debug` (`com.garatachia.afp.dev`) y `release` (`com.garatachia.afp`), firmas propias y apertura de AFP mediante Trusted Web Activity en `https://finanzas.garatachia.com/dashboard`. La pantalla nativa permite activar/pausar el diagnóstico, comprobar el acceso especial a notificaciones, seleccionar BBVA México, Wallet, HSBC, Banamex, Santander, Nu, DiDi Finanzas y Mercado Pago, ver el estado del lector y consultar el estado de batería y las instrucciones de bloqueo para Samsung. No solicita permiso para mostrar notificaciones propias.
 
-El `NotificationListenerService` acepta únicamente los ocho paquetes verificados de la [matriz](android/diagnostics/format-matrix.md), excluye resúmenes agrupados y empieza pausado. Las fuentes nuevas permanecen desactivadas al actualizar; se conserva la selección anterior, incluso vacía. Cada fuente tiene interruptor, versión instalada y contadores; el botón «Seleccionar todas las instaladas» aplica una selección explícita. Conserva hasta 100 muestras en un búfer local AES-GCM con Android Keystore, fuera de copias de seguridad. El texto solo se revela en el teléfono; la exportación oculta letras, cifras, fechas e identificadores. No interpreta compras ni envía eventos o crea gastos. Room, vinculación y sincronización pertenecen a las fases siguientes; la arquitectura de la web y la BD actual se conserva.
+El `NotificationListenerService` acepta únicamente los ocho paquetes verificados de la [matriz](android/diagnostics/format-matrix.md), excluye resúmenes agrupados y empieza pausado. Las fuentes nuevas permanecen desactivadas al actualizar; se conserva la selección anterior, incluso vacía. Cada fuente tiene interruptor, versión instalada y contadores; el botón «Seleccionar todas las instaladas» aplica una selección explícita. Conserva hasta 100 muestras en un búfer local AES-GCM con Android Keystore, fuera de copias de seguridad. El texto solo se revela en el teléfono; la exportación oculta letras, cifras, fechas e identificadores. No interpreta compras ni envía eventos o crea gastos. Este diagnóstico conserva su funcionamiento local. La vinculación y recepción se implementan en la Fase 2; Room y sincronización automática corresponden a la Fase 3.
 
 **Plan ajustado el 21 de octubre de 2026:** el inventario y diagnóstico de todas las tarjetas se adelantan a la Fase 1, con fuentes verificadas y alias separados para tarjetas físicas, digitales y Wallet. BBVA sigue como primer piloto de registro automático; las demás tarjetas se habilitarán por formato validado. La ampliación está implementada en la APK **0.1.2 / versionCode 3**, instalada en el S24 Ultra con la misma firma y el permiso conservado. Se contrastaron en modo de solo lectura las **nueve tarjetas actuales**, correspondientes a siete emisores; las ocho aplicaciones de diagnóstico están instaladas y seleccionadas explícitamente. HSBC 1/2 y BANAMEX 1/2 conservan identidades separadas; sus alias y los tokens de Wallet todavía requieren evidencia real. El [plan](PLAN_CAPTURA_AUTOMATICA_ANDROID.md) y la [matriz](android/diagnostics/format-matrix.md) distinguen la cobertura prevista de la comprobada.
 
 `public/.well-known/assetlinks.json` declara la identidad pública de la APK de producción. **Publicado en Vercel con autorización el 20 de octubre de 2026:** responde 200 como JSON público por HTTPS, coincide con el certificado de la APK y Android verifica el dominio como `verified` en el S24 Ultra. La firma de desarrollo no se autoriza en el dominio de producción. Las claves están en `android/.private/` y `android/signing.properties`, excluidas de Git: respaldarlas privadamente antes de distribuir y conservarlas para futuras actualizaciones. La [evidencia de despliegue](artifacts/android-fase1/deployment.json) registra la versión y sus comprobaciones; la APK 0.1.1 abre como TWA sin barra de direcciones en Chrome del S24 Ultra, confirmado por el usuario. La revisión de batería y las pruebas actuales se documentan en la [verificación de ocho fuentes](artifacts/android-fase1/multi-source-verification.json). Quedan pendientes los avisos reales, su anonimización revisada y la captura real con pantalla bloqueada; el usuario avisará al recibir un cargo nuevo.
 
 Guía de instalación, compilación, firma y pruebas: [docs/android-captura.md](docs/android-captura.md). Alcance, actividades concluidas y comprobaciones pendientes: [PLAN_CAPTURA_AUTOMATICA_ANDROID.md](PLAN_CAPTURA_AUTOMATICA_ANDROID.md). Evidencia de fuentes y campos: [matriz de formatos](android/diagnostics/format-matrix.md). La fase solo podrá cerrarse después de verificar TWA y avisos reales en el S24 Ultra; los ejemplos sintéticos no acreditan cobertura bancaria.
+
+### Vinculación y recepción — Fase 2
+
+**Implementada y verificada localmente y en el S24 Ultra · 21 de octubre de 2026.** La APK **0.2.0 / versionCode 4** incorpora vinculación nativa, estado, pausa/reanudación y desvinculación. Configuración incluye «Captura automática», con autorización de código, lista propia, pausa/reanudación y revocación confirmadas. La APK de producción instalada continúa en 0.1.2; las pruebas utilizaron exclusivamente desarrollo y conservaron su permiso y muestras.
+
+- El teléfono genera 32 bytes aleatorios y los persiste antes de enviar. El servidor guarda únicamente el hash del secreto y del código de doce caracteres, con vigencia de cinco minutos. Reintentar el inicio recupera la misma identidad y vencimiento. La autorización exige Bearer Supabase, consume el código una sola vez y fija el propietario en una transacción, incluso entre cuentas concurrentes.
+- La credencial `Authorization: Capture <deviceId>.<secret>` permite únicamente enviar eventos y consultar/administrar el estado de su propia captura. No da acceso a Gastos, tarjetas ni otras cuentas. Cerrar la TWA o vencer/cerrar la sesión web conserva la autorización. Pausar o revocar son acciones explícitas.
+- `BindingStore` usa AES-GCM, Android Keystore, escritura atómica y `noBackupFilesDir`. Conserva las identidades anteriores al revincular y rechaza cambiar su propietario. La BD también impide reasignar un dispositivo autorizado; la relación compuesta dispositivo/propietario protege los eventos ya recibidos. La futura cola deberá guardar esa misma identidad original en cada pendiente.
+- `POST /api/captures/events` valida contrato v1, UUID, paquete del catálogo, hash de notificación, fechas y campos de texto acotados. Autentica antes de leer el cuerpo y vuelve a comprobar dentro de la transacción. Confirma únicamente después del commit; mismo UUID/contenido devuelve el recibo existente y contenido distinto devuelve 409. Pausa, revocación y recepción comparten bloqueo para evitar envíos posteriores a una revocación confirmada. Los eventos permanecen en recepción/observación: esta fase no interpreta compras ni crea gastos.
+- Los límites de inicio y autorización se conservan en PostgreSQL, con 429 y `Retry-After`. Las respuestas excluyen secretos, usan `private, no-store` y no registran texto bancario ni credenciales. No se depende de cookies o almacenamiento del navegador TWA.
+
+La migración **aditiva** `20261021000000_add_android_capture_linking` agrega cuatro tablas, índices, relaciones, RLS explícito sin políticas públicas y un trigger de propietario inmutable. No modifica registros financieros históricos. **Pendiente de aplicación a producción y despliegue web con autorización explícita**: primero respaldo/revisión del historial, `prisma migrate deploy` y `prisma generate`; después publicar la web y distribuir la APK firmada. No se puede vincular la APK con la web de producción mientras esos cambios sigan pendientes.
+
+Verificación: **234 pruebas web correctas, sin omisiones**, con PostgreSQL 16 local y Auth ficticia; reconstrucción de las 18 migraciones desde cero y actualización histórica, checksums, diff vacío, conservación de datos y 21 tablas con RLS. **14 pruebas Kotlin/JVM correctas**, incluyendo el cliente real contra HTTPS/API/PostgreSQL locales, y **cuatro pruebas instrumentadas nuevas correctas en el S24 Ultra**: Keystore, reapertura, alteraciones, conservación del propietario y flujo de entrega/pausa/revocación. Builds web, ambas APK y lint correctos; se conservan los avisos previos de TanStack Table y cinco de Android. Las pruebas no enviaron avisos bancarios reales ni escribieron en Supabase. [Evidencia](artifacts/android-fase2/verification.json), [contrato y procedimiento reproducible](docs/android-captura.md#vinculación-y-recepción-segura--fase-2).
 
 ## Variables de entorno requeridas
 

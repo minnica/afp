@@ -30,7 +30,15 @@ async function catalog(db) {
 }
 
 async function assertAutomation(db) {
-  assert.deepEqual((await db.$queryRawUnsafe(automationSql))[0].automation, beforeAutomation);
+  const actual = (await db.$queryRawUnsafe(automationSql))[0].automation;
+  // Se mantiene íntegra la automatización histórica; la nueva función solo fija propietario.
+  const added = actual.functions.filter(row => row.name === 'capture_device_owner_immutable');
+  if (added.length) {
+    assert.equal(added.length, 1);
+    assert.match(added[0].definition, /OLD\."userId" IS NOT NULL/);
+    assert.match(added[0].definition, /NEW\."userId" IS DISTINCT FROM OLD\."userId"/);
+  }
+  assert.deepEqual({ ...actual, functions: actual.functions.filter(row => row.name !== 'capture_device_owner_immutable') }, beforeAutomation);
 }
 
 async function assertNewTableRls(db, role) {
@@ -78,12 +86,13 @@ function assertCatalog(actual) {
   assert.match(contributionConstraint[0].definition, /CHECK.*cashContributionAmount/);
   for (const section of ['columns', 'constraints', 'indexes', 'enums']) {
     const rows = actual[section].filter(row => (row.table_name || row.tablename) !== 'expense_operations'
+      && !['capture_devices', 'capture_pairings', 'capture_events', 'capture_rate_limits'].includes(row.table_name || row.tablename)
       && !(section === 'columns' && row.table_name === 'card_cycles' && creditColumns.includes(row.column_name))
       && !(section === 'columns' && row.table_name === 'daily_expenses' && row.column_name === 'cashContributionAmount')
       && !(section === 'constraints' && row.name === 'daily_expenses_cash_contribution_check'));
     assert.deepEqual(rows, before[section], `Catálogo distinto en ${section}`);
   }
-  assert.equal(actual.security.length, before.security.length + 1);
+  assert.equal(actual.security.length, before.security.length + 5);
   for (const row of actual.security) {
     assert.equal(row.rls, true, `RLS desactivado: ${row.table_name}`);
     assert.equal(row.force_rls, false);
@@ -236,7 +245,7 @@ async function main() {
         console.log(`OK ${i ? 'actualización desde las 13 migraciones aplicadas' : 'base vacía'}: catálogo equivalente, diff vacío, checksums, deploy repetible, registros intactos y RLS.`);
       } finally { await db.$disconnect(); }
     }
-    console.log(`Reconstrucción y actualización verificadas; ${localMigrations().length} migraciones y 17 tablas con RLS, incluido el historial.`);
+    console.log(`Reconstrucción y actualización verificadas; ${localMigrations().length} migraciones y 21 tablas con RLS, incluido el historial.`);
   } finally {
     // Solo elimina bases/roles con sufijo aleatorio creados por esta ejecución.
     for (const name of createdDatabases.reverse()) await admin.$executeRawUnsafe(`DROP DATABASE "${name}" WITH (FORCE)`);

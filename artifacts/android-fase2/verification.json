@@ -1,0 +1,150 @@
+{
+  "date": "2026-10-21",
+  "phase": 2,
+  "status": "implemented-and-verified",
+  "productionModified": false,
+  "scope": {
+    "financialExpensesCreated": false,
+    "notificationDiagnosticsUploaded": false,
+    "roomAndWorkManager": "phase-3",
+    "automaticFinancialRegistration": "phase-4"
+  },
+  "database": {
+    "environment": "disposable-local-postgresql-16",
+    "supabaseAuth": "simulated",
+    "migrations": 18,
+    "tablesWithRlsIncludingMigrationHistory": 21,
+    "freshInstall": "passed",
+    "historicalUpgrade": "passed",
+    "checksums": "passed",
+    "schemaDiff": "empty",
+    "historicalRecords": "preserved",
+    "publicPolicies": 0,
+    "regressions": {
+      "tests": 234,
+      "pass": 234,
+      "fail": 0,
+      "skipped": 0
+    }
+  },
+  "securityChecks": [
+    "one-time approval bound to initiating device",
+    "five-minute expiration without extension on retry",
+    "durable limits and Retry-After",
+    "concurrent approvals from two accounts preserve one owner",
+    "concurrent retries preserve one event and receipt",
+    "changed content with same UUID returns 409",
+    "transaction failure rolls back without receipt",
+    "web logout does not invalidate device credential",
+    "device credentials rejected by financial APIs",
+    "pause rejects events with 403",
+    "revocation rejects events with 401",
+    "revocation serializes with receipt",
+    "revoked pending code cannot be approved",
+    "device owner immutable in API, database and native store"
+  ],
+  "android": {
+    "versionName": "0.2.0",
+    "versionCode": 4,
+    "unitTests": [
+      {
+        "name": "com.garatachia.afp.CaptureBindingTest",
+        "tests": "4",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.garatachia.afp.CaptureDeliveryJvmTest",
+        "tests": "1",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.garatachia.afp.CapturePolicyTest",
+        "tests": "9",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      }
+    ],
+    "httpsJvmTest": "real Kotlin client with pinned local test certificate, real API and local PostgreSQL",
+    "instrumentation": {
+      "device": "Samsung S24 Ultra SM-S928B",
+      "android": "16",
+      "api": 36,
+      "tests": 4,
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0,
+      "checks": [
+        "Keystore encryption and reopening",
+        "tampering rejected without overwriting",
+        "old owner and identity retained when relinking",
+        "native HTTPS pairing, event receipt, replay, conflict, pause, resume and revocation"
+      ]
+    },
+    "builds": {
+      "debug": "passed",
+      "release": "passed",
+      "lint": "passed",
+      "lintWarnings": 5
+    },
+    "apks": {
+      "debug": {
+        "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+        "sha256": "7a36d8bbf56b6d0b9ffec5cdc9f5387b6c5b6821c29c748baac23b84f93a65a7"
+      },
+      "release": {
+        "path": "android/app/build/outputs/apk/release/app-release.apk",
+        "sha256": "f6374f2918b878197a1651589c59bee87487571dcd61b5d485d539e96a36b222"
+      }
+    },
+    "releaseSignature": "verified; same public certificate as Digital Asset Links",
+    "phoneAfterTests": {
+      "productionVersion": "0.1.2",
+      "productionVersionCode": 3,
+      "productionInstalled": true,
+      "notificationListenerAccessPreserved": true,
+      "developmentTestPackageRemoved": true,
+      "localCertificateAndReverseTunnelRemoved": true
+    }
+  },
+  "web": {
+    "build": "passed (next build --webpack)",
+    "lintErrors": 0,
+    "existingLintWarning": "TanStack Table incompatible-library",
+    "browser": {
+      "implementation": "real components and API, fictitious account in local PostgreSQL",
+      "widthsChecked": [
+        320,
+        390,
+        1280
+      ],
+      "horizontalOverflow": false,
+      "captureButtonMinimumHeightPx": 44,
+      "checks": [
+        "invalid code keeps input and displays rejection",
+        "valid code authorizes and updates list",
+        "pause blocks event receipt",
+        "resume restores receipt",
+        "revoke blocks receipt and removes actions"
+      ],
+      "screenshots": [
+        "web-320.png",
+        "web-390.png",
+        "web-desktop.png"
+      ]
+    }
+  },
+  "incidents": [
+    "Emulator attempts did not complete startup; not counted as executed tests.",
+    "Next development manifests briefly returned HTTP 500 during recompilation; repeated after routes compiled and all checks passed. Reproducible fixture precompiles protected routes."
+  ],
+  "pending": [
+    "Authorized migration and deployment to production",
+    "Distribution or installation of signed 0.2.0 production APK",
+    "Existing phase-1 real bank samples remain pending"
+  ]
+}
