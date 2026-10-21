@@ -1,0 +1,42 @@
+{
+  "checkedAtUtc": "2026-10-21T07:10:13.499Z",
+  "migration": "20261021000000_add_android_capture_linking",
+  "migrationChecksum": "c80f3d004d6b34fede13ca5afa2d6f3107eb192fbcf09042cf5df4bc6338d8aa",
+  "authorizedByUser": true,
+  "authorizationScope": "Aplicar migración en Supabase; el usuario hará commit y push.",
+  "method": "prisma migrate deploy",
+  "mcpStatus": "Configured, but OAuth refresh requires authorization; project Prisma connection used.",
+  "appliedMigrations": 18,
+  "pendingMigrations": 0,
+  "allChecksumsMatch": true,
+  "schemaDiff": "empty",
+  "migrateStatus": "up to date",
+  "existingFinancialRecordsUnchanged": true,
+  "originalMigrationRowsUnchanged": true,
+  "existingColumnsConstraintsIndexesEnumsUnchanged": true,
+  "previousPermissionsRlsAndAutomationUnchanged": true,
+  "rlsTables": 21,
+  "newTablesWithRls": 4,
+  "newPublicPolicies": 0,
+  "deviceOwnerImmutable": true,
+  "eventOwnerCompositeForeignKey": true,
+  "newCaptureTablesEmpty": true,
+  "privateBackupDirectory": "estados_cuenta/android_fase2_2026-10-21-lfHFCZ/",
+  "backupScope": "All public rows as exact PostgreSQL JSON text, schema metadata, grants, triggers and functions; excludes Supabase Auth.",
+  "productionDatabaseChanged": true,
+  "applicationDeployedByThisOperation": false,
+  "productionTestRecordsCreated": 0,
+  "commitCreated": false,
+  "pushed": false,
+  "apkInstalled": false,
+  "webObservation": {
+    "unauthenticatedDeviceListStatus": 401,
+    "authenticatedFlowVerified": false,
+    "deploymentCommitVerified": false
+  },
+  "gitObservation": {
+    "head": "f084cc4",
+    "localBranchAlignedWithOriginMaster": true,
+    "documentationChangesAddedAfterUserCommit": true
+  }
+}

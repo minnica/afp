@@ -2,7 +2,7 @@
   "date": "2026-10-21",
   "phase": 2,
   "status": "implemented-and-verified",
-  "productionModified": false,
+  "productionModified": true,
   "scope": {
     "financialExpensesCreated": false,
     "notificationDiagnosticsUploaded": false,
@@ -143,8 +143,18 @@
     "Next development manifests briefly returned HTTP 500 during recompilation; repeated after routes compiled and all checks passed. Reproducible fixture precompiles protected routes."
   ],
   "pending": [
-    "Authorized migration and deployment to production",
+    "User commit and push of production migration documentation and evidence; verify deployed web version",
     "Distribution or installation of signed 0.2.0 production APK",
     "Existing phase-1 real bank samples remain pending"
-  ]
+  ],
+  "testRunModifiedProduction": false,
+  "productionUpdate": {
+    "report": "produccion.json",
+    "migrationApplied": true,
+    "appliedMigrations": 18,
+    "pendingMigrations": 0,
+    "existingFinancialRecordsUnchanged": true,
+    "applicationDeployed": false,
+    "commitAndPushOwner": "user"
+  }
 }
