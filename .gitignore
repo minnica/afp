@@ -43,3 +43,16 @@ next-env.d.ts
 /src/generated/prisma
 /estados_cuenta
 /skills
+
+# Android: compilaciones, configuración local, firmas y muestras privadas
+/android/.gradle/
+/android/.kotlin/
+/android/**/build/
+/android/**/__pycache__/
+/android/local.properties
+/android/signing.properties
+/android/.private/
+/android/diagnostics/private/
+*.jks
+*.keystore
+*.p12

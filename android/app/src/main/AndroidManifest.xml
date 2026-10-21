@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.INTERNET" />
+    <queries>
+        <package android:name="com.bancomer.mbanking" />
+        <package android:name="com.google.android.apps.walletnfcrel" />
+        <package android:name="mx.hsbc.hsbcmexico" />
+        <package android:name="com.citibanamex.banamexmobile" />
+        <package android:name="mx.bancosantander.supermovil" />
+        <package android:name="com.nu.production" />
+        <package android:name="com.didiglobal.cashloan" />
+        <package android:name="com.mercadopago.wallet" />
+        <intent><action android:name="android.support.customtabs.action.CustomTabsService" /></intent>
+    </queries>
+    <application
+        android:name=".CaptureApplication"
+        android:allowBackup="false"
+        android:fullBackupContent="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:usesCleartextTraffic="false"
+        android:theme="@style/Theme.AFP">
+        <meta-data android:name="asset_statements" android:resource="@string/asset_statements" />
+        <activity android:name=".MainActivity" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name="com.google.androidbrowserhelper.trusted.LauncherActivity" android:exported="true">
+            <meta-data android:name="android.support.customtabs.trusted.DEFAULT_URL" android:value="@string/web_url" />
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" android:host="${webHost}" />
+            </intent-filter>
+        </activity>
+        <activity android:name="com.google.androidbrowserhelper.trusted.ManageDataLauncherActivity" android:exported="false">
+            <meta-data android:name="android.support.customtabs.trusted.MANAGE_SPACE_URL" android:value="@string/web_url" />
+        </activity>
+        <activity android:name="com.google.androidbrowserhelper.trusted.FocusActivity" android:exported="false" />
+        <service
+            android:name=".CaptureNotificationListener"
+            android:exported="true"
+            android:label="@string/notification_access_label"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
+    </application>
+</manifest>

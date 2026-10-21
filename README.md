@@ -283,7 +283,7 @@ En **Gastos**, al crear o editar un registro, «Gasto compartido» con el badge 
 - Tarjetas, pagos y avisos del Dashboard, conciliación del estado y consumo mínimo conservan el **cargo completo**. Recibir efectivo no es un abono al banco. Los listados de Gastos muestran total pagado, recibido y parte personal; sus resúmenes conservan el total pagado y añaden el personal cuando corresponde. El filtro por monto sigue buscando el total del movimiento.
 - La captura offline, el borrador móvil y el recibo idempotente conservan la aportación con el mismo UUID. Guardar limpia la opción para el siguiente gasto. Edición y eliminación requieren conexión; borrar el gasto elimina también su aportación y actualiza los cálculos en la siguiente consulta.
 
-La migración **aditiva** `20261020000000_add_cash_expense_contributions` agrega una columna con cero por defecto y una restricción de importe en `daily_expenses`; conserva cargos, ingresos y RLS. **Aplicada a Supabase con autorización explícita el 20 de octubre de 2026** mediante `prisma migrate deploy`: 17 migraciones, checksums correctos, sin pendientes y diff de esquema vacío. La comparación del respaldo anterior con la base posterior confirmó que los registros existentes, el historial previo, los permisos, RLS y la automatización se conservaron; todos los gastos anteriores tienen aportación cero. El respaldo privado está en `estados_cuenta/gastos_compartidos_2026-10-20/`, excluido de Git; [evidencia de aplicación](artifacts/gastos-compartidos/produccion.json). **La publicación de la app sigue pendiente.** En otras instalaciones, aplicar las migraciones y regenerar Prisma antes de ejecutar esta versión, porque Gastos, Dashboard y Tarjetas consultan la columna nueva. No registra automáticamente los ejemplos personales ni interpreta notas antiguas como aportaciones.
+La migración **aditiva** `20261020000000_add_cash_expense_contributions` agrega una columna con cero por defecto y una restricción de importe en `daily_expenses`; conserva cargos, ingresos y RLS. **Aplicada a Supabase con autorización explícita el 20 de octubre de 2026** mediante `prisma migrate deploy`: 17 migraciones, checksums correctos, sin pendientes y diff de esquema vacío. La comparación del respaldo anterior con la base posterior confirmó que los registros existentes, el historial previo, los permisos, RLS y la automatización se conservaron; todos los gastos anteriores tienen aportación cero. El respaldo privado está en `estados_cuenta/gastos_compartidos_2026-10-20/`, excluido de Git; [evidencia de aplicación](artifacts/gastos-compartidos/produccion.json). **La app se publicó con autorización el 20 de octubre de 2026 al desplegar Digital Asset Links para Android.** En otras instalaciones, aplicar las migraciones y regenerar Prisma antes de ejecutar esta versión, porque Gastos, Dashboard y Tarjetas consultan la columna nueva. No registra automáticamente los ejemplos personales ni interpreta notas antiguas como aportaciones.
 
 Validación local: 212 pruebas correctas, sin omisiones, con PostgreSQL 16 desechable y Auth simulada; incluye CRUD, aislamiento, concurrencia, reintentos, captura offline, restricciones SQL, suscripciones y las tres vistas de Análisis. `db:verify` verifica las 17 migraciones desde cero y desde el esquema histórico, datos preservados, defaults, checksums, RLS y diff vacío. Build con `pnpm exec next build --webpack` correcto; lint sin errores, con la advertencia previa de TanStack Table.
 
@@ -347,6 +347,8 @@ Cada fila muestra el nombre personalizado de la tarjeta; omite el nombre del pro
 Los dos campos JSON son opcionales y se agregan con la migración aditiva `20261011000000_add_card_usage_verification`. Aplicar con `prisma migrate deploy`, regenerar Prisma y reiniciar el servidor. La evidencia inicial y su verificación están en `estados_cuenta/consumo_minimo/`; no hay dependencia de esos archivos privados durante la ejecución. En conciliaciones futuras, actualizar estos metadatos junto con la evidencia del nuevo corte y preservar las notas de origen.
 
 ### PWA / modo offline
+
+La APK Android nativa en desarrollo se documenta por separado en [Captura automática Android](#captura-automática-android--fase-1). La cola web descrita aquí conserva su funcionamiento independiente.
 
 La app puede instalarse como PWA y soporta captura offline de gastos diarios en `/gastos`.
 
@@ -424,6 +426,18 @@ La reconstrucción cubre el esquema `public` de AFP y su RLS, no usuarios/datos 
 
 ---
 
+## Captura automática Android — Fase 1
+
+`android/` contiene una aplicación Kotlin/Compose con variantes `debug` (`com.garatachia.afp.dev`) y `release` (`com.garatachia.afp`), firmas propias y apertura de AFP mediante Trusted Web Activity en `https://finanzas.garatachia.com/dashboard`. La pantalla nativa permite activar/pausar el diagnóstico, comprobar el acceso especial a notificaciones, seleccionar BBVA México, Wallet, HSBC, Banamex, Santander, Nu, DiDi Finanzas y Mercado Pago, ver el estado del lector y consultar el estado de batería y las instrucciones de bloqueo para Samsung. No solicita permiso para mostrar notificaciones propias.
+
+El `NotificationListenerService` acepta únicamente los ocho paquetes verificados de la [matriz](android/diagnostics/format-matrix.md), excluye resúmenes agrupados y empieza pausado. Las fuentes nuevas permanecen desactivadas al actualizar; se conserva la selección anterior, incluso vacía. Cada fuente tiene interruptor, versión instalada y contadores; el botón «Seleccionar todas las instaladas» aplica una selección explícita. Conserva hasta 100 muestras en un búfer local AES-GCM con Android Keystore, fuera de copias de seguridad. El texto solo se revela en el teléfono; la exportación oculta letras, cifras, fechas e identificadores. No interpreta compras ni envía eventos o crea gastos. Room, vinculación y sincronización pertenecen a las fases siguientes; la arquitectura de la web y la BD actual se conserva.
+
+**Plan ajustado el 21 de octubre de 2026:** el inventario y diagnóstico de todas las tarjetas se adelantan a la Fase 1, con fuentes verificadas y alias separados para tarjetas físicas, digitales y Wallet. BBVA sigue como primer piloto de registro automático; las demás tarjetas se habilitarán por formato validado. La ampliación está implementada en la APK **0.1.2 / versionCode 3**, instalada en el S24 Ultra con la misma firma y el permiso conservado. Se contrastaron en modo de solo lectura las **nueve tarjetas actuales**, correspondientes a siete emisores; las ocho aplicaciones de diagnóstico están instaladas y seleccionadas explícitamente. HSBC 1/2 y BANAMEX 1/2 conservan identidades separadas; sus alias y los tokens de Wallet todavía requieren evidencia real. El [plan](PLAN_CAPTURA_AUTOMATICA_ANDROID.md) y la [matriz](android/diagnostics/format-matrix.md) distinguen la cobertura prevista de la comprobada.
+
+`public/.well-known/assetlinks.json` declara la identidad pública de la APK de producción. **Publicado en Vercel con autorización el 20 de octubre de 2026:** responde 200 como JSON público por HTTPS, coincide con el certificado de la APK y Android verifica el dominio como `verified` en el S24 Ultra. La firma de desarrollo no se autoriza en el dominio de producción. Las claves están en `android/.private/` y `android/signing.properties`, excluidas de Git: respaldarlas privadamente antes de distribuir y conservarlas para futuras actualizaciones. La [evidencia de despliegue](artifacts/android-fase1/deployment.json) registra la versión y sus comprobaciones; la APK 0.1.1 abre como TWA sin barra de direcciones en Chrome del S24 Ultra, confirmado por el usuario. La revisión de batería y las pruebas actuales se documentan en la [verificación de ocho fuentes](artifacts/android-fase1/multi-source-verification.json). Quedan pendientes los avisos reales, su anonimización revisada y la captura real con pantalla bloqueada; el usuario avisará al recibir un cargo nuevo.
+
+Guía de instalación, compilación, firma y pruebas: [docs/android-captura.md](docs/android-captura.md). Alcance, actividades concluidas y comprobaciones pendientes: [PLAN_CAPTURA_AUTOMATICA_ANDROID.md](PLAN_CAPTURA_AUTOMATICA_ANDROID.md). Evidencia de fuentes y campos: [matriz de formatos](android/diagnostics/format-matrix.md). La fase solo podrá cerrarse después de verificar TWA y avisos reales en el S24 Ultra; los ejemplos sintéticos no acreditan cobertura bancaria.
+
 ## Variables de entorno requeridas
 
 ```
@@ -441,6 +455,7 @@ DIRECT_URL=            # conexión de Prisma CLI para migraciones y diff; prisma
 
 ```
 afp/
+├── android/                       → APK Kotlin/Compose; diagnóstico nativo y apertura TWA
 ├── prisma/
 │   ├── schema.prisma              → modelos Prisma (fuente de verdad de BD)
 │   └── migrations/                → migraciones versionadas
@@ -612,6 +627,8 @@ pnpm exec prisma studio          # explorador visual de BD
 ## Deploy
 
 Producción en Vercel, proyecto `afp`. La dirección personalizada es `https://finanzas.garatachia.com`; `https://afp-virid.vercel.app` sigue disponible.
+
+**Último despliegue autorizado · 20 de octubre de 2026:** `dpl_3ydQbyNmuVbf8g2nWPAJgEJz4Bnk`, estado `READY`, desde la base `505b47e` con Digital Asset Links añadido. La base coincide con la versión anterior; el cambio web de esta publicación es el archivo público de relación con Android. Se publicaron 196 archivos de la web y configuración de compilación mediante Vercel MCP, con las variables existentes del proyecto; las claves y datos de `android/` permanecieron locales. Se comprobaron páginas públicas, manifest y rechazo 401 en API sin sesión. No se ejecutaron migraciones ni escrituras financieras. [Evidencia y despliegue anterior](artifacts/android-fase1/deployment.json).
 
 El subdominio `finanzas.garatachia.com` está agregado al proyecto de producción en Vercel. En Namecheap se creó el CNAME de `finanzas` hacia `767214e385092158.vercel-dns-017.com`, confirmado mediante consulta al DNS autoritativo y validación de Vercel (`misconfigured: false`). HTTPS y las respuestas de `/login`, `/dashboard`, `/gastos` y el manifest se verificaron usando la IP de Vercel; `/` redirige a `/dashboard` en el nuevo dominio. El usuario confirmó posteriormente el acceso desde el nuevo dominio. Los DNS del dominio se administran fuera de Vercel.
 

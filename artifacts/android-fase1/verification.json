@@ -1,0 +1,116 @@
+{
+  "historicalSnapshot": true,
+  "supersededBy": "artifacts/android-fase1/multi-source-verification.json",
+  "apkPathsReferToHistoricalBuild": true,
+  "date": "2026-10-20",
+  "phase": 1,
+  "status": "implementation-and-twa-verified-real-bank-notifications-pending",
+  "device": {
+    "manufacturer": "Samsung",
+    "model": "SM-S928B",
+    "android": "16",
+    "apiLevel": 36,
+    "oneUiBuild": "80500"
+  },
+  "sources": [
+    {
+      "packageName": "com.bancomer.mbanking",
+      "versionName": "26.90.14",
+      "installed": true,
+      "realFormatVerified": false
+    },
+    {
+      "packageName": "com.google.android.apps.walletnfcrel",
+      "versionName": "26.40.996156910",
+      "installed": true,
+      "realFormatVerified": false
+    }
+  ],
+  "android": {
+    "unitTests": {
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "instrumentedTests": {
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "instrumentedInput": "synthetic-only",
+    "lint": {
+      "errors": 0,
+      "warnings": 5,
+      "notes": "Target Android 16 y dependencias fijadas con versiones posteriores disponibles; sin supresiones."
+    },
+    "productionCertificateSha256": "50:32:79:BA:8B:E2:8B:65:BE:AE:47:AE:AD:1B:17:FD:D5:7A:D5:43:44:C6:52:32:7F:F3:C2:39:28:BB:57:83",
+    "productionSignatureVerified": true,
+    "apks": {
+      "debug": {
+        "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+        "bytes": 33771312,
+        "sha256": "d6ff71b0d68fc7b1d329dd47428de661b04171034d56eaee1732ea2f94752bc3"
+      },
+      "release": {
+        "path": "android/app/build/outputs/apk/release/app-release.apk",
+        "bytes": 1931949,
+        "sha256": "73cc92d3c7cfcb75367314b2244bd9c8ac3733a763c1d6736aa69a1e243c3c07"
+      }
+    },
+    "installedManifestVerified": true,
+    "versionName": "0.1.1",
+    "versionCode": 2,
+    "twaLaunchFix": {
+      "cause": "Browser Helper ManageDataLauncherActivity missing from manifest",
+      "change": "Declare ManageDataLauncherActivity and FocusActivity as non-exported activities",
+      "regression": "twaAuxiliaryComponentsCanBeManagedByBrowserHelper: passed"
+    },
+    "browserVerification": {
+      "packageName": "com.android.chrome",
+      "versionName": "141.0.7390.43",
+      "activity": "org.chromium.chrome.browser.customtabs.CustomTabActivity",
+      "browserToolbarVisible": false,
+      "userConfirmedAfpOpens": true
+    },
+    "updatePreservedNotificationAccess": true,
+    "updatePreservedListenerService": true
+  },
+  "web": {
+    "tests": 214,
+    "passed": 207,
+    "skipped": 7,
+    "failed": 0,
+    "skipReason": "Integraciones sin AFP_TEST_DATABASE_URL",
+    "build": "pnpm exec next build --webpack: passed",
+    "lint": {
+      "errors": 0,
+      "warnings": 1,
+      "notes": "Advertencia previa TanStack useReactTable"
+    }
+  },
+  "assetLinks": {
+    "localHttpStatus": 200,
+    "localContentType": "application/json; charset=UTF-8",
+    "productionHttpStatus": 200,
+    "productionPublished": true,
+    "browserOriginVerification": "verified-on-device-and-confirmed-by-user",
+    "productionContentType": "application/json; charset=utf-8",
+    "androidDomainVerificationState": "verified"
+  },
+  "pending": [
+    "Muestras reales y anonimizadas revisadas de BBVA y Wallet.",
+    "Captura real con pantalla bloqueada y restricciones Samsung."
+  ],
+  "financialWrites": false,
+  "productionModified": true,
+  "activation": {
+    "notificationAccessGranted": true,
+    "diagnosticActive": true,
+    "listenerConnected": true,
+    "source": "Android settings and known status visible in AFP only"
+  },
+  "productionDeployment": "dpl_3ydQbyNmuVbf8g2nWPAJgEJz4Bnk",
+  "updatedAtLocal": "2026-10-21T00:00:33-06:00"
+}

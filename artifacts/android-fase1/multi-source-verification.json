@@ -1,0 +1,265 @@
+{
+  "verifiedAtLocal": "2026-10-21T00:29:06-06:00",
+  "scope": "android-phase-1-eight-source-diagnostic",
+  "phase1": {
+    "implementationVerified": true,
+    "complete": false,
+    "status": "waiting-for-real-bank-notifications",
+    "realPurchaseFormatVerified": false,
+    "lockScreenCaptureVerified": false
+  },
+  "inventory": {
+    "method": "PostgreSQL READ ONLY transaction; single owner; card names only",
+    "cardCount": 9,
+    "issuerCount": 7,
+    "applicationCount": 8,
+    "identityOrFinancialChanges": false,
+    "multiCardIssuers": [
+      "HSBC",
+      "Banamex"
+    ],
+    "aliasResolution": "pending-real-samples-and-phase-4"
+  },
+  "device": {
+    "manufacturer": "samsung",
+    "model": "SM-S928B",
+    "androidRelease": "16",
+    "apiLevel": "36",
+    "oneUiBuild": "80500"
+  },
+  "sources": [
+    {
+      "label": "BBVA México",
+      "cards": [
+        "BBVA"
+      ],
+      "packageName": "com.bancomer.mbanking",
+      "installed": true,
+      "versionName": "26.90.14",
+      "officialListing": "https://play.google.com/store/apps/details?id=com.bancomer.mbanking",
+      "explicitlySelected": true,
+      "realFormatVerified": false,
+      "financialFieldsStatus": "not-observed",
+      "cardAliasesVerified": false
+    },
+    {
+      "label": "Google Wallet",
+      "cards": [],
+      "walletEnrollmentPending": true,
+      "packageName": "com.google.android.apps.walletnfcrel",
+      "installed": true,
+      "versionName": "26.40.996156910",
+      "officialListing": "https://play.google.com/store/apps/details?id=com.google.android.apps.walletnfcrel",
+      "explicitlySelected": true,
+      "realFormatVerified": false,
+      "financialFieldsStatus": "not-observed",
+      "cardAliasesVerified": false
+    },
+    {
+      "label": "HSBC México",
+      "cards": [
+        "HSBC 1",
+        "HSBC 2"
+      ],
+      "packageName": "mx.hsbc.hsbcmexico",
+      "installed": true,
+      "versionName": "3.75.14",
+      "officialListing": "https://play.google.com/store/apps/details?id=mx.hsbc.hsbcmexico",
+      "explicitlySelected": true,
+      "realFormatVerified": false,
+      "financialFieldsStatus": "not-observed",
+      "cardAliasesVerified": false
+    },
+    {
+      "label": "Banamex",
+      "cards": [
+        "BANAMEX 1",
+        "BANAMEX 2"
+      ],
+      "packageName": "com.citibanamex.banamexmobile",
+      "installed": true,
+      "versionName": "136.0.0",
+      "officialListing": "https://play.google.com/store/apps/details?id=com.citibanamex.banamexmobile",
+      "explicitlySelected": true,
+      "realFormatVerified": false,
+      "financialFieldsStatus": "not-observed",
+      "cardAliasesVerified": false
+    },
+    {
+      "label": "Santander México",
+      "cards": [
+        "SANTANDER"
+      ],
+      "packageName": "mx.bancosantander.supermovil",
+      "installed": true,
+      "versionName": "12.2",
+      "officialListing": "https://play.google.com/store/apps/details?id=mx.bancosantander.supermovil",
+      "explicitlySelected": true,
+      "realFormatVerified": false,
+      "financialFieldsStatus": "not-observed",
+      "cardAliasesVerified": false
+    },
+    {
+      "label": "Nu",
+      "cards": [
+        "NU"
+      ],
+      "packageName": "com.nu.production",
+      "installed": true,
+      "versionName": "10.8.43-minApi28",
+      "officialListing": "https://play.google.com/store/apps/details?id=com.nu.production",
+      "explicitlySelected": true,
+      "realFormatVerified": false,
+      "financialFieldsStatus": "not-observed",
+      "cardAliasesVerified": false
+    },
+    {
+      "label": "DiDi Finanzas",
+      "cards": [
+        "DIDI"
+      ],
+      "packageName": "com.didiglobal.cashloan",
+      "installed": true,
+      "versionName": "3.2.2",
+      "officialListing": "https://play.google.com/store/apps/details?id=com.didiglobal.cashloan",
+      "explicitlySelected": true,
+      "realFormatVerified": false,
+      "financialFieldsStatus": "not-observed",
+      "cardAliasesVerified": false
+    },
+    {
+      "label": "Mercado Pago",
+      "cards": [
+        "MERCADOPAGO"
+      ],
+      "packageName": "com.mercadopago.wallet",
+      "installed": true,
+      "versionName": "2.457.2",
+      "officialListing": "https://play.google.com/store/apps/details?id=com.mercadopago.wallet",
+      "explicitlySelected": true,
+      "realFormatVerified": false,
+      "financialFieldsStatus": "not-observed",
+      "cardAliasesVerified": false
+    }
+  ],
+  "excludedInstalledSource": {
+    "packageName": "com.didiglobal.passenger",
+    "reason": "Dedicated DiDi Finanzas verified; add other DiDi emitters only with evidence and explicit selection"
+  },
+  "selection": {
+    "knownSources": 8,
+    "installedSources": 8,
+    "afterUpgradeBeforeManualSelection": 2,
+    "afterExplicitSelectInstalledAction": 8,
+    "finalUpdatePreservedSelection": true,
+    "unknownStoredPackagesDiscarded": true,
+    "emptySelectionPreserved": true,
+    "newPackagesEnabledAutomatically": false
+  },
+  "activation": {
+    "applicationId": "com.garatachia.afp",
+    "versionName": "0.1.2",
+    "notificationAccessGranted": true,
+    "batteryOptimizationExempt": true,
+    "standbyBucket": "5",
+    "runAnyInBackground": "RUN_ANY_IN_BACKGROUND: allow",
+    "samsungSleepListsCheck": "requires-manual-settings-inspection",
+    "diagnosticActive": true,
+    "listenerConnected": true,
+    "statusObservedInNativeUi": "Lector conectado; esperando avisos nuevos"
+  },
+  "samsungSettingsInspection": {
+    "verified": true,
+    "applicationBatteryPath": "Ajustes → Aplicaciones → AFP → Batería → No restringido",
+    "appliedToAfpOnly": true,
+    "before": {
+      "batteryOptimizationExempt": false,
+      "standbyBucket": "10",
+      "runAnyInBackground": "default allow"
+    },
+    "after": {
+      "batteryOptimizationExempt": true,
+      "standbyBucket": "5",
+      "runAnyInBackground": "allow"
+    },
+    "sleepListsPath": "Ajustes → Batería → Límites de uso en segundo plano",
+    "sleepingAppsList": "empty",
+    "deepSleepingApps": {
+      "afpPresent": false,
+      "entireListInspected": true,
+      "inspectionPages": 6
+    },
+    "neverAutoSleepingAppsList": "empty",
+    "globalSettingsOrOtherApplicationsChanged": false,
+    "provesLockedNotificationDelivery": false
+  },
+  "android": {
+    "versionName": "0.1.2",
+    "versionCode": 3,
+    "debugAndReleaseBuilds": "passed",
+    "signatureVerified": true,
+    "certificateMatchesPublishedIdentity": true,
+    "certificateSha256": "50:32:79:BA:8B:E2:8B:65:BE:AE:47:AE:AD:1B:17:FD:D5:7A:D5:43:44:C6:52:32:7F:F3:C2:39:28:BB:57:83",
+    "apks": {
+      "debug": {
+        "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+        "bytes": 33938428,
+        "sha256": "629badec4ad0c4100c8b65a894536e25d62948f5c7b63ae1bc8bbc6c0283bac0"
+      },
+      "release": {
+        "path": "android/app/build/outputs/apk/release/app-release.apk",
+        "bytes": 1948529,
+        "sha256": "7501f8ddc7489a01a9b8d260542b31d03201fb2d0549d57b780083c64a97f83f"
+      }
+    },
+    "twa": {
+      "twoOpeningsVerified": true,
+      "browserPackage": "com.android.chrome",
+      "browserToolbarVisible": false,
+      "method": "production-button-tapped-twice-after-returning-to-diagnostic",
+      "navigationRegressionReproducedBeforeFix": true,
+      "fix": "NEW_TASK | CLEAR_TOP when launching Browser Helper from the diagnostic activity",
+      "debugTestDoesNotProveProductionOriginTrust": true
+    }
+  },
+  "tests": {
+    "unit": {
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "instrumented": {
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "node": {
+      "tests": 3,
+      "failures": 0,
+      "command": "node --test tests/android-assetlinks.test.cjs tests/android-sources.test.cjs"
+    },
+    "bankNotificationFixtures": "synthetic-only",
+    "navigation": "actual accessibility clicks twice with an existing TWA",
+    "lint": {
+      "errors": 0,
+      "warnings": 5,
+      "warningIds": [
+        "OldTargetApi",
+        "AndroidGradlePluginVersion",
+        "GradleDependency",
+        "GradleDependency",
+        "GradleDependency"
+      ]
+    }
+  },
+  "pending": [
+    "Collect and review real purchase notifications; produce reviewed anonymized fixtures preserving bank language and distinguish absent/ambiguous fields.",
+    "Verify actual pilot notification delivery while the S24 Ultra is locked. User will report a new normal charge; no purchase requested just for testing."
+  ],
+  "financialWrites": false,
+  "databaseChanges": false,
+  "newWebDeployment": false,
+  "previousEvidence": "artifacts/android-fase1/verification.json"
+}

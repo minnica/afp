@@ -1,0 +1,79 @@
+{
+  "date": "2026-10-20",
+  "authorizedByUser": true,
+  "project": "afp",
+  "projectId": "prj_FUBRDkPPFpOgJG9zuLLhTwm3JHKV",
+  "teamId": "team_5jQEAASyPb5wB0LxR9KsHf5X",
+  "target": "production",
+  "status": "READY",
+  "deploymentId": "dpl_3ydQbyNmuVbf8g2nWPAJgEJz4Bnk",
+  "deploymentUrl": "https://afp-74ll0zeki-minnicas-projects.vercel.app",
+  "productionUrl": "https://finanzas.garatachia.com",
+  "previousDeploymentId": "dpl_9j56k9nLM8e7ZAybdvcdZQYrERuL",
+  "baseCommit": "505b47e3beb331e5c0156dd8966e613640e53ba9",
+  "uncommittedWebChange": "public/.well-known/assetlinks.json",
+  "sourceFiles": 196,
+  "sourceBundleSha256": "609cc88cfb04d9c1e9bd0af04e107cd702f83d75b8c6861e17e3b30c515a24e3",
+  "createdAtUtc": "2026-10-21T05:51:39.169Z",
+  "readyAtUtc": "2026-10-21T05:53:00.438Z",
+  "buildDurationSeconds": 78,
+  "certificateSha256": "50:32:79:BA:8B:E2:8B:65:BE:AE:47:AE:AD:1B:17:FD:D5:7A:D5:43:44:C6:52:32:7F:F3:C2:39:28:BB:57:83",
+  "publicAssetLinks": {
+    "status": 200,
+    "contentType": "application/json; charset=utf-8",
+    "redirects": false,
+    "certificateMatchesApk": true
+  },
+  "android": {
+    "model": "SM-S928B",
+    "package": "com.garatachia.afp",
+    "domainVerificationState": "verified",
+    "notificationAccessGranted": true,
+    "diagnosticActive": true,
+    "listenerConnected": true,
+    "browserBarVisualCheck": "passed",
+    "apkVersionName": "0.1.1",
+    "apkVersionCode": 2,
+    "twaLaunchFix": "Declare Browser Helper auxiliary activities; regression passed on SM-S928B.",
+    "browserPackage": "com.android.chrome",
+    "browserVersion": "141.0.7390.43",
+    "userConfirmedAfpOpens": true,
+    "notificationAccessPreservedAfterUpdate": true,
+    "listenerServicePresentAfterUpdate": true
+  },
+  "smokeChecks": [
+    {
+      "path": "/login",
+      "status": 200
+    },
+    {
+      "path": "/dashboard",
+      "status": 200
+    },
+    {
+      "path": "/gastos",
+      "status": 200
+    },
+    {
+      "path": "/manifest.webmanifest",
+      "status": 200
+    },
+    {
+      "path": "/api/expenses",
+      "status": 401
+    },
+    {
+      "path": "/api/cards",
+      "status": 401
+    }
+  ],
+  "observability": {
+    "deploymentErrorLogGroups": 0,
+    "scope": "New deployment; error/fatal logs; last 10 minutes; grouped by level",
+    "drains": 0,
+    "limit": "Immediate smoke checks; not a full authenticated financial-flow test."
+  },
+  "databaseModified": false,
+  "financialWrites": false,
+  "updatedAtLocal": "2026-10-21T00:00:33-06:00"
+}

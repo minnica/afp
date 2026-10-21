@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.garatachia.afp",
+      "sha256_cert_fingerprints": [
+        "50:32:79:BA:8B:E2:8B:65:BE:AE:47:AE:AD:1B:17:FD:D5:7A:D5:43:44:C6:52:32:7F:F3:C2:39:28:BB:57:83"
+      ]
+    }
+  }
+]
