@@ -1,0 +1,16 @@
+{
+  "versionCode": 5,
+  "versionName": "0.3.0",
+  "firstInstallTime": "2026-10-20 23:45:31",
+  "lastUpdateTime": "2026-10-21 01:52:40",
+  "notificationAccess": true,
+  "authorized": true,
+  "listenerConnected": true,
+  "pending": 0,
+  "review": 0,
+  "delivered": 6,
+  "diagnosticSamples": 6,
+  "batteryExempt": true,
+  "allSourcesSelected": true,
+  "selectedSourceCount": 8
+}

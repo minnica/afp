@@ -44,7 +44,7 @@ export async function processCaptureEvent(tx, event) {
   const { parserKey = null } = interpretation;
   let { reason } = interpretation;
   let proposal = interpretation.proposal;
-  let status = "REVIEW", referenceKey = null;
+  let status = reason === "NON_CREDIT_ACCOUNT" ? "DISCARDED" : "REVIEW", referenceKey = null;
   if (reason === "PURCHASE") {
     const aliases = await tx.captureCardAlias.findMany({ where: {
       userId: event.userId, sourcePackage: event.sourcePackage, kind: proposal.alias.kind, value: proposal.alias.value,
@@ -94,6 +94,7 @@ export async function processCaptureEvent(tx, event) {
     userId: event.userId, parserKey, status, reason, proposal, referenceKey,
     cardId: proposal.cardId || null, amount: proposal.amount || null,
     operationDate: proposal.date ? new Date(`${proposal.date}T12:00:00.000Z`) : null,
+    resolvedAt: status === "DISCARDED" ? new Date() : null,
   } });
   if (reason === "PURCHASE") await registerCaptureMovement(tx, movement, false);
   await tx.captureEvent.update({ where: { id: event.id }, data: {

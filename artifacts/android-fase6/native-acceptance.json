@@ -1,0 +1,80 @@
+{
+  "date": "2026-10-21",
+  "device": "Samsung S24 Ultra / Android 16 / API 36",
+  "jvm": {
+    "tests": 18,
+    "passed": 18,
+    "failed": 0,
+    "skipped": 0,
+    "rerunTasks": true,
+    "transport": "Kotlin → HTTPS → API/PostgreSQL locales; Auth ficticia"
+  },
+  "instrumentation": {
+    "tests": 29,
+    "passed": 29,
+    "failed": 0,
+    "skipped": 0,
+    "classes": [
+      "CaptureRemoteSettingsTest",
+      "CaptureRemoteScreenTest",
+      "CaptureQueueTest",
+      "CaptureQueueDeliveryTest",
+      "BindingStoreTest",
+      "CaptureDeliveryTest",
+      "DiagnosticStoreTest",
+      "TwaNavigationTest"
+    ],
+    "auxiliaryWarning": "Aviso previo del runner: androidx.test.services no instalado; no afectó las pruebas."
+  },
+  "upgradeProbe": {
+    "class": "QueueUpgradeProbeTest",
+    "separateInvocationsPassed": 2,
+    "from": "0.4.0 / 6 dev",
+    "to": "0.5.0 / 7 dev",
+    "method": "adb install -r con la misma firma, sin limpiar datos entre las invocaciones",
+    "syntheticPending": 1,
+    "afterState": "PENDING",
+    "afterAttempts": 0,
+    "verified": [
+      "cifrado y cuerpo descifrable",
+      "UUID",
+      "propietario",
+      "dispositivo",
+      "secreto",
+      "activación",
+      "ocho fuentes",
+      "pausa remota por identidad",
+      "permiso aplicable",
+      "pausa de envíos"
+    ],
+    "personalDataUsed": false,
+    "sentToProduction": false
+  },
+  "personalUpdate": {
+    "before": "phone-before.json",
+    "after": "phone-after.json",
+    "preservation": {
+      "firstInstallTime": true,
+      "notificationAccess": true,
+      "authorization": true,
+      "listenerConnected": true,
+      "batteryExemption": true,
+      "selectedSources": true,
+      "deliveryReceipts": true,
+      "pending": 0,
+      "review": 0,
+      "diagnosticSamplesBefore": 6,
+      "diagnosticSamplesAfter": 9
+    },
+    "realProductionReport": "production-state.json",
+    "note": "La cola personal estaba vacía. La conservación de pendientes no vacíos se comprobó separadamente en dev."
+  },
+  "build": {
+    "debug": "correcto",
+    "release": "correcto",
+    "testApk": "correcto",
+    "signature": "apksigner verify correcto",
+    "lintErrors": 0,
+    "lintWarnings": 7
+  }
+}

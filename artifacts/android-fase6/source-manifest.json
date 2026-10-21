@@ -1,0 +1,1152 @@
+[
+  {
+    "file": "components.json",
+    "sha": "5e86874249f57e02427f70f41b8fcab80d385d4e",
+    "size": 525
+  },
+  {
+    "file": "eslint.config.mjs",
+    "sha": "cd75aa7aed9445d40d942532b05d163ddd4ade9f",
+    "size": 400
+  },
+  {
+    "file": "jsconfig.json",
+    "sha": "0bf40be13518f30f011bbbb4acd2f1addd343a4b",
+    "size": 77
+  },
+  {
+    "file": "next.config.mjs",
+    "sha": "b6602e5627ba732b0c03ec06edd019a961206960",
+    "size": 213
+  },
+  {
+    "file": "package.json",
+    "sha": "d455c2b597f6d32e77d472435a6419d027b536a7",
+    "size": 1726
+  },
+  {
+    "file": "pnpm-lock.yaml",
+    "sha": "59d1f4b1568764a3696e2c5e4f9666c40124f834",
+    "size": 327701
+  },
+  {
+    "file": "pnpm-workspace.yaml",
+    "sha": "dd36a7f1ac69aeb6243ca97ac9be2a53df3e7d64",
+    "size": 105
+  },
+  {
+    "file": "postcss.config.mjs",
+    "sha": "8f8be689e9af58f80351df6e6b551146822f42a4",
+    "size": 94
+  },
+  {
+    "file": "prisma.config.ts",
+    "sha": "870e21fc22bf01ad64653745c1fead3ee361719d",
+    "size": 192
+  },
+  {
+    "file": "prisma/migrations/20260509070227_init/migration.sql",
+    "sha": "d3472cf1fe2af07e6af63870e66c2455c11a2b9d",
+    "size": 11802
+  },
+  {
+    "file": "prisma/migrations/20260517045000_add_payable_accounts/migration.sql",
+    "sha": "d9f66e5d07f42df4e377ddcb0170da47bdce1088",
+    "size": 1772
+  },
+  {
+    "file": "prisma/migrations/20260517222440_add_subscription_frequency/migration.sql",
+    "sha": "84eda35c8a722d59df209a668d03b5f4b57bc352",
+    "size": 217
+  },
+  {
+    "file": "prisma/migrations/20260517235633_replace_receivable_expected_date_with_charge_day/migration.sql",
+    "sha": "1fdbc7e15770e038832f37b12650e028282734f3",
+    "size": 269
+  },
+  {
+    "file": "prisma/migrations/20260518002802_replace_receivable_charge_day_with_charge_days/migration.sql",
+    "sha": "7d36424664fea2e116246aa882a7ace2b6b0aa63",
+    "size": 303
+  },
+  {
+    "file": "prisma/migrations/20260518041110_add_expense_subscription_relation/migration.sql",
+    "sha": "ca6362c0fbee5b37a09323ebbee2dd4042ddd2c5",
+    "size": 282
+  },
+  {
+    "file": "prisma/migrations/20260518234708_add_payable_loan_support/migration.sql",
+    "sha": "27977b021b4a2505676caeef90898788053fcb02",
+    "size": 1261
+  },
+  {
+    "file": "prisma/migrations/20260604000000_add_subscription_active_fields/migration.sql",
+    "sha": "5af908e27901d10cf6130140f89d6db552605fe2",
+    "size": 164
+  },
+  {
+    "file": "prisma/migrations/20261009000000_add_installment_statement_reconciliations/migration.sql",
+    "sha": "b04646fef252eeb3a90c145ecf29fffa1d199b7d",
+    "size": 99
+  },
+  {
+    "file": "prisma/migrations/20261010000000_add_card_cycle_credits/migration.sql",
+    "sha": "c36ac5e910784c1e14ebe5dc8139f02c560c2fb7",
+    "size": 1275
+  },
+  {
+    "file": "prisma/migrations/20261011000000_add_card_usage_verification/migration.sql",
+    "sha": "98a3d1b6415f1ffdbcd7a2f029f4642f8e443a83",
+    "size": 203
+  },
+  {
+    "file": "prisma/migrations/20261015000000_add_notice_dismissals/migration.sql",
+    "sha": "accd7253f28dcc9f0befeafc3c8b95f8bf6b5b2a",
+    "size": 1006
+  },
+  {
+    "file": "prisma/migrations/20261016000000_add_subscription_charges/migration.sql",
+    "sha": "48db9a669b2dfc93f02f30fae1cfd37d84ea641f",
+    "size": 1685
+  },
+  {
+    "file": "prisma/migrations/20261017000000_add_expense_operations/migration.sql",
+    "sha": "785e223c637eed4c0c9a8be6a3b331329d90cd61",
+    "size": 646
+  },
+  {
+    "file": "prisma/migrations/20261017020000_enable_application_rls/migration.sql",
+    "sha": "adc1b84a306a4acaed58caf9a6bd95bb139a374c",
+    "size": 3017
+  },
+  {
+    "file": "prisma/migrations/20261017030000_add_post_cut_credits/migration.sql",
+    "sha": "f60757c82bda8578dbb26ce6ab76d0493fe98714",
+    "size": 329
+  },
+  {
+    "file": "prisma/migrations/20261020000000_add_cash_expense_contributions/migration.sql",
+    "sha": "8342f81eba0f48ecd788732a76baac3655c3f647",
+    "size": 458
+  },
+  {
+    "file": "prisma/migrations/20261021000000_add_android_capture_linking/migration.sql",
+    "sha": "0ba2f4d528959febcfc3d26f63ceac1065c82a27",
+    "size": 4133
+  },
+  {
+    "file": "prisma/migrations/20261021010000_add_capture_processing/migration.sql",
+    "sha": "da9d5d6ee0e77ec8fa5aeb3b512d559ac3182fa4",
+    "size": 6532
+  },
+  {
+    "file": "prisma/migrations/20261021020000_capture_installment_reconciliation/migration.sql",
+    "sha": "8d5ebb0e53b6384ea43674011e6221e6cc58c670",
+    "size": 278
+  },
+  {
+    "file": "prisma/migrations/20261021030000_capture_review_and_reconciliation/migration.sql",
+    "sha": "9dfef021cfbd4c625ea03282fe436d7769302b82",
+    "size": 1401
+  },
+  {
+    "file": "prisma/migrations/migration_lock.toml",
+    "sha": "7abbf1b5bc2ed90d381336ef493ef3a44c488e3d",
+    "size": 128
+  },
+  {
+    "file": "prisma/schema.prisma",
+    "sha": "491f7c232dc280aeefd2ec1f1cccd8e2c5e94d35",
+    "size": 20827
+  },
+  {
+    "file": "public/.well-known/assetlinks.json",
+    "sha": "83ec07e1c907014c459be789267fe9510a8727f6",
+    "size": 338
+  },
+  {
+    "file": "public/file.svg",
+    "sha": "fb380eeffe87d50b597383664c02982964d0d28c",
+    "size": 391
+  },
+  {
+    "file": "public/globe.svg",
+    "sha": "2eba23b01a46733bb8423e6d38ebf5f7e95abec5",
+    "size": 1035
+  },
+  {
+    "file": "public/icons/app-icon-v3-1024.png",
+    "sha": "4800e97915f00211507b42e2558ec1c91241bbf8",
+    "size": 21381
+  },
+  {
+    "file": "public/icons/app-icon-v3-192.png",
+    "sha": "e3e36c6b2df2267a9366872b0e9dff465da068e7",
+    "size": 3151
+  },
+  {
+    "file": "public/icons/app-icon-v3-512.png",
+    "sha": "f85335996016f4c4ed3dfb9c93aa609fb3224f65",
+    "size": 9576
+  },
+  {
+    "file": "public/icons/app-icon-v3-maskable-512.png",
+    "sha": "a0f576ea0c97dfcb89523e841fb47cac4a6e8774",
+    "size": 8110
+  },
+  {
+    "file": "public/icons/app-icon.svg",
+    "sha": "ee660ccc61ae642401b79cb4c917945fea4e298f",
+    "size": 803
+  },
+  {
+    "file": "public/icons/apple-touch-icon-v3.png",
+    "sha": "2f8cef4995036b5269a630aaa4c1e8268c461cdf",
+    "size": 2999
+  },
+  {
+    "file": "public/manifest.webmanifest",
+    "sha": "124e62e419dc741d931ee83a7d3b25464146d382",
+    "size": 831
+  },
+  {
+    "file": "public/next.svg",
+    "sha": "3f3e95622612b989c5bd6a03299a308c6f3c7e6b",
+    "size": 1375
+  },
+  {
+    "file": "public/sw.js",
+    "sha": "95fd05a05971aa0c2116f5bf44bd3a4be3592782",
+    "size": 2473
+  },
+  {
+    "file": "public/vercel.svg",
+    "sha": "cebb8852d58c8886be3e9051a26957f42bb82f1a",
+    "size": 128
+  },
+  {
+    "file": "public/window.svg",
+    "sha": "54c48e0daa6caa317fe1b4c419007fd93e948db9",
+    "size": 385
+  },
+  {
+    "file": "src/actions/cardCycles.js",
+    "sha": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+    "size": 0
+  },
+  {
+    "file": "src/actions/cards.js",
+    "sha": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+    "size": 0
+  },
+  {
+    "file": "src/actions/expenses.js",
+    "sha": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+    "size": 0
+  },
+  {
+    "file": "src/actions/incomes.js",
+    "sha": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+    "size": 0
+  },
+  {
+    "file": "src/actions/installmentPurchases.js",
+    "sha": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+    "size": 0
+  },
+  {
+    "file": "src/actions/receivables.js",
+    "sha": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+    "size": 0
+  },
+  {
+    "file": "src/actions/settings.js",
+    "sha": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+    "size": 0
+  },
+  {
+    "file": "src/actions/subscriptions.js",
+    "sha": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+    "size": 0
+  },
+  {
+    "file": "src/app/analisis/page.js",
+    "sha": "de0371e05ff5d2a4310e0828966a250337d56ba6",
+    "size": 217
+  },
+  {
+    "file": "src/app/api/captures/configuration/route.js",
+    "sha": "2b54ef5c5d2bafda26827c6091bd443ea51b1199",
+    "size": 965
+  },
+  {
+    "file": "src/app/api/captures/device/route.js",
+    "sha": "081a8c9d247f9e67d61dffc03b00bbad76fe7104",
+    "size": 288
+  },
+  {
+    "file": "src/app/api/captures/devices/route.js",
+    "sha": "11046eed921eb7eff220354542cd54d083bb2e7a",
+    "size": 202
+  },
+  {
+    "file": "src/app/api/captures/events/route.js",
+    "sha": "e74cd2d5cbbbbb364f6768dcfa5b374c34e45627",
+    "size": 127
+  },
+  {
+    "file": "src/app/api/captures/movements/route.js",
+    "sha": "6e49fd7ab4519d87b09a0f50083dbdd9db9efa90",
+    "size": 3079
+  },
+  {
+    "file": "src/app/api/captures/pairings/route.js",
+    "sha": "e51fbd8196514482f6386cef62cfd2f0a647596c",
+    "size": 205
+  },
+  {
+    "file": "src/app/api/captures/reconciliation/route.js",
+    "sha": "de1949bb5a8061193db0e1e14ab5cd692187f1b2",
+    "size": 1020
+  },
+  {
+    "file": "src/app/api/card-cycles/route.js",
+    "sha": "d14ac0d15f4766de4b343bea9ffec71702b2ac33",
+    "size": 15994
+  },
+  {
+    "file": "src/app/api/cards/route.js",
+    "sha": "438c7a459b9fbb207fba93b5dc6914e998eafad7",
+    "size": 5210
+  },
+  {
+    "file": "src/app/api/dashboard/route.js",
+    "sha": "f8157c74940a60f67ade67a039dbfa41891bf2f6",
+    "size": 37567
+  },
+  {
+    "file": "src/app/api/expenses/route.js",
+    "sha": "e5caf7137387323c9dbca48cb01abebb6e2ff846",
+    "size": 12011
+  },
+  {
+    "file": "src/app/api/gastos/bootstrap/route.js",
+    "sha": "0c6e32a728b5bb055864bf9e1ac3c1619b33b106",
+    "size": 6615
+  },
+  {
+    "file": "src/app/api/incomes/route.js",
+    "sha": "5bbd2597d9b9882c36512c22d797ab6fc56e4487",
+    "size": 8193
+  },
+  {
+    "file": "src/app/api/installment-purchases/route.js",
+    "sha": "0c307796dff9ecf946e8fb841db79f6e745d2e7c",
+    "size": 12932
+  },
+  {
+    "file": "src/app/api/notice-dismissals/route.js",
+    "sha": "3f5f89afb079e8b6cc610860044280c4a0bdb0c8",
+    "size": 1918
+  },
+  {
+    "file": "src/app/api/payables/route.js",
+    "sha": "d5034e78c524b2bf0d8adae45c762d44eb4f2712",
+    "size": 8586
+  },
+  {
+    "file": "src/app/api/receivables/route.js",
+    "sha": "c05e1615577409dd7ad4e6cbd3d1aeac97427741",
+    "size": 9175
+  },
+  {
+    "file": "src/app/api/settings/route.js",
+    "sha": "048b364fa732023a2671430d184c38ba00c693b4",
+    "size": 4745
+  },
+  {
+    "file": "src/app/api/setup-user/route.js",
+    "sha": "0180f04259a999228006916806bee91b13963796",
+    "size": 1686
+  },
+  {
+    "file": "src/app/api/subscription-charges/route.js",
+    "sha": "2b1d57a7d90acdc2e5a807d51ac780c5fdbcaa50",
+    "size": 2055
+  },
+  {
+    "file": "src/app/api/subscriptions/route.js",
+    "sha": "d18e92959bbf913a9eec2e46250f75917cca0310",
+    "size": 9313
+  },
+  {
+    "file": "src/app/compras-a-meses/page.js",
+    "sha": "b9b56bbdbeb35d61ba863ee8f7ff20a4e57f733e",
+    "size": 266
+  },
+  {
+    "file": "src/app/configuracion/page.js",
+    "sha": "1681dd21427a48613359e253051133c6604dc15c",
+    "size": 249
+  },
+  {
+    "file": "src/app/cuentas-por-cobrar/page.js",
+    "sha": "25d5e20ec72c71f3f7d443b4e163ee887d7f4c20",
+    "size": 281
+  },
+  {
+    "file": "src/app/cuentas-por-pagar/page.jsx",
+    "sha": "2709249e782db3367d835a2a6f4a06f587dece76",
+    "size": 276
+  },
+  {
+    "file": "src/app/dashboard/page.js",
+    "sha": "0676ab2edac4ad9c5e9515b37676ea2e1827c29b",
+    "size": 244
+  },
+  {
+    "file": "src/app/favicon.ico",
+    "sha": "23e3df23f3c2a53edd4d3c9092b2452514a095ab",
+    "size": 10294
+  },
+  {
+    "file": "src/app/gastos/page.js",
+    "sha": "6a970f564b7356f5f66cc189f5724f09c4a7f500",
+    "size": 229
+  },
+  {
+    "file": "src/app/globals.css",
+    "sha": "b472584b736df69cf2a582d5608867a23c91f265",
+    "size": 10086
+  },
+  {
+    "file": "src/app/ingresos/page.js",
+    "sha": "3470dfd342ffad68d0a2194e2a431bbc8a830096",
+    "size": 239
+  },
+  {
+    "file": "src/app/layout.js",
+    "sha": "545e789d4bb74a589ccc449d3e11ebbbb047f047",
+    "size": 1494
+  },
+  {
+    "file": "src/app/login/page.js",
+    "sha": "82b9f32bbf34ee53717ce2b098a363b6a44d9922",
+    "size": 6060
+  },
+  {
+    "file": "src/app/page.js",
+    "sha": "c0a104f05eda3ec09874ce47389b212ddf27ceb8",
+    "size": 110
+  },
+  {
+    "file": "src/app/suscripciones/page.js",
+    "sha": "74123d2f38f204e2ff33c9493b3f4d8f285dd53a",
+    "size": 264
+  },
+  {
+    "file": "src/app/tarjetas/page.js",
+    "sha": "5580fa72f8aab6c1a3f8c0b4e02e7af2714a9471",
+    "size": 239
+  },
+  {
+    "file": "src/components/analisis/AnalysisCharts.jsx",
+    "sha": "3b61a1c1edf9652b7791e06f9ecb05c5fea5717b",
+    "size": 10390
+  },
+  {
+    "file": "src/components/analisis/AnalysisContent.jsx",
+    "sha": "ea678a1285f730f9a37c564ec3e3a1cdece5675d",
+    "size": 3363
+  },
+  {
+    "file": "src/components/analisis/AnalysisError.jsx",
+    "sha": "3408483a26299b767f29aafe4d47f09007e6239e",
+    "size": 504
+  },
+  {
+    "file": "src/components/analisis/AnalysisSkeleton.jsx",
+    "sha": "9dfad168e010b4afd4a2eba16e34bca6116f5631",
+    "size": 466
+  },
+  {
+    "file": "src/components/analisis/MonthSelector.jsx",
+    "sha": "f171d5145249e14b1874ba04222989ca443bd863",
+    "size": 654
+  },
+  {
+    "file": "src/components/compras-a-meses/ComprasAMesesContent.jsx",
+    "sha": "1bb8831cc7abefeb5e022c19e4443a1ca6781979",
+    "size": 38478
+  },
+  {
+    "file": "src/components/configuracion/CaptureConfigurationPanel.jsx",
+    "sha": "52abb8789931ce30e58fe660cc9e4f447d1f26c6",
+    "size": 12757
+  },
+  {
+    "file": "src/components/configuracion/CaptureDevices.jsx",
+    "sha": "334e5910e569f991f1fd88657308e2624f2843a0",
+    "size": 12807
+  },
+  {
+    "file": "src/components/configuracion/CaptureFields.jsx",
+    "sha": "85d189b382ccf4d25672bf8401d4a8db4d9f956a",
+    "size": 1942
+  },
+  {
+    "file": "src/components/configuracion/CaptureMovementEditor.jsx",
+    "sha": "ef16c731cca120070c96d411bffbe052687b6737",
+    "size": 10450
+  },
+  {
+    "file": "src/components/configuracion/CapturePilotSummary.jsx",
+    "sha": "a8874c71041e22dfce9863bc3a4e86a5f95c0dec",
+    "size": 3149
+  },
+  {
+    "file": "src/components/configuracion/CaptureReconciliation.jsx",
+    "sha": "30f6a58059f3d8b82197fbc8b460d52a92e78d23",
+    "size": 11334
+  },
+  {
+    "file": "src/components/configuracion/CaptureReview.jsx",
+    "sha": "8abb020e79eb26364a0d242ec2fa6d7502d21fb2",
+    "size": 8129
+  },
+  {
+    "file": "src/components/configuracion/SettingsContent.jsx",
+    "sha": "b49c6072fe262fac1b4f9e601440b4d1d594547e",
+    "size": 14444
+  },
+  {
+    "file": "src/components/cuentas-por-cobrar/CuentasPorCobrarContent.jsx",
+    "sha": "968d42a71c89b2a543ee8873a5040d9d55440824",
+    "size": 35526
+  },
+  {
+    "file": "src/components/cuentas-por-pagar/CuentasPorPagarContent.jsx",
+    "sha": "8c3931ad5b675a0ddba67eee1008e8d3e9a057b6",
+    "size": 36250
+  },
+  {
+    "file": "src/components/dashboard/CardUsageWaiverBreakdown.jsx",
+    "sha": "2e1c6e0a2af01f5a7e79bbebb7ed5909fd9f0b67",
+    "size": 6103
+  },
+  {
+    "file": "src/components/dashboard/CardUsageWaiverProgress.jsx",
+    "sha": "4096d8e0785f65f7b7be382de43ddd334c4f0452",
+    "size": 15842
+  },
+  {
+    "file": "src/components/dashboard/CyclePeriodHelp.jsx",
+    "sha": "25c4c79c2bc19df3c8491713ff1f5de5f509b358",
+    "size": 2950
+  },
+  {
+    "file": "src/components/dashboard/DashboardContent.jsx",
+    "sha": "1d2fb8e4671495a790aa6d9551371055e3d76d72",
+    "size": 15216
+  },
+  {
+    "file": "src/components/dashboard/DashboardPanels.jsx",
+    "sha": "42a6080ca6649e0eadab5c67761e7c1492635150",
+    "size": 4535
+  },
+  {
+    "file": "src/components/dashboard/DashboardProvider.jsx",
+    "sha": "38b8a4d5c1f8aa4927d14a9b8e72a0276eef7880",
+    "size": 6619
+  },
+  {
+    "file": "src/components/dashboard/ImportantNotices.jsx",
+    "sha": "1f1c50859698df6dae113d59a49d01201cb583be",
+    "size": 12923
+  },
+  {
+    "file": "src/components/gastos/CaptureStatus.jsx",
+    "sha": "083bac505e26f09feb77b5fca4bf4ad668e1cd27",
+    "size": 486
+  },
+  {
+    "file": "src/components/gastos/DailyExpenseCards.jsx",
+    "sha": "81612a988d213c51ed21097b66d4c770c020f460",
+    "size": 9829
+  },
+  {
+    "file": "src/components/gastos/ExpenseCreateSurface.jsx",
+    "sha": "8bee3ec54be99bdf5ad6cad191395657366e25ca",
+    "size": 676
+  },
+  {
+    "file": "src/components/gastos/GastosContent.jsx",
+    "sha": "25146b4e7c67d3adad147377a206f40cffadf02e",
+    "size": 70695
+  },
+  {
+    "file": "src/components/gastos/OfflineCaptureConflicts.jsx",
+    "sha": "627d991cb30f7af170a87c9e4e97587bb6d65402",
+    "size": 3189
+  },
+  {
+    "file": "src/components/gastos/SharedExpenseFields.jsx",
+    "sha": "2ef750ad5375de0c4e4bad5ec8dc5eb73ceee5f6",
+    "size": 2914
+  },
+  {
+    "file": "src/components/gastos/SubscriptionCharges.jsx",
+    "sha": "1dbdbea2a1f08bcab363df3f970205f549e5a875",
+    "size": 21981
+  },
+  {
+    "file": "src/components/ingresos/IngresosContent.jsx",
+    "sha": "2fa064f363e4cf75026f1994e5352dfe1a0e646c",
+    "size": 27674
+  },
+  {
+    "file": "src/components/layout/AppHeader.jsx",
+    "sha": "326910b488b57c80e758b2e8ec442dfdc84f53ae",
+    "size": 1161
+  },
+  {
+    "file": "src/components/layout/AppHeaderActions.jsx",
+    "sha": "7cbe5251688a96de25177dc46a68586f9bb27db4",
+    "size": 4786
+  },
+  {
+    "file": "src/components/layout/AppShell.jsx",
+    "sha": "8e2cced3ee008df09354f3fad29ae94b6c6112ec",
+    "size": 575
+  },
+  {
+    "file": "src/components/layout/AppSidebar.jsx",
+    "sha": "ac1c71db683fcc550bfda917d0cac37bae23058c",
+    "size": 2050
+  },
+  {
+    "file": "src/components/layout/MobileNavigationSheet.jsx",
+    "sha": "4cd234a732a21608d88dbecd1aa090fe3480cecd",
+    "size": 6990
+  },
+  {
+    "file": "src/components/layout/PageSkeleton.jsx",
+    "sha": "8f991f74a08218eb57378e889dfc7cc675467029",
+    "size": 7102
+  },
+  {
+    "file": "src/components/pwa/ServiceWorkerRegistration.jsx",
+    "sha": "d2eae598627f641475ad074820f9fa487352a644",
+    "size": 1203
+  },
+  {
+    "file": "src/components/suscripciones/SuscripcionesContent.jsx",
+    "sha": "7f4488fad794e70406f356635cfe84c41703dd27",
+    "size": 40167
+  },
+  {
+    "file": "src/components/tarjetas/CycleBreakdown.jsx",
+    "sha": "748f4e9c51dd056d4f98c74f63b63d9635a20105",
+    "size": 8813
+  },
+  {
+    "file": "src/components/tarjetas/CyclesDataTable.jsx",
+    "sha": "db1718696ed0703347d02fd2c516c7dc05622f02",
+    "size": 35148
+  },
+  {
+    "file": "src/components/tarjetas/TarjetasContent.jsx",
+    "sha": "c06660c13957b7f2c1aa455f9a46c2084041c6b0",
+    "size": 23296
+  },
+  {
+    "file": "src/components/ui/accordion.jsx",
+    "sha": "f47bcd285af0014dae3004dc3830f88faf61ed03",
+    "size": 2586
+  },
+  {
+    "file": "src/components/ui/alert-dialog.jsx",
+    "sha": "c7a506a17a92647f72d014af7abc3a8c80ded477",
+    "size": 5104
+  },
+  {
+    "file": "src/components/ui/alert.jsx",
+    "sha": "84fa80df9aa40eda348c5d064e1b5fc2adcfd8ae",
+    "size": 2005
+  },
+  {
+    "file": "src/components/ui/badge.jsx",
+    "sha": "f25153e624ed34ffde48bbdb12713eddf6421e12",
+    "size": 1905
+  },
+  {
+    "file": "src/components/ui/button.jsx",
+    "sha": "788df125a71ce4e26836d339aa49363e3b5a3f62",
+    "size": 3145
+  },
+  {
+    "file": "src/components/ui/calendar.jsx",
+    "sha": "552c952ef8715ddc26962bad53298fa1022a8020",
+    "size": 7961
+  },
+  {
+    "file": "src/components/ui/card.jsx",
+    "sha": "55b5eaa9fe16c7a918341d15a31816666de9e4b3",
+    "size": 2274
+  },
+  {
+    "file": "src/components/ui/chart.jsx",
+    "sha": "94d2e1883f81b05d0325eb00cf8dce221ad19c8d",
+    "size": 9279
+  },
+  {
+    "file": "src/components/ui/checkbox.jsx",
+    "sha": "8c147be84a67d1914fec21d137e5babda464010a",
+    "size": 1622
+  },
+  {
+    "file": "src/components/ui/collapsible.jsx",
+    "sha": "a08eb9aa421151c23413cb066b91a93c8a56327d",
+    "size": 599
+  },
+  {
+    "file": "src/components/ui/combobox.jsx",
+    "sha": "3f92c8bf6b05133c05ba2cb83c177eae67240b61",
+    "size": 8736
+  },
+  {
+    "file": "src/components/ui/command.jsx",
+    "sha": "dd5362a24f294c2efeb621463b503d9f4a18b264",
+    "size": 4633
+  },
+  {
+    "file": "src/components/ui/create-record-surface.jsx",
+    "sha": "84604445acce8dff3cf6f4ae0a680e5d9a55bc59",
+    "size": 10134
+  },
+  {
+    "file": "src/components/ui/data-table.jsx",
+    "sha": "28c56e9ca16dfb256fa32bac3a38f37792cec9ee",
+    "size": 9678
+  },
+  {
+    "file": "src/components/ui/date-picker.jsx",
+    "sha": "593aa2021ed9635d1338bccd837ad1a25b7f3c06",
+    "size": 4229
+  },
+  {
+    "file": "src/components/ui/dialog.jsx",
+    "sha": "e8448cc7eb96e9d4f3bccf11e8ac2c98b9aa57e8",
+    "size": 3614
+  },
+  {
+    "file": "src/components/ui/dropdown-menu.jsx",
+    "sha": "328182b1c5032b20e7b17ca644bb838f15e0167a",
+    "size": 7922
+  },
+  {
+    "file": "src/components/ui/empty.jsx",
+    "sha": "7fe7edc9065c6b7627ea4e98d7fa2f95ee49519f",
+    "size": 2169
+  },
+  {
+    "file": "src/components/ui/expense-filter-combobox.jsx",
+    "sha": "c2b819f8930468ab13170a7885675626f1a65004",
+    "size": 5641
+  },
+  {
+    "file": "src/components/ui/field.jsx",
+    "sha": "7f22e00dc5da1b6c05d42f37d77ccf12fc86178a",
+    "size": 5761
+  },
+  {
+    "file": "src/components/ui/header-dialog.jsx",
+    "sha": "3d02e100c5dcf73dc5ea0be32c0e23d011edefb9",
+    "size": 3003
+  },
+  {
+    "file": "src/components/ui/input-group.jsx",
+    "sha": "d90181e191045b13aab01cb0e84e253e36f4dc3a",
+    "size": 4875
+  },
+  {
+    "file": "src/components/ui/input.jsx",
+    "sha": "18f6105c8b392ec4614f3b002bbd7fa61f45ceaf",
+    "size": 1427
+  },
+  {
+    "file": "src/components/ui/item.jsx",
+    "sha": "aa850e9035c404a6b58e59ac9118bb7bfc22b696",
+    "size": 4337
+  },
+  {
+    "file": "src/components/ui/label.jsx",
+    "sha": "f2ce860bc5c7c4f9398cc0e3ef1967754acd71ca",
+    "size": 561
+  },
+  {
+    "file": "src/components/ui/number-input.jsx",
+    "sha": "c9d24697e5d51e937ae0c7046090d0303d57c69e",
+    "size": 3972
+  },
+  {
+    "file": "src/components/ui/payment-method-selector.jsx",
+    "sha": "6035c74f7a51167672d82dcb7d216b73f4f4e53a",
+    "size": 1492
+  },
+  {
+    "file": "src/components/ui/popover.jsx",
+    "sha": "564882e19164494f783e242d4cc8e13f3a95a0c5",
+    "size": 2075
+  },
+  {
+    "file": "src/components/ui/progress.jsx",
+    "sha": "18c7fc7449ac062b9c072902764aff8e94de878d",
+    "size": 710
+  },
+  {
+    "file": "src/components/ui/radio-group.jsx",
+    "sha": "bb1b2bfe02697057caee311cd4d74e3c52bffeb0",
+    "size": 1701
+  },
+  {
+    "file": "src/components/ui/record-card.jsx",
+    "sha": "a6bb87535bbeefb4b6a7ed878e7f0475b90e85c1",
+    "size": 5375
+  },
+  {
+    "file": "src/components/ui/request-error-dialog.jsx",
+    "sha": "4b17b955938b8e0cb99b07fc8c643d9125471d9b",
+    "size": 5264
+  },
+  {
+    "file": "src/components/ui/responsive-breakdown.jsx",
+    "sha": "f29140bfbb706a07e310ee1926ad9e9c3520ca19",
+    "size": 8716
+  },
+  {
+    "file": "src/components/ui/responsive-select.jsx",
+    "sha": "eb97462279dc4781a0732251927d4e0aaf85d8d8",
+    "size": 15060
+  },
+  {
+    "file": "src/components/ui/searchable-select.jsx",
+    "sha": "914bf78b4ae10a0f2e6204dca15af06c576d1bda",
+    "size": 298
+  },
+  {
+    "file": "src/components/ui/select.jsx",
+    "sha": "c8c24b37f290b6b6edda90a62211e742d0166e44",
+    "size": 6305
+  },
+  {
+    "file": "src/components/ui/separator.jsx",
+    "sha": "a022cf0994bc7008ec2229984fdef247ad7851b0",
+    "size": 587
+  },
+  {
+    "file": "src/components/ui/sheet.jsx",
+    "sha": "b60e5791e475529582a11274e7e871b634e7d9fa",
+    "size": 4035
+  },
+  {
+    "file": "src/components/ui/sidebar.jsx",
+    "sha": "cdccc62e88dc4a74cc285723abe6c5c124970cf5",
+    "size": 19562
+  },
+  {
+    "file": "src/components/ui/skeleton.jsx",
+    "sha": "87a0e3d949e46983343417eea3b1cbb61bc5e6cd",
+    "size": 247
+  },
+  {
+    "file": "src/components/ui/sonner.jsx",
+    "sha": "d6a3259c8809f456e116a8b02b7fcda11302dec7",
+    "size": 1485
+  },
+  {
+    "file": "src/components/ui/spinner.jsx",
+    "sha": "a172221b24bbb40109db9393867d02a3df4d735d",
+    "size": 445
+  },
+  {
+    "file": "src/components/ui/table.jsx",
+    "sha": "8f5e3788791752bd6f778fbd5674b3a3d905cc5f",
+    "size": 2122
+  },
+  {
+    "file": "src/components/ui/tabs.jsx",
+    "sha": "f39a6865d5b3c7409ef87a80e3416ea005bd1532",
+    "size": 3365
+  },
+  {
+    "file": "src/components/ui/textarea.jsx",
+    "sha": "8662bcdcea66b5905a131320453f4c27e42b70de",
+    "size": 775
+  },
+  {
+    "file": "src/components/ui/tooltip.jsx",
+    "sha": "5fe84af2afe2cdba9130a02c330fe12f98649ee3",
+    "size": 1870
+  },
+  {
+    "file": "src/hooks/use-analysis.js",
+    "sha": "36e3edd6b57ad34844b3a74b9511df3b6df4e283",
+    "size": 229
+  },
+  {
+    "file": "src/hooks/use-capture-resource.js",
+    "sha": "d5a52f8864aac3f2e02db4e42505cd50e6f94922",
+    "size": 2091
+  },
+  {
+    "file": "src/hooks/use-creation-draft.js",
+    "sha": "55e51696a3a57e8740c488aa3c44db8333ed8329",
+    "size": 1765
+  },
+  {
+    "file": "src/hooks/use-dialog-focus.js",
+    "sha": "858ecd4088e6a6a48072039536c241403444dbe0",
+    "size": 701
+  },
+  {
+    "file": "src/hooks/use-mobile.js",
+    "sha": "49342a0fdcc5934f40eb041a11f4193098ef881d",
+    "size": 748
+  },
+  {
+    "file": "src/hooks/use-notice-dismissals.js",
+    "sha": "df0f9eb2ac46e5668c77a8529cd3a0287b17182c",
+    "size": 4044
+  },
+  {
+    "file": "src/lib/analysisPresentation.js",
+    "sha": "cfef5892716d335b4d90502a38c8e9a38f1a4212",
+    "size": 1102
+  },
+  {
+    "file": "src/lib/apiAuth.js",
+    "sha": "fd2aedb39d9a3420709bfd123af05b1537d678dd",
+    "size": 2472
+  },
+  {
+    "file": "src/lib/apiFetch.js",
+    "sha": "c198eacf64920e0019255a45a3156e24b483b81f",
+    "size": 4088
+  },
+  {
+    "file": "src/lib/calculations/cardCredits.js",
+    "sha": "14e1b5b4bd3bb17b68b3cad6f38960d0eda2cdc9",
+    "size": 2018
+  },
+  {
+    "file": "src/lib/calculations/cardCyclePayments.js",
+    "sha": "26b64adba5ecfe57f11e8540b225ce9adc458f29",
+    "size": 2337
+  },
+  {
+    "file": "src/lib/calculations/cardCycles.js",
+    "sha": "4db1c6ca0bb4cbf7e0b52a41fe1a28621c5b0c7b",
+    "size": 8213
+  },
+  {
+    "file": "src/lib/calculations/cardUsageWaivers.js",
+    "sha": "8e7f335d386aedb4abf90cb7300275b52ef7a02a",
+    "size": 16798
+  },
+  {
+    "file": "src/lib/calculations/cycleDataQuality.js",
+    "sha": "de9751614f3bfdcfa4dee4d7e80c690a78870a5d",
+    "size": 1105
+  },
+  {
+    "file": "src/lib/calculations/dashboard.js",
+    "sha": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+    "size": 0
+  },
+  {
+    "file": "src/lib/calculations/debtAccounts.js",
+    "sha": "6eb3b5aac417033da4af1d824babb9ecf02443e9",
+    "size": 984
+  },
+  {
+    "file": "src/lib/calculations/installmentStatements.js",
+    "sha": "49d1d1aa14c9036cb2660b05a0306322e9cb71b9",
+    "size": 2003
+  },
+  {
+    "file": "src/lib/calculations/installments.js",
+    "sha": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+    "size": 0
+  },
+  {
+    "file": "src/lib/calculations/receivables.js",
+    "sha": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+    "size": 0
+  },
+  {
+    "file": "src/lib/calculations/subscriptionStatements.js",
+    "sha": "81ec9550b3d5295b966f84a0e380d1678e1a3621",
+    "size": 1974
+  },
+  {
+    "file": "src/lib/captureApi.js",
+    "sha": "6cb6b1fab54d48a5f59c48dd453ef64f9f1f94c4",
+    "size": 5079
+  },
+  {
+    "file": "src/lib/captureConfiguration.js",
+    "sha": "203e0371612fac9e1a265492e9f37075c87cf1c0",
+    "size": 7394
+  },
+  {
+    "file": "src/lib/captureParsers.js",
+    "sha": "f51ed3d6778a67a086bcdfb76a60e2bd30aa525d",
+    "size": 5320
+  },
+  {
+    "file": "src/lib/capturePilot.js",
+    "sha": "da2f26ebd9a7d5f6e948b54366b37a1090069748",
+    "size": 5267
+  },
+  {
+    "file": "src/lib/capturePresentation.js",
+    "sha": "05b524a78a6a7b696f08baa59755d238e77b3867",
+    "size": 2849
+  },
+  {
+    "file": "src/lib/captureProcessing.js",
+    "sha": "2e4c0f2e50f9afe29e40998f1d4abaf27b74cb9b",
+    "size": 14743
+  },
+  {
+    "file": "src/lib/captureProtocol.js",
+    "sha": "ee99b342a83a235ab04bb1f34320d1ed8b6f2af2",
+    "size": 3927
+  },
+  {
+    "file": "src/lib/captureReconciliation.js",
+    "sha": "ab3e830a5977724fdb30e25f9d95d3ea41a1a916",
+    "size": 8032
+  },
+  {
+    "file": "src/lib/captureReview.js",
+    "sha": "3fb116f16616f3d1c17a8b1a56d4d6a7d184f23c",
+    "size": 2671
+  },
+  {
+    "file": "src/lib/captureService.js",
+    "sha": "2f55791156a4558ed96e1fb69c7476918e0927d3",
+    "size": 8372
+  },
+  {
+    "file": "src/lib/cardPaymentPresentation.js",
+    "sha": "f854eb10b120e238a8a0f1abee120edca7409b95",
+    "size": 1788
+  },
+  {
+    "file": "src/lib/cardUsagePresentation.js",
+    "sha": "4f279d4aec8fad7149715c256f7f5bc684a1ad79",
+    "size": 1967
+  },
+  {
+    "file": "src/lib/dashboardPresentation.js",
+    "sha": "812e516a81fec6275ff7513e0c15c021cf067ed9",
+    "size": 1135
+  },
+  {
+    "file": "src/lib/dates.js",
+    "sha": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+    "size": 0
+  },
+  {
+    "file": "src/lib/debtAccountService.js",
+    "sha": "1799d4cc027fb10a2914f07ebb378baa065cd30b",
+    "size": 1526
+  },
+  {
+    "file": "src/lib/expenseFilters.js",
+    "sha": "a5d053800a5447b3c0f81793542563b762fa891d",
+    "size": 1439
+  },
+  {
+    "file": "src/lib/expenseOperations.js",
+    "sha": "0a08a896ed2e9642408502bd4cea9644377fd022",
+    "size": 2294
+  },
+  {
+    "file": "src/lib/expenseService.js",
+    "sha": "a924271ba40ada425683025abdf592592cdf3931",
+    "size": 4906
+  },
+  {
+    "file": "src/lib/money.js",
+    "sha": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+    "size": 0
+  },
+  {
+    "file": "src/lib/navigation.js",
+    "sha": "9b4c7473007859a16b805471c36cc517253ace63",
+    "size": 1259
+  },
+  {
+    "file": "src/lib/noticeDismissals.js",
+    "sha": "28805b4697bd1dfa49c0d798770cc9852ec0b0c1",
+    "size": 2169
+  },
+  {
+    "file": "src/lib/offlineExpenses.js",
+    "sha": "b01306952edacc149e8a3220c361fbcc5a964b3d",
+    "size": 8803
+  },
+  {
+    "file": "src/lib/prisma.js",
+    "sha": "c8d0a275216305cc589843e312da907e9489808f",
+    "size": 407
+  },
+  {
+    "file": "src/lib/requestErrors.js",
+    "sha": "f4e517ffed17c2fcd387b6c9b620dd46f4f50cd7",
+    "size": 4424
+  },
+  {
+    "file": "src/lib/requestRecovery.js",
+    "sha": "d60966abe497729c4821090ef3ea5a9e8500101d",
+    "size": 2535
+  },
+  {
+    "file": "src/lib/sharedExpenses.js",
+    "sha": "77eec90fc1c9b5da0f80c9f7efbfedcb3cf00a2b",
+    "size": 1629
+  },
+  {
+    "file": "src/lib/subscriptionChargeService.js",
+    "sha": "ff2c41ee21a5a7f92566d0a21f347fa8b5b86a6d",
+    "size": 6224
+  },
+  {
+    "file": "src/lib/subscriptionCharges.js",
+    "sha": "dfcaf4916cb8e3b5a4ae2c1468b9d527dfe471c8",
+    "size": 4498
+  },
+  {
+    "file": "src/lib/supabase.js",
+    "sha": "def467a8c6fd6b6b29287782e6b77c4dbc7fdddf",
+    "size": 248
+  },
+  {
+    "file": "src/lib/userSetup.js",
+    "sha": "cca42e9f21dbdc1d9a40417079ef42d3f4b9b2ef",
+    "size": 1199
+  },
+  {
+    "file": "src/lib/utils.js",
+    "sha": "337eb99ab6802cef682c94528a085edf5fb738b6",
+    "size": 137
+  },
+  {
+    "file": "src/lib/validations.js",
+    "sha": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+    "size": 0
+  }
+]

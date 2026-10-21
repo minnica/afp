@@ -1,8 +1,10 @@
-// Los formatos de arranque son contratos SINTÉTICOS, no muestras bancarias.
+// Los formatos de compra de arranque son SINTÉTICOS. El aviso real de cargo
+// a cuenta corresponde a débito, fuera del piloto de tarjetas de crédito.
 // verified solo cambia tras incorporar evidencia real anonimizada y sus regresiones.
 export const captureParsers = [
   { key: "bbva.purchase.es.v1", sourcePackage: "com.bancomer.mbanking", title: "Compra aprobada", verified: false },
   { key: "wallet.purchase.es.v1", sourcePackage: "com.google.android.apps.walletnfcrel", title: "Pago realizado", verified: false },
+  { key: "bbva.account-charge.es.v1", sourcePackage: "com.bancomer.mbanking", verified: false, evidence: "REAL_OUT_OF_SCOPE" },
 ];
 
 export function normalizeMerchant(value) {
@@ -38,7 +40,18 @@ export function interpretCapture(event) {
   if (/\b(MSI|meses sin intereses|preautorizaci[oó]n|retenci[oó]n|devoluci[oó]n|reembolso|cancelaci[oó]n|abono|rechazad[ao]|promoci[oó]n|c[oó]digo de (?:acceso|verificaci[oó]n)|env[ií]o|pedido recibido)\b/i.test(texts)) {
     return { reason: "SPECIAL_MOVEMENT", proposal: {} };
   }
-  const parsers = captureParsers.filter(parser => parser.sourcePackage === event.sourcePackage && parser.title === event.fields?.["android.title"]);
+  // Prefijo observado y confirmado por el propietario como transferencia de
+  // débito. No vincular su terminación con los alias de tarjetas de crédito.
+  if (event.sourcePackage === "com.bancomer.mbanking") {
+    const body = event.fields?.["android.bigText"] || event.fields?.["android.text"] || "";
+    const account = body.match(/^Tienes un cargo a tu cuenta \*(\d{4}) de \$([\d,.]+)\. /);
+    if (account) {
+      const conflicting = event.fields["android.bigText"] && event.fields["android.text"] && !body.startsWith(event.fields["android.text"]);
+      return { parserKey: "bbva.account-charge.es.v1", verified: false,
+        reason: conflicting ? "CONFLICTING_FIELDS" : "NON_CREDIT_ACCOUNT", proposal: {} };
+    }
+  }
+  const parsers = captureParsers.filter(parser => typeof parser.title === "string" && parser.sourcePackage === event.sourcePackage && parser.title === event.fields?.["android.title"]);
   if (parsers.length !== 1) return { reason: "UNKNOWN_FORMAT", proposal: {} };
   const parser = parsers[0];
   const full = event.fields["android.bigText"] || event.fields["android.text"] || "";

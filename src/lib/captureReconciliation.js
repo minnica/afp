@@ -5,6 +5,7 @@ import { lockDebtAccounts } from "@/lib/debtAccountService";
 import { createExpenseInTransaction } from "@/lib/expenseService";
 import { captureDate, correctionSchema } from "@/lib/captureReview";
 import { shouldIncludePurchaseInCycle, getMonthlyPaymentUsed } from "@/lib/calculations/cardCycles";
+import { capturePilotSummary } from "@/lib/capturePilot";
 
 const periodSchema = z.object({ cardId: z.string().min(1), startDate: captureDate, endDate: captureDate }).refine(p => p.startDate <= p.endDate
   && new Date(p.endDate) - new Date(p.startDate) <= 62 * 86400000);
@@ -50,7 +51,8 @@ export async function captureStatement(db, userId, input) {
       if (matched) confirmed = confirmed.plus(row.chargeAmount);
       return { ...row, matched, changed: Boolean(match && !matched) };
     });
-    return { period, statement, records, total: total.toFixed(2), confirmed: confirmed.toFixed(2),
+    const pilot = await capturePilotSummary(tx, userId, period, records, statement);
+    return { period, statement, records, pilot, total: total.toFixed(2), confirmed: confirmed.toFixed(2),
       difference: statement?.chargesTotal != null ? new Prisma.Decimal(statement.chargesTotal).minus(total).toFixed(2) : null };
   });
 }

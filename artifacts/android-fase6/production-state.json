@@ -1,0 +1,36 @@
+{
+  "date": "2026-10-21T18:37:38.373Z",
+  "financialTablesChecked": 17,
+  "changedFinancialTables": [],
+  "identitiesAndCredentialHashesPreserved": true,
+  "oldEventsPreserved": true,
+  "previousEvents": 6,
+  "currentEvents": 6,
+  "automaticFormats": 0,
+  "activeDevices": 1,
+  "reports": [
+    {
+      "reportedAt": "2026-10-21T18:36:00.151Z",
+      "state": {
+        "action": "report",
+        "active": true,
+        "version": 1,
+        "batteryExempt": true,
+        "deliveryPaused": false,
+        "pausedPackages": [],
+        "selectedPackages": [
+          "com.didiglobal.cashloan",
+          "mx.hsbc.hsbcmexico",
+          "mx.bancosantander.supermovil",
+          "com.citibanamex.banamexmobile",
+          "com.nu.production",
+          "com.mercadopago.wallet",
+          "com.bancomer.mbanking",
+          "com.google.android.apps.walletnfcrel"
+        ],
+        "listenerConnected": true,
+        "notificationAccess": true
+      }
+    }
+  ]
+}

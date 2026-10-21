@@ -1,0 +1,78 @@
+{
+  "date": "2026-10-21",
+  "id": "dpl_4vn4oDLnajjHffjUVAi7mKyKrCaC",
+  "project": "afp",
+  "projectId": "prj_FUBRDkPPFpOgJG9zuLLhTwm3JHKV",
+  "teamId": "team_5jQEAASyPb5wB0LxR9KsHf5X",
+  "target": "production",
+  "state": "READY",
+  "origin": "https://finanzas.garatachia.com",
+  "deploymentUrl": "https://afp-ift7mqp1i-minnicas-projects.vercel.app",
+  "authorization": "Solicitud de implementar Fase 6 y permiso para realizar las operaciones necesarias sin confirmaciones adicionales.",
+  "source": {
+    "baseCommit": "3ef6ae23037989624877676d1fbaa32b3f4927f4",
+    "workingTreeChanges": true,
+    "commitOrPushPerformed": false,
+    "files": 230,
+    "bytes": 1511670,
+    "sourceSha256": "0c4ed9b037f209574632fbcac0601d1ea9f44b302b6756560639e187490d4bcb",
+    "manifest": "source-manifest.json",
+    "privateFilesUploaded": false,
+    "currentSourcesMatchSnapshot": true
+  },
+  "migration": {
+    "date": "2026-10-21T18:19:07.241Z",
+    "migration": "20261021030000_capture_review_and_reconciliation",
+    "kind": "aditiva",
+    "completedMigrations": 21,
+    "pending": [],
+    "checksumsMatch": true,
+    "changedExistingTables": [],
+    "newTables": [
+      "capture_statements"
+    ],
+    "tables": 27,
+    "rlsTables": 27,
+    "policies": 0,
+    "automationPreserved": true,
+    "existingPrivilegesPreserved": true,
+    "schemaDiffEmpty": true,
+    "backupScope": "AFP public + metadatos, privilegios, automatización y claves Android; excluye Supabase Auth",
+    "privateBackupGitIgnored": true
+  },
+  "smoke": "production-http.json",
+  "runtimeErrors": {
+    "since": "2026-10-21T18:34:10Z",
+    "groupsFound": 0,
+    "limit": "Consulta inmediata por proyecto; no acredita todos los flujos autenticados."
+  },
+  "apk": {
+    "version": "0.5.0",
+    "versionCode": 7,
+    "signedWithExistingIdentity": true,
+    "signatureMatchesAssetLinks": true,
+    "apkSha256": "758410504c13d2e5f08b85fc93e68f4a76333637e4f2265a13bd81f5129d6f03",
+    "installed": true,
+    "previousVersion": "0.3.0 / 5",
+    "preservation": {
+      "firstInstallTime": true,
+      "notificationAccess": true,
+      "authorization": true,
+      "listenerConnected": true,
+      "batteryExemption": true,
+      "selectedSources": true,
+      "deliveryReceipts": true,
+      "pending": 0,
+      "review": 0,
+      "diagnosticSamplesBefore": 6,
+      "diagnosticSamplesAfter": 9
+    },
+    "domainVerification": "verified",
+    "developmentPackagesRemainingInCurrentProfile": false
+  },
+  "automation": {
+    "automaticFormats": 0,
+    "mode": "OBSERVATION",
+    "realCreditParsersActivated": false
+  }
+}

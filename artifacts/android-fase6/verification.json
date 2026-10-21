@@ -1,0 +1,106 @@
+{
+  "date": "2026-10-21",
+  "phase": 6,
+  "status": "Preparada, publicada y en observación; criterio de salida real pendiente",
+  "complete": false,
+  "activitiesCompleted": 5,
+  "activitiesTotal": 8,
+  "completed": [
+    "Recepción/diagnóstico y observación con automatización desactivada",
+    "Ocho fuentes y nueve tarjetas conservadas, sin activar otros formatos",
+    "Pruebas de fallo y controles financieros",
+    "Respaldo, migración aditiva, publicación web/backend y APK firmada instalada",
+    "Actualización de APK conserva identidad, permisos aplicables, configuración, recibos y un pendiente ficticio en dev"
+  ],
+  "pending": [
+    "Validar compras reales de crédito presenciales/en línea/Wallet y avisos disponibles de Amazon/Mercado Libre",
+    "Activar exclusivamente formatos BBVA de crédito comprobados",
+    "Observar y conciliar un período que incluya un corte completo"
+  ],
+  "userScope": {
+    "creditCardsOnly": true,
+    "bbvaAccountNoticeConfirmedAsDebitTransfer": true,
+    "existingNoticeArchived": "credit-scope.json",
+    "creditSamplesVerified": 0,
+    "cardIdsAndProductsChanged": false
+  },
+  "web": {
+    "tests": 298,
+    "passed": 298,
+    "failed": 0,
+    "skipped": 0,
+    "newParserCases": 2,
+    "newPilotIntegrationScenarios": 7,
+    "build": "next build --webpack correcto",
+    "lintErrors": 0,
+    "lintWarnings": [
+      "Advertencia previa react-hooks/incompatible-library de TanStack Table"
+    ]
+  },
+  "database": {
+    "freshReconstruction": true,
+    "upgradeFromHistorical13Migrations": true,
+    "completedMigrations": 21,
+    "schemaDiffEmpty": true,
+    "checksumsMatch": true,
+    "tablesWithRls": 27,
+    "publicPolicies": 0,
+    "productionApplied": true,
+    "newPhase6Migrations": 0,
+    "unchangedFinancialTables": 17
+  },
+  "android": {
+    "jvmPassed": 18,
+    "instrumentedPassed": 29,
+    "upgradeProbeInvocationsPassed": 2,
+    "skipped": 0,
+    "installedVersion": "0.5.0 / 7",
+    "details": "native-acceptance.json"
+  },
+  "browser": {
+    "tool": "Agent Browser / Chromium",
+    "scope": "Componentes/API reales en compilación local con Auth ficticia y PostgreSQL desechable",
+    "flows": [
+      "Abrir Conciliar y seleccionar BBVA ficticia",
+      "Abrir seguimiento vacío",
+      "Registrar cargo faltante 125.50 desde la interfaz",
+      "Comprobar un cargo sin evidencia y un faltante añadido",
+      "Confirmar en estado: resumen pasa de 0/1 a 1/1 y mantiene cargo sin evidencia",
+      "Abrir/cerrar seguimiento con Enter",
+      "Sin errores de página"
+    ],
+    "viewports": [
+      {
+        "width": 390,
+        "documentWidth": 375,
+        "horizontalOverflow": false
+      },
+      {
+        "width": 320,
+        "documentWidth": 305,
+        "horizontalOverflow": false,
+        "disclosureTouchHeight": 44
+      }
+    ],
+    "screenshots": [
+      "seguimiento-390.png",
+      "seguimiento-320.png"
+    ],
+    "limitation": "Las capturas preceden a una corrección de copy sin cambio de comportamiento; la versión final tiene build, lint y regresiones correctos."
+  },
+  "production": {
+    "deployment": "production-deployment.json",
+    "http": "production-http.json",
+    "finalState": "production-state.json",
+    "financialRecordsChanged": false,
+    "originalEventsPreserved": true,
+    "automaticFormats": 0
+  },
+  "limits": [
+    "No hay una muestra revisada de compra de crédito ni cobertura real acreditada de esos canales.",
+    "La transferencia de débito no valida crédito ni captura del piloto con pantalla bloqueada.",
+    "Los indicadores de evidencia adicional, corrección o falta de vínculo no equivalen a duplicados, errores reales o avisos perdidos.",
+    "No se simula que transcurrió un corte ni se crean compras de prueba en producción.",
+    "Las pruebas de compras y fallos usan datos ficticios y Auth local; no sustituyen el uso bancario real."
+  ]
+}

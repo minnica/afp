@@ -1,0 +1,68 @@
+{
+  "date": "2026-10-21T18:49:32.136Z",
+  "origin": "https://finanzas.garatachia.com",
+  "results": [
+    {
+      "path": "/login",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "cacheControl": "public, max-age=0, must-revalidate"
+    },
+    {
+      "path": "/dashboard",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "cacheControl": "public, max-age=0, must-revalidate"
+    },
+    {
+      "path": "/configuracion",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "cacheControl": "public, max-age=0, must-revalidate"
+    },
+    {
+      "path": "/manifest.webmanifest",
+      "status": 200,
+      "contentType": "application/manifest+json; charset=utf-8",
+      "cacheControl": "public, max-age=0, must-revalidate"
+    },
+    {
+      "path": "/.well-known/assetlinks.json",
+      "status": 200,
+      "contentType": "application/json; charset=utf-8",
+      "cacheControl": "public, max-age=0, must-revalidate"
+    },
+    {
+      "path": "/api/expenses",
+      "status": 401,
+      "contentType": "application/json",
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/captures/devices",
+      "status": 401,
+      "contentType": "application/json",
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/captures/configuration",
+      "status": 401,
+      "contentType": "application/json",
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/captures/movements",
+      "status": 401,
+      "contentType": "application/json",
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/captures/reconciliation",
+      "status": 401,
+      "contentType": "application/json",
+      "cacheControl": "private, no-store"
+    }
+  ],
+  "summaryInPublishedBundle": true,
+  "releaseCertificateMatches": true
+}

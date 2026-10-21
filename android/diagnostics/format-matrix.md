@@ -23,18 +23,20 @@ Las fuentes añadidas no se activan al actualizar la APK. Se conserva la selecci
 
 ## Campos y resolución por tarjeta
 
+Los campos siguientes se refieren a **compras de crédito**. El aviso BBVA de cargo a cuenta recibido durante la preparación de Fase 6 fue confirmado por el propietario como transferencia de débito; no completa estos campos ni acredita cobertura de crédito.
+
 | Fuente | Importe | Moneda | Comercio | Fecha de operación | Identidad de tarjeta | Referencia |
 |---|---|---|---|---|---|---|
-| BBVA | Sin observar | Sin observar | Sin observar | Sin observar | Alias físico/digital pendientes | Sin observar |
-| Wallet | Sin observar | Sin observar | Sin observar | Sin observar | Token y banco pendientes; no equivale a terminación física | Sin observar |
-| HSBC | Sin observar | Sin observar | Sin observar | Sin observar | HSBC 1 / HSBC 2 sin resolver | Sin observar |
-| Banamex | Sin observar | Sin observar | Sin observar | Sin observar | BANAMEX 1 / BANAMEX 2 sin resolver | Sin observar |
-| Santander | Sin observar | Sin observar | Sin observar | Sin observar | Alias pendiente | Sin observar |
-| Nu | Sin observar | Sin observar | Sin observar | Sin observar | Alias pendiente | Sin observar |
-| DiDi Finanzas | Sin observar | Sin observar | Sin observar | Sin observar | Alias pendiente | Sin observar |
+| BBVA | Sin observar | Sin observar | Sin observar | Sin observar | Alias de crédito configurados; sin aviso de compra | Sin observar |
+| Wallet | Sin observar | Sin observar | Sin observar | Sin observar | Alias de Wallet configurados para seis tarjetas; sin aviso de compra | Sin observar |
+| HSBC | Sin observar | Sin observar | Sin observar | Sin observar | Alias de ambas configurados; falta muestra de compra | Sin observar |
+| Banamex | Sin observar | Sin observar | Sin observar | Sin observar | Alias de ambas configurados; falta muestra de compra | Sin observar |
+| Santander | Sin observar | Sin observar | Sin observar | Sin observar | Alias configurado; campo del aviso sin observar | Sin observar |
+| Nu | Sin observar | Sin observar | Sin observar | Sin observar | Alias configurado; campo del aviso sin observar | Sin observar |
+| DiDi Finanzas | Sin observar | Sin observar | Sin observar | Sin observar | Alias configurado; campo del aviso sin observar | Sin observar |
 | Mercado Pago | Sin observar | Sin observar | Sin observar | Sin observar | Tarjeta frente a cuenta/saldo pendiente | Sin observar |
 
-«Sin observar» significa que falta una notificación real revisada; no significa que el campo esté ausente. Para cada muestra, registrar **presente, ausente o ambiguo** solo después de revisar el contenido en el teléfono. Las fechas de publicación, recepción y `Notification.when` no sustituyen la fecha de la operación. Conocer el emisor no permite elegir entre dos tarjetas del mismo banco. Las identidades y alias se vincularán en la Fase 4 con los registros existentes; este inventario no crea vinculaciones financieras.
+«Sin observar» significa que falta una notificación real revisada; no significa que el campo esté ausente. Para cada muestra, registrar **presente, ausente o ambiguo** solo después de revisar el contenido en el teléfono. Las fechas de publicación, recepción y `Notification.when` no sustituyen la fecha de la operación. Conocer el emisor no permite elegir entre dos tarjetas del mismo banco. La Fase 4 configuró 24 alias verificados por declaración del propietario en las nueve tarjetas existentes. Eso no demuestra qué campos entrega un aviso ni habilita formatos; este inventario no crea vinculaciones financieras.
 
 ## Validación del teléfono y escenarios físicos
 
@@ -65,3 +67,9 @@ Las pruebas instrumentadas de captura usan exclusivamente **notificaciones sint�
 5. Verificar si la evidencia distingue cada tarjeta. Un campo ausente o ambiguo permanece así; no completar por deducción.
 
 La exportación `anonymous-shape-only` oculta letras y cifras y sirve para inspeccionar estructura. **No constituye una muestra de lenguaje bancario para desarrollar un analizador.** Todavía no existen fixtures bancarios reales revisados en el repositorio. La fase permanece abierta hasta validar la captura real del piloto; otras fuentes pueden continuar identificadas como pendientes.
+
+## Observación del piloto de crédito · Fase 6
+
+El 21 de octubre se publicó la web y se actualizó la APK personal a **0.5.0 / 7**, conservando autorización, permiso, batería y las ocho fuentes seleccionadas. Se conservaron los seis eventos/recibos recibidos de cuatro fuentes; no constituyen seis compras verificadas. El único aviso BBVA disponible fue identificado explícitamente como una transferencia de débito y quedó descartado, con su evidencia conservada. Su prefijo se reconoce como ajeno al piloto de crédito y no aparece entre los formatos automatizables. No se incorporó una muestra ni un analizador activable de compra de crédito.
+
+Presencial, en línea, Wallet, Amazon, Mercado Libre y suscripciones de crédito siguen pendientes de avisos revisados. El diagnóstico de las otras fuentes se mantiene y la automatización sigue desactivada en todas las tarjetas. La verificación técnica actual comprende 298 pruebas web, 18 JVM, 29 instrumentadas y dos comprobaciones de actualización, sin omisiones; los casos de compras son ficticios. El seguimiento por tarjeta/período está en Conciliar y no atribuye compras a avisos ausentes o ambiguos. [Plan Fase 6](../../PLAN_CAPTURA_AUTOMATICA_ANDROID.md#fase-6-piloto-completo-con-bbva-platinum), [evidencia](../../artifacts/android-fase6/verification.json).

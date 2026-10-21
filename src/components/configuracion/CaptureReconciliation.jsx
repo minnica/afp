@@ -21,6 +21,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Empty, EmptyDescription } from "@/components/ui/empty";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Spinner } from "@/components/ui/spinner";
+import CapturePilotSummary from "@/components/configuracion/CapturePilotSummary";
 
 const money = value => new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" }).format(Number(value));
 
@@ -57,6 +58,7 @@ function StatementResult({ data, configuration, userId, refresh, onChanged }) {
     <div role="status">{notice}</div>
     <p className="text-sm">Cargos de compras en AFP: <strong>{money(data.total)}</strong> · Cotejados en este período: <strong>{money(data.confirmed)}</strong>{data.difference !== null ? <> · Diferencia: <strong>{money(data.difference)}</strong></> : null}</p>
     <p className="text-sm text-muted-foreground">Compara el total de cargos de compras, incluidas las cuotas MSI del mes de la fecha final. Usa el período de tu corte. Pagos, abonos, saldo anterior, comisiones e intereses se explican aparte; este total no sustituye el saldo a pagar de Tarjetas. La ausencia de un cargo no lo cancela.</p>
+    <CapturePilotSummary pilot={data.pilot} />
     <form className="flex flex-col gap-4" onSubmit={event => { event.preventDefault(); void act({ action: "save", chargesTotal: chargesTotal === "" ? null : String(chargesTotal), notes, expectedUpdatedAt: version, expectedMetadata: metadata }); }}>
       <FieldGroup>
         <Field><FieldLabel htmlFor="statement-total">Total de cargos de compras del estado (opcional)</FieldLabel><Input className="min-h-11" id="statement-total" type="number" formatNumber min="0" step="0.01" value={chargesTotal} onChange={event => setChargesTotal(event.target.value)} disabled={busy} /></Field>
@@ -71,7 +73,8 @@ function StatementResult({ data, configuration, userId, refresh, onChanged }) {
     <Separator />
     {data.records.length === 0 ? <Empty><EmptyDescription>No hay cargos de compras en este período. Puedes registrar los que falten.</EmptyDescription></Empty> : <ItemGroup className="gap-3">{data.records.map(row => <Item key={`${row.type}:${row.id}`} variant="outline" className="flex-wrap">
       <ItemContent className="min-w-0 basis-full sm:basis-0"><ItemTitle className="flex-wrap break-words">{row.concept}<Badge variant={row.matched ? "secondary" : "warning"}>{row.matched ? "Conciliado" : row.changed ? "Cambió; volver a cotejar" : "Por cotejar"}</Badge></ItemTitle>
-        <ItemDescription>{new Date(row.date).toISOString().slice(0, 10)} · {money(row.chargeAmount)}{row.type === "INSTALLMENT" ? " · Cuota MSI" : ""}</ItemDescription></ItemContent>
+        <ItemDescription>{new Date(row.date).toISOString().slice(0, 10)} · {money(row.chargeAmount)}{row.type === "INSTALLMENT" ? " · Cuota MSI" : ""}</ItemDescription>
+        {data.pilot && <ItemDescription>{data.pilot.evidenceByRecord.find(item => item.id === row.id && item.type === row.type)?.count || 0} avisos vinculados</ItemDescription>}</ItemContent>
       <Button variant="outline" className="min-h-11" disabled={busy} onClick={() => act({ action: row.matched ? "unconfirm" : "confirm", type: row.type, recordId: row.id, fingerprint: row.fingerprint })}>{row.matched ? "Deshacer cotejo" : "Confirmar en estado"}</Button>
     </Item>)}</ItemGroup>}
     <Collapsible open={missingOpen} onOpenChange={setMissingOpen} className="flex flex-col gap-4"><CollapsibleTrigger asChild><Button variant="outline" className="min-h-11 self-start">Registrar cargo faltante</Button></CollapsibleTrigger><CollapsibleContent>

@@ -90,5 +90,5 @@ export async function captureConfiguration(db, userId) {
     db.category.findMany({ where: { userId }, select: { id: true, name: true }, orderBy: { name: "asc" } }),
     db.subscription.findMany({ where: { userId, paymentMethod: "CARD" }, select: { id: true, name: true, cardId: true }, orderBy: { name: "asc" } }),
   ]);
-  return { cards, aliases, automations, rules, categories, subscriptions, parsers: captureParsers.map(({ key, sourcePackage, verified }) => ({ key, sourcePackage, verified })) };
+  return { cards, aliases, automations, rules, categories, subscriptions, parsers: captureParsers.filter(parser => parser.evidence !== "REAL_OUT_OF_SCOPE").map(({ key, sourcePackage, verified }) => ({ key, sourcePackage, verified })) };
 }
