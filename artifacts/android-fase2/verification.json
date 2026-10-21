@@ -109,6 +109,17 @@
       "notificationListenerAccessPreserved": true,
       "developmentTestPackageRemoved": true,
       "localCertificateAndReverseTunnelRemoved": true
+    },
+    "phoneActivation": {
+      "report": "phone-activation.json",
+      "productionVersion": "0.2.0",
+      "productionVersionCode": 4,
+      "notificationListenerAccessPreserved": true,
+      "diagnosticSamplesPreserved": true,
+      "diagnosticSourceSelectionPreserved": true,
+      "realAccountPaired": true,
+      "nativeAuthorizedStateVerified": true,
+      "nativeAuthorizedStateAfterActivityReopen": true
     }
   },
   "web": {
@@ -136,6 +147,13 @@
         "web-390.png",
         "web-desktop.png"
       ]
+    },
+    "productionPairing": {
+      "report": "phone-activation.json",
+      "existingAuthenticatedPhoneSessionUsed": true,
+      "pairingApprovedThroughWebUi": true,
+      "nativeStateQueryConfirmedByServer": true,
+      "deploymentCommitVerified": false
     }
   },
   "incidents": [
@@ -143,8 +161,7 @@
     "Next development manifests briefly returned HTTP 500 during recompilation; repeated after routes compiled and all checks passed. Reproducible fixture precompiles protected routes."
   ],
   "pending": [
-    "User commit and push of production migration documentation and evidence; verify deployed web version",
-    "Distribution or installation of signed 0.2.0 production APK",
+    "User commit and push of activation documentation and evidence",
     "Existing phase-1 real bank samples remain pending"
   ],
   "testRunModifiedProduction": false,
@@ -155,6 +172,7 @@
     "pendingMigrations": 0,
     "existingFinancialRecordsUnchanged": true,
     "applicationDeployed": false,
-    "commitAndPushOwner": "user"
+    "commitAndPushOwner": "user",
+    "operationScope": "Database migration only; later real phone activation is recorded separately in phone-activation.json."
   }
 }
