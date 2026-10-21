@@ -113,6 +113,7 @@ export function calculateCycleAmount({
       cashContributionAmount: cycleMoney(expense.cashContributionAmount),
       date: expense.date,
       categoryName: expense.category?.name || null,
+      reconciliationStatus: expense.reconciliationStatus, reconciledAt: expense.reconciledAt, captureMovements: expense.captureMovements,
     }));
 
   // Un cargo registrado sustituye la previsión de su mes incluso cuando la
@@ -145,6 +146,7 @@ export function calculateCycleAmount({
       currentMonth: getPurchaseCycleNumber(purchase, cycle),
       initialPaymentsMade: purchase.initialPaymentsMade,
       categoryName: purchase.category?.name || null,
+      reconciliationStatus: purchase.reconciliationStatus, reconciledAt: purchase.reconciledAt, captureMovements: purchase.captureMovements,
     }));
 
   const expensesAmount = cycleSum(includedExpenses);

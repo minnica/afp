@@ -86,6 +86,7 @@ model User {
   captureAutomations   CaptureAutomation[]
   captureRules         CaptureMerchantRule[]
   captureMovements     CaptureMovement[]
+  captureStatements    CaptureStatement[]
   expenseTombstones    ExpenseTombstone[]
 
   @@map("users")
@@ -137,6 +138,7 @@ model Card {
   captureAliases       CaptureCardAlias[]
   captureAutomations   CaptureAutomation[]
   captureRules         CaptureMerchantRule[]
+  captureStatements    CaptureStatement[]
 
   @@unique([userId, name])
   @@map("cards")
@@ -254,6 +256,7 @@ model DailyExpense {
   payableAccountId        String?
   subscriptionId          String?
   reconciliationStatus    String        @default("CONFIRMED")
+  reconciledAt            DateTime?
   loanBalanceAfterPayment Decimal?
   loanInterestAmount      Decimal?
   loanPrincipalAmount     Decimal?
@@ -295,6 +298,7 @@ model InstallmentPurchase {
   notes                    String?
   status                   InstallmentPurchaseStatus @default(ACTIVE)
   reconciliationStatus     String                    @default("CONFIRMED")
+  reconciledAt             DateTime?
   createdAt                DateTime                  @default(now())
   updatedAt                DateTime                  @updatedAt
 
@@ -461,6 +465,9 @@ model CaptureDevice {
   pausedAt   DateTime?
   revokedAt  DateTime?
   lastSeenAt DateTime?
+  pausedPackages Json @default("[]")
+  reportedState Json?
+  reportedAt DateTime?
   user       User?           @relation(fields: [userId], references: [id], onDelete: Cascade)
   pairing    CapturePairing?
   events     CaptureEvent[]
@@ -562,6 +569,7 @@ model CaptureMovement {
   reason                String
   parserKey             String?
   proposal              Json
+  correction            Json?
   cardId                String?
   amount                Decimal?
   operationDate         DateTime?
@@ -597,6 +605,26 @@ model ExpenseTombstone {
 }
 
 // Ventanas persistentes: los límites no dependen de la memoria de una función.
+// Cotejo manual de cargos de un período; las huellas conservan el historial
+// incluso si el usuario modifica o elimina posteriormente un registro.
+model CaptureStatement {
+  id String @id @default(uuid()) @db.Uuid
+  userId String
+  cardId String
+  startDate String
+  endDate String
+  chargesTotal Decimal?
+  notes String @default("")
+  matches Json @default("{}")
+  operations Json @default("{}")
+  updatedAt DateTime @updatedAt
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  card Card @relation(fields: [cardId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, cardId, startDate, endDate])
+  @@map("capture_statements")
+}
+
 model CaptureRateLimit {
   key       String   @id
   count     Int

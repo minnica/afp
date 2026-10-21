@@ -9,7 +9,7 @@ export const capturePackages = [
   "com.didiglobal.cashloan", "com.mercadopago.wallet",
 ];
 export const pairingLifetimeMs = 5 * 60 * 1000;
-export const deviceSelect = { id: true, name: true, createdAt: true, approvedAt: true, pausedAt: true, revokedAt: true, lastSeenAt: true };
+export const deviceSelect = { id: true, name: true, createdAt: true, approvedAt: true, pausedAt: true, revokedAt: true, lastSeenAt: true, pausedPackages: true, reportedState: true, reportedAt: true };
 export function captureHash(value) { return createHash("sha256").update(value).digest("hex"); }
 export function validSecret(secret) {
   return typeof secret === "string" && /^[A-Za-z0-9_-]{43}$/.test(secret)

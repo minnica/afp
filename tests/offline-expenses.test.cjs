@@ -21,6 +21,31 @@ function fixture() {
   return { tab, storage, receipts, requests, globals, setSend: fn => { send = fn; } };
 }
 const payload = { concept: "Comida", amount: 10, date: "2026-10-17", categoryId: "category-a", paymentMethod: "CASH" };
+test("conflicto con captura: decisión explícita conserva UUID, notas y aportación al registrar otra compra", async () => {
+  const f = fixture(), queue = f.tab();
+  const entry = await queue.addOfflineExpense('a', { ...payload, cashContributionAmount: '2', notes: 'Personal' });
+  f.setSend(async () => { throw Object.assign(new Error('Ya hay una captura por conciliar con esta tarjeta e importe.'), { status: 409 }); });
+  await queue.syncOfflineExpenses('a');
+  await queue.resolveOfflineCapture('b', entry.clientId, false);
+  assert.equal((await queue.readOfflineExpenses('a')).length, 1);
+  await queue.resolveOfflineCapture('a', entry.clientId, true);
+  const pending = (await f.tab().readOfflineExpenses('a'))[0];
+  assert.equal(pending.payload.confirmDistinctCapture, true);
+  assert.equal(pending.payload.operationId, entry.clientId);
+  assert.equal(pending.payload.notes, 'Personal'); assert.equal(pending.payload.cashContributionAmount, '2');
+  f.setSend(async input => ({ ok: true, json: async () => ({ expense: { id: input.operationId } }) }));
+  await queue.syncOfflineExpenses('a'); assert.equal((await queue.readOfflineExpenses('a')).length, 0);
+});
+test("conservar gasto existente solo retira un conflicto confirmado, sin borrar otros pendientes", async () => {
+  const f = fixture(), queue = f.tab();
+  const conflict = await queue.addOfflineExpense('a', payload), ordinary = await queue.addOfflineExpense('a', payload);
+  await queue.resolveOfflineCapture('a', ordinary.clientId, false);
+  assert.equal((await queue.readOfflineExpenses('a')).length, 2);
+  f.setSend(async () => { throw Object.assign(new Error('Ya hay una captura por conciliar con esta tarjeta e importe.'), { status: 409 }); });
+  await queue.syncOfflineExpenses('a', { onlyClientId: conflict.clientId });
+  await queue.resolveOfflineCapture('a', conflict.clientId, false);
+  assert.deepEqual((await queue.readOfflineExpenses('a')).map(row => row.clientId), [ordinary.clientId]);
+});
 function deferred() { let resolve; const promise = new Promise(r => { resolve = r; }); return { promise, resolve }; }
 
 test("aportación offline: recarga, error y reintento conservan el importe y UUID", async () => {

@@ -115,14 +115,14 @@ export async function addOfflineExpense(userId, payload) {
   return expense;
 }
 
-async function settleExpense(userId, clientId, error) {
+async function settleExpense(userId, clientId, error, status) {
   await transaction(["expenses"], "readwrite", tx => {
     const store = tx.objectStore("expenses");
     if (!error) { store.delete([userId, clientId]); return; }
     const request = store.get([userId, clientId]);
     request.onsuccess = () => {
       // Un fallo tardío de otra pestaña nunca resucita una entrada confirmada.
-      if (request.result) store.put({ ...request.result, lastError: error });
+      if (request.result) store.put({ ...request.result, lastError: error, lastStatus: status || null });
     };
   });
   notifyChanges(userId, !error);
@@ -148,7 +148,7 @@ async function synchronize(userId, onlyClientId, errorMode) {
       syncedExpenses.push(data.expense);
       confirmations.push({ clientId: entry.clientId, alreadyConfirmed: Boolean(data.alreadyConfirmed) });
     } catch (error) {
-      await settleExpense(userId, entry.clientId, error.message || "Sin conexión. Se reintentará al volver internet.");
+      await settleExpense(userId, entry.clientId, error.message || "Sin conexión. Se reintentará al volver internet.", error.status);
     }
   }
   return { syncedExpenses, confirmations, failedExpenses: await readOfflineExpenses(userId) };
@@ -165,4 +165,25 @@ export async function syncOfflineExpenses(userId, { onlyClientId, errorMode = "i
   localSyncs.set(userId, current);
   try { return await current; }
   finally { if (localSyncs.get(userId) === current) localSyncs.delete(userId); }
+}
+
+export async function resolveOfflineCapture(userId, clientId, distinct) {
+  if (!userId) throw new Error("Inicia sesión para resolver el pendiente.");
+  const run = async () => {
+    await transaction(["expenses"], "readwrite", tx => {
+      const store = tx.objectStore("expenses");
+      const request = store.get([userId, clientId]);
+      request.onsuccess = () => {
+        const row = request.result;
+        if (!row || row.lastStatus !== 409 || !row.lastError?.includes("captura por conciliar")) return;
+        if (distinct) store.put({ ...row, payload: { ...row.payload, confirmDistinctCapture: true }, lastError: "", lastStatus: null });
+        else store.delete([userId, clientId]);
+      };
+    });
+    notifyChanges(userId);
+  };
+  if (typeof navigator !== "undefined" && navigator.locks) return navigator.locks.request(`${DATABASE}:${userId}`, run);
+  const previous = localSyncs.get(userId) || Promise.resolve();
+  const current = previous.catch(() => {}).then(run); localSyncs.set(userId, current);
+  try { return await current; } finally { if (localSyncs.get(userId) === current) localSyncs.delete(userId); }
 }

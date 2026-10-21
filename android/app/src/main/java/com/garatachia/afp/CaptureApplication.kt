@@ -48,10 +48,32 @@ class CaptureApplication : Application() {
         get() = CapturePolicy.selection(preferences.getStringSet("sources", null))
         set(value) { preferences.edit { putStringSet("sources", CapturePolicy.selection(value)) } }
 
+    private val remoteSettings by lazy { CaptureRemoteSettings(preferences) { BindingStore(this).read().lastOrNull()?.deviceId } }
+    val remotePauses = MutableStateFlow<Set<String>>(emptySet())
+    val remotePausedPackages: Set<String> get() = remoteSettings.pausedPackages()
+    val captureSources: Set<String> get() = selected - remotePausedPackages
+
+    fun applyRemoteConfiguration(binding: CaptureBinding, configuration: org.json.JSONObject) {
+        remoteSettings.apply(binding, configuration)
+        remotePauses.value = remotePausedPackages
+    }
+
+    fun reportState(): org.json.JSONObject {
+        val access = android.provider.Settings.Secure.getString(contentResolver, "enabled_notification_listeners")
+            .orEmpty().split(':').any { android.content.ComponentName.unflattenFromString(it)?.packageName == packageName }
+        val battery = getSystemService(android.os.PowerManager::class.java).isIgnoringBatteryOptimizations(packageName)
+        return org.json.JSONObject().put("action", "report").put("version", 1)
+            .put("active", active).put("listenerConnected", connected.value).put("notificationAccess", access)
+            .put("batteryExempt", battery).put("deliveryPaused", deliveryPaused)
+            .put("selectedPackages", org.json.JSONArray(selected.toList()))
+            .put("pausedPackages", org.json.JSONArray(remotePausedPackages.toList()))
+    }
+
     override fun onCreate() {
         super.onCreate()
         // Materializar la selección anterior antes de ampliar el catálogo; conserva también el vacío.
         selected = selected
+        runCatching { remotePauses.value = remotePausedPackages }.onFailure { queueStorageError.value = true }
         reload()
         CaptureSyncScheduler.recover(this)
     }
@@ -71,7 +93,7 @@ class CaptureApplication : Application() {
         }
         scope.launch {
         // Se comprueba otra vez después de esperar en la cola de escritura.
-        if (!CapturePolicy.accepts(sample.packageName, active, selected, false)) return@launch
+        if (!CapturePolicy.accepts(sample.packageName, active, captureSources, false)) return@launch
         if (CaptureContentFilter.excluded(sample.fields)) return@launch
         if (binding?.ownerId != null && binding.state in setOf("ACTIVE", "PAUSED")) {
             // El commit cifrado de Room sucede antes de programar cualquier entrega.

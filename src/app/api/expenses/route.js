@@ -9,6 +9,8 @@ import { runExpenseOperation } from "@/lib/expenseOperations";
 import { getCashContributionError, sumPersonalExpenses } from "@/lib/sharedExpenses";
 
 const expenseSelect = {
+  reconciledAt: true,
+  captureMovements: { select: { id: true, events: { select: { sourcePackage: true } } } },
   reconciliationStatus: true,
   id: true,
   userId: true,
@@ -354,6 +356,8 @@ export async function PATCH(request) {
           date: parsedDate, paymentMethod, cardId: paymentMethod === "CARD" ? cardId : null,
           concept: concept.trim(), amount: numericAmount, categoryId, notes: notes?.trim() || null,
           cashContributionAmount: Number(cashContributionAmount),
+          ...(existing.reconciledAt && (String(existing.amount) !== String(numericAmount) || existing.cardId !== (paymentMethod === "CARD" ? cardId : null)
+            || existing.date.toISOString().slice(0, 10) !== date) ? { reconciledAt: null, reconciliationStatus: "PENDING" } : {}),
           subscriptionId: subscriptionId || null,
         },
         select: expenseSelect,

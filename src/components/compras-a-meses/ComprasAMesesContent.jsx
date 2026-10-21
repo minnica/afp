@@ -1,4 +1,5 @@
 "use client";
+import CaptureStatus from "@/components/gastos/CaptureStatus";
 
 import { apiFetch } from "@/lib/apiFetch";
 
@@ -451,7 +452,7 @@ export default function ComprasAMesesContent() {
         <RecordCard
           title={purchase.concept}
           subtitle={purchase.card?.name}
-          badges={<Badge variant="outline">{statusLabel}</Badge>}
+          badges={<><Badge variant="outline">{statusLabel}</Badge><CaptureStatus record={purchase} /></>}
           amount={formatMoney(purchase.monthlyPaymentUsed)}
           amountLabel="Mensualidad"
           actions={<RecordActions label={`compra: ${purchase.concept}`} onEdit={() => startEditingPurchase(purchase)} onDelete={() => setPurchaseToDelete(purchase)} />}
@@ -499,6 +500,7 @@ export default function ComprasAMesesContent() {
           return (
             <div className="min-w-0">
               <p className="font-medium">{purchase.concept}</p>
+              <CaptureStatus record={purchase} />
               {purchase.verifiedStatementDate ? (
                 <p className="text-xs text-muted-foreground">
                   Estado de cuenta: {format(

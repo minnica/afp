@@ -1,9 +1,11 @@
-import { apiResponse as NextResponse, requireApiUser, apiAccessErrorResponse, requireOwnedReferences } from "@/lib/apiAuth";
+import { apiResponse as NextResponse, requireApiUser, apiAccessErrorResponse, requireOwnedReferences, ApiAccessError } from "@/lib/apiAuth";
 import { runDebtAccountOperation } from "@/lib/debtAccountService";
 import { prisma } from "@/lib/prisma";
 import { getLatestInstallmentStatement } from "@/lib/calculations/installmentStatements";
 
 const purchaseSelect = {
+  reconciledAt: true,
+  captureMovements: { select: { id: true, events: { select: { sourcePackage: true } } } },
   reconciliationStatus: true,
   id: true,
   userId: true,
@@ -409,6 +411,8 @@ export async function PATCH(request) {
 
     const result = await runDebtAccountOperation(prisma, userId, async tx => {
       await requireOwnedReferences(tx, userId, body, ["cardId", "categoryId", "personId"]);
+      const previous = await tx.installmentPurchase.findFirst({ where: { id, userId } });
+      if (!previous) throw new ApiAccessError("Compra no encontrada.", 404);
       const purchase = await tx.installmentPurchase.update({
         where: { id, userId },
         data: {
@@ -422,6 +426,9 @@ export async function PATCH(request) {
           categoryId,
           notes: notes?.trim() || null,
           status,
+          ...(previous.reconciledAt && (String(previous.totalAmount) !== String(numericTotalAmount) || previous.cardId !== cardId
+            || previous.purchaseDate.toISOString().slice(0, 10) !== purchaseDate || previous.months !== numericMonths
+            || Number(previous.manualMonthlyPayment) !== Number(numericManualMonthlyPayment)) ? { reconciledAt: null, reconciliationStatus: "PENDING" } : {}),
         },
         select: purchaseSelect,
       });

@@ -80,12 +80,13 @@ export async function getCaptureDevice(db, credential) {
     }));
     if (device.userId && !device.revokedAt) await tx.captureDevice.update({ where: { id: device.id }, data: { lastSeenAt: new Date() } });
     return { deviceId: device.id, ownerId: device.userId, state,
-      configuration: { contractVersion: 1, mode: automaticExpenses ? "PER_CARD" : "OBSERVATION", automaticExpenses, allowedPackages: capturePackages } };
+      configuration: { contractVersion: 1, mode: automaticExpenses ? "PER_CARD" : "OBSERVATION", automaticExpenses, allowedPackages: capturePackages, pausedPackages: device.pausedPackages || [] } };
   });
 }
 
 export async function changeCaptureDevice(db, userId, input) {
-  if (!input || typeof input.deviceId !== "string" || !["pause", "resume", "revoke"].includes(input.action)) throw new ApiAccessError("Acción no válida.", 400);
+  if (!input || typeof input.deviceId !== "string" || !["pause", "resume", "revoke", "source"].includes(input.action)) throw new ApiAccessError("Acción no válida.", 400);
+  if (input.action === "source" && (!capturePackages.includes(input.sourcePackage) || typeof input.paused !== "boolean")) throw new ApiAccessError("Fuente no válida.", 400);
   return db.$transaction(async tx => {
     // Un ID ajeno y uno inexistente producen la misma respuesta.
     const found = await tx.captureDevice.findFirst({ where: { id: input.deviceId, userId } });
@@ -93,7 +94,8 @@ export async function changeCaptureDevice(db, userId, input) {
     await tx.$queryRaw`SELECT id FROM capture_devices WHERE id = ${found.id}::uuid FOR UPDATE`;
     const device = await tx.captureDevice.findUnique({ where: { id: found.id } });
     if (device.revokedAt && input.action !== "revoke") throw new ApiAccessError("La autorización fue revocada. Vincula una nueva identidad desde el teléfono.", 409);
-    const data = input.action === "revoke" ? { revokedAt: device.revokedAt || new Date() }
+    const data = input.action === "source" ? { pausedPackages: capturePackages.filter(pkg => pkg === input.sourcePackage ? input.paused : (device.pausedPackages || []).includes(pkg)) }
+      : input.action === "revoke" ? { revokedAt: device.revokedAt || new Date() }
       : { pausedAt: input.action === "pause" ? device.pausedAt || new Date() : null };
     return { device: await tx.captureDevice.update({ where: { id: device.id }, data, select: deviceSelect }) };
   });

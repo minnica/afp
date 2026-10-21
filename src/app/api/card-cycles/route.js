@@ -40,6 +40,8 @@ const cycleSelect = {
 };
 
 const cycleExpenseSelect = {
+  reconciliationStatus: true, reconciledAt: true,
+  captureMovements: { select: { events: { select: { sourcePackage: true } } } },
   subscriptionCharge: { select: { month: true } },
   subscriptionId: true,
   paymentMethod: true,
@@ -77,6 +79,8 @@ const cycleSubscriptionSelect = {
 };
 
 const cyclePurchaseSelect = {
+  reconciliationStatus: true, reconciledAt: true,
+  captureMovements: { select: { events: { select: { sourcePackage: true } } } },
   id: true,
   cardId: true,
   concept: true,

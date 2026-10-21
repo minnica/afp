@@ -1,4 +1,6 @@
 "use client";
+import CaptureStatus from "@/components/gastos/CaptureStatus";
+import OfflineCaptureConflicts from "@/components/gastos/OfflineCaptureConflicts";
 
 import { apiFetch } from "@/lib/apiFetch";
 import { RequestError } from "@/lib/requestErrors";
@@ -953,7 +955,7 @@ export default function GastosContent() {
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
                 <p className="font-medium">{expense.concept}</p>
-                {expense.reconciliationStatus === "PENDING" && <Badge variant="warning">Por conciliar</Badge>}
+                <CaptureStatus record={expense} />
                 {expense._offlineStatus === "pending" ? (
                   <Badge
                     variant="outline"
@@ -1610,6 +1612,7 @@ export default function GastosContent() {
             </Alert>
           ) : null}
 
+          {user && <OfflineCaptureConflicts userId={user.id} pending={pendingOfflineExpenses} disabled={!isOnline || isSyncingOfflineExpenses} onResolved={async () => { await refreshPendingOfflineExpenses(user.id); await syncPendingExpenses({ silent: true }); }} />}
           <div className={`grid min-w-0 gap-5 ${compactEntry ? "" : "xl:grid-cols-[360px_1fr]"}`}>
             <ExpenseCreateSurface compact={compactEntry} error={createError} isSaving={isSaving} isOnline={isOnline} onSubmit={createExpense}>
               {({ compact }) => (

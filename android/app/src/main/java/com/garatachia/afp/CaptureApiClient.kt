@@ -15,7 +15,8 @@ class CaptureApiException(val status: Int, val retryAfterMs: Long = 0) : Excepti
 })
 
 class CaptureApiClient(private val origin: String,
-    private val connectionFactory: (URL) -> HttpsURLConnection = { it.openConnection() as HttpsURLConnection }) {
+    private val connectionFactory: (URL) -> HttpsURLConnection = { it.openConnection() as HttpsURLConnection },
+    private val configurationReceived: (CaptureBinding, JSONObject) -> Unit = { _, _ -> }) {
     init {
         val url = URL(origin)
         require(url.protocol == "https" && url.userInfo == null && url.query == null && url.ref == null)
@@ -59,7 +60,13 @@ class CaptureApiClient(private val origin: String,
         return binding.copy(deviceId = response.getString("deviceId"), state = "PENDING",
             code = response.getString("code"), expiresAt = response.getString("expiresAt"))
     }
-    fun status(binding: CaptureBinding): CaptureBinding = merge(binding, request("device", binding = binding))
+    fun status(binding: CaptureBinding): CaptureBinding {
+        val response = request("device", binding = binding)
+        val current = merge(binding, response)
+        response.optJSONObject("configuration")?.let { configurationReceived(current, it) }
+        return current
+    }
+    fun report(binding: CaptureBinding, report: JSONObject) { request("device", "POST", binding, report) }
     fun change(binding: CaptureBinding, action: String): CaptureBinding {
         require(action in setOf("pause", "resume", "revoke"))
         return merge(binding, request("device", if (action == "revoke") "DELETE" else "POST", binding,

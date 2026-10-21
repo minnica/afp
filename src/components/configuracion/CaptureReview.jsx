@@ -1,138 +1,66 @@
 "use client";
-
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { apiFetch } from "@/lib/apiFetch";
-import { captureReasons, captureStatuses } from "@/lib/capturePresentation";
+import { captureReasons, captureSources, captureInboxStatuses } from "@/lib/capturePresentation";
+import { useCaptureResource } from "@/hooks/use-capture-resource";
+import { useDialogFocus } from "@/hooks/use-dialog-focus";
+import CaptureMovementEditor from "@/components/configuracion/CaptureMovementEditor";
+import CaptureConfigurationPanel from "@/components/configuracion/CaptureConfigurationPanel";
+import CaptureReconciliation from "@/components/configuracion/CaptureReconciliation";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Field, FieldLabel } from "@/components/ui/field";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ResponsiveSelect } from "@/components/ui/responsive-select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Empty, EmptyDescription } from "@/components/ui/empty";
 import { Item, ItemActions, ItemContent, ItemDescription, ItemGroup, ItemTitle } from "@/components/ui/item";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Spinner } from "@/components/ui/spinner";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
-  AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { useDialogFocus } from "@/hooks/use-dialog-focus";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
-const aliasNames = { PHYSICAL: "Física", DIGITAL: "Digital", WALLET: "Wallet" };
+function CaptureInbox({ userId, configuration }) {
+  const [status, setStatus] = useState("REVIEW"), [cursor, setCursor] = useState(null), [detail, setDetail] = useState(null), [confirmation, setConfirmation] = useState(null);
+  const [busy, setBusy] = useState(false), [error, setError] = useState("");
+  const { captureFocus, restoreFocus } = useDialogFocus();
+  const { data, error: loadError, loading, refresh, region } = useCaptureResource(`/api/captures/movements?status=${status}${cursor ? `&cursor=${cursor}` : ''}`, userId);
+  return <section ref={region} className="flex flex-col gap-4" aria-label="Bandeja de captura" onClickCapture={captureFocus}>
+    <div className="flex flex-wrap items-center gap-3"><ResponsiveSelect id="capture-inbox-status" aria-label="Estado de los avisos" value={status} onValueChange={value => { setStatus(value); setCursor(null); }} options={Object.entries(captureInboxStatuses).map(([value, label]) => ({ value, label }))} />
+      <Button variant="outline" className="min-h-11" disabled={busy || loading} onClick={refresh}>Actualizar avisos</Button></div>
+    <p className="text-sm text-muted-foreground">Se actualiza al volver a AFP y cada 30 segundos mientras esta bandeja está visible. Los avisos por revisar no cambian tus totales.</p>
+    {(error || loadError) && <Alert variant="destructive"><AlertDescription>{error || loadError}</AlertDescription></Alert>}
+    {!data ? <Skeleton className="h-24 w-full" /> : data.movements.length === 0 ? <Empty><EmptyDescription>No hay avisos en este estado. Los nuevos aparecerán al recibirse desde el teléfono.</EmptyDescription></Empty> : <ItemGroup className="gap-3">{data.movements.map(movement => {
+      const proposal = { ...movement.proposal, ...movement.correction };
+      return <Item key={movement.id} variant="outline" className="flex-wrap"><ItemContent className="min-w-0 basis-full">
+        <ItemTitle className="flex-wrap break-words">{proposal.merchant || "Aviso sin compra identificada"}<Badge variant={movement.inboxState === 'REVIEW' ? 'warning' : 'secondary'}>{captureInboxStatuses[movement.inboxState]}</Badge></ItemTitle>
+        <ItemDescription>{proposal.amount ? `${proposal.amount} ${proposal.currency || ''} · ${proposal.date || ''} · ` : ''}{captureReasons[movement.reason] || "Requiere revisión."}</ItemDescription>
+        <ItemDescription>{configuration.cards.find(card => card.id === proposal.cardId)?.name || 'Tarjeta por identificar'} · {captureSources[movement.events[0]?.sourcePackage] || 'Aviso'}{movement.status === 'OBSERVED' ? ' · Observación' : ''}</ItemDescription>
+        {(movement.originalExpenseId && !movement.expenseId && movement.status !== 'CONVERTED') && <ItemDescription>Gasto eliminado; el aviso conserva su resolución y no lo recrea.</ItemDescription>}
+        {movement.status === 'CONVERTED' && <ItemDescription>{movement.reason === 'USER_LINKED_INSTALLMENT' ? 'Vinculado a una compra a meses existente.' : 'Convertido a MSI; el gasto completo fue sustituido.'}</ItemDescription>}
+      </ItemContent><ItemActions className="flex-wrap"><Button variant="outline" className="min-h-11" disabled={busy} onClick={async () => {
+        setBusy(true); setError('');
+        try { const response = await apiFetch(`/api/captures/movements?id=${movement.id}`, { expectedUserId: userId, errorMode: 'inline' }); setDetail(await response.json()); }
+        catch (err) { setError(err.message); } finally { setBusy(false); }
+      }}>Revisar aviso</Button>{['REVIEW','OBSERVED'].includes(movement.status) && <Button variant="ghost" className="min-h-11" disabled={busy} onClick={() => setConfirmation(movement)}>Descartar aviso</Button>}</ItemActions></Item>;
+    })}</ItemGroup>}
+    <div className="flex flex-wrap gap-2">{cursor && <Button variant="outline" className="min-h-11" disabled={busy} onClick={() => setCursor(null)}>Volver al inicio</Button>}{data?.nextCursor && <Button variant="outline" className="min-h-11" disabled={busy} onClick={() => setCursor(data.nextCursor)}>Ver más avisos</Button>}</div>
+    {detail && <CaptureMovementEditor key={detail.movement.id} detail={detail} configuration={configuration} userId={userId} onSaved={refresh} onClose={() => setDetail(null)} restoreFocus={restoreFocus} />}
+    <AlertDialog open={Boolean(confirmation)} onOpenChange={open => { if (!open && !busy) setConfirmation(null); }}><AlertDialogContent onCloseAutoFocus={restoreFocus}><AlertDialogHeader><AlertDialogTitle>Descartar aviso</AlertDialogTitle><AlertDialogDescription>El aviso se conservará en Descartado y no creará un gasto.</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel className="min-h-11" disabled={busy}>Cancelar</AlertDialogCancel><AlertDialogAction className="min-h-11" disabled={busy} onClick={async event => {
+      event.preventDefault(); setBusy(true); setError('');
+      try { await apiFetch('/api/captures/movements', { method: 'PATCH', expectedUserId: userId, errorMode: 'inline', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: confirmation.id, action: 'discard' }) }); setConfirmation(null); await refresh(); }
+      catch (err) { setError(err.message); } finally { setBusy(false); }
+    }}>Descartar</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
+  </section>;
+}
 
 export default function CaptureReview({ userId }) {
-  const [configuration, setConfiguration] = useState(null);
-  const [movements, setMovements] = useState([]);
-  const [cursor, setCursor] = useState(null);
-  const [error, setError] = useState("");
-  const [notice, setNotice] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [confirmation, setConfirmation] = useState(null);
-  const controller = useRef(null);
   const { captureFocus, restoreFocus } = useDialogFocus();
-  const refresh = useCallback(async signal => {
-    const [settings, inbox] = await Promise.all([
-      apiFetch("/api/captures/configuration", { expectedUserId: userId, errorMode: "inline", signal }).then(response => response.json()),
-      apiFetch("/api/captures/movements", { expectedUserId: userId, errorMode: "inline", signal }).then(response => response.json()),
-    ]);
-    if (!signal.aborted) { setConfiguration(settings); setMovements(inbox.movements); setCursor(inbox.nextCursor); }
-  }, [userId]);
-  useEffect(() => {
-    const abort = new AbortController(); controller.current = abort;
-    const load = () => refresh(abort.signal).catch(err => { if (!abort.signal.aborted) setError(err.message); });
-    load(); window.addEventListener("focus", load);
-    return () => { abort.abort(); window.removeEventListener("focus", load); };
-  }, [refresh]);
-
-  async function perform(action) {
-    if (busy) return;
-    const signal = controller.current.signal;
-    setBusy(true); setError(""); setNotice("");
-    try {
-      await apiFetch(action.inventory ? "/api/captures/configuration" : "/api/captures/movements", {
-        method: "PATCH", expectedUserId: userId, errorMode: "inline", signal,
-        headers: { "Content-Type": "application/json" }, body: JSON.stringify(action),
-      });
-      if (!signal.aborted) setNotice(action.inventory ? "Terminaciones guardadas. La automatización conserva su estado." : "Resolución guardada.");
-      await refresh(signal);
-    } catch (err) { if (!signal.aborted) setError(`${err.message} Actualiza los avisos para comprobar el resultado.`); }
-    finally { if (!signal.aborted) { setBusy(false); setConfirmation(null); } }
-  }
-
-  return <section className="flex flex-col gap-4" aria-label="Interpretación de avisos" onClickCapture={captureFocus}>
-    <Separator />
-    <div className="flex flex-wrap items-center justify-between gap-3">
-      <h3 className="font-medium">Tarjetas y avisos</h3>
-      <Button variant="outline" className="min-h-11" disabled={busy} onClick={async () => {
-        setError(""); setBusy(true);
-        try { await refresh(controller.current.signal); } catch (err) { if (!controller.current.signal.aborted) setError(err.message); }
-        finally { setBusy(false); }
-      }}>Actualizar avisos</Button>
-    </div>
-    <p className="text-sm text-muted-foreground">Solo se registran automáticamente formatos validados y habilitados para una tarjeta concreta. Los casos en revisión no cambian tus totales.</p>
-    {error && <Alert variant="destructive"><AlertDescription>{error}</AlertDescription></Alert>}
-    <div role="status">{notice && <Alert><AlertDescription>{notice}</AlertDescription></Alert>}</div>
-    {!configuration ? <Skeleton className="h-20 w-full" /> : <>
-      <ItemGroup>{configuration.cards.map(card => {
-        const aliases = configuration.aliases.filter(alias => alias.cardId === card.id);
-        const active = configuration.automations.filter(item => item.cardId === card.id && item.mode === "AUTOMATIC");
-        return <Item key={card.id}>
-          <ItemContent className="min-w-0">
-            <ItemTitle>{card.name}<Badge variant="secondary">{active.length ? `${active.length} formato(s) automático(s)` : "Observación"}</Badge></ItemTitle>
-            <ItemDescription>{aliases.length ? aliases.map(alias => `${aliasNames[alias.kind]} •${alias.value}${alias.verifiedAt ? "" : " sin verificar"}`).join(" · ") : "Terminaciones físicas, digitales y de Wallet pendientes"}</ItemDescription>
-          </ItemContent>
-        </Item>;
-      })}</ItemGroup>
-      <Field>
-        <FieldLabel htmlFor="capture-inventory-file">Importar terminaciones desde JSON</FieldLabel>
-        <Input id="capture-inventory-file" type="file" className="min-h-11" accept=".json,application/json" disabled={busy} onChange={async event => {
-          const file = event.target.files?.[0]; event.target.value = "";
-          if (!file) return;
-          if (file.size > 60000) { setError("El archivo supera el tamaño permitido."); return; }
-          try { const inventory = JSON.parse(await file.text()); await perform({ action: "importAliases", inventory }); }
-          catch { setError("No se pudo leer el JSON. Usa el formato captura-tarjetas.example.json."); }
-        }} />
-      </Field>
-      {!configuration.parsers.some(parser => parser.verified) && <p className="text-sm text-muted-foreground">Faltan muestras reales de BBVA y Wallet. Los formatos iniciales solo están probados con datos ficticios; los demás bancos siguen pendientes.</p>}
-    </>}
-    <h3 className="font-medium">Avisos recibidos</h3>
-    {configuration && movements.length === 0 && <Empty><EmptyDescription>Aún no hay avisos procesados. Los nuevos aparecerán al recibirse desde el teléfono.</EmptyDescription></Empty>}
-    <ItemGroup className="gap-3">{movements.map(movement => {
-      const p = movement.proposal;
-      const open = ["REVIEW", "OBSERVED"].includes(movement.status);
-      return <Item key={movement.id} variant="outline" className="flex-wrap">
-        <ItemContent className="min-w-0 basis-full">
-          <ItemTitle className="flex-wrap break-words">{p.merchant || "Aviso sin compra identificada"}<Badge variant={open ? "warning" : "secondary"}>{captureStatuses[movement.status]}</Badge></ItemTitle>
-          <ItemDescription>{p.amount ? `${p.amount} ${p.currency} · ${p.date} · ` : ""}{captureReasons[movement.reason] || "Requiere revisión."}</ItemDescription>
-          {movement.originalExpenseId && !movement.expenseId && movement.status !== "CONVERTED" && <ItemDescription>El gasto fue eliminado. El aviso conserva su resolución y no lo vuelve a crear.</ItemDescription>}
-          {movement.expense && <a href="/gastos" className="flex min-h-11 items-center text-sm underline underline-offset-4">Ver gasto: {movement.expense.concept}{movement.expense.reconciliationStatus === "PENDING" ? " · Por conciliar" : ""}</a>}
-        </ItemContent>
-        {open && <ItemActions className="flex-wrap">
-          {(p.candidates || []).filter(candidate => candidate.type === "EXPENSE").map(candidate => <Button key={candidate.id} variant="outline" className="min-h-11 h-auto min-w-0 max-w-full whitespace-normal break-words" disabled={busy}
-            onClick={() => setConfirmation({ id: movement.id, action: "link", expenseId: candidate.id, label: `Vincular al existente: ${candidate.concept}` })}>Vincular al existente: {candidate.concept}</Button>)}
-          {["POSSIBLE_DUPLICATE", "NOTIFICATION_REVISION"].includes(movement.reason) && <Button variant="outline" className="min-h-11" disabled={busy}
-            onClick={() => setConfirmation({ id: movement.id, action: "distinct", label: "Es otra compra" })}>Es otra compra</Button>}
-          <Button variant="ghost" className="min-h-11" disabled={busy} onClick={() => setConfirmation({ id: movement.id, action: "discard", label: "Descartar aviso" })}>Descartar aviso</Button>
-        </ItemActions>}
-      </Item>;
-    })}</ItemGroup>
-    {cursor && <Button variant="outline" className="min-h-11 self-start" disabled={busy} onClick={async () => {
-      setBusy(true); setError("");
-      try {
-        const response = await apiFetch(`/api/captures/movements?cursor=${cursor}`, { expectedUserId: userId, errorMode: "inline", signal: controller.current.signal });
-        const data = await response.json();
-        if (!controller.current.signal.aborted) { setMovements(rows => [...rows, ...data.movements]); setCursor(data.nextCursor); }
-      } catch (err) { if (!controller.current.signal.aborted) setError(err.message); }
-      finally { setBusy(false); }
-    }}>Ver más avisos</Button>}
-    <AlertDialog open={Boolean(confirmation)} onOpenChange={open => { if (!open && !busy) setConfirmation(null); }}>
-      <AlertDialogContent onCloseAutoFocus={restoreFocus}>
-        <AlertDialogHeader><AlertDialogTitle className="break-words">{confirmation?.label}</AlertDialogTitle>
-          <AlertDialogDescription>{confirmation?.action === "distinct" ? "Se creará otro gasto por conciliar. Confirma que se trata de una compra diferente."
-            : confirmation?.action === "link" ? "El aviso se asociará al gasto existente y conservará sus datos y correcciones." : "El aviso se conservará descartado y no creará un gasto."}</AlertDialogDescription></AlertDialogHeader>
-        <AlertDialogFooter><AlertDialogCancel className="min-h-11" disabled={busy}>Cancelar</AlertDialogCancel>
-          <AlertDialogAction className="min-h-11" disabled={busy} onClick={event => { event.preventDefault(); const { label: ignoredLabel, ...action } = confirmation; void ignoredLabel; perform(action); }}>{busy && <Spinner />}Confirmar</AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+  const { data: configuration, error, refresh, region } = useCaptureResource('/api/captures/configuration', userId);
+  return <section ref={region} className="flex min-w-0 flex-col gap-4" aria-label="Revisión y conciliación de captura"><Separator />
+    {error && <Alert variant="destructive"><AlertDescription>{error}</AlertDescription><Button variant="outline" onClick={refresh}>Reintentar configuración</Button></Alert>}
+    {!configuration ? <Skeleton className="h-24 w-full" /> : <Tabs defaultValue="inbox" className="min-w-0"><TabsList className="h-auto w-full flex-wrap"><TabsTrigger value="inbox" className="min-h-11">Bandeja</TabsTrigger><TabsTrigger value="configuration" className="min-h-11">Tarjetas y reglas</TabsTrigger><TabsTrigger value="statement" className="min-h-11">Conciliar</TabsTrigger></TabsList>
+      <TabsContent value="inbox"><CaptureInbox userId={userId} configuration={configuration} /></TabsContent>
+      <TabsContent value="configuration"><CaptureConfigurationPanel configuration={configuration} userId={userId} refresh={refresh} captureFocus={captureFocus} restoreFocus={restoreFocus} /></TabsContent>
+      <TabsContent value="statement"><CaptureReconciliation configuration={configuration} userId={userId} onChanged={refresh} /></TabsContent>
+    </Tabs>}
   </section>;
 }

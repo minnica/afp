@@ -12,7 +12,8 @@ data class BindingViewState(val binding: CaptureBinding? = null, val busy: Boole
 class BindingController(context: Context, private val scope: CoroutineScope,
     private val updated: (CaptureBinding) -> Unit = {}) {
     private val store = BindingStore(context)
-    private val client = CaptureApiClient(context.getString(R.string.capture_origin))
+    private val app = context.applicationContext as CaptureApplication
+    private val client = CaptureApiClient(context.getString(R.string.capture_origin), configurationReceived = app::applyRemoteConfiguration)
     private val mutableState = MutableStateFlow(BindingViewState())
     val state = mutableState.asStateFlow()
     init { scope.launch {

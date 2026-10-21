@@ -3,6 +3,8 @@ import { apiResponse as NextResponse, requireApiUser, apiAccessErrorResponse } f
 import { prisma } from "@/lib/prisma";
 
 const expenseSelect = {
+  reconciledAt: true,
+  captureMovements: { select: { id: true, events: { select: { sourcePackage: true } } } },
   reconciliationStatus: true,
   id: true,
   userId: true,

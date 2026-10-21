@@ -6,6 +6,7 @@ import { BreakdownHelp, BreakdownSection, BreakdownSections } from "@/components
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { PopoverDescription } from "@/components/ui/popover";
+import CaptureStatus from "@/components/gastos/CaptureStatus";
 
 function formatMoney(value) {
   return new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" }).format(
@@ -115,7 +116,7 @@ export default function CycleBreakdown({ cycle }) {
           emptyText="No hay gastos diarios en este ciclo."
           getPrimary={(item) => item.concept}
           getSecondary={(item) =>
-            `${formatShortDate(item.date)}${item.categoryName ? ` · ${item.categoryName}` : ""}`
+            <>{`${formatShortDate(item.date)}${item.categoryName ? ` · ${item.categoryName}` : ""}`}<span className="flex flex-wrap items-center gap-2"><CaptureStatus record={item} /></span></>
           }
           getAmount={(item) => item.amount}
         />
@@ -143,9 +144,9 @@ export default function CycleBreakdown({ cycle }) {
           emptyText="No hay mensualidades en este ciclo."
           getPrimary={(item) => item.concept}
           getSecondary={(item) =>
-            `${formatShortDate(item.purchaseDate)} · mes ${item.currentMonth || "-"}/${
+            <>{`${formatShortDate(item.purchaseDate)} · mes ${item.currentMonth || "-"}/${
               item.months
-            }${item.categoryName ? ` · ${item.categoryName}` : ""}`
+            }${item.categoryName ? ` · ${item.categoryName}` : ""}`}<span className="flex flex-wrap items-center gap-2"><CaptureStatus record={item} /></span></>
           }
           getAmount={(item) => item.amount}
         />

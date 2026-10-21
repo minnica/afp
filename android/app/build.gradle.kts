@@ -18,8 +18,8 @@ android {
         applicationId = "com.garatachia.afp"
         minSdk = 28
         targetSdk = 36
-        versionCode = 5
-        versionName = "0.3.0"
+        versionCode = 6
+        versionName = "0.4.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         manifestPlaceholders["webHost"] = "finanzas.garatachia.com"
         resValue("string", "web_url", "https://finanzas.garatachia.com/dashboard")
@@ -67,7 +67,9 @@ kotlin { compilerOptions { jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget
 ksp { arg("room.schemaLocation", "$projectDir/schemas") }
 
 dependencies {
-    implementation(platform("androidx.compose:compose-bom:2026.04.01"))
+    val composeBom = platform("androidx.compose:compose-bom:2026.04.01")
+    implementation(composeBom)
+    androidTestImplementation(composeBom)
     implementation("androidx.activity:activity-compose:1.12.3")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.10.0")
@@ -80,4 +82,5 @@ dependencies {
     testImplementation("org.json:json:20240303")
     androidTestImplementation("androidx.test.ext:junit:1.3.0")
     androidTestImplementation("androidx.test:runner:1.7.0")
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
 }

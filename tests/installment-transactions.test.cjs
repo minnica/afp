@@ -30,6 +30,7 @@ function fixture() {
         },
       },
       installmentPurchase: {
+        findFirst: async ({ where }) => draft.purchases.find(row => row.id === where.id && row.userId === where.userId) || null,
         create: async ({ data }) => {
           const row = { ...data, id: `purchase-${++sequence}` };
           draft.purchases.push(row);

@@ -10,5 +10,16 @@ export const captureReasons = {
   RULE_UNAVAILABLE: "La categoría o suscripción de la regla ya no está disponible.", AUTOMATIC: "Gasto registrado por conciliar.",
   USER_DISTINCT: "Registrado como otra compra.", USER_LINKED: "Vinculado al gasto existente; conserva sus correcciones.",
   USER_DISCARDED: "Aviso descartado.", USER_INSTALLMENTS: "El gasto se sustituyó por una compra a meses.",
+  USER_LINKED_INSTALLMENT: "Evidencia vinculada a la compra a meses existente; conserva sus correcciones.",
 };
 export const captureStatuses = { REVIEW: "Por revisar", OBSERVED: "Observación", REGISTERED: "Registrado", LINKED: "Vinculado", DISCARDED: "Descartado", CONVERTED: "A meses" };
+export const captureInboxStatuses = { REVIEW: "Por revisar", REGISTERED: "Registrado", RECONCILED: "Conciliado", DISCARDED: "Descartado" };
+export const captureSources = {
+  "com.bancomer.mbanking": "BBVA", "com.google.android.apps.walletnfcrel": "Google Wallet", "mx.hsbc.hsbcmexico": "HSBC",
+  "com.citibanamex.banamexmobile": "Banamex", "mx.bancosantander.supermovil": "Santander", "com.nu.production": "Nu",
+  "com.didiglobal.cashloan": "DiDi Finanzas", "com.mercadopago.wallet": "Mercado Pago",
+};
+export function captureOrigin(record) {
+  const sources = [...new Set((record.captureMovements || []).flatMap(movement => (movement.events || []).map(event => captureSources[event.sourcePackage] || "Aviso")))];
+  return sources.length ? `Captura: ${sources.join(" / ")}` : "";
+}

@@ -2,7 +2,7 @@
 
 La Fase 1 añade una APK Kotlin/Compose en `android/`. Abre la interfaz financiera actual mediante Trusted Web Activity (TWA) y permite comprobar qué notificaciones entregan BBVA México, Google Wallet, HSBC, Banamex, Santander, Nu, DiDi Finanzas y Mercado Pago. La pantalla nativa incluye activación, selección de fuentes, estado del permiso y del lector, muestras locales e instrucciones para Samsung.
 
-El diagnóstico está **pausado por defecto**. La Fase 2 añade vinculación independiente, cifrada y revocable, y recepción segura de eventos. El inicio de sesión web permanece en el navegador de la TWA; el componente nativo no lo lee. La Fase 3 añade la cola Room cifrada y el envío automático mediante WorkManager para los avisos recibidos con una identidad autorizada. La Fase 4 incorpora el motor de interpretación/registro y la revisión básica; los formatos reales siguen bloqueados por falta de muestras verificadas.
+El diagnóstico está **pausado por defecto**. La Fase 2 añade vinculación independiente, cifrada y revocable, y recepción segura de eventos. El inicio de sesión web permanece en el navegador de la TWA; el componente nativo no lo lee. La Fase 3 añade la cola Room cifrada y el envío automático mediante WorkManager para los avisos recibidos con una identidad autorizada. La Fase 4 incorpora el motor de interpretación/registro; la Fase 5 completa revisión y conciliación desde AFP, con APK 0.4.0 preparada y aceptación nativa concluida mediante 29 pruebas instrumentadas en el S24 Ultra. Los formatos reales siguen bloqueados por falta de muestras verificadas.
 
 El plan se ajustó el 21 de octubre de 2026 para preparar el diagnóstico de todas las tarjetas desde la Fase 1 y conservar la activación automática gradual por tarjeta/formato, empezando por BBVA. La APK **0.1.2 / versionCode 3** amplió el diagnóstico a ocho paquetes verificados; posteriormente se actualizó a **0.2.0 / versionCode 4**, vinculada en el S24 Ultra; la Fase 3 actualiza la APK a **0.3.0 / versionCode 5**. El inventario actual, leído mediante una transacción de solo lectura, contiene nueve tarjetas de siete emisores. La [matriz de fuentes](../android/diagnostics/format-matrix.md) relaciona esos nombres existentes con las aplicaciones y mantiene separados los paquetes verificados de los formatos aún sin muestras reales.
 
@@ -348,7 +348,7 @@ Todas las rutas siguientes exigen **Bearer Supabase** y obtienen el usuario del 
 | `GET /api/captures/movements` | Últimos 50 avisos, `nextCursor`; admite `status` y `cursor` propios. No expone datos de otras cuentas. |
 | `PATCH /api/captures/movements` | `id` y `action`: `link` (+`expenseId`), `distinct`, `discard`, `convertToInstallments` (+`months`, entero 2–120). |
 
-Las configuraciones, vínculos y conversiones validan propiedad dentro de la transacción. «Es otra compra» solo resuelve posibles duplicados/revisiones identificados; no permite completar datos desconocidos ni registrar cualquier aviso especial. Descartar conserva la evidencia. La lista básica de Configuración adelanta parte de Fase 5; edición, conciliación, controles completos de reglas/modos y actualizaciones periódicas siguen pendientes de esa fase.
+Las configuraciones, vínculos y conversiones validan propiedad dentro de la transacción. «Es otra compra» solo resuelve posibles duplicados/revisiones identificados; no permite completar datos desconocidos ni registrar cualquier aviso especial. Descartar conserva la evidencia. La lista básica de Configuración de Fase 4 se amplía con edición, conciliación, controles completos de reglas/modos y actualizaciones periódicas en la Fase 5 documentada abajo.
 
 ### Persistencia, migraciones e incidencia de producción
 
@@ -381,3 +381,97 @@ pnpm exec next build --webpack
 **Android y navegador:** 18 pruebas JVM y 25 instrumentadas correctas, cero fallos/omisiones, repetidas sin caché en el S24 Ultra contra HTTPS/API/PostgreSQL locales. La prueba inicial fallida por un manifiesto JSON del servidor de desarrollo pasó después de la reconexión USB; la ejecución completa final usa una compilación local estable. Ambas APK firmadas y lint correctos; se conservan los avisos previos, incluido el auxiliar del runner sobre `androidx.test.services`. La APK personal no se actualizó ni perdió su configuración. Chromium comprueba importación de nueve tarjetas, vínculo sin sobrescribir datos, compra distinta por conciliar y descarte confirmado, con persistencia en PostgreSQL. A 320 y 390 px no hay desbordamiento, las nueve filas son visibles y los botones/campo de importación tienen 44 px; las confirmaciones enfocan Cancelar.
 
 Para repetir el recorrido de navegador/teléfono con una compilación estable, añadir `AFP_CAPTURE_TEST_PRODUCTION=1` al fixture `tests/helpers/capture-browser-server.cjs`, junto a `AFP_TEST_DATABASE_URL`, `AFP_CAPTURE_TEST_KEY` y `AFP_CAPTURE_TEST_CERTIFICATE` locales. El helper copia la app a un directorio temporal sin `.env`, compila allí con `next build --webpack`, mantiene Auth ficticia y no cambia el registro de analizadores. Este modo estabiliza la prueba; no activa automatización ni publica la web. Usar después los comandos Android de Fase 3, con `--rerun-tasks` si se necesita repetir la entrega JVM contra el servidor actual, y no dar por ejecutada una tarea marcada `UP-TO-DATE`.
+
+## Revisión y conciliación en AFP — Fase 5
+
+Fase concluida el **21 de octubre de 2026**, con APK preparada **0.4.0 / versionCode 6**. La web ofrece los flujos completos de revisión y la aceptación nativa se comprobó en el S24 Ultra con Android 16 mediante 29 pruebas instrumentadas correctas, sin omisiones. La APK personal instalada continúa en 0.3.0. La falta de muestras bancarias reales conserva los bloqueos de Fases 1/4, independientemente de la disponibilidad de estos controles.
+
+### Configurar teléfono, fuentes y tarjetas
+
+Abre **Configuración → Captura automática**. Además de autorizar/pausar/revocar el dispositivo, «Aplicaciones de…» permite pausar cada fuente. AFP muestra la preferencia solicitada, si fue reportada como aplicada y la fecha del último reporte de permisos, lector, captura, envíos y batería. Un reporte es una fotografía, no una comprobación en tiempo real. Una APK sin esta capacidad aparece como «Sin estado nativo reportado».
+
+La APK 0.4.0 obtiene la configuración al consultar estado y antes de sincronizar. Los trabajos periódicos de recuperación siguen teniendo un mínimo de 15 minutos sujeto a las restricciones de Android; no hay control remoto inmediato sin comunicación. Las pausas se guardan por identidad y se comprueban en el lector y antes de persistir el aviso. Una respuesta de una identidad anterior se ignora. **Reanudar** respeta las fuentes que seleccionaste localmente: no habilita aplicaciones nuevas ni deseleccionadas. Los avisos guardados antes de la pausa conservan su entrega y UUID. La pantalla nativa indica cuáles están pausadas desde AFP.
+
+En **Tarjetas y reglas**, selecciona la tarjeta existente. Puedes añadir/verificar una terminación con su tipo, fuente y evidencia, editar su verificación o eliminarla con confirmación. Para cambiar las cifras, guarda la terminación correcta y elimina la anterior. Se conservan los ceros iniciales; las colisiones entre tarjetas requieren revisión. La importación JSON anterior continúa siendo aditiva. Ninguna de estas acciones renombra tarjetas ni habilita automatización.
+
+Los formatos se habilitan individualmente por tarjeta. Los analizadores sintéticos BBVA/Wallet muestran Diagnóstico y el servidor rechaza su activación; las fuentes sin analizador comprobado siguen pendientes. Un formato verificado con alias verificado puede pasar a Automático y volver a Observación. Las reglas usan comercio exacto, categoría y suscripción opcional de esa misma tarjeta; se pueden editar/eliminar desde la aplicación. Eliminar configuración conserva los movimientos anteriores.
+
+### Resolver avisos
+
+**Bandeja** filtra Por revisar, Registrado, Conciliado y Descartado. Observación queda dentro de Por revisar; los vínculos y MSI quedan en Registrado hasta tener un cotejo explícito. La consulta se renueva al recuperar foco/conexión y cada 30 segundos mientras la región y la pestaña del navegador están visibles. Las peticiones anteriores se cancelan y los borradores del detalle permanecen.
+
+«Revisar aviso» muestra todas las evidencias originales y sus fechas. Si falta información o hay un error, corrige tarjeta, fecha, importe final en MXN, concepto y categoría, y guarda la corrección. La propuesta original no se sobrescribe. Una edición concurrente obliga a actualizar antes de guardar otra.
+
+- **Registrar compra** usa los datos revisados y crea un gasto Por conciliar. Detecta coincidencias actuales con gastos, MSI, avisos y huellas de eliminados antes de crear otro registro.
+- **Vincular evidencia** asocia el aviso a un gasto existente con la misma tarjeta e importe. Se puede buscar por concepto. También se ofrecen MSI existentes con la misma tarjeta e importe total en fechas próximas. El vínculo no cambia categoría, notas, personas, cuentas ni aportaciones del registro.
+- **Es otra compra** conserva la multiplicidad tras una confirmación explícita. Dos importes iguales no son una clave de deduplicación.
+- **Descartar aviso** pide confirmación y lo conserva en Descartado, sin gasto.
+- Un gasto registrado se puede editar en **Gastos** o **Convertir a MSI** desde el detalle. La conversión pide plazo y confirmación; crea la compra, mueve las evidencias y retira el gasto completo en una transacción. Los vínculos personales o aportaciones bloquean la conversión hasta revisarlos. Si ya se había cotejado el cargo, la cuota nueva vuelve a Por conciliar. Una MSI existente puede consultarse en **Compras a meses**.
+
+Un aviso de moneda extranjera requiere capturar el cargo final MXN comprobado antes de registrarlo. Un aviso no financiero se descarta; una devolución, pago o abono se registra en su flujo financiero correspondiente después de revisar el estado. No se infieren personas ni aportaciones de efectivo a partir del texto.
+
+Si una captura manual de Gastos queda en cola por coincidir con otra captura Por conciliar, aparece una decisión local: **Es otra compra** conserva todos los datos y el mismo UUID al reenviar; **Conservar gasto existente** pide confirmar que revisaste ese gasto y retira únicamente el pendiente local. Advierte que las notas/aportaciones locales no se copian al registro existente, que se puede editar previamente.
+
+### Cotejar un estado de cuenta
+
+En **Conciliar**, selecciona tarjeta, inicio y fin inclusivos y pulsa **Consultar período**. Se admiten períodos de hasta 63 días; usa las fechas de tu corte. La lista compara cargos de compras completos y cuotas MSI del mes de la fecha final, calculadas con las reglas y referencias bancarias existentes.
+
+Captura opcionalmente el **total de cargos de compras del estado**, incluido cero, y la **explicación de diferencias**. El subtotal no representa el saldo a pagar: pagos, abonos, saldo anterior, intereses y comisiones requieren su explicación y los flujos de Tarjetas/Ingresos correspondientes. El cotejo no sustituye el importe del estado de cuenta registrado en Tarjetas.
+
+**Confirmar en estado** coteja solo ese ID y conserva su huella financiera. **Deshacer cotejo** lo devuelve a Por conciliar. Cada cargo igual ocupa una fila independiente. La ausencia de un cargo no lo borra, cancela ni modifica automáticamente. Las diferencias se guardan como explicación editable.
+
+**Registrar cargo faltante** exige comprobar que no es uno de los cargos existentes. Se crea Por conciliar y se confirma después en su propia fila. Antes de enviar, UUID y datos quedan guardados en sessionStorage por cuenta y período. Un reintento conserva el recibo transaccional; una respuesta perdida o un gasto posteriormente eliminado no generan otro cargo con ese intento. Para un faltante MSI, regístralo en Compras a meses y vuelve a consultar el período.
+
+Cambiar tarjeta, importe, fecha o condiciones financieras de una MSI retira su cotejo; la huella anterior permite detectar el cambio. Editar concepto, categoría, notas o aportación conserva la decisión. Los borradores del total/explicación no se reemplazan durante la actualización periódica y no pueden sobrescribir metadatos cambiados en otra pantalla. **Recargar total y explicación** vuelve a cargar los guardados cuando quieras reemplazar tu borrador.
+
+Gastos móvil/escritorio, su respaldo offline, Compras a meses y el desglose de Tarjetas muestran el origen del aviso y Por conciliar/Conciliado. Sin conexión se ve la última información guardada en Gastos; corregir, vincular, convertir y cotejar requieren conexión. Las capturas pendientes siguen incluidas en estimaciones y fuera del consumo confirmado para exentar comisión; el cotejo explícito confirma el cargo.
+
+### Persistencia, verificación y publicación
+
+La migración **aditiva** `20261021030000_capture_review_and_reconciliation` añade `CaptureStatement` (`capture_statements`), `CaptureMovement.correction`, `reconciledAt` en gastos/MSI y pausas/reportes en dispositivos. La tabla nueva tiene RLS explícito sin políticas públicas. El cotejo y los faltantes comparten el bloqueo financiero por propietario; sus recibos conservan el resultado incluso si se elimina el registro. Las API administrativas exigen Bearer Supabase e ignoran propietarios enviados por el cliente; el reporte nativo usa exclusivamente su credencial Capture.
+
+Pruebas locales reproducibles, sin `.env` como conexión de pruebas:
+
+```bash
+podman run --rm -d --name afp-phase5-postgres \
+  -e POSTGRES_PASSWORD=afp_test_only -e POSTGRES_DB=afp_test_phase5 \
+  -p 127.0.0.1:55445:5432 docker.io/library/postgres:16-alpine
+DIRECT_URL=postgresql://postgres:afp_test_only@127.0.0.1:55445/afp_test_phase5 \
+DATABASE_URL=postgresql://postgres:afp_test_only@127.0.0.1:55445/afp_test_phase5 \
+pnpm exec prisma migrate deploy
+pnpm exec prisma generate
+AFP_TEST_DATABASE_URL=postgresql://postgres:afp_test_only@127.0.0.1:55445/afp_test_phase5 pnpm test
+AFP_MIGRATION_TEST_DATABASE_URL=postgresql://postgres:afp_test_only@127.0.0.1:55445/afp_test_phase5 pnpm db:verify
+pnpm lint
+pnpm exec next build --webpack
+```
+
+Para la interfaz, preparar los datos ficticios con `AFP_TEST_DATABASE_URL=<base local anterior> node tests/helpers/seed-capture-review.cjs` e iniciar el fixture estable descrito en Fase 4. Iniciar sesión local con `capture-qa@example.test` y una contraseña ficticia; el helper solo admite una BD localhost `afp_test…`. Incluye nueve tarjetas y avisos inventados, no activa los formatos reales y no copia `.env`. La revisión con Agent Browser comprueba los componentes y API reales contra PostgreSQL, con autenticación ficticia.
+
+**288 pruebas web correctas sin omisiones**, incluidos 19 escenarios nuevos de revisión/cotejo y dos de conflictos offline; **18 JVM correctas sin omisiones**, incluida entrega Kotlin → HTTPS/API/PostgreSQL locales con pausa por fuente y reporte. Se verificaron las 21 migraciones desde cero y desde el historial, diff vacío, checksums, conservación de datos y 27 tablas con RLS. Ambas APK, firma release, lint Android y APK instrumentada compilan; lint web mantiene la advertencia previa de TanStack Table.
+
+**Aceptación nativa concluida:** al conectar el S24 Ultra por USB pasaron **29 pruebas instrumentadas, cero fallos y cero omisiones**: las 25 históricas, tres de `CaptureRemoteSettingsTest` y una de `CaptureRemoteScreenTest`. Las tres primeras verifican persistencia, pausa aislada por fuente, respuesta tardía de otra identidad, reanudación y selección local. La cuarta usa Compose Test para desplazarse por la pantalla real y comprobar la pausa de BBVA, su desaparición al reanudar y el selector todavía activado, con Wallet conservado. Los reportes de pausa y reanudación proceden de `CaptureApplication.reportState()` en el teléfono y se cotejan campo por campo con la API/PostgreSQL locales, incluida la fecha de reporte.
+
+La prueba de pantalla requiere la variante `.dev` sin vinculación previa. Invoca explícitamente el cliente HTTPS local con el certificado de prueba; no cambia el origen de la APK ni su confianza TLS global. Detiene los trabajos de esa variante y mantiene el mutex durante la identidad ficticia, revoca esa identidad y restaura las preferencias al terminar. No mide la programación automática de WorkManager ni la captura bancaria real. Gradle retiró los paquetes dev/pruebas y se comprobó que AFP personal conserva **0.3.0 / versionCode 5** y su fecha de actualización anterior. El fallo inicial del emulador no se cuenta como ejecución; la aceptación corresponde al teléfono físico. [Resultados nativos sin identificadores personales](../artifacts/android-fase5/native-acceptance.json).
+
+Para repetir, inicia primero el fixture HTTPS de Fase 3/4 con esta base local y espera ambos mensajes de disponibilidad (`Capture QA HTTPS ready on 4209` y `Capture API ready on 4208`). Usa un certificado de prueba localhost vigente y un JDK completo. Después ejecuta:
+
+```bash
+adb reverse tcp:4209 tcp:4209
+adb push /tmp/afp-phase5-test.crt /data/local/tmp/afp-capture-test.crt
+cd android
+JAVA_HOME=/ruta/al/jdk \
+AFP_CAPTURE_TEST_ORIGIN=https://localhost:4209 \
+AFP_CAPTURE_TEST_CERTIFICATE=/tmp/afp-phase5-test.crt \
+./gradlew :app:testDebugUnitTest :app:connectedDebugAndroidTest \
+  -Djava.net.preferIPv4Stack=true \
+  -Pandroid.testInstrumentationRunnerArguments.class=com.garatachia.afp.CaptureRemoteSettingsTest,com.garatachia.afp.CaptureRemoteScreenTest,com.garatachia.afp.CaptureQueueTest,com.garatachia.afp.CaptureQueueDeliveryTest,com.garatachia.afp.BindingStoreTest,com.garatachia.afp.CaptureDeliveryTest,com.garatachia.afp.DiagnosticStoreTest,com.garatachia.afp.TwaNavigationTest \
+  -Pandroid.testInstrumentationRunnerArguments.captureTestOrigin=https://localhost:4209 \
+  -Pandroid.testInstrumentationRunnerArguments.captureTestCertificate=/data/local/tmp/afp-capture-test.crt
+```
+
+La dependencia `ui-test-junit4` usa el mismo BOM de Compose que la aplicación y solo se añade a las pruebas. Tras descargar las dependencias se puede repetir con `--offline`; IPv4 evitó la espera de conexión de Gradle en este entorno. La comprobación de pantalla usa sincronización de Compose para evitar las carreras observadas al desplazar la lista mediante accesibilidad.
+
+El recorrido final de Chromium comprueba corrección y registro, compra distinta, conversión a MSI, vínculo a una MSI existente, descarte, alias/reglas, pausa solicitada y cotejo/faltantes persistidos. Una recarga offline real de Gastos conserva **Captura: BBVA** y **Por conciliar**. La bandeja visible realizó dos consultas separadas por **29 999 ms**. No hay desbordamiento horizontal a 320/390 px; se corrigieron las filas estrechas del panel de fuentes y del cotejo. Las imágenes de [bandeja](../artifacts/android-fase5/inbox-320.png), [cotejo móvil](../artifacts/android-fase5/reconciliation-390.png) y [Gastos offline](../artifacts/android-fase5/offline-390.png) solo contienen datos ficticios.
+
+**Producción pendiente:** esta migración solo se aplicó a PostgreSQL local. Con autorización explícita, respaldar AFP, verificar historial, aplicar `prisma migrate deploy`, generar Prisma, publicar web/backend y actualizar la APK a 0.4.0 conservando firma, permisos, vinculación y cola. No instalar la APK nueva contra un backend antiguo para validar estos contratos. Esta implementación no modificó Supabase, no publicó la web y no actualizó la instalación personal. La Fase 5 queda cerrada en implementación y aceptación; la publicación, las muestras reales y el piloto conservan sus actividades y condiciones independientes. [Evidencia agregada de Fase 5](../artifacts/android-fase5/verification.json).

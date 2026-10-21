@@ -5,6 +5,7 @@ import { interpretCapture, normalizeMerchant } from "@/lib/captureParsers";
 import { captureHash } from "@/lib/captureProtocol";
 import { subscriptionChargeDate, getSubscriptionReceipts } from "@/lib/subscriptionCharges";
 import { Prisma } from "@prisma/client";
+import { effectiveCapture, correctCapture } from "@/lib/captureReview";
 
 export async function archiveCapturedExpense(tx, expense) {
   await tx.expenseTombstone.upsert({ where: { expenseId: expense.id }, update: {}, create: {
@@ -23,11 +24,13 @@ export async function captureCandidates(tx, userId, proposal) {
   const where = { userId, cardId: proposal.cardId, amount: proposal.amount, date: dateWindow(proposal.date) };
   // Una transacción usa una conexión: no iniciar consultas simultáneas sobre ella.
   const expenses = await tx.dailyExpense.findMany({ where, select: { id: true, concept: true, date: true, amount: true } });
+  const installments = await tx.installmentPurchase.findMany({ where: { userId, cardId: proposal.cardId, totalAmount: proposal.amount, purchaseDate: where.date }, select: { id: true, concept: true } });
   const deleted = await tx.expenseTombstone.findMany({ where, select: { expenseId: true, concept: true, date: true, amount: true } });
   const movements = await tx.captureMovement.findMany({ where: { userId, cardId: proposal.cardId, amount: proposal.amount, operationDate: where.date },
     select: { id: true, expenseId: true, originalExpenseId: true, status: true } });
   return [
     ...expenses.map(row => ({ type: "EXPENSE", id: row.id, concept: row.concept })),
+    ...installments.map(row => ({ type: "INSTALLMENT", id: row.id, concept: row.concept })),
     ...deleted.map(row => ({ type: "DELETED", id: row.expenseId, concept: row.concept })),
     ...movements.map(row => ({ type: "MOVEMENT", id: row.id, expenseId: row.expenseId, deleted: !!row.originalExpenseId && !row.expenseId })),
   ];
@@ -100,11 +103,12 @@ export async function processCaptureEvent(tx, event) {
 }
 
 async function captureExpenseData(tx, movement) {
-  const { userId, proposal } = movement;
+  const { userId } = movement;
+  const proposal = effectiveCapture(movement);
   const rule = await tx.captureMerchantRule.findUnique({ where: {
     userId_cardId_merchant: { userId, cardId: proposal.cardId, merchant: normalizeMerchant(proposal.merchant) },
   } });
-  let categoryId = rule?.categoryId;
+  let categoryId = movement.correction?.categoryId || rule?.categoryId;
   if (!categoryId) categoryId = (await tx.category.upsert({ where: { userId_name: { userId, name: "Por clasificar" } },
     create: { userId, name: "Por clasificar" }, update: {} })).id;
   const data = { date: proposal.date, amount: proposal.amount, concept: proposal.merchant,
@@ -131,7 +135,7 @@ async function captureExpenseData(tx, movement) {
 }
 
 export async function registerCaptureMovement(tx, movement, distinct) {
-  const p = movement.proposal;
+  const p = effectiveCapture(movement);
   if (!p.cardId || !p.amount || !p.date || p.currency !== "MXN") throw new ApiAccessError("El aviso necesita tarjeta, importe, moneda y fecha verificados.", 409);
   if (!distinct && (await captureCandidates(tx, movement.userId, p)).some(candidate => candidate.type !== "MOVEMENT" || candidate.id !== movement.id)) {
     return tx.captureMovement.update({ where: { id: movement.id }, data: { reason: "POSSIBLE_DUPLICATE" } });
@@ -145,28 +149,42 @@ export async function registerCaptureMovement(tx, movement, distinct) {
 
 export async function resolveCaptureMovement(db, userId, input) {
   if (!input || typeof input.id !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(input.id)
-    || !["link", "distinct", "discard", "convertToInstallments"].includes(input.action)) {
+    || !["link", "linkInstallment", "distinct", "discard", "convertToInstallments", "correct", "register"].includes(input.action)) {
     throw new ApiAccessError("Resolución no válida.", 400);
   }
   return db.$transaction(async tx => {
     await lockDebtAccounts(tx, userId);
     const movement = await tx.captureMovement.findFirst({ where: { id: input.id, userId } });
     if (!movement) throw new ApiAccessError("Aviso no encontrado.", 404);
+    if (input.action === "correct") return correctCapture(tx, movement, input);
     if (input.action === "convertToInstallments") return convertCaptureToInstallments(tx, movement, input);
     // Una decisión terminal se conserva al reintentar o ante otra pestaña.
     if (["REGISTERED", "LINKED", "DISCARDED", "CONVERTED"].includes(movement.status)) return movement;
     if (input.action === "discard") return tx.captureMovement.update({ where: { id: movement.id }, data: { status: "DISCARDED", reason: "USER_DISCARDED", resolvedAt: new Date() } });
+    if (input.action === "linkInstallment") {
+      if (typeof input.installmentPurchaseId !== "string") throw new ApiAccessError("Selecciona la compra a meses existente.", 400);
+      const purchase = await tx.installmentPurchase.findFirst({ where: { id: input.installmentPurchaseId, userId } });
+      if (!purchase) throw new ApiAccessError("Compra a meses no encontrada.", 404);
+      const proposal = effectiveCapture(movement);
+      if (purchase.cardId !== proposal.cardId || !proposal.amount || !new Prisma.Decimal(purchase.totalAmount).equals(proposal.amount)) throw new ApiAccessError("Revisa tarjeta e importe total antes de vincular la evidencia.", 409);
+      return tx.captureMovement.update({ where: { id: movement.id }, data: { status: "CONVERTED", reason: "USER_LINKED_INSTALLMENT", installmentPurchaseId: purchase.id, resolvedAt: new Date() } });
+    }
     if (input.action === "link") {
       if (typeof input.expenseId !== "string") throw new ApiAccessError("Selecciona el gasto existente.", 400);
       const expense = await tx.dailyExpense.findFirst({ where: { id: input.expenseId, userId } });
       if (!expense) throw new ApiAccessError("Gasto no encontrado.", 404);
-      if (expense.cardId !== movement.proposal.cardId || !movement.proposal.amount || !new Prisma.Decimal(expense.amount).equals(movement.proposal.amount)) {
+      const proposal = effectiveCapture(movement);
+      if (expense.cardId !== proposal.cardId || !proposal.amount || !new Prisma.Decimal(expense.amount).equals(proposal.amount)) {
         throw new ApiAccessError("Revisa tarjeta e importe antes de vincular el aviso.", 409);
       }
       return tx.captureMovement.update({ where: { id: movement.id }, data: { status: "LINKED", reason: "USER_LINKED",
         expenseId: expense.id, originalExpenseId: expense.id, resolvedAt: new Date() } });
     }
-    if (!["POSSIBLE_DUPLICATE", "NOTIFICATION_REVISION"].includes(movement.reason)) throw new ApiAccessError("Este aviso necesita revisión de sus datos antes de registrarse.", 409);
+    if (input.action === "register") {
+      if (!movement.correction) throw new ApiAccessError("Revisa y guarda los datos antes de registrar la compra.", 409);
+      return registerCaptureMovement(tx, movement, false);
+    }
+    if (!movement.correction && !["POSSIBLE_DUPLICATE", "NOTIFICATION_REVISION"].includes(movement.reason)) throw new ApiAccessError("Este aviso necesita revisión de sus datos antes de registrarse.", 409);
     return registerCaptureMovement(tx, movement, true);
   }, { isolationLevel: "ReadCommitted" });
 }
@@ -182,7 +200,7 @@ async function convertCaptureToInstallments(tx, movement, input) {
   await requireOwnedReferences(tx, movement.userId, expense, ["cardId", "categoryId"]);
   const purchase = await tx.installmentPurchase.create({ data: { userId: movement.userId, cardId: expense.cardId,
     purchaseDate: expense.date, concept: expense.concept, totalAmount: expense.amount, months: input.months, categoryId: expense.categoryId,
-    notes: expense.notes, reconciliationStatus: expense.reconciliationStatus } });
+    notes: expense.notes, reconciliationStatus: expense.reconciledAt ? "PENDING" : expense.reconciliationStatus } });
   await archiveCapturedExpense(tx, expense);
   // Todas las evidencias del mismo gasto pasan a la compra antes de borrar.
   await tx.captureMovement.updateMany({ where: { userId: movement.userId, expenseId: expense.id }, data: {

@@ -1,0 +1,212 @@
+{
+  "date": "2026-10-21",
+  "scope": "Aceptación nativa de Fase 5 con datos ficticios; sin publicación ni cambios en la APK personal.",
+  "device": {
+    "model": "Samsung S24 Ultra",
+    "android": "16",
+    "api": 36
+  },
+  "applicationUnderTest": "com.garatachia.afp.dev",
+  "version": "0.4.0-dev / versionCode 6",
+  "instrumented": {
+    "tests": 29,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": 29,
+    "historical": 25,
+    "newPreferences": 3,
+    "newComposeScreen": 1,
+    "reportTimestamp": "2026-10-21T18:00:28",
+    "durationSeconds": 14.157
+  },
+  "jvm": {
+    "tests": 18,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": 18
+  },
+  "transport": {
+    "api": "HTTPS localhost:4209 mediante adb reverse",
+    "database": "PostgreSQL 16 local desechable afp_test_phase5",
+    "authentication": "Auth y cuenta ficticias; credencial Capture generada para la prueba",
+    "certificate": "Certificado localhost confiado solo por el cliente de pruebas; sin cambios en la confianza TLS de la APK"
+  },
+  "screen": {
+    "framework": "Compose Test; UI real de MainActivity en el teléfono",
+    "verified": [
+      "Pausa solicitada por fuente en la API y configuración recibida por el cliente Kotlin",
+      "Texto de BBVA pausada visible en pantalla",
+      "Reporte de estado real del teléfono persistido y cotejado campo por campo con reportedAt",
+      "Reanudación retira el texto de pausa",
+      "Selector BBVA visible y activado tras reanudar",
+      "Selección BBVA/Wallet conservada y Wallet disponible durante la pausa",
+      "Reporte de reanudación persistido sin fuentes pausadas"
+    ],
+    "isolation": "Requiere paquete .dev sin vinculación; bloquea/cancela WorkManager de pruebas, usa cliente local explícito, revoca la identidad ficticia y restaura preferencias.",
+    "limit": "No mide tiempos automáticos de WorkManager ni acredita muestras bancarias reales o captura real con pantalla bloqueada."
+  },
+  "recovery": [
+    "La primera JVM comenzó antes de que el fixture HTTPS estuviera listo; la repetición con el servidor disponible pasó las 18 pruebas.",
+    "El emulador fallido se sustituyó por el S24 Ultra conectado por USB.",
+    "La espera de conexión de Gradle se evitó con caché offline e IPv4 al descargar Compose Test.",
+    "La navegación inicial por accesibilidad no fue estable; la prueba final usa sincronización y selectores de Compose."
+  ],
+  "runnerWarning": "UTP intentó configurar MANAGE_EXTERNAL_STORAGE de androidx.test.services, ausente; no impidió ejecutar las 29 pruebas ni se concedió ese permiso a AFP.",
+  "cleanup": {
+    "developmentAndTestPackagesRemoved": true,
+    "personalApkVersionBeforeAndAfter": "0.3.0 / versionCode 5",
+    "personalApkLastUpdateBeforeAndAfter": "2026-10-21 01:52:40",
+    "localApiStopped": true,
+    "temporaryDatabaseRemoved": true,
+    "adbReverseAndTemporaryFilesRemoved": true
+  },
+  "cases": [
+    {
+      "class": "CaptureRemoteSettingsTest",
+      "test": "explicitResumePreservesUnselectedSourcesAndOldServerResponseDoesNotErasePause",
+      "result": "passed"
+    },
+    {
+      "class": "CaptureRemoteSettingsTest",
+      "test": "relinkingDoesNotInheritPausesAndLateOldConfigurationIsIgnored",
+      "result": "passed"
+    },
+    {
+      "class": "CaptureRemoteSettingsTest",
+      "test": "remotePausePersistsWithoutChangingLocalSelectionOrOtherSources",
+      "result": "passed"
+    },
+    {
+      "class": "CaptureRemoteScreenTest",
+      "test": "sourcePauseResumeIsVisibleAndRealPhoneStateReachesLocalApi",
+      "result": "passed"
+    },
+    {
+      "class": "CaptureQueueTest",
+      "test": "lostResponseAndProcessReopeningReuseReceiptAndClearOnlyAcknowledgedPayload",
+      "result": "passed"
+    },
+    {
+      "class": "CaptureQueueTest",
+      "test": "persistsEncryptedBeforeNetworkAndRecoversSameUuidAfterReopening",
+      "result": "passed"
+    },
+    {
+      "class": "CaptureQueueTest",
+      "test": "localPauseAndServerPauseRetainEventsWithoutSending",
+      "result": "passed"
+    },
+    {
+      "class": "CaptureQueueTest",
+      "test": "concurrentCallbacksPersistOnlyOneIdentityAndNeverCapPendingQueueAtHundred",
+      "result": "passed"
+    },
+    {
+      "class": "CaptureQueueTest",
+      "test": "alteredCiphertextIsPreservedForReviewAndCannotBeTransplantedToAnotherIdentity",
+      "result": "passed"
+    },
+    {
+      "class": "CaptureQueueTest",
+      "test": "invalidCredentialBlocksIdentityUntilExplicitSuccessfulStatusCheck",
+      "result": "passed"
+    },
+    {
+      "class": "CaptureQueueTest",
+      "test": "oldOwnerNeverUsesNewCredentialAndCannotStarveNewIdentity",
+      "result": "passed"
+    },
+    {
+      "class": "CaptureQueueTest",
+      "test": "activeNotificationReplayDoesNotRequeueDeliveredButRevisionsAndDistinctPublicationsRemain",
+      "result": "passed"
+    },
+    {
+      "class": "CaptureQueueTest",
+      "test": "malformedAndMismatchedReceiptsStayPendingWhilePermanentRejectionNeedsReview",
+      "result": "passed"
+    },
+    {
+      "class": "CaptureQueueTest",
+      "test": "temporaryFailuresAndRetryAfterNeverDiscardOrChangeUuid",
+      "result": "passed"
+    },
+    {
+      "class": "CaptureQueueDeliveryTest",
+      "test": "roomReopensAndRetriesAfterRealServerCommitWithoutCreatingAnotherEvent",
+      "result": "passed"
+    },
+    {
+      "class": "BindingStoreTest",
+      "test": "tamperingFailsWithoutReplacingCredentials",
+      "result": "passed"
+    },
+    {
+      "class": "BindingStoreTest",
+      "test": "relinkingArchivesOldIdentityWithoutMovingItsOwner",
+      "result": "passed"
+    },
+    {
+      "class": "BindingStoreTest",
+      "test": "identitySurvivesReopeningAndIsEncryptedOutsideBackups",
+      "result": "passed"
+    },
+    {
+      "class": "CaptureDeliveryTest",
+      "test": "httpsPairingDeliveryPauseAndRevocationAgainstLocalServer",
+      "result": "passed"
+    },
+    {
+      "class": "DiagnosticStoreTest",
+      "test": "twaUrlIsResolvedAsTextInTheInstalledManifest",
+      "result": "passed"
+    },
+    {
+      "class": "DiagnosticStoreTest",
+      "test": "readsExpandedNotificationWithoutInventingMissingFields",
+      "result": "passed"
+    },
+    {
+      "class": "DiagnosticStoreTest",
+      "test": "anonymousExportRemovesIdentityAndTimestamps",
+      "result": "passed"
+    },
+    {
+      "class": "DiagnosticStoreTest",
+      "test": "retainsOnlyMostRecentHundredSamples",
+      "result": "passed"
+    },
+    {
+      "class": "DiagnosticStoreTest",
+      "test": "encryptedSamplesSurviveNewStoreInstance",
+      "result": "passed"
+    },
+    {
+      "class": "DiagnosticStoreTest",
+      "test": "sourceSelectionMigrationPreservesChoicesAndExcludesUnknownPackages",
+      "result": "passed"
+    },
+    {
+      "class": "DiagnosticStoreTest",
+      "test": "tamperingIsReportedAndNeverSilentlyOverwritten",
+      "result": "passed"
+    },
+    {
+      "class": "DiagnosticStoreTest",
+      "test": "twaAuxiliaryComponentsCanBeManagedByBrowserHelper",
+      "result": "passed"
+    },
+    {
+      "class": "DiagnosticStoreTest",
+      "test": "allVerifiedSourcesRetainSeparateIdentityAndMissingText",
+      "result": "passed"
+    },
+    {
+      "class": "TwaNavigationTest",
+      "test": "openAfpWorksAfterReturningToDiagnosticWithAnExistingTwa",
+      "result": "passed"
+    }
+  ]
+}

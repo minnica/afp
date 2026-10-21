@@ -95,15 +95,15 @@ function assertCatalog(actual) {
   for (const section of ['columns', 'constraints', 'indexes', 'enums']) {
     const rows = actual[section].filter(row => (row.table_name || row.tablename) !== 'expense_operations'
       && !['capture_devices', 'capture_pairings', 'capture_events', 'capture_rate_limits', 'capture_card_aliases',
-        'capture_automations', 'capture_merchant_rules', 'capture_movements', 'expense_tombstones'].includes(row.table_name || row.tablename)
+        'capture_automations', 'capture_merchant_rules', 'capture_movements', 'expense_tombstones', 'capture_statements'].includes(row.table_name || row.tablename)
       && !(section === 'columns' && row.table_name === 'card_cycles' && creditColumns.includes(row.column_name))
       && !(section === 'columns' && row.table_name === 'daily_expenses' && row.column_name === 'cashContributionAmount')
-      && !(section === 'columns' && ['daily_expenses', 'installment_purchases'].includes(row.table_name) && row.column_name === 'reconciliationStatus')
+      && !(section === 'columns' && ['daily_expenses', 'installment_purchases'].includes(row.table_name) && ['reconciliationStatus', 'reconciledAt'].includes(row.column_name))
       && !(section === 'constraints' && ['daily_expenses_reconciliation_check', 'installment_purchases_reconciliation_check'].includes(row.name))
       && !(section === 'constraints' && row.name === 'daily_expenses_cash_contribution_check'));
     assert.deepEqual(rows, before[section], `Catálogo distinto en ${section}`);
   }
-  assert.equal(actual.security.length, before.security.length + 10);
+  assert.equal(actual.security.length, before.security.length + 11);
   for (const row of actual.security) {
     assert.equal(row.rls, true, `RLS desactivado: ${row.table_name}`);
     assert.equal(row.force_rls, false);
@@ -138,7 +138,7 @@ async function seed(db) {
 async function records(db) {
   return {
     loan: await db.payableAccount.findUnique({ where: { id: 'a11-loan' } }),
-    payment: await db.dailyExpense.findUnique({ where: { id: 'a11-payment' }, omit: { cashContributionAmount: true, reconciliationStatus: true } }),
+    payment: await db.dailyExpense.findUnique({ where: { id: 'a11-payment' }, omit: { cashContributionAmount: true, reconciliationStatus: true, reconciledAt: true } }),
     receivable: await db.receivableAccount.findUnique({ where: { id: 'a11-receivable' } }),
   };
 }
@@ -256,7 +256,7 @@ async function main() {
         console.log(`OK ${i ? 'actualización desde las 13 migraciones aplicadas' : 'base vacía'}: catálogo equivalente, diff vacío, checksums, deploy repetible, registros intactos y RLS.`);
       } finally { await db.$disconnect(); }
     }
-    console.log(`Reconstrucción y actualización verificadas; ${localMigrations().length} migraciones y 26 tablas con RLS, incluido el historial.`);
+    console.log(`Reconstrucción y actualización verificadas; ${localMigrations().length} migraciones y ${before.security.length + 11} tablas con RLS, incluido el historial.`);
   } finally {
     // Solo elimina bases/roles con sufijo aleatorio creados por esta ejecución.
     for (const name of createdDatabases.reverse()) await admin.$executeRawUnsafe(`DROP DATABASE "${name}" WITH (FORCE)`);

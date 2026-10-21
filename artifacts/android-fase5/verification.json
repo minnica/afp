@@ -1,0 +1,125 @@
+{
+  "date": "2026-10-21",
+  "scope": "Implementación y aceptación de Fase 5; pruebas con datos ficticios, PostgreSQL local desechable y S24 Ultra conectado por USB.",
+  "phase": {
+    "implementationActivitiesCompleted": 7,
+    "implementationComplete": true,
+    "acceptanceComplete": true,
+    "pending": null
+  },
+  "production": {
+    "databaseModified": false,
+    "webDeployed": false,
+    "personalApkUpdated": false,
+    "personalInstalledVersion": "0.3.0 / 5",
+    "realBankFormatsActivated": false
+  },
+  "web": {
+    "command": "AFP_TEST_DATABASE_URL=<localhost afp_test_phase5> pnpm test",
+    "tests": 288,
+    "passed": 288,
+    "failed": 0,
+    "skipped": 0,
+    "newReviewScenarios": 19,
+    "newOfflineConflictScenarios": 2,
+    "lintErrors": 0,
+    "lintWarnings": [
+      "Advertencia previa de TanStack Table: react-hooks/incompatible-library"
+    ],
+    "build": "pnpm exec next build --webpack: correcto; fixture aislado compilado también en modo producción."
+  },
+  "database": {
+    "location": "PostgreSQL 16 desechable en localhost; base afp_test_phase5",
+    "migration": "20261021030000_capture_review_and_reconciliation",
+    "migrationKind": "aditiva",
+    "completedMigrations": 21,
+    "tables": 27,
+    "tablesWithRls": 27,
+    "publicPolicies": 0,
+    "freshReconstruction": "correcta",
+    "upgradeFromHistorical13Migrations": "correcta",
+    "schemaDiff": "vacío",
+    "checksums": "correctos",
+    "historicalRecords": "conservados",
+    "repeatDeployment": "sin cambios"
+  },
+  "android": {
+    "preparedVersion": "0.4.0 / versionCode 6",
+    "jvmTests": 18,
+    "jvmPassed": 18,
+    "jvmFailed": 0,
+    "jvmSkipped": 0,
+    "realLocalTransport": "Cliente Kotlin → HTTPS → API AFP → PostgreSQL; Auth ficticia; incluye pausa por fuente, recepción idempotente y reporte nativo.",
+    "buildDebug": "correcto",
+    "buildRelease": "correcto",
+    "releaseSignatureVerification": "apksigner verify correcto",
+    "instrumentationApkBuild": "correcto",
+    "lintErrors": 0,
+    "lintWarnings": 7,
+    "newInstrumentedTests": 4,
+    "newInstrumentedTestsExecuted": 4,
+    "instrumentationLimitation": null,
+    "environmentRecovery": "El Java inicial carecía de compilador; se usó un JDK 21 completo temporal para ejecutar los builds y las pruebas.",
+    "networkRecovery": "Un fallo de transporte de configuración no se informa como fallo de almacenamiento; el reporte es reintentable y no bloquea la entrega de avisos guardados.",
+    "instrumentedTests": 29,
+    "instrumentedPassed": 29,
+    "instrumentedFailed": 0,
+    "instrumentedSkipped": 0,
+    "instrumentedDevice": "Samsung S24 Ultra / Android 16 / API 36",
+    "instrumentationEvidence": "native-acceptance.json",
+    "screenVerification": "Compose Test: pausa BBVA visible, reanudación retira el aviso y conserva el selector activado/selección local; reportes de pausa y reanudación cotejados contra API/PostgreSQL locales mediante cliente explícito.",
+    "initialInstrumentationFailureResolved": "Emulador fallido sustituido por teléfono físico; navegación de prueba estabilizada con Compose Test; 29 pruebas correctas, sin omisiones."
+  },
+  "browser": {
+    "tool": "Agent Browser / Chromium",
+    "fixture": "tests/helpers/capture-browser-server.cjs con AFP_CAPTURE_TEST_PRODUCTION=1; copia temporal sin .env, Auth ficticia y PostgreSQL real local",
+    "seed": "tests/helpers/seed-capture-review.cjs: nueve tarjetas y avisos inventados",
+    "verifiedFlows": [
+      "Abrir y corregir un aviso desconocido; propuesta original conservada",
+      "Importe precargado 350.50 mostrado sin pérdida de decimales; foco inicial en el título",
+      "Registrar un gasto por conciliar",
+      "Conversión confirmada a doce mensualidades, retirando el gasto completo",
+      "Cotejo individual de cuota 29.21 con diferencia cero",
+      "Registrar un faltante 50.00 por conciliar, conservando la cuota y mostrando diferencia -50.00",
+      "Vincular evidencia a MSI existente sin crear otra compra",
+      "Descartar un aviso con confirmación",
+      "Pausa por fuente persistida, mostrada como solicitada y pendiente de reporte",
+      "Guardar alias ficticio 0001, conservando ceros y evidencia",
+      "Guardar regla de comercio y categoría desde la interfaz",
+      "Confirmar una compra distinta con el mismo importe y conservarla como otro gasto",
+      "Abrir Gastos, guardar caché, desconectar y recargar: Captura BBVA y Por conciliar visibles sin conexión",
+      "Formularios y selector inferior adaptados a móvil; sin desbordamiento horizontal a 320 y 390 px",
+      "Actualización real de bandeja visible: peticiones a 53204 y 83203 ms, separación 29999 ms"
+    ],
+    "uncaughtPageErrors": 0,
+    "mobile": [
+      {
+        "viewport": 320,
+        "documentWidth": 305,
+        "horizontalOverflow": false
+      },
+      {
+        "viewport": 390,
+        "documentWidth": 375,
+        "horizontalOverflow": false
+      }
+    ],
+    "touchControls": "Acciones nuevas y fechas de 44 px; ResponsiveSelect conserva su extensión táctil canónica sobre el campo visible de 28 px.",
+    "incidentAndRepair": "El fixture de desarrollo reiniciaba por HMR; se usó compilación estable. Se corrigieron el importe con Controller, la recuperación de metadatos concurrentes y las filas estrechas en móvil.",
+    "screenshots": [
+      "inbox-320.png",
+      "inbox-390.png",
+      "configuration-320.png",
+      "configuration-390.png",
+      "reconciliation-320.png",
+      "reconciliation-390.png",
+      "offline-390.png"
+    ]
+  },
+  "limitations": [
+    "Las muestras bancarias reales y la captura real con pantalla bloqueada siguen pendientes en Fases 1/4.",
+    "Los analizadores sintéticos siguen sin poder activarse.",
+    "El cotejo compara cargos de compras y cuotas MSI del mes final; no representa el saldo a pagar completo.",
+    "La publicación y actualización de Supabase/APK requieren respaldo y autorización explícita."
+  ]
+}

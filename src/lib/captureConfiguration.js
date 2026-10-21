@@ -12,6 +12,9 @@ export const captureInventorySchema = z.object({ version: z.literal(1), cards: z
 }).strict()).max(100) }).strict();
 
 const actionSchema = z.discriminatedUnion("action", [
+  z.object({ action: z.literal("alias"), cardId: z.string().min(1), sourcePackage: z.enum(capturePackages), kind: z.enum(["PHYSICAL", "DIGITAL", "WALLET"]), value: lastFour, verified: z.boolean(), evidence: z.string().trim().max(500) }).strict(),
+  z.object({ action: z.literal("deleteAlias"), id: z.uuid() }).strict(),
+  z.object({ action: z.literal("deleteRule"), id: z.uuid() }).strict(),
   z.object({ action: z.literal("importAliases"), inventory: captureInventorySchema }).strict(),
   z.object({ action: z.literal("automation"), cardId: z.string().min(1), parserKey: z.string(), mode: z.enum(["OBSERVATION", "AUTOMATIC"]) }).strict(),
   z.object({ action: z.literal("rule"), cardId: z.string().min(1), merchant: z.string().trim().min(1).max(200), categoryId: z.string().min(1), subscriptionId: z.string().nullable().optional() }).strict(),
@@ -23,6 +26,19 @@ export async function configureCapture(db, userId, input) {
   const data = parsed.data;
   return db.$transaction(async tx => {
     await lockDebtAccounts(tx, userId);
+    if (["deleteAlias", "deleteRule"].includes(data.action)) {
+      const model = data.action === "deleteAlias" ? tx.captureCardAlias : tx.captureMerchantRule;
+      if (!(await model.deleteMany({ where: { id: data.id, userId } })).count) throw new ApiAccessError("Registro no encontrado.", 404);
+      return { deleted: true };
+    }
+    if (data.action === "alias") {
+      await requireOwnedReferences(tx, userId, data, ["cardId"]);
+      if ((data.kind === "WALLET") !== (data.sourcePackage === "com.google.android.apps.walletnfcrel")) throw new ApiAccessError("Selecciona la fuente y el tipo de terminación correspondientes.", 400);
+      if (data.verified && !data.evidence) throw new ApiAccessError("Indica dónde verificaste esta terminación.", 400);
+      const identity = { userId, cardId: data.cardId, sourcePackage: data.sourcePackage, kind: data.kind, value: data.value };
+      const verification = { verifiedAt: data.verified ? new Date() : null, evidence: data.evidence || null };
+      return tx.captureCardAlias.upsert({ where: { userId_cardId_sourcePackage_kind_value: identity }, create: { ...identity, ...verification }, update: verification });
+    }
     if (data.action === "importAliases") {
       if (new Set(data.inventory.cards.map(card => card.name)).size !== data.inventory.cards.length) throw new ApiAccessError("No repitas el nombre de una tarjeta.", 400);
       let imported = 0;
@@ -67,10 +83,12 @@ export async function configureCapture(db, userId, input) {
 }
 
 export async function captureConfiguration(db, userId) {
-  const [cards, aliases, automations, rules] = await Promise.all([
+  const [cards, aliases, automations, rules, categories, subscriptions] = await Promise.all([
     db.card.findMany({ where: { userId }, select: { id: true, name: true }, orderBy: { name: "asc" } }),
     db.captureCardAlias.findMany({ where: { userId } }), db.captureAutomation.findMany({ where: { userId } }),
     db.captureMerchantRule.findMany({ where: { userId } }),
+    db.category.findMany({ where: { userId }, select: { id: true, name: true }, orderBy: { name: "asc" } }),
+    db.subscription.findMany({ where: { userId, paymentMethod: "CARD" }, select: { id: true, name: true, cardId: true }, orderBy: { name: "asc" } }),
   ]);
-  return { cards, aliases, automations, rules, parsers: captureParsers.map(({ key, sourcePackage, verified }) => ({ key, sourcePackage, verified })) };
+  return { cards, aliases, automations, rules, categories, subscriptions, parsers: captureParsers.map(({ key, sourcePackage, verified }) => ({ key, sourcePackage, verified })) };
 }

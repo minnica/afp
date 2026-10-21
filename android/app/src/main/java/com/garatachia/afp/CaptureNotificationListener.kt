@@ -24,7 +24,7 @@ class CaptureNotificationListener : NotificationListenerService() {
     override fun onNotificationPosted(sbn: StatusBarNotification) = capture(sbn)
     private fun capture(sbn: StatusBarNotification) {
         val summary = sbn.notification.flags and Notification.FLAG_GROUP_SUMMARY != 0
-        if (!CapturePolicy.accepts(sbn.packageName, app.active, app.selected, summary)) return
+        if (!CapturePolicy.accepts(sbn.packageName, app.active, app.captureSources, summary)) return
         if (sbn.notification.category == Notification.CATEGORY_PROMO) return
         runCatching {
             DiagnosticSample.fromNotification(sbn, getSystemService(KeyguardManager::class.java).isKeyguardLocked)

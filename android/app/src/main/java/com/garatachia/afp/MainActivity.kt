@@ -103,6 +103,7 @@ class MainActivity : ComponentActivity() {
     private fun DiagnosticScreen() {
         val samples by app.samples.collectAsStateWithLifecycle()
         val connected by app.connected.collectAsStateWithLifecycle()
+        val remotePauses by app.remotePauses.collectAsStateWithLifecycle()
         val storageError by app.storageError.collectAsStateWithLifecycle()
         var active by remember { mutableStateOf(app.active) }
         var selected by remember { mutableStateOf(app.selected) }
@@ -125,7 +126,7 @@ class MainActivity : ComponentActivity() {
                 item {
                     Text("Captura automática", style = MaterialTheme.typography.headlineMedium)
                     Text("Captura y sincronización", color = MaterialTheme.colorScheme.primary)
-                    Text("Comprueba los avisos disponibles en este teléfono. Esta versión todavía no registra gastos.",
+                    Text("Comprueba los avisos disponibles en este teléfono. El registro financiero depende de los formatos y tarjetas habilitados en AFP.",
                         modifier = Modifier.padding(top = 8.dp))
                 }
                 item {
@@ -187,6 +188,7 @@ class MainActivity : ComponentActivity() {
                 }
                 items(CapturePolicy.sources.entries.toList(), key = { it.key }) { (name, label) ->
                     Section(label) {
+                        if (name in remotePauses) Text("Pausada desde AFP. Reanúdala en Configuración → Captura automática.")
                         ToggleRow("Capturar $label", name in selected,
                             enabled = installed[name] != null || name in selected) { enabled ->
                             selected = if (enabled) selected + name else selected - name

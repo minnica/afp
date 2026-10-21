@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { apiResponse, requireApiUser, ApiAccessError } from "@/lib/apiAuth";
-import { deviceCredential, readCaptureJson, validateCaptureEvent, deviceSelect } from "@/lib/captureProtocol";
+import { deviceCredential, readCaptureJson, validateCaptureEvent, deviceSelect, capturePackages } from "@/lib/captureProtocol";
 import { limitCaptureAttempts, startCapturePairing, approveCapturePairing, lockedCaptureDevice, getCaptureDevice, changeCaptureDevice, receiveCaptureEvent } from "@/lib/captureService";
 
 export async function captureRequest(request, action) {
@@ -34,6 +34,19 @@ export async function captureRequest(request, action) {
       if (action === "status") result = await getCaptureDevice(prisma, credential);
       else if (action === "device-change") {
         const input = await readCaptureJson(request);
+        if (input?.action === "report") {
+          const parsed = z.object({ action: z.literal("report"), version: z.literal(1), active: z.boolean(), listenerConnected: z.boolean(),
+            notificationAccess: z.boolean(), batteryExempt: z.boolean(), deliveryPaused: z.boolean(), selectedPackages: z.array(z.enum(capturePackages)).max(8),
+            pausedPackages: z.array(z.enum(capturePackages)).max(8) }).strict().safeParse(input);
+          if (!parsed.success) throw new ApiAccessError("Estado no válido.", 400);
+          result = await prisma.$transaction(async tx => {
+            const device = await lockedCaptureDevice(tx, credential);
+            if (!device.userId || device.revokedAt) throw new ApiAccessError("El teléfono no está autorizado.", 403);
+            await tx.captureDevice.update({ where: { id: device.id }, data: { reportedState: parsed.data, reportedAt: new Date() } });
+            return { reported: true };
+          });
+          return apiResponse.json(result);
+        }
         if (!["pause", "resume"].includes(input?.action)) throw new ApiAccessError("Acción no válida.", 400);
         result = await prisma.$transaction(async tx => {
           const device = await lockedCaptureDevice(tx, credential);

@@ -52,6 +52,24 @@ class CaptureDeliveryJvmTest {
         assertEquals(200, approval.statusCode())
         val active = client.status(pending)
         assertEquals("ACTIVE", active.state); assertNotNull(active.ownerId)
+        val sourcePause = HttpClient.newBuilder().sslContext(ssl).build().send(
+            HttpRequest.newBuilder(URI("$origin/api/captures/devices"))
+                .header("Authorization", "Bearer capture-instrumentation").header("Content-Type", "application/json")
+                .method("PATCH", HttpRequest.BodyPublishers.ofString(JSONObject().put("deviceId", active.deviceId)
+                    .put("action", "source").put("sourcePackage", "com.bancomer.mbanking").put("paused", true).toString())).build(),
+            HttpResponse.BodyHandlers.discarding())
+        assertEquals(200, sourcePause.statusCode())
+        var configured = false
+        val configurableClient = CaptureApiClient(origin, ::connection) { owner, configuration ->
+            assertEquals(active.ownerId, owner.ownerId)
+            assertEquals("com.bancomer.mbanking", configuration.getJSONArray("pausedPackages").getString(0))
+            configured = true
+        }
+        configurableClient.status(active)
+        assertTrue(configured)
+        configurableClient.report(active, JSONObject().put("action", "report").put("version", 1).put("active", true)
+            .put("listenerConnected", false).put("notificationAccess", false).put("batteryExempt", false).put("deliveryPaused", false)
+            .put("selectedPackages", org.json.JSONArray()).put("pausedPackages", org.json.JSONArray(listOf("com.bancomer.mbanking"))))
         val receipt = client.sendEvent(active, event).getJSONObject("event")
         assertEquals("RECEIVED", receipt.getString("status"))
         assertEquals(receipt.toString(), client.sendEvent(active, event).getJSONObject("event").toString())
