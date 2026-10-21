@@ -11,7 +11,7 @@ const routes = fs.readdirSync(path.join(__dirname, "../src/app/api"), { recursiv
   .filter(file => file.endsWith("route.js") && !file.startsWith("captures/"))
   .map(file => file.replace(/\/route.js$/, ""));
 const models = ["card", "cardCycle", "dailyExpense", "category", "person", "incomeType", "income",
-  "subscription", "subscriptionCharge", "installmentPurchase", "receivableAccount", "payableAccount", "cardCycleCredit", "noticeDismissal", "user"];
+  "subscription", "subscriptionCharge", "installmentPurchase", "receivableAccount", "payableAccount", "cardCycleCredit", "noticeDismissal", "user", "expenseTombstone"];
 function fixture({ empty = false } = {}) {
   const calls = [], writes = [];
   const rows = Object.fromEntries(models.map(model => [model, empty ? [] : ["a", "b"].map(userId => ({

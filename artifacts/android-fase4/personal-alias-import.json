@@ -1,0 +1,25 @@
+{
+  "date": "2026-10-21",
+  "cards": 9,
+  "aliases": 24,
+  "verifiedAliases": 24,
+  "countsByKind": {
+    "PHYSICAL": 9,
+    "DIGITAL": 9,
+    "WALLET": 6
+  },
+  "ambiguousAliases": 0,
+  "existingCardIdentitiesPreserved": true,
+  "financialRowsPreserved": true,
+  "automationRowsPreserved": true,
+  "automaticFormatsEnabled": 0,
+  "banamex1VerifiedByExplicitUserInstruction": true,
+  "walletUnavailableAsDeclared": [
+    "HSBC 1",
+    "HSBC 2",
+    "MERCADOPAGO"
+  ],
+  "privateDataExcludedFromGit": true,
+  "privateBackup": "estados_cuenta/android_aliases_2026-10-21_h3coy839",
+  "pendingMigration": "20261021020000_capture_installment_reconciliation"
+}

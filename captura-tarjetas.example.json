@@ -1,0 +1,86 @@
+{
+  "version": 1,
+  "cards": [
+    {
+      "name": "BBVA",
+      "bankPackage": "com.bancomer.mbanking",
+      "physical": [],
+      "digital": [],
+      "wallet": [],
+      "verified": false,
+      "evidence": ""
+    },
+    {
+      "name": "HSBC 1",
+      "bankPackage": "mx.hsbc.hsbcmexico",
+      "physical": [],
+      "digital": [],
+      "wallet": [],
+      "verified": false,
+      "evidence": ""
+    },
+    {
+      "name": "HSBC 2",
+      "bankPackage": "mx.hsbc.hsbcmexico",
+      "physical": [],
+      "digital": [],
+      "wallet": [],
+      "verified": false,
+      "evidence": ""
+    },
+    {
+      "name": "BANAMEX 1",
+      "bankPackage": "com.citibanamex.banamexmobile",
+      "physical": [],
+      "digital": [],
+      "wallet": [],
+      "verified": false,
+      "evidence": ""
+    },
+    {
+      "name": "BANAMEX 2",
+      "bankPackage": "com.citibanamex.banamexmobile",
+      "physical": [],
+      "digital": [],
+      "wallet": [],
+      "verified": false,
+      "evidence": ""
+    },
+    {
+      "name": "SANTANDER",
+      "bankPackage": "mx.bancosantander.supermovil",
+      "physical": [],
+      "digital": [],
+      "wallet": [],
+      "verified": false,
+      "evidence": ""
+    },
+    {
+      "name": "NU",
+      "bankPackage": "com.nu.production",
+      "physical": [],
+      "digital": [],
+      "wallet": [],
+      "verified": false,
+      "evidence": ""
+    },
+    {
+      "name": "DIDI",
+      "bankPackage": "com.didiglobal.cashloan",
+      "physical": [],
+      "digital": [],
+      "wallet": [],
+      "verified": false,
+      "evidence": ""
+    },
+    {
+      "name": "MERCADOPAGO",
+      "bankPackage": "com.mercadopago.wallet",
+      "physical": [],
+      "digital": [],
+      "wallet": [],
+      "verified": false,
+      "evidence": ""
+    }
+  ]
+}

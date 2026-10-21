@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { getLatestInstallmentStatement } from "@/lib/calculations/installmentStatements";
 
 const purchaseSelect = {
+  reconciliationStatus: true,
   id: true,
   userId: true,
   cardId: true,

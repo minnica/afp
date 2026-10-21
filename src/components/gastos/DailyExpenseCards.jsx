@@ -91,6 +91,7 @@ export default function DailyExpenseCards({ expenses, isOnline, onEdit, onDelete
                       <div className="flex min-w-0 items-center justify-between gap-2">
                         <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
                           {expense.category?.name ? <Badge variant="secondary">{expense.category.name}</Badge> : null}
+                          {expense.reconciliationStatus === "PENDING" && <Badge variant="warning">Por conciliar</Badge>}
                           <span className="break-words text-sm text-muted-foreground">
                             {expense.paymentMethod === "CARD" ? `Tarjeta${expense.card ? ` · ${expense.card.name}` : ""}` : "Efectivo"}
                           </span>

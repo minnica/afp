@@ -52,6 +52,7 @@ const dashboardCycleSelect = {
 };
 
 const dashboardExpenseSelect = {
+  reconciliationStatus: true,
   subscriptionCharge: { select: { month: true } },
   notes: true,
   paymentMethod: true,
@@ -99,6 +100,7 @@ const dashboardSubscriptionSelect = {
 };
 
 const dashboardPurchaseSelect = {
+  reconciliationStatus: true,
   card: { select: { usualCutDay: true } },
   id: true,
   cardId: true,

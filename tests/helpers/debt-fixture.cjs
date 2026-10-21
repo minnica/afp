@@ -4,7 +4,7 @@ const { sourceLoader } = require('./load-source.cjs');
 // Persistencia aislada con rollback. El bloqueo se adquiere por el SQL real
 // del servicio; las pruebas PostgreSQL comprueban su semántica en el motor.
 function debtFixture() {
-  let state = { payableAccount: [], receivableAccount: [], dailyExpense: [], income: [] };
+  let state = { payableAccount: [], receivableAccount: [], dailyExpense: [], income: [], expenseTombstone: [] };
   let tail = Promise.resolve(), sequence = 0, failure = false;
   const matches = (row, where = {}) => Object.entries(where).every(([key, value]) => row[key] === value);
   function client(getState, transactional = false) {
@@ -19,6 +19,13 @@ function debtFixture() {
     };
     for (const model of Object.keys(state)) {
       db[model] = {
+        upsert: async ({ where, create, update }) => {
+          assert.ok(transactional);
+          let row = getState()[model].find(row => matches(row, where));
+          if (row) Object.assign(row, update);
+          else { row = { ...create }; getState()[model].push(row); }
+          return hydrate(model, row);
+        },
         findUnique: async ({ where }) => hydrate(model, getState()[model].find(row => matches(row, where))),
         findFirst: async ({ where }) => hydrate(model, getState()[model].find(row => matches(row, where))),
         findMany: async ({ where }) => getState()[model].filter(row => matches(row, where)).map(row => hydrate(model, row)),

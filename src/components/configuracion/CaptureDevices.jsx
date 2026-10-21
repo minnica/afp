@@ -18,6 +18,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import CaptureReview from "@/components/configuracion/CaptureReview";
 
 const schema = z.object({ code: z.string().transform(value => value.replace(/[\s-]/g, "").toUpperCase())
   .pipe(z.string().regex(/^[A-F0-9]{12}$/, "Escribe los doce caracteres del código de tu teléfono.")) });
@@ -73,7 +74,7 @@ export default function CaptureDevices({ userId }) {
   return <Card onClickCapture={captureFocus}>
     <CardHeader>
       <CardTitle>Captura automática</CardTitle>
-      <CardDescription>Autoriza la APK de AFP para enviar avisos desde tu teléfono. Los avisos todavía no crean gastos automáticamente.</CardDescription>
+      <CardDescription>Autoriza tu teléfono y revisa los avisos recibidos. El registro automático requiere validar cada tarjeta y formato.</CardDescription>
     </CardHeader>
     <CardContent className="flex flex-col gap-6">
       <form onSubmit={form.handleSubmit(value => setConfirmation(value))} className="flex flex-col gap-3">
@@ -115,6 +116,7 @@ export default function CaptureDevices({ userId }) {
           </ItemActions>}
         </Item>)}</ItemGroup>}
       <p className="text-sm text-muted-foreground">Cerrar AFP o salir de la sesión web conserva la autorización del teléfono. Usa Pausar o Revocar para detener la recepción.</p>
+      <CaptureReview key={userId} userId={userId} />
     </CardContent>
     <AlertDialog open={Boolean(confirmation)} onOpenChange={open => { if (!open && !busy) setConfirmation(null); }}>
       <AlertDialogContent onCloseAutoFocus={restoreFocus}>

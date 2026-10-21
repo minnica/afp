@@ -953,6 +953,7 @@ export default function GastosContent() {
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
                 <p className="font-medium">{expense.concept}</p>
+                {expense.reconciliationStatus === "PENDING" && <Badge variant="warning">Por conciliar</Badge>}
                 {expense._offlineStatus === "pending" ? (
                   <Badge
                     variant="outline"

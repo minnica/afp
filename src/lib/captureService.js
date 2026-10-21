@@ -1,5 +1,7 @@
 import { ApiAccessError } from "@/lib/apiAuth";
 import { captureHash, validSecret, pairingCode, normalizePairingCode, pairingLifetimeMs, deviceState, sameHash, deviceSelect, capturePackages } from "@/lib/captureProtocol";
+import { processCaptureEvent } from "@/lib/captureProcessing";
+import { captureParsers } from "@/lib/captureParsers";
 
 export async function limitCaptureAttempts(db, scope, identity, maximum, now = new Date()) {
   const key = captureHash(`${scope}:${identity}`);
@@ -72,9 +74,13 @@ export async function getCaptureDevice(db, credential) {
   return db.$transaction(async tx => {
     const device = await lockedCaptureDevice(tx, credential);
     const state = deviceState(device);
+    const verifiedFormats = captureParsers.filter(parser => parser.verified).map(parser => parser.key);
+    const automaticExpenses = Boolean(device.userId && verifiedFormats.length && await tx.captureAutomation.findFirst({
+      where: { userId: device.userId, mode: "AUTOMATIC", parserKey: { in: verifiedFormats } },
+    }));
     if (device.userId && !device.revokedAt) await tx.captureDevice.update({ where: { id: device.id }, data: { lastSeenAt: new Date() } });
     return { deviceId: device.id, ownerId: device.userId, state,
-      configuration: { contractVersion: 1, mode: "OBSERVATION", automaticExpenses: false, allowedPackages: capturePackages } };
+      configuration: { contractVersion: 1, mode: automaticExpenses ? "PER_CARD" : "OBSERVATION", automaticExpenses, allowedPackages: capturePackages } };
   });
 }
 
@@ -101,6 +107,7 @@ export async function receiveCaptureEvent(db, credential, event) {
     if (existing && existing.requestHash !== requestHash) throw new ApiAccessError("El UUID ya se recibió con otro contenido.", 409);
     const row = existing || await tx.captureEvent.create({ data: { ...event, postedAt: new Date(event.postedAt), receivedAt: new Date(event.receivedAt),
       deviceId: device.id, userId: device.userId, requestHash } });
+    if (!existing) await processCaptureEvent(tx, row);
     await tx.captureDevice.update({ where: { id: device.id }, data: { lastSeenAt: new Date() } });
     return { event: { id: row.id, eventId: row.eventId, status: "RECEIVED", receivedAt: row.createdAt } };
   });

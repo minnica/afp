@@ -82,6 +82,11 @@ model User {
   noticeDismissals     NoticeDismissal[]
   captureDevices       CaptureDevice[]
   captureEvents        CaptureEvent[]
+  captureAliases       CaptureCardAlias[]
+  captureAutomations   CaptureAutomation[]
+  captureRules         CaptureMerchantRule[]
+  captureMovements     CaptureMovement[]
+  expenseTombstones    ExpenseTombstone[]
 
   @@map("users")
 }
@@ -129,6 +134,9 @@ model Card {
   dailyExpenses        DailyExpense[]
   installmentPurchases InstallmentPurchase[]
   subscriptions        Subscription[]
+  captureAliases       CaptureCardAlias[]
+  captureAutomations   CaptureAutomation[]
+  captureRules         CaptureMerchantRule[]
 
   @@unique([userId, name])
   @@map("cards")
@@ -231,34 +239,36 @@ model IncomeType {
 }
 
 model DailyExpense {
-  id                  String        @id @default(uuid())
-  userId              String
-  date                DateTime
-  paymentMethod       PaymentMethod
-  cardId              String?
-  concept             String
-  amount              Decimal
-  cashContributionAmount Decimal    @default(0)
-  categoryId          String
-  notes               String?
-  personId            String?
-  receivableAccountId String?
-  payableAccountId    String?
-  subscriptionId      String?
+  id                      String        @id @default(uuid())
+  userId                  String
+  date                    DateTime
+  paymentMethod           PaymentMethod
+  cardId                  String?
+  concept                 String
+  amount                  Decimal
+  cashContributionAmount  Decimal       @default(0)
+  categoryId              String
+  notes                   String?
+  personId                String?
+  receivableAccountId     String?
+  payableAccountId        String?
+  subscriptionId          String?
+  reconciliationStatus    String        @default("CONFIRMED")
   loanBalanceAfterPayment Decimal?
   loanInterestAmount      Decimal?
   loanPrincipalAmount     Decimal?
-  createdAt           DateTime      @default(now())
-  updatedAt           DateTime      @updatedAt
+  createdAt               DateTime      @default(now())
+  updatedAt               DateTime      @updatedAt
 
-  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  card              Card?              @relation(fields: [cardId], references: [id], onDelete: SetNull)
-  category          Category           @relation(fields: [categoryId], references: [id])
-  person            Person?            @relation(fields: [personId], references: [id], onDelete: SetNull)
-  receivableAccount ReceivableAccount? @relation(fields: [receivableAccountId], references: [id], onDelete: SetNull)
-  payableAccount    PayableAccount?    @relation(fields: [payableAccountId], references: [id], onDelete: SetNull)
-  subscription      Subscription?      @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+  user               User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  card               Card?               @relation(fields: [cardId], references: [id], onDelete: SetNull)
+  category           Category            @relation(fields: [categoryId], references: [id])
+  person             Person?             @relation(fields: [personId], references: [id], onDelete: SetNull)
+  receivableAccount  ReceivableAccount?  @relation(fields: [receivableAccountId], references: [id], onDelete: SetNull)
+  payableAccount     PayableAccount?     @relation(fields: [payableAccountId], references: [id], onDelete: SetNull)
+  subscription       Subscription?       @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
   subscriptionCharge SubscriptionCharge?
+  captureMovements   CaptureMovement[]
 
   @@index([userId, date])
   @@index([cardId])
@@ -269,29 +279,31 @@ model DailyExpense {
 }
 
 model InstallmentPurchase {
-  id                   String                    @id @default(uuid())
-  userId               String
-  cardId               String
-  purchaseDate         DateTime
-  concept              String
-  totalAmount          Decimal
-  months               Int
-  manualMonthlyPayment Decimal?
+  id                       String                    @id @default(uuid())
+  userId                   String
+  cardId                   String
+  purchaseDate             DateTime
+  concept                  String
+  totalAmount              Decimal
+  months                   Int
+  manualMonthlyPayment     Decimal?
   statementReconciliations Json?
-  initialPaymentsMade  Int                       @default(0)
-  personId             String?
-  receivableAccountId  String?
-  categoryId           String
-  notes                String?
-  status               InstallmentPurchaseStatus @default(ACTIVE)
-  createdAt            DateTime                  @default(now())
-  updatedAt            DateTime                  @updatedAt
+  initialPaymentsMade      Int                       @default(0)
+  personId                 String?
+  receivableAccountId      String?
+  categoryId               String
+  notes                    String?
+  status                   InstallmentPurchaseStatus @default(ACTIVE)
+  reconciliationStatus     String                    @default("CONFIRMED")
+  createdAt                DateTime                  @default(now())
+  updatedAt                DateTime                  @updatedAt
 
   user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   card              Card               @relation(fields: [cardId], references: [id])
   person            Person?            @relation(fields: [personId], references: [id], onDelete: SetNull)
   receivableAccount ReceivableAccount? @relation(fields: [receivableAccountId], references: [id], onDelete: SetNull)
   category          Category           @relation(fields: [categoryId], references: [id])
+  captureMovements  CaptureMovement[]
 
   @@index([userId, purchaseDate])
   @@index([cardId])
@@ -316,9 +328,9 @@ model Subscription {
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 
-  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  card          Card?          @relation(fields: [cardId], references: [id], onDelete: SetNull)
-  category      Category       @relation(fields: [categoryId], references: [id])
+  user          User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  card          Card?                @relation(fields: [cardId], references: [id], onDelete: SetNull)
+  category      Category             @relation(fields: [categoryId], references: [id])
   dailyExpenses DailyExpense[]
   charges       SubscriptionCharge[]
 
@@ -338,8 +350,8 @@ model SubscriptionCharge {
   createdAt      DateTime                 @default(now())
   updatedAt      DateTime                 @updatedAt
 
-  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  subscription Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscription Subscription  @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
   expense      DailyExpense? @relation(fields: [expenseId], references: [id], onDelete: SetNull)
 
   @@unique([subscriptionId, month])
@@ -471,10 +483,10 @@ model CapturePairing {
 }
 
 model CaptureEvent {
-  id                  String        @id @default(uuid()) @db.Uuid
-  deviceId            String        @db.Uuid
+  id                  String           @id @default(uuid()) @db.Uuid
+  deviceId            String           @db.Uuid
   userId              String
-  eventId             String        @db.Uuid
+  eventId             String           @db.Uuid
   contractVersion     Int
   sourcePackage       String
   notificationKeyHash String
@@ -482,13 +494,106 @@ model CaptureEvent {
   receivedAt          DateTime
   fields              Json
   requestHash         String
-  createdAt           DateTime      @default(now())
-  user                User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  device              CaptureDevice @relation(fields: [deviceId, userId], references: [id, userId], onDelete: Cascade, onUpdate: Restrict)
+  createdAt           DateTime         @default(now())
+  interpretation      Json?
+  movementId          String?          @db.Uuid
+  movement            CaptureMovement? @relation(fields: [movementId], references: [id], onDelete: Restrict)
+  user                User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  device              CaptureDevice    @relation(fields: [deviceId, userId], references: [id, userId], onDelete: Cascade, onUpdate: Restrict)
 
   @@unique([deviceId, eventId])
   @@index([userId, createdAt])
+  @@index([deviceId, sourcePackage, notificationKeyHash, postedAt])
   @@map("capture_events")
+}
+
+// El alias pertenece a una tarjeta concreta. Se permiten colisiones entre tarjetas:
+// el resolver las detecta y bloquea la automatización, nunca elige la primera.
+model CaptureCardAlias {
+  id            String    @id @default(uuid()) @db.Uuid
+  userId        String
+  cardId        String
+  sourcePackage String
+  kind          String
+  value         String
+  verifiedAt    DateTime?
+  evidence      String?
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  card          Card      @relation(fields: [cardId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, cardId, sourcePackage, kind, value])
+  @@index([userId, sourcePackage, kind, value])
+  @@map("capture_card_aliases")
+}
+
+model CaptureAutomation {
+  id        String @id @default(uuid()) @db.Uuid
+  userId    String
+  cardId    String
+  parserKey String
+  mode      String @default("OBSERVATION")
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  card      Card   @relation(fields: [cardId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, cardId, parserKey])
+  @@map("capture_automations")
+}
+
+model CaptureMerchantRule {
+  id             String  @id @default(uuid()) @db.Uuid
+  userId         String
+  cardId         String
+  merchant       String
+  categoryId     String
+  subscriptionId String?
+  user           User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  card           Card    @relation(fields: [cardId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, cardId, merchant])
+  @@map("capture_merchant_rules")
+}
+
+// La propuesta original y originalExpenseId sobreviven a ediciones/borrados.
+// No se vuelve a interpretar automáticamente un evento ya recibido.
+model CaptureMovement {
+  id                    String               @id @default(uuid()) @db.Uuid
+  userId                String
+  status                String               @default("REVIEW")
+  reason                String
+  parserKey             String?
+  proposal              Json
+  cardId                String?
+  amount                Decimal?
+  operationDate         DateTime?
+  referenceKey          String?
+  expenseId             String?
+  originalExpenseId     String?
+  installmentPurchaseId String?
+  createdAt             DateTime             @default(now())
+  resolvedAt            DateTime?
+  user                  User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expense               DailyExpense?        @relation(fields: [expenseId], references: [id], onDelete: SetNull)
+  installmentPurchase   InstallmentPurchase? @relation(fields: [installmentPurchaseId], references: [id], onDelete: SetNull)
+  events                CaptureEvent[]
+
+  @@unique([userId, referenceKey])
+  @@index([userId, status, createdAt])
+  @@index([userId, cardId, operationDate])
+  @@map("capture_movements")
+}
+
+model ExpenseTombstone {
+  expenseId String   @id
+  userId    String
+  cardId    String?
+  date      DateTime
+  amount    Decimal
+  concept   String
+  deletedAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, cardId, date])
+  @@map("expense_tombstones")
 }
 
 // Ventanas persistentes: los límites no dependen de la memoria de una función.

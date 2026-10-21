@@ -7,6 +7,7 @@ const root = path.resolve(__dirname, '../..');
 const os = require('node:os');
 const qaDir = fs.mkdtempSync(path.join(os.tmpdir(), 'afp-capture-qa-'));
 const connectionString = process.env.AFP_TEST_DATABASE_URL;
+const productionFixture = process.env.AFP_CAPTURE_TEST_PRODUCTION === '1';
 if (!connectionString) throw new Error('Falta AFP_TEST_DATABASE_URL.');
 const database = new URL(connectionString);
 if (!['127.0.0.1', 'localhost'].includes(database.hostname) || !/^\/afp_test[a-zA-Z0-9_]*$/.test(database.pathname) || database.search) throw new Error('Solo permite PostgreSQL local afp_test.');
@@ -26,7 +27,15 @@ const next = require('../../node_modules/next');
 const db = new PrismaClient({ adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }) });
 const user = { id: '00000000-0000-4000-8000-000000000091', aud: 'authenticated', email: 'capture-qa@example.test' };
 const token = `${Buffer.from('{"alg":"HS256","typ":"JWT"}').toString('base64url')}.${Buffer.from(JSON.stringify({ sub: user.id, exp: 2000000000, role: 'authenticated' })).toString('base64url')}.fake`;
-const app = next({ dev: true, webpack: true, dir: qaDir, hostname: '127.0.0.1', port: 4208,
+if (productionFixture) {
+  // Compilación aislada: no copia .env ni permite una BD remota. Evita que HMR
+  // reinicie interacciones durante pruebas simultáneas de navegador/teléfono.
+  const built = require('node:child_process').spawnSync(path.join(root, 'node_modules/.bin/next'), ['build', '--webpack'], {
+    cwd: qaDir, env: { ...process.env, NODE_ENV: 'production' }, encoding: 'utf8', timeout: 180000,
+  });
+  if (built.status !== 0) throw new Error(`Falló la compilación del fixture local: ${built.stderr}\n${built.stdout}`);
+}
+const app = next({ dev: !productionFixture, webpack: true, dir: qaDir, hostname: '127.0.0.1', port: 4208,
   conf: { devIndicators: false, allowedDevOrigins: ['127.0.0.1'], experimental: { externalDir: true } } });
 async function main() {
   await db.user.upsert({ where: { id: user.id }, create: { id: user.id, email: user.email }, update: {} });

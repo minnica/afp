@@ -2,7 +2,7 @@
 
 La Fase 1 añade una APK Kotlin/Compose en `android/`. Abre la interfaz financiera actual mediante Trusted Web Activity (TWA) y permite comprobar qué notificaciones entregan BBVA México, Google Wallet, HSBC, Banamex, Santander, Nu, DiDi Finanzas y Mercado Pago. La pantalla nativa incluye activación, selección de fuentes, estado del permiso y del lector, muestras locales e instrucciones para Samsung.
 
-El diagnóstico está **pausado por defecto**. La Fase 2 añade vinculación independiente, cifrada y revocable, y recepción segura de eventos. El inicio de sesión web permanece en el navegador de la TWA; el componente nativo no lo lee. La Fase 3 añade la cola Room cifrada y el envío automático mediante WorkManager para los avisos recibidos con una identidad autorizada. La interpretación y creación automática de gastos siguen pendientes de la Fase 4.
+El diagnóstico está **pausado por defecto**. La Fase 2 añade vinculación independiente, cifrada y revocable, y recepción segura de eventos. El inicio de sesión web permanece en el navegador de la TWA; el componente nativo no lo lee. La Fase 3 añade la cola Room cifrada y el envío automático mediante WorkManager para los avisos recibidos con una identidad autorizada. La Fase 4 incorpora el motor de interpretación/registro y la revisión básica; los formatos reales siguen bloqueados por falta de muestras verificadas.
 
 El plan se ajustó el 21 de octubre de 2026 para preparar el diagnóstico de todas las tarjetas desde la Fase 1 y conservar la activación automática gradual por tarjeta/formato, empezando por BBVA. La APK **0.1.2 / versionCode 3** amplió el diagnóstico a ocho paquetes verificados; posteriormente se actualizó a **0.2.0 / versionCode 4**, vinculada en el S24 Ultra; la Fase 3 actualiza la APK a **0.3.0 / versionCode 5**. El inventario actual, leído mediante una transacción de solo lectura, contiene nueve tarjetas de siete emisores. La [matriz de fuentes](../android/diagnostics/format-matrix.md) relaciona esos nombres existentes con las aplicaciones y mantiene separados los paquetes verificados de los formatos aún sin muestras reales.
 
@@ -280,3 +280,102 @@ AFP_CAPTURE_TEST_CERTIFICATE=<certificado TLS local> \
 También pasaron **234 regresiones web sin omisiones**, lint y build web; se verificaron las 18 migraciones desde cero y actualización histórica, checksums, datos conservados y 21 tablas con RLS. Android compila debug/release y lint sin errores; conserva siete avisos (objetivo/versiones y la sugerencia `UseKtx`; se usa `commit()` directamente para comprobar si persistió la pausa), y un aviso de herramientas SDK XML. El runner emitió un aviso auxiliar por `androidx.test.services` ausente; las 25 pruebas terminaron correctamente. Estos resultados no acreditan muestras bancarias reales ni entrega real de un banco con pantalla bloqueada: la Fase 1 conserva esas tareas pendientes.
 
 **Instalación y comprobación en producción:** se actualizó la APK mediante `adb install -r` con el certificado existente, conservando la fecha original de instalación, el acceso a notificaciones, la vinculación autorizada, la captura activa y las ocho fuentes seleccionadas. Desde la pantalla real se pausaron los envíos, se reinició el proceso para comprobar que la pausa persistía, se reanudaron y se ejecutó el reintento. Se consultó de nuevo la autorización del servidor. La cola personal mostró **0 pendientes, 0 por revisar y 0 entregados**. Las pruebas sintéticas de Room/HTTPS y reinicio usaron exclusivamente desarrollo; no se crearon gastos ni se modificó el servidor de producción. [Evidencia agregada sin datos personales](../artifacts/android-fase3/verification.json).
+
+
+## Interpretación y registro financiero — Fase 4
+
+Implementación del **21 de octubre de 2026**. El motor reside en el servidor: no cambia el contrato v1, las credenciales ni la cola Room de la APK 0.3.0. La autorización del teléfono y la habilitación financiera por tarjeta/formato son controles separados.
+
+### Cobertura comprobada y condición de activación
+
+`src/lib/captureParsers.js` registra `bbva.purchase.es.v1` y `wallet.purchase.es.v1`. **Son contratos sintéticos para verificar la arquitectura, no formatos observados de esas aplicaciones.** Ambos conservan `verified: false`; la API impide habilitarlos automáticamente, aunque se configuren alias. No hay variables de entorno ni propiedades del evento que permitan saltar ese control. Las pruebas transaccionales simulan formatos verificados únicamente mediante su cargador de módulos aislado.
+
+Un formato real se incorpora cuando exista una muestra revisada y anonimizada que conserve el lenguaje/estructura bancaria, con sus regresiones de compra aprobada y variantes negativas. Se versiona el analizador; una versión nueva empieza en observación por tarjeta. HSBC, Banamex, Santander, Nu, DiDi y Mercado Pago conservan sus paquetes de captura y sus avisos desconocidos quedan en revisión. No se ha atribuido cobertura bancaria real a ejemplos ficticios.
+
+Los contratos sintéticos requieren título exacto «Compra aprobada» (BBVA) o «Pago realizado» (Wallet), importe explícito con moneda y dos decimales, comercio, alias de cuatro cifras y fecha completa de operación. El texto ampliado contradictorio, la fecha ausente, horas de verano inexistentes/repetidas, moneda distinta de MXN y movimientos especiales bloquean el registro. Esta gramática no es una instrucción para modificar avisos reales ni una descripción verificada de los textos de los bancos.
+
+### Archivo privado para todas las tarjetas
+
+Se preparó `captura-tarjetas.local.json` **en la raíz**, excluido de Git. `captura-tarjetas.example.json` es su plantilla pública vacía. Incluye BBVA, HSBC 1/2, BANAMEX 1/2, SANTANDER, NU, DIDI y MERCADOPAGO. No se inventan terminaciones ni IDs.
+
+Ejemplo **ficticio** de una entrada dentro de `cards`:
+
+```json
+{
+  "name": "BBVA",
+  "bankPackage": "com.bancomer.mbanking",
+  "physical": ["0123"],
+  "digital": ["0456"],
+  "wallet": ["0789"],
+  "verified": true,
+  "evidence": "Terminaciones revisadas en la app bancaria y en Wallet"
+}
+```
+
+- Escribir solo cuatro cifras **entre comillas** y conservar ceros iniciales. Las listas admiten varios alias de un mismo tipo. Usar `[]` cuando falte información; no equivale a eliminar alias anteriores.
+- Mantener los nombres exactos de AFP y los paquetes de la plantilla. La importación busca las tarjetas del propietario autenticado y conserva sus IDs/historiales. No crea tarjetas ni las fusiona por banco.
+- Marcar `verified: true` únicamente después de comprobar los valores, y describir esa comprobación en `evidence`. Si solo se conocen algunos, dejar vacías las otras listas; la verificación se aplica únicamente a los alias incluidos.
+- El token de Wallet puede diferir de la terminación física/digital. Consultar la tarjeta correspondiente en Wallet; no copiar la física a ese campo por deducción.
+- No incluir PAN completo, CVV, claves, códigos de acceso ni credenciales. No subir el archivo privado a Git ni publicarlo como evidencia.
+
+Importar en **Configuración → Captura automática → Importar terminaciones desde JSON**. La operación es transaccional, aditiva y repetible. Un nombre inexistente revierte todo el archivo. Si una misma fuente/tipo/terminación corresponde a varias tarjetas, ambas se conservan y los avisos quedan en revisión. Importar alias no activa automatizaciones. **Importación real concluida el 21 de octubre de 2026:** 24 alias, todos verificados por declaración del propietario: nueve físicos, nueve digitales y seis de Wallet. Se resolvieron contra las nueve tarjetas existentes de Supabase sin ambigüedades; BANAMEX 1 fue confirmada explícitamente por el usuario. HSBC 1/2 y MERCADOPAGO conservan Wallet vacío porque el propietario indicó que no son compatibles. Se respaldó la entrada original y el estado anterior a importar, se ejecutó el servicio real de configuración en una transacción y se verificaron identidades, valores persistidos y conservación de todas las filas financieras y la automatización previa. No hubo gastos, activación de formatos, migraciones ni despliegue. La plantilla pública que inicialmente recibió las terminaciones se restauró vacía; los datos están exclusivamente en el archivo privado y el respaldo excluido de Git. [Evidencia sin terminaciones](../artifacts/android-fase4/personal-alias-import.json).
+
+### Flujo financiero y decisiones
+
+1. La API valida credencial y contrato antes de interpretar. Dispositivo, recepción y revocación conservan el bloqueo de Fase 2. La escritura financiera toma el bloqueo por propietario compartido con altas, ediciones y borrados manuales.
+2. El evento nuevo se guarda y se interpreta dentro de la misma transacción. Se conserva el resultado del analizador, la propuesta original y la resolución. Un reintento devuelve el recibo anterior y no vuelve a procesar; cambiar contenido con el mismo UUID devuelve 409. Los eventos antiguos de Fases 2/3 no se reinterpretan automáticamente al desplegar.
+3. El resolver exige alias verificado y no ambiguo, formato comprobado y modo `AUTOMATIC` para esa tarjeta/versión. Los otros casos permanecen en observación o revisión y no alteran los importes financieros.
+4. Los importes admitidos llegan a Prisma como cadenas decimales canónicas. La hora real de operación se interpreta en `America/Mexico_City` y se conserva en la propuesta; publicación, recepción del teléfono y recepción del servidor permanecen separadas. El gasto guarda a las 12:00 UTC el día bancario utilizado por el resto de AFP.
+5. Una regla de comercio normalizado **exacto**, separada por tarjeta, indica categoría y suscripción opcional. Sin regla se crea/reutiliza «Por clasificar». Una regla con referencias ya eliminadas lleva el aviso a revisión. No se infieren personas, efectivo recibido ni cuentas.
+6. El gasto nuevo usa `reconciliationStatus: PENDING` (**Por conciliar**). Aparece inmediatamente en Gastos y en los cortes estimados; se conserva en el respaldo local. Consumo mínimo lo muestra como previsto y no lo acredita como confirmado. Los registros históricos/manuales conservan `CONFIRMED`; editar la captura no confirma su conciliación.
+
+**Duplicados:** la identidad idempotente sigue siendo dispositivo/UUID, no un importe/comercio/día. Una referencia bancaria inequívoca se limita a la tarjeta resuelta y solo reúne canales si importe, moneda, día y comercio son consistentes. Una referencia contradictoria queda en revisión. Coincidencias de tarjeta/importe en ±3 días, incluso de gastos manuales, borrados o propuestas anteriores, requieren decisión. La amplitud de esa búsqueda puede generar revisiones de compras distintas, pero no elimina su multiplicidad. Reutilizar una clave de notificación también requiere revisión salvo la evidencia inequívoca ya resuelta. No se da por hecho que cada actualización sea una compra.
+
+La pantalla básica de revisión permite **Vincular al existente**, conservando los datos/correcciones, o **Es otra compra**, creando otro gasto por conciliar mediante decisión confirmada e idempotente. Las resoluciones terminales no se repiten ni recrean gastos eliminados. Las altas manuales posteriores que coincidan con una captura pendiente devuelven 409; el contrato acepta `confirmDistinctCapture: true` como decisión explícita. Su control visual dentro del formulario manual se completará en la Fase 5. Las huellas de borrados empiezan con esta versión; no se recuperan borrados históricos sin evidencia.
+
+**Suscripciones:** solo reglas explícitas crean vínculos. Se reutilizan el bloqueo de fila, la unicidad suscripción/mes y el servicio existente. Un cargo ya registrado, omitido o respaldado por un estado de cuenta requiere revisión; no se crea otro gasto. La captura sustituye la previsión y no acredita consumo confirmado hasta conciliarla.
+
+**MSI y especiales:** MSI, preautorizaciones, devoluciones, cancelaciones, abonos, rechazos, pedidos/promociones y monedas distintas de MXN quedan en revisión. `convertToInstallments` sustituye un gasto identificado por una compra a meses dentro de una transacción y conserva los datos editados, notas y condición pendiente. Retira el cargo completo al crear las mensualidades. Rechaza suscripciones, aportaciones o vínculos personales que necesiten revisión adicional. La interfaz completa de conversión pertenece a Fase 5.
+
+### API administrativa
+
+Todas las rutas siguientes exigen **Bearer Supabase** y obtienen el usuario del token; una credencial nativa no las puede usar. Las respuestas son privadas y sin caché.
+
+| Ruta | Operación |
+|---|---|
+| `GET /api/captures/configuration` | Tarjetas propias, alias, modos, reglas y formatos disponibles. |
+| `PATCH /api/captures/configuration` | `importAliases` con `inventory`, `automation` con tarjeta/formato/modo, o `rule` con comercio/categoría/suscripción opcional. |
+| `GET /api/captures/movements` | Últimos 50 avisos, `nextCursor`; admite `status` y `cursor` propios. No expone datos de otras cuentas. |
+| `PATCH /api/captures/movements` | `id` y `action`: `link` (+`expenseId`), `distinct`, `discard`, `convertToInstallments` (+`months`, entero 2–120). |
+
+Las configuraciones, vínculos y conversiones validan propiedad dentro de la transacción. «Es otra compra» solo resuelve posibles duplicados/revisiones identificados; no permite completar datos desconocidos ni registrar cualquier aviso especial. Descartar conserva la evidencia. La lista básica de Configuración adelanta parte de Fase 5; edición, conciliación, controles completos de reglas/modos y actualizaciones periódicas siguen pendientes de esa fase.
+
+### Persistencia, migraciones e incidencia de producción
+
+`20261021010000_add_capture_processing` añade cinco tablas: alias, automatización, reglas, movimientos y huellas de borrados, además de interpretación/enlace del evento y estado de conciliación del gasto. `20261021020000_capture_installment_reconciliation` incorpora el mismo estado en MSI. Son **aditivas**, con defaults compatibles, restricciones y RLS explícito sin políticas públicas. No reclasifican importes ni modifican registros financieros históricos.
+
+**Incidencia del 21 de octubre:** al escalar un comando de prueba se omitieron las variables locales y Prisma usó `.env`, apuntando a Supabase. Se interrumpió la ejecución cuando ya había empezado la primera migración; faltaban nueve claves foráneas y cuatro restricciones. Se guardó un respaldo privado del estado en `estados_cuenta/android_fase4_recovery_1IBYEM/`, se completaron exclusivamente las partes pendientes en una transacción y se compararon todas las filas antes/después de esa recuperación, sin cambios. RLS ya estaba activo por el automatismo existente y se declaró explícitamente también. Se comprobó el diff vacío y el checksum original, y `migrate resolve --applied` conservó el intento interrumpido como retirado y registró el recibo final aplicado.
+
+La auditoría posterior encontró **19 migraciones efectivas, checksums coincidentes, 26 tablas con RLS y cero políticas públicas**. Las cinco tablas nuevas están vacías: no se importaron terminaciones personales, no se activó automatización y no se crearon gastos de prueba. No existe un snapshot inmediatamente anterior a la invocación equivocada; la comparación de conservación empieza antes de la recuperación. El SQL inicial es aditivo. La web publicada y la APK personal no se actualizaron en esta operación.
+
+**Antes de publicar esta versión:** respaldar y aplicar la segunda migración pendiente con `prisma migrate deploy`, regenerar Prisma y verificar historial/RLS. En una instalación nueva se aplican las 20 migraciones en orden. No volver a ejecutar manualmente el SQL de la primera ni editar su checksum. Las pruebas deben especificar siempre conexiones **localhost / afp_test…**, también al solicitar ejecución fuera del sandbox. [Evidencia de recuperación](../artifacts/android-fase4/production-recovery.json).
+
+### Verificación reproducible y resultados
+
+Con PostgreSQL 16 local desechable, sin reutilizar datos personales:
+
+```bash
+DIRECT_URL=<PostgreSQL localhost afp_test…> pnpm exec prisma migrate deploy
+AFP_TEST_DATABASE_URL=<la misma base local> node --test --experimental-test-isolation=none tests/*.test.cjs
+AFP_MIGRATION_TEST_DATABASE_URL=<la misma base local> pnpm db:verify
+pnpm lint
+pnpm exec next build --webpack
+```
+
+**266 pruebas web correctas, cero fallos y cero omisiones**. Incluyen seis pruebas de analizador y 25 escenarios transaccionales nuevos: concurrencia de diez entregas, respuesta perdida, dos compras iguales, referencias entre canales, alias ausentes/ambiguos, pausa por formato, reglas desactualizadas, manuales y eliminados, correcciones conservadas, suscripciones registradas/omitidas/documentadas, fallos tras escrituras reales y conversión a MSI con rollback. Se verifica numéricamente que las capturas/MSI pendientes entran en el corte y no completan la meta de consumo confirmado. Auth y eventos son ficticios.
+
+`db:verify` reconstruye las **20 migraciones** desde vacío y desde el historial de 13 migraciones, conserva los registros históricos, comprueba defaults y restricciones de conciliación, checksums, diff vacío, segundo deploy sin cambios y **26 tablas con RLS**. Build web correcto; lint conserva únicamente la advertencia previa de TanStack Table. La validación bancaria real y las terminaciones personales permanecen pendientes; no se confunden con la verificación sintética. Evidencia agregada: [Fase 4](../artifacts/android-fase4/verification.json).
+
+**Android y navegador:** 18 pruebas JVM y 25 instrumentadas correctas, cero fallos/omisiones, repetidas sin caché en el S24 Ultra contra HTTPS/API/PostgreSQL locales. La prueba inicial fallida por un manifiesto JSON del servidor de desarrollo pasó después de la reconexión USB; la ejecución completa final usa una compilación local estable. Ambas APK firmadas y lint correctos; se conservan los avisos previos, incluido el auxiliar del runner sobre `androidx.test.services`. La APK personal no se actualizó ni perdió su configuración. Chromium comprueba importación de nueve tarjetas, vínculo sin sobrescribir datos, compra distinta por conciliar y descarte confirmado, con persistencia en PostgreSQL. A 320 y 390 px no hay desbordamiento, las nueve filas son visibles y los botones/campo de importación tienen 44 px; las confirmaciones enfocan Cancelar.
+
+Para repetir el recorrido de navegador/teléfono con una compilación estable, añadir `AFP_CAPTURE_TEST_PRODUCTION=1` al fixture `tests/helpers/capture-browser-server.cjs`, junto a `AFP_TEST_DATABASE_URL`, `AFP_CAPTURE_TEST_KEY` y `AFP_CAPTURE_TEST_CERTIFICATE` locales. El helper copia la app a un directorio temporal sin `.env`, compila allí con `next build --webpack`, mantiene Auth ficticia y no cambia el registro de analizadores. Este modo estabiliza la prueba; no activa automatización ni publica la web. Usar después los comandos Android de Fase 3, con `--rerun-tasks` si se necesita repetir la entrega JVM contra el servidor actual, y no dar por ejecutada una tarea marcada `UP-TO-DATE`.

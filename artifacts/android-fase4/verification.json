@@ -1,0 +1,123 @@
+{
+  "date": "2026-10-21",
+  "phase": "4",
+  "implementation": "implemented",
+  "phaseClosed": false,
+  "reasonOpen": [
+    "There are no reviewed real bank notification samples."
+  ],
+  "coverage": {
+    "admittedFormatFixtures": "synthetic only",
+    "parsers": [
+      "bbva.purchase.es.v1",
+      "wallet.purchase.es.v1"
+    ],
+    "productionVerifiedFormats": 0,
+    "actualBankNotificationCoverageVerified": false,
+    "templateCards": 9,
+    "otherBankSources": "unknown formats stay in review",
+    "personalAliases": {
+      "cards": 9,
+      "physical": 9,
+      "digital": 9,
+      "wallet": 6,
+      "verified": 24,
+      "ambiguous": 0,
+      "evidence": "personal-alias-import.json"
+    }
+  },
+  "web": {
+    "tests": 266,
+    "passed": 266,
+    "failed": 0,
+    "skipped": 0,
+    "parserTests": 6,
+    "newTransactionalScenarios": 25,
+    "database": "disposable localhost PostgreSQL 16",
+    "auth": "synthetic",
+    "build": "passed",
+    "lintErrors": 0,
+    "lintWarnings": [
+      "Existing TanStack Table React Compiler warning."
+    ]
+  },
+  "databaseReproduction": {
+    "migrationCount": 20,
+    "emptyDatabase": "passed",
+    "historicalUpgrade": "passed",
+    "checksums": "passed",
+    "schemaDiff": "empty",
+    "historicalRowsPreserved": true,
+    "rlsTablesIncludingMigrationHistory": 26,
+    "publicPolicies": 0
+  },
+  "android": {
+    "nativeCodeChanged": false,
+    "personalVersion": "0.3.0 / versionCode 5",
+    "instrumentationInitial": {
+      "tests": 25,
+      "passed": 24,
+      "failed": 1,
+      "cause": "Transient Next development-server manifest JSON parse failure at the device-status boundary."
+    },
+    "failedTestRetriedAfterUsbReconnect": {
+      "tests": 1,
+      "passed": 1,
+      "failed": 0
+    },
+    "uniqueInstrumentedTestsPassed": 25,
+    "signedDebugReleaseBuilds": "passed",
+    "lintErrors": 0,
+    "freshFinalRun": {
+      "jvmTests": 18,
+      "instrumentedTests": 25,
+      "passed": 43,
+      "failed": 0,
+      "skipped": 0,
+      "cacheBypassed": true,
+      "api": "isolated localhost production build",
+      "device": "Samsung S24 Ultra / Android 16 API 36",
+      "auxiliaryWarning": "androidx.test.services MANAGE_EXTERNAL_STORAGE command emitted a warning; all tests passed."
+    }
+  },
+  "browser": {
+    "origin": "isolated localhost fixture",
+    "auth": "synthetic",
+    "database": "disposable localhost PostgreSQL",
+    "importAllNineCardAliases": "passed",
+    "linkExistingPreservesExpense": "passed",
+    "distinctCreatesPendingExpense": "passed",
+    "responsiveFinalChecks": {
+      "widths": [
+        320,
+        390,
+        1280
+      ],
+      "noHorizontalOverflow": true,
+      "cardRows": 9,
+      "minimumNewButtonAndInputHeight": 44,
+      "confirmationInitialFocus": "Cancelar",
+      "confirmationControlsHeight": 44
+    },
+    "discardConfirmation": "passed",
+    "persistedDatabaseChecks": "browser-persistence.json",
+    "screenshots": [
+      "ui-desktop.png",
+      "ui-mobile.png"
+    ]
+  },
+  "production": {
+    "unexpectedMigrationRecovered": true,
+    "evidence": "production-recovery.json",
+    "webDeployed": false,
+    "bankAutomationActivated": false,
+    "pendingMigration": "20261021020000_capture_installment_reconciliation",
+    "personalAliasesConfigured": true,
+    "personalAliasImportEvidence": "personal-alias-import.json"
+  },
+  "privacy": {
+    "personalAliasesExcludedFromGit": true,
+    "bankTextsOrCredentialsIncluded": false,
+    "testFinancialRowsWrittenToPersonalDatabase": false
+  }
+}

@@ -76,12 +76,12 @@ export async function applySubscriptionCharge(tx, userId, input) {
   if (input.createReceivable && extra.personId) {
     const receivable = await tx.receivableAccount.create({ data: {
       userId, personId: extra.personId, concept: extra.concept || subscription.name,
-      originalAmount: Number(amount), originDate: new Date(`${date}T12:00:00.000Z`), status: "ACTIVE", originType: "DAILY_EXPENSE",
+      originalAmount: String(amount), originDate: new Date(`${date}T12:00:00.000Z`), status: "ACTIVE", originType: "DAILY_EXPENSE",
     } });
     extra.receivableAccountId = receivable.id;
   }
   const expense = await tx.dailyExpense.create({ data: {
-    ...extra, userId, subscriptionId, date: new Date(`${date}T12:00:00.000Z`), amount: Number(amount),
+    ...extra, userId, subscriptionId, date: new Date(`${date}T12:00:00.000Z`), amount: String(amount),
     paymentMethod, cardId, categoryId, concept: extra.concept || subscription.name,
   } });
   await tx.subscriptionCharge.upsert({ where: { subscriptionId_month: identity },

@@ -3,6 +3,7 @@ import { apiResponse as NextResponse, requireApiUser, apiAccessErrorResponse } f
 import { prisma } from "@/lib/prisma";
 
 const expenseSelect = {
+  reconciliationStatus: true,
   id: true,
   userId: true,
   date: true,

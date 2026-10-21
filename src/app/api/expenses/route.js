@@ -1,12 +1,15 @@
+import { createExpenseInTransaction } from "@/lib/expenseService";
+import { archiveCapturedExpense } from "@/lib/captureProcessing";
 import { apiResponse as NextResponse, requireApiUser, apiAccessErrorResponse, requireOwnedReferences, ApiAccessError } from "@/lib/apiAuth";
-import { lockDebtAccounts, runDebtAccountOperation, refreshDebtAccount } from "@/lib/debtAccountService";
+import { runDebtAccountOperation, refreshDebtAccount } from "@/lib/debtAccountService";
 import { prisma } from "@/lib/prisma";
-import { applySubscriptionCharge, SubscriptionChargeError } from "@/lib/subscriptionChargeService";
+import { SubscriptionChargeError } from "@/lib/subscriptionChargeService";
 
 import { runExpenseOperation } from "@/lib/expenseOperations";
 import { getCashContributionError, sumPersonalExpenses } from "@/lib/sharedExpenses";
 
 const expenseSelect = {
+  reconciliationStatus: true,
   id: true,
   userId: true,
   date: true,
@@ -191,117 +194,7 @@ export async function POST(request) {
     const userId = user.id;
     const body = await request.json();
     const result = await runExpenseOperation(prisma, userId, body, async tx => {
-      await lockDebtAccounts(tx, userId);
-      await requireOwnedReferences(tx, userId, body, ["cardId", "categoryId", "personId", "receivableAccountId", "payableAccountId", "subscriptionId"]);
-
-      const {
-        date,
-        paymentMethod,
-        cardId,
-        concept,
-        amount,
-        categoryId,
-        notes,
-        personId,
-        receivableAccountId,
-        payableAccountId,
-        subscriptionId,
-        createReceivable,
-      } = body;
-
-      if (
-        !userId ||
-        !date ||
-        !paymentMethod ||
-        !concept ||
-        !amount ||
-        !categoryId
-      ) {
-        throw new ApiAccessError("Faltan datos obligatorios.", 400);
-      }
-
-      if (!["CASH", "CARD"].includes(paymentMethod)) {
-        throw new ApiAccessError("Método de pago no válido.", 400);
-      }
-
-      if (paymentMethod === "CARD" && !cardId) {
-        throw new ApiAccessError("Debes seleccionar una tarjeta.", 400);
-      }
-
-      const numericAmount = Number(amount);
-
-      if (!Number.isFinite(numericAmount) || numericAmount <= 0) {
-        throw new ApiAccessError("El monto debe ser mayor a 0.", 400);
-      }
-
-      const contributionError = getCashContributionError(body);
-      if (contributionError) throw new ApiAccessError(contributionError, 400);
-      const cashContributionAmount = Number(body.cashContributionAmount ?? 0);
-
-      const parsedDate = parseDateInput(date);
-
-      if (!parsedDate || Number.isNaN(parsedDate.getTime())) {
-        throw new ApiAccessError("Fecha no válida.", 400);
-      }
-
-      let finalReceivableAccountId = receivableAccountId || null;
-
-      if (subscriptionId) {
-        const result = await applySubscriptionCharge(tx, userId, {
-          subscriptionId, month: date.slice(0, 7), date, amount: numericAmount, action: "confirm",
-          today: new Date().toISOString().slice(0, 10), createReceivable,
-          expenseData: { concept: concept.trim(), paymentMethod, cardId: cardId || null, categoryId, cashContributionAmount,
-            notes: notes?.trim() || null, personId: personId || null,
-            receivableAccountId: finalReceivableAccountId, payableAccountId: payableAccountId || null },
-        });
-        const expense = await tx.dailyExpense.findUnique({ where: { id: result.expenseId, userId }, select: expenseSelect });
-        if (result.alreadyConfirmed && cashContributionAmount !== Number(expense.cashContributionAmount ?? 0)) {
-          throw new ApiAccessError("Este cobro ya existe con otra aportación. Edita el gasto registrado para actualizarla.", 409);
-        }
-        if (payableAccountId) await refreshDebtAccount(tx, userId, "payable", payableAccountId);
-        return { expense, alreadyConfirmed: result.alreadyConfirmed };
-      }
-
-      if (personId && createReceivable) {
-        const receivable = await tx.receivableAccount.create({
-          data: {
-            userId,
-            personId,
-            concept: concept.trim(),
-            originalAmount: numericAmount,
-            originDate: parsedDate,
-            status: "ACTIVE",
-            originType: "DAILY_EXPENSE",
-          },
-        });
-
-        finalReceivableAccountId = receivable.id;
-      }
-
-      const expense = await tx.dailyExpense.create({
-        data: {
-          userId,
-          date: parsedDate,
-          paymentMethod,
-          cardId: paymentMethod === "CARD" ? cardId : null,
-          concept: concept.trim(),
-          amount: numericAmount,
-          cashContributionAmount,
-          categoryId,
-          notes: notes?.trim() || null,
-          personId: personId || null,
-          receivableAccountId: finalReceivableAccountId,
-          payableAccountId: payableAccountId || null,
-          subscriptionId: subscriptionId || null,
-        },
-        select: expenseSelect,
-      });
-
-      if (payableAccountId) {
-        await refreshDebtAccount(tx, userId, "payable", payableAccountId);
-      }
-
-      return { expense };
+      return createExpenseInTransaction(tx, userId, body, expenseSelect);
     });
     return NextResponse.json(result);
   } catch (error) {
@@ -341,6 +234,8 @@ export async function DELETE(request) {
       }
 
       const previousPayableAccountId = existingExpense.payableAccountId;
+
+      await archiveCapturedExpense(tx, existingExpense);
 
       await tx.dailyExpense.delete({
         where: { id, userId },

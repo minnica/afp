@@ -12,6 +12,8 @@ test('A11: recupera la migración original y conserva los trece checksums aplica
     '20261017030000_add_post_cut_credits',
     '20261020000000_add_cash_expense_contributions',
     '20261021000000_add_android_capture_linking',
+    '20261021010000_add_capture_processing',
+    '20261021020000_capture_installment_reconciliation',
   ]);
 });
 

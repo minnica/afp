@@ -56,3 +56,6 @@ next-env.d.ts
 *.jks
 *.keystore
 *.p12
+
+# Alias bancarios privados, editables por el propietario
+/captura-tarjetas.local.json

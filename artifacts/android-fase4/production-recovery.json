@@ -1,0 +1,41 @@
+{
+  "date": "2026-10-21",
+  "incident": "A test migration command omitted its localhost environment override when requesting escalation and used the configured Supabase connection.",
+  "initialMigration": "20261021010000_add_capture_processing",
+  "interrupted": true,
+  "initialPartialSchema": true,
+  "missingForeignKeysCompleted": 9,
+  "missingChecksCompleted": 4,
+  "recoveryBackup": "estados_cuenta/android_fase4_recovery_1IBYEM/",
+  "recovery": {
+    "backupTakenBeforeRepair": true,
+    "allRowsIdenticalBeforeAndAfterRepair": true,
+    "preInitialInvocationSnapshotAvailable": false,
+    "schemaDiffEmptyAfterFirstMigration": true,
+    "originalSqlChecksumPreserved": true,
+    "receiptClosedWith": "prisma migrate resolve --applied 20261021010000_add_capture_processing",
+    "failedAttemptRetainedAsRolledBack": true
+  },
+  "finalAudit": {
+    "errors": [],
+    "pending": [
+      "20261021020000_capture_installment_reconciliation"
+    ]
+  },
+  "rlsTables": 26,
+  "allRlsWithoutPublicPolicies": true,
+  "newTableCounts": {
+    "capture_card_aliases": 0,
+    "capture_automations": 0,
+    "capture_merchant_rules": 0,
+    "capture_movements": 0,
+    "expense_tombstones": 0
+  },
+  "webDeployed": false,
+  "personalApkChanged": false,
+  "actualBankFormatsEnabled": false,
+  "nextDeploymentRequires": [
+    "20261021020000_capture_installment_reconciliation",
+    "prisma generate"
+  ]
+}

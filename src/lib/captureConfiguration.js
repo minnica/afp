@@ -1,0 +1,76 @@
+import { z } from "zod";
+import { ApiAccessError, requireOwnedReferences } from "@/lib/apiAuth";
+import { capturePackages } from "@/lib/captureProtocol";
+import { captureParsers, normalizeMerchant } from "@/lib/captureParsers";
+import { lockDebtAccounts } from "@/lib/debtAccountService";
+
+const bankPackages = capturePackages.filter(value => value !== "com.google.android.apps.walletnfcrel");
+const lastFour = z.string().regex(/^\d{4}$/);
+export const captureInventorySchema = z.object({ version: z.literal(1), cards: z.array(z.object({
+  name: z.string().min(1).max(100), bankPackage: z.enum(bankPackages), physical: z.array(lastFour).max(20),
+  digital: z.array(lastFour).max(20), wallet: z.array(lastFour).max(20), verified: z.boolean(), evidence: z.string().max(500),
+}).strict()).max(100) }).strict();
+
+const actionSchema = z.discriminatedUnion("action", [
+  z.object({ action: z.literal("importAliases"), inventory: captureInventorySchema }).strict(),
+  z.object({ action: z.literal("automation"), cardId: z.string().min(1), parserKey: z.string(), mode: z.enum(["OBSERVATION", "AUTOMATIC"]) }).strict(),
+  z.object({ action: z.literal("rule"), cardId: z.string().min(1), merchant: z.string().trim().min(1).max(200), categoryId: z.string().min(1), subscriptionId: z.string().nullable().optional() }).strict(),
+]);
+
+export async function configureCapture(db, userId, input) {
+  const parsed = actionSchema.safeParse(input);
+  if (!parsed.success) throw new ApiAccessError("Configuración no válida. Revisa el formato de los datos.", 400);
+  const data = parsed.data;
+  return db.$transaction(async tx => {
+    await lockDebtAccounts(tx, userId);
+    if (data.action === "importAliases") {
+      if (new Set(data.inventory.cards.map(card => card.name)).size !== data.inventory.cards.length) throw new ApiAccessError("No repitas el nombre de una tarjeta.", 400);
+      let imported = 0;
+      for (const card of data.inventory.cards) {
+        const existing = await tx.card.findUnique({ where: { userId_name: { userId, name: card.name } } });
+        if (!existing) throw new ApiAccessError("Una tarjeta no existe en tu cuenta. Conserva sus nombres exactos de AFP.", 404);
+        if (card.verified && !card.evidence.trim()) throw new ApiAccessError("Indica dónde verificaste las terminaciones.", 400);
+        // Importación aditiva: un archivo parcial/vacío nunca borra alias anteriores.
+        for (const [field, kind] of [["physical", "PHYSICAL"], ["digital", "DIGITAL"], ["wallet", "WALLET"]]) {
+          const sourcePackage = kind === "WALLET" ? "com.google.android.apps.walletnfcrel" : card.bankPackage;
+          for (const value of new Set(card[field])) {
+            const identity = { userId, cardId: existing.id, sourcePackage, kind, value };
+            const verification = { verifiedAt: card.verified ? new Date() : null, evidence: card.evidence.trim() || null };
+            await tx.captureCardAlias.upsert({ where: { userId_cardId_sourcePackage_kind_value: identity }, create: { ...identity, ...verification }, update: verification });
+            imported++;
+          }
+        }
+      }
+      return { imported };
+    }
+    await requireOwnedReferences(tx, userId, data, ["cardId", "categoryId", "subscriptionId"]);
+    if (data.action === "automation") {
+      const parser = captureParsers.find(parser => parser.key === data.parserKey);
+      if (!parser) throw new ApiAccessError("Formato no disponible.", 400);
+      if (data.mode === "AUTOMATIC") {
+        if (!parser.verified) throw new ApiAccessError("Este formato aún no tiene muestras reales verificadas. Conserva observación.", 409);
+        const aliases = await tx.captureCardAlias.findMany({ where: { userId, cardId: data.cardId, sourcePackage: parser.sourcePackage, verifiedAt: { not: null } } });
+        if (!aliases.length) throw new ApiAccessError("Verifica primero un alias de esta tarjeta y fuente.", 409);
+      }
+      const identity = { userId, cardId: data.cardId, parserKey: data.parserKey };
+      return tx.captureAutomation.upsert({ where: { userId_cardId_parserKey: identity }, create: { ...identity, mode: data.mode }, update: { mode: data.mode } });
+    }
+    if (data.subscriptionId) {
+      const subscription = await tx.subscription.findFirst({ where: { id: data.subscriptionId, userId, cardId: data.cardId, paymentMethod: "CARD" } });
+      if (!subscription) throw new ApiAccessError("La suscripción debe usar la misma tarjeta.", 409);
+    }
+    const identity = { userId, cardId: data.cardId, merchant: normalizeMerchant(data.merchant) };
+    return tx.captureMerchantRule.upsert({ where: { userId_cardId_merchant: identity },
+      create: { ...identity, categoryId: data.categoryId, subscriptionId: data.subscriptionId || null },
+      update: { categoryId: data.categoryId, subscriptionId: data.subscriptionId || null } });
+  }, { isolationLevel: "ReadCommitted" });
+}
+
+export async function captureConfiguration(db, userId) {
+  const [cards, aliases, automations, rules] = await Promise.all([
+    db.card.findMany({ where: { userId }, select: { id: true, name: true }, orderBy: { name: "asc" } }),
+    db.captureCardAlias.findMany({ where: { userId } }), db.captureAutomation.findMany({ where: { userId } }),
+    db.captureMerchantRule.findMany({ where: { userId } }),
+  ]);
+  return { cards, aliases, automations, rules, parsers: captureParsers.map(({ key, sourcePackage, verified }) => ({ key, sourcePackage, verified })) };
+}

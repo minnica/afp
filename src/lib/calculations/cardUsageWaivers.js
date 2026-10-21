@@ -155,6 +155,7 @@ export function buildCardUsageWaivers({ cards, cyclesWithAmounts, expenses, subs
           ? "Comisión, interés o impuesto bancario verificado"
           : getUsageExclusion(expense);
         if (reason) excluded.push({ ...item, reason });
+        else if (expense.reconciliationStatus === "PENDING") projected.push({ ...item, reason: "Captura automática por conciliar" });
         else if (usageDay(expense.date) > today) projected.push({ ...item, reason: "Gasto con fecha futura" });
         else daily.push(item);
       }
@@ -241,7 +242,8 @@ export function buildCardUsageWaivers({ cards, cyclesWithAmounts, expenses, subs
       for (const purchase of purchases.filter((item) => item.cardId === card.id && item.status !== "CANCELLED")) {
         if (!usageInRange(purchase.purchaseDate, cycle.startDate, cycle.cutDate)) continue;
         const item = { id: purchase.id, concept: purchase.concept, amount: usageMoney(purchase.totalAmount), purchaseDate: purchase.purchaseDate, months: purchase.months, categoryName: purchase.category?.name || null };
-        if (usageDay(purchase.purchaseDate) > today) projected.push({ ...item, reason: "Compra con fecha futura" });
+        if (purchase.reconciliationStatus === "PENDING") projected.push({ ...item, reason: "Compra a meses por conciliar" });
+        else if (usageDay(purchase.purchaseDate) > today) projected.push({ ...item, reason: "Compra con fecha futura" });
         else newPurchases.push(item);
       }
     }
