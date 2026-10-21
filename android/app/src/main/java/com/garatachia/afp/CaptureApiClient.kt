@@ -5,7 +5,7 @@ import java.net.URL
 import java.io.ByteArrayOutputStream
 import javax.net.ssl.HttpsURLConnection
 
-class CaptureApiException(val status: Int) : Exception(when (status) {
+class CaptureApiException(val status: Int, val retryAfterMs: Long = 0) : Exception(when (status) {
     401, 403 -> "La autorización no permite esta acción. Consulta el estado del teléfono."
     404 -> "El servidor todavía no ofrece la vinculación. Requiere la actualización de AFP."
     409 -> "La vinculación ya se utilizó. Consulta el estado."
@@ -37,7 +37,8 @@ class CaptureApiClient(private val origin: String,
                 connection.outputStream.use { it.write(body.toString().toByteArray(Charsets.UTF_8)) }
             }
             val status = connection.responseCode
-            if (status !in 200..299) throw CaptureApiException(status)
+            if (status !in 200..299) throw CaptureApiException(status,
+                retryAfterMillis(connection.getHeaderField("Retry-After")))
             val bytes = connection.inputStream.use { input ->
                 val output = ByteArrayOutputStream()
                 val buffer = ByteArray(4096)
@@ -64,11 +65,19 @@ class CaptureApiClient(private val origin: String,
         return merge(binding, request("device", if (action == "revoke") "DELETE" else "POST", binding,
             if (action == "revoke") null else JSONObject().put("action", action)))
     }
-    // Punto de entrega para la futura cola Room. El diagnóstico nunca llama a este método.
+    // La cola entrega exactamente el cuerpo persistido y conserva el UUID hasta recibir su recibo.
     fun sendEvent(binding: CaptureBinding, event: JSONObject): JSONObject {
         require(binding.state == "ACTIVE" && binding.ownerId != null)
         return request("events", "POST", binding, event)
     }
     private fun merge(binding: CaptureBinding, response: JSONObject) = binding.withStatus(
         response.getString("deviceId"), if (response.isNull("ownerId")) null else response.getString("ownerId"), response.getString("state"))
+    companion object {
+        fun retryAfterMillis(value: String?, now: Long = System.currentTimeMillis()): Long {
+            val seconds = value?.trim()?.toLongOrNull()
+            if (seconds != null) return seconds.coerceIn(0, 86400) * 1000
+            return runCatching { java.time.ZonedDateTime.parse(value, java.time.format.DateTimeFormatter.RFC_1123_DATE_TIME)
+                .toInstant().toEpochMilli().minus(now).coerceIn(0, 86400000) }.getOrDefault(0)
+        }
+    }
 }

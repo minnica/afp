@@ -12,7 +12,7 @@ import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 import javax.crypto.spec.GCMParameterSpec
 
-// Búfer local de diagnóstico. La cola de entrega con Room pertenece a la Fase 3.
+// Búfer independiente de la cola Room: borrarlo no borra pendientes ni recibos de entrega.
 class DiagnosticStore(context: Context, name: String = "diagnostic-samples") {
     private val file = AtomicFile(File(context.noBackupFilesDir, "$name.enc"))
     private val keyAlias = "afp.$name.v1"

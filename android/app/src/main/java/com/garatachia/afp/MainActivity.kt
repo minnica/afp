@@ -124,7 +124,7 @@ class MainActivity : ComponentActivity() {
                 contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 item {
                     Text("Captura automática", style = MaterialTheme.typography.headlineMedium)
-                    Text("Diagnóstico y vinculación", color = MaterialTheme.colorScheme.primary)
+                    Text("Captura y sincronización", color = MaterialTheme.colorScheme.primary)
                     Text("Comprueba los avisos disponibles en este teléfono. Esta versión todavía no registra gastos.",
                         modifier = Modifier.padding(top = 8.dp))
                 }
@@ -145,16 +145,17 @@ class MainActivity : ComponentActivity() {
                             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP))
                     }
                 }
+                item { QueueSection(app) }
                 item {
                     Section("Activación") {
-                        ToggleRow("Guardar muestras de diagnóstico", active) {
+                        ToggleRow("Guardar avisos y diagnóstico", active) {
                             active = it
                             app.active = it
                             if (it && access) NotificationListenerService.requestRebind(
                                 ComponentName(this@MainActivity, CaptureNotificationListener::class.java))
                         }
                         Text(when {
-                            !active -> "Diagnóstico pausado"
+                            !active -> "Captura pausada"
                             !access -> "Falta permitir el acceso a notificaciones"
                             !connected -> "Acceso permitido; lector desconectado"
                             else -> "Lector conectado; esperando avisos nuevos"
@@ -179,7 +180,7 @@ class MainActivity : ComponentActivity() {
                             selected = selected + installed.filterValues { it != null }.keys
                             app.selected = selected
                         }) { Text("Seleccionar todas las instaladas") }
-                        Text("Solo se leen estas fuentes seleccionadas. Se excluyen los resúmenes agrupados. Una actualización del aviso puede producir otra muestra; no representa necesariamente otra compra.")
+                        Text("Solo se leen estas fuentes seleccionadas. Se excluyen resúmenes agrupados, códigos de acceso reconocibles y promociones explícitas. Un formato desconocido se conserva para revisión. Una actualización del aviso no representa necesariamente otra compra.")
                         Text("HSBC y Banamex pueden emitir avisos de varias tarjetas; Wallet puede representar tarjetas de varios bancos. Capturar un aviso no identifica todavía cuál se usó ni activa registros automáticos.")
                         if (selected.isEmpty()) Text("No hay fuentes seleccionadas. El lector no guardará avisos.")
                     }
@@ -227,11 +228,11 @@ class MainActivity : ComponentActivity() {
                     HorizontalDivider()
                     Text("Muestras locales (${samples.size}/100)", style = MaterialTheme.typography.titleLarge,
                         modifier = Modifier.padding(top = 16.dp))
-                    Text("Se cifran con Android Keystore y se conservan las 100 más recientes. No se envían al servidor ni se incluyen en copias de seguridad. Pausar conserva las muestras.")
+                    Text("Se cifran con Android Keystore y se conservan las 100 más recientes. Los avisos admitidos recibidos con el teléfono vinculado también se guardan en la cola y se envían a AFP. Borrar estas muestras conserva los pendientes y recibos de la cola. No se incluyen en copias de seguridad.")
                     if (storageError) Text("No se pudo leer o guardar una muestra. Revisa el almacenamiento; no se garantiza la captura durante este error.",
                         color = MaterialTheme.colorScheme.error)
                     if (exportError) Text("No se pudo guardar la exportación. Vuelve a intentarlo.", color = MaterialTheme.colorScheme.error)
-                    if (samples.isEmpty()) Text("Todavía no hay muestras. Solo se capturan avisos nuevos durante la activación.")
+                    if (samples.isEmpty()) Text("Todavía no hay muestras. Se capturan avisos nuevos y, al reconectar, los que aún siguen activos.")
                     if (samples.isNotEmpty()) {
                         OutlinedButton(onClick = {
                             exportError = false

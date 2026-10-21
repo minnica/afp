@@ -64,7 +64,7 @@ fun BindingSection(controller: BindingController, openSettings: () -> Unit) {
                 if (!binding.replaceable) TextButton(onClick = { confirmRevoke = true }, enabled = !view.busy) { Text("Desvincular teléfono") }
             }
             Text("La vinculación se guarda cifrada y es independiente de la sesión web. Cerrar AFP o salir del navegador no la cancela.", style = MaterialTheme.typography.bodySmall)
-            Text("La sincronización de avisos estará disponible en una próxima actualización. El diagnóstico sigue guardándose en este teléfono y todavía no crea gastos.", style = MaterialTheme.typography.bodySmall)
+            Text("Los avisos nuevos se conservan con su cuenta original. La cola puede enviarlos a AFP sin crear gastos todavía.", style = MaterialTheme.typography.bodySmall)
         }
     }
     if (confirmRevoke) AlertDialog(onDismissRequest = { confirmRevoke = false },

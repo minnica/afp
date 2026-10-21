@@ -17,21 +17,21 @@ import javax.crypto.spec.GCMParameterSpec
 class BindingStore(context: Context, name: String = "capture-bindings") {
     private val file = AtomicFile(File(context.noBackupFilesDir, "$name.enc"))
     private val keyAlias = "afp.$name.v1"
-    @Synchronized fun read(): List<CaptureBinding> {
-        if (!file.baseFile.exists()) return emptyList()
+    fun read(): List<CaptureBinding> = synchronized(lock) {
+        if (!file.baseFile.exists()) return@synchronized emptyList()
         val bytes = file.openRead().use { it.readBytes() }
         require(bytes.size >= 29 && bytes[0] == 1.toByte())
         val cipher = Cipher.getInstance("AES/GCM/NoPadding")
         cipher.init(Cipher.DECRYPT_MODE, key(), GCMParameterSpec(128, bytes.copyOfRange(1, 13)))
         val list = JSONArray(String(cipher.doFinal(bytes.copyOfRange(13, bytes.size)), Charsets.UTF_8))
-        return (0 until list.length()).map { index ->
+        (0 until list.length()).map { index ->
             val row = list.getJSONObject(index)
             fun optional(name: String) = if (row.isNull(name)) null else row.getString(name)
             CaptureBinding(row.getString("secret"), optional("deviceId"), optional("ownerId"),
                 row.getString("state"), optional("code"), optional("expiresAt"))
         }
     }
-    @Synchronized fun save(binding: CaptureBinding, newIdentity: Boolean = false) {
+    fun save(binding: CaptureBinding, newIdentity: Boolean = false) = synchronized(lock) {
         val previous = read()
         val current = previous.lastOrNull()
         if (newIdentity) require(current == null || current.replaceable)
@@ -61,4 +61,5 @@ class BindingStore(context: Context, name: String = "capture-bindings") {
             generateKey()
         }
     }
+    companion object { private val lock = Any() }
 }

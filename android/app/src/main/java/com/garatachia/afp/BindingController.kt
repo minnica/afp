@@ -9,7 +9,8 @@ import kotlinx.coroutines.launch
 
 data class BindingViewState(val binding: CaptureBinding? = null, val busy: Boolean = true, val error: String? = null)
 
-class BindingController(context: Context, private val scope: CoroutineScope) {
+class BindingController(context: Context, private val scope: CoroutineScope,
+    private val updated: (CaptureBinding) -> Unit = {}) {
     private val store = BindingStore(context)
     private val client = CaptureApiClient(context.getString(R.string.capture_origin))
     private val mutableState = MutableStateFlow(BindingViewState())
@@ -41,6 +42,7 @@ class BindingController(context: Context, private val scope: CoroutineScope) {
                     binding = if (action == "status") client.status(binding) else client.change(binding, action)
                 }
                 store.save(requireNotNull(binding))
+                updated(binding)
                 binding
             }.onSuccess { mutableState.value = BindingViewState(it, false) }.onFailure { error ->
                 val saved = runCatching { store.read().lastOrNull() }.getOrNull()

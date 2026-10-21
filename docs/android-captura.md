@@ -1,10 +1,10 @@
-# AFP Android · diagnóstico, vinculación y recepción segura
+# AFP Android · diagnóstico, vinculación y sincronización
 
 La Fase 1 añade una APK Kotlin/Compose en `android/`. Abre la interfaz financiera actual mediante Trusted Web Activity (TWA) y permite comprobar qué notificaciones entregan BBVA México, Google Wallet, HSBC, Banamex, Santander, Nu, DiDi Finanzas y Mercado Pago. La pantalla nativa incluye activación, selección de fuentes, estado del permiso y del lector, muestras locales e instrucciones para Samsung.
 
-El diagnóstico está **pausado por defecto**. La Fase 2 añade vinculación independiente, cifrada y revocable, y recepción segura de eventos. El inicio de sesión web permanece en el navegador de la TWA; el componente nativo no lo lee. El lector continúa guardando únicamente muestras locales: su envío automático mediante Room/WorkManager corresponde a la Fase 3.
+El diagnóstico está **pausado por defecto**. La Fase 2 añade vinculación independiente, cifrada y revocable, y recepción segura de eventos. El inicio de sesión web permanece en el navegador de la TWA; el componente nativo no lo lee. La Fase 3 añade la cola Room cifrada y el envío automático mediante WorkManager para los avisos recibidos con una identidad autorizada. La interpretación y creación automática de gastos siguen pendientes de la Fase 4.
 
-El plan se ajustó el 21 de octubre de 2026 para preparar el diagnóstico de todas las tarjetas desde la Fase 1 y conservar la activación automática gradual por tarjeta/formato, empezando por BBVA. La APK **0.1.2 / versionCode 3** amplió el diagnóstico a ocho paquetes verificados; posteriormente se actualizó a **0.2.0 / versionCode 4**, ya instalada y vinculada en el S24 Ultra. El inventario actual, leído mediante una transacción de solo lectura, contiene nueve tarjetas de siete emisores. La [matriz de fuentes](../android/diagnostics/format-matrix.md) relaciona esos nombres existentes con las aplicaciones y mantiene separados los paquetes verificados de los formatos aún sin muestras reales.
+El plan se ajustó el 21 de octubre de 2026 para preparar el diagnóstico de todas las tarjetas desde la Fase 1 y conservar la activación automática gradual por tarjeta/formato, empezando por BBVA. La APK **0.1.2 / versionCode 3** amplió el diagnóstico a ocho paquetes verificados; posteriormente se actualizó a **0.2.0 / versionCode 4**, vinculada en el S24 Ultra; la Fase 3 actualiza la APK a **0.3.0 / versionCode 5**. El inventario actual, leído mediante una transacción de solo lectura, contiene nueve tarjetas de siete emisores. La [matriz de fuentes](../android/diagnostics/format-matrix.md) relaciona esos nombres existentes con las aplicaciones y mantiene separados los paquetes verificados de los formatos aún sin muestras reales.
 
 ## Compilación y firma
 
@@ -28,7 +28,7 @@ El generador necesita `keytool`. Crea dos identidades con contraseñas aleatoria
 | Desarrollo (`debug`) | `com.garatachia.afp.dev` | `android/app/build/outputs/apk/debug/app-debug.apk` |
 | Producción (`release`) | `com.garatachia.afp` | `android/app/build/outputs/apk/release/app-release.apk` |
 
-Ambas usan firma propia y pueden instalarse simultáneamente. Sus permisos, configuración y muestras son independientes. La variante de producción también permanece en modo diagnóstico; el nombre de variante no activa registros automáticos. Sus APK y archivos de compilación no se versionan.
+Ambas usan firma propia y pueden instalarse simultáneamente. Sus permisos, configuración y muestras son independientes. La variante de producción también permanece sin creación automática de gastos; el nombre de variante no activa registros automáticos. Sus APK y archivos de compilación no se versionan.
 
 El wrapper oficial se incluye con el SHA-256 de la distribución. `GRADLE_USER_HOME` puede apuntar a un directorio temporal para aislar las descargas. No es necesario instalar Gradle globalmente.
 
@@ -85,15 +85,15 @@ Las instrucciones están incluidas en la pantalla nativa de AFP:
 
 Las rutas varían entre versiones de One UI; las instrucciones se basan en la [gestión de aplicaciones documentada por Samsung](https://developer.samsung.com/mobile/app-management.html). La ruta de Batería y sus opciones se contrastaron con el S24 Ultra el 21 de octubre: se aplicó **No restringido** y Android confirmó la exención de optimización, standby bucket `5` (exento) y permiso de ejecución en segundo plano `allow`. En **Ajustes → Batería → Límites de uso en segundo plano**, la lista de aplicaciones suspendidas estaba vacía, AFP no apareció al recorrer toda la lista de suspensión profunda y la lista sin autosuspensión estaba vacía. No se modificaron ajustes de otras apps ni el ahorro global. La pantalla nativa consulta exención, restricción en segundo plano y ahorro de energía al volver del sistema; esos estados no acreditan entrega real de avisos ni reemplazan la revisión de las listas Samsung. Android puede ocultar [contenido sensible](https://developer.android.com/about/versions/15/behavior-changes-all#otp-redaction). AFP conserva los campos accesibles sin inventar los ausentes y presenta las muestras sin texto como tales.
 
-El lector solo examina publicaciones nuevas de los paquetes seleccionados del catálogo verificado; descarta resúmenes agrupados antes de leer el texto. No consulta el historial ni recorre notificaciones activas al conectarse. Las actualizaciones de una notificación son muestras separadas, identificables por el hash de su clave, y no se interpretan como nuevas compras. La exclusión semántica de promociones y códigos corresponde a fases posteriores; en esta fase una muestra nunca produce un movimiento financiero.
+El lector examina publicaciones nuevas y, al conectarse, las notificaciones todavía activas de los paquetes seleccionados. Descarta resúmenes agrupados y categoría promocional antes de extraer el texto; aplica después filtros explícitos de promociones y códigos de acceso. Un formato desconocido se conserva para revisión posterior. No consulta un historial completo ni recupera avisos desaparecidos. Una publicación idéntica conserva su identidad en la cola; una actualización diferente no se interpreta por sí sola como una compra nueva.
 
 ## Muestras y privacidad
 
-El búfer conserva como máximo las **100 muestras más recientes** en `noBackupFilesDir`. Se cifra con AES-GCM y una clave no exportable de Android Keystore, con escrituras atómicas. La cola de operaciones del proceso serializa cargas, capturas y limpieza. Un fallo de lectura, cifrado o persistencia se muestra en pantalla y no reemplaza silenciosamente un archivo ilegible. Este búfer no constituye todavía una cola de sincronización ni garantiza recuperación de eventos durante un fallo.
+El búfer conserva como máximo las **100 muestras más recientes** en `noBackupFilesDir`. Se cifra con AES-GCM y una clave no exportable de Android Keystore, con escrituras atómicas. La cola de operaciones del proceso serializa cargas, capturas y limpieza. Un fallo de lectura, cifrado o persistencia se muestra en pantalla y no reemplaza silenciosamente un archivo ilegible. Este búfer es independiente de la cola Room de Fase 3. Su límite y su borrado no afectan a pendientes ni a recibos de entrega. Un fallo anterior al commit de Room no garantiza captura, y se indica en pantalla.
 
 Las muestras incluyen paquete, UUID, hash de clave de notificación, publicación, recepción, `Notification.when`, bloqueo y campos de texto estándar disponibles: título, texto, texto ampliado, subtítulo, resumen y líneas. `Notification.when` es un valor de presentación de Android: **no se asume que sea la fecha de operación bancaria**. Cada campo se limita a 4096 caracteres y las líneas a doce. Las fechas visibles usan `America/Mexico_City`.
 
-El texto original solo se revela expresamente dentro de la pantalla nativa, protegida contra capturas de pantalla. El diagnóstico no se escribe en Logcat, Git ni el servidor. Los eventos que un cliente autorizado entrega expresamente al endpoint de Fase 2 sí se persisten en el servidor; el lector de diagnóstico no los envía. La app excluye copias de seguridad y transferencia de datos; pausar conserva las muestras y borrarlas requiere confirmación. Eliminar datos o desinstalar la app elimina el diagnóstico local.
+El texto original solo se revela expresamente dentro de la pantalla nativa, protegida contra capturas de pantalla. El diagnóstico no se escribe en Logcat ni Git. Desde la Fase 3, un aviso nuevo admitido y asociado a una identidad autorizada se guarda también en la cola Room y se entrega al servidor mediante HTTPS. La exportación del diagnóstico sigue siendo local y anonimizada. La app excluye copias de seguridad y transferencia de datos; pausar conserva las muestras y borrarlas requiere confirmación. Eliminar datos o desinstalar la app elimina el diagnóstico local.
 
 **Exportar estructura anonimizada** usa el selector de documentos de Android. Sustituye letras por `x`, cifras por `0` y símbolos no admitidos por `·`; omite fechas, UUID y claves. Conserva paquete, nombres de campos, disponibilidad de texto y bloqueo. La exportación se identifica como `anonymous-shape-only` y `realFormatVerified: false`: permite inspeccionar estructura, pero no sustituye una muestra de lenguaje bancario revisada para desarrollar analizadores. No existe exportación del texto original en esta fase.
 
@@ -126,7 +126,7 @@ Implementada y activada el **21 de octubre de 2026**, APK **0.2.0 / versionCode 
 3. Vuelve a la APK y pulsa **Consultar estado**. Mostrará autorizado, pendiente, vencido, pausado o revocado. Un código vencido o una identidad revocada permite generar otra identidad; se conserva el historial cifrado anterior con su propietario.
 4. **Pausar recepción/Reanudar recepción** y **Desvincular teléfono** son acciones explícitas con conexión. La web permite las mismas acciones sobre tus dispositivos; revocar es irreversible para esa identidad. Cerrar la pantalla o salir de la sesión web conserva la autorización del teléfono.
 
-La recepción permite conservar avisos, pero todavía no activa la captura sincronizada ni crea gastos. El diagnóstico y su selección de fuentes siguen siendo independientes. La configuración inicial del servidor es `OBSERVATION`, `automaticExpenses: false`; disponer de un paquete conocido nunca habilita una tarjeta ni un formato bancario.
+La Fase 2 habilitó la recepción; la Fase 3 conecta el lector a la cola y sincronización. Todavía no crea gastos. El diagnóstico y su selección de fuentes siguen siendo independientes. La configuración inicial del servidor es `OBSERVATION`, `automaticExpenses: false`; disponer de un paquete conocido nunca habilita una tarjeta ni un formato bancario.
 
 ### Contrato de API
 
@@ -163,7 +163,7 @@ Solo se admiten los ocho paquetes verificados; las fechas tienen zona explícita
 
 La respuesta tiene `{event: {id, eventId, status: "RECEIVED", receivedAt}}`. `receivedAt` del recibo es la fecha de persistencia del servidor; se conservan aparte publicación y recepción del teléfono. El mismo dispositivo/UUID y contenido normalizado devuelve el recibo original; cambiar el contenido da 409. El orden de claves y las representaciones equivalentes de fecha no crean otro evento. No se deduplican compras diferentes por importe o comercio. Se autentica antes de leer texto y se vuelve a comprobar la autorización bajo el mismo bloqueo transaccional que pausa/revocación: pendiente, vencido y pausado reciben 403; revocado recibe 401 al enviar. No se confirma un evento si falla el commit.
 
-`BindingStore` usa AES-GCM, una clave no exportable de Android Keystore, archivos atómicos en `noBackupFilesDir` y exclusión de backups/transferencia declarada en el manifest. Reabrir conserva identidad y propietario; una alteración del cifrado produce un error visible y no sobrescribe el archivo. Una nueva vinculación archiva la identidad anterior. La BD protege además el propietario autorizado con trigger y una relación compuesta dispositivo/usuario para los eventos. La futura cola Room deberá guardar el dispositivo y propietario originales por pendiente y nunca reutilizar la credencial de otra cuenta para enviarlos. Las muestras antiguas del diagnóstico no se convierten automáticamente en eventos de ninguna cuenta.
+`BindingStore` usa AES-GCM, una clave no exportable de Android Keystore, archivos atómicos en `noBackupFilesDir` y exclusión de backups/transferencia declarada en el manifest. Reabrir conserva identidad y propietario; una alteración del cifrado produce un error visible y no sobrescribe el archivo. Una nueva vinculación archiva la identidad anterior. La BD protege además el propietario autorizado con trigger y una relación compuesta dispositivo/usuario para los eventos. La cola Room de Fase 3 guarda el dispositivo y propietario originales por pendiente y nunca reutiliza la credencial de otra cuenta para enviarlos. Las muestras antiguas del diagnóstico no se convierten automáticamente en eventos de ninguna cuenta.
 
 ### Migración y activación
 
@@ -173,7 +173,7 @@ La respuesta tiene `{event: {id, eventId, status: "RECEIVED", receivedAt}}`. `re
 
 El MCP de Supabase estaba configurado pero requería renovar su autorización OAuth; se utilizó la conexión Prisma existente y se comprobó que correspondiera al mismo proyecto de AFP. La operación de migración no hizo commit, push ni despliegue; el usuario gestiona Git. La TWA y su firma conservan Digital Asset Links; no hace falta modificar ese archivo. Para repetir el procedimiento en otras instalaciones, revisar respaldo e historial y aplicar migraciones antes de publicar servidor/interfaz compatibles.
 
-**Actualización y vinculación real concluidas posteriormente el 21 de octubre:** se instaló la APK firmada con `adb install -r android/app/build/outputs/apk/release/app-release.apk`, actualizando 0.1.2 a 0.2.0 sin desinstalar. Se conservaron la fecha inicial de instalación, el permiso de notificaciones y las cero muestras locales anteriores. Desde la sesión web existente en el teléfono se autorizó el código en Configuración; después la APK consultó el servidor y mostró «Teléfono autorizado para enviar eventos», también al reabrir la pantalla. La consulta de solo lectura a Supabase confirmó código consumido, autorización activa y fecha de consulta nativa, sin pausa ni revocación. El flujo autenticado en producción funciona; no se verificó el SHA exacto del despliegue. Esta activación creó la vinculación real del teléfono, sin enviar avisos bancarios ni crear gastos. [Evidencia sin credenciales](../artifacts/android-fase2/phone-activation.json). La sincronización y el registro financiero siguen pendientes de las Fases 3 y 4; el usuario hará commit y push de esta documentación.
+**Actualización y vinculación real concluidas posteriormente el 21 de octubre:** se instaló la APK firmada con `adb install -r android/app/build/outputs/apk/release/app-release.apk`, actualizando 0.1.2 a 0.2.0 sin desinstalar. Se conservaron la fecha inicial de instalación, el permiso de notificaciones y las cero muestras locales anteriores. Desde la sesión web existente en el teléfono se autorizó el código en Configuración; después la APK consultó el servidor y mostró «Teléfono autorizado para enviar eventos», también al reabrir la pantalla. La consulta de solo lectura a Supabase confirmó código consumido, autorización activa y fecha de consulta nativa, sin pausa ni revocación. El flujo autenticado en producción funciona; no se verificó el SHA exacto del despliegue. Esta activación creó la vinculación real del teléfono, sin enviar avisos bancarios ni crear gastos. [Evidencia sin credenciales](../artifacts/android-fase2/phone-activation.json). Ese cierre de Fase 2 precedió a la sincronización de Fase 3; el registro financiero sigue pendiente de Fase 4; el usuario hará commit y push de esta documentación.
 
 ### Verificación reproducible
 
@@ -213,3 +213,70 @@ adb reverse --remove tcp:4209
 Durante la primera ejecución física, el servidor de desarrollo respondió 500 por un manifiesto JSON transitorio de Next mientras recompilaba. Se repitieron las cuatro pruebas con la compilación estable y todas pasaron. Los intentos de emulador no completaron el arranque; no se presentan como evidencia de ejecución. La APK de producción y su acceso a notificaciones se verificaron conservados después de las pruebas. [Evidencia agregada de Fase 2](../artifacts/android-fase2/verification.json).
 
 Referencias: [Android Keystore](https://developer.android.com/privacy-and-security/keystore) y [consideraciones de seguridad de autorización por dispositivo](https://www.rfc-editor.org/rfc/rfc8628.html#section-5). AFP implementa su propio protocolo de vinculación; no declara compatibilidad OAuth Device Grant.
+
+## Cola local y sincronización — Fase 3
+
+Implementación del **21 de octubre de 2026**, APK **0.3.0 / versionCode 5**, con las firmas existentes. Room **2.8.5**, KSP **2.3.12** y WorkManager **2.12.0**, fijados en Gradle. El esquema local está en `android/app/schemas/com.garatachia.afp.CaptureQueueDatabase/1.json`. No requiere migraciones de Supabase, nuevos endpoints ni publicar la web.
+
+### Captura y propiedad
+
+Con **Guardar avisos y diagnóstico** activo y una fuente seleccionada, el lector descarta resúmenes agrupados y notificaciones clasificadas como promociones por Android. Después excluye patrones explícitos de códigos de acceso, verificación, OTP y promociones. Las reglas se prueban con ejemplos sintéticos; todavía no acreditan cobertura de formatos bancarios reales. Los textos desconocidos, ocultos o vacíos se conservan para revisión posterior, sin inventar campos ni crear gastos.
+
+Si existe una identidad con propietario autorizado, el aviso se guarda en Room antes de programar su entrega, incluso si la recepción del dispositivo o los envíos locales están pausados. Se fija la identidad al recibir el aviso, antes de esperar otras escrituras. Cada fila conserva dispositivo, propietario, UUID, huella de publicación/contenido, fechas y cuerpo cifrado. Nunca se sustituye el propietario al revincular. Sin propietario autorizado, solo se conserva diagnóstico local; las muestras anteriores no se convierten automáticamente en eventos de una cuenta nueva.
+
+Al conectar/reconectar el lector se revisan exclusivamente las notificaciones todavía activas que pasan los mismos filtros. La huella combina paquete, hash de clave Android, publicación y campos ordenados. Volver a encontrar la misma publicación/contenido devuelve la fila y UUID originales, también después de su entrega. Si cambia el contenido o la publicación, se conserva otro evento: la interpretación de revisiones y la vinculación entre canales corresponden a la Fase 4. No se utiliza importe/comercio/fecha como clave única de una compra.
+
+### Cifrado y conservación
+
+Room guarda `capture-queue.db` y sus archivos WAL/SHM en `noBackupFilesDir`. El cuerpo usa AES-GCM con clave no exportable de Android Keystore y datos autenticados que incluyen UUID, dispositivo, propietario y huella. Alterar el cifrado o trasladarlo a otra identidad impide descifrarlo. El aviso permanece **Por revisar**; no se sobrescribe ni se reintenta automáticamente. `BindingStore` comparte un bloqueo entre instancias para que UI, lector y worker no compitan por el archivo de credenciales.
+
+El manifest mantiene `allowBackup=false`, `fullBackupContent=false` y exclusiones explícitas de backup y transferencia, incluidas bases y preferencias. WorkManager no recibe textos ni credenciales en su `Data`; únicamente persiste la programación. No se escriben contenidos ni credenciales en Logcat.
+
+Los pendientes no tienen el límite de 100 del diagnóstico ni una caducidad automática. Después de recibir un recibo válido se borra el cuerpo cifrado de esa fila y se conserva su identidad/huella como comprobante local para impedir reencolar avisos activos ya entregados. El diagnóstico conserva independientemente sus 100 muestras recientes. **Borrar muestras locales** no elimina pendientes ni recibos de la cola. Borrar datos o desinstalar sí elimina la cola; conservar la instalación al actualizar con `adb install -r`.
+
+### Entrega y recuperación
+
+`CaptureSyncWorker` usa `NetworkType.CONNECTED`, reintentos exponenciales desde 30 segundos y trabajo único. `APPEND_OR_REPLACE` evita perder una captura que llega justo al finalizar un lote. El reintento manual reemplaza la programación pendiente; un mutex impide dos drenajes simultáneos en el proceso. Los lotes están acotados a 100 filas elegibles; las identidades bloqueadas no impiden entregar avisos de otra identidad.
+
+La app vuelve a programar al iniciar y mantiene un trabajo periódico de recuperación cada 15 minutos para cubrir una muerte entre el commit de Room y `enqueue`. WorkManager restaura sus trabajos tras reinicios, después del desbloqueo cuando Android lo requiere. Los tiempos son mínimos sujetos a conectividad, batería y restricciones del sistema; no se promete entrega inmediata.
+
+| Resultado | Comportamiento |
+|---|---|
+| Recibo con el UUID original, `RECEIVED`, ID y fecha válidos | Marca entregado y retira el cuerpo de la cola. |
+| Respuesta perdida, timeout, red interrumpida, JSON/recibo incompleto, 408, 425 o 5xx | Conserva cuerpo y UUID; reintento progresivo. |
+| 429 | Conserva el aviso, respeta `Retry-After` en segundos o fecha HTTP y detiene ese lote. |
+| 401/403 | Bloquea los envíos de esa identidad, conservando todos sus pendientes. |
+| Otros 4xx, incluido conflicto 409 | Deja el aviso por revisar y muestra un error sin texto interno del servidor. |
+| Cifrado alterado | Conserva los bytes y muestra revisión; reintentar no sobrescribe ni envía el aviso. |
+
+El envío usa exclusivamente la credencial de la identidad original si sigue activa. **Consultar estado** o **Reanudar recepción**, tras confirmar `ACTIVE`, levanta el bloqueo de esa misma identidad. **Reintentar pendientes y errores** reprograma temporales y permite otro intento de los rechazos permanentes recuperables; no cambia cuentas, no restablece autorizaciones y no adelanta `Retry-After`. Un evento de una identidad revocada permanece separado aunque se vincule otra cuenta.
+
+### Pantalla nativa
+
+**Envío de avisos** muestra pendientes, por revisar, entregados, último envío confirmado, errores y referencias/fechas de avisos rechazados. Las fechas usan `America/Mexico_City`. Ofrece **Pausar envíos/Reanudar envíos** sin conexión, con preferencia persistente, y **Reintentar pendientes y errores**. La pausa de envíos conserva nuevas capturas; desactivar **Guardar avisos y diagnóstico** detiene la captura. Pausar/reanudar recepción desde la sección de vinculación sigue siendo una acción del servidor que requiere conexión. Consultar una autorización no reanuda una pausa local.
+
+Las acciones nuevas usan controles Material 3 de al menos 48 dp, contenido desplazable, estado anunciado y errores de lectura que no cierran la pantalla. Se conserva `FLAG_SECURE`, la TWA y los controles de permisos, fuentes y batería. Se indica expresamente que revisar avisos activos no recupera un historial completo y que **todavía no se crean gastos**.
+
+### Verificación reproducible de Fase 3
+
+Preparar PostgreSQL/HTTPS locales como en la Fase 2. Con el fixture listo y las rutas compiladas:
+
+```bash
+adb reverse tcp:4209 tcp:4209
+adb push <certificado TLS local> /data/local/tmp/afp-capture-test.crt
+cd android
+AFP_CAPTURE_TEST_ORIGIN=https://localhost:4209 \
+AFP_CAPTURE_TEST_CERTIFICATE=<certificado TLS local> \
+./gradlew :app:testDebugUnitTest :app:connectedDebugAndroidTest :app:assembleRelease :app:lint \
+  -Pandroid.testInstrumentationRunnerArguments.class=com.garatachia.afp.CaptureQueueTest,com.garatachia.afp.CaptureQueueDeliveryTest,com.garatachia.afp.BindingStoreTest,com.garatachia.afp.CaptureDeliveryTest,com.garatachia.afp.DiagnosticStoreTest,com.garatachia.afp.TwaNavigationTest \
+  -Pandroid.testInstrumentationRunnerArguments.captureTestOrigin=https://localhost:4209 \
+  -Pandroid.testInstrumentationRunnerArguments.captureTestCertificate=/data/local/tmp/afp-capture-test.crt
+```
+
+**18 pruebas JVM y 25 instrumentadas correctas, sin omisiones**, en el S24 Ultra (Android 16/API 36). Las diez pruebas nuevas de Room verifican reapertura/UUID, cifrado de archivo/WAL, recibo perdido, revisiones, callbacks concurrentes, más de 100 pendientes, credenciales, pausa, aislamiento de propietarios, ausencia de bloqueo entre identidades, `Retry-After`, errores permanentes y cifrado alterado. Una prueba adicional conecta Room con cliente HTTPS, API y PostgreSQL reales: pierde la confirmación después del commit, reabre la BD y obtiene el mismo recibo en el reintento. Auth y avisos son ficticios, sin escrituras financieras. Se repiten las catorce instrumentadas históricas de vinculación, diagnóstico y TWA.
+
+`QueueRecoveryProbeTest` ofrece una comprobación física en dos ejecuciones sobre **desarrollo**, nunca sobre el paquete personal. Instalar las APK debug y androidTest; registrar Wi-Fi/datos antes de desconectarlos. Ejecutar `seedOfflineQueue` con argumento `recoveryProbe=seed`: persiste un aviso sintético con envíos pausados, sin credencial utilizable, y comprueba la restricción de red del trabajo. Reiniciar Android conservando la instalación, desbloquear si hace falta, restaurar la conectividad original y ejecutar `verifyQueueAfterPhysicalReboot` con `recoveryProbe=verify`: verifica el mismo UUID/cuerpo, cero intentos, pausa persistente y programación periódica conservada. No ejecutar estos métodos como parte de la suite normal: se omiten salvo que reciban su argumento explícito. Retirar después los paquetes de pruebas.
+
+También pasaron **234 regresiones web sin omisiones**, lint y build web; se verificaron las 18 migraciones desde cero y actualización histórica, checksums, datos conservados y 21 tablas con RLS. Android compila debug/release y lint sin errores; conserva siete avisos (objetivo/versiones y la sugerencia `UseKtx`; se usa `commit()` directamente para comprobar si persistió la pausa), y un aviso de herramientas SDK XML. El runner emitió un aviso auxiliar por `androidx.test.services` ausente; las 25 pruebas terminaron correctamente. Estos resultados no acreditan muestras bancarias reales ni entrega real de un banco con pantalla bloqueada: la Fase 1 conserva esas tareas pendientes.
+
+**Instalación y comprobación en producción:** se actualizó la APK mediante `adb install -r` con el certificado existente, conservando la fecha original de instalación, el acceso a notificaciones, la vinculación autorizada, la captura activa y las ocho fuentes seleccionadas. Desde la pantalla real se pausaron los envíos, se reinició el proceso para comprobar que la pausa persistía, se reanudaron y se ejecutó el reintento. Se consultó de nuevo la autorización del servidor. La cola personal mostró **0 pendientes, 0 por revisar y 0 entregados**. Las pruebas sintéticas de Room/HTTPS y reinicio usaron exclusivamente desarrollo; no se crearon gastos ni se modificó el servidor de producción. [Evidencia agregada sin datos personales](../artifacts/android-fase3/verification.json).

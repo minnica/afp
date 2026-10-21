@@ -1,7 +1,7 @@
 # AFP Android: plan por fases para capturar compras automáticamente
 
 **Archivo:** `PLAN_CAPTURA_AUTOMATICA_ANDROID.md`, en la raíz del proyecto.\
-**Estado:** Fase 1 con implementación terminada y validación real pendiente: ocho fuentes verificadas y seleccionadas, nueve tarjetas inventariadas, batería Samsung revisada, TWA comprobada y Digital Asset Links publicado. Solo quedan las muestras bancarias reales, su anonimización revisada y la captura real con pantalla bloqueada. El usuario avisará al recibir un cargo. Fase 2 concluida: verificada con PostgreSQL local, cliente Kotlin y cuatro pruebas nuevas en el S24 Ultra; migración aplicada y verificada en Supabase; APK de producción 0.2.0 instalada y teléfono vinculado mediante el flujo web real, con autorización nativa confirmada. Fases 3–7 sin iniciar.\
+**Estado:** Fase 1 con implementación terminada y validación real pendiente: ocho fuentes verificadas y seleccionadas, nueve tarjetas inventariadas, batería Samsung revisada, TWA comprobada y Digital Asset Links publicado. Solo quedan las muestras bancarias reales, su anonimización revisada y la captura real con pantalla bloqueada. El usuario avisará al recibir un cargo. Fase 2 concluida: verificada con PostgreSQL local, cliente Kotlin y cuatro pruebas nuevas en el S24 Ultra; migración aplicada y verificada en Supabase; APK de producción 0.2.0 instalada y teléfono vinculado mediante el flujo web real, con autorización nativa confirmada. Fase 3 implementada y verificada: cola Room cifrada, WorkManager, reintentos idempotentes y recuperación comprobada tras reinicio real del S24 Ultra. APK 0.3.0 / versionCode 5. Fases 4–7 sin iniciar.\
 **Dispositivo inicial:** Samsung S24 Ultra, Android 16 y One UI 8.5.\
 **Cobertura prevista:** todas las tarjetas existentes en AFP, conservando sus identidades e historiales.\
 **Primer piloto de registro automático:** BBVA Platinum; los demás bancos se preparan desde el diagnóstico y se activan gradualmente.
@@ -171,15 +171,28 @@ Evidencia agregada sin secretos, códigos temporales, textos bancarios ni identi
 
 **Objetivo:** conservar los avisos capturados y entregarlos sin duplicarlos.
 
-- [ ] Guardar cada evento en Room antes de iniciar cualquier petición. Mantener su UUID durante todos los reintentos.
-- [ ] Filtrar localmente las aplicaciones autorizadas y excluir promociones, códigos de acceso y resúmenes de notificaciones agrupadas.
-- [ ] Proteger el texto financiero almacenado localmente y excluir credenciales y pendientes de copias de seguridad automáticas.
-- [ ] Implementar el envío mediante WorkManager con restricción de conexión y reintentos progresivos.
-- [ ] Conservar pendientes ante respuestas perdidas y errores temporales; pausar envíos ante credenciales inválidas y mostrar errores permanentes para revisión.
-- [ ] Recuperar la cola tras reinicios. Al reconectar el lector, inspeccionar únicamente las notificaciones todavía activas, sin presentarlas como un historial completo.
-- [ ] Mostrar cantidad de pendientes, último envío confirmado, errores y acciones para reintentar o pausar.
+- [x] Guardar cada evento en Room antes de iniciar cualquier petición. Mantener su UUID durante todos los reintentos.
+- [x] Filtrar localmente las aplicaciones autorizadas y excluir promociones, códigos de acceso y resúmenes de notificaciones agrupadas.
+- [x] Proteger el texto financiero almacenado localmente y excluir credenciales y pendientes de copias de seguridad automáticas.
+- [x] Implementar el envío mediante WorkManager con restricción de conexión y reintentos progresivos.
+- [x] Conservar pendientes ante respuestas perdidas y errores temporales; pausar envíos ante credenciales inválidas y mostrar errores permanentes para revisión.
+- [x] Recuperar la cola tras reinicios. Al reconectar el lector, inspeccionar únicamente las notificaciones todavía activas, sin presentarlas como un historial completo.
+- [x] Mostrar cantidad de pendientes, último envío confirmado, errores y acciones para reintentar o pausar.
 
 **Criterio de salida:** desconectar Internet, reiniciar el teléfono o perder una respuesta del servidor no pierde eventos ya guardados ni genera gastos duplicados.
+
+**Implementación concluida y criterio de salida verificado · 21 de octubre de 2026.**
+
+- Room 2.8.5 persiste cada evento admitido con UUID, dispositivo y propietario originales antes de programar la petición. El cuerpo se cifra con AES-GCM/Android Keystore y datos autenticados de la identidad; base y WAL quedan en `noBackupFilesDir`, con backups y transferencia excluidos. El esquema local está versionado; no hay migraciones ni cambios de API/BD del servidor.
+- El lector aplica el catálogo y selección existentes, descarta resúmenes agrupados, categoría promocional y patrones explícitos de promociones/códigos. Revisa solo notificaciones aún activas al reconectar. La misma publicación/contenido conserva su UUID y cuenta incluso tras una revinculación; las revisiones diferentes no se confunden con compras. No se importan muestras antiguas del diagnóstico.
+- WorkManager exige conexión y reintenta con espera exponencial desde 30 segundos, respetando `Retry-After`. Una recuperación periódica cada 15 minutos cubre la interrupción entre commit y programación. La cola conserva respuestas perdidas/incompletas y fallos temporales; 401/403 bloquea únicamente la identidad afectada hasta comprobar su autorización. Los rechazos permanentes y el cifrado alterado permanecen para revisión. Un recibo válido retira el cuerpo de la cola y conserva la huella de entrega; los pendientes no tienen el límite de 100 muestras del diagnóstico.
+- La pantalla muestra pendientes, revisiones, entregados, último envío confirmado, errores y acciones de pausa/reintento. Pausar envíos conserva nuevas capturas; desactivar la captura las detiene. Borrar diagnóstico no borra la cola. Los propietarios originales nunca se sustituyen por la cuenta de una nueva vinculación.
+- **18 pruebas JVM y 25 instrumentadas correctas, cero fallos y cero omisiones**, en el S24 Ultra Android 16/API 36. Incluyen diez nuevas de Room y una de entrega Room → cliente HTTPS → API/PostgreSQL locales: se pierde la confirmación después del commit real, se reabre la BD y el reintento devuelve el mismo recibo. Auth y eventos son ficticios. Se verifican concurrencia, más de 100 pendientes, revisiones, rechazo de credenciales, aislamiento, `Retry-After`, recibos incompletos, errores permanentes y alteraciones del cifrado.
+- **Dos comprobaciones físicas adicionales correctas:** con Wi-Fi y datos desactivados se persistió un aviso sintético exclusivamente en desarrollo, con envíos pausados y sin credencial utilizable. Se reinició realmente el S24 Ultra y se verificaron UUID, cuerpo, propietario, cero intentos, pausa y trabajo periódico conservados. Se restauraron Wi-Fi y datos al estado anterior. Esto prueba persistencia de eventos ya guardados; no afirma recuperar avisos desaparecidos ni captura bancaria real durante el bloqueo.
+- **234 regresiones web correctas sin omisiones**, build y lint web correctos. Reconstrucción de las 18 migraciones desde cero y actualización histórica, checksums, diff vacío, datos conservados y 21 tablas con RLS. Ambas APK compilan y lint Android no tiene errores; quedan siete avisos (objetivo/versiones y `UseKtx`, conservando la comprobación del resultado de `commit()`), además de un aviso de herramientas SDK XML. El runner emitió un aviso auxiliar por `androidx.test.services` ausente, sin afectar las pruebas.
+- **APK firmada 0.3.0 / versionCode 5 instalada en producción:** se conservaron instalación original, permiso, vinculación, captura activa y ocho fuentes seleccionadas. Se comprobó desde la pantalla real pausa persistente tras reiniciar el proceso, reanudación, reintento y consulta de autorización. La cola personal quedó en 0 pendientes, 0 por revisar y 0 entregados; las muestras sintéticas se limitaron a desarrollo. No se requirieron despliegue web ni cambios de Supabase.
+
+El servidor continúa en recepción/observación: **no se interpretan ni crean gastos hasta la Fase 4**. Las muestras bancarias reales y la captura real con pantalla bloqueada de Fase 1 siguen pendientes. No se publican secretos, textos bancarios ni identificadores del teléfono. Procedimiento y límites: [guía Fase 3](docs/android-captura.md#cola-local-y-sincronización--fase-3). Evidencia agregada: [verificación Fase 3](artifacts/android-fase3/verification.json).
 
 ### Fase 4. Interpretación y registro financiero automático
 

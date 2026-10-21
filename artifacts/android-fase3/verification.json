@@ -1,0 +1,135 @@
+{
+  "date": "2026-10-21",
+  "phase": 3,
+  "result": "PASS",
+  "apk": {
+    "versionName": "0.3.0",
+    "versionCode": 5,
+    "releaseSha256": "6c776ada8ea4a86d9fb17d922e17b07681fcc9fc5e23d0d1ee5482470cf46286",
+    "existingProductionSignerVerified": true,
+    "assetLinksSignerMatches": true
+  },
+  "scope": {
+    "nativeRoomQueue": true,
+    "workManagerDelivery": true,
+    "automaticExpenses": false,
+    "backendChanges": false,
+    "serverMigrationsAdded": 0,
+    "webDeploymentRequired": false,
+    "syntheticTestsOnly": true
+  },
+  "jvm": {
+    "tests": 18,
+    "failures": 0,
+    "skipped": 0,
+    "realLocalHttpsDelivery": true,
+    "contentFilterCoverage": [
+      "explicit access codes and promotions excluded",
+      "unknown and hidden content retained",
+      "transaction evidence retained when merchant name contains promotional words",
+      "Retry-After seconds and HTTP dates"
+    ]
+  },
+  "instrumentation": {
+    "device": "Samsung SM-S928B / S24 Ultra",
+    "android": 16,
+    "api": 36,
+    "fullSuite": {
+      "tests": 25,
+      "failures": 0,
+      "skipped": 0
+    },
+    "finalQueueRegression": {
+      "tests": 11,
+      "failures": 0,
+      "skipped": 0
+    },
+    "coverage": [
+      "Room persistence before send",
+      "encrypted payload and WAL",
+      "UUID retained across reopening",
+      "same publication deduplicated after delivery",
+      "same publication retains original owner after relinking",
+      "notification revisions preserved",
+      "concurrent callbacks",
+      "more than 100 pending events preserved",
+      "lost receipt after real PostgreSQL commit",
+      "same HTTPS receipt recovered after Room reopening",
+      "401 and 403 stop affected identity",
+      "new identity never borrows prior credentials",
+      "blocked identity does not starve another identity",
+      "local and remote pause",
+      "temporary failures and Retry-After",
+      "invalid receipt remains pending",
+      "permanent errors need review",
+      "modified ciphertext and AAD rejected",
+      "existing diagnostic, binding and TWA regressions"
+    ]
+  },
+  "physicalRecovery": {
+    "seedTestPassed": true,
+    "wifiAndMobileDataDisabledForSeed": true,
+    "realPhoneRebootPerformed": true,
+    "verifyTestPassedAfterReboot": true,
+    "sameEventIdAndOwnerAndPayload": true,
+    "attemptsAfterReboot": 0,
+    "localPausePersisted": true,
+    "workManagerNetworkConstraintVerified": true,
+    "periodicRecoveryPersisted": true,
+    "fixture": "synthetic development event; no usable credential; delivery paused"
+  },
+  "web": {
+    "tests": 234,
+    "failures": 0,
+    "skipped": 0,
+    "lintErrors": 0,
+    "existingLintWarnings": 1,
+    "webpackBuild": "PASS"
+  },
+  "databaseReproduction": {
+    "target": "disposable localhost PostgreSQL 16",
+    "freshAndHistoricalUpgrade": "PASS",
+    "migrations": 18,
+    "rlsTablesIncludingHistory": 21,
+    "schemaDiffEmpty": true,
+    "checksumsAndHistoricalDataPreserved": true
+  },
+  "androidBuild": {
+    "debug": "PASS",
+    "release": "PASS",
+    "lintErrors": 0,
+    "lintWarnings": 7,
+    "warningNotes": [
+      "Existing target/Gradle/Compose/Activity/Lifecycle update notices",
+      "Newer test-only JSON artifact available",
+      "UseKtx suggestion retained to check Boolean commit result",
+      "SDK XML tooling warning",
+      "Auxiliary androidx.test.services appops warning; all instrumentation passed"
+    ]
+  },
+  "pendingOutsidePhase3": [
+    "Real banking samples and locked-screen capture evidence remain pending in Phase 1",
+    "Financial parsing and automatic expenses start in Phase 4"
+  ],
+  "privacy": "No secrets, pairing codes, bank text or device serials included.",
+  "productionPhone": {
+    "versionCode": "5",
+    "versionName": "0.3.0",
+    "installationPreserved": true,
+    "notificationAccessPreserved": true,
+    "localPauseSurvivesProcessRestart": true,
+    "resumedAndRetriedFromUi": true,
+    "queueSummary": [
+      "0 pendientes · 0 por revisar · 0 entregados"
+    ],
+    "wifiRestored": true,
+    "mobileDataRestored": true,
+    "authorizedAfterReopenAndStatusCheck": true,
+    "captureEnabledPreserved": true,
+    "sourcesSelection": "8/8 instaladas · 8 seleccionadas e instaladas",
+    "listenerConnected": true,
+    "syntheticEventsSentToProduction": 0,
+    "financialRecordsCreated": 0
+  },
+  "testEnvironmentCleanedUp": true
+}
