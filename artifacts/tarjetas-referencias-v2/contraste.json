@@ -1,0 +1,626 @@
+{
+  "320": [
+    {
+      "skin": "bbva-platinum",
+      "label": "Saldo utilizado",
+      "contrast": 8.1
+    },
+    {
+      "skin": "bbva-platinum",
+      "label": "$12,500.25",
+      "contrast": 7.04
+    },
+    {
+      "skin": "bbva-platinum",
+      "label": "Línea de crédito",
+      "contrast": 7.29
+    },
+    {
+      "skin": "bbva-platinum",
+      "label": "$35,000.00",
+      "contrast": 7.06
+    },
+    {
+      "skin": "bbva-platinum",
+      "label": "Disponible",
+      "contrast": 5.36
+    },
+    {
+      "skin": "bbva-platinum",
+      "label": "$22,499.75",
+      "contrast": 4.96
+    },
+    {
+      "skin": "bbva-platinum",
+      "label": "Platinum",
+      "contrast": 6.63
+    },
+    {
+      "skin": "hsbc-zero",
+      "label": "Zero · 1",
+      "contrast": 12.37
+    },
+    {
+      "skin": "hsbc-zero",
+      "label": "Saldo utilizado",
+      "contrast": 7.55
+    },
+    {
+      "skin": "hsbc-zero",
+      "label": "$7,512.40",
+      "contrast": 11.57
+    },
+    {
+      "skin": "hsbc-zero",
+      "label": "Línea de crédito",
+      "contrast": 7.35
+    },
+    {
+      "skin": "hsbc-zero",
+      "label": "$16,000.00",
+      "contrast": 11.68
+    },
+    {
+      "skin": "hsbc-zero",
+      "label": "Disponible",
+      "contrast": 7
+    },
+    {
+      "skin": "hsbc-zero",
+      "label": "$8,487.60",
+      "contrast": 11.14
+    },
+    {
+      "skin": "hsbc-zero",
+      "label": "Zero · 2",
+      "contrast": 12.34
+    },
+    {
+      "skin": "hsbc-zero",
+      "label": "Saldo utilizado · Exceso $500.20",
+      "contrast": 7.13
+    },
+    {
+      "skin": "hsbc-zero",
+      "label": "$20,500.20",
+      "contrast": 11.46
+    },
+    {
+      "skin": "hsbc-zero",
+      "label": "Línea de crédito",
+      "contrast": 7.35
+    },
+    {
+      "skin": "hsbc-zero",
+      "label": "$20,000.00",
+      "contrast": 11.68
+    },
+    {
+      "skin": "hsbc-zero",
+      "label": "Disponible",
+      "contrast": 7
+    },
+    {
+      "skin": "hsbc-zero",
+      "label": "$0.00",
+      "contrast": 11.14
+    },
+    {
+      "skin": "banamex-joy",
+      "label": "Joy · 1",
+      "contrast": 5.14
+    },
+    {
+      "skin": "banamex-joy",
+      "label": "Saldo utilizado",
+      "contrast": 4.86
+    },
+    {
+      "skin": "banamex-joy",
+      "label": "$2,150.50",
+      "contrast": 4.8
+    },
+    {
+      "skin": "banamex-joy",
+      "label": "Línea de crédito",
+      "contrast": 4.86
+    },
+    {
+      "skin": "banamex-joy",
+      "label": "$12,000.00",
+      "contrast": 5.15
+    },
+    {
+      "skin": "banamex-joy",
+      "label": "Disponible",
+      "contrast": 4.75
+    },
+    {
+      "skin": "banamex-joy",
+      "label": "$9,849.50",
+      "contrast": 5.14
+    },
+    {
+      "skin": "banamex-joy",
+      "label": "Joy · 2",
+      "contrast": 5.2
+    },
+    {
+      "skin": "banamex-joy",
+      "label": "Saldo utilizado",
+      "contrast": 4.92
+    },
+    {
+      "skin": "banamex-joy",
+      "label": "$0.00",
+      "contrast": 5.2
+    },
+    {
+      "skin": "banamex-joy",
+      "label": "Línea de crédito",
+      "contrast": 4.92
+    },
+    {
+      "skin": "banamex-joy",
+      "label": "$8,000.00",
+      "contrast": 5.2
+    },
+    {
+      "skin": "banamex-joy",
+      "label": "Disponible",
+      "contrast": 4.75
+    },
+    {
+      "skin": "banamex-joy",
+      "label": "$8,000.00",
+      "contrast": 5.14
+    },
+    {
+      "skin": "santander-likeu",
+      "label": "Saldo utilizado",
+      "contrast": 11.3
+    },
+    {
+      "skin": "santander-likeu",
+      "label": "$4,500.50",
+      "contrast": 11.2
+    },
+    {
+      "skin": "santander-likeu",
+      "label": "Línea de crédito",
+      "contrast": 11.29
+    },
+    {
+      "skin": "santander-likeu",
+      "label": "$25,000.00",
+      "contrast": 11.3
+    },
+    {
+      "skin": "santander-likeu",
+      "label": "Disponible",
+      "contrast": 5.32
+    },
+    {
+      "skin": "santander-likeu",
+      "label": "$20,499.50",
+      "contrast": 5.68
+    },
+    {
+      "skin": "nu",
+      "label": "crédito",
+      "contrast": 6.69
+    },
+    {
+      "skin": "nu",
+      "label": "Saldo a favor",
+      "contrast": 7.73
+    },
+    {
+      "skin": "nu",
+      "label": "$300.10",
+      "contrast": 7.45
+    },
+    {
+      "skin": "nu",
+      "label": "Línea de crédito",
+      "contrast": 6.85
+    },
+    {
+      "skin": "nu",
+      "label": "$10,000.00",
+      "contrast": 7.25
+    },
+    {
+      "skin": "nu",
+      "label": "Disponible",
+      "contrast": 5.69
+    },
+    {
+      "skin": "nu",
+      "label": "$10,300.10",
+      "contrast": 5.92
+    },
+    {
+      "skin": "didi",
+      "label": "Saldo utilizado",
+      "contrast": 5.4
+    },
+    {
+      "skin": "didi",
+      "label": "$50.00",
+      "contrast": 5.81
+    },
+    {
+      "skin": "didi",
+      "label": "Línea de crédito",
+      "contrast": 5.4
+    },
+    {
+      "skin": "didi",
+      "label": "$2,400.00",
+      "contrast": 5.81
+    },
+    {
+      "skin": "didi",
+      "label": "Disponible",
+      "contrast": 4.82
+    },
+    {
+      "skin": "didi",
+      "label": "$2,350.00",
+      "contrast": 5.18
+    },
+    {
+      "skin": "mercado-pago",
+      "label": "Saldo utilizado",
+      "contrast": 12.1
+    },
+    {
+      "skin": "mercado-pago",
+      "label": "$1,250.75",
+      "contrast": 12.13
+    },
+    {
+      "skin": "mercado-pago",
+      "label": "Línea de crédito",
+      "contrast": 9.93
+    },
+    {
+      "skin": "mercado-pago",
+      "label": "$5,000.00",
+      "contrast": 9.5
+    },
+    {
+      "skin": "mercado-pago",
+      "label": "Disponible",
+      "contrast": 8.49
+    },
+    {
+      "skin": "mercado-pago",
+      "label": "$3,749.25",
+      "contrast": 6.56
+    },
+    {
+      "skin": "mercado-pago",
+      "label": "mercado pago",
+      "contrast": 5.33
+    },
+    {
+      "skin": "mercado-pago",
+      "label": "crédito",
+      "contrast": 11.14
+    }
+  ],
+  "375": [
+    {
+      "skin": "bbva-platinum",
+      "label": "Saldo utilizado",
+      "contrast": 8.1
+    },
+    {
+      "skin": "bbva-platinum",
+      "label": "$12,500.25",
+      "contrast": 6.96
+    },
+    {
+      "skin": "bbva-platinum",
+      "label": "Línea de crédito",
+      "contrast": 7.31
+    },
+    {
+      "skin": "bbva-platinum",
+      "label": "$35,000.00",
+      "contrast": 7.14
+    },
+    {
+      "skin": "bbva-platinum",
+      "label": "Disponible",
+      "contrast": 5.3
+    },
+    {
+      "skin": "bbva-platinum",
+      "label": "$22,499.75",
+      "contrast": 4.91
+    },
+    {
+      "skin": "bbva-platinum",
+      "label": "Platinum",
+      "contrast": 6.89
+    },
+    {
+      "skin": "hsbc-zero",
+      "label": "Zero · 1",
+      "contrast": 12.46
+    },
+    {
+      "skin": "hsbc-zero",
+      "label": "Saldo utilizado",
+      "contrast": 7.55
+    },
+    {
+      "skin": "hsbc-zero",
+      "label": "$7,512.40",
+      "contrast": 11.57
+    },
+    {
+      "skin": "hsbc-zero",
+      "label": "Línea de crédito",
+      "contrast": 7.4
+    },
+    {
+      "skin": "hsbc-zero",
+      "label": "$16,000.00",
+      "contrast": 11.68
+    },
+    {
+      "skin": "hsbc-zero",
+      "label": "Disponible",
+      "contrast": 7
+    },
+    {
+      "skin": "hsbc-zero",
+      "label": "$8,487.60",
+      "contrast": 11.14
+    },
+    {
+      "skin": "hsbc-zero",
+      "label": "Zero · 2",
+      "contrast": 12.37
+    },
+    {
+      "skin": "hsbc-zero",
+      "label": "Saldo utilizado · Exceso $500.20",
+      "contrast": 7.14
+    },
+    {
+      "skin": "hsbc-zero",
+      "label": "$20,500.20",
+      "contrast": 11.46
+    },
+    {
+      "skin": "hsbc-zero",
+      "label": "Línea de crédito",
+      "contrast": 7.4
+    },
+    {
+      "skin": "hsbc-zero",
+      "label": "$20,000.00",
+      "contrast": 11.7
+    },
+    {
+      "skin": "hsbc-zero",
+      "label": "Disponible",
+      "contrast": 7
+    },
+    {
+      "skin": "hsbc-zero",
+      "label": "$0.00",
+      "contrast": 11.14
+    },
+    {
+      "skin": "banamex-joy",
+      "label": "Joy · 1",
+      "contrast": 5.14
+    },
+    {
+      "skin": "banamex-joy",
+      "label": "Saldo utilizado",
+      "contrast": 4.86
+    },
+    {
+      "skin": "banamex-joy",
+      "label": "$2,150.50",
+      "contrast": 4.85
+    },
+    {
+      "skin": "banamex-joy",
+      "label": "Línea de crédito",
+      "contrast": 4.86
+    },
+    {
+      "skin": "banamex-joy",
+      "label": "$12,000.00",
+      "contrast": 5.15
+    },
+    {
+      "skin": "banamex-joy",
+      "label": "Disponible",
+      "contrast": 4.74
+    },
+    {
+      "skin": "banamex-joy",
+      "label": "$9,849.50",
+      "contrast": 5.14
+    },
+    {
+      "skin": "banamex-joy",
+      "label": "Joy · 2",
+      "contrast": 5.14
+    },
+    {
+      "skin": "banamex-joy",
+      "label": "Saldo utilizado",
+      "contrast": 4.86
+    },
+    {
+      "skin": "banamex-joy",
+      "label": "$0.00",
+      "contrast": 5.14
+    },
+    {
+      "skin": "banamex-joy",
+      "label": "Línea de crédito",
+      "contrast": 4.86
+    },
+    {
+      "skin": "banamex-joy",
+      "label": "$8,000.00",
+      "contrast": 5.15
+    },
+    {
+      "skin": "banamex-joy",
+      "label": "Disponible",
+      "contrast": 4.74
+    },
+    {
+      "skin": "banamex-joy",
+      "label": "$8,000.00",
+      "contrast": 5.14
+    },
+    {
+      "skin": "santander-likeu",
+      "label": "Saldo utilizado",
+      "contrast": 11.28
+    },
+    {
+      "skin": "santander-likeu",
+      "label": "$4,500.50",
+      "contrast": 11.11
+    },
+    {
+      "skin": "santander-likeu",
+      "label": "Línea de crédito",
+      "contrast": 11.22
+    },
+    {
+      "skin": "santander-likeu",
+      "label": "$25,000.00",
+      "contrast": 11.22
+    },
+    {
+      "skin": "santander-likeu",
+      "label": "Disponible",
+      "contrast": 5.28
+    },
+    {
+      "skin": "santander-likeu",
+      "label": "$20,499.50",
+      "contrast": 5.51
+    },
+    {
+      "skin": "nu",
+      "label": "crédito",
+      "contrast": 6.64
+    },
+    {
+      "skin": "nu",
+      "label": "Saldo a favor",
+      "contrast": 7.8
+    },
+    {
+      "skin": "nu",
+      "label": "$300.10",
+      "contrast": 7.42
+    },
+    {
+      "skin": "nu",
+      "label": "Línea de crédito",
+      "contrast": 6.91
+    },
+    {
+      "skin": "nu",
+      "label": "$10,000.00",
+      "contrast": 7.41
+    },
+    {
+      "skin": "nu",
+      "label": "Disponible",
+      "contrast": 5.7
+    },
+    {
+      "skin": "nu",
+      "label": "$10,300.10",
+      "contrast": 5.95
+    },
+    {
+      "skin": "didi",
+      "label": "Saldo utilizado",
+      "contrast": 5.4
+    },
+    {
+      "skin": "didi",
+      "label": "$50.00",
+      "contrast": 5.81
+    },
+    {
+      "skin": "didi",
+      "label": "Línea de crédito",
+      "contrast": 5.4
+    },
+    {
+      "skin": "didi",
+      "label": "$2,400.00",
+      "contrast": 5.81
+    },
+    {
+      "skin": "didi",
+      "label": "Disponible",
+      "contrast": 4.82
+    },
+    {
+      "skin": "didi",
+      "label": "$2,350.00",
+      "contrast": 5.18
+    },
+    {
+      "skin": "mercado-pago",
+      "label": "Saldo utilizado",
+      "contrast": 12.24
+    },
+    {
+      "skin": "mercado-pago",
+      "label": "$1,250.75",
+      "contrast": 12.13
+    },
+    {
+      "skin": "mercado-pago",
+      "label": "Línea de crédito",
+      "contrast": 10.09
+    },
+    {
+      "skin": "mercado-pago",
+      "label": "$5,000.00",
+      "contrast": 9.77
+    },
+    {
+      "skin": "mercado-pago",
+      "label": "Disponible",
+      "contrast": 8.74
+    },
+    {
+      "skin": "mercado-pago",
+      "label": "$3,749.25",
+      "contrast": 6.72
+    },
+    {
+      "skin": "mercado-pago",
+      "label": "mercado pago",
+      "contrast": 5.34
+    },
+    {
+      "skin": "mercado-pago",
+      "label": "crédito",
+      "contrast": 11.29
+    }
+  ]
+}

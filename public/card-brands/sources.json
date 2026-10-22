@@ -1,7 +1,7 @@
 {
   "reviewedOn": "2026-10-21",
   "purpose": "Identidad visual de las tarjetas personales en Crédito y deuda. Los importes y controles son HTML accesible; los motivos gráficos son decorativos.",
-  "confirmedByOwner": "BBVA Platinum; ambas HSBC Zero; ambas Banamex Joy; Santander LikeU roja.",
+  "confirmedByOwner": "BBVA Platinum; ambas HSBC Zero; ambas Banamex Joy; Santander LikeU. Las referencias locales posteriores muestran LikeU blanca iridiscente y prevalecen para su apariencia.",
   "assets": [
     {
       "file": "bbva.svg",
@@ -52,5 +52,95 @@
     "https://www.mercadopago.com.mx/tarjeta-de-credito",
     "https://http2.mlstatic.com/frontend-assets/credit-card-landings/tarjeta-de-credito/lista-de-espera/landing/new-card-hero.webp"
   ],
-  "scope": "Adaptación de los colores y materiales de los plásticos; no reproduce números, vencimientos, CVV ni datos de titular. Los nombres 1/2 se conservan. La selección visual no modifica usagePolicy ni datos financieros."
+  "scope": "Los frentes móviles usan las referencias del propietario, importes HTML accesibles y las marcas de red confirmadas en sus imágenes. LikeU, Santander, su llama, su trama y las redes son SVG sin imágenes incrustadas. Los WebP anteriores de LikeU/Santander se conservan solo como antecedentes y no se regeneran ni se usan en el frente. No se publican capturas completas, terminaciones, vencimientos, CVV ni datos de titular; usagePolicy conserva sus valores.",
+  "referenceSet": "estados_cuenta/referencias_tarjetas",
+  "preparationScript": "scripts/prepare-card-reference-assets.cjs",
+  "referenceAssets": [
+    {
+      "file": "bbva-platinum-motif.webp",
+      "source": "bbva.jpeg",
+      "note": "Recorte del relieve central; CSS mezcla el metal y difumina sus bordes."
+    },
+    {
+      "file": "hsbc-zero-motif.webp",
+      "source": "hsbc-zero.png",
+      "note": "Círculo de pincel extraído con máscara blanca; sin chip ni red de pago."
+    },
+    {
+      "file": "banamex-wordmark.webp",
+      "source": "joy.jpeg",
+      "note": "Marca blanca extraída con transparencia; se excluyen fondo cian y pétalos."
+    },
+    {
+      "file": "joy-reference-petals.webp",
+      "source": "joy.jpeg",
+      "note": "Pétalos superiores y laterales; fondo cian transparente, sin red de pago."
+    },
+    {
+      "file": "likeu-pearl-motif.webp",
+      "source": "santander.jpeg",
+      "note": "Banda central del relieve iridiscente y la llama; sustituye la apariencia roja anterior."
+    },
+    {
+      "file": "santander-wordmark.webp",
+      "source": "santander.jpeg",
+      "note": "Marca superior derecha, extraída en rojo sobre transparencia."
+    },
+    {
+      "file": "likeu-wordmark.webp",
+      "source": "santander.jpeg",
+      "note": "Marca de producto superior izquierda, extraída en rojo sobre transparencia."
+    },
+    {
+      "file": "didi-card-wordmark.webp",
+      "source": "didi.jpeg",
+      "note": "Marca DiDi del plástico; sustituye el logotipo anterior de DiDi Finanzas."
+    },
+    {
+      "file": "mercado-pago-motif.webp",
+      "source": "mercadopago.png",
+      "note": "Recorte del emblema de manos del plástico; excluye los importes y controles de la app."
+    }
+  ],
+  "layoutRevision": "Sin barras de progreso en Crédito y deuda. Visa/Mastercard al pie del frente; Platinum debajo de Visa, Joy debajo de Banamex, marca Mercado Pago y crédito al pie. Zero/LikeU/crédito Nu conservan su posición en la cabecera.",
+  "vectorAssets": [
+    {
+      "file": "likeu-wordmark.svg",
+      "source": "https://assets.santandermedia.com/adobe/assets/urn%3Aaaid%3Aaem%3A028ccfe7-3fd7-4a90-a8c6-adf55e1c1413/original/as/MDP_Folleto_LikeU_Dic2025_CAT2026_V4_140126.pdf",
+      "note": "Cuatro trazos vectoriales de la portada oficial; sin conversión desde la captura ni imágenes incrustadas."
+    },
+    {
+      "file": "santander.svg",
+      "source": "Mismo folleto oficial, portada",
+      "note": "Trazado completo del logotipo de Santander, extraído del PDF."
+    },
+    {
+      "file": "santander-flame.svg",
+      "source": "Mismo folleto oficial, portada",
+      "note": "Llama oficial utilizada para construir los contornos del fondo."
+    },
+    {
+      "file": "likeu-pearl-pattern.svg",
+      "source": "scripts/generate-likeu-pattern.cjs",
+      "reference": "estados_cuenta/referencias_tarjetas/santander.jpeg",
+      "note": "110 contornos vectoriales a distancia constante de la llama oficial, con curva suave y tonos iridiscentes. Sin mapas de bits."
+    },
+    {
+      "file": "visa.svg",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/5/5c/Visa_Inc._logo_%282021%E2%80%93present%29.svg",
+      "reference": "https://commons.wikimedia.org/wiki/File:Visa_Inc._logo_(2021%E2%80%93present).svg",
+      "note": "Trazado vectorial de la marca Visa; presentación blanca en BBVA y Mercado Pago, azul en HSBC."
+    },
+    {
+      "file": "mastercard.svg",
+      "reference": "https://brand.mastercard.com/brandcenter-es/artwork.html/",
+      "note": "Construcción vectorial local del símbolo de dos círculos y su intersección, con los colores de Mastercard y las proporciones de la referencia."
+    }
+  ],
+  "legacyRasterAssets": [
+    "likeu-wordmark.webp",
+    "santander-wordmark.webp",
+    "likeu-pearl-motif.webp"
+  ],
+  "officialLikeuBrochureSha256": "e788fe5b9718aa823c58fcb199c0cbdf8dd08016c0755fd2094706dc6ccbdbf6"
 }

@@ -4,7 +4,6 @@ import Image from "next/image";
 import { getCardAppearance } from "@/lib/cardAppearance";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 
 const currency = new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" });
 const money = amount => amount == null ? "—" : currency.format(amount);
@@ -14,16 +13,18 @@ export default function MobileCreditCard({ card, balance, onEdit }) {
   const instance = ["banamex-joy", "hsbc-zero"].includes(appearance.skin) ? card.name.trim().match(/\s([12])$/)?.[1] : null;
   const product = instance ? `${appearance.product} · ${instance}` : appearance.product;
   const hasCreditBalance = balance.creditBalance > 0;
+  const brand = appearance.logo ? (
+    <Image src={appearance.logo} width={appearance.logoWidth} height={appearance.logoHeight} alt="" className="credit-card-brand-logo" unoptimized />
+  ) : <span className="credit-card-wordmark" aria-hidden="true">{appearance.skin === "neutral" ? card.name : appearance.brand}</span>;
+  const productMark = <span className="credit-card-product">{appearance.productLogo ? <Image src={appearance.productLogo} width={appearance.productLogoWidth} height={appearance.productLogoHeight} alt={product} className="credit-card-product-logo" unoptimized /> : product}</span>;
   return (
     <Card className="mobile-credit-card gap-0 p-0 ring-0 md:hidden" data-card-skin={appearance.skin}>
       <div className="credit-card-face">
-        <div className="credit-card-art" aria-hidden="true"><span /><span /><span /></div>
+        <div className="credit-card-art" aria-hidden="true" />
         <CardHeader className="credit-card-face-header">
           <div className="credit-card-brand-row">
-            {appearance.logo ? (
-              <Image src={appearance.logo} width={appearance.logoWidth} height={appearance.logoHeight} alt="" className="credit-card-brand-logo" unoptimized />
-            ) : <span className="credit-card-wordmark" aria-hidden="true">{appearance.skin === "neutral" ? card.name : appearance.brand}</span>}
-            <span className="credit-card-product">{product}</span>
+            {appearance.brandPlacement !== "footer" ? <div className="credit-card-brand-block">{brand}{appearance.productPlacement === "below-brand" ? productMark : null}</div> : null}
+            {!appearance.productPlacement ? productMark : null}
           </div>
           <CardTitle className="sr-only"><h3>{card.name}</h3></CardTitle>
         </CardHeader>
@@ -37,11 +38,12 @@ export default function MobileCreditCard({ card, balance, onEdit }) {
             <div><dt>Disponible</dt><dd>{money(balance.availableCredit)}</dd></div>
           </dl>
         </CardContent>
-        {balance.hasBalance && balance.utilization !== null ? (
+        {appearance.network ? (
           <CardFooter className="credit-card-face-footer">
-            <div className="credit-card-usage">
-              <Progress value={Math.min(balance.utilization, 100)} aria-label={`Crédito utilizado de ${card.name}`} getValueLabel={() => `${balance.utilization.toFixed(1)} % del límite utilizado`} className="credit-card-progress [&_[data-slot=progress-indicator]]:motion-reduce:transition-none" />
-              <span className="credit-card-percentage">{balance.utilization.toFixed(1)} %</span>
+            {appearance.brandPlacement === "footer" ? brand : null}
+            <div className="credit-card-network" data-network={appearance.network}>
+              <Image src={`/card-brands/${appearance.network}.svg`} width={appearance.network === "visa" ? 1000 : 100} height={appearance.network === "visa" ? 325 : 62} alt={appearance.network === "visa" ? "Visa" : "Mastercard"} className="credit-card-network-logo" unoptimized />
+              {appearance.productPlacement === "footer" ? productMark : null}
             </div>
           </CardFooter>
         ) : null}

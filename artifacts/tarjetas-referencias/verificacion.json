@@ -1,0 +1,590 @@
+{
+  "date": "2026-10-21",
+  "route": "/credito-y-deuda",
+  "scope": "Refinamiento de los frentes móviles de las nueve tarjetas a partir de las siete referencias locales del propietario.",
+  "environment": {
+    "ui": "Componentes reales de la aplicación en una copia temporal de Next.js",
+    "auth": "Simulada",
+    "data": "Ficticios en memoria",
+    "database": "No utilizada",
+    "production": "Sin cambios",
+    "browser": "Chromium mediante agent-browser"
+  },
+  "changes": [
+    "Material metálico y relieve central de BBVA Platinum",
+    "Círculo de pincel real de HSBC Zero y orden de marcas como en la referencia",
+    "Pétalos y marca Banamex de la referencia, conservando Joy 1/2",
+    "LikeU blanca iridiscente con marcas y llama; sustituye la versión roja anterior",
+    "Morado iluminado de Nu sin marca de agua añadida",
+    "DiDi Card con marca del plástico y monograma naranja",
+    "Mercado Pago con emblema de manos, material azul y filo amarillo",
+    "Proporción 1.586:1 a 320 y 375 px; reflujo con texto ampliado",
+    "Respuesta visual al hover/pulsación, foco visible y movimiento reducido"
+  ],
+  "responsive": [
+    {
+      "cards": [
+        {
+          "clipped": [],
+          "height": 180.3125,
+          "name": "BBVA",
+          "ratio": 1.586,
+          "skin": "bbva-platinum",
+          "width": 286
+        },
+        {
+          "clipped": [],
+          "height": 180.3125,
+          "name": "HSBC 1",
+          "ratio": 1.586,
+          "skin": "hsbc-zero",
+          "width": 286
+        },
+        {
+          "clipped": [],
+          "height": 180.3125,
+          "name": "HSBC 2",
+          "ratio": 1.586,
+          "skin": "hsbc-zero",
+          "width": 286
+        },
+        {
+          "clipped": [],
+          "height": 180.3125,
+          "name": "BANAMEX 1",
+          "ratio": 1.586,
+          "skin": "banamex-joy",
+          "width": 286
+        },
+        {
+          "clipped": [],
+          "height": 180.3125,
+          "name": "BANAMEX 2",
+          "ratio": 1.586,
+          "skin": "banamex-joy",
+          "width": 286
+        },
+        {
+          "clipped": [],
+          "height": 180.3125,
+          "name": "SANTANDER",
+          "ratio": 1.586,
+          "skin": "santander-likeu",
+          "width": 286
+        },
+        {
+          "clipped": [],
+          "height": 180.3125,
+          "name": "NU",
+          "ratio": 1.586,
+          "skin": "nu",
+          "width": 286
+        },
+        {
+          "clipped": [],
+          "height": 180.3125,
+          "name": "DIDI",
+          "ratio": 1.586,
+          "skin": "didi",
+          "width": 286
+        },
+        {
+          "clipped": [],
+          "height": 180.3125,
+          "name": "MERCADOPAGO",
+          "ratio": 1.586,
+          "skin": "mercado-pago",
+          "width": 286
+        }
+      ],
+      "pageWidth": 320,
+      "viewport": 320
+    },
+    {
+      "cards": [
+        {
+          "clipped": [],
+          "height": 215,
+          "name": "BBVA",
+          "ratio": 1.586,
+          "skin": "bbva-platinum",
+          "width": 341
+        },
+        {
+          "clipped": [],
+          "height": 215,
+          "name": "HSBC 1",
+          "ratio": 1.586,
+          "skin": "hsbc-zero",
+          "width": 341
+        },
+        {
+          "clipped": [],
+          "height": 215,
+          "name": "HSBC 2",
+          "ratio": 1.586,
+          "skin": "hsbc-zero",
+          "width": 341
+        },
+        {
+          "clipped": [],
+          "height": 215,
+          "name": "BANAMEX 1",
+          "ratio": 1.586,
+          "skin": "banamex-joy",
+          "width": 341
+        },
+        {
+          "clipped": [],
+          "height": 215,
+          "name": "BANAMEX 2",
+          "ratio": 1.586,
+          "skin": "banamex-joy",
+          "width": 341
+        },
+        {
+          "clipped": [],
+          "height": 215,
+          "name": "SANTANDER",
+          "ratio": 1.586,
+          "skin": "santander-likeu",
+          "width": 341
+        },
+        {
+          "clipped": [],
+          "height": 215,
+          "name": "NU",
+          "ratio": 1.586,
+          "skin": "nu",
+          "width": 341
+        },
+        {
+          "clipped": [],
+          "height": 215,
+          "name": "DIDI",
+          "ratio": 1.586,
+          "skin": "didi",
+          "width": 341
+        },
+        {
+          "clipped": [],
+          "height": 215,
+          "name": "MERCADOPAGO",
+          "ratio": 1.586,
+          "skin": "mercado-pago",
+          "width": 341
+        }
+      ],
+      "pageWidth": 375,
+      "viewport": 375
+    },
+    {
+      "cards": [
+        {
+          "clipped": [],
+          "height": 249.671875,
+          "name": "BBVA",
+          "ratio": 1.586,
+          "skin": "bbva-platinum",
+          "width": 396
+        },
+        {
+          "clipped": [],
+          "height": 249.671875,
+          "name": "HSBC 1",
+          "ratio": 1.586,
+          "skin": "hsbc-zero",
+          "width": 396
+        },
+        {
+          "clipped": [],
+          "height": 249.671875,
+          "name": "HSBC 2",
+          "ratio": 1.586,
+          "skin": "hsbc-zero",
+          "width": 396
+        },
+        {
+          "clipped": [],
+          "height": 249.671875,
+          "name": "BANAMEX 1",
+          "ratio": 1.586,
+          "skin": "banamex-joy",
+          "width": 396
+        },
+        {
+          "clipped": [],
+          "height": 249.671875,
+          "name": "BANAMEX 2",
+          "ratio": 1.586,
+          "skin": "banamex-joy",
+          "width": 396
+        },
+        {
+          "clipped": [],
+          "height": 249.671875,
+          "name": "SANTANDER",
+          "ratio": 1.586,
+          "skin": "santander-likeu",
+          "width": 396
+        },
+        {
+          "clipped": [],
+          "height": 249.671875,
+          "name": "NU",
+          "ratio": 1.586,
+          "skin": "nu",
+          "width": 396
+        },
+        {
+          "clipped": [],
+          "height": 249.671875,
+          "name": "DIDI",
+          "ratio": 1.586,
+          "skin": "didi",
+          "width": 396
+        },
+        {
+          "clipped": [],
+          "height": 249.671875,
+          "name": "MERCADOPAGO",
+          "ratio": 1.586,
+          "skin": "mercado-pago",
+          "width": 396
+        }
+      ],
+      "pageWidth": 430,
+      "viewport": 430
+    },
+    {
+      "cards": [
+        {
+          "clipped": [],
+          "height": 462.15625,
+          "name": "BBVA",
+          "ratio": 1.586,
+          "skin": "bbva-platinum",
+          "width": 733
+        },
+        {
+          "clipped": [],
+          "height": 462.15625,
+          "name": "HSBC 1",
+          "ratio": 1.586,
+          "skin": "hsbc-zero",
+          "width": 733
+        },
+        {
+          "clipped": [],
+          "height": 462.15625,
+          "name": "HSBC 2",
+          "ratio": 1.586,
+          "skin": "hsbc-zero",
+          "width": 733
+        },
+        {
+          "clipped": [],
+          "height": 462.15625,
+          "name": "BANAMEX 1",
+          "ratio": 1.586,
+          "skin": "banamex-joy",
+          "width": 733
+        },
+        {
+          "clipped": [],
+          "height": 462.15625,
+          "name": "BANAMEX 2",
+          "ratio": 1.586,
+          "skin": "banamex-joy",
+          "width": 733
+        },
+        {
+          "clipped": [],
+          "height": 462.15625,
+          "name": "SANTANDER",
+          "ratio": 1.586,
+          "skin": "santander-likeu",
+          "width": 733
+        },
+        {
+          "clipped": [],
+          "height": 462.15625,
+          "name": "NU",
+          "ratio": 1.586,
+          "skin": "nu",
+          "width": 733
+        },
+        {
+          "clipped": [],
+          "height": 462.15625,
+          "name": "DIDI",
+          "ratio": 1.586,
+          "skin": "didi",
+          "width": 733
+        },
+        {
+          "clipped": [],
+          "height": 462.15625,
+          "name": "MERCADOPAGO",
+          "ratio": 1.586,
+          "skin": "mercado-pago",
+          "width": 733
+        }
+      ],
+      "pageWidth": 767,
+      "viewport": 767
+    },
+    {
+      "cards": [],
+      "pageWidth": 768,
+      "viewport": 768
+    },
+    {
+      "cards": [],
+      "pageWidth": 1280,
+      "viewport": 1280
+    }
+  ],
+  "enlargedText": {
+    "percent": 200,
+    "cards": [
+      {
+        "clipped": [],
+        "height": 550.546875,
+        "name": "BBVA",
+        "ratio": 0.561,
+        "skin": "bbva-platinum",
+        "width": 309
+      },
+      {
+        "clipped": [],
+        "height": 495.15625,
+        "name": "HSBC 1",
+        "ratio": 0.624,
+        "skin": "hsbc-zero",
+        "width": 309
+      },
+      {
+        "clipped": [],
+        "height": 583.9375,
+        "name": "HSBC 2",
+        "ratio": 0.529,
+        "skin": "hsbc-zero",
+        "width": 309
+      },
+      {
+        "clipped": [],
+        "height": 505.953125,
+        "name": "BANAMEX 1",
+        "ratio": 0.611,
+        "skin": "banamex-joy",
+        "width": 309
+      },
+      {
+        "clipped": [],
+        "height": 505.953125,
+        "name": "BANAMEX 2",
+        "ratio": 0.611,
+        "skin": "banamex-joy",
+        "width": 309
+      },
+      {
+        "clipped": [],
+        "height": 497.5625,
+        "name": "SANTANDER",
+        "ratio": 0.621,
+        "skin": "santander-likeu",
+        "width": 309
+      },
+      {
+        "clipped": [],
+        "height": 445.5625,
+        "name": "NU",
+        "ratio": 0.694,
+        "skin": "nu",
+        "width": 309
+      },
+      {
+        "clipped": [],
+        "height": 492.75,
+        "name": "DIDI",
+        "ratio": 0.627,
+        "skin": "didi",
+        "width": 309
+      },
+      {
+        "clipped": [],
+        "height": 477.046875,
+        "name": "MERCADOPAGO",
+        "ratio": 0.648,
+        "skin": "mercado-pago",
+        "width": 309
+      }
+    ],
+    "pageWidth": 468,
+    "viewport": 375,
+    "limitation": "La cabecera compartida tiene desbordamiento horizontal previo a este ajuste al ampliar la raíz al 200 %. Los textos de los frentes permanecen dentro de sus límites y las columnas se apilan."
+  },
+  "longContent": {
+    "cards": [
+      {
+        "clipped": [],
+        "height": 215,
+        "name": "BBVA",
+        "ratio": 1.586,
+        "skin": "bbva-platinum",
+        "width": 341
+      },
+      {
+        "clipped": [],
+        "height": 215,
+        "name": "HSBC 1",
+        "ratio": 1.586,
+        "skin": "hsbc-zero",
+        "width": 341
+      },
+      {
+        "clipped": [],
+        "height": 215,
+        "name": "HSBC 2",
+        "ratio": 1.586,
+        "skin": "hsbc-zero",
+        "width": 341
+      },
+      {
+        "clipped": [],
+        "height": 215,
+        "name": "BANAMEX 1",
+        "ratio": 1.586,
+        "skin": "banamex-joy",
+        "width": 341
+      },
+      {
+        "clipped": [],
+        "height": 215,
+        "name": "BANAMEX 2",
+        "ratio": 1.586,
+        "skin": "banamex-joy",
+        "width": 341
+      },
+      {
+        "clipped": [],
+        "height": 215,
+        "name": "SANTANDER",
+        "ratio": 1.586,
+        "skin": "santander-likeu",
+        "width": 341
+      },
+      {
+        "clipped": [],
+        "height": 215,
+        "name": "NU",
+        "ratio": 1.586,
+        "skin": "nu",
+        "width": 341
+      },
+      {
+        "clipped": [],
+        "height": 215,
+        "name": "DIDI",
+        "ratio": 1.586,
+        "skin": "didi",
+        "width": 341
+      },
+      {
+        "clipped": [],
+        "height": 215,
+        "name": "MERCADOPAGO",
+        "ratio": 1.586,
+        "skin": "mercado-pago",
+        "width": 341
+      },
+      {
+        "clipped": [],
+        "height": 227.375,
+        "name": "Tarjeta personal con un nombre muy largo para comprobar el ajuste",
+        "ratio": 1.5,
+        "skin": "neutral",
+        "width": 341
+      }
+    ],
+    "pageWidth": 375,
+    "viewport": 375
+  },
+  "states": {
+    "missingCapture": "Muestra guiones, Sin saldo capturado y acción Capturar; no dibuja progreso",
+    "zeroBalance": "Joy 2 muestra $0.00 y 0.0 %",
+    "creditBalance": "Nu muestra Saldo a favor y $300.10 positivos; disponible $10,300.10",
+    "overLimit": "HSBC 2 conserva exceso $500.20, disponible $0.00 y 102.5 %",
+    "unknownName": "Apariencia neutra, encabezado completo y altura adaptable"
+  },
+  "interaction": {
+    "click": "Abre Saldo de BBVA",
+    "enter": "Abre el mismo diálogo con foco en su título",
+    "escape": "Cierra el diálogo y devuelve el foco a Actualizar saldo de BBVA",
+    "save": "No se probó persistencia; no cambió el formulario ni la API",
+    "javascriptErrors": 0
+  },
+  "accessibility": {
+    "axeVersion": "4.12.1",
+    "wcagTags": [
+      "wcag2a",
+      "wcag2aa"
+    ],
+    "wcagViolations": 0,
+    "incomplete": "Contraste sobre fondos gráficos, completado mediante píxeles de capturas sin texto",
+    "existingBestPracticeFindings": [
+      "landmark-main-is-top-level",
+      "landmark-no-duplicate-main",
+      "landmark-unique"
+    ],
+    "contrast": {
+      "textsPerViewport": 71,
+      "viewports": [
+        320,
+        375
+      ],
+      "minimumRatio": 4.69,
+      "method": "Rangos de texto en la UI real; ocultar solo los textos y el botón transparente, capturar los fondos y comparar luminancia WCAG con cada píxel bajo los rangos. Marcas gráficas excluidas.",
+      "details": "contraste.json"
+    }
+  },
+  "checks": {
+    "productionBuild": {
+      "command": "pnpm build",
+      "exitCode": 0
+    },
+    "lint": {
+      "command": "pnpm lint",
+      "exitCode": 0,
+      "existingWarning": "react-hooks/incompatible-library en src/components/ui/data-table.jsx"
+    },
+    "regressions": {
+      "command": "node --test tests/card-balances.test.cjs",
+      "passed": 6,
+      "failed": 0,
+      "skipped": 0
+    },
+    "diff": {
+      "command": "git diff --check",
+      "exitCode": 0
+    }
+  },
+  "artifacts": [
+    "tarjetas.png",
+    "mobile-320.png",
+    "mobile-375.png",
+    "desktop.png",
+    "contraste.json"
+  ],
+  "assetPreparation": "node scripts/prepare-card-reference-assets.cjs",
+  "limits": [
+    "La revisión visual usa Auth/API simuladas y no acredita persistencia bancaria real.",
+    "No se probó en un teléfono físico durante esta tarea.",
+    "Escritorio conserva su presentación habitual."
+  ],
+  "assets": {
+    "count": 9,
+    "bytes": 51432
+  }
+}

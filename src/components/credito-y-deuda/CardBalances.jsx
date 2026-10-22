@@ -20,7 +20,6 @@ import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/c
 import { Input } from "@/components/ui/input";
 import { Item, ItemGroup } from "@/components/ui/item";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "@/components/ui/sonner";
 import MobileCreditCard from "./MobileCreditCard";
@@ -241,7 +240,7 @@ export default function CardBalances({ cards, onSave, loadError, onRetry }) {
             {cards.map((card) => {
               const balance = getCardBalance(card);
               return (
-                <Item key={card.id} role="listitem" variant="outline" className="block min-w-0 overflow-hidden bg-card p-0 md:grid md:grid-cols-1 md:gap-3 md:p-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)_auto] lg:gap-6" data-credit-card={card.id}>
+                <Item key={card.id} role="listitem" variant="outline" className="block min-w-0 overflow-hidden border-0 bg-transparent p-0 md:grid md:grid-cols-1 md:gap-3 md:border md:bg-card md:p-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)_auto] lg:gap-6" data-credit-card={card.id}>
                   <MobileCreditCard card={card} balance={balance} onEdit={() => setEditingCard(card)} />
                   <div className="hidden min-w-0 items-start justify-between gap-3 md:flex lg:block">
                     <div className="flex min-w-0 flex-col gap-1">
@@ -262,10 +261,7 @@ export default function CardBalances({ cards, onSave, loadError, onRetry }) {
                       <div className="min-w-0"><dt className="text-xs text-muted-foreground">Límite de crédito</dt><dd className="break-words text-sm tabular-nums">{money(balance.creditLimit)}</dd></div>
                       <div className="min-w-0"><dt className="text-xs text-muted-foreground">Crédito disponible</dt><dd className="break-words text-sm tabular-nums">{money(balance.availableCredit)}</dd></div>
                     </dl>
-                    {balance.hasBalance && balance.utilization !== null ? <div className="flex items-center gap-3">
-                      <Progress value={Math.min(balance.utilization, 100)} aria-label={`Crédito utilizado de ${card.name}`} getValueLabel={() => `${balance.utilization.toFixed(1)} % del límite utilizado`} className="flex-1 [&_[data-slot=progress-indicator]]:motion-reduce:transition-none" />
-                      <span className="shrink-0 text-xs tabular-nums text-muted-foreground">{balance.utilization.toFixed(1)} % usado</span>
-                    </div> : null}
+                    {balance.hasBalance && balance.utilization !== null ? <p className="text-xs tabular-nums text-muted-foreground">{balance.utilization.toFixed(1)} % del límite utilizado</p> : null}
                     {balance.overLimit > 0 ? <p className="text-xs text-warning">Sobre el límite por {money(balance.overLimit)}</p> : null}
                     {balance.creditBalance > 0 ? <p className="text-xs text-muted-foreground">Saldo a favor: {money(balance.creditBalance)}</p> : null}
                   </div>

@@ -1,0 +1,898 @@
+{
+  "date": "2026-10-21",
+  "route": "/credito-y-deuda",
+  "request": "Quitar las barras de progreso, respetar las posiciones de marcas/modelos/redes de las referencias y corregir la pixelación de LikeU.",
+  "environment": {
+    "ui": "Componentes reales de Next.js en copia temporal",
+    "auth": "Simulada",
+    "data": "Ficticios en memoria",
+    "database": "No utilizada",
+    "browser": "Chromium mediante agent-browser",
+    "production": "Sin cambios"
+  },
+  "implementation": {
+    "progressBars": "Eliminadas en los frentes móviles y en las filas de escritorio; escritorio conserva solo el porcentaje en texto.",
+    "placements": {
+      "bbva": "BBVA arriba; Visa y Platinum abajo a la derecha.",
+      "hsbc": "Zero 1/2 a la izquierda y HSBC a la derecha; Visa al pie.",
+      "joy": "Banamex arriba; Joy 1/2 debajo; Mastercard abajo a la derecha.",
+      "likeu": "LikeU arriba a la izquierda, Santander a la derecha y Mastercard al pie.",
+      "nu": "Nu y crédito arriba; Mastercard al pie.",
+      "didi": "DiDi arriba, sin modelo adicional; Mastercard al pie.",
+      "mercadopago": "Marca abajo a la izquierda; Visa y crédito abajo a la derecha."
+    },
+    "vectors": {
+      "files": [
+        "likeu-wordmark.svg",
+        "santander.svg",
+        "santander-flame.svg",
+        "likeu-pearl-pattern.svg",
+        "visa.svg",
+        "mastercard.svg"
+      ],
+      "embeddedBitmaps": 0,
+      "likeuSource": "Trazos originales extraídos del folleto oficial de Santander",
+      "likeuPattern": "110 contornos a distancia constante de la llama, con curvas y gradiente iridiscente",
+      "patternCommand": "node scripts/generate-likeu-pattern.cjs"
+    },
+    "layout": "Se elimina el borde duplicado de las tarjetas móviles; la altura crece para texto o nombres largos."
+  },
+  "responsive": [
+    {
+      "cards": [
+        {
+          "clipped": [],
+          "height": 181.578125,
+          "name": "BBVA",
+          "network": "Visa",
+          "productInFooter": "Platinum",
+          "ratio": 1.586,
+          "skin": "bbva-platinum",
+          "width": 288,
+          "x": 16,
+          "y": 521
+        },
+        {
+          "clipped": [],
+          "height": 181.578125,
+          "name": "HSBC 1",
+          "network": "Visa",
+          "ratio": 1.586,
+          "skin": "hsbc-zero",
+          "width": 288,
+          "x": 16,
+          "y": 714.578125
+        },
+        {
+          "clipped": [],
+          "height": 181.578125,
+          "name": "HSBC 2",
+          "network": "Visa",
+          "ratio": 1.586,
+          "skin": "hsbc-zero",
+          "width": 288,
+          "x": 16,
+          "y": 908.15625
+        },
+        {
+          "clipped": [],
+          "height": 181.578125,
+          "name": "BANAMEX 1",
+          "network": "Mastercard",
+          "ratio": 1.586,
+          "skin": "banamex-joy",
+          "width": 288,
+          "x": 16,
+          "y": 1101.734375
+        },
+        {
+          "clipped": [],
+          "height": 181.578125,
+          "name": "BANAMEX 2",
+          "network": "Mastercard",
+          "ratio": 1.586,
+          "skin": "banamex-joy",
+          "width": 288,
+          "x": 16,
+          "y": 1295.3125
+        },
+        {
+          "clipped": [],
+          "height": 181.578125,
+          "name": "SANTANDER",
+          "network": "Mastercard",
+          "ratio": 1.586,
+          "skin": "santander-likeu",
+          "width": 288,
+          "x": 16,
+          "y": 1488.890625
+        },
+        {
+          "clipped": [],
+          "height": 181.578125,
+          "name": "NU",
+          "network": "Mastercard",
+          "ratio": 1.586,
+          "skin": "nu",
+          "width": 288,
+          "x": 16,
+          "y": 1682.46875
+        },
+        {
+          "clipped": [],
+          "height": 181.578125,
+          "name": "DIDI",
+          "network": "Mastercard",
+          "ratio": 1.586,
+          "skin": "didi",
+          "width": 288,
+          "x": 16,
+          "y": 1876.046875
+        },
+        {
+          "clipped": [],
+          "height": 181.578125,
+          "name": "MERCADOPAGO",
+          "network": "Visa",
+          "productInFooter": "crédito",
+          "ratio": 1.586,
+          "skin": "mercado-pago",
+          "width": 288,
+          "x": 16,
+          "y": 2069.625
+        }
+      ],
+      "pageWidth": 320,
+      "progressBars": 0,
+      "viewport": 320
+    },
+    {
+      "cards": [
+        {
+          "clipped": [],
+          "height": 216.265625,
+          "name": "BBVA",
+          "network": "Visa",
+          "productInFooter": "Platinum",
+          "ratio": 1.586,
+          "skin": "bbva-platinum",
+          "width": 343,
+          "x": 16,
+          "y": 501
+        },
+        {
+          "clipped": [],
+          "height": 216.265625,
+          "name": "HSBC 1",
+          "network": "Visa",
+          "ratio": 1.586,
+          "skin": "hsbc-zero",
+          "width": 343,
+          "x": 16,
+          "y": 729.265625
+        },
+        {
+          "clipped": [],
+          "height": 216.265625,
+          "name": "HSBC 2",
+          "network": "Visa",
+          "ratio": 1.586,
+          "skin": "hsbc-zero",
+          "width": 343,
+          "x": 16,
+          "y": 957.53125
+        },
+        {
+          "clipped": [],
+          "height": 216.265625,
+          "name": "BANAMEX 1",
+          "network": "Mastercard",
+          "ratio": 1.586,
+          "skin": "banamex-joy",
+          "width": 343,
+          "x": 16,
+          "y": 1185.796875
+        },
+        {
+          "clipped": [],
+          "height": 216.265625,
+          "name": "BANAMEX 2",
+          "network": "Mastercard",
+          "ratio": 1.586,
+          "skin": "banamex-joy",
+          "width": 343,
+          "x": 16,
+          "y": 1414.0625
+        },
+        {
+          "clipped": [],
+          "height": 216.265625,
+          "name": "SANTANDER",
+          "network": "Mastercard",
+          "ratio": 1.586,
+          "skin": "santander-likeu",
+          "width": 343,
+          "x": 16,
+          "y": 1642.328125
+        },
+        {
+          "clipped": [],
+          "height": 216.265625,
+          "name": "NU",
+          "network": "Mastercard",
+          "ratio": 1.586,
+          "skin": "nu",
+          "width": 343,
+          "x": 16,
+          "y": 1870.59375
+        },
+        {
+          "clipped": [],
+          "height": 216.265625,
+          "name": "DIDI",
+          "network": "Mastercard",
+          "ratio": 1.586,
+          "skin": "didi",
+          "width": 343,
+          "x": 16,
+          "y": 2098.859375
+        },
+        {
+          "clipped": [],
+          "height": 216.265625,
+          "name": "MERCADOPAGO",
+          "network": "Visa",
+          "productInFooter": "crédito",
+          "ratio": 1.586,
+          "skin": "mercado-pago",
+          "width": 343,
+          "x": 16,
+          "y": 2327.125
+        }
+      ],
+      "pageWidth": 375,
+      "progressBars": 0,
+      "viewport": 375
+    },
+    {
+      "cards": [
+        {
+          "clipped": [],
+          "height": 250.9375,
+          "name": "BBVA",
+          "network": "Visa",
+          "productInFooter": "Platinum",
+          "ratio": 1.586,
+          "skin": "bbva-platinum",
+          "width": 398,
+          "x": 16,
+          "y": 485
+        },
+        {
+          "clipped": [],
+          "height": 250.9375,
+          "name": "HSBC 1",
+          "network": "Visa",
+          "ratio": 1.586,
+          "skin": "hsbc-zero",
+          "width": 398,
+          "x": 16,
+          "y": 747.9375
+        },
+        {
+          "clipped": [],
+          "height": 250.9375,
+          "name": "HSBC 2",
+          "network": "Visa",
+          "ratio": 1.586,
+          "skin": "hsbc-zero",
+          "width": 398,
+          "x": 16,
+          "y": 1010.875
+        },
+        {
+          "clipped": [],
+          "height": 250.9375,
+          "name": "BANAMEX 1",
+          "network": "Mastercard",
+          "ratio": 1.586,
+          "skin": "banamex-joy",
+          "width": 398,
+          "x": 16,
+          "y": 1273.8125
+        },
+        {
+          "clipped": [],
+          "height": 250.9375,
+          "name": "BANAMEX 2",
+          "network": "Mastercard",
+          "ratio": 1.586,
+          "skin": "banamex-joy",
+          "width": 398,
+          "x": 16,
+          "y": 1536.75
+        },
+        {
+          "clipped": [],
+          "height": 250.9375,
+          "name": "SANTANDER",
+          "network": "Mastercard",
+          "ratio": 1.586,
+          "skin": "santander-likeu",
+          "width": 398,
+          "x": 16,
+          "y": 1799.6875
+        },
+        {
+          "clipped": [],
+          "height": 250.9375,
+          "name": "NU",
+          "network": "Mastercard",
+          "ratio": 1.586,
+          "skin": "nu",
+          "width": 398,
+          "x": 16,
+          "y": 2062.625
+        },
+        {
+          "clipped": [],
+          "height": 250.9375,
+          "name": "DIDI",
+          "network": "Mastercard",
+          "ratio": 1.586,
+          "skin": "didi",
+          "width": 398,
+          "x": 16,
+          "y": 2325.5625
+        },
+        {
+          "clipped": [],
+          "height": 250.9375,
+          "name": "MERCADOPAGO",
+          "network": "Visa",
+          "productInFooter": "crédito",
+          "ratio": 1.586,
+          "skin": "mercado-pago",
+          "width": 398,
+          "x": 16,
+          "y": 2588.5
+        }
+      ],
+      "pageWidth": 430,
+      "progressBars": 0,
+      "viewport": 430
+    },
+    {
+      "cards": [
+        {
+          "clipped": [],
+          "height": 463.421875,
+          "name": "BBVA",
+          "network": "Visa",
+          "productInFooter": "Platinum",
+          "ratio": 1.586,
+          "skin": "bbva-platinum",
+          "width": 735,
+          "x": 16,
+          "y": 381
+        },
+        {
+          "clipped": [],
+          "height": 463.421875,
+          "name": "HSBC 1",
+          "network": "Visa",
+          "ratio": 1.586,
+          "skin": "hsbc-zero",
+          "width": 735,
+          "x": 16,
+          "y": 856.421875
+        },
+        {
+          "clipped": [],
+          "height": 463.421875,
+          "name": "HSBC 2",
+          "network": "Visa",
+          "ratio": 1.586,
+          "skin": "hsbc-zero",
+          "width": 735,
+          "x": 16,
+          "y": 1331.84375
+        },
+        {
+          "clipped": [],
+          "height": 463.421875,
+          "name": "BANAMEX 1",
+          "network": "Mastercard",
+          "ratio": 1.586,
+          "skin": "banamex-joy",
+          "width": 735,
+          "x": 16,
+          "y": 1807.265625
+        },
+        {
+          "clipped": [],
+          "height": 463.421875,
+          "name": "BANAMEX 2",
+          "network": "Mastercard",
+          "ratio": 1.586,
+          "skin": "banamex-joy",
+          "width": 735,
+          "x": 16,
+          "y": 2282.6875
+        },
+        {
+          "clipped": [],
+          "height": 463.421875,
+          "name": "SANTANDER",
+          "network": "Mastercard",
+          "ratio": 1.586,
+          "skin": "santander-likeu",
+          "width": 735,
+          "x": 16,
+          "y": 2758.109375
+        },
+        {
+          "clipped": [],
+          "height": 463.421875,
+          "name": "NU",
+          "network": "Mastercard",
+          "ratio": 1.586,
+          "skin": "nu",
+          "width": 735,
+          "x": 16,
+          "y": 3233.53125
+        },
+        {
+          "clipped": [],
+          "height": 463.421875,
+          "name": "DIDI",
+          "network": "Mastercard",
+          "ratio": 1.586,
+          "skin": "didi",
+          "width": 735,
+          "x": 16,
+          "y": 3708.953125
+        },
+        {
+          "clipped": [],
+          "height": 463.421875,
+          "name": "MERCADOPAGO",
+          "network": "Visa",
+          "productInFooter": "crédito",
+          "ratio": 1.586,
+          "skin": "mercado-pago",
+          "width": 735,
+          "x": 16,
+          "y": 4184.375
+        }
+      ],
+      "pageWidth": 767,
+      "progressBars": 0,
+      "viewport": 767
+    },
+    {
+      "cards": [],
+      "pageWidth": 768,
+      "progressBars": 0,
+      "viewport": 768
+    },
+    {
+      "cards": [],
+      "pageWidth": 1280,
+      "progressBars": 0,
+      "viewport": 1280
+    }
+  ],
+  "retina": {
+    "cards": [
+      {
+        "clipped": [],
+        "height": 216.265625,
+        "name": "BBVA",
+        "network": "Visa",
+        "productInFooter": "Platinum",
+        "ratio": 1.586,
+        "skin": "bbva-platinum",
+        "width": 343,
+        "x": 16,
+        "y": 501
+      },
+      {
+        "clipped": [],
+        "height": 216.265625,
+        "name": "HSBC 1",
+        "network": "Visa",
+        "ratio": 1.586,
+        "skin": "hsbc-zero",
+        "width": 343,
+        "x": 16,
+        "y": 729.265625
+      },
+      {
+        "clipped": [],
+        "height": 216.265625,
+        "name": "HSBC 2",
+        "network": "Visa",
+        "ratio": 1.586,
+        "skin": "hsbc-zero",
+        "width": 343,
+        "x": 16,
+        "y": 957.53125
+      },
+      {
+        "clipped": [],
+        "height": 216.265625,
+        "name": "BANAMEX 1",
+        "network": "Mastercard",
+        "ratio": 1.586,
+        "skin": "banamex-joy",
+        "width": 343,
+        "x": 16,
+        "y": 1185.796875
+      },
+      {
+        "clipped": [],
+        "height": 216.265625,
+        "name": "BANAMEX 2",
+        "network": "Mastercard",
+        "ratio": 1.586,
+        "skin": "banamex-joy",
+        "width": 343,
+        "x": 16,
+        "y": 1414.0625
+      },
+      {
+        "clipped": [],
+        "height": 216.265625,
+        "name": "SANTANDER",
+        "network": "Mastercard",
+        "ratio": 1.586,
+        "skin": "santander-likeu",
+        "width": 343,
+        "x": 16,
+        "y": 1642.328125
+      },
+      {
+        "clipped": [],
+        "height": 216.265625,
+        "name": "NU",
+        "network": "Mastercard",
+        "ratio": 1.586,
+        "skin": "nu",
+        "width": 343,
+        "x": 16,
+        "y": 1870.59375
+      },
+      {
+        "clipped": [],
+        "height": 216.265625,
+        "name": "DIDI",
+        "network": "Mastercard",
+        "ratio": 1.586,
+        "skin": "didi",
+        "width": 343,
+        "x": 16,
+        "y": 2098.859375
+      },
+      {
+        "clipped": [],
+        "height": 216.265625,
+        "name": "MERCADOPAGO",
+        "network": "Visa",
+        "productInFooter": "crédito",
+        "ratio": 1.586,
+        "skin": "mercado-pago",
+        "width": 343,
+        "x": 16,
+        "y": 2327.125
+      }
+    ],
+    "pageWidth": 375,
+    "progressBars": 0,
+    "viewport": 375
+  },
+  "enlargedText": {
+    "percent": 200,
+    "measurement": {
+      "cards": [
+        {
+          "clipped": [],
+          "height": 414.125,
+          "name": "BBVA",
+          "network": "Visa",
+          "productInFooter": "Platinum",
+          "ratio": 0.751,
+          "skin": "bbva-platinum",
+          "width": 311,
+          "x": 32,
+          "y": 1521.109375
+        },
+        {
+          "clipped": [],
+          "height": 445.765625,
+          "name": "HSBC 1",
+          "network": "Visa",
+          "ratio": 0.698,
+          "skin": "hsbc-zero",
+          "width": 311,
+          "x": 32,
+          "y": 1959.234375
+        },
+        {
+          "clipped": [],
+          "height": 474.359375,
+          "name": "HSBC 2",
+          "network": "Visa",
+          "ratio": 0.656,
+          "skin": "hsbc-zero",
+          "width": 311,
+          "x": 32,
+          "y": 2429
+        },
+        {
+          "clipped": [],
+          "height": 437.234375,
+          "name": "BANAMEX 1",
+          "network": "Mastercard",
+          "ratio": 0.711,
+          "skin": "banamex-joy",
+          "width": 311,
+          "x": 32,
+          "y": 2927.359375
+        },
+        {
+          "clipped": [],
+          "height": 437.234375,
+          "name": "BANAMEX 2",
+          "network": "Mastercard",
+          "ratio": 0.711,
+          "skin": "banamex-joy",
+          "width": 311,
+          "x": 32,
+          "y": 3388.59375
+        },
+        {
+          "clipped": [],
+          "height": 463.046875,
+          "name": "SANTANDER",
+          "network": "Mastercard",
+          "ratio": 0.672,
+          "skin": "santander-likeu",
+          "width": 311,
+          "x": 32,
+          "y": 3849.828125
+        },
+        {
+          "clipped": [],
+          "height": 411.046875,
+          "name": "NU",
+          "network": "Mastercard",
+          "ratio": 0.757,
+          "skin": "nu",
+          "width": 311,
+          "x": 32,
+          "y": 4336.875
+        },
+        {
+          "clipped": [],
+          "height": 411.046875,
+          "name": "DIDI",
+          "network": "Mastercard",
+          "ratio": 0.757,
+          "skin": "didi",
+          "width": 311,
+          "x": 32,
+          "y": 4771.921875
+        },
+        {
+          "clipped": [],
+          "height": 374.953125,
+          "name": "MERCADOPAGO",
+          "network": "Visa",
+          "productInFooter": "crédito",
+          "ratio": 0.829,
+          "skin": "mercado-pago",
+          "width": 311,
+          "x": 32,
+          "y": 5206.96875
+        }
+      ],
+      "pageWidth": 396,
+      "progressBars": 0,
+      "viewport": 375
+    },
+    "limitation": "El encabezado compartido conserva el desbordamiento anterior al ampliar la raíz al 200 %. Los textos, modelos y logotipos de los frentes no se recortan."
+  },
+  "longNamesAndAmounts": {
+    "cards": [
+      {
+        "clipped": [],
+        "height": 216.265625,
+        "name": "BBVA",
+        "network": "Visa",
+        "productInFooter": "Platinum",
+        "ratio": 1.586,
+        "skin": "bbva-platinum",
+        "width": 343,
+        "x": 16,
+        "y": 585
+      },
+      {
+        "clipped": [],
+        "height": 216.265625,
+        "name": "HSBC 1",
+        "network": "Visa",
+        "ratio": 1.586,
+        "skin": "hsbc-zero",
+        "width": 343,
+        "x": 16,
+        "y": 813.265625
+      },
+      {
+        "clipped": [],
+        "height": 216.265625,
+        "name": "HSBC 2",
+        "network": "Visa",
+        "ratio": 1.586,
+        "skin": "hsbc-zero",
+        "width": 343,
+        "x": 16,
+        "y": 1041.53125
+      },
+      {
+        "clipped": [],
+        "height": 216.265625,
+        "name": "BANAMEX 1",
+        "network": "Mastercard",
+        "ratio": 1.586,
+        "skin": "banamex-joy",
+        "width": 343,
+        "x": 16,
+        "y": 1269.796875
+      },
+      {
+        "clipped": [],
+        "height": 216.265625,
+        "name": "BANAMEX 2",
+        "network": "Mastercard",
+        "ratio": 1.586,
+        "skin": "banamex-joy",
+        "width": 343,
+        "x": 16,
+        "y": 1498.0625
+      },
+      {
+        "clipped": [],
+        "height": 216.265625,
+        "name": "SANTANDER",
+        "network": "Mastercard",
+        "ratio": 1.586,
+        "skin": "santander-likeu",
+        "width": 343,
+        "x": 16,
+        "y": 1726.328125
+      },
+      {
+        "clipped": [],
+        "height": 216.265625,
+        "name": "NU",
+        "network": "Mastercard",
+        "ratio": 1.586,
+        "skin": "nu",
+        "width": 343,
+        "x": 16,
+        "y": 1954.59375
+      },
+      {
+        "clipped": [],
+        "height": 216.265625,
+        "name": "DIDI",
+        "network": "Mastercard",
+        "ratio": 1.586,
+        "skin": "didi",
+        "width": 343,
+        "x": 16,
+        "y": 2182.859375
+      },
+      {
+        "clipped": [],
+        "height": 216.265625,
+        "name": "MERCADOPAGO",
+        "network": "Visa",
+        "productInFooter": "crédito",
+        "ratio": 1.586,
+        "skin": "mercado-pago",
+        "width": 343,
+        "x": 16,
+        "y": 2411.125
+      },
+      {
+        "clipped": [],
+        "height": 216.765625,
+        "name": "Tarjeta personal con un nombre muy largo para comprobar el ajuste",
+        "ratio": 1.582,
+        "skin": "neutral",
+        "width": 343,
+        "x": 16,
+        "y": 2639.390625
+      }
+    ],
+    "pageWidth": 375,
+    "progressBars": 0,
+    "viewport": 375
+  },
+  "missingCapture": {
+    "content": "Sin saldo capturado y guiones",
+    "network": "Visa visible",
+    "progressBars": 0
+  },
+  "interaction": {
+    "tap": "Abre el diálogo Saldo de BBVA",
+    "enter": "Abre el diálogo y enfoca el título",
+    "escape": "Cierra y devuelve el foco a Actualizar saldo de BBVA",
+    "reducedMotion": {
+      "matches": true,
+      "transitionSeconds": 0.00001
+    },
+    "javascriptErrors": 0
+  },
+  "accessibility": {
+    "axeVersion": "4.12.1",
+    "tags": [
+      "wcag2a",
+      "wcag2aa"
+    ],
+    "violations": 0,
+    "contrast": {
+      "textsPerViewport": 62,
+      "textsTotal": 124,
+      "viewports": [
+        320,
+        375
+      ],
+      "minimumRatio": 4.74,
+      "details": "contraste.json",
+      "method": "Capturar fondos sin textos y comparar la luminancia de cada píxel bajo sus rangos con el color de cada texto. Marcas gráficas excluidas."
+    },
+    "note": "Axe deja incompleto el contraste sobre imágenes; se completa con la medición de píxeles."
+  },
+  "validation": {
+    "build": {
+      "command": "pnpm build",
+      "exitCode": 0
+    },
+    "lint": {
+      "command": "pnpm lint",
+      "exitCode": 0,
+      "existingWarning": "react-hooks/incompatible-library en data-table.jsx"
+    },
+    "regressions": {
+      "command": "node --test tests/card-balances.test.cjs",
+      "passed": 6,
+      "failed": 0,
+      "skipped": 0
+    },
+    "svg": {
+      "parse": "XML válido",
+      "embeddedImages": 0
+    },
+    "diff": {
+      "command": "git diff --check",
+      "exitCode": 0
+    }
+  },
+  "artifacts": [
+    "tarjetas.png",
+    "mobile-320.png",
+    "mobile-375.png",
+    "mobile-retina.png",
+    "desktop.png",
+    "contraste.json"
+  ],
+  "limits": [
+    "No se probó persistencia bancaria real ni una base de datos en esta revisión.",
+    "No se modificó ni publicó producción.",
+    "La revisión Retina se hizo en Chromium; no en un teléfono físico."
+  ],
+  "previousEvidence": "../tarjetas-referencias/verificacion.json"
+}
