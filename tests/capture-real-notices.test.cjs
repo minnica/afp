@@ -6,21 +6,22 @@ const { interpretCapture, captureParsers } = sourceLoader()('src/lib/capturePars
 
 test('Nu real anonimizado: pago CFE conserva solo importe/comercio y exige completar tarjeta, moneda y fecha', () => {
   const result = interpretCapture(fixture.event);
-  assert.equal(result.parserKey, 'nu.cfe-service-payment.es.v1');
-  assert.equal(result.reason, 'INCOMPLETE_FORMAT'); assert.equal(result.verified, false);
+  assert.equal(result.parserKey, 'nu.cfe-service-payment.es.v2');
+  assert.equal(result.reason, 'FORMAT_POLICY_REQUIRED'); assert.equal(result.verified, false);
   assert.equal(result.proposal.amount, '123.45'); assert.equal(result.proposal.merchant, 'CFE');
   assert.equal(result.proposal.movementType, 'SERVICE_PAYMENT');
   assert.deepEqual(Array.from(result.proposal.missingFields), ['currency', 'card', 'operationDate']);
   for (const key of ['cardId', 'alias', 'currency', 'date', 'operationAt', 'reference']) assert.equal(result.proposal[key], undefined);
   const parser = captureParsers.find(row => row.key === result.parserKey);
-  assert.equal(parser.verified, false); assert.equal(parser.evidence, 'REAL_REVIEWED_PARTIAL');
+  assert.equal(parser.verified, true); assert.equal(parser.evidence, 'REAL_REVIEWED_POLICY_REQUIRED');
+  assert.equal(captureParsers.find(row => row.key === 'nu.cfe-service-payment.es.v1').verified, false);
 });
 
 test('Nu CFE: ni el resto de campos Android ni sus fechas completan datos bancarios ausentes', () => {
   const result = interpretCapture({ ...fixture.event, postedAt: '2026-10-22T02:00:00Z', receivedAt: '2026-10-22T02:00:01Z', fields: {
     ...fixture.event.fields, 'android.subText': 'Aviso del 21/10/2026 · tarjeta *0123 · MXN',
   } });
-  assert.equal(result.reason, 'INCOMPLETE_FORMAT');
+  assert.equal(result.reason, 'FORMAT_POLICY_REQUIRED');
   for (const key of ['cardId', 'alias', 'currency', 'date', 'operationAt']) assert.equal(result.proposal[key], undefined);
 });
 

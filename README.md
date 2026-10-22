@@ -608,6 +608,12 @@ La compra real inicial quedó registrada **una sola vez**, con ambos avisos vinc
 
 La bandeja permite **Interpretar con el formato actual** sobre un aviso pendiente sin correcciones ni resolución: guarda historial y conserva el evento/recibo original; esa acción no crea gastos. La migración aditiva de política de fecha e historial se aplicó con respaldo privado: **25 migraciones completas, diff vacío, 30 tablas con RLS**, sin cambios en las filas anteriores al migrar. Verificación final: **429 pruebas correctas, cero omisiones**, lint y build correctos; reproducción desde vacío/actualización de las 25 migraciones y navegador → API → un gasto con datos ficticios. La compra inicial real se revisó expresamente; falta observar la creación automática real tras publicar y conciliar un corte. [Evidencia y límites](artifacts/android-wallet-banamex/verification.json).
 
+**Nu/CFE y cobro de suscripción · 22 de octubre.** Con la decisión expresa del propietario se añadió `nu.cfe-service-payment.es.v2`: solo para el aviso exacto de pago CFE, una regla vincula una tarjeta y la suscripción existentes, fija MXN y usa el día de publicación en México. El aviso original sigue sin contener tarjeta, moneda ni fecha bancaria; la propuesta conserva el origen de los datos y la fecha de aceptación de la regla. No habilita otros avisos Nu ni modifica el analizador parcial v1.
+
+El pago real pendiente ya se registró **una sola vez** y confirmó el cobro de octubre de la suscripción CFE. Dejó de estar pendiente en **Cobros de suscripciones** y ya no genera su **Aviso importante**; basta actualizar AFP. Se conservaron frecuencia bimestral, importe estimado y pago habitual en efectivo. Solo esta ocurrencia usa crédito Nu y el importe real del aviso. Eventos, recibos, alias y gastos anteriores se preservaron; Wallet/BANAMEX 1 conservó su configuración.
+
+La regla Nu/CFE y su automatización quedaron preparadas en Supabase, con cotejo puntual del pago confirmado por el propietario; no representa un estado de cuenta ni un corte completo. **Falta publicar este nuevo código mediante commit/push y verificar `READY` para automatizar avisos futuros.** La migración aditiva quedó aplicada: **26 migraciones, diff vacío, 30 tablas con RLS**. Verificación: **440 pruebas correctas, cero omisiones**, lint sin errores y build correcto; reconstrucción desde vacío y actualización histórica verificadas. [Evidencia y límites Nu/CFE](artifacts/android-nu-cfe/verification.json).
+
 ## Variables de entorno requeridas
 
 ```

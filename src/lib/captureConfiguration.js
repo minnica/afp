@@ -4,6 +4,7 @@ import { capturePackages } from "@/lib/captureProtocol";
 import { captureParsers, normalizeMerchant } from "@/lib/captureParsers";
 import { lockDebtAccounts } from "@/lib/debtAccountService";
 import { buildCaptureRollout, captureRolloutMovements, captureFormatReadiness, captureActivationReasons } from "@/lib/captureRollout";
+import { matchesCapturePolicy } from "@/lib/captureFormatPolicy";
 
 const bankPackages = capturePackages.filter(value => value !== "com.google.android.apps.walletnfcrel");
 const lastFour = z.string().regex(/^\d{4}$/);
@@ -19,6 +20,8 @@ const actionSchema = z.discriminatedUnion("action", [
   z.object({ action: z.literal("importAliases"), inventory: captureInventorySchema }).strict(),
   z.object({ action: z.literal("automation"), cardId: z.string().min(1), parserKey: z.string(), mode: z.enum(["OBSERVATION", "AUTOMATIC"]),
     datePolicy: z.enum(["BANK_OPERATION", "NOTIFICATION_POSTED_AT"]).optional() }).strict(),
+  z.object({ action: z.literal("formatPolicy"), cardId: z.string().min(1), parserKey: z.literal("nu.cfe-service-payment.es.v2"),
+    completionPolicy: z.literal("NU_CFE_MXN"), datePolicy: z.literal("NOTIFICATION_POSTED_AT"), subscriptionId: z.string().min(1) }).strict(),
   z.object({ action: z.literal("rule"), cardId: z.string().min(1), merchant: z.string().trim().min(1).max(200), categoryId: z.string().min(1), subscriptionId: z.string().nullable().optional() }).strict(),
 ]);
 
@@ -62,6 +65,23 @@ export async function configureCapture(db, userId, input) {
       return { imported };
     }
     await requireOwnedReferences(tx, userId, data, ["cardId", "categoryId", "subscriptionId"]);
+    if (data.action === "formatPolicy") {
+      const parser = captureParsers.find(parser => parser.key === data.parserKey && parser.completionPolicy === data.completionPolicy);
+      if (!parser) throw new ApiAccessError("Regla de formato no disponible.", 400);
+      const aliases = await tx.captureCardAlias.findMany({ where: { userId, cardId: data.cardId, sourcePackage: parser.sourcePackage, verifiedAt: { not: null } } });
+      if (!aliases.length) throw new ApiAccessError("Configura y verifica la fuente Nu de esta tarjeta antes de guardar la regla.", 409);
+      const existing = await tx.captureAutomation.findFirst({ where: { userId, parserKey: parser.key, completionPolicy: parser.completionPolicy } });
+      if (existing?.cardId === data.cardId && existing.policySubscriptionId === data.subscriptionId && matchesCapturePolicy(existing, parser)) return existing;
+      // Cambiar el destinatario detiene la automatización anterior y exige un
+      // piloto propio. Nunca hay dos tarjetas receptoras para este aviso sin alias.
+      await tx.captureAutomation.updateMany({ where: { userId, parserKey: parser.key }, data: {
+        mode: "OBSERVATION", completionPolicy: null, policyAcceptedAt: null, policySubscriptionId: null,
+      } });
+      const identity = { userId, cardId: data.cardId, parserKey: parser.key };
+      const policy = { mode: "OBSERVATION", datePolicy: data.datePolicy, completionPolicy: data.completionPolicy,
+        policyAcceptedAt: new Date(), policySubscriptionId: data.subscriptionId };
+      return tx.captureAutomation.upsert({ where: { userId_cardId_parserKey: identity }, create: { ...identity, ...policy }, update: policy });
+    }
     if (data.action === "automation") {
       const parser = captureParsers.find(parser => parser.key === data.parserKey);
       if (!parser) {
@@ -74,14 +94,19 @@ export async function configureCapture(db, userId, input) {
       if (data.mode === "AUTOMATIC") {
         if (!parser.verified) throw new ApiAccessError("Este formato aún no tiene muestras reales verificadas. Conserva observación.", 409);
         if (parser.dateSource === "NOTIFICATION_POSTED_AT" && data.datePolicy !== "NOTIFICATION_POSTED_AT") {
-          throw new ApiAccessError("Confirma el uso de la fecha del aviso de Wallet en hora de México para habilitar este formato.", 409);
+          throw new ApiAccessError("Confirma el uso de la fecha del aviso en hora de México para habilitar este formato.", 409);
         }
         const aliases = await tx.captureCardAlias.findMany({ where: { userId } });
+        const automations = await tx.captureAutomation.findMany({ where: { userId } });
+        if (parser.completionPolicy && !automations.some(policy => policy.cardId === data.cardId && matchesCapturePolicy(policy, parser))) {
+          throw new ApiAccessError("Confirma la tarjeta, moneda, fecha y suscripción de la regla Nu/CFE.", 409);
+        }
         const movements = await captureRolloutMovements(tx, userId, { cardId: data.cardId, parserKey: parser.key });
-        const readiness = captureFormatReadiness(parser, data.cardId, aliases, movements);
+        const readiness = captureFormatReadiness(parser, data.cardId, aliases, movements, automations);
         if (!readiness.canEnable) throw new ApiAccessError(captureActivationReasons[readiness.blockers[0]], 409);
       }
       const identity = { userId, cardId: data.cardId, parserKey: data.parserKey };
+      if (parser.completionPolicy && data.datePolicy === "BANK_OPERATION") throw new ApiAccessError("Esta regla usa la fecha del aviso aceptada. Conserva esa política o vuelve a observación.", 409);
       return tx.captureAutomation.upsert({ where: { userId_cardId_parserKey: identity },
         create: { ...identity, mode: data.mode, ...(data.datePolicy ? { datePolicy: data.datePolicy } : {}) },
         update: { mode: data.mode, ...(data.datePolicy ? { datePolicy: data.datePolicy } : {}) } });
@@ -103,7 +128,7 @@ export async function captureConfiguration(db, userId) {
     db.captureCardAlias.findMany({ where: { userId } }), db.captureAutomation.findMany({ where: { userId } }),
     db.captureMerchantRule.findMany({ where: { userId } }),
     db.category.findMany({ where: { userId }, select: { id: true, name: true }, orderBy: { name: "asc" } }),
-    db.subscription.findMany({ where: { userId, paymentMethod: "CARD" }, select: { id: true, name: true, cardId: true }, orderBy: { name: "asc" } }),
+    db.subscription.findMany({ where: { userId }, select: { id: true, name: true, cardId: true, paymentMethod: true }, orderBy: { name: "asc" } }),
   ]);
   const movements = await captureRolloutMovements(db, userId);
   return { cards, aliases, automations, rules, categories, subscriptions,

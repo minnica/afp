@@ -77,6 +77,7 @@ export async function getCaptureDevice(db, credential) {
     const verifiedFormats = captureParsers.filter(parser => parser.verified);
     const automaticExpenses = Boolean(device.userId && verifiedFormats.length && await tx.captureAutomation.findFirst({
       where: { userId: device.userId, mode: "AUTOMATIC", OR: verifiedFormats.map(parser => ({ parserKey: parser.key,
+        ...(parser.completionPolicy ? { completionPolicy: parser.completionPolicy, policyAcceptedAt: { not: null }, policySubscriptionId: { not: null } } : {}),
         ...(parser.dateSource === "NOTIFICATION_POSTED_AT" ? { datePolicy: "NOTIFICATION_POSTED_AT" } : {}) })) },
     }));
     if (device.userId && !device.revokedAt) await tx.captureDevice.update({ where: { id: device.id }, data: { lastSeenAt: new Date() } });

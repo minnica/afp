@@ -84,6 +84,13 @@ function assertCatalog(actual) {
   assert.match(actual.constraints.find(row => row.table_name === 'capture_automations' && row.name === 'capture_automations_datePolicy_check')?.definition || '', /BANK_OPERATION.*NOTIFICATION_POSTED_AT/);
   const analyses = actual.columns.find(row => row.table_name === 'capture_movements' && row.column_name === 'analysisHistory');
   assert.equal(analyses?.data_type, 'jsonb'); assert.equal(analyses?.is_nullable, 'YES'); assert.equal(analyses?.column_default, null);
+  for (const [name, type] of [['completionPolicy', 'text'], ['policyAcceptedAt', 'timestamp without time zone'], ['policySubscriptionId', 'text']]) {
+    const column = actual.columns.find(row => row.table_name === 'capture_automations' && row.column_name === name);
+    assert.equal(column?.data_type, type); assert.equal(column?.is_nullable, 'YES'); assert.equal(column?.column_default, null);
+  }
+  assert.match(actual.constraints.find(row => row.name === 'capture_automations_completion_policy_check')?.definition || '', /NU_CFE_MXN/);
+  assert.match(actual.constraints.find(row => row.name === 'capture_automations_policySubscriptionId_fkey')?.definition || '', /REFERENCES subscriptions.*ON DELETE SET NULL/);
+  assert.ok(actual.indexes.some(row => row.indexname === 'capture_automations_owner_format_policy_key'));
   const balanceColumns = ['balanceAsOf', 'balanceTracking', 'creditLimit', 'usedBalance'];
   const capturedBalanceColumns = actual.columns.filter(row => row.table_name === 'cards' && balanceColumns.includes(row.column_name));
   assert.deepEqual(capturedBalanceColumns.map(row => row.column_name), balanceColumns);

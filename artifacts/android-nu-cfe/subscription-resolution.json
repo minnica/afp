@@ -1,0 +1,18 @@
+{
+  "date": "2026-10-22T07:32:16.551Z",
+  "createdExpenses": 1,
+  "confirmedSubscriptionOccurrences": 1,
+  "subscriptionPendingCleared": true,
+  "importantNoticeCleared": true,
+  "sourceEventAndNativeReceiptPreserved": true,
+  "aliasesAndExistingAutomationPreserved": true,
+  "subscriptionDefaultsPreserved": true,
+  "paymentMethodForThisOccurrence": "CARD",
+  "cardForThisOccurrence": "NU",
+  "currencySource": "OWNER_FORMAT_POLICY",
+  "datePolicy": "NOTIFICATION_POSTED_AT",
+  "fullBankStatementReviewed": false,
+  "automaticConfigurationPreparedOnlyFor": "nu.cfe-service-payment.es.v2",
+  "webReleasePending": true,
+  "apkReplaced": false
+}

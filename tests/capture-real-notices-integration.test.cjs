@@ -33,7 +33,7 @@ test('Nu CFE PostgreSQL: aviso real anonimizado conserva recepción y exige revi
       const responses = await Promise.all(Array.from({ length: 8 }, () => service.receiveCaptureEvent(db, credential, input)));
       for (const response of responses) assert.deepEqual(response, responses[0]);
       stored = await read(input);
-      assert.equal(stored.movement.status, 'REVIEW'); assert.equal(stored.movement.reason, 'INCOMPLETE_FORMAT');
+      assert.equal(stored.movement.status, 'REVIEW'); assert.equal(stored.movement.reason, 'FORMAT_POLICY_REQUIRED');
       assert.equal(stored.movement.proposal.amount, '123.45'); assert.equal(stored.movement.proposal.merchant, 'CFE');
       assert.equal(stored.movement.cardId, null); assert.equal(stored.movement.operationDate, null); assert.equal(stored.movement.expenseId, null);
       assert.equal(await db.dailyExpense.count({ where: { userId: user.id } }), 0);

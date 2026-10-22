@@ -1,0 +1,15 @@
+{
+  "date": "2026-10-22T07:30:08.948Z",
+  "migration": "20261023020000_capture_nu_cfe_policy",
+  "kind": "aditiva",
+  "completedMigrations": 26,
+  "pending": [],
+  "checksumsMatch": true,
+  "changedExistingTables": [],
+  "newTables": [],
+  "tables": 30,
+  "rlsTables": 30,
+  "policies": 0,
+  "automationPreserved": true,
+  "existingPrivilegesPreserved": true
+}

@@ -1,11 +1,13 @@
-// Los formatos de compra de arranque son SINTÉTICOS. Los avisos reales de
-// débito y pago CFE no aportan una compra de crédito completa automatizable.
-// verified solo cambia tras incorporar evidencia real anonimizada y sus regresiones.
+// Los formatos de arranque son SINTÉTICOS. verified acredita la gramática real
+// anonimizada y sus regresiones; los campos ausentes nunca se inventan. Nu/CFE
+// solo se completa mediante la regla expresa de tarjeta, moneda y suscripción.
 export const captureParsers = [
   { key: "bbva.purchase.es.v1", sourcePackage: "com.bancomer.mbanking", title: "Compra aprobada", verified: false },
   { key: "wallet.purchase.es.v1", sourcePackage: "com.google.android.apps.walletnfcrel", title: "Pago realizado", verified: false },
   { key: "bbva.account-charge.es.v1", sourcePackage: "com.bancomer.mbanking", verified: false, evidence: "REAL_OUT_OF_SCOPE" },
   { key: "nu.cfe-service-payment.es.v1", sourcePackage: "com.nu.production", verified: false, evidence: "REAL_REVIEWED_PARTIAL" },
+  { key: "nu.cfe-service-payment.es.v2", sourcePackage: "com.nu.production", verified: true, evidence: "REAL_REVIEWED_POLICY_REQUIRED",
+    completionPolicy: "NU_CFE_MXN", dateSource: "NOTIFICATION_POSTED_AT" },
   { key: "wallet.banamex-purchase.es.v1", sourcePackage: "com.google.android.apps.walletnfcrel", verified: true, evidence: "REAL_REVIEWED",
     aliasSourcePackage: "com.citibanamex.banamexmobile", aliasKinds: ["PHYSICAL", "DIGITAL"], dateSource: "NOTIFICATION_POSTED_AT" },
   { key: "banamex.card-charge.es.v1", sourcePackage: "com.citibanamex.banamexmobile", verified: false, evidence: "REAL_REVIEWED_PARTIAL",
@@ -124,16 +126,17 @@ export function interpretCapture(event) {
   // moneda; publicación/recepción no sustituyen la fecha de operación y el
   // paquete Nu no identifica una tarjeta. Conservar lo disponible para revisión.
   if (event.sourcePackage === "com.nu.production" && event.fields?.["android.title"] === "Tu pago a CFE fue exitoso") {
-    const parserKey = "nu.cfe-service-payment.es.v1";
+    const parserKey = "nu.cfe-service-payment.es.v2";
     const body = event.fields["android.bigText"] || event.fields["android.text"] || "";
-    if (event.fields["android.bigText"] && event.fields["android.text"] && !body.startsWith(event.fields["android.text"])) {
+    if (conflictingBodies(event.fields)) {
       return { parserKey, verified: false, reason: "CONFLICTING_FIELDS", proposal: {} };
     }
     const match = body.match(/^El pago de \$([\d,.]+) a CFE fue exitoso\.$/);
     if (!match) return { parserKey, verified: false, reason: "INCOMPLETE_FORMAT", proposal: {} };
     const amount = captureAmount(match[1]);
     if (!amount) return { parserKey, verified: false, reason: "INVALID_FIELDS", proposal: {} };
-    return { parserKey, verified: false, reason: "INCOMPLETE_FORMAT", proposal: {
+    if (/\b(?:USD|EUR)\b/.test(texts)) return { parserKey, verified: false, reason: "FOREIGN_CURRENCY", proposal: {} };
+    return { parserKey, verified: false, reason: "FORMAT_POLICY_REQUIRED", proposal: {
       amount, merchant: "CFE", movementType: "SERVICE_PAYMENT", missingFields: ["currency", "card", "operationDate"],
     } };
   }

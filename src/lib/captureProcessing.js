@@ -7,6 +7,7 @@ import { captureHash } from "@/lib/captureProtocol";
 import { subscriptionChargeDate, getSubscriptionReceipts } from "@/lib/subscriptionCharges";
 import { Prisma } from "@prisma/client";
 import { effectiveCapture, correctCapture } from "@/lib/captureReview";
+import { matchesCapturePolicy } from "@/lib/captureFormatPolicy";
 
 export async function archiveCapturedExpense(tx, expense) {
   await tx.expenseTombstone.upsert({ where: { expenseId: expense.id }, update: {}, create: {
@@ -140,11 +141,17 @@ async function captureExpenseData(tx, movement) {
   const rule = await tx.captureMerchantRule.findUnique({ where: {
     userId_cardId_merchant: { userId, cardId: proposal.cardId, merchant: normalizeMerchant(proposal.merchant) },
   } });
-  let categoryId = movement.correction?.categoryId || rule?.categoryId;
+  const policyParser = proposal.completionPolicy && captureParsers.find(parser => parser.key === movement.parserKey && parser.completionPolicy);
+  const policySubscription = policyParser && proposal.subscriptionId ? await tx.subscription.findFirst({ where: { id: proposal.subscriptionId, userId } }) : null;
+  if (policyParser) {
+    const policy = await tx.captureAutomation.findFirst({ where: { userId, cardId: proposal.cardId, parserKey: policyParser.key } });
+    if (!matchesCapturePolicy(policy, policyParser, proposal) || !policySubscription) return { reason: "FORMAT_POLICY_REQUIRED" };
+  }
+  let categoryId = movement.correction?.categoryId || policySubscription?.categoryId || rule?.categoryId;
   if (!categoryId) categoryId = (await tx.category.upsert({ where: { userId_name: { userId, name: "Por clasificar" } },
     create: { userId, name: "Por clasificar" }, update: {} })).id;
   const data = { date: proposal.date, amount: proposal.amount, concept: proposal.merchant,
-    paymentMethod: "CARD", cardId: proposal.cardId, categoryId, subscriptionId: rule?.subscriptionId || null };
+    paymentMethod: "CARD", cardId: proposal.cardId, categoryId, subscriptionId: policySubscription?.id || rule?.subscriptionId || null };
   for (const [field, model] of [["cardId", "card"], ["categoryId", "category"], ["subscriptionId", "subscription"]]) {
     if (data[field] && !await tx[model].findFirst({ where: { id: data[field], userId } })) return { reason: "RULE_UNAVAILABLE" };
   }
@@ -157,8 +164,8 @@ async function captureExpenseData(tx, movement) {
     const cycles = await tx.cardCycle.findMany({ where: { userId, cardId: data.cardId }, select: { usageReconciliation: true, cardId: true, year: true, month: true } });
     const today = new Intl.DateTimeFormat("sv-SE", { timeZone: "America/Mexico_City" }).format(new Date());
     const scheduledDate = subscriptionChargeDate(full, month);
-    if (full.cardId !== data.cardId || full.paymentMethod !== "CARD" || !subscriptionChargeDate(full, month)
-      || scheduledDate > today
+    if ((!policySubscription && (full.cardId !== data.cardId || full.paymentMethod !== "CARD")) || !subscriptionChargeDate(full, month)
+      || scheduledDate > today || data.date > today
       || full.charges.some(charge => charge.month === month)
       || full.dailyExpenses.some(expense => (expense.subscriptionCharge?.month || expense.date.toISOString().slice(0, 7)) === month)
       || getSubscriptionReceipts(full, month, cycles).length) return { reason: "SUBSCRIPTION_CONFLICT" };

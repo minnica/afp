@@ -1,0 +1,13 @@
+{
+  "testedAt": "2026-10-22T07:38:12.234Z",
+  "localFictitiousAuthAndData": true,
+  "realBrowserAndHttpApis": true,
+  "policySavedThroughBrowser": true,
+  "explicitReinterpretationAndRegistrationThroughBrowser": true,
+  "subscriptionChargeConfirmed": true,
+  "importantNoticeCleared": true,
+  "singleExpenseAndMonthlyDecision": true,
+  "actualAmountAndNuCardForOccurrence": true,
+  "cashSubscriptionDefaultsPreserved": true,
+  "originalEventAndNativeReceiptPreserved": true
+}

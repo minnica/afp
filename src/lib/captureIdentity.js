@@ -1,3 +1,5 @@
+import { completeCaptureFormat } from "@/lib/captureFormatPolicy";
+
 export function captureAliasScope(parser) {
   return { sourcePackage: parser.aliasSourcePackage || parser.sourcePackage,
     kinds: parser.aliasKinds || null };
@@ -9,6 +11,7 @@ export function aliasSupportsParser(alias, parser) {
 }
 
 export async function resolveCaptureIdentity(tx, event, interpretation, parser) {
+  if (parser?.completionPolicy) return completeCaptureFormat(tx, event, interpretation, parser);
   const proposal = interpretation.proposal;
   if (!proposal.alias && !proposal.printedAlias) return interpretation;
   const printed = proposal.printedAlias;

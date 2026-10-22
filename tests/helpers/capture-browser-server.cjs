@@ -49,7 +49,7 @@ async function main() {
     if (url.pathname.startsWith('/auth/')) return send({});
     if (url.pathname === '/api/setup-user') return send({ ok: true });
     if (url.pathname === '/api/settings') return send({ categories: [], people: [], incomeTypes: [] });
-    if (url.pathname === '/api/dashboard') return send({ importantNotices: [], cardUsageWaiversCurrent: [], cardUsageWaiverHistory: [] });
+    if (url.pathname === '/api/dashboard' && process.env.AFP_CAPTURE_TEST_REAL_DASHBOARD !== '1') return send({ importantNotices: [], cardUsageWaiversCurrent: [], cardUsageWaiverHistory: [] });
     if (url.pathname === '/api/notice-dismissals') return send({ dismissals: [] });
     return handle(req, res);
   };

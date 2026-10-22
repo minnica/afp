@@ -64,7 +64,8 @@ export default function CaptureMovementEditor({ detail, configuration, userId, o
           <ItemTitle>{captureSources[event.sourcePackage]}</ItemTitle><ItemDescription>{new Date(event.receivedAt).toLocaleString("es-MX")}</ItemDescription>
           <p className="whitespace-pre-wrap break-words text-sm">{Object.values(event.fields).join("\n") || "Aviso sin texto accesible"}</p>
         </ItemContent></Item>)}</ItemGroup>
-        {proposal.dateSource === "NOTIFICATION_POSTED_AT" && <Alert><AlertDescription>La fecha propuesta procede de la publicación del aviso de Wallet, en hora de México. El aviso no incluye fecha bancaria de operación.</AlertDescription></Alert>}
+        {proposal.dateSource === "NOTIFICATION_POSTED_AT" && <Alert><AlertDescription>La fecha propuesta procede de la publicación del aviso, en hora de México. El aviso no incluye fecha bancaria de operación.</AlertDescription></Alert>}
+        {proposal.completionPolicy && <Alert><AlertDescription>La tarjeta y MXN proceden de tu regla Nu/CFE. Registrar confirma el cobro de {configuration.subscriptions.find(row => row.id === proposal.subscriptionId)?.name || "la suscripción configurada"} correspondiente al mes del aviso, con su importe real. Si el cobro ya está resuelto o no corresponde, queda por revisar.</AlertDescription></Alert>}
         {movement.analysisHistory?.length > 0 && <p className="text-sm text-muted-foreground">Interpretado con el formato actual. Se conservan {movement.analysisHistory.length} análisis anteriores y el aviso original.</p>}
         {open ? <>
           {!movement.correction && movement.events.length === 1 && <Button variant="outline" className="min-h-11 self-start" disabled={busy || form.formState.isDirty} onClick={() => setConfirmation({ action: "reinterpret" })}>Interpretar con el formato actual</Button>}

@@ -400,6 +400,7 @@ model Subscription {
   category      Category             @relation(fields: [categoryId], references: [id])
   dailyExpenses DailyExpense[]
   charges       SubscriptionCharge[]
+  capturePolicies CaptureAutomation[]
 
   @@index([userId])
   @@index([cardId])
@@ -603,10 +604,15 @@ model CaptureAutomation {
   parserKey String
   mode      String @default("OBSERVATION")
   datePolicy String @default("BANK_OPERATION")
+  completionPolicy String?
+  policyAcceptedAt DateTime?
+  policySubscriptionId String?
+  policySubscription Subscription? @relation(fields: [policySubscriptionId], references: [id], onDelete: SetNull)
   user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   card      Card   @relation(fields: [cardId], references: [id], onDelete: Cascade)
 
   @@unique([userId, cardId, parserKey])
+  @@unique([userId, parserKey, completionPolicy], map: "capture_automations_owner_format_policy_key")
   @@map("capture_automations")
 }
 

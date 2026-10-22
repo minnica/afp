@@ -2,12 +2,14 @@ import { Prisma } from "@prisma/client";
 import { normalizeMerchant } from "@/lib/captureParsers";
 import { capturePackages } from "@/lib/captureProtocol";
 import { aliasSupportsParser } from "@/lib/captureIdentity";
+import { matchesCapturePolicy } from "@/lib/captureFormatPolicy";
 
 export const captureActivationReasons = {
   UNVERIFIED_FORMAT: "Faltan muestras reales verificadas de este formato.",
   NO_VERIFIED_ALIAS: "Falta una terminación verificada de esta tarjeta y fuente.",
   AMBIGUOUS_ALIAS: "Una terminación de esta fuente también pertenece a otra tarjeta. Revisa los alias.",
   NO_REVIEWED_CAPTURE: "Revisa, registra o vincula y concilia una propuesta de esta tarjeta y formato, sin corregir los datos interpretados.",
+  FORMAT_POLICY_REQUIRED: "Confirma la regla Nu/CFE con tarjeta, MXN, fecha del aviso y suscripción.",
 };
 
 function matchingAlias(alias, proposal, sourcePackage) {
@@ -17,14 +19,16 @@ function matchingAlias(alias, proposal, sourcePackage) {
 
 // El cotejo debe respaldar la propuesta original. Completar/corregir un aviso
 // desconocido no valida el analizador; editar datos personales sí se permite.
-export function isReviewedCapture(movement, parser, aliases) {
+export function isReviewedCapture(movement, parser, aliases, automations = []) {
   const p = movement.proposal, expense = movement.expense;
   if (!p || movement.parserKey !== parser.key || !["REGISTERED", "LINKED"].includes(movement.status)
     || !movement.resolvedAt || !expense?.reconciledAt || expense.paymentMethod !== "CARD"
     || p.currency !== "MXN" || !p.amount || !p.date || !p.merchant
     || !(p.operationAt || (parser.dateSource === "NOTIFICATION_POSTED_AT" && p.dateSource === parser.dateSource && p.notificationAt))
     || p.cardId !== movement.cardId || p.cardId !== expense.cardId) return false;
-  if (!aliases.some(alias => matchingAlias(alias, p, parser.sourcePackage))) return false;
+  if (parser.completionPolicy) {
+    if (!automations.some(policy => matchesCapturePolicy(policy, parser, p)) || expense.subscriptionId !== p.subscriptionId) return false;
+  } else if (!aliases.some(alias => matchingAlias(alias, p, parser.sourcePackage))) return false;
   if (!movement.events.some(event => {
     const analyses = [event.interpretation, ...(movement.analysisHistory || []).filter(analysis => event.id && analysis.eventId === event.id
       && analysis.requestHash === event.requestHash).map(analysis => analysis.interpretation)];
@@ -41,18 +45,21 @@ export function isReviewedCapture(movement, parser, aliases) {
   } catch { return false; }
 }
 
-export function captureFormatReadiness(parser, cardId, aliases, movements) {
+export function captureFormatReadiness(parser, cardId, aliases, movements, automations = []) {
   const own = aliases.filter(alias => alias.cardId === cardId && aliasSupportsParser(alias, parser));
   const verified = own.filter(alias => alias.verifiedAt);
-  const ambiguous = own.filter(alias => aliases.some(other => other.cardId !== cardId
+  const ambiguous = parser.completionPolicy ? [] : own.filter(alias => aliases.some(other => other.cardId !== cardId
     && aliasSupportsParser(other, parser) && (parser.aliasKinds || other.kind === alias.kind) && other.value === alias.value));
-  const reviewed = movements.filter(movement => movement.cardId === cardId && isReviewedCapture(movement, parser, aliases));
+  const reviewed = movements.filter(movement => movement.cardId === cardId && isReviewedCapture(movement, parser, aliases, automations));
+  const policy = automations.find(policy => policy.cardId === cardId && matchesCapturePolicy(policy, parser));
   const blockers = [];
   if (!parser.verified || parser.evidence === "REAL_OUT_OF_SCOPE") blockers.push("UNVERIFIED_FORMAT");
+  if (parser.completionPolicy && !policy) blockers.push("FORMAT_POLICY_REQUIRED");
   if (!verified.length) blockers.push("NO_VERIFIED_ALIAS");
   if (ambiguous.length) blockers.push("AMBIGUOUS_ALIAS");
   if (!reviewed.length) blockers.push("NO_REVIEWED_CAPTURE");
   return { parserKey: parser.key, sourcePackage: parser.sourcePackage, verified: Boolean(parser.verified), dateSource: parser.dateSource || "BANK_OPERATION",
+    ...(parser.completionPolicy ? { completionPolicy: parser.completionPolicy, hasFormatPolicy: Boolean(policy), policySubscriptionId: policy?.policySubscriptionId || null } : {}),
     verifiedAliases: verified.length, ambiguousAliases: ambiguous.length, reviewedCaptures: reviewed.length,
     blockers, canEnable: blockers.length === 0 };
 }
@@ -61,7 +68,7 @@ export async function captureRolloutMovements(db, userId, filter = {}) {
   return db.captureMovement.findMany({ where: { userId, ...filter, status: { in: ["REGISTERED", "LINKED"] },
     expense: { userId, reconciledAt: { not: null } } }, select: {
     cardId: true, parserKey: true, status: true, proposal: true, correction: true, analysisHistory: true, resolvedAt: true,
-    expense: { select: { cardId: true, date: true, amount: true, paymentMethod: true, reconciledAt: true } },
+    expense: { select: { cardId: true, date: true, amount: true, paymentMethod: true, reconciledAt: true, subscriptionId: true } },
     events: { where: { userId }, select: { id: true, requestHash: true, sourcePackage: true, interpretation: true } },
   } });
 }
@@ -81,7 +88,7 @@ export function buildCaptureRollout(cards, aliases, automations, parsers, moveme
       sources: sources.map(sourcePackage => ({ sourcePackage,
       verifiedAliases: aliases.filter(alias => alias.cardId === card.id && alias.sourcePackage === sourcePackage && alias.verifiedAt).length,
       formats: formats.filter(parser => parser.sourcePackage === sourcePackage).map(parser => ({
-        ...captureFormatReadiness(parser, card.id, aliases, movements),
+        ...captureFormatReadiness(parser, card.id, aliases, movements, automations),
         mode: automations.find(mode => mode.cardId === card.id && mode.parserKey === parser.key)?.mode || "OBSERVATION",
         datePolicy: automations.find(mode => mode.cardId === card.id && mode.parserKey === parser.key)?.datePolicy || "BANK_OPERATION",
       })),

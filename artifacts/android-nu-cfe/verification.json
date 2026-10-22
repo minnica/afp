@@ -1,0 +1,138 @@
+{
+  "implementedOn": "2026-10-22",
+  "gitBase": "3681c0a3663643b691abb2035ae2ee69c25396b7",
+  "scope": "Nu/CFE exact notice, explicit card/currency/date/subscription policy and one linked subscription occurrence.",
+  "privacy": {
+    "actualAmountSuffixesReferencesOwnerAndFinancialIdsExcluded": true,
+    "privateSourceAndBackupGitIgnored": true,
+    "screenshotsAndBrowserUseOnlyFictitiousData": true
+  },
+  "format": {
+    "key": "nu.cfe-service-payment.es.v2",
+    "sourcePackage": "com.nu.production",
+    "evidence": "REAL_REVIEWED_POLICY_REQUIRED",
+    "sourceFields": [
+      "amount",
+      "CFE payee"
+    ],
+    "absentSourceFields": [
+      "currency",
+      "card identity",
+      "bank operation date"
+    ],
+    "explicitOwnerPolicy": {
+      "card": "NU",
+      "currency": "MXN",
+      "dateSource": "NOTIFICATION_POSTED_AT",
+      "timeZone": "America/Mexico_City",
+      "subscription": "Explicit existing CFE subscription ID",
+      "month": "Notification calendar month in Mexico"
+    },
+    "fieldsProvenanceAndPolicyAcceptancePreserved": true,
+    "legacyV1RemainsPartial": true,
+    "otherNuNoticesEnabled": false
+  },
+  "policy": {
+    "oneTargetPerOwnerAndFormat": true,
+    "ownershipAndVerifiedNuSourceRequired": true,
+    "saveStartsInObservation": true,
+    "samePolicySaveIdempotent": true,
+    "changingTargetResetsObservationAndRequiresNewPilot": true,
+    "deletingSubscriptionPreventsGenericExpenseFallback": true
+  },
+  "subscription": {
+    "actualNoticeAmountForOccurrence": true,
+    "categoryFromSubscriptionUnlessPersonalCorrection": true,
+    "singleExpenseAndMonthlyDecisionInOneTransaction": true,
+    "pendingAndImportantNoticesResolvedByConfirmedCharge": true,
+    "recurringCashMethodAndBimonthlyFrequencyPreserved": true,
+    "alreadyRecordedSkippedOffScheduleStatementConfirmedOrFutureDateRequiresReview": true,
+    "noApproximateMatchByNameOrAmount": true
+  },
+  "checks": {
+    "suite": {
+      "passed": true,
+      "sha256": "47c9689763ba7b4719d52b79ce11525bf7baacb3ecb857f83cda620a18f92ecb",
+      "tests": 440,
+      "passedTests": 440,
+      "failures": 0,
+      "skipped": 0,
+      "isolatedLocalPostgreSQL": true,
+      "fixedClockForReproducibleNuRegression": true
+    },
+    "lint": {
+      "passed": true,
+      "sha256": "d9c4017ed5156b468869aab77a743e79b7c62422bd9d83e0e77d206126999db0",
+      "errors": 0,
+      "preexistingWarnings": 1
+    },
+    "build": {
+      "passed": true,
+      "sha256": "70a55af069205fdf82cfee59a8c368bd93f11495e2a399c2ef3b05c2e334cf0b"
+    },
+    "databaseReproduction": {
+      "passed": true,
+      "sha256": "1eab0d91e64dc9bd615b35b4c2884f9f7a489e8d98ffb66f495a17014be5ea30",
+      "migrations": 26,
+      "rlsTables": 30,
+      "fromEmpty": true,
+      "fromHistoricalBaseline": true,
+      "checksumsMatch": true,
+      "schemaDiffEmpty": true,
+      "rowsAndPrivilegesPreserved": true,
+      "suiteAtReproductionRun": 439,
+      "finalSuiteIncludingFutureDateRegression": 440
+    }
+  },
+  "browser": {
+    "realUiApiAndPostgreSQL": true,
+    "fictitiousAuthAndData": true,
+    "realDashboardEndpointEnabled": true,
+    "policySelectionAndConfirmation": true,
+    "explicitAnalysisAndRegistration": true,
+    "httpBeforeAndAfterVerifyBothNotices": true,
+    "originalNativeReceiptPreserved": true,
+    "details": "browser-http.json",
+    "screenshots": [
+      "review-390.png",
+      "registered-390.png",
+      "subscription-confirmed-390.png"
+    ],
+    "mobileWidths": [
+      320,
+      390
+    ],
+    "horizontalOverflow": false,
+    "confirmedOccurrenceVisibleAsRegisteredNu": true,
+    "subscriptionPanelShowsNoPendingCharges": true
+  },
+  "production": {
+    "migration": "production-migration.json",
+    "finalState": "production-state.json",
+    "subscriptionResolution": "subscription-resolution.json",
+    "newDailyExpenses": 1,
+    "newConfirmedSubscriptionOccurrences": 1,
+    "originalEventAndReceiptPreserved": true,
+    "priorFinancialRowsAndSubscriptionDefaultsPreserved": true,
+    "aliasesAndWalletBanamexAutomationPreserved": true,
+    "calendarTriggerExpectedRevisionIncrement": 3,
+    "fullStatementOrCompleteCutReviewed": false,
+    "realInitialOccurrenceResolvedByExplicitReview": true
+  },
+  "release": {
+    "webDeployed": false,
+    "commitAndPushPerformed": false,
+    "productionMigrationApplied": true,
+    "nuCfeAutomaticConfigurationPrepared": true,
+    "futureAutomationRequiresPublishingCode": true,
+    "personalApk": "0.5.0 / versionCode 7",
+    "nativeContractChanged": false,
+    "apkReplaced": false
+  },
+  "pending": [
+    "Commit/push and verify deployment READY before relying on future Nu/CFE automation",
+    "Observe next normal CFE payment after release and reconcile a complete cut",
+    "Other Nu payees, card purchases and formats need independent evidence and configuration",
+    "Payments for earlier subscription periods require explicit review of the correct month"
+  ]
+}

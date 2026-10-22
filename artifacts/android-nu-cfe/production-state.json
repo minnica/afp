@@ -1,0 +1,38 @@
+{
+  "date": "2026-10-22T07:32:34.967Z",
+  "priorFinancialRowsPreserved": true,
+  "calendarExpenseTrigger": [
+    {
+      "changedFields": [
+        "revision",
+        "nextAttemptAt"
+      ],
+      "revisionIncrement": 3
+    }
+  ],
+  "financialAdditions": {
+    "daily_expenses": 1,
+    "subscription_charges": 1
+  },
+  "sourceEventsAndOriginalReceiptsPreserved": true,
+  "aliasesPreserved": true,
+  "deviceIdentityAndCredentialsPreserved": true,
+  "reinterpretedAndLinkedExistingMovements": 1,
+  "newSourceEvents": 0,
+  "automaticConfigurations": [
+    {
+      "mode": "AUTOMATIC",
+      "parserKey": "wallet.banamex-purchase.es.v1",
+      "datePolicy": "NOTIFICATION_POSTED_AT"
+    },
+    {
+      "mode": "AUTOMATIC",
+      "parserKey": "nu.cfe-service-payment.es.v2",
+      "datePolicy": "NOTIFICATION_POSTED_AT"
+    }
+  ],
+  "datePolicyExplicitlyAccepted": true,
+  "fullBankStatementReviewed": false,
+  "webReleasePending": true,
+  "apkReplaced": false
+}
