@@ -127,6 +127,9 @@ model Card {
   usualDueDay Int
   notes       String?
   usagePolicy Json?
+  creditLimit Decimal? @db.Decimal(12, 2)
+  usedBalance Decimal? @db.Decimal(12, 2)
+  balanceAsOf DateTime? @db.Date
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

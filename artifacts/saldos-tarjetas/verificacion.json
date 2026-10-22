@@ -1,0 +1,62 @@
+{
+  "fecha": "2026-10-21",
+  "funcionalidad": "Tarjetas: captura manual del saldo bancario, límite y disponible calculado",
+  "entorno": {
+    "datos": "Ficticios, exclusivamente locales",
+    "interfaz": "Componentes reales de AFP en una copia aislada sin archivos .env",
+    "api": "Rutas reales de AFP",
+    "autenticacion": "Simulada",
+    "persistencia": "PostgreSQL 16 desechable en localhost",
+    "produccion": "Sin migración, despliegue ni escrituras en Supabase"
+  },
+  "validacion": {
+    "regresiones": { "comando": "pnpm db:verify con AFP_MIGRATION_TEST_DATABASE_URL local", "pruebas": 359, "correctas": 359, "fallidas": 0, "omitidas": 0 },
+    "baseDeDatos": {
+      "migraciones": 22,
+      "desdeCero": true,
+      "desdeHistorial": true,
+      "checksums": "Correctos",
+      "diffPrisma": "Vacío",
+      "tablasConRls": 27,
+      "registrosHistoricos": "Conservados; los campos de saldo anteriores quedan nulos",
+      "capturasConcurrentes": "Cada actualización persiste los tres campos completos",
+      "ciclosPagosMovimientos": "Sin cambios al actualizar el saldo manual"
+    },
+    "build": { "comando": "pnpm exec next build --webpack", "resultado": "Correcto" },
+    "lint": { "comando": "pnpm lint", "errores": 0, "avisosPrevios": 1, "detalle": "TanStack useReactTable en src/components/ui/data-table.jsx; archivos nuevos y modificados sin errores ni avisos" },
+    "diffCheck": "Correcto"
+  },
+  "navegador": {
+    "motor": "Chromium mediante agent-browser",
+    "resumenParcial": { "capturadas": 3, "totalTarjetas": 4, "deuda": 33000.45, "limite": 65000, "disponible": 32799.85 },
+    "despuesDeGuardar": { "capturadas": 4, "totalTarjetas": 4, "deuda": 34500.70, "limite": 75000, "disponible": 41299.60 },
+    "escenariosComprobados": [
+      "Capturar 10000 de límite y 1500.25 de saldo: separadores de miles visibles y valor canónico correcto",
+      "Recargar: los importes guardados persisten y el resumen sigue completo",
+      "Capturar cero: muestra saldo cero y disponible de 10000",
+      "Cancelar una edición conserva los datos persistidos",
+      "Rechazo HTTP 400 de prueba conserva campos y muestra error dentro del formulario",
+      "Respuesta demorada bloquea controles, cierre y Escape mientras guarda",
+      "Cerrar o guardar devuelve el foco al botón de la tarjeta",
+      "Límite negativo y campos vacíos muestran errores y enfocan el resumen de validación",
+      "Saldo a favor y exceso de límite aparecen explícitos",
+      "Acceso a ciclos y administración permanece disponible"
+    ],
+    "pantallas": [
+      { "ancho": 320, "alto": 740, "desbordamientoHorizontal": false },
+      { "ancho": 375, "alto": 812, "desbordamientoHorizontal": false },
+      { "ancho": 812, "alto": 375, "desbordamientoHorizontal": false, "dialogo": "Cuerpo desplazable; Guardar y Cancelar visibles" },
+      { "ancho": 1280, "alto": 900, "desbordamientoHorizontal": false }
+    ],
+    "accesibilidad": {
+      "axeVersion": "4.12.1",
+      "resumenYLista": { "violaciones": 0, "comprobacionesIncompletas": 0 },
+      "dialogo": { "violaciones": 0, "comprobacionesIncompletas": 1, "detalle": "Axe no resuelve automáticamente el fondo de dos párrafos en el diálogo; revisión visual y contraste calculado de 6.94:1" },
+      "controlesNuevos": "Al menos 44 px de alto, con etiquetas accesibles",
+      "movimientoReducido": "Verificado; animación de 0.01 ms mediante la regla global existente",
+      "textoAl200PorCiento": "Panel nuevo sin desbordamiento; la cabecera compartida existente sí desborda a 375 px y no se modificó en esta tarea",
+      "limite": "Verificación de navegador, sin validación en teléfono físico ni lector de pantalla"
+    }
+  },
+  "capturas": ["mobile.png", "desktop.png", "form-mobile.png"]
+}

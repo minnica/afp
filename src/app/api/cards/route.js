@@ -1,5 +1,6 @@
 import { apiResponse as NextResponse, requireApiUser, apiAccessErrorResponse, requireOwnedReferences } from "@/lib/apiAuth";
 import { prisma } from "@/lib/prisma";
+import { creditBalanceSchema } from "@/lib/cardBalances";
 
 const cardSelect = {
   id: true,
@@ -8,6 +9,9 @@ const cardSelect = {
   usualCutDay: true,
   usualDueDay: true,
   notes: true,
+  creditLimit: true,
+  usedBalance: true,
+  balanceAsOf: true,
   createdAt: true,
   updatedAt: true,
 };
@@ -143,6 +147,27 @@ export async function PATCH(request) {
 
     if (!id) {
       return NextResponse.json({ error: "Falta id." }, { status: 400 });
+    }
+
+    if (body.action === "UPDATE_CREDIT_BALANCE") {
+      const parsed = creditBalanceSchema().safeParse(body);
+      if (!parsed.success) {
+        return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
+      }
+      const card = await prisma.card.update({
+        where: { id, userId },
+        data: {
+          creditLimit: parsed.data.creditLimit,
+          usedBalance: parsed.data.usedBalance,
+          balanceAsOf: new Date(`${parsed.data.balanceAsOf}T00:00:00.000Z`),
+        },
+        select: cardSelect,
+      });
+      return NextResponse.json({ card });
+    }
+
+    if (body.action !== undefined) {
+      return NextResponse.json({ error: "Acción no válida." }, { status: 400 });
     }
 
     if (!name || !usualCutDay || !usualDueDay) {

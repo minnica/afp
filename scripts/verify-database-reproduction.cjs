@@ -71,6 +71,15 @@ function runRegressions(url) {
 
 function assertCatalog(actual) {
   // Conserva el snapshot histórico; verifica explícitamente las columnas nuevas.
+  const balanceColumns = ['balanceAsOf', 'creditLimit', 'usedBalance'];
+  const capturedBalanceColumns = actual.columns.filter(row => row.table_name === 'cards' && balanceColumns.includes(row.column_name));
+  assert.deepEqual(capturedBalanceColumns.map(row => row.column_name), balanceColumns);
+  for (const column of capturedBalanceColumns) {
+    assert.equal(column.is_nullable, 'YES');
+    assert.equal(column.column_default, null);
+    assert.equal(column.data_type, column.column_name === 'balanceAsOf' ? 'date' : 'numeric');
+  }
+  assert.match(actual.constraints.find(row => row.table_name === 'cards' && row.name === 'cards_credit_balance_complete_check')?.definition || '', /CHECK.*creditLimit.*usedBalance.*balanceAsOf/);
   const creditColumns = ['postCutCreditAmount', 'postCutCreditDate', 'postCutCreditNotes'];
   const expectedCredits = [
     { ...before.columns.find(row => row.table_name === 'card_cycles' && row.column_name === 'paidAmount'), column_name: 'postCutCreditAmount', is_nullable: 'NO', column_default: '0' },
@@ -97,6 +106,8 @@ function assertCatalog(actual) {
       && !['capture_devices', 'capture_pairings', 'capture_events', 'capture_rate_limits', 'capture_card_aliases',
         'capture_automations', 'capture_merchant_rules', 'capture_movements', 'expense_tombstones', 'capture_statements'].includes(row.table_name || row.tablename)
       && !(section === 'columns' && row.table_name === 'card_cycles' && creditColumns.includes(row.column_name))
+      && !(section === 'columns' && row.table_name === 'cards' && balanceColumns.includes(row.column_name))
+      && !(section === 'constraints' && row.name === 'cards_credit_balance_complete_check')
       && !(section === 'columns' && row.table_name === 'daily_expenses' && row.column_name === 'cashContributionAmount')
       && !(section === 'columns' && ['daily_expenses', 'installment_purchases'].includes(row.table_name) && ['reconciliationStatus', 'reconciledAt'].includes(row.column_name))
       && !(section === 'constraints' && ['daily_expenses_reconciliation_check', 'installment_purchases_reconciliation_check'].includes(row.name))
@@ -113,6 +124,8 @@ function assertCatalog(actual) {
 
 async function seed(db) {
   const user = await db.user.create({ data: { id: 'a11-user', email: 'a11@example.test' } });
+  await db.$executeRaw`INSERT INTO cards (id, "userId", name, "usualCutDay", "usualDueDay", "updatedAt")
+    VALUES ('a11-card', ${user.id}, 'Tarjeta histórica', 10, 30, CURRENT_TIMESTAMP)`;
   const person = await db.person.create({ data: { id: 'a11-person', userId: user.id, name: 'Prueba A11' } });
   const receivable = await db.receivableAccount.create({ data: {
     id: 'a11-receivable', userId: user.id, personId: person.id, concept: 'Reembolso',
@@ -137,6 +150,7 @@ async function seed(db) {
 
 async function records(db) {
   return {
+    card: await db.card.findUnique({ where: { id: 'a11-card' }, omit: { creditLimit: true, usedBalance: true, balanceAsOf: true } }),
     loan: await db.payableAccount.findUnique({ where: { id: 'a11-loan' } }),
     payment: await db.dailyExpense.findUnique({ where: { id: 'a11-payment' }, omit: { cashContributionAmount: true, reconciliationStatus: true, reconciledAt: true } }),
     receivable: await db.receivableAccount.findUnique({ where: { id: 'a11-receivable' } }),
@@ -244,6 +258,10 @@ async function main() {
         }
         runPrisma(['db', 'execute', '--file', path.join(root, 'prisma/migrations', securityMigration, 'migration.sql')], dbUrl);
         assert.deepEqual(await records(db), savedRecords);
+        const historicalCard = await db.card.findUnique({ where: { id: 'a11-card' } });
+        assert.equal(historicalCard.creditLimit, null);
+        assert.equal(historicalCard.usedBalance, null);
+        assert.equal(historicalCard.balanceAsOf, null);
         assert.equal(String((await db.dailyExpense.findUnique({ where: { id: 'a11-payment' } })).cashContributionAmount), '0');
         if (savedHistory) {
           const currentHistory = await db.$queryRawUnsafe('SELECT * FROM public._prisma_migrations ORDER BY migration_name');

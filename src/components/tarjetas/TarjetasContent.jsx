@@ -44,6 +44,7 @@ import { Badge } from "@/components/ui/badge";
 import { Item, ItemGroup, ItemMedia } from "@/components/ui/item";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import CyclesDataTable from "@/components/tarjetas/CyclesDataTable";
+import CardBalances from "@/components/tarjetas/CardBalances";
 import PageSkeleton from "@/components/layout/PageSkeleton";
 
 const MONTH_NAMES = [
@@ -59,6 +60,7 @@ export default function TarjetasContent() {
 
   const [user, setUser] = useState(null);
   const [cards, setCards] = useState([]);
+  const [cardsLoadError, setCardsLoadError] = useState(false);
   const [cycles, setCycles] = useState([]);
 
   const [name, setName] = useState("");
@@ -80,10 +82,28 @@ export default function TarjetasContent() {
   const [isUpdatingCard, setIsUpdatingCard] = useState(false);
 
   async function loadCards(userId, { mutationCompleted = false } = {}) {
-    const response = await apiFetch(`/api/cards?userId=${userId}`, { mutationCompleted });
+    try {
+      const response = await apiFetch(`/api/cards?userId=${userId}`, { mutationCompleted, expectedUserId: userId });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "No se pudieron cargar las tarjetas.");
+      setCards(data.cards || []);
+      setCardsLoadError(false);
+    } catch (error) {
+      setCardsLoadError(true);
+      throw error;
+    }
+  }
+
+  async function saveCreditBalance(cardId, values) {
+    if (!user) throw new Error("Inicia sesión para continuar.");
+    const response = await apiFetch("/api/cards", {
+      method: "PATCH", expectedUserId: user.id,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: cardId, action: "UPDATE_CREDIT_BALANCE", ...values }),
+    });
     const data = await response.json();
-    if (!response.ok) throw new Error(data.error || "No se pudieron cargar las tarjetas.");
-    setCards(data.cards || []);
+    if (!response.ok) throw new Error(data.error || "No se pudo guardar el saldo.");
+    setCards((previous) => previous.map((card) => card.id === cardId ? data.card : card));
   }
 
   async function loadCycles(userId, { mutationCompleted = false } = {}) {
@@ -406,6 +426,13 @@ export default function TarjetasContent() {
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         ) : null}
+
+        <CardBalances
+          cards={cards}
+          onSave={saveCreditBalance}
+          loadError={cardsLoadError}
+          onRetry={async () => { if (user) { try { await loadCards(user.id); setError(""); } catch { /* El resumen conserva su error y reintento. */ } } }}
+        />
 
         <Card className="rounded-none bg-transparent py-0 ring-0 [--card-spacing:0px] md:rounded-xl md:bg-card md:py-4 md:ring-1 md:[--card-spacing:--spacing(4)]">
           <CardHeader className="mb-3 md:mb-0">
