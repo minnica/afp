@@ -31,10 +31,15 @@ test("cobros API: exige sesión y obtiene el usuario del token", async () => {
   assert.equal(result.status, 200);
   assert.equal(calls[0][1], "owner");
   assert.equal(result.headers["Cache-Control"], "private, no-store");
-  await route.POST(request("valid", { month: "2026-10", userId: "other", expenseData: { userId: "other" } }));
+  await route.POST(request("valid", { month: "2026-10", userId: "other", amount: "135.50", paymentMethod: "CARD", cardId: "card",
+    createReceivable: true, expenseData: { userId: "other", categoryId: "foreign" } }));
   assert.equal(calls[1][0], "transaction");
   assert.equal(calls[1][1], "owner");
   assert.equal(calls[1][2].expenseData, undefined);
+  assert.equal(calls[1][2].createReceivable, undefined);
+  assert.equal(calls[1][2].amount, "135.50");
+  assert.equal(calls[1][2].paymentMethod, "CARD");
+  assert.equal(calls[1][2].cardId, "card");
 });
 
 test("cobros API: rechaza meses, días y cuerpos inválidos antes de escribir", async () => {

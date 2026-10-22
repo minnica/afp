@@ -6,7 +6,8 @@ export class SubscriptionChargeError extends Error {
 
 export const subscriptionChargeInclude = {
   charges: true,
-  dailyExpenses: { select: { id: true, date: true, amount: true, subscriptionCharge: { select: { month: true } } } },
+  dailyExpenses: { select: { id: true, date: true, amount: true, paymentMethod: true,
+    card: { select: { name: true } }, subscriptionCharge: { select: { month: true } } } },
   card: { select: { name: true } },
   category: { select: { name: true } },
 };
@@ -61,12 +62,15 @@ export async function applySubscriptionCharge(tx, userId, input) {
   if (!["number", "string"].includes(typeof amount) || !/^\d+(?:\.\d{1,2})?$/.test(String(amount))
     || Number(amount) <= 0 || !Number.isSafeInteger(Math.round(Number(amount) * 100))) throw new SubscriptionChargeError("Ingresa un importe positivo con hasta dos decimales.");
   const extra = input.expenseData || {};
-  const paymentMethod = extra.paymentMethod ?? subscription.paymentMethod;
-  const cardId = paymentMethod === "CARD" ? (extra.cardId ?? subscription.cardId) : null;
+  const paymentMethod = input.paymentMethod !== undefined ? input.paymentMethod : extra.paymentMethod ?? subscription.paymentMethod;
+  if (!["CASH", "CARD"].includes(paymentMethod)) throw new SubscriptionChargeError("Selecciona un método de pago válido.");
+  const requestedCardId = input.cardId !== undefined ? input.cardId : extra.cardId ?? subscription.cardId;
+  if (requestedCardId != null && typeof requestedCardId !== "string") throw new SubscriptionChargeError("Selecciona una tarjeta válida.");
+  const cardId = paymentMethod === "CARD" ? requestedCardId : null;
   const categoryId = extra.categoryId ?? subscription.categoryId;
   if (!await tx.category.findFirst({ where: { id: categoryId, userId } })) throw new SubscriptionChargeError("La categoría ya no está disponible.");
   if (paymentMethod === "CARD" && (!cardId || !await tx.card.findFirst({ where: { id: cardId, userId } }))) {
-    throw new SubscriptionChargeError("La tarjeta ya no está disponible. Actualiza la suscripción.");
+    throw new SubscriptionChargeError("Selecciona una tarjeta disponible para este cobro.");
   }
   for (const [field, model] of [["personId", "person"], ["receivableAccountId", "receivableAccount"], ["payableAccountId", "payableAccount"]]) {
     if (extra[field] && !await tx[model].findFirst({ where: { id: extra[field], userId } })) {

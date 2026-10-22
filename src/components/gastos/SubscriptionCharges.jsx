@@ -3,6 +3,9 @@
 import { apiFetch } from "@/lib/apiFetch";
 
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
+import { Controller, useForm, useWatch } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowLeft02Icon, Cancel01Icon, CheckmarkCircle02Icon, MoreHorizontalIcon, RepeatIcon, Tick02Icon } from "@hugeicons/core-free-icons";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -17,6 +20,7 @@ import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "@/components/u
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Item, ItemActions, ItemContent, ItemDescription, ItemGroup, ItemSeparator, ItemTitle } from "@/components/ui/item";
+import { PaymentMethodSelector } from "@/components/ui/payment-method-selector";
 import { ResponsiveSelect } from "@/components/ui/responsive-select";
 import { DisclosureButton } from "@/components/ui/responsive-breakdown";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -36,14 +40,92 @@ const localDay = () => {
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
 };
 
+const adjustmentSchema = z.object({
+  amount: z.string().refine(value => /^\d+(?:\.\d{1,2})?$/.test(value) && Number(value) > 0
+    && Number.isSafeInteger(Math.round(Number(value) * 100)), "Ingresa un monto positivo con hasta dos decimales."),
+  date: z.string().refine(value => validChargeDay(value) && value <= localDay(), "Elige una fecha válida no posterior a hoy."),
+  paymentMethod: z.enum(["CASH", "CARD"]),
+  cardId: z.string(),
+}).superRefine((values, context) => {
+  if (values.paymentMethod === "CARD" && !values.cardId) {
+    context.addIssue({ code: "custom", path: ["cardId"], message: "Selecciona la tarjeta con la que pagaste." });
+  }
+});
+
+function ChargeAdjustmentForm({ charge, cards, busy, isOnline, error, onConfirm }) {
+  const { control, handleSubmit, setValue, setError } = useForm({
+    resolver: zodResolver(adjustmentSchema),
+    defaultValues: { amount: String(charge.amount), date: charge.date, paymentMethod: charge.paymentMethod, cardId: charge.cardId || "" },
+  });
+  const paymentMethod = useWatch({ control, name: "paymentMethod" });
+
+  return (
+    <form className="flex flex-col gap-4" aria-busy={busy} noValidate onSubmit={handleSubmit(values => {
+      if (values.paymentMethod === "CARD" && !cards.some(card => card.id === values.cardId)) {
+        setError("cardId", { message: "Selecciona una tarjeta disponible para este cobro." });
+        return;
+      }
+      return onConfirm({ ...values, cardId: values.paymentMethod === "CARD" ? values.cardId : null });
+    })}>
+      <div className="flex flex-col gap-1">
+        <p className="break-words font-medium">{charge.name}</p>
+        <p className="text-sm text-muted-foreground">Los cambios se aplican solo a este cobro.</p>
+      </div>
+      <fieldset disabled={busy}><FieldGroup>
+        <Controller name="amount" control={control} render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor="subscription-charge-amount">Monto pagado</FieldLabel>
+            <Input {...field} id="subscription-charge-amount" type="number" formatNumber min="0.01" step="0.01"
+              aria-invalid={fieldState.invalid} aria-describedby={fieldState.invalid ? "subscription-charge-amount-error" : "subscription-charge-amount-hint"} />
+            <FieldDescription id="subscription-charge-amount-hint">Previsto: {money(charge.amount)}</FieldDescription>
+            {fieldState.error ? <FieldError id="subscription-charge-amount-error">{fieldState.error.message}</FieldError> : null}
+          </Field>
+        )} />
+        <Controller name="date" control={control} render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor="subscription-charge-date">Fecha de pago</FieldLabel>
+            <DatePicker id="subscription-charge-date" value={field.value} onChange={field.onChange} disabled={busy} aria-label="Fecha de pago" />
+            {fieldState.error ? <FieldError role="alert">{fieldState.error.message}</FieldError> : null}
+          </Field>
+        )} />
+        <Controller name="paymentMethod" control={control} render={({ field }) => (
+          <Field>
+            <FieldLabel id="subscription-charge-payment-label">Método de pago</FieldLabel>
+            <PaymentMethodSelector id="subscription-charge-payment" value={field.value} disabled={busy} onValueChange={value => {
+              field.onChange(value);
+              if (value === "CASH") setValue("cardId", "", { shouldValidate: true });
+            }} />
+          </Field>
+        )} />
+        {paymentMethod === "CARD" ? <Controller name="cardId" control={control} render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor="subscription-charge-card">Tarjeta</FieldLabel>
+            <ResponsiveSelect id="subscription-charge-card" value={field.value} onValueChange={field.onChange}
+              options={cards.map(card => ({ value: card.id, label: card.name }))} title="Seleccionar tarjeta" placeholder="Selecciona la tarjeta"
+              searchable="auto" disabled={busy || !cards.length} aria-invalid={fieldState.invalid}
+              aria-describedby={fieldState.invalid ? "subscription-charge-card-error" : !cards.length ? "subscription-charge-card-hint" : undefined} />
+            {!cards.length ? <FieldDescription id="subscription-charge-card-hint">Agrega una tarjeta en Tarjetas para poder seleccionarla.</FieldDescription> : null}
+            {fieldState.error ? <FieldError id="subscription-charge-card-error">{fieldState.error.message}</FieldError> : null}
+          </Field>
+        )} /> : null}
+      </FieldGroup></fieldset>
+      {error ? <FieldError role="alert">{error}</FieldError> : null}
+      {!isOnline ? <Alert><AlertDescription>Conéctate para confirmar este cobro. Tus ajustes se conservan.</AlertDescription></Alert> : null}
+      <DialogFooter><Button disabled={busy || !isOnline} className="h-11">{busy ? <Spinner data-icon="inline-start" /> : <HugeiconsIcon icon={Tick02Icon} data-icon="inline-start" aria-hidden="true" />}Confirmar cobro</Button></DialogFooter>
+    </form>
+  );
+}
+
 function ChargeList({ charges, renderActions }) {
   return (
     <ItemGroup className="gap-0">
       {charges.map((charge, index) => {
         const pending = charge.status === "PENDING";
         const amount = charge.status === "SKIPPED" ? null : pending ? charge.amount : charge.confirmedAmount ?? charge.amount;
+        const recordedPayment = charge.confirmedPaymentMethod === "CASH" ? "Efectivo"
+          : charge.confirmedPaymentMethod === "CARD" ? charge.confirmedCardName || "Tarjeta no disponible" : null;
         const detail = pending ? `${dayLabel(charge.date)} · ${charge.paymentMethod === "CASH" ? "Efectivo" : charge.cardName || "Tarjeta no disponible"}`
-          : charge.status === "SKIPPED" ? "Omitido" : charge.status === "VERIFIED" ? "Estado de cuenta" : "Registrado";
+          : charge.status === "SKIPPED" ? "Omitido" : charge.status === "VERIFIED" ? "Estado de cuenta" : ["Registrado", recordedPayment].filter(Boolean).join(" · ");
         return (
           <Fragment key={charge.id}>
             {index ? <ItemSeparator className="my-0" /> : null}
@@ -66,7 +148,7 @@ function ChargeList({ charges, renderActions }) {
   );
 }
 
-export default function SubscriptionCharges({ userId, isOnline, onChanged, refreshKey }) {
+export default function SubscriptionCharges({ userId, cards = [], isOnline, onChanged, refreshKey }) {
   const [open, setOpen] = useState(false);
   const [today, setToday] = useState(localDay);
   const [month, setMonth] = useState(() => localDay().slice(0, 7));
@@ -79,8 +161,6 @@ export default function SubscriptionCharges({ userId, isOnline, onChanged, refre
   const [feedback, setFeedback] = useState("");
   const [editing, setEditing] = useState(null);
   const [skipping, setSkipping] = useState(null);
-  const [amount, setAmount] = useState("");
-  const [date, setDate] = useState("");
   const [formError, setFormError] = useState("");
   const actionTriggerRef = useRef(null);
   const sectionRef = useRef(null);
@@ -176,7 +256,10 @@ export default function SubscriptionCharges({ userId, isOnline, onChanged, refre
       if (editing) requestAnimationFrame(() => sectionRef.current?.focus({ preventScroll: true }));
       setState(previous => ({ ...previous, error: "", charges: previous.charges.map(item => item.id === charge.id
         ? { ...item, status: action === "skip" ? "SKIPPED" : action === "restore" ? "PENDING" : "CONFIRMED",
-          confirmedAmount: action === "confirm" ? Number(overrides.amount ?? charge.amount) : null } : item) }));
+          confirmedAmount: action === "confirm" && !result.alreadyConfirmed ? Number(overrides.amount ?? charge.amount) : null,
+          confirmedPaymentMethod: action === "confirm" && !result.alreadyConfirmed ? overrides.paymentMethod ?? charge.paymentMethod : null,
+          confirmedCardName: action === "confirm" && !result.alreadyConfirmed
+            ? cards.find(card => card.id === (overrides.cardId ?? charge.cardId))?.name || null : null } : item) }));
       setFeedback(action === "skip" ? "Cobro omitido." : action === "restore" ? "Cobro restaurado."
         : result.alreadyConfirmed ? "Este cobro ya estaba registrado." : "Cobro confirmado.");
       await Promise.all([onChanged(), refreshDashboard()]);
@@ -213,8 +296,6 @@ export default function SubscriptionCharges({ userId, isOnline, onChanged, refre
   function editCharge(charge) {
     setFormError("");
     setEditing(charge);
-    setAmount(String(charge.amount));
-    setDate(charge.date);
     requestAnimationFrame(() => sectionRef.current?.focus({ preventScroll: true }));
   }
 
@@ -270,30 +351,13 @@ export default function SubscriptionCharges({ userId, isOnline, onChanged, refre
               {editing ? <Button type="button" variant="ghost" size="icon" className="-my-2 -ml-2 size-11" disabled={busy} aria-label="Volver a cobros" onClick={returnToList}><HugeiconsIcon icon={ArrowLeft02Icon} aria-hidden="true" /></Button> : null}
               <DialogTitle>{editing ? "Ajustar cobro" : "Cobros de suscripciones"}</DialogTitle>
             </div>
-            <DialogDescription className="sr-only">Confirma los cobros de tus suscripciones. Los ajustes de monto y fecha afectan solo a ese cobro.</DialogDescription>
+            <DialogDescription className="sr-only">Confirma los cobros de tus suscripciones. Los ajustes de monto, fecha y método de pago afectan solo a ese cobro.</DialogDescription>
           </DialogHeader>
           <DialogClose asChild><Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2 size-11" disabled={busy} aria-label="Cerrar cobros de suscripciones"><HugeiconsIcon icon={Cancel01Icon} aria-hidden="true" /></Button></DialogClose>
           <div ref={sectionRef} tabIndex={-1} role="region" aria-label={editing ? "Ajustar cobro" : "Cobros del mes"} className="flex min-h-0 min-w-0 flex-col gap-3 overflow-y-auto overscroll-contain pr-1 outline-none [color-scheme:dark] [scrollbar-gutter:stable] sm:[scrollbar-gutter:auto]">
             {editing ? (
-              <form className="flex flex-col gap-4" aria-busy={busy} onSubmit={event => {
-                event.preventDefault();
-                if (!validChargeDay(date) || date > localDay() || !/^\d+(?:\.\d{1,2})?$/.test(amount) || Number(amount) <= 0) {
-                  setFormError("Ingresa un monto positivo y una fecha no posterior a hoy."); return;
-                }
-                update(editing, "confirm", { amount, date });
-              }}>
-                <p className="break-words font-medium">{editing.name}</p>
-                <fieldset disabled={busy}><FieldGroup>
-                  <Field data-invalid={Boolean(formError)}>
-                    <FieldLabel htmlFor="subscription-charge-amount">Monto</FieldLabel>
-                    <Input id="subscription-charge-amount" type="number" formatNumber min="0.01" step="0.01" value={amount} onChange={event => setAmount(event.target.value)} aria-invalid={Boolean(formError)} aria-describedby={formError ? "subscription-charge-error" : "subscription-charge-amount-hint"} />
-                    <FieldDescription id="subscription-charge-amount-hint">Solo este cobro.</FieldDescription>
-                  </Field>
-                  <Field><FieldLabel htmlFor="subscription-charge-date">Fecha</FieldLabel><DatePicker id="subscription-charge-date" value={date} onChange={setDate} disabled={busy} /></Field>
-                </FieldGroup></fieldset>
-                {formError ? <FieldError id="subscription-charge-error">{formError}</FieldError> : null}
-                <DialogFooter><Button disabled={disabled} className="h-11">{busy ? <Spinner data-icon="inline-start" /> : <HugeiconsIcon icon={Tick02Icon} data-icon="inline-start" aria-hidden="true" />}Confirmar cobro</Button></DialogFooter>
-              </form>
+              <ChargeAdjustmentForm charge={editing} cards={cards} busy={busy} isOnline={isOnline} error={formError}
+                onConfirm={values => update(editing, "confirm", values)} />
             ) : (
               <>
                 <div className="grid grid-cols-[minmax(0,1fr)_6rem] gap-3 py-2">
@@ -320,7 +384,7 @@ export default function SubscriptionCharges({ userId, isOnline, onChanged, refre
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild><Button type="button" variant="ghost" size="icon" className="size-11" disabled={disabled} onClick={event => { actionTriggerRef.current = event.currentTarget; }} aria-label={`Opciones de ${charge.name}`}><HugeiconsIcon icon={MoreHorizontalIcon} aria-hidden="true" /></Button></DropdownMenuTrigger>
                         <DropdownMenuContent align="end" onCloseAutoFocus={event => { if (editing || skipping) event.preventDefault(); }}><DropdownMenuGroup>
-                          <DropdownMenuItem onSelect={() => editCharge(charge)}>Ajustar</DropdownMenuItem>
+                          <DropdownMenuItem onSelect={() => editCharge(charge)}>Ajustar monto o pago</DropdownMenuItem>
                           <DropdownMenuItem onSelect={() => { setFormError(""); setSkipping(charge); }}>Omitir este mes</DropdownMenuItem>
                         </DropdownMenuGroup></DropdownMenuContent>
                       </DropdownMenu>

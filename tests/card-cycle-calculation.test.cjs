@@ -105,6 +105,20 @@ test("gasto vinculado sustituye previsión y conserva importe real, incluso en o
   assert.equal(calc(8, { subscriptions: [sub], expenses }).calculatedAmount, 90);
 });
 
+test("ajustar el método o tarjeta del cobro retira la previsión original y suma solo el pago real", () => {
+  const subscription = { ...sub, charges: [{ month: "2024-07", status: "CONFIRMED", expenseId: "real" }] };
+  for (const payment of [{ paymentMethod: "CARD", cardId: "other" }, { paymentMethod: "CASH", cardId: null }]) {
+    const expenses = [expense("real", "2024-07-20", 135.5, { ...payment, subscriptionId: "sub", subscriptionCharge: { month: "2024-07" } })];
+    assert.equal(calc(8, { subscriptions: [subscription], expenses }).calculatedAmount, 0);
+    assert.equal(ctx.calculateCycleAmount({ cycle: { ...cycle(8), cardId: "other" }, subscriptions: [subscription], expenses }).calculatedAmount,
+      payment.paymentMethod === "CARD" ? 135.5 : 0);
+    assert.equal(calc(9, { subscriptions: [subscription], expenses }).subscriptionsAmount, 100);
+  }
+  const cashSubscription = { ...subscription, paymentMethod: "CASH", cardId: null };
+  assert.equal(calc(8, { subscriptions: [cashSubscription], expenses: [expense("real", "2024-07-20", 135.5,
+    { paymentMethod: "CARD", subscriptionId: "sub" })] }).calculatedAmount, 135.5);
+});
+
 test("arrays sin mapas no mezclan tarjetas y otro plástico no elimina una previsión", () => {
   const expenses = [expense("otra", "2024-07-20", 700, { cardId: "other", subscriptionId: "sub" })];
   const result = calc(8, {

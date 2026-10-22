@@ -31,9 +31,20 @@ test("desactivar conserva los cobros hasta el día de baja", () => {
 });
 
 test("un gasto vinculado sustituye automáticamente el previsto", () => {
-  const result = list({ ...sub, dailyExpenses: [{ id: "e", date: new Date("2026-10-15"), amount: 219 }] });
+  const result = list({ ...sub, dailyExpenses: [{ id: "e", date: new Date("2026-10-15"), amount: 219, paymentMethod: "CASH" }] });
   assert.equal(result[0].status, "CONFIRMED");
   assert.equal(result[0].confirmedAmount, 219);
+  assert.equal(result[0].confirmedPaymentMethod, "CASH");
+  assert.equal(result[0].paymentMethod, "CARD");
+});
+
+test("el historial identifica la tarjeta real aunque la suscripción se pague habitualmente en efectivo", () => {
+  const result = list({ ...sub, paymentMethod: "CASH", cardId: null, dailyExpenses: [{ id: "e", date: new Date("2026-10-15"),
+    amount: "135.50", paymentMethod: "CARD", card: { name: "Nu" } }] })[0];
+  assert.equal(result.confirmedAmount, 135.5);
+  assert.equal(result.confirmedPaymentMethod, "CARD");
+  assert.equal(result.confirmedCardName, "Nu");
+  assert.equal(result.paymentMethod, "CASH");
 });
 
 test("la decisión identifica el período aunque el gasto se contabilice en otro mes", () => {

@@ -7,6 +7,61 @@ const { PrismaClient } = require("@prisma/client");
 const { PrismaPg } = require("@prisma/adapter-pg");
 const connectionString = process.env.AFP_TEST_DATABASE_URL;
 
+test("cobros: API persiste monto y tarjeta de una ocurrencia, valida propietario y conserva recurrencia", { skip: !connectionString }, async () => {
+  const url = new URL(connectionString);
+  assert.ok(["localhost", "127.0.0.1"].includes(url.hostname) && url.pathname.startsWith("/afp_test"), "Solo permite una base local de prueba.");
+  const db = new PrismaClient({ adapter: new PrismaPg({ connectionString }) });
+  const user = await db.user.create({ data: { email: `subscription-payments-${Date.now()}@example.test` } });
+  const other = await db.user.create({ data: { email: `subscription-other-${Date.now()}@example.test` } });
+  try {
+    const category = await db.category.create({ data: { userId: user.id, name: "Servicios" } });
+    const card = await db.card.create({ data: { userId: user.id, name: "Nu prueba", usualCutDay: 25, usualDueDay: 10 } });
+    const foreignCard = await db.card.create({ data: { userId: other.id, name: "Ajena", usualCutDay: 25, usualDueDay: 10 } });
+    const subscription = await db.subscription.create({ data: { userId: user.id, name: "Luz", amount: "120",
+      paymentMethod: "CASH", categoryId: category.id, chargeDay: 1, startMonth: 1, startYear: 2026 } });
+    const { sourceLoader } = require("./helpers/load-source.cjs");
+    const load = sourceLoader({
+      "@/lib/prisma": { prisma: db },
+      "next/server": { NextResponse: { json: (body, options = {}) => ({ body, status: options.status || 200 }) } },
+      "@supabase/supabase-js": { createClient: () => ({ auth: { getUser: async () => ({ data: { user } }) } }) },
+    });
+    const api = load("src/app/api/subscription-charges/route.js");
+    const today = new Date().toISOString().slice(0, 10);
+    const month = today.slice(0, 7);
+    const body = { subscriptionId: subscription.id, month, today, action: "confirm", amount: "135.50", paymentMethod: "CARD", cardId: card.id };
+    const request = payload => ({ headers: new Headers({ authorization: "Bearer test" }), json: async () => payload });
+    const rejected = await api.POST(request({ ...body, cardId: foreignCard.id }));
+    assert.equal(rejected.status, 400);
+    assert.equal(await db.dailyExpense.count({ where: { userId: user.id } }), 0);
+    assert.equal(await db.subscriptionCharge.count({ where: { userId: user.id } }), 0);
+    const results = await Promise.all(Array.from({ length: 4 }, () => api.POST(request(body))));
+    assert.ok(results.every(result => result.status === 200));
+    assert.equal(new Set(results.map(result => result.body.expenseId)).size, 1);
+    assert.equal(await db.dailyExpense.count({ where: { userId: user.id } }), 1);
+    const expense = await db.dailyExpense.findUnique({ where: { id: results[0].body.expenseId } });
+    assert.equal(String(expense.amount), "135.5");
+    assert.equal(expense.paymentMethod, "CARD");
+    assert.equal(expense.cardId, card.id);
+    const recurring = await db.subscription.findUnique({ where: { id: subscription.id } });
+    assert.equal(String(recurring.amount), "120");
+    assert.equal(recurring.paymentMethod, "CASH");
+    assert.equal(recurring.cardId, null);
+    const charges = await load("src/lib/subscriptionChargeService.js").loadSubscriptionCharges(db, user.id, month, today);
+    assert.equal(charges[0].confirmedAmount, 135.5);
+    assert.equal(charges[0].confirmedCardName, card.name);
+    const next = new Date(`${month}-01T12:00:00Z`);
+    next.setUTCMonth(next.getUTCMonth() + 1);
+    const nextDay = next.toISOString().slice(0, 10);
+    const upcoming = await load("src/lib/subscriptionChargeService.js").loadSubscriptionCharges(db, user.id, nextDay.slice(0, 7), nextDay);
+    assert.equal(upcoming[0].status, "PENDING");
+    assert.equal(upcoming[0].amount, 120);
+    assert.equal(upcoming[0].paymentMethod, "CASH");
+  } finally {
+    await db.user.deleteMany({ where: { id: { in: [user.id, other.id] } } });
+    await db.$disconnect();
+  }
+});
+
 test("cobros: transacción, concurrencia, omisión, restauración, evidencia y aislamiento", { skip: !connectionString }, async () => {
   const url = new URL(connectionString);
   assert.ok(["localhost", "127.0.0.1"].includes(url.hostname) && url.pathname.startsWith("/afp_test"), "Solo permite una base local de prueba.");

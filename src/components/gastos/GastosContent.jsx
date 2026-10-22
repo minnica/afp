@@ -1647,7 +1647,7 @@ export default function GastosContent() {
                         Quitar filtros
                       </Button>
                     ) : null}
-                    <SubscriptionCharges userId={user?.id} isOnline={isOnline} refreshKey={expenses}
+                    <SubscriptionCharges userId={user?.id} cards={cards} isOnline={isOnline} refreshKey={expenses}
                       onChanged={() => loadExpenses(user.id, { force: true, mutationCompleted: true })} />
                   </CardAction>
                 </CardHeader>

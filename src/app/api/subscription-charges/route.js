@@ -15,7 +15,10 @@ async function handle(request, write) {
       return NextResponse.json({ error: "El mes o la fecha local no son válidos. Actualiza la página." }, { status: 400 });
     }
     if (write) {
-      const result = await prisma.$transaction(tx => applySubscriptionCharge(tx, user.id, { ...input, today, expenseData: undefined }));
+      const { subscriptionId, month, action, amount, date, paymentMethod, cardId } = input;
+      const result = await prisma.$transaction(tx => applySubscriptionCharge(tx, user.id, {
+        subscriptionId, month, action, amount, date, paymentMethod, cardId, today,
+      }));
       return NextResponse.json(result, { headers: { "Cache-Control": "private, no-store" } });
     }
     const charges = await loadSubscriptionCharges(prisma, user.id, input.month, today);

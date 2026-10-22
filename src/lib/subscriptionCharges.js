@@ -61,6 +61,8 @@ export function buildSubscriptionCharges({ subscriptions, month, today, cycles =
       categoryName: subscription.category?.name || null, status,
       confirmedAmount: expenses.length ? expenses.reduce((sum, expense) => sum + Math.round(Number(expense.amount) * 100), 0) / 100
         : receipts.length ? receipts.reduce((sum, receipt) => sum + Math.round(receipt.amount * 100), 0) / 100 : null,
+      confirmedPaymentMethod: expenses.length === 1 ? expenses[0].paymentMethod ?? null : null,
+      confirmedCardName: expenses.length === 1 ? expenses[0].card?.name || null : null,
       expenseId: expenses[0]?.id || decision?.expenseId || null,
     }];
   }).sort((a, b) => a.date.localeCompare(b.date) || a.name.localeCompare(b.name, "es"));
