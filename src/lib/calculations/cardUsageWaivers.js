@@ -69,11 +69,71 @@ function usagePeriod(cycle) {
   return { start, cut, verified: Boolean(evidence) };
 }
 
+// Turbo exige una compra cada 30 días, independientemente del corte de crédito.
+// AFP solo observa los movimientos de crédito registrados, no la activación en Nu.
+function buildNuTurboUsage({ card, cyclesWithAmounts, expenses, subscriptions, purchases, now }) {
+  const today = usageDay(now);
+  const entries = [];
+  const cardExpenses = expenses.filter((expense) => expense.cardId === card.id && expense.paymentMethod === "CARD");
+  const statements = cyclesWithAmounts.filter((cycle) => cycle.cardId === card.id)
+    .map(verifiedUsageStatement).filter(Boolean);
+  const excludedIds = new Set(statements.flatMap((statement) => statement.excludedExpenseIds || []));
+  const isPurchase = (entry) => !getUsageExclusion(entry)
+    && !/^(?:IVA\b|COMISION(?:ES)?\b|INTERESES?\b|(?:RETIRO|DISPOSICION)\b.*EFECTIVO)/.test(normalizeUsageText(entry.concept));
+  const add = (entry) => {
+    const date = entry.date && usageDay(entry.date);
+    if (!date || date > today || !Number.isFinite(Number(entry.amount)) || Number(entry.amount) <= 0) return;
+    entries.push({ ...entry, date, amount: usageMoney(entry.amount) });
+  };
+  for (const expense of cardExpenses) {
+    if (expense.reconciliationStatus === "PENDING" || excludedIds.has(expense.id) || !isPurchase(expense)) continue;
+    add({ id: `expense:${expense.id}`, concept: expense.concept, amount: expense.amount, date: expense.date });
+  }
+  // Un comprobante verificado cuenta una vez; el calendario de suscripciones no cuenta.
+  const seenReceipts = new Set();
+  for (const statement of statements) {
+    for (const receipt of Array.isArray(statement.subscriptionCharges) ? statement.subscriptionCharges : []) {
+      if (!receipt || typeof receipt.subscriptionId !== "string" || !receipt.subscriptionId.trim()
+        || !isStatementDay(receipt.date) || !usageInRange(receipt.date, statement.startDate, statement.cutDate)) continue;
+      const key = `${receipt.subscriptionId}:${receipt.date}:${usageMoney(receipt.amount)}`;
+      if (seenReceipts.has(key)) continue;
+      seenReceipts.add(key);
+      const recorded = cardExpenses.some((expense) => expense.subscriptionId === receipt.subscriptionId
+        && usageDay(expense.date)?.slice(0, 7) === receipt.date.slice(0, 7));
+      if (recorded) continue;
+      const concept = receipt.name || subscriptions.find((subscription) => subscription.id === receipt.subscriptionId)?.name || "Suscripción";
+      if (isPurchase({ concept })) add({ id: `receipt:${key}`, concept, amount: receipt.amount, date: receipt.date });
+    }
+  }
+  for (const purchase of purchases) {
+    if (purchase.cardId !== card.id || purchase.status === "CANCELLED" || purchase.reconciliationStatus === "PENDING" || !isPurchase(purchase)) continue;
+    add({ id: `purchase:${purchase.id}`, concept: purchase.concept, amount: purchase.totalAmount, date: purchase.purchaseDate });
+  }
+  entries.sort((a, b) => b.date.localeCompare(a.date) || a.id.localeCompare(b.id));
+  const lastPurchase = entries[0] || null;
+  const deadline = lastPurchase ? new Date(`${lastPurchase.date}T12:00:00Z`) : null;
+  if (deadline) deadline.setUTCDate(deadline.getUTCDate() + 30);
+  const renewBy = deadline ? usageDay(deadline) : null;
+  const daysRemaining = renewBy ? Math.round((new Date(`${renewBy}T12:00:00Z`) - new Date(`${today}T12:00:00Z`)) / 86400000) : null;
+  const status = daysRemaining === null || daysRemaining < 0 ? "NOT_MET" : daysRemaining === 0 ? "DUE_TODAY" : "MET";
+  const windowStart = new Date(`${today}T12:00:00Z`);
+  windowStart.setUTCDate(windowStart.getUTCDate() - 30);
+  const recentPurchases = entries.filter((entry) => entry.date >= usageDay(windowStart));
+  return {
+    card, product: "Cajita Turbo", requirementType: "PURCHASE_FREQUENCY",
+    ruleSourceUrl: "https://blog.nu.com.mx/productos-nu/cuenta-nu/cajitas-nu-preguntas-respuestas/",
+    requiredPurchases: 1, requirementDays: 30, minimumAmount: null,
+    status, isExempt: status !== "NOT_MET", lastPurchase, renewBy, daysRemaining,
+    purchaseCount: recentPurchases.length, recentPurchases,
+  };
+}
+
 // El período vigente depende de sus fechas bancarias, no del mes ni del pago.
 export function buildCurrentCardUsageWaivers(args) {
   const now = args.now || new Date();
   const today = usageDay(now);
   return args.cards.flatMap((card) => {
+    if (card.usagePolicy?.productKey === "NU") return [buildNuTurboUsage({ ...args, card, now })];
     if (!CARD_USAGE_PRODUCTS[card.usagePolicy?.productKey]) return [];
     const candidates = args.cyclesWithAmounts
       .filter((cycle) => cycle.cardId === card.id)

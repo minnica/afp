@@ -885,7 +885,7 @@ export async function GET(request) {
 
       return {
         ...cycle,
-        ...getCyclePaymentState(cycle),
+        ...getCyclePaymentState(cycle, now),
         dataWarnings: getCyclePeriodWarnings(cycle, cardCycles),
         ...amounts,
       };

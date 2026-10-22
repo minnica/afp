@@ -1,3 +1,8 @@
+function getBankDay(value) {
+  const date = new Date(value);
+  return Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
+}
+
 // El estado guardado y la fecha de pago no demuestran la liquidación.
 export function getCyclePaymentState(cycle, today = new Date()) {
   const hasStatement = cycle.statementAmount !== null && cycle.statementAmount !== undefined;
@@ -15,11 +20,14 @@ export function getCyclePaymentState(cycle, today = new Date()) {
     : pendingAmount === 0 ? "PAID"
     : paidCents > 0 ? "PARTIALLY_PAID" : "PENDING";
   const isSettled = paymentStatus === "PAID" || paymentStatus === "NO_PAYMENT_DUE";
+  // Las fechas bancarias guardan su día UTC; hoy corresponde al día local.
+  // El pago vence al terminar ese día, independientemente de la hora guardada.
+  const localDay = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
   let displayStatus;
   if (isSettled) displayStatus = paymentStatus;
-  else if (today > new Date(cycle.dueDate)) displayStatus = "OVERDUE";
+  else if (localDay > getBankDay(cycle.dueDate)) displayStatus = "OVERDUE";
   else if (paymentStatus === "PARTIALLY_PAID") displayStatus = "PARTIALLY_PAID";
-  else if (today >= new Date(cycle.cutDate)) displayStatus = hasStatement ? "PAYMENT_PENDING" : "CUT";
+  else if (localDay >= getBankDay(cycle.cutDate)) displayStatus = hasStatement ? "PAYMENT_PENDING" : "CUT";
   else displayStatus = "OPEN";
 
   return { paymentStatus, paymentDueAmount, pendingAmount, excessAmount, isSettled, displayStatus };

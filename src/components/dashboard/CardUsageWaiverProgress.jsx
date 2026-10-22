@@ -20,6 +20,7 @@ import { Dialog } from "@/components/ui/dialog";
 import { Empty, EmptyDescription } from "@/components/ui/empty";
 import { BreakdownDialogContent } from "@/components/ui/responsive-breakdown";
 import CardUsageWaiverBreakdown from "@/components/dashboard/CardUsageWaiverBreakdown";
+import { NuTurboUsageRow } from "@/components/dashboard/NuTurboUsage";
 
 export function CardUsageWaiverTabs({ inHeader = false }) {
   return (
@@ -54,6 +55,7 @@ function MobileCurrentUsageList({ items, today, onBreakdown }) {
   return (
     <ItemGroup className="gap-3" data-usage-current-list>
       {items.map((item) => {
+        if (item.requirementType === "PURCHASE_FREQUENCY") return <NuTurboUsageRow key={item.card.id} item={item} today={today} mobile onBreakdown={onBreakdown} />;
         const hasCycle = Boolean(item.selectedCycle);
         const needsReview = item.confirmationPending || item.periodSelectionPending;
         const descriptionId = `${listId}-${item.selectedCycle?.id || item.card.id}`;
@@ -106,6 +108,12 @@ function UsageList({ items, today, historical = false, compact = false, onBreakd
   return (
     <ItemGroup className="gap-0">
       {items.map((item, index) => {
+        if (item.requirementType === "PURCHASE_FREQUENCY") return (
+          <div key={item.card.id}>
+            <NuTurboUsageRow item={item} today={today} onBreakdown={onBreakdown} />
+            {index < items.length - 1 ? <ItemSeparator className="my-0" /> : null}
+          </div>
+        );
         const needsReview = item.confirmationPending || item.periodSelectionPending;
         const missedGoal = historical && item.status === "NOT_MET" && !needsReview
           && !item.isExempt && Number(item.remainingAmount) > 0;
@@ -194,9 +202,9 @@ export default function CardUsageWaiverProgress({
   const selectedPeriod = historyOptions.some((option) => option.value === historyPeriod)
     ? historyPeriod : historyOptions[0]?.value || "";
   const history = useMemo(() => sortUsageByCutDate(historyItems.filter((item) => usageHistoryPeriod(item) === selectedPeriod)), [historyItems, selectedPeriod]);
-  const pending = current.filter((item) => item.selectedCycle && !item.isExempt);
-  const missing = current.filter((item) => !item.selectedCycle);
-  const completed = current.filter((item) => item.selectedCycle && item.isExempt);
+  const pending = current.filter((item) => (item.selectedCycle || item.requirementType === "PURCHASE_FREQUENCY") && !item.isExempt);
+  const missing = current.filter((item) => !item.selectedCycle && item.requirementType !== "PURCHASE_FREQUENCY");
+  const completed = current.filter((item) => (item.selectedCycle || item.requirementType === "PURCHASE_FREQUENCY") && item.isExempt);
   const onBreakdown = (item, trigger) => {
     breakdownTriggerRef.current = trigger;
     setSelectedItem(item);

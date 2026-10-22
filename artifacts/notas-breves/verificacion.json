@@ -1,0 +1,24 @@
+{
+  "appliedAt": "2026-10-21T23:52:04.113Z",
+  "changedNotes": 190,
+  "counts": {
+    "cards": 9,
+    "card_cycles": 17,
+    "card_cycle_credits": 1,
+    "daily_expenses": 105,
+    "installment_purchases": 56,
+    "receivable_accounts": 1,
+    "incomes": 1
+  },
+  "onlyNotesChanged": true,
+  "financialCalculationsUnchanged": true,
+  "maxNoteLength": 119,
+  "personalNotesPreserved": 9,
+  "reReadAfterCommit": true,
+  "migrations": false,
+  "deployment": false,
+  "cyclesVerified": 108,
+  "registeredLabelCount": 109,
+  "updatedLabelCount": 81,
+  "originalNotesBackedUpPrivately": true
+}

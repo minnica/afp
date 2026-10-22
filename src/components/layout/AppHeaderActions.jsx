@@ -81,7 +81,7 @@ export default function AppHeaderActions({ disabled = false }) {
       <Tabs value={usageView} onValueChange={onUsageViewChange} className="gap-0">
         <HeaderDialog
           title="Consumo mínimo"
-          description="Consulta cuánto falta y cuándo corta el período vigente de cada tarjeta. Toca una tarjeta para ver su desglose."
+          description="Consulta tus metas de consumo y la próxima renovación de Cajita Turbo. Toca una tarjeta para ver su desglose."
           icon={Target02Icon}
           disabled={disabled}
           onOpenChange={onUsageOpenChange}

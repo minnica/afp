@@ -174,8 +174,8 @@ export default function CreateRecordSurface({
     }}>
       <div data-slot={actionSlot} className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
         <DialogTrigger asChild>
-          <Button variant="outline" className="mx-auto flex h-12 w-full max-w-lg text-sm" disabled={isSaving}>
-            <HugeiconsIcon icon={Add01Icon} strokeWidth={2} aria-hidden="true" />
+          <Button variant="action" className="mx-auto flex h-12 w-full max-w-lg text-sm" disabled={isSaving}>
+            <HugeiconsIcon icon={Add01Icon} data-icon="inline-start" strokeWidth={2} aria-hidden="true" />
             {title}
           </Button>
         </DialogTrigger>

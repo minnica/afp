@@ -7,8 +7,8 @@ function dateValue(value) {
 
 export function sortUsageByCutDate(items, direction = "asc") {
   return [...items].sort((a, b) => {
-    const aDate = dateValue(a.selectedCycle?.cutDate);
-    const bDate = dateValue(b.selectedCycle?.cutDate);
+    const aDate = dateValue(a.renewBy || a.selectedCycle?.cutDate);
+    const bDate = dateValue(b.renewBy || b.selectedCycle?.cutDate);
     if (aDate === null && bDate !== null) return 1;
     if (bDate === null && aDate !== null) return -1;
     return (aDate !== null && bDate !== null ? (aDate - bDate) * (direction === "desc" ? -1 : 1) : 0)

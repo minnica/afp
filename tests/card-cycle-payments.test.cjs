@@ -57,7 +57,9 @@ function fixture(initial = {}) {
   const request = body => ({ url: "http://localhost/api/test", headers: new Headers({ authorization: "Bearer test" }), json: async () => body });
   return {
     patch: (body) => load("src/app/api/card-cycles/route.js").PATCH(request({ id: "cycle", ...body })),
-    get: (route) => load(`src/app/api/${route}/route.js`).GET(request()),
+    get: (route, params = {}) => load(`src/app/api/${route}/route.js`).GET({
+      ...request(), url: `http://localhost/api/${route}?${new URLSearchParams(params)}`,
+    }),
     state: () => plain(cycle), writes: () => writes, reads, locks, fail: () => { fail = true; },
   };
 }
@@ -67,10 +69,64 @@ test("un peso de mil conserva 999 pendientes, aun con PAID/paidAt históricos", 
   const result = getCyclePaymentState(partial, now);
   assert.equal(result.pendingAmount, 999);
   assert.equal(result.paymentStatus, "PARTIALLY_PAID");
-  assert.equal(result.displayStatus, "OVERDUE");
+  assert.equal(result.displayStatus, "PARTIALLY_PAID");
+  assert.equal(getCyclePaymentState(partial, new Date(2026, 9, 26)).displayStatus, "OVERDUE");
   assert.equal(result.isSettled, false);
   assert.equal(getCyclePaymentState(partial, new Date("2026-10-20")).displayStatus, "PARTIALLY_PAID");
   assert.equal(getCyclePaymentState({ ...base, paidAt: "2026-10-20", status: "PAID" }, now).pendingAmount, 1000);
+});
+
+test("el pago sigue vigente todo el día bancario de vencimiento", () => {
+  for (const dueDate of ["2026-10-21T00:00:00Z", "2026-10-21T12:00:00Z"]) {
+    for (const hour of [0, 6, 12, 23]) {
+      const today = new Date(2026, 9, 21, hour, 59, 59, 999);
+      for (const [overrides, expected] of [
+        [{}, "PAYMENT_PENDING"],
+        [{ paidAmount: 1 }, "PARTIALLY_PAID"],
+        [{ statementAmount: null }, "CUT"],
+      ]) {
+        const cycle = { ...base, dueDate, status: "OVERDUE", ...overrides };
+        assert.equal(getCyclePaymentState(cycle, today).displayStatus, expected);
+      }
+    }
+  }
+});
+
+test("solo vence al empezar el día local siguiente, incluidos cambios de mes y año", () => {
+  for (const [year, month, day] of [[2026, 9, 21], [2026, 9, 31], [2026, 11, 31]]) {
+    const dueDate = new Date(Date.UTC(year, month, day));
+    const cycle = { ...base, dueDate };
+    assert.equal(getCyclePaymentState(cycle, new Date(year, month, day - 1, 23, 59)).displayStatus, "PAYMENT_PENDING");
+    assert.equal(getCyclePaymentState(cycle, new Date(year, month, day, 23, 59, 59, 999)).displayStatus, "PAYMENT_PENDING");
+    const nextDay = new Date(year, month, day + 1);
+    assert.equal(getCyclePaymentState(cycle, nextDay).displayStatus, "OVERDUE");
+    assert.equal(getCyclePaymentState({ ...cycle, paidAmount: 1 }, nextDay).displayStatus, "OVERDUE");
+    assert.equal(getCyclePaymentState({ ...cycle, paidAmount: 1000 }, nextDay).displayStatus, "PAID");
+    assert.equal(getCyclePaymentState({ ...cycle, statementAmount: 0 }, nextDay).displayStatus, "NO_PAYMENT_DUE");
+  }
+});
+
+test("el corte se presenta desde el inicio de su día bancario", () => {
+  assert.equal(getCyclePaymentState(base, new Date(2026, 9, 9, 23, 59)).displayStatus, "OPEN");
+  assert.equal(getCyclePaymentState(base, new Date(2026, 9, 10)).displayStatus, "PAYMENT_PENDING");
+  assert.equal(getCyclePaymentState({ ...base, statementAmount: null }, new Date(2026, 9, 10)).displayStatus, "CUT");
+});
+
+test("Dashboard usa la fecha del cliente para el estado y el aviso de vencimiento", async () => {
+  const f = fixture({ dueDate: "2026-10-21T12:00:00Z", status: "OVERDUE" });
+  for (const [clientDate, status, group] of [
+    ["2026-10-20", "PAYMENT_PENDING", "upcoming"],
+    ["2026-10-21", "PAYMENT_PENDING", "today"],
+    ["2026-10-22", "OVERDUE", "overdue"],
+  ]) {
+    const response = await f.get("dashboard", { clientDate });
+    assert.equal(response.status, 200);
+    assert.equal(response.body.cycles[0].displayStatus, status);
+    const notice = response.body.importantNotices.find(n => n.type === "CARD_PAYMENT");
+    assert.equal(notice.group, group);
+    assert.equal(notice.amount, 1000);
+  }
+  assert.equal(f.writes(), 0);
 });
 
 test("centavos, excedente, cero y falta de estado tienen situaciones distintas", () => {

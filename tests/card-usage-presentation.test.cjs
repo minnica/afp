@@ -21,6 +21,13 @@ test("historial distingue años, deduplica períodos y ofrece el más reciente p
   assert.equal(options[0].label, "Enero de 2027");
 });
 
+test("renovaciones de Turbo se ordenan junto a los cortes por su fecha límite", () => {
+  const nu = { card: { name: "Nu" }, requirementType: "PURCHASE_FREQUENCY", renewBy: "2026-10-17" };
+  const items = [row("Después", "2026-10-18"), nu, row("Antes", "2026-10-16")];
+  assert.deepEqual(Array.from(helpers.sortUsageByCutDate(items), (item) => item.card.name), ["Antes", "Nu", "Después"]);
+  assert.equal(helpers.usageHistoryPeriod(nu), "");
+});
+
 test("fecha de corte respeta el día almacenado y hoy, mañana y días restantes", () => {
   const today = new Date(2026, 9, 13, 23, 45);
   assert.equal(helpers.formatUsageCutDate(row("A", "2026-10-13T00:00:00Z"), today), "Corte: 13 oct · hoy");

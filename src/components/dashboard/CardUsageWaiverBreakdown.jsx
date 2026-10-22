@@ -4,6 +4,7 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { BreakdownHelp, BreakdownSection, BreakdownSections } from "@/components/ui/responsive-breakdown";
+import { NuTurboUsageBreakdown } from "@/components/dashboard/NuTurboUsage";
 
 function formatMoney(value) {
   return new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" }).format(Number(value || 0));
@@ -16,6 +17,7 @@ function formatBreakdownDate(dateString) {
 
 export default function CardUsageWaiverBreakdown({ item }) {
   const isMobile = useIsMobile();
+  if (item.requirementType === "PURCHASE_FREQUENCY") return <NuTurboUsageBreakdown item={item} />;
   const breakdown = item.breakdown || {};
   const sections = [
     {

@@ -48,6 +48,9 @@ body:has([data-slot="record-create-panel"]) [data-sonner-toaster][data-y-positio
   --color-secondary: var(--secondary);
   --color-primary-foreground: var(--primary-foreground);
   --color-primary: var(--primary);
+  --color-action: var(--action);
+  --color-action-foreground: var(--action-foreground);
+  --color-action-hover: var(--action-hover);
   --color-popover-foreground: var(--popover-foreground);
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
@@ -70,6 +73,9 @@ body:has([data-slot="record-create-panel"]) [data-sonner-toaster][data-y-positio
   --popover-foreground: oklch(0.145 0 0);
   --primary: oklch(0.205 0 0);
   --primary-foreground: oklch(0.985 0 0);
+  --action: oklch(0.423357512 0.081004433 173.374392);
+  --action-foreground: oklch(0.985 0 0);
+  --action-hover: oklch(0.368492943 0.069628915 174.754828);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
@@ -108,6 +114,10 @@ body:has([data-slot="record-create-panel"]) [data-sonner-toaster][data-y-positio
   --popover-foreground: oklch(0.985 0 0);
   --primary: oklch(0.922 0 0);
   --primary-foreground: oklch(0.205 0 0);
+  /* Equivalente sRGB exacto de #00fdcf. */
+  --action: oklch(0.886207726 0.169998647 173.103491);
+  --action-foreground: oklch(0.214016260 0.039533011 177.508046);
+  --action-hover: oklch(0.91 0.14 173.103491);
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);
