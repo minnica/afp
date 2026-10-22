@@ -1,6 +1,7 @@
-import { apiResponse as NextResponse, requireApiUser, apiAccessErrorResponse, requireOwnedReferences } from "@/lib/apiAuth";
+import { apiResponse as NextResponse, requireApiUser, apiAccessErrorResponse, requireOwnedReferences, ApiAccessError } from "@/lib/apiAuth";
 import { prisma } from "@/lib/prisma";
-import { creditBalanceSchema } from "@/lib/cardBalances";
+import { creditBalanceSchema, getBalanceToday } from "@/lib/cardBalances";
+import { createBalanceTracking, getTrackedCard, loadBalanceMovements, runBalanceSnapshot } from "@/lib/cardBalanceTracking";
 
 const cardSelect = {
   id: true,
@@ -12,6 +13,7 @@ const cardSelect = {
   creditLimit: true,
   usedBalance: true,
   balanceAsOf: true,
+  balanceTracking: true,
   createdAt: true,
   updatedAt: true,
 };
@@ -21,10 +23,13 @@ export async function GET(request) {
     const user = await requireApiUser(request);
     const userId = user.id;
 
-    const cards = await prisma.card.findMany({
-      where: { userId },
-      select: cardSelect,
-      orderBy: { name: "asc" },
+    const cards = await runBalanceSnapshot(prisma, async (tx) => {
+      const today = getBalanceToday();
+      const records = await tx.card.findMany({
+        where: { userId }, select: cardSelect, orderBy: { name: "asc" },
+      });
+      const movements = await loadBalanceMovements(tx, userId, records, today);
+      return records.map((card) => getTrackedCard(card, movements, today));
     });
 
     return NextResponse.json({ cards });
@@ -154,14 +159,34 @@ export async function PATCH(request) {
       if (!parsed.success) {
         return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
       }
-      const card = await prisma.card.update({
-        where: { id, userId },
-        data: {
-          creditLimit: parsed.data.creditLimit,
-          usedBalance: parsed.data.usedBalance,
-          balanceAsOf: new Date(`${parsed.data.balanceAsOf}T00:00:00.000Z`),
-        },
-        select: cardSelect,
+      if (typeof body.balanceCaptureId !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(body.balanceCaptureId)) {
+        throw new ApiAccessError("Actualiza la página antes de guardar el saldo del banco.", 400);
+      }
+      const card = await runBalanceSnapshot(prisma, async (tx) => {
+        const today = getBalanceToday();
+        const current = await tx.card.findUnique({ where: { id, userId }, select: cardSelect });
+        if (!current) throw Object.assign(new Error("Registro no encontrado."), { code: "P2025" });
+        if (current.balanceTracking?.captureId === body.balanceCaptureId) {
+          if (Number(current.creditLimit) !== parsed.data.creditLimit || Number(current.usedBalance) !== parsed.data.usedBalance || new Date(current.balanceAsOf).toISOString().slice(0, 10) !== parsed.data.balanceAsOf) {
+            throw new ApiAccessError("Este intento ya corresponde a otra captura de saldo. Cierra y vuelve a abrir el formulario.", 409);
+          }
+          const movements = await loadBalanceMovements(tx, userId, [current], today);
+          return getTrackedCard(current, movements, today);
+        }
+        if (current.balanceTracking && body.expectedBalanceCaptureId !== current.balanceTracking.captureId) {
+          throw new ApiAccessError("El saldo base cambió en otra pantalla. Cierra y vuelve a abrir el formulario para revisarlo.", 409);
+        }
+        const seed = { ...current, balanceTracking: { version: 1, day: today, startedAt: new Date().toISOString(), captureId: body.balanceCaptureId, baseExposureCents: "0" } };
+        const movements = await loadBalanceMovements(tx, userId, [seed], today);
+        const saved = await tx.card.update({
+          where: { id, userId },
+          data: {
+            creditLimit: parsed.data.creditLimit, usedBalance: parsed.data.usedBalance,
+            balanceAsOf: new Date(`${parsed.data.balanceAsOf}T00:00:00.000Z`),
+            balanceTracking: createBalanceTracking(seed, movements, today, seed.balanceTracking.startedAt, body.balanceCaptureId),
+          }, select: cardSelect,
+        });
+        return getTrackedCard(saved, movements, today);
       });
       return NextResponse.json({ card });
     }

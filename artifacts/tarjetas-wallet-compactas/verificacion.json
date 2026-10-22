@@ -1,0 +1,278 @@
+{
+  "date": "2026-10-21",
+  "scope": "Tarjetas móviles rectangulares de Crédito y deuda, con información compacta y tap sin texto de acción.",
+  "environment": "Copia aislada de AFP, autenticación ficticia y PostgreSQL 16 desechable. Sin acceso a datos personales ni producción.",
+  "designGuidance": {
+    "skill": "ui-ux-pro-max",
+    "search": "Sin coincidencia específica verificada para compactar el frente; los resultados fueron generales.",
+    "fallback": "Reglas generales de quick-reference.md: jerarquía, contraste, teclado, texto ampliado, controles nativos y espacio reservado durante la carga. La proporción y eliminación de copy siguen la instrucción del usuario."
+  },
+  "changes": [
+    "Eliminadas las filas Automático · Estimado, Base y Toca para actualizar.",
+    "Marca/modelo en una fila; Joy · 1/2 y Zero · 1/2 identifican las tarjetas repetidas. El nombre completo sigue como encabezado accesible.",
+    "Saldo utilizado o Saldo a favor, Límite y Disponible; barra con porcentaje.",
+    "Saldo a favor mostrado positivo con etiqueta explícita; exceso junto al saldo, sin fila adicional.",
+    "Altura mínima calculada desde el ancho del frente a 1.586:1. Crece cuando el contenido lo necesita. Skeleton con la misma proporción."
+  ],
+  "mobile": [
+    {
+      "cards": [
+        {
+          "buttonLabel": "Actualizar saldo de BANAMEX 1",
+          "clipped": [],
+          "copy": "BanamexJoy · 1BANAMEX 1Saldo utilizado$2,150.50Límite$12,000.00Disponible$9,849.5017.9 %",
+          "height": 180.3125,
+          "name": "BANAMEX 1",
+          "ratio": 1.586,
+          "skin": "banamex-joy",
+          "targetFillsCardInterior": true,
+          "width": 286
+        },
+        {
+          "buttonLabel": "Actualizar saldo de BANAMEX 2",
+          "clipped": [],
+          "copy": "BanamexJoy · 2BANAMEX 2Saldo utilizado$0.00Límite$8,000.00Disponible$8,000.000.0 %",
+          "height": 180.3125,
+          "name": "BANAMEX 2",
+          "ratio": 1.586,
+          "skin": "banamex-joy",
+          "targetFillsCardInterior": true,
+          "width": 286
+        },
+        {
+          "buttonLabel": "Actualizar saldo de BBVA",
+          "clipped": [],
+          "copy": "PlatinumBBVASaldo utilizado$12,500.25Límite$35,000.00Disponible$22,499.7535.7 %",
+          "height": 180.3125,
+          "name": "BBVA",
+          "ratio": 1.586,
+          "skin": "bbva-platinum",
+          "targetFillsCardInterior": true,
+          "width": 286
+        },
+        {
+          "buttonLabel": "Actualizar saldo de DIDI",
+          "clipped": [],
+          "copy": "DiDi CardDIDISaldo utilizado$50.00Límite$2,400.00Disponible$2,350.002.1 %",
+          "height": 180.3125,
+          "name": "DIDI",
+          "ratio": 1.586,
+          "skin": "didi",
+          "targetFillsCardInterior": true,
+          "width": 286
+        },
+        {
+          "buttonLabel": "Actualizar saldo de HSBC 1",
+          "clipped": [],
+          "copy": "Zero · 1HSBC 1Saldo utilizado$7,512.40Límite$16,000.00Disponible$8,487.6047.0 %",
+          "height": 180.3125,
+          "name": "HSBC 1",
+          "ratio": 1.586,
+          "skin": "hsbc-zero",
+          "targetFillsCardInterior": true,
+          "width": 286
+        },
+        {
+          "buttonLabel": "Actualizar saldo de HSBC 2",
+          "clipped": [],
+          "copy": "Zero · 2HSBC 2Saldo utilizado · Exceso $500.20$20,500.20Límite$20,000.00Disponible$0.00102.5 %",
+          "height": 180.3125,
+          "name": "HSBC 2",
+          "ratio": 1.586,
+          "skin": "hsbc-zero",
+          "targetFillsCardInterior": true,
+          "width": 286
+        },
+        {
+          "buttonLabel": "Actualizar saldo de MERCADOPAGO",
+          "clipped": [],
+          "copy": "mercado pagoCréditoMERCADOPAGOSaldo utilizado$1,250.75Límite$5,000.00Disponible$3,749.2525.0 %",
+          "height": 180.3125,
+          "name": "MERCADOPAGO",
+          "ratio": 1.586,
+          "skin": "mercado-pago",
+          "targetFillsCardInterior": true,
+          "width": 286
+        },
+        {
+          "buttonLabel": "Actualizar saldo de NU",
+          "clipped": [],
+          "copy": "CréditoNUSaldo a favor$300.10Límite$10,000.00Disponible$10,300.100.0 %",
+          "height": 180.3125,
+          "name": "NU",
+          "ratio": 1.586,
+          "skin": "nu",
+          "targetFillsCardInterior": true,
+          "width": 286
+        },
+        {
+          "buttonLabel": "Actualizar saldo de SANTANDER",
+          "clipped": [],
+          "copy": "SantanderLikeU · RojaSANTANDERSaldo utilizado$4,500.50Límite$25,000.00Disponible$20,499.5018.0 %",
+          "height": 180.3125,
+          "name": "SANTANDER",
+          "ratio": 1.586,
+          "skin": "santander-likeu",
+          "targetFillsCardInterior": true,
+          "width": 286
+        }
+      ],
+      "pageWidth": 320,
+      "viewport": 320
+    },
+    {
+      "cards": [
+        {
+          "buttonLabel": "Actualizar saldo de BANAMEX 1",
+          "clipped": [],
+          "copy": "BanamexJoy · 1BANAMEX 1Saldo utilizado$2,150.50Límite$12,000.00Disponible$9,849.5017.9 %",
+          "height": 215,
+          "name": "BANAMEX 1",
+          "ratio": 1.586,
+          "skin": "banamex-joy",
+          "targetFillsCardInterior": true,
+          "width": 341
+        },
+        {
+          "buttonLabel": "Actualizar saldo de BANAMEX 2",
+          "clipped": [],
+          "copy": "BanamexJoy · 2BANAMEX 2Saldo utilizado$0.00Límite$8,000.00Disponible$8,000.000.0 %",
+          "height": 215,
+          "name": "BANAMEX 2",
+          "ratio": 1.586,
+          "skin": "banamex-joy",
+          "targetFillsCardInterior": true,
+          "width": 341
+        },
+        {
+          "buttonLabel": "Actualizar saldo de BBVA",
+          "clipped": [],
+          "copy": "PlatinumBBVASaldo utilizado$12,500.25Límite$35,000.00Disponible$22,499.7535.7 %",
+          "height": 215,
+          "name": "BBVA",
+          "ratio": 1.586,
+          "skin": "bbva-platinum",
+          "targetFillsCardInterior": true,
+          "width": 341
+        },
+        {
+          "buttonLabel": "Actualizar saldo de DIDI",
+          "clipped": [],
+          "copy": "DiDi CardDIDISaldo utilizado$50.00Límite$2,400.00Disponible$2,350.002.1 %",
+          "height": 215,
+          "name": "DIDI",
+          "ratio": 1.586,
+          "skin": "didi",
+          "targetFillsCardInterior": true,
+          "width": 341
+        },
+        {
+          "buttonLabel": "Actualizar saldo de HSBC 1",
+          "clipped": [],
+          "copy": "Zero · 1HSBC 1Saldo utilizado$7,512.40Límite$16,000.00Disponible$8,487.6047.0 %",
+          "height": 215,
+          "name": "HSBC 1",
+          "ratio": 1.586,
+          "skin": "hsbc-zero",
+          "targetFillsCardInterior": true,
+          "width": 341
+        },
+        {
+          "buttonLabel": "Actualizar saldo de HSBC 2",
+          "clipped": [],
+          "copy": "Zero · 2HSBC 2Saldo utilizado · Exceso $500.20$20,500.20Límite$20,000.00Disponible$0.00102.5 %",
+          "height": 215,
+          "name": "HSBC 2",
+          "ratio": 1.586,
+          "skin": "hsbc-zero",
+          "targetFillsCardInterior": true,
+          "width": 341
+        },
+        {
+          "buttonLabel": "Actualizar saldo de MERCADOPAGO",
+          "clipped": [],
+          "copy": "mercado pagoCréditoMERCADOPAGOSaldo utilizado$1,250.75Límite$5,000.00Disponible$3,749.2525.0 %",
+          "height": 215,
+          "name": "MERCADOPAGO",
+          "ratio": 1.586,
+          "skin": "mercado-pago",
+          "targetFillsCardInterior": true,
+          "width": 341
+        },
+        {
+          "buttonLabel": "Actualizar saldo de NU",
+          "clipped": [],
+          "copy": "CréditoNUSaldo a favor$300.10Límite$10,000.00Disponible$10,300.100.0 %",
+          "height": 215,
+          "name": "NU",
+          "ratio": 1.586,
+          "skin": "nu",
+          "targetFillsCardInterior": true,
+          "width": 341
+        },
+        {
+          "buttonLabel": "Actualizar saldo de SANTANDER",
+          "clipped": [],
+          "copy": "SantanderLikeU · RojaSANTANDERSaldo utilizado$4,500.50Límite$25,000.00Disponible$20,499.5018.0 %",
+          "height": 215,
+          "name": "SANTANDER",
+          "ratio": 1.586,
+          "skin": "santander-likeu",
+          "targetFillsCardInterior": true,
+          "width": 341
+        }
+      ],
+      "pageWidth": 375,
+      "viewport": 375
+    }
+  ],
+  "desktop": {
+    "viewport": 1280,
+    "pageWidth": 1280,
+    "visibleMobileCards": 0,
+    "layout": "Listado de escritorio conservado."
+  },
+  "text200Percent": {
+    "viewport": 320,
+    "pageWidth": 468,
+    "cardsWithClippedText": [],
+    "behavior": "Las columnas se apilan y el frente crece para no recortar datos.",
+    "existingLimitation": "La cabecera compartida mantiene su desbordamiento previo al ampliar texto."
+  },
+  "interaction": {
+    "tap": "Abre Saldo de BANAMEX 1 con sus importes y enfoca el título.",
+    "enter": true,
+    "escape": true,
+    "restoreFocusOnClose": true
+  },
+  "accessibility": {
+    "version": "4.12.1",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 77
+      }
+    ]
+  },
+  "contrast": {
+    "viewports": [
+      320,
+      375
+    ],
+    "labelsPerViewport": 72,
+    "minimumRatio": 4.73,
+    "belowAA": [],
+    "evidence": "contraste.json"
+  },
+  "javascriptExceptions": [],
+  "validation": {
+    "eslint": "Correcto en ambos componentes editados, sin avisos ni errores.",
+    "build": "pnpm exec next build --webpack: correcto; 37 rutas generadas.",
+    "diffCheck": "Correcto."
+  },
+  "screenshots": [
+    "mobile.png",
+    "mobile-320.png"
+  ]
+}

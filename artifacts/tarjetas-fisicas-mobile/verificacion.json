@@ -1,0 +1,58 @@
+{
+  "fecha": "2026-10-21",
+  "cambio": "Apariencia de tarjeta física en la lista móvil de Crédito y deuda",
+  "alcance": "Presentación de las nueve tarjetas; sin cambios de API, datos financieros, migraciones o publicación web",
+  "modelos": [
+    { "tarjetas": ["BBVA"], "modelo": "BBVA Platinum", "acabado": "Plateado con motivos geométricos" },
+    { "tarjetas": ["HSBC 1", "HSBC 2"], "modelo": "HSBC Zero", "acabado": "Plateado claro con motivo circular" },
+    { "tarjetas": ["BANAMEX 1", "BANAMEX 2"], "modelo": "Banamex Joy", "acabado": "Turquesa y motivos rojos del plástico oficial" },
+    { "tarjetas": ["SANTANDER"], "modelo": "Santander LikeU roja", "acabado": "Rojo con textura del plástico oficial" },
+    { "tarjetas": ["NU"], "modelo": "Nu crédito", "acabado": "Morado" },
+    { "tarjetas": ["DIDI"], "modelo": "DiDi Card", "acabado": "Naranja con formas curvas" },
+    { "tarjetas": ["MERCADOPAGO"], "modelo": "Mercado Pago crédito", "acabado": "Azul oscuro con borde amarillo" }
+  ],
+  "fuentes": "../../public/card-brands/sources.json",
+  "componentes": ["Card", "CardHeader", "CardTitle", "CardContent", "CardFooter", "Item", "ItemGroup", "Badge", "Progress", "Button"],
+  "entorno": {
+    "interfazYApi": "Componentes y rutas reales de AFP en una copia aislada sin archivos .env",
+    "datos": "Importes ficticios en PostgreSQL 16 local desechable",
+    "autenticacion": "Simulada",
+    "navegador": "Chromium mediante agent-browser",
+    "produccion": "Sin modificaciones"
+  },
+  "validacion": {
+    "build": { "comando": "pnpm exec next build --webpack", "resultado": "Correcto" },
+    "lint": { "comando": "pnpm exec eslint src/lib/cardAppearance.js src/components/credito-y-deuda", "errores": 0, "avisos": 0 },
+    "diffCheck": "Correcto",
+    "escenarios": [
+      "Las nueve tarjetas conservan su nombre, importes, progreso y botón de saldo",
+      "Las dos HSBC Zero y las dos Banamex Joy permanecen identificadas por separado",
+      "Cero, saldo a favor y exceso de límite se muestran con su explicación",
+      "Todas las marcas gráficas cargan desde archivos locales",
+      "Actualizar saldo de BBVA abre el formulario de BBVA con los importes correctos",
+      "Cancelar conserva el saldo y devuelve el foco al botón de la tarjeta",
+      "Escritorio muestra las nueve filas habituales y oculta las caras de plástico"
+    ],
+    "pantallas": [
+      { "ancho": 320, "alto": 740, "desbordamientoHorizontal": false },
+      { "ancho": 375, "alto": 812, "desbordamientoHorizontal": false },
+      { "ancho": 1280, "alto": 900, "desbordamientoHorizontal": false }
+    ],
+    "accesibilidad": {
+      "botonesDeSaldo": "Nueve controles de 44 px de alto",
+      "axe": { "version": "4.12.1", "violaciones": 0, "revisionIncompleta": "Color-contrast: fondos con degradados e imágenes; 76 nodos requieren comprobación adicional" },
+      "contrasteAdicional": {
+        "evidencia": "contraste.json",
+        "metodo": "Comparación de luminancia del color de texto frente a los píxeles del fondo real bajo los límites de cada etiqueta e importe, ocultando temporalmente solo esos textos y el indicador de desarrollo. Captura a 320 px y DPR 1.",
+        "textos": 72,
+        "minimo": 4.96,
+        "porDebajoDe4_5": 0
+      },
+      "textoAl200PorCiento": "Panel sin desbordamiento y etiquetas/importes sin recortes a 320 px; la cabecera compartida existente puede desbordar al ampliar el texto",
+      "erroresJavaScript": 0,
+      "limite": "Revisión en navegador; sin prueba en teléfono físico o lector de pantalla"
+    }
+  },
+  "capturas": ["mobile.png", "mobile-320.png", "bbva-mobile.png", "desktop.png"],
+  "publicacion": "Código listo para el commit y push del usuario"
+}

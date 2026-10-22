@@ -1,0 +1,257 @@
+{
+  "date": "2026-10-21",
+  "scope": "Ajustes visuales móviles de Crédito y deuda; nueve tarjetas, siete apariencias. ui-ux-pro-max y componentes locales de shadcn.",
+  "environment": "Copia local de la aplicación, autenticación ficticia y PostgreSQL 16 desechable. Sin acceso a datos personales ni escrituras en producción.",
+  "changes": [
+    "Joy: turquesa sólido y pétalos rojos vectoriales sin velo sobrepuesto.",
+    "Nu: SVG oficial en el logotipo ampliado.",
+    "LikeU roja: referencia oficial de alta resolución para llama central y líneas de relieve.",
+    "Importes, barra, estado, fecha, avisos y acción dentro del frente; tocar la superficie abre el formulario."
+  ],
+  "mobile": [
+    {
+      "cards": [
+        {
+          "allInfoInside": true,
+          "buttonName": "Actualizar saldo de BANAMEX 1",
+          "clipped": [],
+          "height": 320,
+          "name": "BANAMEX 1",
+          "progress": "17.920833333333334",
+          "skin": "banamex-joy",
+          "targetFillsCardInterior": true
+        },
+        {
+          "allInfoInside": true,
+          "buttonName": "Actualizar saldo de BANAMEX 2",
+          "clipped": [],
+          "height": 320,
+          "name": "BANAMEX 2",
+          "progress": "0",
+          "skin": "banamex-joy",
+          "targetFillsCardInterior": true
+        },
+        {
+          "allInfoInside": true,
+          "buttonName": "Actualizar saldo de BBVA",
+          "clipped": [],
+          "height": 320,
+          "name": "BBVA",
+          "progress": "35.715",
+          "skin": "bbva-platinum",
+          "targetFillsCardInterior": true
+        },
+        {
+          "allInfoInside": true,
+          "buttonName": "Actualizar saldo de DIDI",
+          "clipped": [],
+          "height": 320,
+          "name": "DIDI",
+          "progress": "2.083333333333333",
+          "skin": "didi",
+          "targetFillsCardInterior": true
+        },
+        {
+          "allInfoInside": true,
+          "buttonName": "Actualizar saldo de HSBC 1",
+          "clipped": [],
+          "height": 320,
+          "name": "HSBC 1",
+          "progress": "46.9525",
+          "skin": "hsbc-zero",
+          "targetFillsCardInterior": true
+        },
+        {
+          "allInfoInside": true,
+          "buttonName": "Actualizar saldo de HSBC 2",
+          "clipped": [],
+          "height": 334.78125,
+          "name": "HSBC 2",
+          "progress": "100",
+          "skin": "hsbc-zero",
+          "targetFillsCardInterior": true
+        },
+        {
+          "allInfoInside": true,
+          "buttonName": "Actualizar saldo de MERCADOPAGO",
+          "clipped": [],
+          "height": 321,
+          "name": "MERCADOPAGO",
+          "progress": "25.014999999999997",
+          "skin": "mercado-pago",
+          "targetFillsCardInterior": true
+        },
+        {
+          "allInfoInside": true,
+          "buttonName": "Actualizar saldo de NU",
+          "clipped": [],
+          "height": 334.78125,
+          "name": "NU",
+          "progress": "0",
+          "skin": "nu",
+          "targetFillsCardInterior": true
+        },
+        {
+          "allInfoInside": true,
+          "buttonName": "Actualizar saldo de SANTANDER",
+          "clipped": [],
+          "height": 320,
+          "name": "SANTANDER",
+          "progress": "18.002000000000002",
+          "skin": "santander-likeu",
+          "targetFillsCardInterior": true
+        }
+      ],
+      "page": 320,
+      "viewport": 320
+    },
+    {
+      "cards": [
+        {
+          "allInfoInside": true,
+          "buttonName": "Actualizar saldo de BANAMEX 1",
+          "clipped": [],
+          "height": 320,
+          "name": "BANAMEX 1",
+          "progress": "17.920833333333334",
+          "skin": "banamex-joy",
+          "targetFillsCardInterior": true
+        },
+        {
+          "allInfoInside": true,
+          "buttonName": "Actualizar saldo de BANAMEX 2",
+          "clipped": [],
+          "height": 320,
+          "name": "BANAMEX 2",
+          "progress": "0",
+          "skin": "banamex-joy",
+          "targetFillsCardInterior": true
+        },
+        {
+          "allInfoInside": true,
+          "buttonName": "Actualizar saldo de BBVA",
+          "clipped": [],
+          "height": 320,
+          "name": "BBVA",
+          "progress": "35.715",
+          "skin": "bbva-platinum",
+          "targetFillsCardInterior": true
+        },
+        {
+          "allInfoInside": true,
+          "buttonName": "Actualizar saldo de DIDI",
+          "clipped": [],
+          "height": 320,
+          "name": "DIDI",
+          "progress": "2.083333333333333",
+          "skin": "didi",
+          "targetFillsCardInterior": true
+        },
+        {
+          "allInfoInside": true,
+          "buttonName": "Actualizar saldo de HSBC 1",
+          "clipped": [],
+          "height": 320,
+          "name": "HSBC 1",
+          "progress": "46.9525",
+          "skin": "hsbc-zero",
+          "targetFillsCardInterior": true
+        },
+        {
+          "allInfoInside": true,
+          "buttonName": "Actualizar saldo de HSBC 2",
+          "clipped": [],
+          "height": 340.359375,
+          "name": "HSBC 2",
+          "progress": "100",
+          "skin": "hsbc-zero",
+          "targetFillsCardInterior": true
+        },
+        {
+          "allInfoInside": true,
+          "buttonName": "Actualizar saldo de MERCADOPAGO",
+          "clipped": [],
+          "height": 326.578125,
+          "name": "MERCADOPAGO",
+          "progress": "25.014999999999997",
+          "skin": "mercado-pago",
+          "targetFillsCardInterior": true
+        },
+        {
+          "allInfoInside": true,
+          "buttonName": "Actualizar saldo de NU",
+          "clipped": [],
+          "height": 340.359375,
+          "name": "NU",
+          "progress": "0",
+          "skin": "nu",
+          "targetFillsCardInterior": true
+        },
+        {
+          "allInfoInside": true,
+          "buttonName": "Actualizar saldo de SANTANDER",
+          "clipped": [],
+          "height": 320,
+          "name": "SANTANDER",
+          "progress": "18.002000000000002",
+          "skin": "santander-likeu",
+          "targetFillsCardInterior": true
+        }
+      ],
+      "page": 375,
+      "viewport": 375
+    }
+  ],
+  "desktop": {
+    "viewport": 1280,
+    "pageWidth": 1280,
+    "visibleMobileCards": 0,
+    "layout": "Listado de escritorio conservado."
+  },
+  "text200Percent": {
+    "viewport": 320,
+    "pageWidth": 499,
+    "cardsWithClippedText": [],
+    "limitation": "La cabecera compartida mantiene su desbordamiento previo con texto ampliado; las tarjetas no recortan importes ni etiquetas."
+  },
+  "interaction": {
+    "tap": "La superficie de BANAMEX 1 abre Saldo de BANAMEX 1 con sus importes.",
+    "enter": true,
+    "space": true,
+    "escape": true,
+    "initialFocus": "Título del diálogo",
+    "restoreFocusOnClose": true,
+    "save": "PATCH /api/cards 200 sobre saldo ficticio; cierre del formulario, importes conservados y foco restaurado."
+  },
+  "accessibility": {
+    "version": "4.12.1",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 123
+      }
+    ]
+  },
+  "contrast": {
+    "viewports": [
+      320,
+      375
+    ],
+    "labelsPerViewport": 110,
+    "minimumRatio": 4.73,
+    "belowAA": [],
+    "evidence": "contraste.json"
+  },
+  "javascriptExceptions": [],
+  "validation": {
+    "eslint": "Correcto, sin errores ni avisos en el componente editado.",
+    "build": "pnpm exec next build --webpack: correcto, 37 rutas generadas."
+  },
+  "screenshots": [
+    "mobile.png",
+    "mobile-320.png",
+    "form-mobile.png",
+    "desktop.png"
+  ]
+}

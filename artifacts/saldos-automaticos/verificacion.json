@@ -1,0 +1,81 @@
+{
+  "fecha": "2026-10-21",
+  "funcionalidad": "Seguimiento automático de saldos de tarjetas desde las capturas bancarias existentes",
+  "entornoLocal": {
+    "datos": "Ficticios, exclusivamente locales",
+    "interfaz": "Componentes reales de AFP en una copia aislada sin archivos .env",
+    "api": "Rutas reales de AFP",
+    "autenticacion": "Simulada",
+    "persistencia": "PostgreSQL 16 desechable en localhost"
+  },
+  "validacion": {
+    "regresiones": {
+      "comando": "pnpm db:verify con AFP_MIGRATION_TEST_DATABASE_URL local",
+      "pruebas": 378,
+      "correctas": 378,
+      "fallidas": 0,
+      "omitidas": 0
+    },
+    "baseDeDatos": {
+      "migraciones": 23,
+      "desdeCero": true,
+      "desdeHistorial": true,
+      "checksums": "Correctos",
+      "diffPrisma": "Vacío",
+      "tablasConRls": 27,
+      "transicionDesdeCapturasManuales": "Sin alteración de los valores bancarios ni cargos repetidos; incluye pagos históricos sin fecha",
+      "concurrencia": "Sin pérdida de gastos; conflictos de conciliación devuelven 409",
+      "respuestaPerdida": "Repetir la captura con el mismo UUID conserva el punto de partida y los cargos posteriores",
+      "aislamiento": "Cada usuario consulta y concilia únicamente sus propias tarjetas",
+      "rollback": "Sin modificaciones parciales"
+    },
+    "build": { "comando": "pnpm exec next build --webpack", "resultado": "Correcto" },
+    "lint": {
+      "comando": "pnpm lint",
+      "errores": 0,
+      "avisosPrevios": 1,
+      "detalle": "TanStack useReactTable en src/components/ui/data-table.jsx; archivos de la funcionalidad sin errores ni avisos"
+    },
+    "escenariosAutomaticos": [
+      "Gastos nuevos con tarjeta suman el cargo completo; efectivo y aportaciones personales no afectan el crédito",
+      "Editar, trasladar de tarjeta, cambiar método y eliminar recalcula la contribución",
+      "Los cargos anteriores al día inicial ya pertenecen al saldo base; los futuros esperan su fecha",
+      "Pagos acumulados descuentan únicamente la diferencia; repetir, editar y deshacer no duplica pagos",
+      "Completar la fecha de un pago histórico no lo descuenta otra vez",
+      "Una compra MSI suma el importe completo una vez; los cambios administrativos de cuotas no liberan crédito",
+      "Convertir un gasto a MSI mantiene un único cargo",
+      "Devoluciones posteriores al corte y bonificaciones explícitas reducen la deuda",
+      "Ingresos generales y suscripciones previstas no liberan ni consumen crédito",
+      "Guardar un nuevo saldo bancario establece un nuevo punto de partida transaccional"
+    ]
+  },
+  "navegador": {
+    "motor": "Chromium mediante agent-browser",
+    "flujoConDatosFicticios": [
+      { "paso": "Saldo inicial", "tarjeta": "Azul prueba", "saldo": "12500.25" },
+      { "paso": "Registrar gasto de 100.25 mediante el formulario de Gastos y volver a Tarjetas", "saldo": "12600.50" },
+      { "paso": "Actualizar pago acumulado de 500 a 750 desde el detalle del corte", "saldo": "12350.50" },
+      { "paso": "Conciliar saldo bancario desde el formulario de la tarjeta", "saldo": "12345.67" },
+      { "paso": "Registrar otro gasto de 10.01 mediante la API real y refrescar por foco", "saldo": "12355.68", "disponible": "22644.32" }
+    ],
+    "accesibilidad": {
+      "resumenYListaAxe": { "violaciones": 0, "comprobacionesIncompletas": 0 },
+      "controles": "Etiquetas accesibles y al menos 44 px de alto",
+      "limite": "Revisión de navegador con datos ficticios, sin teléfono físico ni lector de pantalla"
+    },
+    "pantallas": [
+      { "ancho": 320, "alto": 740, "desbordamientoHorizontal": false },
+      { "ancho": 375, "alto": 812, "desbordamientoHorizontal": false },
+      { "ancho": 1280, "alto": 900, "desbordamientoHorizontal": false }
+    ]
+  },
+  "produccion": {
+    "migracionAutorizada": "20261022000000_add_card_balance_tracking",
+    "evidencia": "produccion.json",
+    "lecturaSinEscrituras": "lectura-produccion.json",
+    "capturasInicialesConservadas": 9,
+    "tarjetasActivasSinAjusteInicial": 9,
+    "publicacionWeb": "Pendiente del commit y push del usuario"
+  },
+  "capturas": ["mobile.png", "desktop.png", "form-mobile.png"]
+}

@@ -130,6 +130,7 @@ model Card {
   creditLimit Decimal? @db.Decimal(12, 2)
   usedBalance Decimal? @db.Decimal(12, 2)
   balanceAsOf DateTime? @db.Date
+  balanceTracking Json?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

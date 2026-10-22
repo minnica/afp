@@ -7,6 +7,7 @@ const { spawnSync } = require('node:child_process');
 const { PrismaClient } = require('@prisma/client');
 const { PrismaPg } = require('@prisma/adapter-pg');
 const { root, auditHistory, localMigrations } = require('./audit-migration-history.cjs');
+const { sourceLoader } = require('../tests/helpers/load-source.cjs');
 const before = require('../artifacts/auditoria-2026-10-15/a11-metadata-before.json');
 const beforeAutomation = require('../artifacts/auditoria-2026-10-15/a11-automation-before.json');
 const metadataSql = readFileSync(path.join(__dirname, 'database-metadata.sql'), 'utf8');
@@ -71,15 +72,16 @@ function runRegressions(url) {
 
 function assertCatalog(actual) {
   // Conserva el snapshot histórico; verifica explícitamente las columnas nuevas.
-  const balanceColumns = ['balanceAsOf', 'creditLimit', 'usedBalance'];
+  const balanceColumns = ['balanceAsOf', 'balanceTracking', 'creditLimit', 'usedBalance'];
   const capturedBalanceColumns = actual.columns.filter(row => row.table_name === 'cards' && balanceColumns.includes(row.column_name));
   assert.deepEqual(capturedBalanceColumns.map(row => row.column_name), balanceColumns);
   for (const column of capturedBalanceColumns) {
     assert.equal(column.is_nullable, 'YES');
     assert.equal(column.column_default, null);
-    assert.equal(column.data_type, column.column_name === 'balanceAsOf' ? 'date' : 'numeric');
+    assert.equal(column.data_type, column.column_name === 'balanceAsOf' ? 'date' : column.column_name === 'balanceTracking' ? 'jsonb' : 'numeric');
   }
   assert.match(actual.constraints.find(row => row.table_name === 'cards' && row.name === 'cards_credit_balance_complete_check')?.definition || '', /CHECK.*creditLimit.*usedBalance.*balanceAsOf/);
+  assert.ok(actual.constraints.some(row => row.table_name === 'cards' && row.name === 'cards_balance_tracking_check'));
   const creditColumns = ['postCutCreditAmount', 'postCutCreditDate', 'postCutCreditNotes'];
   const expectedCredits = [
     { ...before.columns.find(row => row.table_name === 'card_cycles' && row.column_name === 'paidAmount'), column_name: 'postCutCreditAmount', is_nullable: 'NO', column_default: '0' },
@@ -107,7 +109,7 @@ function assertCatalog(actual) {
         'capture_automations', 'capture_merchant_rules', 'capture_movements', 'expense_tombstones', 'capture_statements'].includes(row.table_name || row.tablename)
       && !(section === 'columns' && row.table_name === 'card_cycles' && creditColumns.includes(row.column_name))
       && !(section === 'columns' && row.table_name === 'cards' && balanceColumns.includes(row.column_name))
-      && !(section === 'constraints' && row.name === 'cards_credit_balance_complete_check')
+      && !(section === 'constraints' && ['cards_credit_balance_complete_check', 'cards_balance_tracking_check'].includes(row.name))
       && !(section === 'columns' && row.table_name === 'daily_expenses' && row.column_name === 'cashContributionAmount')
       && !(section === 'columns' && ['daily_expenses', 'installment_purchases'].includes(row.table_name) && ['reconciliationStatus', 'reconciledAt'].includes(row.column_name))
       && !(section === 'constraints' && ['daily_expenses_reconciliation_check', 'installment_purchases_reconciliation_check'].includes(row.name))
@@ -150,7 +152,7 @@ async function seed(db) {
 
 async function records(db) {
   return {
-    card: await db.card.findUnique({ where: { id: 'a11-card' }, omit: { creditLimit: true, usedBalance: true, balanceAsOf: true } }),
+    card: await db.card.findUnique({ where: { id: 'a11-card' }, omit: { creditLimit: true, usedBalance: true, balanceAsOf: true, balanceTracking: true } }),
     loan: await db.payableAccount.findUnique({ where: { id: 'a11-loan' } }),
     payment: await db.dailyExpense.findUnique({ where: { id: 'a11-payment' }, omit: { cashContributionAmount: true, reconciliationStatus: true, reconciledAt: true } }),
     receivable: await db.receivableAccount.findUnique({ where: { id: 'a11-receivable' } }),
@@ -214,6 +216,14 @@ async function main() {
     }
     const oldConfig = path.join(temp, 'prisma.config.ts');
     writeFileSync(oldConfig, `export default { schema: ${JSON.stringify(path.join(root, 'prisma/schema.prisma'))}, migrations: { path: ${JSON.stringify(oldMigrations)} }, datasource: { url: process.env.DIRECT_URL } };\n`);
+    const beforeTrackingMigrations = path.join(temp, 'before-tracking');
+    mkdirSync(beforeTrackingMigrations);
+    cpSync(path.join(root, 'prisma/migrations/migration_lock.toml'), path.join(beforeTrackingMigrations, 'migration_lock.toml'));
+    for (const entry of localMigrations().filter(row => row.migration_name < '20261022000000_add_card_balance_tracking')) {
+      cpSync(path.join(root, 'prisma/migrations', entry.migration_name), path.join(beforeTrackingMigrations, entry.migration_name), { recursive: true });
+    }
+    const beforeTrackingConfig = path.join(temp, 'before-tracking.config.ts');
+    writeFileSync(beforeTrackingConfig, `export default { schema: ${JSON.stringify(path.join(root, 'prisma/schema.prisma'))}, migrations: { path: ${JSON.stringify(beforeTrackingMigrations)} }, datasource: { url: process.env.DIRECT_URL } };\n`);
     const oldSecurity = path.join(temp, 'security.sql');
     writeFileSync(oldSecurity, before.security.map(row => `ALTER TABLE public."${row.table_name}" ENABLE ROW LEVEL SECURITY;`).join('\n') + '\n' +
       beforeAutomation.functions[0].definition + ';\nCREATE EVENT TRIGGER ensure_rls ON ddl_command_end WHEN TAG IN (\'CREATE TABLE\', \'CREATE TABLE AS\', \'SELECT INTO\') EXECUTE FUNCTION public.rls_auto_enable();\n');
@@ -238,6 +248,15 @@ async function main() {
           await seed(db);
           savedRecords = await records(db);
           savedHistory = await db.$queryRawUnsafe('SELECT * FROM public._prisma_migrations ORDER BY migration_name');
+          // Simula las nueve tarjetas capturadas en producción antes de activar
+          // seguimiento: la migración nueva debe conservar exactamente ese saldo.
+          runPrisma(['migrate', 'deploy', '--config', beforeTrackingConfig], dbUrl);
+          const today = sourceLoader()('src/lib/cardBalances.js').getBalanceToday();
+          const at = new Date(`${today}T12:00:00Z`);
+          await db.$executeRaw`UPDATE cards SET "creditLimit" = 20000, "usedBalance" = 3000, "balanceAsOf" = ${at} WHERE id = 'a11-card'`;
+          await db.dailyExpense.create({ data: { id: 'a11-existing-charge', userId: 'a11-user', cardId: 'a11-card', categoryId: 'a11-category', date: at, paymentMethod: 'CARD', concept: 'Ya incluido en banco', amount: 500 } });
+          await db.installmentPurchase.create({ data: { id: 'a11-existing-msi', userId: 'a11-user', cardId: 'a11-card', categoryId: 'a11-category', purchaseDate: at, concept: 'MSI ya incluida', totalAmount: 12000, months: 12 } });
+          await db.cardCycle.create({ data: { id: 'a11-existing-cycle', userId: 'a11-user', cardId: 'a11-card', month: at.getUTCMonth() + 1, year: at.getUTCFullYear(), startDate: new Date(at.getTime() - 31 * 86400000), cutDate: new Date(at.getTime() - 86400000), dueDate: new Date(at.getTime() + 5 * 86400000), paidAmount: 1000, paidAt: null } });
         }
         runPrisma(['migrate', 'deploy'], dbUrl);
         const first = await catalog(db);
@@ -259,9 +278,21 @@ async function main() {
         runPrisma(['db', 'execute', '--file', path.join(root, 'prisma/migrations', securityMigration, 'migration.sql')], dbUrl);
         assert.deepEqual(await records(db), savedRecords);
         const historicalCard = await db.card.findUnique({ where: { id: 'a11-card' } });
-        assert.equal(historicalCard.creditLimit, null);
-        assert.equal(historicalCard.usedBalance, null);
-        assert.equal(historicalCard.balanceAsOf, null);
+        if (i === 1) {
+          assert.equal(historicalCard.creditLimit.toFixed(2), '20000.00');
+          assert.equal(historicalCard.usedBalance.toFixed(2), '3000.00');
+          assert.equal(historicalCard.balanceTracking.version, 1);
+          const { getTrackedCard, loadBalanceMovements } = sourceLoader()('src/lib/cardBalanceTracking.js');
+          const day = historicalCard.balanceTracking.day;
+          const movements = await loadBalanceMovements(db, 'a11-user', [historicalCard], day);
+          assert.equal(getTrackedCard(historicalCard, movements, day).usedBalance, '3000.00');
+          assert.equal(getTrackedCard(historicalCard, movements, day).balanceAdjustment, '0.00');
+        } else {
+          assert.equal(historicalCard.creditLimit, null);
+          assert.equal(historicalCard.usedBalance, null);
+          assert.equal(historicalCard.balanceAsOf, null);
+          assert.equal(historicalCard.balanceTracking, null);
+        }
         assert.equal(String((await db.dailyExpense.findUnique({ where: { id: 'a11-payment' } })).cashContributionAmount), '0');
         if (savedHistory) {
           const currentHistory = await db.$queryRawUnsafe('SELECT * FROM public._prisma_migrations ORDER BY migration_name');

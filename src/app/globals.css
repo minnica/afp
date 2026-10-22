@@ -4,6 +4,183 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Superficies de los plásticos confirmados, solo en las tarjetas móviles de
+   Crédito y deuda. Cada frente compacto contiene importes y barra de uso. */
+.mobile-credit-card {
+  --wallet-surface: linear-gradient(130deg, #354354, #1b2532);
+  --wallet-ink: #ffffff;
+  --wallet-muted: #f4f5f8;
+  --wallet-rule: #ffffff30;
+  container-type: inline-size;
+  border-radius: 1rem;
+}
+
+.credit-card-face {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  min-height: calc(100cqi / 1.586);
+  flex-direction: column;
+  justify-content: space-between;
+  gap: .5rem;
+  overflow: hidden;
+  padding: 1rem;
+  color: var(--wallet-ink);
+  background: var(--wallet-surface);
+  border-radius: 1rem;
+  box-shadow: inset 0 1px 0 #ffffff38, inset 0 -1px 0 #00000018;
+}
+
+.credit-card-face-header,
+.credit-card-face-content,
+.credit-card-face-footer {
+  position: relative;
+  padding: 0;
+}
+
+.credit-card-face-header { min-width: 0; grid-template-columns: minmax(0, 1fr); gap: 0; }
+.credit-card-brand-row { display: flex; min-width: 0; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; }
+.credit-card-brand-logo { width: auto; max-width: min(7rem, 100%); height: 1.5rem; object-fit: contain; object-position: left; }
+.credit-card-wordmark { min-width: 0; font-size: 1.25rem; font-weight: 600; line-height: 1.1; letter-spacing: -.04em; overflow-wrap: anywhere; }
+.credit-card-product { max-width: 8rem; font-size: .75rem; line-height: 1.3; text-align: right; }
+.credit-card-amounts { display: grid; min-width: 0; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: .5rem .75rem; }
+.credit-card-amounts dt { color: var(--wallet-muted); font-size: .75rem; line-height: 1.4; }
+.credit-card-amounts dd { font-size: 1rem; font-weight: 600; line-height: 1.25; font-variant-numeric: tabular-nums; letter-spacing: -.025em; overflow-wrap: anywhere; }
+.credit-card-used { grid-column: 1 / -1; }
+.credit-card-used dd { font-size: clamp(1.375rem, 6.5vw, 1.75rem); font-weight: 650; line-height: 1.15; }
+/* El frente puede crecer al ampliar texto; la proporción nunca recorta datos. */
+@container (max-width: 17.5rem) {
+  .credit-card-amounts { grid-template-columns: minmax(0, 1fr); }
+}
+.credit-card-face-footer { display: flex; flex-direction: column; align-items: stretch; color: var(--wallet-muted); font-size: .75rem; line-height: 1.4; }
+.credit-card-usage { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; }
+.credit-card-progress { flex: 1; min-width: 3rem; background: var(--wallet-rule); }
+.credit-card-progress [data-slot="progress-indicator"] { background: var(--wallet-ink); }
+.credit-card-percentage { font-variant-numeric: tabular-nums; }
+/* Botón nativo superpuesto: conserva la semántica de dl/progress y el foco
+   del diálogo, sin anidar elementos interactivos dentro de otro botón. */
+.credit-card-open { position: absolute; inset: 0; width: 100%; height: 100%; padding: 0; border: 0; border-radius: inherit; cursor: pointer; }
+.credit-card-open:hover,
+.credit-card-open:active { background: transparent; }
+.credit-card-open:focus-visible { outline: 2px solid var(--wallet-ink); outline-offset: -5px; box-shadow: none; }
+
+.credit-card-art { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+.credit-card-art span { position: absolute; display: block; }
+
+.mobile-credit-card[data-card-skin="bbva-platinum"] {
+  --wallet-surface: linear-gradient(118deg, #f1f3f5 0%, #c9cdd2 43%, #aeb4bd 72%, #dfe3e7 100%);
+  --wallet-ink: #152a40;
+  --wallet-muted: #29384b;
+  --wallet-rule: #253b5020;
+}
+.mobile-credit-card[data-card-skin="bbva-platinum"] .credit-card-art span {
+  top: 1.75rem;
+  right: -1rem;
+  width: 9rem;
+  height: 9rem;
+  border-top: 2px solid #ffffff55;
+  border-left: 2px solid #ffffff55;
+  transform: rotate(45deg) skew(12deg, 12deg);
+  box-shadow: -2px -2px 0 #5b687929;
+}
+.mobile-credit-card[data-card-skin="bbva-platinum"] .credit-card-art span:nth-child(2) { top: 4.5rem; right: -2.25rem; }
+.mobile-credit-card[data-card-skin="bbva-platinum"] .credit-card-art span:nth-child(3) { top: 7.25rem; right: -3.5rem; }
+
+.mobile-credit-card[data-card-skin="hsbc-zero"] {
+  --wallet-surface: linear-gradient(125deg, #f4f4f0, #dddeda 60%, #eeefeb);
+  --wallet-ink: #222622;
+  --wallet-muted: #414740;
+  --wallet-rule: #20282020;
+}
+.mobile-credit-card[data-card-skin="hsbc-zero"] .credit-card-art span:first-child {
+  width: 10rem;
+  height: 10rem;
+  top: 2rem;
+  right: -1.5rem;
+  border: .8rem solid #ffffffa8;
+  border-right-width: .25rem;
+  border-bottom-width: .4rem;
+  border-radius: 48% 51% 45% 55%;
+  transform: rotate(-25deg);
+  box-shadow: 0 0 0 2px #ffffff40, inset 2px 0 0 #ffffff80;
+}
+.mobile-credit-card[data-card-skin="hsbc-zero"] .credit-card-product { font-size: 1rem; font-weight: 500; letter-spacing: -.05em; text-transform: uppercase; }
+
+.mobile-credit-card[data-card-skin="banamex-joy"] {
+  --wallet-surface: #009fc1;
+  --wallet-ink: #002c3b;
+  --wallet-muted: #002b38;
+  --wallet-rule: #00344430;
+}
+.mobile-credit-card[data-card-skin="banamex-joy"] .credit-card-art {
+  inset: -32px -40px auto auto;
+  width: 224px;
+  height: 144px;
+  background: url("/card-brands/joy-petals.svg") center / contain no-repeat;
+}
+.mobile-credit-card[data-card-skin="banamex-joy"] .credit-card-wordmark { color: #ffffff; }
+.mobile-credit-card[data-card-skin="banamex-joy"] .credit-card-product { padding: .2rem .4rem; border-radius: .25rem; background: var(--wallet-surface); font-size: .875rem; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; }
+
+.mobile-credit-card[data-card-skin="santander-likeu"] {
+  --wallet-surface: #b70617;
+}
+.mobile-credit-card[data-card-skin="santander-likeu"] .credit-card-art {
+  inset: 0 0 auto;
+  height: 15rem;
+  background: #c40a18 url("/card-brands/likeu-red.webp") center 42% / 135% auto no-repeat;
+  background-blend-mode: multiply;
+  mask-image: linear-gradient(180deg, #000 70%, transparent);
+}
+
+.mobile-credit-card[data-card-skin="nu"] {
+  --wallet-surface: linear-gradient(120deg, #7b16c1, #820ad1 65%, #6600a9);
+}
+.mobile-credit-card[data-card-skin="nu"] .credit-card-brand-logo { filter: brightness(0) invert(1); }
+.mobile-credit-card[data-card-skin="nu"] .credit-card-art {
+  inset: 1rem -4rem auto auto;
+  width: 17rem;
+  height: 12rem;
+  background: url("/card-brands/nu.svg") center / 90% auto no-repeat;
+  opacity: .1;
+  filter: brightness(0) invert(1);
+  transform: rotate(-15deg);
+}
+
+.mobile-credit-card[data-card-skin="didi"] {
+  --wallet-surface: linear-gradient(110deg, #ff782f, #ff620f 60%, #f75a06);
+  --wallet-ink: #1f0e03;
+  --wallet-muted: #2b1404;
+  --wallet-rule: #471e0828;
+}
+.mobile-credit-card[data-card-skin="didi"] .credit-card-art span:first-child {
+  top: -5rem;
+  right: -2rem;
+  width: 16rem;
+  height: 16rem;
+  border: 3rem solid #a530092b;
+  border-top-width: 1.5rem;
+  border-right-width: 1rem;
+  border-radius: 0 0 50% 50%;
+  transform: rotate(-38deg);
+}
+
+.mobile-credit-card[data-card-skin="mercado-pago"] {
+  --wallet-surface: radial-gradient(ellipse at 90% 20%, #07516c, #022e40 55%, #011e2a);
+}
+.mobile-credit-card[data-card-skin="mercado-pago"] .credit-card-face { border-bottom: 2px solid #ffe600; }
+.mobile-credit-card[data-card-skin="mercado-pago"] .credit-card-wordmark { max-width: none; font-size: 1.125rem; line-height: 1; letter-spacing: -.055em; }
+.mobile-credit-card[data-card-skin="mercado-pago"] .credit-card-art span {
+  top: 2.25rem;
+  right: -3.5rem;
+  width: 15rem;
+  height: 11rem;
+  border: 2px solid #44c8ee20;
+  border-radius: 50%;
+  transform: rotate(-25deg);
+}
+.mobile-credit-card[data-card-skin="mercado-pago"] .credit-card-art span:nth-child(2) { top: 2.6rem; right: -2.75rem; }
+.mobile-credit-card[data-card-skin="mercado-pago"] .credit-card-art span:nth-child(3) { top: 3rem; right: -2rem; }
+
 /* Deja accesible la captura rápida mientras se muestra una notificación. */
 body:has([data-slot="expense-create-action"], [data-slot="record-create-action"]) [data-sonner-toaster][data-y-position="bottom"] {
   bottom: calc(5rem + env(safe-area-inset-bottom));

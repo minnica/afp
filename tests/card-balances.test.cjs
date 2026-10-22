@@ -1,6 +1,7 @@
 const assert = require('node:assert/strict');
 const { test } = require('node:test');
 const { sourceLoader } = require('./helpers/load-source.cjs');
+const { randomUUID } = require('node:crypto');
 const { getCardBalance, summarizeCardBalances, creditBalanceSchema } = sourceLoader()('src/lib/cardBalances.js');
 const plain = value => JSON.parse(JSON.stringify(value));
 const snapshot = (creditLimit, usedBalance, balanceAsOf = '2026-10-21') => ({ creditLimit, usedBalance, balanceAsOf });
@@ -71,17 +72,28 @@ function apiFixture() {
   const writes = [];
   const prisma = { card: {
     findMany: async ({ where }) => where.userId === row.userId ? [row] : [],
+    findUnique: async ({ where }) => where.userId === row.userId && where.id === row.id ? row : null,
     update: async ({ where, data }) => {
       if (where.userId !== row.userId || where.id !== row.id) throw Object.assign(new Error('missing'), { code: 'P2025' });
       writes.push(plain(data)); Object.assign(row, data); return row;
     },
   } };
+  for (const model of ['dailyExpense', 'installmentPurchase', 'cardCycle', 'cardCycleCredit']) prisma[model] = { findMany: async () => [] };
+  prisma.$transaction = async operation => operation(prisma);
   const route = sourceLoader({
     '@/lib/prisma': { prisma },
     '@supabase/supabase-js': { createClient: () => ({ auth: { getUser: async token => ({ data: { user: ['a', 'b'].includes(token) ? { id: token } : null } }) } }) },
     'next/server': { NextResponse: { json: (body, options = {}) => ({ body: plain(body), status: options.status || 200, headers: new Headers(options.headers) }) } },
   })('src/app/api/cards/route.js');
-  const request = (body, token = 'a') => ({ url: 'http://localhost/api/cards?userId=b', headers: new Headers(token ? { authorization: `Bearer ${token}` } : {}), json: async () => body });
+  const attempts = new Map();
+  const request = (body, token = 'a') => {
+    if (body?.action === 'UPDATE_CREDIT_BALANCE') {
+      const key = JSON.stringify(body);
+      if (!attempts.has(key)) attempts.set(key, randomUUID());
+      body = { ...body, balanceCaptureId: attempts.get(key), expectedBalanceCaptureId: row.balanceTracking?.captureId ?? null };
+    }
+    return { url: 'http://localhost/api/cards?userId=b', headers: new Headers(token ? { authorization: `Bearer ${token}` } : {}), json: async () => body };
+  };
   return { route, request, row, writes };
 }
 
@@ -107,7 +119,7 @@ test('saldos API: guardar sustituye la captura; editar la tarjeta conserva los s
   assert.equal(saved.body.card.userId, 'a');
   assert.equal(saved.body.card.name, 'Azul');
   assert.equal(saved.body.card.notes, 'Conservar');
-  assert.deepEqual(Object.keys(writes[0]).sort(), ['balanceAsOf', 'creditLimit', 'usedBalance']);
+  assert.deepEqual(Object.keys(writes[0]).sort(), ['balanceAsOf', 'balanceTracking', 'creditLimit', 'usedBalance']);
   assert.equal((await route.PATCH(request(body))).status, 200);
   assert.equal(row.usedBalance, 5000.25);
   assert.equal((await route.PATCH(request({ ...body, usedBalance: 0 }))).status, 200);

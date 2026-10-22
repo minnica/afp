@@ -1,0 +1,56 @@
+{
+  "reviewedOn": "2026-10-21",
+  "purpose": "Identidad visual de las tarjetas personales en Crédito y deuda. Los importes y controles son HTML accesible; los motivos gráficos son decorativos.",
+  "confirmedByOwner": "BBVA Platinum; ambas HSBC Zero; ambas Banamex Joy; Santander LikeU roja.",
+  "assets": [
+    {
+      "file": "bbva.svg",
+      "source": "https://www.bbva.mx/content/dam/library/logos/logo_bbva_print.svg",
+      "reference": "https://www.bbva.mx/personas/productos/tarjetas-de-credito/tarjeta-de-credito-platinum.html"
+    },
+    {
+      "file": "hsbc.svg",
+      "source": "https://www.hsbc.com.mx/content/dam/hsbc/mx/images/logo_hsbc.svg",
+      "reference": "https://www.hsbc.com.mx/tarjetas-de-credito/productos/zero/"
+    },
+    {
+      "file": "joy.png",
+      "source": "https://www.banamex.com/es/personas/tarjetas-credito/assets/img/desktop/Simplicity.png",
+      "reference": "https://www.banamex.com/es/personas/tarjetas-credito/tarjeta-de-credito-sin-anualidad-joy-ab/index.html",
+      "note": "La página actual de Joy publica el plástico turquesa y rojo en este archivo con nombre histórico. Referencia del motivo decorativo joy-petals.svg."
+    },
+    {
+      "file": "joy-petals.svg",
+      "source": "https://www.banamex.com/es/personas/tarjetas-credito/assets/img/desktop/Simplicity.png",
+      "note": "Adaptación vectorial local de los pétalos rojos de la referencia Joy, sobre fondo transparente; no incluye logotipos ni datos bancarios."
+    },
+    {
+      "file": "likeu-red.webp",
+      "source": "https://assets.santandermedia.com/adobe/assets/urn%3Aaaid%3Aaem%3Ab1b2bad6-7373-42ed-8cde-135b6973bf7b/as/UUID.webp?height=1200",
+      "reference": "https://www.santander.com.mx/personas/credito-y-financiamiento/tarjetas-de-credito/likeu",
+      "note": "Referencia de alta resolución; CSS encuadra la llama central y las líneas de relieve sin mostrar el chip ni los datos del plástico."
+    },
+    {
+      "file": "nu.svg",
+      "source": "https://blog.nu.com.mx/productos-nu/tarjeta-de-credito/como-solicitar-tu-tarjeta-de-credito-nu/",
+      "reference": "https://nubank.com.mx/credito/",
+      "note": "SVG original del encabezado oficial, sin alterar sus trazos; se presenta en blanco sobre morado."
+    },
+    {
+      "file": "nu.png",
+      "source": "https://blog.nu.com.mx/wp-content/themes/mediamonks/images/footer/logo.png",
+      "reference": "https://nubank.com.mx/credito/",
+      "note": "Referencia histórica; el frente y el motivo ampliado usan nu.svg para conservar nitidez."
+    },
+    {
+      "file": "didi.svg",
+      "source": "https://manhattan-static.didiglobal.com/static/manhattan_global_static/us/prod/html-template/assets/m_white-Du9o6zfc.svg",
+      "reference": "https://didifinance.com/tarjeta-de-credito?country=MX"
+    }
+  ],
+  "additionalReferences": [
+    "https://www.mercadopago.com.mx/tarjeta-de-credito",
+    "https://http2.mlstatic.com/frontend-assets/credit-card-landings/tarjeta-de-credito/lista-de-espera/landing/new-card-hero.webp"
+  ],
+  "scope": "Adaptación de los colores y materiales de los plásticos; no reproduce números, vencimientos, CVV ni datos de titular. Los nombres 1/2 se conservan. La selección visual no modifica usagePolicy ni datos financieros."
+}

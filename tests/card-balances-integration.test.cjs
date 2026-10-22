@@ -23,7 +23,7 @@ test('PostgreSQL: captura bancaria persiste sin modificar ciclos, pagos ni movim
     const card = await db.card.create({ data: { userId: user.id, name: 'Tarjeta prueba', usualCutDay: 10, usualDueDay: 30, notes: 'Referencia' } });
     assert.equal(card.usedBalance, null);
     const cycle = await db.cardCycle.create({ data: { userId: user.id, cardId: card.id, month: 1, year: 2026, startDate: new Date('2025-12-11'), cutDate: new Date('2026-01-10'), dueDate: new Date('2026-01-30'), statementAmount: '1000.50', paidAmount: '200.25' } });
-    const update = { id: card.id, action: 'UPDATE_CREDIT_BALANCE', creditLimit: '15000.50', usedBalance: '13000.25', balanceAsOf: '2026-01-20' };
+    const update = { id: card.id, action: 'UPDATE_CREDIT_BALANCE', creditLimit: '15000.50', usedBalance: '13000.25', balanceAsOf: '2026-01-20', balanceCaptureId: randomUUID(), expectedBalanceCaptureId: null };
     assert.equal((await api.PATCH(request(update))).status, 200);
     assert.equal((await api.GET(request())).body.cards[0].usedBalance, '13000.25');
     assert.deepEqual(await db.cardCycle.findUnique({ where: { id: cycle.id } }), cycle);
@@ -32,8 +32,9 @@ test('PostgreSQL: captura bancaria persiste sin modificar ciclos, pagos ni movim
     assert.equal((await api.PATCH(request(update))).status, 404);
     assert.deepEqual((await api.GET(request())).body.cards, []);
     actor = user.id;
-    const results = await Promise.all(Array.from({ length: 6 }, (_, i) => api.PATCH(request({ ...update, creditLimit: 1000 + i, usedBalance: i, balanceAsOf: `2026-01-${21 + i}` }))));
-    assert.ok(results.every(result => result.status === 200));
+    const results = await Promise.all(Array.from({ length: 6 }, (_, i) => api.PATCH(request({ ...update, balanceCaptureId: randomUUID(), expectedBalanceCaptureId: update.balanceCaptureId, creditLimit: 1000 + i, usedBalance: i, balanceAsOf: `2026-01-${21 + i}` }))));
+    assert.equal(results.filter(result => result.status === 200).length, 1);
+    assert.ok(results.every(result => [200, 409].includes(result.status)));
     const saved = await db.card.findUnique({ where: { id: card.id } });
     const used = Number(saved.usedBalance);
     assert.equal(Number(saved.creditLimit), used + 1000);
@@ -43,7 +44,7 @@ test('PostgreSQL: captura bancaria persiste sin modificar ciclos, pagos ni movim
     await assert.rejects(db.card.update({ where: { id: card.id }, data: { creditLimit: -1 } }));
     await assert.rejects(db.card.update({ where: { id: card.id }, data: { balanceAsOf: null } }));
     assert.deepEqual(await db.card.findUnique({ where: { id: card.id } }), saved);
-    assert.equal((await api.PATCH(request({ ...update, usedBalance: '-50.25' }))).status, 200);
+    assert.equal((await api.PATCH(request({ ...update, usedBalance: '-50.25', balanceCaptureId: randomUUID(), expectedBalanceCaptureId: saved.balanceTracking.captureId }))).status, 200);
     assert.equal((await db.card.findUnique({ where: { id: card.id } })).usedBalance.toFixed(2), '-50.25');
   } finally {
     await db.user.deleteMany({ where: { id: { in: [user.id, other.id] } } });

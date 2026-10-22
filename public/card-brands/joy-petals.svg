@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="379" viewBox="0 0 600 379" fill="none">
+  <!-- Motivo decorativo adaptado de los pétalos del plástico Joy; sin logotipos ni datos. -->
+  <defs>
+    <linearGradient id="upper" x1="278" y1="0" x2="415" y2="155" gradientUnits="userSpaceOnUse"><stop stop-color="#f2555d"/><stop offset="1" stop-color="#e8233b"/></linearGradient>
+    <linearGradient id="right" x1="465" y1="7" x2="575" y2="157" gradientUnits="userSpaceOnUse"><stop stop-color="#ac2031"/><stop offset="1" stop-color="#7e101c"/></linearGradient>
+    <radialGradient id="left" cx="0" cy="0" r="1" gradientTransform="translate(280 143) rotate(76) scale(161 143)" gradientUnits="userSpaceOnUse"><stop stop-color="#581e1c"/><stop offset=".42" stop-color="#bd1d30"/><stop offset="1" stop-color="#ed2440"/></radialGradient>
+    <linearGradient id="middle" x1="510" y1="120" x2="578" y2="279" gradientUnits="userSpaceOnUse"><stop stop-color="#bd2637"/><stop offset="1" stop-color="#641918"/></linearGradient>
+    <linearGradient id="lower" x1="370" y1="252" x2="519" y2="295" gradientUnits="userSpaceOnUse"><stop stop-color="#781c23"/><stop offset="1" stop-color="#e92540"/></linearGradient>
+  </defs>
+  <path d="M406 229C436 217 478 215 503 222C529 233 532 268 531 302C534 337 515 357 483 369C439 384 388 389 370 367C351 347 357 287 375 257C383 244 393 234 406 229Z" fill="#8f1725"/>
+  <path d="M406 222C436 210 478 208 503 215C529 226 532 261 531 295C534 330 515 350 483 362C439 377 388 382 370 360C351 340 357 280 375 250C383 237 393 227 406 222Z" fill="url(#lower)"/>
+  <path d="M296 141C260 151 217 163 202 187C191 205 197 236 205 262C215 294 224 309 254 307C298 304 355 289 387 276C411 265 415 246 406 215L387 148Z" fill="#8d1423"/>
+  <path d="M296 134C260 144 217 156 202 180C191 198 197 229 205 255C215 287 224 302 254 300C298 297 355 282 387 269C411 258 415 239 406 208L387 141Z" fill="url(#left)"/>
+  <path d="M264-30C245 5 253 54 289 107C317 147 340 169 374 153C408 133 432 108 450 87L408-30Z" fill="#b51d30"/>
+  <path d="M270-35C251 0 259 49 295 102C323 142 346 164 380 148C414 128 438 103 456 82L414-35Z" fill="url(#upper)"/>
+  <path d="M494-20C472-1 448 31 432 62C412 98 424 112 455 130L523 160C558 155 596 128 626 89V-20Z" fill="#74101d"/>
+  <path d="M500-26C478-7 454 25 438 56C418 92 430 106 461 124L529 154C564 149 602 122 632 83V-26Z" fill="url(#right)"/>
+  <path d="M523 119C500 126 490 163 484 195L480 241C480 273 517 291 553 295C590 299 617 277 629 246L630 153C605 131 565 108 523 119Z" fill="#e83c50"/>
+  <path d="M523 126C500 133 490 170 484 202L480 248C480 280 517 298 553 302C590 306 617 284 629 253L630 160C605 138 565 115 523 126Z" fill="url(#middle)"/>
+</svg>

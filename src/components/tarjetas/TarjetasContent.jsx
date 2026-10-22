@@ -16,8 +16,9 @@ import { Empty, EmptyDescription } from "@/components/ui/empty";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   CreditCard,
   ChevronDown,
@@ -44,7 +45,6 @@ import { Badge } from "@/components/ui/badge";
 import { Item, ItemGroup, ItemMedia } from "@/components/ui/item";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import CyclesDataTable from "@/components/tarjetas/CyclesDataTable";
-import CardBalances from "@/components/tarjetas/CardBalances";
 import PageSkeleton from "@/components/layout/PageSkeleton";
 
 const MONTH_NAMES = [
@@ -60,7 +60,7 @@ export default function TarjetasContent() {
 
   const [user, setUser] = useState(null);
   const [cards, setCards] = useState([]);
-  const [cardsLoadError, setCardsLoadError] = useState(false);
+  const cardsRequest = useRef(null);
   const [cycles, setCycles] = useState([]);
 
   const [name, setName] = useState("");
@@ -81,30 +81,21 @@ export default function TarjetasContent() {
   const [editCardNotes, setEditCardNotes] = useState("");
   const [isUpdatingCard, setIsUpdatingCard] = useState(false);
 
-  async function loadCards(userId, { mutationCompleted = false } = {}) {
+  const loadCards = useCallback(async (userId, { mutationCompleted = false, errorMode } = {}) => {
+    cardsRequest.current?.abort();
+    const controller = new AbortController();
+    cardsRequest.current = controller;
     try {
-      const response = await apiFetch(`/api/cards?userId=${userId}`, { mutationCompleted, expectedUserId: userId });
+      const response = await apiFetch(`/api/cards?userId=${userId}`, { mutationCompleted, expectedUserId: userId, errorMode, signal: controller.signal });
       const data = await response.json();
+      if (controller.signal.aborted) return;
       if (!response.ok) throw new Error(data.error || "No se pudieron cargar las tarjetas.");
       setCards(data.cards || []);
-      setCardsLoadError(false);
     } catch (error) {
-      setCardsLoadError(true);
+      if (controller.signal.aborted) return;
       throw error;
     }
-  }
-
-  async function saveCreditBalance(cardId, values) {
-    if (!user) throw new Error("Inicia sesión para continuar.");
-    const response = await apiFetch("/api/cards", {
-      method: "PATCH", expectedUserId: user.id,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: cardId, action: "UPDATE_CREDIT_BALANCE", ...values }),
-    });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || "No se pudo guardar el saldo.");
-    setCards((previous) => previous.map((card) => card.id === cardId ? data.card : card));
-  }
+  }, []);
 
   async function loadCycles(userId, { mutationCompleted = false } = {}) {
     const response = await apiFetch(`/api/card-cycles?userId=${userId}`, { mutationCompleted });
@@ -153,7 +144,8 @@ export default function TarjetasContent() {
     }
 
     init();
-  }, [router]);
+    return () => cardsRequest.current?.abort();
+  }, [router, loadCards]);
 
   async function createCard() {
     if (!user || isSaving) return false;
@@ -261,7 +253,7 @@ export default function TarjetasContent() {
     // Retira o actualiza el aviso del encabezado con una lectura posterior al PATCH.
     await refreshDashboard({ force: true });
     try {
-      await loadCycles(user.id, { mutationCompleted: true });
+      await Promise.all([loadCycles(user.id, { mutationCompleted: true }), loadCards(user.id, { mutationCompleted: true })]);
     } catch {
       setError("El cambio se guardó, pero no se pudo actualizar el listado. Recarga para consultar los cálculos.");
     }
@@ -295,7 +287,7 @@ export default function TarjetasContent() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "No se pudo deshacer el pago.");
       await refreshDashboard({ force: true });
-      await loadCycles(user.id, { mutationCompleted: true });
+      await Promise.all([loadCycles(user.id, { mutationCompleted: true }), loadCards(user.id, { mutationCompleted: true })]);
     } catch (err) {
       setError(err.message || "No se pudo deshacer el pago.");
     }
@@ -427,18 +419,14 @@ export default function TarjetasContent() {
           </Alert>
         ) : null}
 
-        <CardBalances
-          cards={cards}
-          onSave={saveCreditBalance}
-          loadError={cardsLoadError}
-          onRetry={async () => { if (user) { try { await loadCards(user.id); setError(""); } catch { /* El resumen conserva su error y reintento. */ } } }}
-        />
-
         <Card className="rounded-none bg-transparent py-0 ring-0 [--card-spacing:0px] md:rounded-xl md:bg-card md:py-4 md:ring-1 md:[--card-spacing:--spacing(4)]">
-          <CardHeader className="mb-3 md:mb-0">
+          <CardHeader className="mb-3 flex flex-row flex-wrap items-center justify-between gap-2 md:mb-0">
             <CardTitle className="text-base font-semibold md:text-lg">
               Ciclos mensuales
             </CardTitle>
+            <Button variant="ghost" asChild className="min-h-11">
+              <Link href="/credito-y-deuda">Ver saldos de crédito</Link>
+            </Button>
           </CardHeader>
           <CardContent>
             <CyclesDataTable

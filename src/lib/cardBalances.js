@@ -46,6 +46,7 @@ export function getCardBalance(card) {
     overLimit: Math.max(usedCents - limitCents, 0) / 100,
     utilization: limitCents > 0 ? Math.max(usedCents, 0) / limitCents * 100 : null,
     balanceAsOf: String(card.balanceAsOf instanceof Date ? card.balanceAsOf.toISOString() : card.balanceAsOf).slice(0, 10),
+    automatic: card.balanceTrackingStatus === "ACTIVE",
   };
 }
 
@@ -57,6 +58,7 @@ export function summarizeCardBalances(cards) {
     totalCards: cards.length,
     capturedCards: balances.length,
     missingCards: cards.length - balances.length,
+    automaticCards: balances.filter((balance) => balance.automatic).length,
     debt: total("debt"),
     creditLimit: total("creditLimit"),
     availableCredit: total("availableCredit"),

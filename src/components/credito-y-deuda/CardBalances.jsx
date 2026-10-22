@@ -1,26 +1,29 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { useForm, useWatch, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ChevronDown, Info, X } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Cancel01Icon, InformationCircleIcon } from "@hugeicons/core-free-icons";
 import { creditBalanceSchema, getBalanceToday, getCardBalance, summarizeCardBalances } from "@/lib/cardBalances";
 import { cn } from "@/lib/utils";
 import { useDialogFocus } from "@/hooks/use-dialog-focus";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Empty, EmptyDescription } from "@/components/ui/empty";
+import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyTitle } from "@/components/ui/empty";
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Item, ItemGroup } from "@/components/ui/item";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Progress } from "@/components/ui/progress";
+import { Separator } from "@/components/ui/separator";
 import { toast } from "@/components/ui/sonner";
+import MobileCreditCard from "./MobileCreditCard";
 
 const currency = new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" });
 const dateFormat = new Intl.DateTimeFormat("es-MX", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
@@ -31,6 +34,7 @@ function BalanceEditor({ card, onSave, onClose, restoreFocus }) {
   const titleRef = useRef(null);
   const validationRef = useRef(null);
   const dialogRef = useRef(null);
+  const captureRequestRef = useRef(null);
   const [saveError, setSaveError] = useState("");
   const { control, handleSubmit, formState: { errors, isSubmitting } } = useForm({
     resolver: zodResolver(creditBalanceSchema()),
@@ -66,7 +70,11 @@ function BalanceEditor({ card, onSave, onClose, restoreFocus }) {
   async function save(values) {
     setSaveError("");
     try {
-      await onSave(card.id, values);
+      const payload = JSON.stringify(values);
+      if (captureRequestRef.current?.payload !== payload) {
+        captureRequestRef.current = { payload, id: crypto.randomUUID() };
+      }
+      await onSave(card.id, { ...values, balanceCaptureId: captureRequestRef.current.id, expectedBalanceCaptureId: card.balanceTracking?.captureId ?? null });
       toast.success(`Saldo de ${card.name} actualizado.`);
       onClose();
     } catch (error) {
@@ -87,13 +95,13 @@ function BalanceEditor({ card, onSave, onClose, restoreFocus }) {
       >
         <DialogHeader className="shrink-0 border-b p-4 pr-16">
           <DialogTitle ref={titleRef} tabIndex={-1} className="break-words outline-none">Saldo de {card.name}</DialogTitle>
-          <DialogDescription>Captura los importes que muestra tu banco, en pesos mexicanos.</DialogDescription>
+          <DialogDescription>Captura los importes actuales del banco para establecer un nuevo punto de partida.</DialogDescription>
         </DialogHeader>
         <Button type="button" variant="ghost" size="icon" className="absolute right-2 top-2 size-11" aria-label="Cerrar saldo" disabled={isSubmitting} onClick={onClose}>
-          <X aria-hidden="true" />
+          <HugeiconsIcon icon={Cancel01Icon} aria-hidden="true" />
         </Button>
         <form onSubmit={(event) => handleSubmit(save, () => requestAnimationFrame(() => validationRef.current?.focus()))(event)} noValidate aria-busy={isSubmitting} className="flex min-h-0 flex-col">
-          <div className="min-h-0 space-y-4 overflow-y-auto p-4">
+          <div className="flex min-h-0 flex-col gap-4 overflow-y-auto p-4">
             {saveError ? <Alert variant="destructive"><AlertDescription>{saveError}</AlertDescription></Alert> : null}
             {Object.keys(errors).length > 0 ? <Alert variant="destructive" ref={validationRef} tabIndex={-1}>
               <AlertDescription>
@@ -134,7 +142,7 @@ function BalanceEditor({ card, onSave, onClose, restoreFocus }) {
               <strong className="text-base tabular-nums">{money(preview?.availableCredit)}</strong>
               {preview?.overLimit > 0 ? <p className="w-full text-xs text-warning">El saldo supera el límite por {money(preview.overLimit)}.</p> : null}
             </Item>
-            <p className="text-xs text-muted-foreground">Esta captura se actualiza manualmente. Registrar compras o pagos en AFP no modifica estos importes.</p>
+            <p className="text-xs text-muted-foreground">Después de guardar, AFP actualizará el saldo con tus gastos, compras a meses, pagos y devoluciones registrados.</p>
           </div>
           <DialogFooter className="shrink-0 border-t p-4">
             <Button type="button" variant="outline" className="min-h-11" disabled={isSubmitting} onClick={onClose}>Cancelar</Button>
@@ -148,7 +156,7 @@ function BalanceEditor({ card, onSave, onClose, restoreFocus }) {
 
 function BalanceMetric({ label, amount, emphasized = false }) {
   return (
-    <div className={cn("min-w-0 space-y-1", emphasized && "col-span-2 sm:col-span-1")}>
+    <div className={cn("flex min-w-0 flex-col gap-1", emphasized && "col-span-2 sm:col-span-1")}>
       <dt className="text-sm text-muted-foreground">{label}</dt>
       <dd className={cn("break-words text-xl font-semibold tracking-tight tabular-nums", emphasized && "text-3xl")}>{money(amount)}</dd>
     </div>
@@ -167,94 +175,107 @@ export default function CardBalances({ cards, onSave, loadError, onRetry }) {
   }
 
   return (
-    <section className="mb-6 space-y-4" aria-labelledby="credit-balances-title" data-credit-balances onClickCapture={captureFocus}>
-      <div className="flex items-center justify-between gap-3">
-        <h2 id="credit-balances-title" className="text-base font-semibold md:text-lg">Crédito y deuda</h2>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button type="button" variant="ghost" size="icon" className="size-11 shrink-0" aria-label="Cómo se calculan los saldos">
-              <Info aria-hidden="true" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent align="end" className="max-w-[calc(100vw-2rem)] space-y-2 text-sm">
-            <p>Los saldos son los que capturas de tu banco en la fecha indicada. Incluye toda la deuda, también las mensualidades futuras.</p>
-            <p>El disponible se calcula como límite menos saldo utilizado, con mínimo cero. Retenciones o cargos pendientes pueden hacer que difiera del banco.</p>
-            <p>Un saldo a favor aumenta el disponible de esa tarjeta y no reduce la deuda de las demás. Los pagos mensuales se consultan en Ciclos mensuales.</p>
-          </PopoverContent>
-        </Popover>
-      </div>
-
-      {loadError ? (
-        <Alert variant="destructive"><AlertDescription className="space-y-2">
-          <p>No se pudieron cargar los saldos de tus tarjetas.</p>
-          <Button type="button" variant="outline" className="min-h-11" disabled={retrying} onClick={retry}>{retrying ? "Cargando…" : "Reintentar saldos"}</Button>
-        </AlertDescription></Alert>
-      ) : !cards.length ? (
-        <Empty className="border"><EmptyDescription>Agrega tu primera tarjeta en «Administrar tarjetas» para consultar su límite, saldo y disponible.</EmptyDescription></Empty>
-      ) : (
-        <>
-          <Card>
-            <CardContent className="space-y-4">
+    <section className="flex flex-col gap-6" aria-labelledby="credit-balances-title" data-credit-balances onClickCapture={captureFocus}>
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between gap-3">
+          <CardTitle><h2 id="credit-balances-title">Resumen de crédito</h2></CardTitle>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button type="button" variant="ghost" size="icon" className="size-11 shrink-0" aria-label="Cómo se calculan los saldos">
+                <HugeiconsIcon icon={InformationCircleIcon} aria-hidden="true" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="flex max-w-[calc(100vw-2rem)] flex-col gap-2 text-sm">
+              <p>El saldo estimado parte de tu última captura del banco y se actualiza con los movimientos registrados en AFP. Los gastos y las compras a meses suman; los pagos y las devoluciones restan.</p>
+              <p>Una compra a meses consume su importe completo una vez. Los cobros previstos y las mensualidades calculadas no se vuelven a sumar. Los pagos acumulados se aplican solo por su diferencia.</p>
+              <p>«Actualizar» permite ajustar el saldo con el banco y establecer un nuevo punto de partida. Los cargos anteriores al día de inicio ya están incluidos en ese saldo base.</p>
+              <p>El disponible se calcula como límite menos saldo utilizado, con mínimo cero. Retenciones o cargos pendientes pueden hacer que difiera del banco.</p>
+              <p>Un saldo a favor aumenta el disponible de esa tarjeta y no reduce la deuda de las demás. Para registrar pagos y consultar los ciclos mensuales, abre Tarjetas.</p>
+            </PopoverContent>
+          </Popover>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-4">
+          {loadError ? (
+            <Alert variant="destructive"><AlertDescription className="flex flex-col gap-2">
+              <p>No se pudieron cargar los saldos de tus tarjetas.</p>
+              <Button type="button" variant="outline" className="min-h-11" disabled={retrying} onClick={retry}>{retrying ? "Cargando…" : "Reintentar saldos"}</Button>
+            </AlertDescription></Alert>
+          ) : !cards.length ? (
+            <Empty>
+              <EmptyHeader>
+                <EmptyTitle>Aún no tienes tarjetas</EmptyTitle>
+                <EmptyDescription>Agrega tu primera tarjeta para consultar su límite, saldo y disponible.</EmptyDescription>
+              </EmptyHeader>
+              <EmptyContent><Button asChild className="min-h-11"><Link href="/tarjetas">Administrar tarjetas</Link></Button></EmptyContent>
+            </Empty>
+          ) : (
+            <>
               <dl className="grid grid-cols-2 items-end gap-4 sm:grid-cols-3 sm:gap-6">
-                <BalanceMetric label={summary.missingCards ? "Deuda capturada" : "Deuda total"} amount={summary.debt} emphasized />
+                <BalanceMetric label={summary.missingCards ? "Deuda capturada" : summary.automaticCards ? "Deuda estimada" : "Deuda total"} amount={summary.debt} emphasized />
                 <BalanceMetric label="Límite de crédito" amount={summary.creditLimit} />
                 <BalanceMetric label="Crédito disponible" amount={summary.availableCredit} />
               </dl>
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 border-t pt-3 text-xs text-muted-foreground">
+              <Separator />
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
                 <span>{summary.capturedCards} de {summary.totalCards} tarjetas con saldo</span>
-                {summary.oldestDate ? <span>{summary.oldestDate === summary.newestDate ? `Consultado el ${dateLabel(summary.oldestDate)}` : `Consultas del ${dateLabel(summary.oldestDate)} al ${dateLabel(summary.newestDate)}`}</span> : null}
-                <span>MXN · Actualización manual · Disponible calculado</span>
+                {summary.oldestDate ? <span>{summary.oldestDate === summary.newestDate ? `Saldo base del ${dateLabel(summary.oldestDate)}` : `Saldos base del ${dateLabel(summary.oldestDate)} al ${dateLabel(summary.newestDate)}`}</span> : null}
+                <span>{summary.automaticCards ? "MXN · Se actualiza con tus movimientos" : "MXN · Captura del banco"} · Disponible calculado</span>
               </div>
               {summary.missingCards > 0 ? <p className="text-sm text-warning" role="status">{summary.capturedCards === 0 ? "Captura los saldos de tus tarjetas para conocer tu deuda total." : `Faltan ${summary.missingCards} ${summary.missingCards === 1 ? "tarjeta" : "tarjetas"} por capturar. Estos totales están incompletos.`}</p> : null}
               {summary.creditBalance > 0 ? <p className="text-xs text-muted-foreground">Saldo a favor: {money(summary.creditBalance)}. No se descuenta de la deuda de otras tarjetas.</p> : null}
-            </CardContent>
-          </Card>
+            </>
+          )}
+        </CardContent>
+      </Card>
 
-          <Collapsible defaultOpen={summary.capturedCards === 0}>
-            <CollapsibleTrigger asChild>
-              <Button type="button" variant="ghost" className="group h-auto min-h-11 max-w-full gap-2 whitespace-normal text-left">
-                Saldos por tarjeta <Badge variant="secondary">{cards.length}</Badge>
-                <ChevronDown aria-hidden="true" className="size-4 transition-transform group-data-[state=open]:rotate-180 motion-reduce:transition-none" />
-              </Button>
-            </CollapsibleTrigger>
-            <CollapsibleContent className="pt-3">
-              <ItemGroup className="gap-3">
-                {cards.map((card) => {
-                  const balance = getCardBalance(card);
-                  return (
-                    <Item key={card.id} role="listitem" variant="outline" className="grid min-w-0 grid-cols-1 gap-3 bg-card p-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)_auto] lg:gap-6" data-credit-card={card.id}>
-                      <div className="flex min-w-0 items-start justify-between gap-3 lg:block">
-                        <div className="min-w-0 space-y-1">
-                          <h3 className="break-words text-sm font-semibold">{card.name}</h3>
-                          {balance.hasBalance ? <p className="text-xs text-muted-foreground">Consulta: <time dateTime={balance.balanceAsOf}>{dateLabel(balance.balanceAsOf)}</time></p> : <Badge variant="secondary">Sin capturar</Badge>}
-                        </div>
-                        <Button type="button" variant="outline" className="min-h-11 shrink-0 lg:hidden" aria-label={`${balance.hasBalance ? "Actualizar" : "Capturar"} saldo de ${card.name}`} onClick={() => setEditingCard(card)}>{balance.hasBalance ? "Actualizar" : "Capturar"}</Button>
+      {!loadError && cards.length > 0 ? (
+        <section className="flex flex-col gap-3" aria-labelledby="card-balances-list-title">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <h2 id="card-balances-list-title" className="text-sm font-medium">Saldos por tarjeta</h2>
+              <Badge variant="secondary">{cards.length}</Badge>
+            </div>
+            <Button asChild variant="ghost" className="min-h-11"><Link href="/tarjetas">Ver ciclos y pagos</Link></Button>
+          </div>
+          <ItemGroup className="gap-3">
+            {cards.map((card) => {
+              const balance = getCardBalance(card);
+              return (
+                <Item key={card.id} role="listitem" variant="outline" className="block min-w-0 overflow-hidden bg-card p-0 md:grid md:grid-cols-1 md:gap-3 md:p-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)_auto] lg:gap-6" data-credit-card={card.id}>
+                  <MobileCreditCard card={card} balance={balance} onEdit={() => setEditingCard(card)} />
+                  <div className="hidden min-w-0 items-start justify-between gap-3 md:flex lg:block">
+                    <div className="flex min-w-0 flex-col gap-1">
+                      <h3 className="break-words text-sm font-semibold">{card.name}</h3>
+                      {balance.hasBalance ? <>
+                        <p className="text-xs text-muted-foreground">Base: <time dateTime={balance.balanceAsOf}>{dateLabel(balance.balanceAsOf)}</time></p>
+                        <Badge variant={balance.automatic ? "secondary" : "warning"}>{balance.automatic ? "Automático · Estimado" : "Actualiza para iniciar seguimiento"}</Badge>
+                      </> : <Badge variant="secondary">Sin capturar</Badge>}
+                    </div>
+                    <Button type="button" variant="outline" className="min-h-11 shrink-0 lg:hidden" aria-label={`${balance.hasBalance ? "Actualizar" : "Capturar"} saldo de ${card.name}`} onClick={() => setEditingCard(card)}>{balance.hasBalance ? "Actualizar" : "Capturar"}</Button>
+                  </div>
+                  <div className="hidden min-w-0 flex-col gap-3 md:flex">
+                    <dl className="grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-3">
+                      <div className="col-span-2 min-w-0 sm:col-span-1">
+                        <dt className="text-xs text-muted-foreground">Saldo utilizado</dt>
+                        <dd className="break-words text-lg font-semibold tabular-nums">{money(balance.usedBalance)}</dd>
                       </div>
-                      <div className="min-w-0 space-y-3">
-                        <dl className="grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-3">
-                          <div className="col-span-2 min-w-0 sm:col-span-1">
-                            <dt className="text-xs text-muted-foreground">Saldo utilizado</dt>
-                            <dd className="break-words text-lg font-semibold tabular-nums">{money(balance.usedBalance)}</dd>
-                          </div>
-                          <div className="min-w-0"><dt className="text-xs text-muted-foreground">Límite de crédito</dt><dd className="break-words text-sm tabular-nums">{money(balance.creditLimit)}</dd></div>
-                          <div className="min-w-0"><dt className="text-xs text-muted-foreground">Crédito disponible</dt><dd className="break-words text-sm tabular-nums">{money(balance.availableCredit)}</dd></div>
-                        </dl>
-                        {balance.hasBalance && balance.utilization !== null ? <div className="flex items-center gap-3">
-                          <Progress value={Math.min(balance.utilization, 100)} aria-label={`Crédito utilizado de ${card.name}`} getValueLabel={() => `${balance.utilization.toFixed(1)} % del límite utilizado`} className="flex-1 [&_[data-slot=progress-indicator]]:motion-reduce:transition-none" />
-                          <span className="shrink-0 text-xs tabular-nums text-muted-foreground">{balance.utilization.toFixed(1)} % usado</span>
-                        </div> : null}
-                        {balance.overLimit > 0 ? <p className="text-xs text-warning">Sobre el límite por {money(balance.overLimit)}</p> : null}
-                        {balance.creditBalance > 0 ? <p className="text-xs text-muted-foreground">Saldo a favor: {money(balance.creditBalance)}</p> : null}
-                      </div>
-                      <Button type="button" variant="outline" className="hidden min-h-11 lg:inline-flex" aria-label={`${balance.hasBalance ? "Actualizar" : "Capturar"} saldo de ${card.name}`} onClick={() => setEditingCard(card)}>{balance.hasBalance ? "Actualizar" : "Capturar"}</Button>
-                    </Item>
-                  );
-                })}
-              </ItemGroup>
-            </CollapsibleContent>
-          </Collapsible>
-        </>
-      )}
+                      <div className="min-w-0"><dt className="text-xs text-muted-foreground">Límite de crédito</dt><dd className="break-words text-sm tabular-nums">{money(balance.creditLimit)}</dd></div>
+                      <div className="min-w-0"><dt className="text-xs text-muted-foreground">Crédito disponible</dt><dd className="break-words text-sm tabular-nums">{money(balance.availableCredit)}</dd></div>
+                    </dl>
+                    {balance.hasBalance && balance.utilization !== null ? <div className="flex items-center gap-3">
+                      <Progress value={Math.min(balance.utilization, 100)} aria-label={`Crédito utilizado de ${card.name}`} getValueLabel={() => `${balance.utilization.toFixed(1)} % del límite utilizado`} className="flex-1 [&_[data-slot=progress-indicator]]:motion-reduce:transition-none" />
+                      <span className="shrink-0 text-xs tabular-nums text-muted-foreground">{balance.utilization.toFixed(1)} % usado</span>
+                    </div> : null}
+                    {balance.overLimit > 0 ? <p className="text-xs text-warning">Sobre el límite por {money(balance.overLimit)}</p> : null}
+                    {balance.creditBalance > 0 ? <p className="text-xs text-muted-foreground">Saldo a favor: {money(balance.creditBalance)}</p> : null}
+                  </div>
+                  <Button type="button" variant="outline" className="hidden min-h-11 lg:inline-flex" aria-label={`${balance.hasBalance ? "Actualizar" : "Capturar"} saldo de ${card.name}`} onClick={() => setEditingCard(card)}>{balance.hasBalance ? "Actualizar" : "Capturar"}</Button>
+                </Item>
+              );
+            })}
+          </ItemGroup>
+        </section>
+      ) : null}
       {editingCard ? <BalanceEditor key={editingCard.id} card={editingCard} onSave={onSave} onClose={() => setEditingCard(null)} restoreFocus={restoreFocus} /> : null}
     </section>
   );

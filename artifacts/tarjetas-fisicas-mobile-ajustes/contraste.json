@@ -1,0 +1,75 @@
+{
+  "method": "Color del texto calculado frente a cada píxel del fondo en su caja, con el texto temporalmente oculto. Incluye importes, etiquetas, modelo, fecha, estado, porcentaje, aviso y acción; excluye marcas decorativas.",
+  "results": [
+    {
+      "viewport": 320,
+      "labels": 110,
+      "skins": [
+        {
+          "skin": "banamex-joy",
+          "minimum": 4.73
+        },
+        {
+          "skin": "bbva-platinum",
+          "minimum": 5.32
+        },
+        {
+          "skin": "didi",
+          "minimum": 4.96
+        },
+        {
+          "skin": "hsbc-zero",
+          "minimum": 7.06
+        },
+        {
+          "skin": "mercado-pago",
+          "minimum": 7.34
+        },
+        {
+          "skin": "nu",
+          "minimum": 5.7
+        },
+        {
+          "skin": "santander-likeu",
+          "minimum": 6.31
+        }
+      ],
+      "belowAA": []
+    },
+    {
+      "viewport": 375,
+      "labels": 110,
+      "skins": [
+        {
+          "skin": "banamex-joy",
+          "minimum": 4.73
+        },
+        {
+          "skin": "bbva-platinum",
+          "minimum": 5.1
+        },
+        {
+          "skin": "didi",
+          "minimum": 4.93
+        },
+        {
+          "skin": "hsbc-zero",
+          "minimum": 7.06
+        },
+        {
+          "skin": "mercado-pago",
+          "minimum": 7.34
+        },
+        {
+          "skin": "nu",
+          "minimum": 5.69
+        },
+        {
+          "skin": "santander-likeu",
+          "minimum": 6.31
+        }
+      ],
+      "belowAA": []
+    }
+  ]
+}

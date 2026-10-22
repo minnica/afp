@@ -1,0 +1,35 @@
+{
+  "viewport": 320,
+  "labels": 72,
+  "skins": [
+    {
+      "skin": "banamex-joy",
+      "minimum": 4.98
+    },
+    {
+      "skin": "bbva-platinum",
+      "minimum": 5.01
+    },
+    {
+      "skin": "didi",
+      "minimum": 4.96
+    },
+    {
+      "skin": "hsbc-zero",
+      "minimum": 7.06
+    },
+    {
+      "skin": "mercado-pago",
+      "minimum": 7.12
+    },
+    {
+      "skin": "nu",
+      "minimum": 6.17
+    },
+    {
+      "skin": "santander-likeu",
+      "minimum": 5.17
+    }
+  ],
+  "belowAA": []
+}
