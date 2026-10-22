@@ -40,6 +40,7 @@ import { Separator } from "@/components/ui/separator";
 import { Item, ItemActions, ItemContent, ItemDescription, ItemGroup, ItemTitle } from "@/components/ui/item";
 import PageSkeleton from "@/components/layout/PageSkeleton";
 import CaptureDevices from "@/components/configuracion/CaptureDevices";
+import GoogleCalendarSettings from "@/components/configuracion/GoogleCalendarSettings";
 
 export default function SettingsContent() {
   const { captureFocus, restoreFocus } = useDialogFocus();
@@ -90,7 +91,8 @@ export default function SettingsContent() {
         }
 
         setUser(session.user);
-        if (new URLSearchParams(window.location.search).get("tab") === "capture") setInitialTab("capture");
+        const requestedTab = new URLSearchParams(window.location.search).get("tab");
+        if (["capture", "calendar"].includes(requestedTab)) setInitialTab(requestedTab);
 
         await ensureUserSetup(session.user);
 
@@ -255,10 +257,15 @@ export default function SettingsContent() {
             <TabsTrigger value="people" className="min-h-11">Personas</TabsTrigger>
             <TabsTrigger value="incomeTypes" className="min-h-11">Tipos de ingreso</TabsTrigger>
             <TabsTrigger value="capture" className="min-h-11">Captura automática</TabsTrigger>
+            <TabsTrigger value="calendar" className="min-h-11">Google Calendar</TabsTrigger>
           </TabsList>
 
           <TabsContent value="capture">
             {user && <CaptureDevices key={user.id} userId={user.id} />}
+          </TabsContent>
+
+          <TabsContent value="calendar">
+            {user && <GoogleCalendarSettings key={user.id} userId={user.id} />}
           </TabsContent>
 
           <TabsContent value="categories">

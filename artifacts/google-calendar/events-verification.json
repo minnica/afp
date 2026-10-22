@@ -1,0 +1,86 @@
+{
+  "at": "2026-10-22T06:20:08.445Z",
+  "origin": "https://finanzas.garatachia.com",
+  "deploymentId": "dpl_GVQkfJ6Rg4vKHwNqJ8xsFHJGSpiu",
+  "sourceManifest": "source-manifest-events.json",
+  "sourceManifestSha256": "795efdafdcbf3dd0b2dbf9a70305b8c9e0373b7e3817109b76051e6a8a747f1c",
+  "sourceFiles": 283,
+  "sourceBytes": 2623551,
+  "validation": {
+    "testsPassed": 72,
+    "testsFailed": 0,
+    "testsSkipped": 0,
+    "webpackBuild": "passed",
+    "lintErrors": 0,
+    "financialEvents": [
+      "card cycle dates",
+      "card payments",
+      "income linked to receivable",
+      "expense linked to payable"
+    ],
+    "nativeCaptureAfterCommit": "passed",
+    "concurrentAndBatchedWork": "passed",
+    "fictitiousDataOnly": true
+  },
+  "scheduler": {
+    "legacyFiveMinuteJobs": 0,
+    "dailyMaintenance": [
+      {
+        "path": "/api/cron/calendar-sync",
+        "schedule": "0 12 * * *"
+      }
+    ],
+    "primaryTrigger": "financial mutations after commit",
+    "recovery": "next eligible mutation, manual sync, or daily maintenance"
+  },
+  "http": [
+    {
+      "path": "/api/cron/calendar-sync",
+      "status": 401
+    },
+    {
+      "path": "/api/captures/events",
+      "status": 401
+    },
+    {
+      "path": "/api/incomes",
+      "status": 401
+    },
+    {
+      "path": "/api/cron/calendar-sync",
+      "status": 200,
+      "processed": 0,
+      "results": []
+    },
+    {
+      "path": "/api/cron/calendar-sync",
+      "status": 200,
+      "processed": 0,
+      "results": []
+    }
+  ],
+  "stateUnchanged": true,
+  "connections": [
+    {
+      "status": "CONNECTED",
+      "lastSyncedAt": "2026-10-22T06:05:25.632Z",
+      "lastError": null,
+      "revision": 2,
+      "syncedRevision": 2
+    }
+  ],
+  "events": {
+    "_count": 182,
+    "_max": {
+      "updatedAt": "2026-10-22T06:05:25.568Z"
+    }
+  },
+  "deploymentState": "READY",
+  "productionAliasVerified": true,
+  "deploymentUrl": "https://afp-bdcr4acfh-minnicas-projects.vercel.app",
+  "runtimeErrors": {
+    "since": "2026-10-22T06:19:00Z",
+    "groupsFound": 0,
+    "limitation": "Immediate observation window"
+  }
+}

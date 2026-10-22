@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { scheduleCalendarSync } from "@/lib/calendar/schedule";
 
 export class ApiAccessError extends Error {
   constructor(message, status) {
@@ -25,6 +26,9 @@ export async function requireApiUser(request) {
   });
   const { data, error } = await auth.auth.getUser(token);
   if (error || !data?.user?.id) throw new ApiAccessError("La sesión venció. Vuelve a iniciar sesión.", 401);
+  // Se ejecuta tras la respuesta/commit; los triggers deciden si cambió la agenda.
+  // La revisión diaria recupera interrupciones y escrituras directas fuera de las API.
+  if (["POST", "PATCH", "DELETE", "PUT"].includes(request.method) && !new URL(request.url).pathname.startsWith("/api/calendar/")) scheduleCalendarSync(data.user.id);
   return data.user;
 }
 

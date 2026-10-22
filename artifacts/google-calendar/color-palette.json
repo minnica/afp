@@ -1,0 +1,30 @@
+{
+  "at": "2026-10-22T06:26:52.313Z",
+  "palette": {
+    "completed": {
+      "id": "10",
+      "background": "#51b749",
+      "foreground": "#1d1d1d",
+      "contrast": 6.6
+    },
+    "pending": {
+      "id": "9",
+      "background": "#5484ed",
+      "foreground": "#1d1d1d",
+      "contrast": 4.74
+    },
+    "partial": {
+      "id": "6",
+      "background": "#ffb878",
+      "foreground": "#1d1d1d",
+      "contrast": 9.94
+    },
+    "informational": {
+      "id": "8",
+      "background": "#e1e1e1",
+      "foreground": "#1d1d1d",
+      "contrast": 12.89
+    }
+  },
+  "note": "Paleta oficial de la API; Google adapta el renderizado según cliente y tema."
+}

@@ -1,0 +1,17 @@
+{
+  "at": "2026-10-22T05:35:25.919Z",
+  "changedExistingTables": [],
+  "newTables": [
+    "calendar_oauth_states",
+    "google_calendar_connections",
+    "google_calendar_events"
+  ],
+  "history": {
+    "errors": [],
+    "pending": []
+  },
+  "tablesWithRls": 30,
+  "policies": 0,
+  "migrationHistoryRows": 25,
+  "appliedMigrations": 24
+}

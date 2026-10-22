@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { apiResponse, requireApiUser, ApiAccessError } from "@/lib/apiAuth";
 import { deviceCredential, readCaptureJson, validateCaptureEvent, deviceSelect, capturePackages } from "@/lib/captureProtocol";
 import { limitCaptureAttempts, startCapturePairing, approveCapturePairing, lockedCaptureDevice, getCaptureDevice, changeCaptureDevice, receiveCaptureEvent } from "@/lib/captureService";
+import { scheduleCalendarSync } from "@/lib/calendar/schedule";
 
 export async function captureRequest(request, action) {
   try {
@@ -29,7 +30,7 @@ export async function captureRequest(request, action) {
     } else {
       const credential = deviceCredential(request);
       // Se autentica antes de leer texto financiero; recepción vuelve a comprobar dentro del commit.
-      await prisma.$transaction(tx => lockedCaptureDevice(tx, credential, action === "event"));
+      const authenticatedDevice = await prisma.$transaction(tx => lockedCaptureDevice(tx, credential, action === "event"));
       await limitCaptureAttempts(prisma, "device", credential.id, 600);
       if (action === "status") result = await getCaptureDevice(prisma, credential);
       else if (action === "device-change") {
@@ -63,6 +64,9 @@ export async function captureRequest(request, action) {
       } else {
         const event = validateCaptureEvent(await readCaptureJson(request, 128 * 1024));
         result = await receiveCaptureEvent(prisma, credential, event);
+        // La recepción y el gasto ya confirmaron su transacción. Un aviso sin cambios
+        // financieros se descarta por la revisión de la conexión, sin contactar Google.
+        scheduleCalendarSync(authenticatedDevice.userId);
       }
     }
     return apiResponse.json(result);

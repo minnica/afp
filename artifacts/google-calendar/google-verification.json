@@ -1,0 +1,17 @@
+{
+  "at": "2026-10-22T05:53:26.857Z",
+  "status": "CONNECTED",
+  "lastSyncedAt": "2026-10-22T05:50:50.886Z",
+  "lastError": null,
+  "revision": 2,
+  "syncedRevision": 2,
+  "plannedEvents": 182,
+  "mappedEvents": 182,
+  "googleActiveEvents": 182,
+  "uniqueSources": 182,
+  "mismatches": 0,
+  "showAmounts": false,
+  "from": "2026-07-23",
+  "to": "2027-02-18",
+  "privateDetailsIncluded": false
+}

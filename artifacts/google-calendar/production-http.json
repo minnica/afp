@@ -1,0 +1,58 @@
+{
+  "at": "2026-10-22T05:41:55.544Z",
+  "checks": [
+    {
+      "route": "/acerca",
+      "method": "GET",
+      "authenticatedCron": false,
+      "status": 200,
+      "cache": "public, max-age=0, must-revalidate"
+    },
+    {
+      "route": "/privacidad",
+      "method": "GET",
+      "authenticatedCron": false,
+      "status": 200,
+      "cache": "public, max-age=0, must-revalidate"
+    },
+    {
+      "route": "/api/calendar/google",
+      "method": "GET",
+      "authenticatedCron": false,
+      "status": 401,
+      "cache": "private, no-store"
+    },
+    {
+      "route": "/api/calendar/google/connect",
+      "method": "POST",
+      "authenticatedCron": false,
+      "status": 401,
+      "cache": "private, no-store"
+    },
+    {
+      "route": "/api/calendar/google/sync",
+      "method": "POST",
+      "authenticatedCron": false,
+      "status": 401,
+      "cache": "private, no-store"
+    },
+    {
+      "route": "/api/cron/calendar-sync",
+      "method": "GET",
+      "authenticatedCron": false,
+      "status": 401,
+      "cache": "private, no-store"
+    },
+    {
+      "route": "/api/cron/calendar-sync",
+      "method": "GET",
+      "authenticatedCron": true,
+      "status": 200,
+      "cache": "private, no-store",
+      "response": {
+        "processed": 0,
+        "results": []
+      }
+    }
+  ]
+}

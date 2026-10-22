@@ -1,0 +1,67 @@
+{
+  "at": "2026-10-22T06:08:11.582Z",
+  "origin": "https://finanzas.garatachia.com",
+  "deploymentId": "dpl_AisG3JvSTGyLnmr5nHcbrgcZYJJN",
+  "sourceManifest": "source-manifest-optimization.json",
+  "sourceManifestSha256": "f7f93354df0cd8e77f440f1191fc1da35ff618ffe6275ac5c41d42f8240fc524",
+  "sourceFiles": 282,
+  "sourceBytes": 2621732,
+  "validation": {
+    "testsPassed": 53,
+    "testsFailed": 0,
+    "testsSkipped": 0,
+    "webpackBuild": "passed",
+    "lintErrors": 0
+  },
+  "scheduler": {
+    "name": "afp-google-calendar-sync",
+    "schedule": "*/5 * * * *",
+    "active": true,
+    "commandMatchesSource": true,
+    "idleRequestsEnqueued": 0,
+    "dailyReviewAfterHours": 24,
+    "writesTriggerImmediateSync": true
+  },
+  "http": [
+    {
+      "authorized": false,
+      "status": 401
+    },
+    {
+      "authorized": true,
+      "status": 200,
+      "processed": 0,
+      "results": []
+    },
+    {
+      "authorized": true,
+      "status": 200,
+      "processed": 0,
+      "results": []
+    }
+  ],
+  "stateUnchanged": true,
+  "connections": [
+    {
+      "status": "CONNECTED",
+      "lastSyncedAt": "2026-10-22T06:05:25.632Z",
+      "lastError": null,
+      "revision": 2,
+      "syncedRevision": 2
+    }
+  ],
+  "events": {
+    "_count": 182,
+    "_max": {
+      "updatedAt": "2026-10-22T06:05:25.568Z"
+    }
+  },
+  "deploymentState": "READY",
+  "productionAliasVerified": true,
+  "deploymentUrl": "https://afp-5apyr0nn3-minnicas-projects.vercel.app",
+  "runtimeErrors": {
+    "since": "2026-10-22T06:06:40Z",
+    "groupsFound": 0,
+    "limitation": "Immediate observation window"
+  }
+}

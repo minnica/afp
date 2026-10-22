@@ -1,0 +1,64 @@
+{
+  "date": "2026-10-22",
+  "id": "dpl_AC3mQEq7gHVK2A3dbBHn43kamVvR",
+  "projectId": "prj_FUBRDkPPFpOgJG9zuLLhTwm3JHKV",
+  "teamId": "team_5jQEAASyPb5wB0LxR9KsHf5X",
+  "state": "READY",
+  "target": "production",
+  "origin": "https://finanzas.garatachia.com",
+  "deploymentUrl": "https://afp-66vrg0x13-minnicas-projects.vercel.app",
+  "source": {
+    "baseCommit": "54b5f7236f4047de7f67ab5054957b27da03e578",
+    "workingTreeChanges": true,
+    "commitOrPushPerformed": false,
+    "files": 281,
+    "bytes": 2620522,
+    "sourceSha256": "611046afe89ebf2b3a9da437176656bb1b89e4ffa0ebe250201985d5de92a824",
+    "manifest": "source-manifest.json",
+    "privateFilesUploaded": false
+  },
+  "migration": "production-migration.json",
+  "httpChecks": "production-http.json",
+  "validation": {
+    "testsPassed": 404,
+    "testsSkipped": 0,
+    "migrations": 24,
+    "freshAndHistoricalUpgradeVerified": true,
+    "webpackProductionBuild": "passed",
+    "lintErrors": 0,
+    "existingLintWarnings": 1,
+    "mobileViewport": "390x844",
+    "mobilePreferencesAndDisconnect": "passed with fictitious data",
+    "horizontalOverflow": false
+  },
+  "oauth": {
+    "googleProject": "afpcloud-512405",
+    "publishingStatus": "IN_PRODUCTION",
+    "publishingEvidence": "User screenshot confirmed En producción",
+    "userConnection": "CONNECTED",
+    "verification": "google-verification.json",
+    "activeEvents": 182,
+    "uniqueSources": 182,
+    "mismatches": 0,
+    "pendingChanges": false
+  },
+  "scheduler": {
+    "provider": "Supabase pg_cron + pg_net",
+    "jobName": "afp-google-calendar-sync",
+    "schedule": "*/5 * * * *",
+    "active": true,
+    "verifiedRunAt": "2026-10-22T05:50:00.114Z",
+    "verifiedHttpStatus": 200,
+    "verifiedProcessedConnections": 1,
+    "verifiedResult": "SYNCED",
+    "authorizationStorage": "Supabase Vault",
+    "fallback": "Vercel daily cron at 12:00 UTC"
+  },
+  "runtimeErrors": {
+    "since": "2026-10-22T05:39:40Z",
+    "groupsFound": 1,
+    "historicalError": "OAuth RECONNECT at 2026-10-22T05:46:45Z, before successful connection",
+    "currentStatus": "CONNECTED with lastError null; all 182 events verified against Google",
+    "limitation": "Immediate observation window; does not guarantee future availability"
+  }
+}

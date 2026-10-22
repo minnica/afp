@@ -88,8 +88,67 @@ model User {
   captureMovements     CaptureMovement[]
   captureStatements    CaptureStatement[]
   expenseTombstones    ExpenseTombstone[]
+  googleCalendar       GoogleCalendarConnection?
+  calendarOAuthStates  CalendarOAuthState[]
 
   @@map("users")
+}
+
+model GoogleCalendarConnection {
+  id                 String   @id @default(uuid())
+  userId             String   @unique
+  googleSubject      String?
+  googleEmail        String?
+  refreshToken       String?
+  calendarId         String?
+  calendarMarker     String   @default(uuid())
+  status             String   @default("DISCONNECTED")
+  preferences        Json     @default("{}")
+  revision           Int      @default(1)
+  syncedRevision     Int      @default(0)
+  lastSyncedAt       DateTime?
+  lastError          String?
+  nextAttemptAt      DateTime @default(now())
+  attempts           Int      @default(0)
+  lockToken          String?
+  lockUntil          DateTime?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  events             GoogleCalendarEvent[]
+
+  @@index([status, nextAttemptAt])
+  @@map("google_calendar_connections")
+}
+
+model CalendarOAuthState {
+  stateHash       String   @id
+  userId          String
+  browserHash     String
+  verifier        String
+  expiresAt       DateTime
+  createdAt       DateTime @default(now())
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([expiresAt])
+  @@index([userId])
+  @@map("calendar_oauth_states")
+}
+
+model GoogleCalendarEvent {
+  connectionId String
+  sourceKey    String
+  eventId      String
+  generation   Int      @default(0)
+  eventDate    String
+  payloadHash  String?
+  removed      Boolean  @default(false)
+  updatedAt    DateTime @updatedAt
+  connection   GoogleCalendarConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+
+  @@id([connectionId, sourceKey])
+  @@unique([connectionId, eventId])
+  @@map("google_calendar_events")
 }
 
 // Recibo durable: borrar/editar el gasto no permite volver a ejecutar la captura.

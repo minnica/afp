@@ -39,7 +39,13 @@ async function assertAutomation(db) {
     assert.match(added[0].definition, /OLD\."userId" IS NOT NULL/);
     assert.match(added[0].definition, /NEW\."userId" IS DISTINCT FROM OLD\."userId"/);
   }
-  assert.deepEqual({ ...actual, functions: actual.functions.filter(row => row.name !== 'capture_device_owner_immutable') }, beforeAutomation);
+  const calendar = actual.functions.find(row => row.name === 'afp_calendar_changed');
+  if (calendar) {
+    assert.match(calendar.definition, /revision = revision \+ 1/);
+    const triggers = await db.$queryRawUnsafe("SELECT count(*)::int AS count FROM pg_trigger WHERE tgname='afp_calendar_changed' AND NOT tgisinternal");
+    assert.equal(triggers[0].count, 9);
+  }
+  assert.deepEqual({ ...actual, functions: actual.functions.filter(row => !['capture_device_owner_immutable', 'afp_calendar_changed'].includes(row.name)) }, beforeAutomation);
 }
 
 async function assertNewTableRls(db, role) {
@@ -106,7 +112,8 @@ function assertCatalog(actual) {
   for (const section of ['columns', 'constraints', 'indexes', 'enums']) {
     const rows = actual[section].filter(row => (row.table_name || row.tablename) !== 'expense_operations'
       && !['capture_devices', 'capture_pairings', 'capture_events', 'capture_rate_limits', 'capture_card_aliases',
-        'capture_automations', 'capture_merchant_rules', 'capture_movements', 'expense_tombstones', 'capture_statements'].includes(row.table_name || row.tablename)
+        'capture_automations', 'capture_merchant_rules', 'capture_movements', 'expense_tombstones', 'capture_statements',
+        'google_calendar_connections', 'calendar_oauth_states', 'google_calendar_events'].includes(row.table_name || row.tablename)
       && !(section === 'columns' && row.table_name === 'card_cycles' && creditColumns.includes(row.column_name))
       && !(section === 'columns' && row.table_name === 'cards' && balanceColumns.includes(row.column_name))
       && !(section === 'constraints' && ['cards_credit_balance_complete_check', 'cards_balance_tracking_check'].includes(row.name))
@@ -116,7 +123,7 @@ function assertCatalog(actual) {
       && !(section === 'constraints' && row.name === 'daily_expenses_cash_contribution_check'));
     assert.deepEqual(rows, before[section], `Catálogo distinto en ${section}`);
   }
-  assert.equal(actual.security.length, before.security.length + 11);
+  assert.equal(actual.security.length, before.security.length + 14);
   for (const row of actual.security) {
     assert.equal(row.rls, true, `RLS desactivado: ${row.table_name}`);
     assert.equal(row.force_rls, false);
@@ -305,7 +312,7 @@ async function main() {
         console.log(`OK ${i ? 'actualización desde las 13 migraciones aplicadas' : 'base vacía'}: catálogo equivalente, diff vacío, checksums, deploy repetible, registros intactos y RLS.`);
       } finally { await db.$disconnect(); }
     }
-    console.log(`Reconstrucción y actualización verificadas; ${localMigrations().length} migraciones y ${before.security.length + 11} tablas con RLS, incluido el historial.`);
+    console.log(`Reconstrucción y actualización verificadas; ${localMigrations().length} migraciones y ${before.security.length + 14} tablas con RLS, incluido el historial.`);
   } finally {
     // Solo elimina bases/roles con sufijo aleatorio creados por esta ejecución.
     for (const name of createdDatabases.reverse()) await admin.$executeRawUnsafe(`DROP DATABASE "${name}" WITH (FORCE)`);

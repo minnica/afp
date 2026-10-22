@@ -1,0 +1,66 @@
+{
+  "at": "2026-10-22T06:32:27.059Z",
+  "status": "CONNECTED",
+  "lastError": null,
+  "revision": 3,
+  "syncedRevision": 3,
+  "plannedEvents": 180,
+  "activeEvents": 182,
+  "uniqueSources": 182,
+  "beforeEvents": 182,
+  "counts": {
+    "completed": 45,
+    "pending": 69,
+    "partial": 4,
+    "informational": 62
+  },
+  "allColorCounts": {
+    "6": 4,
+    "8": 62,
+    "9": 69,
+    "10": 47
+  },
+  "colorErrors": 0,
+  "mismatches": 0,
+  "changedColors": 113,
+  "clarifiedPartialTitles": 4,
+  "changedOtherFields": 0,
+  "completedNotGreen": 0,
+  "outsideManagedWindow": [
+    {
+      "colorId": "10",
+      "label": "Pagado"
+    },
+    {
+      "colorId": "10",
+      "label": "Pagado"
+    }
+  ],
+  "idsPreserved": true,
+  "privateDetailsIncluded": false,
+  "deployment": {
+    "id": "dpl_GtRDXBV3uBMNS2s3F3jm33uNh4n8",
+    "state": "READY",
+    "productionAliasVerified": true,
+    "url": "https://afp-ce45aiz1m-minnicas-projects.vercel.app",
+    "sourceManifest": "source-manifest-colors.json",
+    "sourceManifestSha256": "4f061cf36f9430605578810c2fa84f481d98bbcc985bd81f2dc712730cce9f42",
+    "sourceFiles": 283,
+    "sourceBytes": 2623922,
+    "privateFilesUploaded": false
+  },
+  "validation": {
+    "testsPassed": 15,
+    "testsFailed": 0,
+    "testsSkipped": 0,
+    "webpackBuild": "passed",
+    "lintErrors": 0,
+    "nativePaletteContrast": "color-palette.json",
+    "fiveMinutePollingReenabled": false
+  },
+  "runtimeErrors": {
+    "since": "2026-10-22T06:28:40Z",
+    "groupsFound": 0,
+    "limitation": "Immediate observation window"
+  }
+}
