@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { cycleCreditSelect } from "@/lib/calculations/cardCredits";
 import { calculateCycleAmount } from "@/lib/calculations/cardCycles";
 import { getCyclePeriodWarnings } from "@/lib/calculations/cycleDataQuality";
+import { guardCapturedPaymentTotal } from "@/lib/capturePayments";
 
 const cycleSelect = {
   usageReconciliation: true,
@@ -356,6 +357,7 @@ async function updateCycle(userId, id, getData) {
     const current = await tx.cardCycle.findUnique({ where: { id, userId } });
     if (!current) throw new ApiAccessError("Ciclo no encontrado.", 404);
     const data = getData(current);
+    await guardCapturedPaymentTotal(tx, current, data);
     const next = { ...current, ...data };
     if (Number(next.postCutCreditAmount ?? 0) > 0) {
       if (next.statementAmount == null || Math.round(Number(next.postCutCreditAmount) * 100) > Math.round(Number(next.statementAmount) * 100)) {

@@ -39,6 +39,14 @@ export default function CaptureConfigurationPanel({ configuration, userId, refre
     <div role="status">{notice}</div>
     <Field><FieldLabel htmlFor="capture-config-card">Tarjeta a configurar</FieldLabel><ResponsiveSelect id="capture-config-card" value={cardId} disabled={busy} onValueChange={value => { setCardId(value); ruleForm.reset(); }} options={configuration.cards.map(row => ({ value: row.id, label: row.name }))} searchable="auto" /></Field>
     {!cardId ? <p className="text-sm text-muted-foreground">Añade una tarjeta en Tarjetas para configurar sus avisos.</p> : <>
+      {(configuration.paymentPolicies || []).some(row => row.cardId === cardId) && <>
+        <h3 className="font-medium">Pagos de tarjeta</h3>
+        <ItemGroup>{configuration.paymentPolicies.filter(row => row.cardId === cardId).map(policy => <Item key={policy.id} role="listitem"><ItemContent>
+          <ItemTitle>{policy.source === "BBVA_RECEIPT" ? "Comprobante compartido de BBVA" : "Aviso de pago recibido de Nu"}<Badge variant={policy.mode === "AUTOMATIC" ? "secondary" : "warning"}>{policy.mode === "AUTOMATIC" ? "Automático" : "Solo revisión"}</Badge></ItemTitle>
+          <ItemDescription>{policy.source === "BBVA_RECEIPT" ? `Destino •${policy.destinationLast4}. Comparte el comprobante con AFP después de transferir.` : "Se registra al recibir un aviso de pago con un único corte pendiente identificado."} Los casos ambiguos quedan en la bandeja.</ItemDescription>
+        </ItemContent><ItemActions><Button variant="outline" className="min-h-11" disabled={busy} onClick={() => perform({ action: "paymentAutomation", id: policy.id, mode: policy.mode === "AUTOMATIC" ? "OBSERVATION" : "AUTOMATIC" })}>{policy.mode === "AUTOMATIC" ? "Pasar a revisión" : "Activar pagos automáticos"}</Button></ItemActions></Item>)}</ItemGroup>
+        <Separator />
+      </>}
       <CaptureRolloutStatus coverage={configuration.rollout?.find(row => row.cardId === cardId)} cardId={cardId} busy={busy} onAutomation={setConfirmation} />
       <Separator />
       <h3 className="font-medium">Terminaciones de la tarjeta</h3>
@@ -51,7 +59,7 @@ export default function CaptureConfigurationPanel({ configuration, userId, refre
         <FieldGroup>
           <Field><FieldLabel htmlFor="alias-source">Aplicación emisora</FieldLabel><Controller name="sourcePackage" control={aliasForm.control} render={({ field }) => <ResponsiveSelect id="alias-source" value={field.value} disabled={busy} onValueChange={value => {
             field.onChange(value); aliasForm.setValue("kind", value === "com.google.android.apps.walletnfcrel" ? "WALLET" : "PHYSICAL");
-          }} options={Object.entries(captureSources).map(([value, label]) => ({ value, label }))} />} /></Field>
+          }} options={Object.entries(captureSources).filter(([value]) => value !== "com.garatachia.afp.paymentreceipts").map(([value, label]) => ({ value, label }))} />} /></Field>
           <Field><FieldLabel htmlFor="alias-kind">Tipo de terminación</FieldLabel><Controller name="kind" control={aliasForm.control} render={({ field }) => <ResponsiveSelect id="alias-kind" value={field.value} disabled={busy} onValueChange={field.onChange} options={Object.entries(kinds).map(([value, label]) => ({ value, label }))} />} /></Field>
           {[['value', 'Últimas cuatro cifras'], ['evidence', 'Dónde la verificaste']].map(([name, label]) => <Field key={name} data-invalid={Boolean(aliasForm.formState.errors[name])}><FieldLabel htmlFor={`alias-${name}`}>{label}</FieldLabel><Input className="min-h-11" id={`alias-${name}`} maxLength={name === 'value' ? 4 : 500} inputMode={name === 'value' ? 'numeric' : undefined} disabled={busy} aria-invalid={Boolean(aliasForm.formState.errors[name])} {...aliasForm.register(name)} /><FieldError errors={[aliasForm.formState.errors[name]]} /></Field>)}
           <Field orientation="horizontal"><Controller name="verified" control={aliasForm.control} render={({ field }) => <Checkbox id="alias-verified" checked={field.value} onCheckedChange={field.onChange} disabled={busy} />} /><FieldLabel htmlFor="alias-verified" className="min-h-11">Comprobé esta terminación</FieldLabel></Field>

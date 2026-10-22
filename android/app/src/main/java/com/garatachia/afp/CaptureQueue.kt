@@ -34,6 +34,22 @@ class CaptureQueue(val database: CaptureQueueDatabase, private val cipher: Queue
         })
     }
     fun payload(row: QueuedCapture) = JSONObject(cipher.decrypt(row.payload, row.identity()))
+    fun enqueueReceipt(contentHash: String, text: String, mimeType: String, binding: CaptureBinding, receivedAt: Long = System.currentTimeMillis()): QueuedCapture {
+        require(binding.state in setOf("ACTIVE", "PAUSED") && contentHash.matches(Regex("[a-f0-9]{64}")))
+        require(text.isNotBlank() && text.length <= 20000 && mimeType in ReceiptTextReader.mimeTypes)
+        val device = requireNotNull(binding.deviceId)
+        val owner = requireNotNull(binding.ownerId)
+        val fingerprint = "payment-receipt:$contentHash"
+        return database.runInTransaction(Callable {
+            dao.byFingerprint(device, owner, fingerprint) ?: run {
+                val row = QueuedCapture(java.util.UUID.randomUUID().toString(), device, owner, fingerprint, byteArrayOf(), receivedAt)
+                val payload = JSONObject().put("receiptVersion", 1).put("eventId", row.eventId).put("contentHash", contentHash)
+                    .put("receivedAt", Instant.ofEpochMilli(receivedAt).toString()).put("extractedText", text).put("mimeType", mimeType)
+                dao.insert(row.copy(payload = cipher.encrypt(payload.toString(), row.identity())))
+                requireNotNull(dao.byFingerprint(device, owner, fingerprint))
+            }
+        })
+    }
     fun authorized(binding: CaptureBinding) {
         if (binding.state == "ACTIVE" && binding.deviceId != null && binding.ownerId != null)
             dao.unblock(binding.deviceId, binding.ownerId)

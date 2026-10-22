@@ -1,5 +1,6 @@
 import { captureParsers, normalizeMerchant } from "@/lib/captureParsers";
 import { Prisma } from "@prisma/client";
+import { paymentCaptureKind } from "@/lib/capturePaymentParsers";
 
 const unresolved = ["REVIEW", "OBSERVED"];
 const coincidenceReasons = ["POSSIBLE_DUPLICATE", "REFERENCE_CONFLICT", "NOTIFICATION_REVISION"];
@@ -30,12 +31,13 @@ export async function capturePilotSummary(tx, userId, period, records, statement
   const expenseIds = records.filter(row => row.type === "EXPENSE").map(row => row.id);
   const purchaseIds = records.filter(row => row.type === "INSTALLMENT").map(row => row.id);
   const operationDate = { gte: new Date(`${period.startDate}T00:00:00Z`), lte: new Date(`${period.endDate}T23:59:59.999Z`) };
-  const movements = await tx.captureMovement.findMany({ where: { userId, OR: [
+  const receivedMovements = await tx.captureMovement.findMany({ where: { userId, OR: [
     { expenseId: { in: expenseIds } }, { installmentPurchaseId: { in: purchaseIds } },
     { cardId: period.cardId, operationDate },
   ] }, select: { id: true, status: true, reason: true, expenseId: true, originalExpenseId: true,
     installmentPurchaseId: true, proposal: true, correction: true,
     events: { where: { userId }, select: { id: true, sourcePackage: true } } } });
+  const movements = receivedMovements.filter(row => !paymentCaptureKind(row));
   const aliases = await tx.captureCardAlias.findMany({ where: { userId, cardId: period.cardId }, select: { sourcePackage: true } });
   const sources = [...new Set(aliases.map(alias => alias.sourcePackage))];
   const automations = await tx.captureAutomation.findMany({ where: { userId, cardId: period.cardId, mode: "AUTOMATIC" }, select: { parserKey: true } });

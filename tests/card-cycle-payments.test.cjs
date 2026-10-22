@@ -16,6 +16,7 @@ function fixture(initial = {}) {
   const reads = [], locks = [];
   let inTransaction = false;
   const prisma = {
+    cardCyclePayment: { findMany: async () => [] },
     cardCycle: {
       findMany: async () => [plain(cycle)],
       findUnique: async ({ where }) => {

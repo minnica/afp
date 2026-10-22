@@ -77,7 +77,7 @@ test('Fase 6 PostgreSQL: seguimiento del piloto sin atribuir cobertura ni crear 
       }
       assert.equal((await captureStatement(db, user.id, historical)).pilot.unassignedSourceEvents, 2);
     });
-    await t.test('avisos de débito se descartan: reintentos y activación forzada no crean una compra de crédito', async () => {
+    await t.test('avisos de débito quedan por revisar: reintentos y activación forzada no crean una compra de crédito', async () => {
       const config = await load('src/lib/captureConfiguration.js').captureConfiguration(db, user.id);
       assert.ok(!config.parsers.some(parser => parser.key === 'bbva.account-charge.es.v1'));
       await assert.rejects(configureCapture(db, user.id, { action: 'automation', cardId: card.id, parserKey: 'bbva.account-charge.es.v1', mode: 'AUTOMATIC' }), error => error.status === 409);
@@ -90,7 +90,7 @@ test('Fase 6 PostgreSQL: seguimiento del piloto sin atribuir cobertura ni crear 
       for (const response of responses) assert.deepEqual(response, responses[0]);
       assert.equal(await db.captureEvent.count({ where: { deviceId: device.id, eventId: input.eventId } }), 1);
       const stored = await db.captureEvent.findUnique({ where: { deviceId_eventId: { deviceId: device.id, eventId: input.eventId } }, include: { movement: true } });
-      assert.equal(stored.movement.status, 'DISCARDED'); assert.equal(stored.movement.reason, 'NON_CREDIT_ACCOUNT'); assert.ok(stored.movement.resolvedAt);
+      assert.equal(stored.movement.status, 'REVIEW'); assert.equal(stored.movement.reason, 'ACCOUNT_DEBIT_REVIEW'); assert.equal(stored.movement.resolvedAt, null);
       assert.equal(await db.dailyExpense.count({ where: { userId: user.id } }), before);
       assert.equal((await read()).pilot.automaticFormats.length, 0);
     });

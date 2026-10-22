@@ -1,0 +1,21 @@
+{
+  "testedAt": "2026-10-22T08:59:03.368Z",
+  "migrationCount": 28,
+  "pendingMigrations": 0,
+  "schemaDiffEmpty": true,
+  "rlsTables": 32,
+  "publicPolicies": 0,
+  "activePaymentRules": 7,
+  "cards": [
+    "BANAMEX 1",
+    "BANAMEX 2",
+    "HSBC 1",
+    "HSBC 2",
+    "SANTANDER",
+    "DIDI",
+    "NU"
+  ],
+  "existingFinancialRowsPreserved": true,
+  "previousPaymentsPreserved": true,
+  "retroactivePaymentsCreated": 0
+}

@@ -1,0 +1,23 @@
+{
+  "verifiedAt": "2026-10-22T09:04:45.013Z",
+  "deploymentId": "dpl_3bm5PkNguskGpumCdpkuWrssESPJ",
+  "productionUrl": "https://finanzas.garatachia.com",
+  "ready": true,
+  "sourceCommit": "bc68bc0a9af4f4cfd2bb271d09695f672eea9e68",
+  "sourceWorkingTree": true,
+  "sourceManifestSha256": "4bcb349a9411c213fba806cde42327a843443ef916301a4464fc2cb649acc0aa",
+  "publicFiles": 298,
+  "activeRules": 7,
+  "credentialAndOwnerPreserved": true,
+  "existingFinancialDataPreserved": true,
+  "noRetroactivePayments": true,
+  "unauthenticatedReceiptApi": 401,
+  "runtimeErrorsObserved": 0,
+  "firstRealAutomaticPaymentStillToObserve": true,
+  "apkVersion": "0.6.0",
+  "apkVersionCode": 8,
+  "commitOrPushPerformed": false,
+  "initialDeploymentId": "dpl_4Xuk4yYXdRZBbKosMgQaAeujR5ZL",
+  "finalDeploymentVerifiedAt": "2026-10-22T09:07:21.072457+00:00",
+  "receiptSourceExcludedFromNotificationApps": true
+}

@@ -23,6 +23,16 @@
         android:usesCleartextTraffic="false"
         android:theme="@style/Theme.AFP">
         <meta-data android:name="asset_statements" android:resource="@string/asset_statements" />
+        <activity android:name=".SharePaymentActivity" android:exported="true" android:label="AFP · Registrar pago">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/png" />
+                <data android:mimeType="image/jpeg" />
+                <data android:mimeType="image/webp" />
+                <data android:mimeType="application/pdf" />
+            </intent-filter>
+        </activity>
         <activity android:name=".MainActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

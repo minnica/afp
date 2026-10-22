@@ -1,4 +1,19 @@
 export const captureReasons = {
+  PAYMENT_AUTOMATIC: "Pago registrado automáticamente con tu regla de pagos.",
+  PAYMENT_POLICY_REQUIRED: "Falta una regla de pagos para ese destino o formato.",
+  PAYMENT_CYCLE_REQUIRED: "No se pudo identificar un único corte con estado de cuenta; selecciona el período.",
+  PAYMENT_MANUAL_TOTAL: "El corte ya tiene pagos manuales; revisa si este abono está incluido.",
+  PAYMENT_POSSIBLE_DUPLICATE: "Ya hay un pago de ese importe en fechas cercanas; revisa su evidencia.",
+  PAYMENT_EXCESS_REVIEW: "El importe supera el saldo pendiente del corte; requiere revisión.",
+  PAYMENT_FUTURE: "La fecha de pago es futura; requiere revisión.",
+  RECEIPT_UNKNOWN_FORMAT: "Comprobante con formato no reconocido; revisa su contenido.",
+  RECEIPT_INCOMPLETE: "No se pudieron leer con certeza los campos del comprobante.",
+  RECEIPT_PERIOD_REQUIRED: "Revisa el concepto y el mes del estado de cuenta.",
+  PAYMENT_REVIEW: "Pago recibido: confirma tarjeta, moneda, fecha y corte.",
+  ACCOUNT_DEBIT_REVIEW: "Salida de dinero de BBVA sin destinatario. Confirma si corresponde a un pago de tarjeta.",
+  PAYMENT_REGISTERED: "Abono registrado en el total pagado del corte.",
+  PAYMENT_LINKED: "Evidencia de un pago ya incluido en el total; no se sumó otra vez.",
+  PAYMENT_REVERSED: "Abono deshecho o evidencia desvinculada; el aviso no se volverá a aplicar.",
   UNKNOWN_FORMAT: "Formato desconocido; necesita una muestra revisada.", INCOMPLETE_FORMAT: "El aviso no incluye todos los datos necesarios.",
   NON_CREDIT_ACCOUNT: "Aviso de cuenta de débito; fuera de la captura de tarjetas de crédito.",
   CONFLICTING_FIELDS: "El aviso contiene textos contradictorios.", INVALID_FIELDS: "Importe o fecha no válidos.", INVALID_CARD_KIND: "No coincide el tipo de tarjeta.",
@@ -18,6 +33,7 @@ export const captureReasons = {
 export const captureStatuses = { REVIEW: "Por revisar", OBSERVED: "Observación", REGISTERED: "Registrado", LINKED: "Vinculado", DISCARDED: "Descartado", CONVERTED: "A meses" };
 export const captureInboxStatuses = { REVIEW: "Por revisar", REGISTERED: "Registrado", RECONCILED: "Conciliado", DISCARDED: "Descartado" };
 export const captureSources = {
+  "com.garatachia.afp.paymentreceipts": "Comprobante compartido",
   "com.bancomer.mbanking": "BBVA", "com.google.android.apps.walletnfcrel": "Google Wallet", "mx.hsbc.hsbcmexico": "HSBC",
   "com.citibanamex.banamexmobile": "Banamex", "mx.bancosantander.supermovil": "Santander", "com.nu.production": "Nu",
   "com.didiglobal.cashloan": "DiDi Finanzas", "com.mercadopago.wallet": "Mercado Pago",

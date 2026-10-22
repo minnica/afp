@@ -31,7 +31,7 @@ function CaptureInbox({ userId, configuration }) {
     {!data ? <Skeleton className="h-24 w-full" /> : data.movements.length === 0 ? <Empty><EmptyDescription>No hay avisos en este estado. Los nuevos aparecerán al recibirse desde el teléfono.</EmptyDescription></Empty> : <ItemGroup className="gap-3">{data.movements.map(movement => {
       const proposal = { ...movement.proposal, ...movement.correction };
       return <Item key={movement.id} variant="outline" className="flex-wrap"><ItemContent className="min-w-0 basis-full">
-        <ItemTitle className="flex-wrap break-words">{proposal.merchant || "Aviso sin compra identificada"}<Badge variant={movement.inboxState === 'REVIEW' ? 'warning' : 'secondary'}>{captureInboxStatuses[movement.inboxState]}</Badge></ItemTitle>
+        <ItemTitle className="flex-wrap break-words">{proposal.merchant || "Aviso por identificar"}<Badge variant={movement.inboxState === 'REVIEW' ? 'warning' : 'secondary'}>{captureInboxStatuses[movement.inboxState]}</Badge></ItemTitle>
         <ItemDescription>{proposal.amount ? `${proposal.amount} ${proposal.currency || ''} · ${proposal.date || ''} · ` : ''}{captureReasons[movement.reason] || "Requiere revisión."}</ItemDescription>
         <ItemDescription>{configuration.cards.find(card => card.id === proposal.cardId)?.name || 'Tarjeta por identificar'} · {captureSources[movement.events[0]?.sourcePackage] || 'Aviso'}{movement.status === 'OBSERVED' ? ' · Observación' : ''}</ItemDescription>
         {proposal.dateSource === 'NOTIFICATION_POSTED_AT' && <ItemDescription>Fecha de publicación del aviso · hora de México</ItemDescription>}

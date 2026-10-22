@@ -14,6 +14,7 @@ export const captureInventorySchema = z.object({ version: z.literal(1), cards: z
 }).strict()).max(100) }).strict();
 
 const actionSchema = z.discriminatedUnion("action", [
+  z.object({ action: z.literal("paymentAutomation"), id: z.uuid(), mode: z.enum(["OBSERVATION", "AUTOMATIC"]) }).strict(),
   z.object({ action: z.literal("alias"), cardId: z.string().min(1), sourcePackage: z.enum(capturePackages), kind: z.enum(["PHYSICAL", "DIGITAL", "WALLET"]), value: lastFour, verified: z.boolean(), evidence: z.string().trim().max(500) }).strict(),
   z.object({ action: z.literal("deleteAlias"), id: z.uuid() }).strict(),
   z.object({ action: z.literal("deleteRule"), id: z.uuid() }).strict(),
@@ -31,6 +32,12 @@ export async function configureCapture(db, userId, input) {
   const data = parsed.data;
   return db.$transaction(async tx => {
     await lockDebtAccounts(tx, userId);
+    if (data.action === "paymentAutomation") {
+      const policy = await tx.capturePaymentPolicy.findFirst({ where: { id: data.id, userId } });
+      if (!policy) throw new ApiAccessError("Regla de pagos no encontrada.", 404);
+      if (!policy.acceptedAt && data.mode === "AUTOMATIC") throw new ApiAccessError("Revisa la tarjeta, moneda y fechas de esta regla antes de activarla.", 409);
+      return tx.capturePaymentPolicy.update({ where: { id: policy.id }, data: { mode: data.mode } });
+    }
     if (["deleteAlias", "deleteRule"].includes(data.action)) {
       const model = data.action === "deleteAlias" ? tx.captureCardAlias : tx.captureMerchantRule;
       if (!(await model.deleteMany({ where: { id: data.id, userId } })).count) throw new ApiAccessError("Registro no encontrado.", 404);
@@ -131,7 +138,8 @@ export async function captureConfiguration(db, userId) {
     db.subscription.findMany({ where: { userId }, select: { id: true, name: true, cardId: true, paymentMethod: true }, orderBy: { name: "asc" } }),
   ]);
   const movements = await captureRolloutMovements(db, userId);
-  return { cards, aliases, automations, rules, categories, subscriptions,
+  const paymentPolicies = await db.capturePaymentPolicy.findMany({ where: { userId }, orderBy: { createdAt: "asc" } });
+  return { cards, aliases, automations, rules, categories, subscriptions, paymentPolicies,
     rollout: buildCaptureRollout(cards, aliases, automations, captureParsers, movements),
-    parsers: captureParsers.filter(parser => parser.evidence !== "REAL_OUT_OF_SCOPE").map(({ key, sourcePackage, verified, dateSource }) => ({ key, sourcePackage, verified, dateSource: dateSource || "BANK_OPERATION" })) };
+    parsers: captureParsers.filter(parser => parser.evidence !== "REAL_OUT_OF_SCOPE" && !parser.paymentOnly).map(({ key, sourcePackage, verified, dateSource }) => ({ key, sourcePackage, verified, dateSource: dateSource || "BANK_OPERATION" })) };
 }

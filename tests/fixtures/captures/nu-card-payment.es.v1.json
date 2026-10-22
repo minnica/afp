@@ -1,0 +1,17 @@
+{
+  "evidence": "REAL_REVIEWED_ANONYMIZED",
+  "limitations": [
+    "Sin tarjeta, moneda explícita, fecha bancaria ni corte",
+    "Los valores financieros y horarios son ficticios"
+  ],
+  "event": {
+    "sourcePackage": "com.nu.production",
+    "postedAt": "2026-10-22T04:00:00.000Z",
+    "receivedAt": "2026-10-22T04:00:00.300Z",
+    "fields": {
+      "android.text": "¡Muchas gracias! Con tu pago a tiempo mantienes un buen historial y evitas recargos. ¡Sigue así!",
+      "android.title": "Recibimos tu pago por $123.45",
+      "android.bigText": "¡Muchas gracias! Con tu pago a tiempo mantienes un buen historial y evitas recargos. ¡Sigue así!"
+    }
+  }
+}

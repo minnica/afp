@@ -1,0 +1,5 @@
+{
+  "evidence": "REAL_LAYOUT_ANONYMIZED",
+  "note": "Plantilla del comprobante compartido por el propietario; cuentas, referencias, importe y concepto ficticios. El comprobante real tenía un error de mes confirmado por su propietario.",
+  "text": "BBVA\nComprobante de la operación\nTipo de operación\nTransferencia a otros bancos\n21 octubre 2026\nImporte\n$ -123.45\nNombre del ordenante\nPERSONA FICTICIA\nCuenta origen\n012180000000000002\nNombre del beneficiario\nPERSONA FICTICIA\nCuenta destino\n646180000000000009\nBanco destino\nSTP\nConcepto\nestado de cuenta octubre\nFecha de operación\n21 octubre 2026, 22:32:27\nFecha de aplicación\n2026-10-21T22:32:49.011-06:00\nClave de rastreo\nMBAN010026102200000000001\nReferencia\n100001\nFolio de operación\n00000000001 646"
+}

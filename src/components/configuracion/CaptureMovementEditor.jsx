@@ -4,6 +4,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import CaptureFields from "@/components/configuracion/CaptureFields";
+import CapturePaymentEditor from "@/components/configuracion/CapturePaymentEditor";
+import { paymentCaptureKind } from "@/lib/capturePaymentParsers";
 import { apiFetch } from "@/lib/apiFetch";
 import { captureSources } from "@/lib/capturePresentation";
 import { Button } from "@/components/ui/button";
@@ -53,6 +55,7 @@ export default function CaptureMovementEditor({ detail, configuration, userId, o
     } catch (err) { setError(`${err.message} Actualiza para comprobar el resultado si se perdió la respuesta.`); }
     finally { setBusy(false); }
   }
+  if (paymentCaptureKind(movement)) return <CapturePaymentEditor detail={current} configuration={configuration} userId={userId} onClose={onClose} onSaved={onSaved} restoreFocus={restoreFocus} />;
   return <><Dialog open onOpenChange={value => { if (!value && !busy) onClose(); }}>
     <DialogContent className="flex max-h-[90dvh] flex-col overflow-hidden sm:max-w-xl" onOpenAutoFocus={event => { event.preventDefault(); titleRef.current?.focus(); }} onCloseAutoFocus={restoreFocus}
       onEscapeKeyDown={event => { if (busy) event.preventDefault(); }} onInteractOutside={event => { if (busy) event.preventDefault(); }} showCloseButton={!busy}>
@@ -67,6 +70,7 @@ export default function CaptureMovementEditor({ detail, configuration, userId, o
         {proposal.dateSource === "NOTIFICATION_POSTED_AT" && <Alert><AlertDescription>La fecha propuesta procede de la publicación del aviso, en hora de México. El aviso no incluye fecha bancaria de operación.</AlertDescription></Alert>}
         {proposal.completionPolicy && <Alert><AlertDescription>La tarjeta y MXN proceden de tu regla Nu/CFE. Registrar confirma el cobro de {configuration.subscriptions.find(row => row.id === proposal.subscriptionId)?.name || "la suscripción configurada"} correspondiente al mes del aviso, con su importe real. Si el cobro ya está resuelto o no corresponde, queda por revisar.</AlertDescription></Alert>}
         {movement.analysisHistory?.length > 0 && <p className="text-sm text-muted-foreground">Interpretado con el formato actual. Se conservan {movement.analysisHistory.length} análisis anteriores y el aviso original.</p>}
+        {movement.status === "DISCARDED" && movement.reason === "NON_CREDIT_ACCOUNT" && <Button variant="outline" className="min-h-11" disabled={busy} onClick={() => setConfirmation({ action: "reinterpret" })}>Revisar como posible pago de tarjeta</Button>}
         {open ? <>
           {!movement.correction && movement.events.length === 1 && <Button variant="outline" className="min-h-11 self-start" disabled={busy || form.formState.isDirty} onClick={() => setConfirmation({ action: "reinterpret" })}>Interpretar con el formato actual</Button>}
           {proposal.currency && proposal.currency !== "MXN" && <Alert><AlertDescription>El aviso indica {proposal.currency}. Captura el importe final cobrado en MXN según el banco antes de registrar.</AlertDescription></Alert>}

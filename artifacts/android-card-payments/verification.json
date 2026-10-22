@@ -1,0 +1,54 @@
+{
+  "implementedAt": "2026-10-22",
+  "scope": "Primera versión local de registro de pagos con revisión explícita; sin automatización de abonos habilitada",
+  "realInspection": {
+    "source": "Lectura de eventos existentes y diagnóstico AFP en S24 Ultra por USB",
+    "delivered": 19,
+    "pending": 0,
+    "queueErrors": 0,
+    "nuCardPaymentNoticeObserved": true,
+    "nuCajitaWithdrawalSeparate": true,
+    "didiPaymentNoticeObserved": false,
+    "bbvaDestinationInObservedNotice": false,
+    "bbvaTransferConceptInObservedNotice": false,
+    "privateDestinationReferences": 6,
+    "financialProductionWrites": 0
+  },
+  "validation": {
+    "fullRegression": {
+      "tests": 454,
+      "passed": 454,
+      "failed": 0,
+      "skipped": 0
+    },
+    "finalTargetedRegression": {
+      "tests": 66,
+      "passed": 66,
+      "failed": 0,
+      "skipped": 0
+    },
+    "migrationCount": 27,
+    "rlsTablesIncludingHistory": 31,
+    "emptyAndHistoricalMigrationPathsVerified": true,
+    "schemaDiffEmpty": true,
+    "existingRowsPreserved": true,
+    "webpackBuild": "passed",
+    "lintErrors": 0,
+    "lintExistingWarnings": 1,
+    "browserEvidence": "browser-verification.json"
+  },
+  "limits": [
+    "Nu requiere confirmar tarjeta, MXN, fecha y corte; no tiene política de automatización de pagos",
+    "BBVA no identifica el destino ni el concepto en la muestra observada",
+    "El vínculo de evidencia existente identifica una parte libre del acumulado manual; no fusiona automáticamente canales",
+    "Las reversiones conservan la última fecha conocida si queda un total pagado; no reconstruyen fechas históricas manuales",
+    "No se aplicó la migración a Supabase ni se desplegó; no se registraron los pagos reales del usuario",
+    "Sin nueva APK ni commit/push"
+  ],
+  "sourcesConsulted": [
+    "https://ui.shadcn.com/docs/components/radix/dialog",
+    "https://ui.shadcn.com/docs/components/radix/alert-dialog",
+    "https://ui.shadcn.com/docs/components/radix/field",
+    "https://ui.shadcn.com/docs/components/radix/item"
+  ]
+}

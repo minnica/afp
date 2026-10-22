@@ -92,6 +92,10 @@ model User {
   calendarOAuthStates  CalendarOAuthState[]
 
   @@map("users")
+  cardCyclePayments CardCyclePayment[]
+
+  capturePaymentPolicies CapturePaymentPolicy[]
+
 }
 
 model GoogleCalendarConnection {
@@ -205,6 +209,8 @@ model Card {
 
   @@unique([userId, name])
   @@map("cards")
+  capturePaymentPolicies CapturePaymentPolicy[]
+
 }
 
 model CardCycle {
@@ -236,6 +242,8 @@ model CardCycle {
   @@index([userId])
   @@index([cardId])
   @@map("card_cycles")
+  payments CardCyclePayment[]
+
 }
 
 model CardCycleCredit {
@@ -660,6 +668,8 @@ model CaptureMovement {
   @@index([userId, status, createdAt])
   @@index([userId, cardId, operationDate])
   @@map("capture_movements")
+  cardPayment CardCyclePayment?
+
 }
 
 model ExpenseTombstone {
@@ -704,4 +714,42 @@ model CaptureRateLimit {
 
   @@index([expiresAt])
   @@map("capture_rate_limits")
+}
+
+// Abonos capturados y evidencia de importes ya incluidos en el acumulado.
+// Los pagos manuales históricos conservan exactamente sus campos existentes.
+model CardCyclePayment {
+  id String @id @default(uuid()) @db.Uuid
+  userId String
+  cycleId String
+  movementId String @unique @db.Uuid
+  amount Decimal @db.Decimal(12, 2)
+  date DateTime @db.Date
+  kind String
+  reversedAt DateTime?
+  createdAt DateTime @default(now())
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cycle CardCycle @relation(fields: [cycleId], references: [id], onDelete: Cascade)
+  movement CaptureMovement @relation(fields: [movementId], references: [id], onDelete: Restrict)
+
+  @@index([userId, cycleId])
+  @@map("card_cycle_payments")
+}
+
+model CapturePaymentPolicy {
+  id String @id @default(uuid()) @db.Uuid
+  userId String
+  cardId String
+  source String
+  destinationLast4 String?
+  destinationHash String?
+  mode String @default("OBSERVATION")
+  acceptedAt DateTime?
+  createdAt DateTime @default(now())
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  card Card @relation(fields: [cardId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, cardId, source])
+  @@unique([userId, source, destinationLast4])
+  @@map("capture_payment_policies")
 }

@@ -20,9 +20,9 @@ test('analizadores: BBVA y Wallet sintéticos conservan tipo, referencia, ceros 
 });
 test('BBVA débito: cargo a cuenta confirmado fuera del piloto no propone una compra de crédito',()=>{
  const result=interpretCapture({sourcePackage:'com.bancomer.mbanking',receivedAt:'2026-10-21T23:00:00Z',fields:{'android.title':'Aviso de cargo en tu cuenta','android.text':'Tienes un cargo a tu cuenta *0123 de $123.45. Resto ficticio para anonimizar el aviso.'}});
- assert.equal(result.parserKey,'bbva.account-charge.es.v1');assert.equal(result.reason,'NON_CREDIT_ACCOUNT');assert.equal(result.verified,false);
- assert.equal(Object.keys(result.proposal).length,0);
- for(const field of ['alias','cardId','merchant','date','currency','operationAt'])assert.equal(result.proposal[field],undefined);
+ assert.equal(result.parserKey,'bbva.account-charge.es.v1');assert.equal(result.reason,'ACCOUNT_DEBIT_REVIEW');assert.equal(result.verified,false);
+ assert.equal(result.proposal.movementType,'ACCOUNT_DEBIT');assert.equal(result.proposal.amount,'123.45');
+ for(const field of ['alias','cardId','date','currency','operationAt','destination','statementPeriod'])assert.equal(result.proposal[field],undefined);
  for(const sourcePackage of ['com.nu.production','com.google.android.apps.walletnfcrel'])assert.equal(interpretCapture({sourcePackage,fields:{'android.text':'Tienes un cargo a tu cuenta *0123 de $123.45. Resto ficticio.'}}).reason,'UNKNOWN_FORMAT');
 });
 test('BBVA incompleto: texto contradictorio, importe inválido y movimiento especial no proponen una compra',()=>{

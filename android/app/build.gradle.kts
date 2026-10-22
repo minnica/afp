@@ -18,8 +18,8 @@ android {
         applicationId = "com.garatachia.afp"
         minSdk = 28
         targetSdk = 36
-        versionCode = 7
-        versionName = "0.5.0"
+        versionCode = 8
+        versionName = "0.6.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         manifestPlaceholders["webHost"] = "finanzas.garatachia.com"
         resValue("string", "web_url", "https://finanzas.garatachia.com/dashboard")
@@ -67,6 +67,7 @@ kotlin { compilerOptions { jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget
 ksp { arg("room.schemaLocation", "$projectDir/schemas") }
 
 dependencies {
+    implementation("com.google.mlkit:text-recognition:16.0.1")
     val composeBom = platform("androidx.compose:compose-bom:2026.04.01")
     implementation(composeBom)
     androidTestImplementation(composeBom)

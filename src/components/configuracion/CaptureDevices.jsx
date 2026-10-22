@@ -117,7 +117,7 @@ export default function CaptureDevices({ userId }) {
             <ItemDescription>{device.reportedAt ? `Estado reportado: ${new Date(device.reportedAt).toLocaleString("es-MX")}. No es una comprobación en tiempo real.` : "Sin estado nativo reportado. Requiere APK 0.4.0 o posterior; consulta el estado en el teléfono."}</ItemDescription>
             {device.reportedState && <ItemDescription>{device.reportedState.notificationAccess ? "Acceso a avisos concedido" : "Sin acceso a avisos"} · {device.reportedState.listenerConnected ? "Lector conectado" : "Lector desconectado"} · {device.reportedState.active ? "Captura activa" : "Captura local pausada"} · {device.reportedState.deliveryPaused ? "Envíos pausados localmente" : "Envíos habilitados"} · {device.reportedState.batteryExempt ? "Batería sin restricción" : "Revisar batería"}</ItemDescription>}
             {!device.revokedAt && <Collapsible className="flex flex-col gap-3"><CollapsibleTrigger asChild><Button variant="outline" className="min-h-11 h-auto max-w-full self-start whitespace-normal text-left">Aplicaciones de {device.name}</Button></CollapsibleTrigger><CollapsibleContent>
-              <ItemGroup>{Object.entries(captureSources).map(([sourcePackage, label]) => {
+              <ItemGroup>{Object.entries(captureSources).filter(([sourcePackage]) => sourcePackage !== "com.garatachia.afp.paymentreceipts").map(([sourcePackage, label]) => {
                 const paused = (device.pausedPackages || []).includes(sourcePackage);
                 const applied = device.reportedState && (device.reportedState.pausedPackages || []).includes(sourcePackage) === paused;
                 const selected = device.reportedState?.selectedPackages?.includes(sourcePackage);

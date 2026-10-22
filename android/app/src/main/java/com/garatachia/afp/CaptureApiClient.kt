@@ -75,7 +75,11 @@ class CaptureApiClient(private val origin: String,
     // La cola entrega exactamente el cuerpo persistido y conserva el UUID hasta recibir su recibo.
     fun sendEvent(binding: CaptureBinding, event: JSONObject): JSONObject {
         require(binding.state == "ACTIVE" && binding.ownerId != null)
-        return request("events", "POST", binding, event)
+        return request(if (event.optInt("receiptVersion") == 1) "payment-receipts" else "events", "POST", binding, event)
+    }
+    fun receiptStatus(binding: CaptureBinding, eventId: String): JSONObject {
+        require(runCatching { java.util.UUID.fromString(eventId) }.isSuccess)
+        return request("payment-receipts?eventId=$eventId", binding = binding).getJSONObject("result")
     }
     private fun merge(binding: CaptureBinding, response: JSONObject) = binding.withStatus(
         response.getString("deviceId"), if (response.isNull("ownerId")) null else response.getString("ownerId"), response.getString("state"))

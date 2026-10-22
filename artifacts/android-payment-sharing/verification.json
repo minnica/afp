@@ -1,0 +1,45 @@
+{
+  "webTests": 466,
+  "webFailures": 0,
+  "webSkipped": 0,
+  "finalParserAndAutomaticPaymentTests": 12,
+  "migrationsVerified": 28,
+  "migrationPaths": [
+    "empty database",
+    "historical upgrade"
+  ],
+  "webBuild": "passed",
+  "webLintErrors": 0,
+  "webLintExistingWarnings": 1,
+  "androidBuild": "debug/release passed",
+  "androidLintErrors": 0,
+  "newPhoneScenarios": 5,
+  "realReceiptOcr": {
+    "amountReadCorrectly": true,
+    "destinationReadCorrectly": true,
+    "operationDayReadCorrectly": true,
+    "originalWrongMonthPreserved": true,
+    "ownerCorrectionSavedPrivately": true
+  },
+  "fullLocalPipeline": [
+    "Android image/PDF",
+    "on-device OCR",
+    "encrypted Room queue",
+    "HTTPS API",
+    "automatic payment receipt",
+    "idempotent replay"
+  ],
+  "productionSyntheticPaymentsCreated": 0,
+  "coverage": [
+    "Six owner-declared BBVA transfer destinations via shared receipt",
+    "Nu received-payment notification"
+  ],
+  "limits": [
+    "BBVA requires sharing the receipt after the transfer",
+    "Ambiguous periods, manual totals, duplicates and uncertain OCR remain for review",
+    "Mercado Pago payment notices are not yet validated",
+    "First real automatic payment after publication remains to observe"
+  ],
+  "deploymentEvidence": "production-verification.json",
+  "phoneEvidence": "phone-verification.json"
+}

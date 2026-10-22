@@ -8,6 +8,9 @@ import { subscriptionChargeDate, getSubscriptionReceipts } from "@/lib/subscript
 import { Prisma } from "@prisma/client";
 import { effectiveCapture, correctCapture } from "@/lib/captureReview";
 import { matchesCapturePolicy } from "@/lib/captureFormatPolicy";
+import { paymentCaptureKind } from "@/lib/capturePaymentParsers";
+import { resolveCapturePayment } from "@/lib/capturePayments";
+import { automateCapturePayment } from "@/lib/capturePaymentAutomation";
 
 export async function archiveCapturedExpense(tx, expense) {
   await tx.expenseTombstone.upsert({ where: { expenseId: expense.id }, update: {}, create: {
@@ -22,6 +25,7 @@ function dateWindow(date) {
 }
 
 export async function captureCandidates(tx, userId, proposal) {
+  if (["CARD_PAYMENT", "ACCOUNT_DEBIT"].includes(proposal.movementType)) return [];
   if (!proposal.cardId || !proposal.amount || !proposal.date) return [];
   const where = { userId, cardId: proposal.cardId, amount: proposal.amount, date: dateWindow(proposal.date) };
   // Una transacción usa una conexión: no iniciar consultas simultáneas sobre ella.
@@ -29,10 +33,10 @@ export async function captureCandidates(tx, userId, proposal) {
   const installments = await tx.installmentPurchase.findMany({ where: { userId, cardId: proposal.cardId, totalAmount: proposal.amount, purchaseDate: where.date }, select: { id: true, concept: true } });
   const deleted = await tx.expenseTombstone.findMany({ where, select: { expenseId: true, concept: true, date: true, amount: true } });
   const movements = await tx.captureMovement.findMany({ where: { userId, cardId: proposal.cardId, amount: proposal.amount, operationDate: where.date },
-    select: { id: true, expenseId: true, originalExpenseId: true, installmentPurchaseId: true, status: true, parserKey: true, correction: true } });
+    select: { id: true, expenseId: true, originalExpenseId: true, installmentPurchaseId: true, status: true, parserKey: true, correction: true, proposal: true } });
   // Los avisos bancarios de solo evidencia no representan un gasto pendiente de
   // creación automática. Si se resolvieron manualmente, sí bloquean duplicados.
-  const financialMovements = movements.filter(row => !(["REVIEW", "OBSERVED"].includes(row.status)
+  const financialMovements = movements.filter(row => !paymentCaptureKind(row) && !(["REVIEW", "OBSERVED"].includes(row.status)
     && !row.expenseId && !row.originalExpenseId && !row.installmentPurchaseId && !row.correction
     && captureParsers.some(parser => parser.key === row.parserKey && parser.evidenceOnly)));
   return [
@@ -96,13 +100,14 @@ export async function processCaptureEvent(tx, event) {
       if (reason === "PURCHASE") reason = "POSSIBLE_DUPLICATE";
     }
   }
-  const movement = await tx.captureMovement.create({ data: {
+  let movement = await tx.captureMovement.create({ data: {
     userId: event.userId, parserKey, status, reason, proposal, referenceKey,
     cardId: proposal.cardId || null, amount: proposal.amount || null,
     operationDate: proposal.date ? new Date(`${proposal.date}T12:00:00.000Z`) : null,
     resolvedAt: status === "DISCARDED" ? new Date() : null,
   } });
   if (reason === "PURCHASE") await registerCaptureMovement(tx, movement, false);
+  if (paymentCaptureKind(movement)) movement = await automateCapturePayment(tx, event, movement);
   await tx.captureEvent.update({ where: { id: event.id }, data: {
     movementId: movement.id, interpretation: { ...interpretation, proposal, reason },
   } });
@@ -110,7 +115,8 @@ export async function processCaptureEvent(tx, event) {
 }
 
 async function reinterpretCaptureMovement(tx, movement) {
-  if (!["REVIEW", "OBSERVED"].includes(movement.status) || movement.expenseId || movement.originalExpenseId || movement.installmentPurchaseId) {
+  const excludedDebit = movement.status === "DISCARDED" && movement.reason === "NON_CREDIT_ACCOUNT";
+  if ((!excludedDebit && !["REVIEW", "OBSERVED"].includes(movement.status)) || movement.expenseId || movement.originalExpenseId || movement.installmentPurchaseId) {
     throw new ApiAccessError("El aviso ya se resolvió. Su registro y análisis se conservan.", 409);
   }
   if (movement.correction) throw new ApiAccessError("Este aviso tiene una corrección personal. Consérvala y resuélvelo desde la revisión.", 409);
@@ -174,6 +180,7 @@ async function captureExpenseData(tx, movement) {
 }
 
 export async function registerCaptureMovement(tx, movement, distinct) {
+  if (paymentCaptureKind(movement)) throw new ApiAccessError("Este aviso corresponde a un pago o cargo de cuenta. Usa la revisión de pagos de tarjeta.", 409);
   const p = effectiveCapture(movement);
   if (!p.cardId || !p.amount || !p.date || p.currency !== "MXN") throw new ApiAccessError("El aviso necesita tarjeta, importe, moneda y fecha verificados.", 409);
   if (!distinct && (await captureCandidates(tx, movement.userId, p)).some(candidate => candidate.type !== "MOVEMENT" || candidate.id !== movement.id)) {
@@ -188,14 +195,16 @@ export async function registerCaptureMovement(tx, movement, distinct) {
 
 export async function resolveCaptureMovement(db, userId, input) {
   if (!input || typeof input.id !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(input.id)
-    || !["link", "linkInstallment", "distinct", "discard", "convertToInstallments", "correct", "register", "reinterpret"].includes(input.action)) {
+    || !["link", "linkInstallment", "distinct", "discard", "convertToInstallments", "correct", "register", "reinterpret", "registerPayment", "linkPayment", "reversePayment"].includes(input.action)) {
     throw new ApiAccessError("Resolución no válida.", 400);
   }
   return db.$transaction(async tx => {
     await lockDebtAccounts(tx, userId);
     const movement = await tx.captureMovement.findFirst({ where: { id: input.id, userId } });
     if (!movement) throw new ApiAccessError("Aviso no encontrado.", 404);
+    if (["registerPayment", "linkPayment", "reversePayment"].includes(input.action)) return resolveCapturePayment(tx, movement, input);
     if (input.action === "reinterpret") return reinterpretCaptureMovement(tx, movement);
+    if (paymentCaptureKind(movement) && input.action !== "discard") throw new ApiAccessError("Resuelve este aviso desde Pagos de tarjeta; no se puede convertir en un gasto.", 409);
     if (input.action === "correct") return correctCapture(tx, movement, input);
     if (input.action === "convertToInstallments") return convertCaptureToInstallments(tx, movement, input);
     // Una decisión terminal se conserva al reintentar o ante otra pestaña.

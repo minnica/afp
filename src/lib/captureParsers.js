@@ -1,10 +1,15 @@
 // Los formatos de arranque son SINTÉTICOS. verified acredita la gramática real
 // anonimizada y sus regresiones; los campos ausentes nunca se inventan. Nu/CFE
 // solo se completa mediante la regla expresa de tarjeta, moneda y suscripción.
+import { interpretPaymentNotice } from "@/lib/capturePaymentParsers";
+import { parsePaymentReceipt, paymentReceiptSource } from "@/lib/paymentReceipts";
+
 export const captureParsers = [
   { key: "bbva.purchase.es.v1", sourcePackage: "com.bancomer.mbanking", title: "Compra aprobada", verified: false },
   { key: "wallet.purchase.es.v1", sourcePackage: "com.google.android.apps.walletnfcrel", title: "Pago realizado", verified: false },
   { key: "bbva.account-charge.es.v1", sourcePackage: "com.bancomer.mbanking", verified: false, evidence: "REAL_OUT_OF_SCOPE" },
+  { key: "nu.card-payment.es.v1", sourcePackage: "com.nu.production", verified: false, evidence: "REAL_REVIEWED_PARTIAL", paymentOnly: true },
+  { key: "bbva.transfer-receipt.es.v1", sourcePackage: paymentReceiptSource, verified: true, evidence: "REAL_REVIEWED", paymentOnly: true },
   { key: "nu.cfe-service-payment.es.v1", sourcePackage: "com.nu.production", verified: false, evidence: "REAL_REVIEWED_PARTIAL" },
   { key: "nu.cfe-service-payment.es.v2", sourcePackage: "com.nu.production", verified: true, evidence: "REAL_REVIEWED_POLICY_REQUIRED",
     completionPolicy: "NU_CFE_MXN", dateSource: "NOTIFICATION_POSTED_AT" },
@@ -99,10 +104,13 @@ function realBanamexCharge(event) {
 }
 
 export function interpretCapture(event) {
+  if (event.sourcePackage === paymentReceiptSource) return parsePaymentReceipt(event);
   const texts = Object.values(event.fields || {}).join("\n");
   if (/\b(MSI|meses sin intereses|preautorizaci[oó]n|retenci[oó]n|devoluci[oó]n|reembolso|cancelaci[oó]n|abono|rechazad[ao]|promoci[oó]n|c[oó]digo de (?:acceso|verificaci[oó]n)|env[ií]o|pedido recibido)\b/i.test(texts)) {
     return { reason: "SPECIAL_MOVEMENT", proposal: {} };
   }
+  const payment = interpretPaymentNotice(event, captureAmount, captureNotificationDate);
+  if (payment) return payment;
   if (event.sourcePackage === "com.google.android.apps.walletnfcrel") {
     const real = realWalletPurchase(event);
     if (real) return real;
@@ -118,8 +126,14 @@ export function interpretCapture(event) {
     const account = body.match(/^Tienes un cargo a tu cuenta \*(\d{4}) de \$([\d,.]+)\. /);
     if (account) {
       const conflicting = event.fields["android.bigText"] && event.fields["android.text"] && !body.startsWith(event.fields["android.text"]);
+      if (conflicting || !captureAmount(account[2])) return { parserKey: "bbva.account-charge.es.v1", verified: false,
+        reason: conflicting ? "CONFLICTING_FIELDS" : "INVALID_FIELDS", proposal: {} };
       return { parserKey: "bbva.account-charge.es.v1", verified: false,
-        reason: conflicting ? "CONFLICTING_FIELDS" : "NON_CREDIT_ACCOUNT", proposal: {} };
+        reason: conflicting ? "CONFLICTING_FIELDS" : "ACCOUNT_DEBIT_REVIEW", proposal: {
+          movementType: "ACCOUNT_DEBIT", merchant: "Cargo a cuenta BBVA", amount: captureAmount(account[2]),
+          ...captureNotificationDate(event), paymentEvidence: "SOURCE_DEBIT_ONLY",
+          missingFields: ["destination", "card", "currency", "statementPeriod", "operationDate"],
+        } };
     }
   }
   // Muestra real confirmada como pago CFE desde Nu. El símbolo $ no fija la

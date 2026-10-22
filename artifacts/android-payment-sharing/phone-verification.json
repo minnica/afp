@@ -1,0 +1,18 @@
+{
+  "version": "0.6.0",
+  "versionCode": 8,
+  "sameInstallation": true,
+  "notificationPermissionPreserved": true,
+  "batteryExemptionPreserved": true,
+  "shareImagesRegistered": true,
+  "sharePdfRegistered": true,
+  "phone": {
+    "authorized": true,
+    "queue": "0 pendientes · 0 por revisar · 19 entregados",
+    "listener": "Lector conectado; esperando avisos nuevos",
+    "capture": null,
+    "sources": "8/8 instaladas · 8 seleccionadas e instaladas"
+  },
+  "credentialAndOwnerPreserved": true,
+  "temporaryDevelopmentAndTestAppsRemoved": true
+}

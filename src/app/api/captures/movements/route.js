@@ -4,6 +4,8 @@ import { resolveCaptureMovement } from "@/lib/captureProcessing";
 import { readCaptureJson } from "@/lib/captureProtocol";
 import { captureInboxWhere, captureInboxState, effectiveCapture } from "@/lib/captureReview";
 import { captureCandidates } from "@/lib/captureProcessing";
+import { paymentCaptureKind } from "@/lib/capturePaymentParsers";
+import { capturePaymentDetail } from "@/lib/capturePayments";
 
 export async function GET(request) {
   try {
@@ -19,7 +21,8 @@ export async function GET(request) {
       const movement = await prisma.captureMovement.findFirst({ where: { id: searchParams.get("id"), userId: user.id },
         include: { events: { orderBy: { createdAt: "asc" }, select: { id: true, sourcePackage: true, postedAt: true, receivedAt: true, fields: true } } } });
       if (!movement) throw new ApiAccessError("Aviso no encontrado.", 404);
-      return apiResponse.json({ movement, candidates: await captureCandidates(prisma, user.id, effectiveCapture(movement)) });
+      return apiResponse.json({ movement, candidates: await captureCandidates(prisma, user.id, effectiveCapture(movement)),
+        ...(paymentCaptureKind(movement) ? { paymentDetail: await capturePaymentDetail(prisma, user.id, movement) } : {}) });
     }
     const rows = await prisma.captureMovement.findMany({ where: { userId: user.id, ...captureInboxWhere(status) },
       ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
