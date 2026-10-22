@@ -1,0 +1,15 @@
+{
+  "kind": "ANONYMIZED_REAL_NOTIFICATION",
+  "reviewedOn": "2026-10-22",
+  "scope": "Compra de crédito Santander confirmada por el propietario tras pagar con Wallet. Comercio, importe, terminación y fechas ficticios; título, doble símbolo de pesos, moneda, palabras y estructura conservados. No contiene referencia bancaria única.",
+  "event": {
+    "sourcePackage": "mx.bancosantander.supermovil",
+    "postedAt": "2026-10-20T20:49:04.970Z",
+    "receivedAt": "2026-10-20T20:49:05.197Z",
+    "fields": {
+      "android.title": "Compra con tarjeta",
+      "android.text": "En COMERCIO FICTICIO por $$123.45 MXN con tarjeta de credito **0123, el 20/10/2026 a las 14:49:02 hrs.",
+      "android.bigText": "En COMERCIO FICTICIO por $$123.45 MXN con tarjeta de credito **0123, el 20/10/2026 a las 14:49:02 hrs."
+    }
+  }
+}

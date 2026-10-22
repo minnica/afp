@@ -17,6 +17,10 @@ export const captureParsers = [
     aliasSourcePackage: "com.citibanamex.banamexmobile", aliasKinds: ["PHYSICAL", "DIGITAL"], dateSource: "NOTIFICATION_POSTED_AT" },
   { key: "banamex.card-charge.es.v1", sourcePackage: "com.citibanamex.banamexmobile", verified: false, evidence: "REAL_REVIEWED_PARTIAL",
     aliasSourcePackage: "com.citibanamex.banamexmobile", aliasKinds: ["PHYSICAL", "DIGITAL"], evidenceOnly: true },
+  { key: "santander.card-purchase.es.v1", sourcePackage: "mx.bancosantander.supermovil", verified: true, evidence: "REAL_REVIEWED",
+    aliasKinds: ["PHYSICAL", "DIGITAL"], dateSource: "BANK_OPERATION" },
+  { key: "wallet.santander-purchase.es.v1", sourcePackage: "com.google.android.apps.walletnfcrel", verified: false, evidence: "REAL_REVIEWED_PARTIAL",
+    aliasSourcePackage: "mx.bancosantander.supermovil", aliasKinds: ["PHYSICAL", "DIGITAL"], evidenceOnly: true },
 ];
 
 export function normalizeMerchant(value) {
@@ -103,6 +107,46 @@ function realBanamexCharge(event) {
   } };
 }
 
+function realSantanderPurchase(event) {
+  const fields = event.fields || {};
+  if (fields["android.title"] !== "Compra con tarjeta") return null;
+  const body = fields["android.bigText"] || fields["android.text"] || "";
+  const match = body.match(/^En (.{1,200}) por \$\$([\d,.]+) (MXN|USD|EUR) con tarjeta de credito \*\*(\d{4}), el (\d{2}\/\d{2}\/\d{4}) a las (\d{2}:\d{2}:\d{2}) hrs\.$/);
+  if (!match) return null;
+  const parserKey = "santander.card-purchase.es.v1";
+  if (conflictingBodies(fields)) return { parserKey, verified: true, reason: "CONFLICTING_FIELDS", proposal: {} };
+  const [, merchant, rawAmount, currency, suffix, day, clock] = match;
+  const amount = captureAmount(rawAmount), time = captureOperationTime(`${day} ${clock}`);
+  const received = new Date(event.receivedAt).getTime();
+  if (!amount || !time || !merchant.trim() || /[\r\n]/.test(merchant) || !Number.isFinite(received)) {
+    return { parserKey, verified: true, reason: "INVALID_FIELDS", proposal: {} };
+  }
+  if (new Date(time.operationAt).getTime() > received + 5 * 60000) return { parserKey, verified: true, reason: "FUTURE_OPERATION", proposal: {} };
+  return { parserKey, verified: true, reason: currency === "MXN" ? "PURCHASE" : "FOREIGN_CURRENCY", proposal: {
+    ...time, dateSource: "BANK_OPERATION", amount, currency, merchant: merchant.trim(),
+    printedAlias: { value: suffix, digits: 4 }, aliasSourcePackage: "mx.bancosantander.supermovil", reference: null,
+  } };
+}
+
+function realWalletSantanderPurchase(event) {
+  const fields = event.fields || {}, body = fields["android.bigText"] || fields["android.text"] || "";
+  const match = body.match(/^(MXN|USD|EUR)([\d,.]+) con Santander LikeU ••(\d{4})$/);
+  if (!match) return null;
+  const parserKey = "wallet.santander-purchase.es.v1";
+  if (conflictingBodies(fields)) return { parserKey, verified: false, reason: "CONFLICTING_FIELDS", proposal: {} };
+  const merchant = fields["android.title"], amount = captureAmount(match[2]), notification = captureNotificationDate(event);
+  if (!amount || !notification || typeof merchant !== "string" || !merchant.trim() || merchant.length > 200 || /[\r\n]/.test(merchant)) {
+    return { parserKey, verified: false, reason: "INVALID_FIELDS", proposal: {} };
+  }
+  // El título muestra la terminación bancaria, no el token NFC. La publicación
+  // se conserva como evidencia: no completa la fecha bancaria ni crea un gasto.
+  return { parserKey, verified: false, reason: match[1] === "MXN" ? "INCOMPLETE_FORMAT" : "FOREIGN_CURRENCY", proposal: {
+    amount, currency: match[1], merchant: merchant.trim(), printedAlias: { value: match[3], digits: 4 },
+    aliasSourcePackage: "mx.bancosantander.supermovil", notificationAt: notification.notificationAt, timeZone: notification.timeZone,
+    evidenceOnly: true, missingFields: ["operationDate"],
+  } };
+}
+
 export function interpretCapture(event) {
   if (event.sourcePackage === paymentReceiptSource) return parsePaymentReceipt(event);
   const texts = Object.values(event.fields || {}).join("\n");
@@ -112,7 +156,11 @@ export function interpretCapture(event) {
   const payment = interpretPaymentNotice(event, captureAmount, captureNotificationDate);
   if (payment) return payment;
   if (event.sourcePackage === "com.google.android.apps.walletnfcrel") {
-    const real = realWalletPurchase(event);
+    const real = realWalletPurchase(event) || realWalletSantanderPurchase(event);
+    if (real) return real;
+  }
+  if (event.sourcePackage === "mx.bancosantander.supermovil") {
+    const real = realSantanderPurchase(event);
     if (real) return real;
   }
   if (event.sourcePackage === "com.citibanamex.banamexmobile") {

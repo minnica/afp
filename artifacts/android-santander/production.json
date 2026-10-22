@@ -1,0 +1,128 @@
+{
+  "verifiedAt": "2026-10-22T23:19:35.800Z",
+  "productionUrl": "https://finanzas.garatachia.com",
+  "deploymentId": "dpl_3wDJjzHKzoFpJWn243Ez3CfAsJ4Y",
+  "state": "READY",
+  "sourceCommit": "0443a0026625ba74c01d8d744b13d8c8c7364ef9",
+  "sourceWorkingTree": true,
+  "sourceFiles": 295,
+  "sourceBytes": 2698558,
+  "sourceManifestSha256": "138071e47d4fa22496b1a93ca807f3045d78e89ebce4227b0ac80bfb72e1faaf",
+  "parserSourceSha1": "0c0d1a73fd1c29f841c6f569ae8ac768b3fc7f45",
+  "sourceMatchesTestedParser": true,
+  "productionAliasVerified": true,
+  "privateFilesUploaded": false,
+  "commitOrPushPerformed": false,
+  "migrationApplied": false,
+  "apkUpdated": false,
+  "personalApk": "0.6.0 / 8",
+  "authenticatedNativeApiPreserved": true,
+  "publicHttpChecks": [
+    {
+      "path": "/gastos",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/configuracion",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/manifest.webmanifest",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/.well-known/assetlinks.json",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/captures/movements",
+      "method": "GET",
+      "status": 401
+    },
+    {
+      "path": "/api/captures/events",
+      "method": "POST",
+      "status": 401
+    }
+  ],
+  "runtimeErrorGroupsObserved": 0,
+  "runtimeErrorScope": "Capture routes, immediate observation window",
+  "dataVerification": {
+    "verifiedAt": "2026-10-22T23:19:35.800Z",
+    "oneExpenseCreated": true,
+    "previousExpensesUnchanged": true,
+    "bankAndWalletSameExpense": true,
+    "originalEventsAndReceiptsUnchanged": true,
+    "originalUnknownInterpretationsRetained": true,
+    "explicitAnalysisHistory": true,
+    "santanderBankAutomatic": true,
+    "bankOperationDate": true,
+    "walletAutomatic": false,
+    "otherAliasesRulesAndFinancialTablesUnchanged": true,
+    "rlsUnchanged": true,
+    "pointVerificationOnly": true,
+    "completeStatementVerified": false,
+    "tablesCompared": 32,
+    "differences": [
+      {
+        "table": "capture_automations",
+        "before": 2,
+        "after": 3,
+        "allowed": true
+      },
+      {
+        "table": "capture_movements",
+        "before": 24,
+        "after": 24,
+        "allowed": true
+      },
+      {
+        "table": "capture_statements",
+        "before": 2,
+        "after": 3,
+        "allowed": true
+      },
+      {
+        "table": "daily_expenses",
+        "before": 639,
+        "after": 640,
+        "allowed": true
+      },
+      {
+        "table": "google_calendar_connections",
+        "before": 1,
+        "after": 1,
+        "allowed": true
+      }
+    ]
+  },
+  "phoneVerification": {
+    "physicalDevice": true,
+    "appOrigin": "https://finanzas.garatachia.com",
+    "screen": "Gastos",
+    "singlePurchaseVisible": true,
+    "correctOwnerConfirmedAmount": true,
+    "card": "SANTANDER",
+    "category": "Por clasificar",
+    "sources": [
+      "Santander",
+      "Google Wallet"
+    ],
+    "pointReconciled": true,
+    "existingCredentialsUsed": true,
+    "financialScreenshotPublished": false
+  },
+  "activation": {
+    "parserKey": "santander.card-purchase.es.v1",
+    "mode": "AUTOMATIC",
+    "datePolicy": "BANK_OPERATION",
+    "walletFormatAutomatic": false,
+    "initialPurchaseResolvedExplicitly": true,
+    "firstFutureAutomaticPurchaseStillToObserve": true,
+    "fullStatementReconciliationStillPending": true
+  }
+}

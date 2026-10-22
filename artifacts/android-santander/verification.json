@@ -1,0 +1,112 @@
+{
+  "reviewedOn": "2026-10-22",
+  "status": "PRODUCTION_READY_INITIAL_PURCHASE_RESOLVED_BANK_FORMAT_ENABLED",
+  "scope": "Compra de crédito Santander comunicada por el propietario tras pagar con Wallet; dos avisos originales conservados y resueltos expresamente como un solo gasto tras la autorización de producción.",
+  "parsers": {
+    "santander.card-purchase.es.v1": {
+      "evidence": "ANONYMIZED_REAL_NOTIFICATION",
+      "verified": true,
+      "dateSource": "BANK_OPERATION",
+      "aliasScope": "Santander PHYSICAL/DIGITAL; never the Wallet NFC token",
+      "automationRequires": "Same owner/card/parser observation, explicit review and reconciliation, verified unambiguous alias, explicit enable"
+    },
+    "wallet.santander-purchase.es.v1": {
+      "evidence": "ANONYMIZED_REAL_NOTIFICATION",
+      "verified": false,
+      "evidenceOnly": true,
+      "missingFields": [
+        "operationDate"
+      ],
+      "notificationDateUsedAsExpenseDate": false,
+      "canEnable": false,
+      "linking": "Explicit owner decision; no automatic merge without a unique common reference"
+    }
+  },
+  "verification": {
+    "unitAndIntegration": {
+      "command": "node --test --experimental-test-isolation=none tests/*.test.cjs",
+      "database": "Local disposable PostgreSQL 16, afp_test_santander; all 28 existing migrations applied",
+      "productionEnvironmentLoaded": false,
+      "passed": 484,
+      "failed": 0,
+      "skipped": 0,
+      "newSantanderChecks": 18,
+      "covers": [
+        "Exact observed grammar and cents, bank date versus receipt date, invalid calendars and future operations",
+        "Contradictory fields, foreign currency, missing fields, special movements and unsupported sources",
+        "Existing UNKNOWN_FORMAT receipts are immutable; explicit reinterpretation is idempotent and creates no expense",
+        "Observation, manual review, reconciliation and enable scoped to one card and parser",
+        "Bank then Wallet and Wallet then bank create one expense; explicit evidence linking preserves it",
+        "Eight concurrent native API deliveries and a lost response return one receipt and create one expense",
+        "Equal legitimate purchases, manual expense duplicates and notification revisions preserve explicit decisions",
+        "Cross-kind alias collisions, unverified and unknown cards, different cards and cross-owner isolation",
+        "Partial Wallet cannot automate even with a forced database mode; personal corrections remain protected",
+        "Returning to observation preserves financial records, event fields, NFC aliases and previous analyses"
+      ]
+    },
+    "lint": {
+      "exitCode": 0,
+      "errors": 0,
+      "preexistingWarnings": 1,
+      "warning": "TanStack Table react-hooks/incompatible-library"
+    },
+    "build": {
+      "command": "pnpm exec next build --webpack",
+      "exitCode": 0
+    },
+    "mobileBrowser": {
+      "tool": "agent-browser; isolated named session",
+      "environment": "Local copy of real Next.js components/API with fake Supabase Auth and disposable PostgreSQL; no production credentials",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "javascriptErrors": 0,
+      "horizontalOverflow": false,
+      "boundaries": {
+        "uiRenders": true,
+        "clientToApi": "GET/PATCH movements HTTP 200; no-session capture endpoints HTTP 401",
+        "apiToDatabase": "Reinterpret, save review, register bank, search and link Wallet persisted to local PostgreSQL",
+        "databaseToResponse": "One expense, two movements linked to the same expense; original event interpretations retained",
+        "responseToUi": "Recognized bank fields displayed; Wallet retains empty bank date; both show resolved expense"
+      },
+      "expensesAfterInterpretation": 0,
+      "expensesAfterRegistrationAndLinking": 1,
+      "screenshots": [
+        "bank-mobile.png",
+        "registered-mobile.png",
+        "wallet-mobile.png",
+        "linked-mobile.png"
+      ]
+    },
+    "originalSampleOfflineAnalysis": {
+      "bank": "PURCHASE with bank operation day, amount and MXN matching the owner's confirmed purchase",
+      "wallet": "INCOMPLETE_FORMAT; amount, MXN and merchant preserved without a bank operation day",
+      "productionMutations": 0,
+      "originalFinancialTextPublished": false
+    }
+  },
+  "migrationRequired": false,
+  "nativeContractChanged": false,
+  "installedApkUpdated": false,
+  "personalApk": "0.6.0 / 8",
+  "production": {
+    "deployed": true,
+    "deploymentId": "dpl_3wDJjzHKzoFpJWn243Ez3CfAsJ4Y",
+    "productionAliasVerified": true,
+    "financialRowsWritten": true,
+    "previousFinancialRowsPreserved": true,
+    "aliasesChanged": false,
+    "automationEnabled": true,
+    "automaticParser": "santander.card-purchase.es.v1",
+    "originalNoticesResolved": true,
+    "oneExpenseWithTwoSources": true,
+    "initialPurchaseResolvedExplicitly": true,
+    "firstFutureAutomaticPurchaseStillToObserve": true
+  },
+  "remaining": [
+    "Observe future normal purchases using the verified Santander bank format",
+    "Reconcile a full period; other Santander formats and channels remain unverified"
+  ],
+  "productionEvidence": "production.json"
+}

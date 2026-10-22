@@ -332,7 +332,7 @@ Para cerrar: recopilar avisos normales del uso real, revisar y anonimizar muestr
 | HSBC 2 | Física y digital; Wallet incompatible según propietario | Sin muestra verificada | Diagnóstico |
 | BANAMEX 1 | Física, digital y Wallet | Wallet verificado con fecha de publicación aceptada; banco parcial de evidencia | Compra registrada y evidencias vinculadas; modo automático preparado, publicación web pendiente |
 | BANAMEX 2 | Física, digital y Wallet | Sin muestra verificada | Diagnóstico |
-| SANTANDER | Física, digital y Wallet | Sin muestra verificada | Diagnóstico |
+| SANTANDER | Física, digital y Wallet | Aviso bancario completo verificado; Wallet LikeU parcial de evidencia | Publicado READY, muestra resuelta una vez y formato bancario habilitado; primera compra automática futura y corte completo pendientes |
 | NU | Física, digital y Wallet | CFE v2 con regla expresa y suscripción; v1 parcial conservado | Cobro de octubre confirmado; modo Nu/CFE preparado, publicación web pendiente |
 | DIDI | Física, digital y Wallet | Sin muestra verificada | Diagnóstico |
 | MERCADOPAGO | Física y digital; Wallet incompatible según propietario | Sin muestra verificada | Diagnóstico; distinguir crédito de cuenta/saldo |
@@ -387,6 +387,20 @@ Esta cobertura solo acredita el formato observado de Wallet/BANAMEX 1. El aviso 
 - [ ] Observar el siguiente pago CFE normal y conciliar un corte completo. Los pagos de períodos anteriores, formatos diferentes y cobros ya resueltos requieren revisión; no se crean gastos genéricos ni un segundo cargo cuando el cobro de suscripción entra en conflicto.
 
 [Evidencia de implementación y preservación Nu/CFE](artifacts/android-nu-cfe/verification.json). El resto de tarjetas, canales y avisos de Nu conserva sus pendientes; Fase 7 permanece abierta.
+
+### Santander y Wallet LikeU · implementación del 22 de octubre de 2026
+
+- [x] Comprobar los dos avisos originales recibidos de una compra confirmada por el propietario, su coincidencia con el alias bancario Santander y el estado de la entrega: 23 recibidos en servidor, cero pendientes y cero errores de cola en el teléfono. Inspección de producción de solo lectura.
+- [x] Incorporar `santander.card-purchase.es.v1`, verificado con una muestra real anonimizada: importe, moneda explícita, comercio, cuatro cifras y fecha/hora bancarias en México. No utiliza la fecha de recepción ni inventa una referencia única.
+- [x] Incorporar `wallet.santander-purchase.es.v1` como evidencia parcial no activable: importe, MXN, comercio, cuatro cifras bancarias y publicación conservada. Sin fecha bancaria ni aceptación implícita del día del aviso; números virtuales NFC intactos.
+- [x] Comprobar interpretación explícita e idempotente de avisos antiguos sin gastos, revisión/registro de una sola compra y vínculo manual de Wallet; originales, recibos, correcciones y controles de duplicados preservados.
+- [x] Verificar **484 pruebas correctas, cero omisiones**, incluidas 18 comprobaciones nuevas con API/PostgreSQL local y ambos órdenes de avisos, concurrencia, reintentos, alias ambiguos, aislamiento, compras iguales y vuelta a observación. Lint y build correctos; navegador móvil real a 390 px con Auth ficticia, un gasto y dos evidencias vinculadas, sin errores JavaScript ni desbordamiento.
+- [x] Publicar con autorización explícita: `dpl_3wDJjzHKzoFpJWn243Ez3CfAsJ4Y`, `READY`, dominio de producción verificado y analizador publicado idéntico al probado. Se publicaron 295 archivos públicos sobre `0443a002`, sin commit ni push. No necesitó migración ni nueva APK; la personal sigue en **0.6.0 / 8**.
+- [x] Tras respaldo privado de 32 tablas, reinterpretar y revisar los avisos originales, registrar la compra una sola vez en **Por clasificar** y vincular Wallet. Cotejo puntual documentado con el aviso bancario y confirmación del propietario, sin presentarlo como estado de cuenta o corte completo. Gastos del celular muestra un gasto y ambas fuentes.
+- [x] Habilitar exclusivamente `santander.card-purchase.es.v1`, con fecha bancaria, tras comprobar los requisitos. Wallet parcial sigue sin modo automático. Los gastos anteriores, alias, eventos/recibos, interpretaciones iniciales, otras reglas y RLS se conservaron.
+- [ ] Observar una compra futura normal registrada automáticamente y conciliar un corte completo. La compra inicial fue resuelta expresamente; otros formatos y canales siguen pendientes.
+
+La aceptación local usó datos ficticios; la aplicación posterior a producción fue autorizada expresamente. La transacción creó un gasto y vinculó ambas evidencias, con cotejo puntual y habilitación solo Santander; el trigger existente marcó Calendar. La lectura posterior comparó las 32 tablas y confirmó la conservación de registros anteriores. Originales y respaldo excluidos de Git. [Verificación de producción](artifacts/android-santander/production.json) y [evidencia técnica](artifacts/android-santander/verification.json).
 
 ## 4. Pruebas y aceptación
 

@@ -1,0 +1,14 @@
+{
+  "kind": "ANONYMIZED_REAL_NOTIFICATION",
+  "reviewedOn": "2026-10-22",
+  "scope": "Aviso Wallet de la compra Santander confirmada por el propietario. Comercio, importe, terminación y fechas ficticios; palabras y estructura conservadas. La terminación coincide con el alias bancario físico/digital, no con el número virtual NFC. Sin fecha bancaria ni referencia común para unir los avisos automáticamente; solo evidencia revisable.",
+  "event": {
+    "sourcePackage": "com.google.android.apps.walletnfcrel",
+    "postedAt": "2026-10-20T20:49:07.663Z",
+    "receivedAt": "2026-10-20T20:49:07.891Z",
+    "fields": {
+      "android.title": "COMERCIO FICTICIO",
+      "android.text": "MXN123.45 con Santander LikeU ••0123"
+    }
+  }
+}
