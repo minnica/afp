@@ -1,16 +1,16 @@
 # AFP Android: plan por fases para capturar compras automáticamente
 
 **Archivo:** `PLAN_CAPTURA_AUTOMATICA_ANDROID.md`, en la raíz del proyecto.\
-**Estado:** Fases 2, 3 y 5 concluidas. Fases 1 y 4 mantienen pendientes las muestras y validación real de compras de crédito. Fase 6 preparada, publicada y en observación: cinco de ocho actividades concluidas; 298 pruebas web, 18 JVM, 29 instrumentadas y dos comprobaciones de actualización correctas, sin omisiones. Supabase actualizado a 21 migraciones y APK personal 0.5.0 / versionCode 7 instalada. El aviso BBVA disponible fue una transferencia de débito confirmada por el propietario y queda fuera del piloto. Falta validar compras reales de crédito, activar solo formatos comprobados y observar/conciliar un corte completo. Fase 7 implementada técnicamente en local, con dos de cinco actividades concluidas y 329 regresiones web correctas sin omisiones; continúa abierta por falta de muestras y cobertura bancaria real.\
+**Estado:** Fases 2, 3 y 5 concluidas. Fases 1, 4, 6 y 7 conservan pendientes de cobertura real y conciliación de un corte completo. Fase 7: controles implementados y primer formato real Wallet/BANAMEX 1 validado; compra inicial registrada una vez y dos evidencias vinculadas mediante revisión explícita. Solo esa tarjeta/formato tiene modo automático preparado en BD, con la fecha del aviso Wallet aceptada por el propietario. **Falta publicar el código web para que opere sobre avisos nuevos.** Supabase tiene 25 migraciones, sin pendientes; APK personal 0.5.0 / versionCode 7 sin cambios. Verificación final: 429 pruebas web correctas, cero omisiones, lint y build correctos; reconstrucción y actualización de las 25 migraciones verificadas. Las tres actividades generales de cobertura/activación/canales de Fase 7 permanecen abiertas para el resto.\
 **Dispositivo inicial:** Samsung S24 Ultra, Android 16 y One UI 8.5.\
 **Cobertura prevista:** todas las tarjetas existentes en AFP, conservando sus identidades e historiales.\
-**Primer piloto de registro automático:** BBVA Platinum; los demás bancos se preparan desde el diagnóstico y se activan gradualmente.
+**Pilotos:** BBVA Platinum continúa pendiente de aviso de crédito. La primera configuración automática preparada es BANAMEX 1 por Wallet, por disponer de evidencia real suficiente y política de fecha aceptada.
 
 ## 1. Objetivo y alcance
 
 Desarrollar una APK propia de AFP que capture las notificaciones de compras, conserve los avisos pendientes y registre los gastos automáticamente.
 
-El diseño y la recopilación de evidencia contemplarán todas las tarjetas desde la Fase 1. BBVA será el primer piloto para validar el registro automático y la conciliación; la preparación de las demás fuentes no se pospondrá hasta la Fase 7.
+El diseño y la recopilación de evidencia contemplarán todas las tarjetas desde la Fase 1. BBVA fue el primer piloto previsto; al no disponer de aviso de crédito, se avanza con BANAMEX 1 por Wallet, con evidencia propia. La preparación de las demás fuentes continúa en paralelo.
 
 El funcionamiento diario dependerá de la aplicación Android y del servidor actual de AFP. No requerirá Codex, ChatGPT, Tasker, Automate, un lector de Gmail en la computadora ni una computadora encendida.
 
@@ -38,7 +38,7 @@ La cobertura depende de la tarjeta y de los avisos disponibles, no de desarrolla
 - Mantener separados los alias de cada tarjeta física, digital y token de Wallet. Dos tarjetas del mismo banco deben poder resolverse por separado; si la evidencia no permite distinguirlas, el aviso queda en revisión.
 - Preparar los analizadores disponibles durante las Fases 2–5, conforme lleguen muestras verificadas. La vinculación, cola y API serán comunes a todas las fuentes; añadir un banco no requerirá rehacer ese flujo.
 - Distinguir **diagnóstico** (comprobar los avisos accesibles), **observación** (interpretar y mostrar propuestas sin crear gastos) y **registro automático** (crear gastos solo para tarjetas y formatos validados). Pausar una aplicación detiene su captura; desactivar la automatización de una tarjeta conserva la observación de las otras.
-- Mantener BBVA como primera activación automática. La habilitación posterior se controla por tarjeta y formato; validar una tarjeta no habilita todas las del mismo banco ni todos los avisos de Wallet.
+- Activar según evidencia propia: BANAMEX 1 por Wallet es la primera configuración preparada; BBVA sigue pendiente. La habilitación se controla por tarjeta y formato; validar una tarjeta no habilita todas las del mismo banco ni todos los avisos de Wallet.
 
 La matriz de cobertura documentará paquetes, versiones, tarjetas previstas, muestras disponibles, alias pendientes y estado de habilitación. Una fuente sin aplicación instalada o sin muestras seguirá identificada como pendiente. Se puede avanzar en las Fases 2–5 mientras se completa el diagnóstico; esa fuente permanecerá fuera del registro automático y sus tareas sin concluir seguirán sin marcar.
 
@@ -330,7 +330,7 @@ Para cerrar: recopilar avisos normales del uso real, revisar y anonimizar muestr
 | BBVA | Física, digital y número virtual Wallet | Comprobante aprobado coincidente con Wallet; sin aviso de crédito capturado | Diagnóstico; piloto previo aún abierto |
 | HSBC 1 | Física y digital; Wallet incompatible según propietario | Sin muestra verificada | Diagnóstico |
 | HSBC 2 | Física y digital; Wallet incompatible según propietario | Sin muestra verificada | Diagnóstico |
-| BANAMEX 1 | Física, digital y Wallet | Sin muestra verificada | Diagnóstico |
+| BANAMEX 1 | Física, digital y Wallet | Wallet verificado con fecha de publicación aceptada; banco parcial de evidencia | Compra registrada y evidencias vinculadas; modo automático preparado, publicación web pendiente |
 | BANAMEX 2 | Física, digital y Wallet | Sin muestra verificada | Diagnóstico |
 | SANTANDER | Física, digital y Wallet | Sin muestra verificada | Diagnóstico |
 | NU | Física, digital y Wallet | Pago CFE real parcial; sin formato activable | Revisión manual; analizador parcial preparado en local |
@@ -350,6 +350,29 @@ Procedimiento por tarjeta, canales pendientes y recuperación: [guía Fase 7](do
 - [ ] Completar los campos ausentes del aviso Nu mediante revisión explícita si se desea registrarlo o vincularlo, y cotejar ambos movimientos por el flujo habitual. El evento Nu existente permanece `REVIEW / UNKNOWN_FORMAT`; no se reprocesa al añadir el analizador.
 
 La inspección de avisos fue de solo lectura; la única escritura posterior fue la corrección de los seis alias Wallet confirmados como incorrectos por el propietario. No se crearon gastos ni se activaron tarjetas. Los permisos actuales y los canales consultados no estaban bloqueados; esto no demuestra que se publicara un aviso al realizar la compra. No se publicaron estos cambios web ni se sustituyó la APK personal **0.5.0 / 7**. Importes, terminaciones, referencias y capturas originales permanecen fuera de Git. [Evidencia y límites del seguimiento](artifacts/android-muestras-2026-10-21/verification.json).
+
+**Nueva comprobación física y de servidor · 22 de octubre de 2026.**
+
+- [x] Verificar la compra comunicada con BANAMEX 1 mediante Wallet: dos avisos reales persistidos, coincidentes en importe declarado, comercio y horario. Wallet identifica el título/terminación digital de esa tarjeta. El banco se recibió en unos cuatro segundos y Wallet en unos 59 segundos desde sus capturas. Son dos evidencias de la compra comunicada, no dos gastos: ambas permanecen `REVIEW / UNKNOWN_FORMAT`, sin registros financieros vinculados ni gasto coincidente de esa tarjeta e importe.
+- [x] Contrastar la cola real y el servidor: **0 pendientes, 0 por revisar en envíos y 19 entregados**, frente a 19 eventos persistidos. Lector conectado, autorización y ocho fuentes activas, batería exenta y sin pausas. El diagnóstico tiene una muestra Banamex y una Wallet, ambas con pantalla desbloqueada. La revisión financiera de la bandeja es independiente del estado de entrega.
+- [x] Buscar un aviso tardío del comprobante BBVA anterior: no hay aviso BBVA/Wallet de ese importe. Se encontró un gasto existente de la misma tarjeta, fecha e importe, sin vínculo a capturas; esa coincidencia no prueba la identidad del comprobante ni autoriza duplicarlo.
+- [x] Preparar y validar los analizadores observados; resolver y cotejar puntualmente las dos evidencias como una sola compra. Wallet identifica la terminación bancaria física/digital según este formato, sin reemplazar el número virtual NFC. El seguimiento de implementación y activación preparada se detalla a continuación.
+
+Esta nueva inspección fue de solo lectura: no creó gastos, resolvió capturas, cambió alias/configuración, modificó código, publicó la web ni sustituyó la APK. Las actividades principales de cobertura, observación conciliada y activación de Fase 7 continúan abiertas. [Evidencia sin datos personales](artifacts/android-muestras-2026-10-22/verification.json).
+
+### Primer formato real Wallet/Banamex · implementación del 22 de octubre de 2026
+
+- [x] Añadir `wallet.banamex-purchase.es.v1`, verificado contra el aviso real y su muestra anonimizada. Reconoce el importe MXN, comercio y terminación bancaria física/digital del título **Joy Banamex**; resuelve la tarjeta usando los alias existentes de Banamex, sin modificar los seis números virtuales Wallet. Colisiones entre tipos/tarjetas impiden el registro.
+- [x] Guardar la decisión expresa del propietario: usar la publicación del aviso Wallet como día del gasto en `America/Mexico_City`. Se conserva `dateSource: NOTIFICATION_POSTED_AT` y `notificationAt`; no se inventa una fecha bancaria `operationAt`. La activación exige esa política por tarjeta/formato y la interfaz la explica.
+- [x] Añadir `banamex.card-charge.es.v1` como evidencia parcial: interpreta importe, comercio, hora AM/PM y terminación abreviada de tres cifras. «Retiro/Compra» no distingue una compra de un retiro, `$` no fija moneda y «Auto.» no se usa como referencia global única. No es activable; un aviso bancario pendiente sin corrección personal no bloquea al Wallet completo ni genera un segundo gasto.
+- [x] Permitir **Interpretar con el formato actual** solo sobre un aviso pendiente, sin corrección personal ni resolución, con una única evidencia original. Es una acción explícita, idempotente y de observación: conserva evento, interpretación inicial y recibo nativo; agrega historial sin crear gastos. Reintentar una entrega antigua conserva su recibo y no solicita ese análisis.
+- [x] Aplicar `20261023010000_capture_wallet_date_policy` en Supabase tras respaldo privado y pruebas. Añade política de fecha e historial de análisis. **25 migraciones completas, ninguna pendiente, diff vacío, 30 tablas con RLS y cero políticas públicas**; filas previas, privilegios y automatización conservados al aplicar la migración.
+- [x] Resolver la compra real BANAMEX 1 confirmada por el propietario: reinterpretar explícitamente los dos avisos, registrar **un gasto**, vincular ambas evidencias y cotejarlo puntualmente con el aviso bancario y la confirmación del propietario. La nota de cotejo aclara que no se revisó un estado de cuenta ni un corte completo. Todos los eventos/recibos originales, alias y registros financieros anteriores se conservaron. Solo se preparó el modo `AUTOMATIC` de BANAMEX 1 / Wallet con su política aceptada; las otras tarjetas y formatos siguen sin habilitar.
+- [x] Verificar **429 pruebas web correctas, cero fallos y cero omisiones**, incluidos contratos reales anonimizados, ambos órdenes banco/Wallet, concurrencia, reintentos, ambigüedades, tarjetas hermanas, correcciones personales, fechas México, monedas ajenas y reanálisis sin alterar originales. Lint sin errores (aviso previo de TanStack), build correcto y reproducción de las 25 migraciones desde vacío y desde la base histórica. Navegador móvil con Auth ficticia y API/PostgreSQL reales: reinterpretación sin gasto, confirmación de fecha, activación y dos avisos HTTP que crean un solo gasto por conciliar.
+- [ ] Publicar este código web mediante commit/push y comprobar el despliegue `READY`. La configuración en BD no activa el analizador en el servidor anterior. No se necesita cambiar el contrato nativo ni actualizar la APK personal **0.5.0 / 7**.
+- [ ] Observar nuevas compras normales de BANAMEX 1 por Wallet después de publicar y completar su conciliación de un corte. La compra inicial fue resuelta expresamente durante la preparación; no se presenta como una creación automática ya comprobada en producción.
+
+Esta cobertura solo acredita el formato observado de Wallet/BANAMEX 1. El aviso bancario parcial de compras futuras quedará por revisar; podrá vincularse al gasto Wallet tras comprobarlo. No se fusionan automáticamente por importe/comercio/horario. Compras iguales, revisiones de notificación y gastos manuales coincidentes conservan revisión para evitar duplicados. BBVA sigue sin aviso asociado al comprobante anterior y su gasto coincidente no se alteró. Nu/CFE y las demás tarjetas/canales continúan pendientes. Fase 7 permanece abierta. [Evidencia de implementación y estado de publicación](artifacts/android-wallet-banamex/verification.json).
 
 ## 4. Pruebas y aceptación
 
@@ -384,7 +407,7 @@ La verificación técnica incluirá:
 
 - La solución será personal y Android; la captura será nativa y la interfaz financiera continuará siendo web.
 - El servidor actual seguirá siendo necesario para completar registros y sincronizar datos. Sin conexión, se conservarán los avisos capturados en el teléfono.
-- Todas las tarjetas se contemplan desde el diagnóstico. BBVA Platinum será el primer piloto automático; se conservarán los IDs, historiales y condiciones de todas las tarjetas existentes.
+- Todas las tarjetas se contemplan desde el diagnóstico. BBVA Platinum fue el primer piloto previsto y sigue pendiente; BANAMEX 1 por Wallet tiene la primera configuración automática preparada con evidencia propia; se conservarán los IDs, historiales y condiciones de todas las tarjetas existentes.
 - La ampliación de la captura y la habilitación del registro automático son pasos separados. La validación y activación se documentan por tarjeta y formato; los casos sin evidencia suficiente permanecen pendientes.
 - La automatización utilizará reglas comprobables. No enviará notificaciones a modelos de IA.
 - Los datos personales y credenciales permanecerán fuera de Git y de los registros de diagnóstico.

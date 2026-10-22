@@ -602,6 +602,7 @@ model CaptureAutomation {
   cardId    String
   parserKey String
   mode      String @default("OBSERVATION")
+  datePolicy String @default("BANK_OPERATION")
   user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   card      Card   @relation(fields: [cardId], references: [id], onDelete: Cascade)
 
@@ -623,7 +624,8 @@ model CaptureMerchantRule {
   @@map("capture_merchant_rules")
 }
 
-// La propuesta original y originalExpenseId sobreviven a ediciones/borrados.
+// El análisis inicial (en el evento), el historial solicitado y originalExpenseId
+// sobreviven a ediciones/borrados. proposal contiene el análisis vigente.
 // No se vuelve a interpretar automáticamente un evento ya recibido.
 model CaptureMovement {
   id                    String               @id @default(uuid()) @db.Uuid
@@ -633,6 +635,7 @@ model CaptureMovement {
   parserKey             String?
   proposal              Json
   correction            Json?
+  analysisHistory       Json?
   cardId                String?
   amount                Decimal?
   operationDate         DateTime?

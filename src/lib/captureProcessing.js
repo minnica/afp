@@ -1,7 +1,8 @@
 import { ApiAccessError, requireOwnedReferences } from "@/lib/apiAuth";
 import { lockDebtAccounts } from "@/lib/debtAccountService";
 import { createExpenseInTransaction } from "@/lib/expenseService";
-import { interpretCapture, normalizeMerchant } from "@/lib/captureParsers";
+import { interpretCapture, normalizeMerchant, captureParsers } from "@/lib/captureParsers";
+import { resolveCaptureIdentity } from "@/lib/captureIdentity";
 import { captureHash } from "@/lib/captureProtocol";
 import { subscriptionChargeDate, getSubscriptionReceipts } from "@/lib/subscriptionCharges";
 import { Prisma } from "@prisma/client";
@@ -27,46 +28,50 @@ export async function captureCandidates(tx, userId, proposal) {
   const installments = await tx.installmentPurchase.findMany({ where: { userId, cardId: proposal.cardId, totalAmount: proposal.amount, purchaseDate: where.date }, select: { id: true, concept: true } });
   const deleted = await tx.expenseTombstone.findMany({ where, select: { expenseId: true, concept: true, date: true, amount: true } });
   const movements = await tx.captureMovement.findMany({ where: { userId, cardId: proposal.cardId, amount: proposal.amount, operationDate: where.date },
-    select: { id: true, expenseId: true, originalExpenseId: true, status: true } });
+    select: { id: true, expenseId: true, originalExpenseId: true, installmentPurchaseId: true, status: true, parserKey: true, correction: true } });
+  // Los avisos bancarios de solo evidencia no representan un gasto pendiente de
+  // creación automática. Si se resolvieron manualmente, sí bloquean duplicados.
+  const financialMovements = movements.filter(row => !(["REVIEW", "OBSERVED"].includes(row.status)
+    && !row.expenseId && !row.originalExpenseId && !row.installmentPurchaseId && !row.correction
+    && captureParsers.some(parser => parser.key === row.parserKey && parser.evidenceOnly)));
   return [
     ...expenses.map(row => ({ type: "EXPENSE", id: row.id, concept: row.concept })),
     ...installments.map(row => ({ type: "INSTALLMENT", id: row.id, concept: row.concept })),
     ...deleted.map(row => ({ type: "DELETED", id: row.expenseId, concept: row.concept })),
-    ...movements.map(row => ({ type: "MOVEMENT", id: row.id, expenseId: row.expenseId, deleted: !!row.originalExpenseId && !row.expenseId })),
+    ...financialMovements.map(row => ({ type: "MOVEMENT", id: row.id, expenseId: row.expenseId, deleted: !!row.originalExpenseId && !row.expenseId })),
   ];
 }
 
 // Se ejecuta dentro de la transacción de recepción, bajo el bloqueo financiero
 // compartido con las altas, ediciones y borrados manuales del mismo usuario.
-export async function processCaptureEvent(tx, event) {
-  await lockDebtAccounts(tx, event.userId);
-  const interpretation = interpretCapture(event);
+async function captureInterpretationState(tx, event, observationOnly = false) {
+  const decoded = interpretCapture(event);
+  const parser = captureParsers.find(parser => parser.key === decoded.parserKey);
+  const interpretation = await resolveCaptureIdentity(tx, event, decoded, parser);
   const { parserKey = null } = interpretation;
   let { reason } = interpretation;
-  let proposal = interpretation.proposal;
-  let status = reason === "NON_CREDIT_ACCOUNT" ? "DISCARDED" : "REVIEW", referenceKey = null;
+  const proposal = interpretation.proposal;
+  let status = reason === "NON_CREDIT_ACCOUNT" ? "DISCARDED" : "REVIEW";
   if (reason === "PURCHASE") {
-    const aliases = await tx.captureCardAlias.findMany({ where: {
-      userId: event.userId, sourcePackage: event.sourcePackage, kind: proposal.alias.kind, value: proposal.alias.value,
+    const automation = await tx.captureAutomation.findUnique({ where: {
+      userId_cardId_parserKey: { userId: event.userId, cardId: proposal.cardId, parserKey },
     } });
-    const cards = [...new Set(aliases.map(alias => alias.cardId))];
-    if (cards.length !== 1) reason = cards.length ? "AMBIGUOUS_CARD" : "UNKNOWN_CARD";
-    else if (!aliases.some(alias => alias.verifiedAt)) reason = "UNVERIFIED_ALIAS";
-    else {
-      proposal = { ...proposal, cardId: cards[0] };
-      const card = await tx.card.findFirst({ where: { id: cards[0], userId: event.userId } });
-      if (!card) reason = "UNKNOWN_CARD";
-      else {
-        const automation = await tx.captureAutomation.findUnique({ where: {
-          userId_cardId_parserKey: { userId: event.userId, cardId: card.id, parserKey },
-        } });
-        if (!interpretation.verified || automation?.mode !== "AUTOMATIC") {
-          status = "OBSERVED";
-          reason = interpretation.verified ? "OBSERVATION" : "UNVERIFIED_FORMAT";
-        }
-      }
+    if (observationOnly || !interpretation.verified || automation?.mode !== "AUTOMATIC") {
+      status = "OBSERVED";
+      reason = interpretation.verified ? "OBSERVATION" : "UNVERIFIED_FORMAT";
+    } else if (parser?.dateSource === "NOTIFICATION_POSTED_AT" && automation.datePolicy !== "NOTIFICATION_POSTED_AT") {
+      reason = "DATE_POLICY_REQUIRED";
     }
   }
+  return { interpretation, parserKey, reason, proposal, status };
+}
+
+export async function processCaptureEvent(tx, event) {
+  await lockDebtAccounts(tx, event.userId);
+  const state = await captureInterpretationState(tx, event);
+  const { interpretation, parserKey, status } = state;
+  let { reason, proposal } = state;
+  let referenceKey = null;
   if (reason === "PURCHASE") {
     referenceKey = proposal.reference ? captureHash(`${proposal.cardId}:${proposal.reference}`) : null;
     const referenced = referenceKey && await tx.captureMovement.findUnique({ where: { userId_referenceKey: { userId: event.userId, referenceKey } } });
@@ -101,6 +106,32 @@ export async function processCaptureEvent(tx, event) {
     movementId: movement.id, interpretation: { ...interpretation, proposal, reason },
   } });
   return movement;
+}
+
+async function reinterpretCaptureMovement(tx, movement) {
+  if (!["REVIEW", "OBSERVED"].includes(movement.status) || movement.expenseId || movement.originalExpenseId || movement.installmentPurchaseId) {
+    throw new ApiAccessError("El aviso ya se resolvió. Su registro y análisis se conservan.", 409);
+  }
+  if (movement.correction) throw new ApiAccessError("Este aviso tiene una corrección personal. Consérvala y resuélvelo desde la revisión.", 409);
+  const events = await tx.captureEvent.findMany({ where: { userId: movement.userId, movementId: movement.id }, orderBy: { createdAt: "asc" } });
+  if (events.length !== 1) throw new ApiAccessError("Revisa manualmente las evidencias de este movimiento.", 409);
+  const event = events[0], state = await captureInterpretationState(tx, event, true);
+  if (!state.parserKey) throw new ApiAccessError("Todavía no hay un formato disponible para este aviso.", 409);
+  const key = captureHash(JSON.stringify({ eventId: event.id, requestHash: event.requestHash, parserKey: state.parserKey,
+    reason: state.reason, proposal: state.proposal }));
+  const history = movement.analysisHistory || [];
+  if (history.some(analysis => analysis.key === key)) return movement;
+  if (history.length >= 50) throw new ApiAccessError("El historial de análisis está completo. Conserva la evidencia y revisa los datos manualmente.", 409);
+  return tx.captureMovement.update({ where: { id: movement.id }, data: {
+    parserKey: state.parserKey, status: state.status, reason: state.reason, proposal: state.proposal,
+    cardId: state.proposal.cardId || null, amount: state.proposal.amount || null,
+    operationDate: state.proposal.date ? new Date(`${state.proposal.date}T12:00:00Z`) : null,
+    referenceKey: null,
+    resolvedAt: state.status === "DISCARDED" ? new Date() : null,
+    analysisHistory: [...history, { key, eventId: event.id, requestHash: event.requestHash, analyzedAt: new Date().toISOString(),
+      previous: { parserKey: movement.parserKey, status: movement.status, reason: movement.reason, proposal: movement.proposal, referenceKey: movement.referenceKey },
+      interpretation: { ...state.interpretation, reason: state.reason, proposal: state.proposal } }],
+  } });
 }
 
 async function captureExpenseData(tx, movement) {
@@ -150,13 +181,14 @@ export async function registerCaptureMovement(tx, movement, distinct) {
 
 export async function resolveCaptureMovement(db, userId, input) {
   if (!input || typeof input.id !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(input.id)
-    || !["link", "linkInstallment", "distinct", "discard", "convertToInstallments", "correct", "register"].includes(input.action)) {
+    || !["link", "linkInstallment", "distinct", "discard", "convertToInstallments", "correct", "register", "reinterpret"].includes(input.action)) {
     throw new ApiAccessError("Resolución no válida.", 400);
   }
   return db.$transaction(async tx => {
     await lockDebtAccounts(tx, userId);
     const movement = await tx.captureMovement.findFirst({ where: { id: input.id, userId } });
     if (!movement) throw new ApiAccessError("Aviso no encontrado.", 404);
+    if (input.action === "reinterpret") return reinterpretCaptureMovement(tx, movement);
     if (input.action === "correct") return correctCapture(tx, movement, input);
     if (input.action === "convertToInstallments") return convertCaptureToInstallments(tx, movement, input);
     // Una decisión terminal se conserva al reintentar o ante otra pestaña.

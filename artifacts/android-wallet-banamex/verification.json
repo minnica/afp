@@ -1,0 +1,129 @@
+{
+  "implementedOn": "2026-10-22",
+  "gitBase": "ee7d05adecd2ffd67e392d5be82ebea0d0010ca4",
+  "scope": "First real Wallet/BANAMEX 1 format, explicit notification-date policy, safe pending-notice reinterpretation and gradual activation.",
+  "privacy": {
+    "realAmountsMerchantsSuffixesReferencesIdentifiersAndSecretsExcluded": true,
+    "sourceEvidenceAndDatabaseBackupGitIgnored": true,
+    "screenshotsUseOnlyFictitiousData": true
+  },
+  "realFormats": [
+    {
+      "key": "wallet.banamex-purchase.es.v1",
+      "sourcePackage": "com.google.android.apps.walletnfcrel",
+      "verified": true,
+      "evidence": "REAL_REVIEWED",
+      "cardIdentity": "Printed suffix resolved against bank physical/digital aliases; never replace virtual NFC aliases",
+      "currency": "MXN",
+      "datePolicy": "NOTIFICATION_POSTED_AT",
+      "ownerExplicitlyAccepted": true,
+      "timeZone": "America/Mexico_City",
+      "bankOperationTimestampInvented": false,
+      "fixture": "../../tests/fixtures/captures/wallet-banamex-purchase.es.v1.json"
+    },
+    {
+      "key": "banamex.card-charge.es.v1",
+      "sourcePackage": "com.citibanamex.banamexmobile",
+      "verified": false,
+      "evidence": "REAL_REVIEWED_PARTIAL",
+      "automaticExpenses": false,
+      "missingFields": [
+        "explicit currency",
+        "withdrawal versus purchase"
+      ],
+      "authorizationIsGlobalUniqueReference": false,
+      "fixture": "../../tests/fixtures/captures/banamex-card-charge.es.v1.json"
+    }
+  ],
+  "reinterpretation": {
+    "explicitRequestOnly": true,
+    "pendingSingleEventWithoutPersonalCorrectionOnly": true,
+    "observationOnlyNoExpenseCreated": true,
+    "originalEventInterpretationAndNativeReceiptPreserved": true,
+    "versionedHistory": true,
+    "concurrentRequestsIdempotent": true
+  },
+  "checks": {
+    "suite": {
+      "sha256": "85aac440c26f53819ea31492f4c97b6cd4466eb62ed4192bb2c7f3ac019cc591",
+      "passed": true,
+      "tests": 429,
+      "passedTests": 429,
+      "failed": 0,
+      "skipped": 0,
+      "database": "Disposable local PostgreSQL 16, 25 migrations"
+    },
+    "lint": {
+      "sha256": "d9c4017ed5156b468869aab77a743e79b7c62422bd9d83e0e77d206126999db0",
+      "passed": true,
+      "errors": 0,
+      "preexistingWarnings": 1
+    },
+    "build": {
+      "sha256": "72822a51765c76b347b7f20d6ba15712843d341fe21fffb21a02c28287ba49e7",
+      "passed": true
+    },
+    "databaseReproduction": {
+      "sha256": "410eb32123b1b076bb065d39642b8551027278b4aebe6ce3f56ca23b4e87744d",
+      "passed": true,
+      "migrations": 25,
+      "fromEmpty": true,
+      "fromHistoricalBaseline": true,
+      "rlsTables": 30,
+      "checksumsMatch": true,
+      "schemaDiffEmpty": true,
+      "existingRowsPreserved": true,
+      "suiteAtThatRun": 428,
+      "finalSuiteRerunTests": 429
+    }
+  },
+  "browser": {
+    "authAndData": "Fictitious; actual application UI/API/PostgreSQL in isolated localhost fixture",
+    "mobileWidths": [
+      320,
+      390
+    ],
+    "desktopWidth": 1280,
+    "horizontalOverflow": false,
+    "reinterpretationAndDateOriginVerified": true,
+    "activationConfirmationExplainsMexicoNotificationDate": true,
+    "actualSavedDatePolicyVerified": true,
+    "httpTwoNoticesOneExpenseAndStableRetryReceipt": true,
+    "details": "browser-http.json",
+    "screenshots": [
+      "reinterpretation-390.png",
+      "activation-390.png",
+      "coverage-1280.png"
+    ]
+  },
+  "production": {
+    "migration": "production-migration.json",
+    "finalState": "production-state.json",
+    "realPurchaseResolvedByExplicitReview": true,
+    "newFinancialExpenses": 1,
+    "linkedSourceNotices": 2,
+    "originalSourceEventsRewritten": false,
+    "fullBankStatementOrCompleteCutReviewed": false,
+    "configurationPreparedOnlyFor": "BANAMEX 1 / wallet.banamex-purchase.es.v1",
+    "otherCardsOrFormatsActivated": false,
+    "previousFinancialRowsPreserved": true,
+    "calendarQueueEffect": "Existing expense INSERT and reconciliation UPDATE triggers increment revision twice and reschedule synchronization; connection credentials/settings preserved"
+  },
+  "release": {
+    "webDeployed": false,
+    "commitOrPushPerformed": false,
+    "productionMigrationApplied": true,
+    "automaticConfigurationPrepared": true,
+    "futureAutomaticRegistrationRequiresPublishingCode": true,
+    "personalApk": "0.5.0 / versionCode 7",
+    "apkReplaced": false,
+    "nativeContractChanged": false
+  },
+  "pending": [
+    "Commit/push and verify Vercel deployment READY before relying on future automatic expenses",
+    "Observe a new normal BANAMEX 1 Wallet purchase after release and reconcile a complete cut",
+    "Other cards/formats/channels require their own verified evidence and activation",
+    "Previous BBVA receipt still has no associated notification; matching existing expense left unchanged",
+    "Nu/CFE remains incomplete and manual review only"
+  ]
+}

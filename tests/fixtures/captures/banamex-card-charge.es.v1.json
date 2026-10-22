@@ -1,0 +1,16 @@
+{
+  "kind": "ANONYMIZED_REAL_NOTIFICATION",
+  "reviewedOn": "2026-10-22",
+  "scope": "Estructura real observada; comercio, importe, sufijo, autorización, fechas y encabezado sustituidos por datos ficticios. Retiro/Compra no distingue una compra de un retiro y $ no fija moneda.",
+  "event": {
+    "sourcePackage": "com.citibanamex.banamexmobile",
+    "postedAt": "2026-10-21T02:28:49.936Z",
+    "receivedAt": "2026-10-21T02:28:50.193Z",
+    "fields": {
+      "android.title": "Aviso bancario ficticio",
+      "android.text": "Retiro/Compra COMERCIO FICTICIO CIUDAD -  ADICIONAL 123 monto $ 123.45 el 20/10/26 08:28:47 PM. Auto. 999111",
+      "android.bigText": "Retiro/Compra COMERCIO FICTICIO CIUDAD -  ADICIONAL 123 monto $ 123.45 el 20/10/26 08:28:47 PM. Auto. 999111",
+      "android.title.big": "Aviso bancario ficticio"
+    }
+  }
+}

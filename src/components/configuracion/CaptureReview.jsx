@@ -34,6 +34,7 @@ function CaptureInbox({ userId, configuration }) {
         <ItemTitle className="flex-wrap break-words">{proposal.merchant || "Aviso sin compra identificada"}<Badge variant={movement.inboxState === 'REVIEW' ? 'warning' : 'secondary'}>{captureInboxStatuses[movement.inboxState]}</Badge></ItemTitle>
         <ItemDescription>{proposal.amount ? `${proposal.amount} ${proposal.currency || ''} · ${proposal.date || ''} · ` : ''}{captureReasons[movement.reason] || "Requiere revisión."}</ItemDescription>
         <ItemDescription>{configuration.cards.find(card => card.id === proposal.cardId)?.name || 'Tarjeta por identificar'} · {captureSources[movement.events[0]?.sourcePackage] || 'Aviso'}{movement.status === 'OBSERVED' ? ' · Observación' : ''}</ItemDescription>
+        {proposal.dateSource === 'NOTIFICATION_POSTED_AT' && <ItemDescription>Fecha del aviso de Wallet · hora de México</ItemDescription>}
         {(movement.originalExpenseId && !movement.expenseId && movement.status !== 'CONVERTED') && <ItemDescription>Gasto eliminado; el aviso conserva su resolución y no lo recrea.</ItemDescription>}
         {movement.status === 'CONVERTED' && <ItemDescription>{movement.reason === 'USER_LINKED_INSTALLMENT' ? 'Vinculado a una compra a meses existente.' : 'Convertido a MSI; el gasto completo fue sustituido.'}</ItemDescription>}
       </ItemContent><ItemActions className="flex-wrap"><Button variant="outline" className="min-h-11" disabled={busy} onClick={async () => {

@@ -1,0 +1,15 @@
+{
+  "date": "2026-10-22T07:08:34.128Z",
+  "migration": "20261023010000_capture_wallet_date_policy",
+  "kind": "aditiva",
+  "completedMigrations": 25,
+  "pending": [],
+  "checksumsMatch": true,
+  "changedExistingTables": [],
+  "newTables": [],
+  "tables": 30,
+  "rlsTables": 30,
+  "policies": 0,
+  "automationPreserved": true,
+  "existingPrivilegesPreserved": true
+}

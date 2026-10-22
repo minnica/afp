@@ -1,0 +1,15 @@
+{
+  "kind": "ANONYMIZED_REAL_NOTIFICATION",
+  "reviewedOn": "2026-10-22",
+  "scope": "Compra Wallet confirmada por el propietario. Comercio, importe, terminación y fechas ficticios; palabras y estructura del cuerpo conservadas. La terminación del título corresponde a la tarjeta bancaria, no al token NFC.",
+  "datePolicy": "La fecha del aviso en America/Mexico_City solo se usa automáticamente tras aceptación explícita por tarjeta/formato.",
+  "event": {
+    "sourcePackage": "com.google.android.apps.walletnfcrel",
+    "postedAt": "2026-10-21T02:28:52.977Z",
+    "receivedAt": "2026-10-21T02:28:53.197Z",
+    "fields": {
+      "android.title": "COMERCIO FICTICIO",
+      "android.text": "MXN123.45 con Joy Banamex ••0123"
+    }
+  }
+}

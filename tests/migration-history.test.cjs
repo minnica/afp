@@ -18,6 +18,7 @@ test('A11: recupera la migración original y conserva los trece checksums aplica
     '20261021040000_add_card_credit_balances',
     '20261022000000_add_card_balance_tracking',
     '20261023000000_add_google_calendar_sync',
+    '20261023010000_capture_wallet_date_policy',
   ]);
 });
 

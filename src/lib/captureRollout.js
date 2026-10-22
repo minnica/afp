@@ -1,6 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { normalizeMerchant } from "@/lib/captureParsers";
 import { capturePackages } from "@/lib/captureProtocol";
+import { aliasSupportsParser } from "@/lib/captureIdentity";
 
 export const captureActivationReasons = {
   UNVERIFIED_FORMAT: "Faltan muestras reales verificadas de este formato.",
@@ -10,7 +11,7 @@ export const captureActivationReasons = {
 };
 
 function matchingAlias(alias, proposal, sourcePackage) {
-  return alias.cardId === proposal.cardId && alias.sourcePackage === sourcePackage
+  return alias.cardId === proposal.cardId && alias.sourcePackage === (proposal.aliasSourcePackage || sourcePackage)
     && alias.kind === proposal.alias?.kind && alias.value === proposal.alias?.value && alias.verifiedAt;
 }
 
@@ -20,12 +21,16 @@ export function isReviewedCapture(movement, parser, aliases) {
   const p = movement.proposal, expense = movement.expense;
   if (!p || movement.parserKey !== parser.key || !["REGISTERED", "LINKED"].includes(movement.status)
     || !movement.resolvedAt || !expense?.reconciledAt || expense.paymentMethod !== "CARD"
-    || p.currency !== "MXN" || !p.amount || !p.date || !p.merchant || !p.operationAt
+    || p.currency !== "MXN" || !p.amount || !p.date || !p.merchant
+    || !(p.operationAt || (parser.dateSource === "NOTIFICATION_POSTED_AT" && p.dateSource === parser.dateSource && p.notificationAt))
     || p.cardId !== movement.cardId || p.cardId !== expense.cardId) return false;
   if (!aliases.some(alias => matchingAlias(alias, p, parser.sourcePackage))) return false;
-  if (!movement.events.some(event => event.sourcePackage === parser.sourcePackage
-    && event.interpretation?.parserKey === parser.key && event.interpretation?.proposal?.cardId === p.cardId
-    && ["OBSERVATION", "UNVERIFIED_FORMAT"].includes(event.interpretation?.reason))) return false;
+  if (!movement.events.some(event => {
+    const analyses = [event.interpretation, ...(movement.analysisHistory || []).filter(analysis => event.id && analysis.eventId === event.id
+      && analysis.requestHash === event.requestHash).map(analysis => analysis.interpretation)];
+    return event.sourcePackage === parser.sourcePackage && analyses.some(analysis => analysis?.parserKey === parser.key
+      && analysis?.proposal?.cardId === p.cardId && ["OBSERVATION", "UNVERIFIED_FORMAT"].includes(analysis?.reason));
+  })) return false;
   const correction = movement.correction;
   if (correction && (correction.cardId !== p.cardId || correction.date !== p.date || correction.currency !== p.currency
     || normalizeMerchant(correction.merchant) !== normalizeMerchant(p.merchant))) return false;
@@ -37,17 +42,17 @@ export function isReviewedCapture(movement, parser, aliases) {
 }
 
 export function captureFormatReadiness(parser, cardId, aliases, movements) {
-  const own = aliases.filter(alias => alias.cardId === cardId && alias.sourcePackage === parser.sourcePackage);
+  const own = aliases.filter(alias => alias.cardId === cardId && aliasSupportsParser(alias, parser));
   const verified = own.filter(alias => alias.verifiedAt);
   const ambiguous = own.filter(alias => aliases.some(other => other.cardId !== cardId
-    && other.sourcePackage === alias.sourcePackage && other.kind === alias.kind && other.value === alias.value));
+    && aliasSupportsParser(other, parser) && (parser.aliasKinds || other.kind === alias.kind) && other.value === alias.value));
   const reviewed = movements.filter(movement => movement.cardId === cardId && isReviewedCapture(movement, parser, aliases));
   const blockers = [];
   if (!parser.verified || parser.evidence === "REAL_OUT_OF_SCOPE") blockers.push("UNVERIFIED_FORMAT");
   if (!verified.length) blockers.push("NO_VERIFIED_ALIAS");
   if (ambiguous.length) blockers.push("AMBIGUOUS_ALIAS");
   if (!reviewed.length) blockers.push("NO_REVIEWED_CAPTURE");
-  return { parserKey: parser.key, sourcePackage: parser.sourcePackage, verified: Boolean(parser.verified),
+  return { parserKey: parser.key, sourcePackage: parser.sourcePackage, verified: Boolean(parser.verified), dateSource: parser.dateSource || "BANK_OPERATION",
     verifiedAliases: verified.length, ambiguousAliases: ambiguous.length, reviewedCaptures: reviewed.length,
     blockers, canEnable: blockers.length === 0 };
 }
@@ -55,9 +60,9 @@ export function captureFormatReadiness(parser, cardId, aliases, movements) {
 export async function captureRolloutMovements(db, userId, filter = {}) {
   return db.captureMovement.findMany({ where: { userId, ...filter, status: { in: ["REGISTERED", "LINKED"] },
     expense: { userId, reconciledAt: { not: null } } }, select: {
-    cardId: true, parserKey: true, status: true, proposal: true, correction: true, resolvedAt: true,
+    cardId: true, parserKey: true, status: true, proposal: true, correction: true, analysisHistory: true, resolvedAt: true,
     expense: { select: { cardId: true, date: true, amount: true, paymentMethod: true, reconciledAt: true } },
-    events: { where: { userId }, select: { sourcePackage: true, interpretation: true } },
+    events: { where: { userId }, select: { id: true, requestHash: true, sourcePackage: true, interpretation: true } },
   } });
 }
 
@@ -78,6 +83,7 @@ export function buildCaptureRollout(cards, aliases, automations, parsers, moveme
       formats: formats.filter(parser => parser.sourcePackage === sourcePackage).map(parser => ({
         ...captureFormatReadiness(parser, card.id, aliases, movements),
         mode: automations.find(mode => mode.cardId === card.id && mode.parserKey === parser.key)?.mode || "OBSERVATION",
+        datePolicy: automations.find(mode => mode.cardId === card.id && mode.parserKey === parser.key)?.datePolicy || "BANK_OPERATION",
       })),
     })) };
   });

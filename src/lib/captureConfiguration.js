@@ -17,7 +17,8 @@ const actionSchema = z.discriminatedUnion("action", [
   z.object({ action: z.literal("deleteAlias"), id: z.uuid() }).strict(),
   z.object({ action: z.literal("deleteRule"), id: z.uuid() }).strict(),
   z.object({ action: z.literal("importAliases"), inventory: captureInventorySchema }).strict(),
-  z.object({ action: z.literal("automation"), cardId: z.string().min(1), parserKey: z.string(), mode: z.enum(["OBSERVATION", "AUTOMATIC"]) }).strict(),
+  z.object({ action: z.literal("automation"), cardId: z.string().min(1), parserKey: z.string(), mode: z.enum(["OBSERVATION", "AUTOMATIC"]),
+    datePolicy: z.enum(["BANK_OPERATION", "NOTIFICATION_POSTED_AT"]).optional() }).strict(),
   z.object({ action: z.literal("rule"), cardId: z.string().min(1), merchant: z.string().trim().min(1).max(200), categoryId: z.string().min(1), subscriptionId: z.string().nullable().optional() }).strict(),
 ]);
 
@@ -72,13 +73,18 @@ export async function configureCapture(db, userId, input) {
       }
       if (data.mode === "AUTOMATIC") {
         if (!parser.verified) throw new ApiAccessError("Este formato aún no tiene muestras reales verificadas. Conserva observación.", 409);
-        const aliases = await tx.captureCardAlias.findMany({ where: { userId, sourcePackage: parser.sourcePackage } });
+        if (parser.dateSource === "NOTIFICATION_POSTED_AT" && data.datePolicy !== "NOTIFICATION_POSTED_AT") {
+          throw new ApiAccessError("Confirma el uso de la fecha del aviso de Wallet en hora de México para habilitar este formato.", 409);
+        }
+        const aliases = await tx.captureCardAlias.findMany({ where: { userId } });
         const movements = await captureRolloutMovements(tx, userId, { cardId: data.cardId, parserKey: parser.key });
         const readiness = captureFormatReadiness(parser, data.cardId, aliases, movements);
         if (!readiness.canEnable) throw new ApiAccessError(captureActivationReasons[readiness.blockers[0]], 409);
       }
       const identity = { userId, cardId: data.cardId, parserKey: data.parserKey };
-      return tx.captureAutomation.upsert({ where: { userId_cardId_parserKey: identity }, create: { ...identity, mode: data.mode }, update: { mode: data.mode } });
+      return tx.captureAutomation.upsert({ where: { userId_cardId_parserKey: identity },
+        create: { ...identity, mode: data.mode, ...(data.datePolicy ? { datePolicy: data.datePolicy } : {}) },
+        update: { mode: data.mode, ...(data.datePolicy ? { datePolicy: data.datePolicy } : {}) } });
     }
     if (data.subscriptionId) {
       const subscription = await tx.subscription.findFirst({ where: { id: data.subscriptionId, userId, cardId: data.cardId, paymentMethod: "CARD" } });
@@ -102,5 +108,5 @@ export async function captureConfiguration(db, userId) {
   const movements = await captureRolloutMovements(db, userId);
   return { cards, aliases, automations, rules, categories, subscriptions,
     rollout: buildCaptureRollout(cards, aliases, automations, captureParsers, movements),
-    parsers: captureParsers.filter(parser => parser.evidence !== "REAL_OUT_OF_SCOPE").map(({ key, sourcePackage, verified }) => ({ key, sourcePackage, verified })) };
+    parsers: captureParsers.filter(parser => parser.evidence !== "REAL_OUT_OF_SCOPE").map(({ key, sourcePackage, verified, dateSource }) => ({ key, sourcePackage, verified, dateSource: dateSource || "BANK_OPERATION" })) };
 }

@@ -44,6 +44,11 @@ export default function CaptureMovementEditor({ detail, configuration, userId, o
       const next = await response.json();
       setCurrent(next);
       if (action.action === "correct") form.reset({ ...next.movement.correction });
+      if (action.action === "reinterpret") {
+        const parsed = next.movement.proposal;
+        form.reset({ merchant: parsed.merchant || "", amount: parsed.amount || "", date: parsed.date || "", cardId: parsed.cardId || "",
+          categoryId: "", currency: "MXN" });
+      }
       setConfirmation(null);
     } catch (err) { setError(`${err.message} Actualiza para comprobar el resultado si se perdió la respuesta.`); }
     finally { setBusy(false); }
@@ -59,7 +64,10 @@ export default function CaptureMovementEditor({ detail, configuration, userId, o
           <ItemTitle>{captureSources[event.sourcePackage]}</ItemTitle><ItemDescription>{new Date(event.receivedAt).toLocaleString("es-MX")}</ItemDescription>
           <p className="whitespace-pre-wrap break-words text-sm">{Object.values(event.fields).join("\n") || "Aviso sin texto accesible"}</p>
         </ItemContent></Item>)}</ItemGroup>
+        {proposal.dateSource === "NOTIFICATION_POSTED_AT" && <Alert><AlertDescription>La fecha propuesta procede de la publicación del aviso de Wallet, en hora de México. El aviso no incluye fecha bancaria de operación.</AlertDescription></Alert>}
+        {movement.analysisHistory?.length > 0 && <p className="text-sm text-muted-foreground">Interpretado con el formato actual. Se conservan {movement.analysisHistory.length} análisis anteriores y el aviso original.</p>}
         {open ? <>
+          {!movement.correction && movement.events.length === 1 && <Button variant="outline" className="min-h-11 self-start" disabled={busy || form.formState.isDirty} onClick={() => setConfirmation({ action: "reinterpret" })}>Interpretar con el formato actual</Button>}
           {proposal.currency && proposal.currency !== "MXN" && <Alert><AlertDescription>El aviso indica {proposal.currency}. Captura el importe final cobrado en MXN según el banco antes de registrar.</AlertDescription></Alert>}
           <form id="capture-correction-form" onSubmit={form.handleSubmit(values => act({ action: "correct", correction: values, expectedCorrection: JSON.stringify(movement.correction ?? null) }))} className="flex flex-col gap-4">
             <CaptureFields form={form} configuration={configuration} disabled={busy} />
@@ -97,5 +105,5 @@ export default function CaptureMovementEditor({ detail, configuration, userId, o
       </div>
       <DialogFooter><Button variant="outline" className="min-h-11" disabled={busy} onClick={onClose}>Cerrar</Button></DialogFooter>
     </DialogContent>
-  </Dialog><AlertDialog open={Boolean(confirmation)} onOpenChange={value => { if (!value && !busy) setConfirmation(null); }}><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>{confirmation?.action === "distinct" ? "Registrar otra compra" : "Convertir a MSI"}</AlertDialogTitle><AlertDialogDescription>{confirmation?.action === "distinct" ? "Confirma que es otra compra, aunque coincida con los movimientos existentes. Se creará un gasto por conciliar." : `El gasto completo se sustituirá por una compra de ${months} mensualidades, conservando sus datos. Las aportaciones y vínculos personales requieren revisión previa.`}</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel disabled={busy} className="min-h-11">Cancelar</AlertDialogCancel><AlertDialogAction disabled={busy} className="min-h-11" onClick={event => { event.preventDefault(); void act(confirmation); }}>Confirmar</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog></>;
+  </Dialog><AlertDialog open={Boolean(confirmation)} onOpenChange={value => { if (!value && !busy) setConfirmation(null); }}><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>{confirmation?.action === "reinterpret" ? "Interpretar aviso pendiente" : confirmation?.action === "distinct" ? "Registrar otra compra" : "Convertir a MSI"}</AlertDialogTitle><AlertDialogDescription>{confirmation?.action === "reinterpret" ? "Se aplicará el formato actual sin crear un gasto. El aviso, el análisis original y el recibo de entrega se conservarán. Las correcciones personales no se sustituyen." : confirmation?.action === "distinct" ? "Confirma que es otra compra, aunque coincida con los movimientos existentes. Se creará un gasto por conciliar." : `El gasto completo se sustituirá por una compra de ${months} mensualidades, conservando sus datos. Las aportaciones y vínculos personales requieren revisión previa.`}</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel disabled={busy} className="min-h-11">Cancelar</AlertDialogCancel><AlertDialogAction disabled={busy} className="min-h-11" onClick={event => { event.preventDefault(); void act(confirmation); }}>Confirmar</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog></>;
 }

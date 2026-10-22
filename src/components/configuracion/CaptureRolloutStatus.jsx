@@ -26,10 +26,12 @@ export default function CaptureRolloutStatus({ coverage, cardId, busy, onAutomat
         {source.formats.map(format => <div key={format.parserKey} className="flex min-w-0 flex-col gap-2">
           <ItemDescription className="break-all">{format.parserKey}</ItemDescription>
           <div><Badge variant={format.mode === "AUTOMATIC" ? "default" : "secondary"}>{format.mode === "AUTOMATIC" ? "Automático" : format.verified ? "Observación" : "Diagnóstico"}</Badge></div>
+          {format.dateSource === "NOTIFICATION_POSTED_AT" && <ItemDescription className="line-clamp-none">Usa la fecha del aviso de Wallet en hora de México. El aviso no incluye una fecha bancaria de operación.</ItemDescription>}
           <ItemDescription className="line-clamp-none">{format.reviewedCaptures} {format.reviewedCaptures === 1 ? "propuesta conciliada sin cambios en los datos interpretados" : "propuestas conciliadas sin cambios en los datos interpretados"}</ItemDescription>
           {format.mode !== "AUTOMATIC" && format.blockers.map(reason => <ItemDescription key={reason} className="line-clamp-none">{reasons[reason]}</ItemDescription>)}
           <ItemActions><Button variant="outline" className="min-h-11" disabled={busy || (format.mode !== "AUTOMATIC" && !format.canEnable)} onClick={() => onAutomation({ action: "automation", cardId, parserKey: format.parserKey,
             mode: format.mode === "AUTOMATIC" ? "OBSERVATION" : "AUTOMATIC",
+            ...(format.dateSource === "NOTIFICATION_POSTED_AT" ? { datePolicy: "NOTIFICATION_POSTED_AT" } : {}),
             label: format.mode === "AUTOMATIC" ? "Volver a observación" : "Habilitar registro automático" })}>
             {format.mode === "AUTOMATIC" ? "Volver a observación" : "Habilitar"}
           </Button></ItemActions>

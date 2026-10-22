@@ -6,6 +6,10 @@ export const captureParsers = [
   { key: "wallet.purchase.es.v1", sourcePackage: "com.google.android.apps.walletnfcrel", title: "Pago realizado", verified: false },
   { key: "bbva.account-charge.es.v1", sourcePackage: "com.bancomer.mbanking", verified: false, evidence: "REAL_OUT_OF_SCOPE" },
   { key: "nu.cfe-service-payment.es.v1", sourcePackage: "com.nu.production", verified: false, evidence: "REAL_REVIEWED_PARTIAL" },
+  { key: "wallet.banamex-purchase.es.v1", sourcePackage: "com.google.android.apps.walletnfcrel", verified: true, evidence: "REAL_REVIEWED",
+    aliasSourcePackage: "com.citibanamex.banamexmobile", aliasKinds: ["PHYSICAL", "DIGITAL"], dateSource: "NOTIFICATION_POSTED_AT" },
+  { key: "banamex.card-charge.es.v1", sourcePackage: "com.citibanamex.banamexmobile", verified: false, evidence: "REAL_REVIEWED_PARTIAL",
+    aliasSourcePackage: "com.citibanamex.banamexmobile", aliasKinds: ["PHYSICAL", "DIGITAL"], evidenceOnly: true },
 ];
 
 export function normalizeMerchant(value) {
@@ -36,10 +40,74 @@ export function captureOperationTime(value) {
   return matches.length === 1 ? { operationAt: matches[0].toISOString(), date: local.slice(0, 10), timeZone: "America/Mexico_City" } : null;
 }
 
+function conflictingBodies(fields) {
+  return Boolean((fields["android.bigText"] && fields["android.text"] && fields["android.bigText"] !== fields["android.text"])
+    || (fields["android.title.big"] && fields["android.title"] && fields["android.title.big"] !== fields["android.title"]));
+}
+
+export function captureNotificationDate(event) {
+  const posted = new Date(event.postedAt), received = new Date(event.receivedAt);
+  if (!Number.isFinite(posted.getTime()) || !Number.isFinite(received.getTime())
+    || posted.getUTCFullYear() < 2000 || posted.getUTCFullYear() > 2100
+    || posted.getTime() > received.getTime() + 5 * 60000) return null;
+  return { date: mexicoClock.format(posted).slice(0, 10), notificationAt: posted.toISOString(),
+    dateSource: "NOTIFICATION_POSTED_AT", timeZone: "America/Mexico_City" };
+}
+
+function realWalletPurchase(event) {
+  const fields = event.fields || {}, body = fields["android.bigText"] || fields["android.text"] || "";
+  const match = body.match(/^(MXN|USD|EUR)([\d,.]+) con Joy Banamex ••(\d{4})$/);
+  if (!match) return null;
+  const parserKey = "wallet.banamex-purchase.es.v1";
+  if (conflictingBodies(fields)) return { parserKey, verified: true, reason: "CONFLICTING_FIELDS", proposal: {} };
+  const merchant = fields["android.title"];
+  const amount = captureAmount(match[2]), date = captureNotificationDate(event);
+  if (!amount || !date || typeof merchant !== "string" || !merchant.trim() || merchant.length > 200 || /[\r\n]/.test(merchant)) {
+    return { parserKey, verified: true, reason: "INVALID_FIELDS", proposal: {} };
+  }
+  return { parserKey, verified: true, reason: match[1] === "MXN" ? "PURCHASE" : "FOREIGN_CURRENCY", proposal: {
+    ...date, amount, currency: match[1], merchant: merchant.trim(),
+    // Wallet muestra la terminación del título, no el token de pagos NFC.
+    printedAlias: { value: match[3], digits: 4 }, aliasSourcePackage: "com.citibanamex.banamexmobile", reference: null,
+  } };
+}
+
+function realBanamexCharge(event) {
+  const fields = event.fields || {}, body = fields["android.bigText"] || fields["android.text"] || "";
+  const match = body.match(/^Retiro\/Compra (.{1,200}) -\s+ADICIONAL (\d{3}) monto \$\s*([\d,.]+) el (\d{2}\/\d{2}\/\d{2}) (\d{2}):(\d{2}):(\d{2}) (AM|PM)\. Auto\. (\d{6})$/);
+  if (!match) return null;
+  const parserKey = "banamex.card-charge.es.v1";
+  if (conflictingBodies(fields)) return { parserKey, verified: false, reason: "CONFLICTING_FIELDS", proposal: {} };
+  const [, merchant, suffix, rawAmount, printedDay, rawHour, minute, second, meridiem, authorization] = match;
+  const [day, month, year] = printedDay.split("/");
+  const hour = Number(rawHour);
+  const time = hour >= 1 && hour <= 12 && captureOperationTime(`${day}/${month}/20${year} ${String(hour % 12 + (meridiem === "PM" ? 12 : 0)).padStart(2, "0")}:${minute}:${second}`);
+  const amount = captureAmount(rawAmount);
+  if (!time || !amount || !merchant.trim() || /[\r\n]/.test(merchant)) return { parserKey, verified: false, reason: "INVALID_FIELDS", proposal: {} };
+  if (new Date(time.operationAt).getTime() > new Date(event.receivedAt).getTime() + 5 * 60000) {
+    return { parserKey, verified: false, reason: "FUTURE_OPERATION", proposal: {} };
+  }
+  // «Retiro/Compra» no distingue por sí solo un retiro de una compra; $ tampoco
+  // fija MXN. La autorización abreviada no se usa como referencia global única.
+  return { parserKey, verified: false, reason: "INCOMPLETE_FORMAT", proposal: {
+    ...time, dateSource: "BANK_OPERATION", amount, merchant: merchant.trim(), movementType: "CARD_CHARGE",
+    printedAlias: { value: suffix, digits: 3 }, aliasSourcePackage: "com.citibanamex.banamexmobile",
+    bankAuthorization: authorization, missingFields: ["currency", "purchaseType"], evidenceOnly: true,
+  } };
+}
+
 export function interpretCapture(event) {
   const texts = Object.values(event.fields || {}).join("\n");
   if (/\b(MSI|meses sin intereses|preautorizaci[oó]n|retenci[oó]n|devoluci[oó]n|reembolso|cancelaci[oó]n|abono|rechazad[ao]|promoci[oó]n|c[oó]digo de (?:acceso|verificaci[oó]n)|env[ií]o|pedido recibido)\b/i.test(texts)) {
     return { reason: "SPECIAL_MOVEMENT", proposal: {} };
+  }
+  if (event.sourcePackage === "com.google.android.apps.walletnfcrel") {
+    const real = realWalletPurchase(event);
+    if (real) return real;
+  }
+  if (event.sourcePackage === "com.citibanamex.banamexmobile") {
+    const real = realBanamexCharge(event);
+    if (real) return real;
   }
   // Prefijo observado y confirmado por el propietario como transferencia de
   // débito. No vincular su terminación con los alias de tarjetas de crédito.

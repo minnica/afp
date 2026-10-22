@@ -1,0 +1,80 @@
+{
+  "reviewedOn": "2026-10-22",
+  "scope": "Verificar la compra nueva comunicada con BANAMEX 1 mediante Wallet y buscar un aviso tardío del comprobante BBVA anterior.",
+  "privacy": {
+    "actualAmountsMerchantsCardSuffixesReferencesAndIdentifiersExcluded": true,
+    "rawEvidenceStoredOnlyInIgnoredPrivateDirectory": true
+  },
+  "newPurchase": {
+    "ownerReportedCard": "BANAMEX 1",
+    "ownerConfirmedWalletPayment": true,
+    "ownerSawBothNotifications": true,
+    "bankSourcePackage": "com.citibanamex.banamexmobile",
+    "walletSourcePackage": "com.google.android.apps.walletnfcrel",
+    "bothNotificationAmountsMatchOwnerReport": true,
+    "merchantTextMatchesBetweenSources": true,
+    "postedTimeDifferenceMilliseconds": 3041,
+    "walletTitleSuffixMatchesExistingBankDigitalAlias": "BANAMEX 1",
+    "walletNotificationSuffixIsNotTheNfcVirtualAccountNumber": true,
+    "bankNotificationHasPrintedOperationDate": true,
+    "bankNotificationHasExplicitMxnCurrency": false,
+    "bankNotificationHasFullConfiguredCardSuffix": false,
+    "walletNotificationHasExplicitMxnCurrency": true,
+    "walletNotificationHasPrintedBankOperationDate": false,
+    "bankCaptureToServerMilliseconds": 3771,
+    "walletCaptureToServerMilliseconds": 59065,
+    "persistedEvents": 2,
+    "persistedCaptureMovements": 2,
+    "bothStatus": "REVIEW",
+    "bothReason": "UNKNOWN_FORMAT",
+    "linkedFinancialRecords": 0,
+    "matchingDailyExpensesForReportedCardAndAmount": 0,
+    "correlationIsManualReviewNotAutomaticMerge": true,
+    "financialExpenseAutomaticallyCreated": false
+  },
+  "previousBbvaPayment": {
+    "associatedBankOrWalletNotificationFound": false,
+    "walletLocalSamplesAtInspection": 1,
+    "onlyWalletServerEventCorrespondsToNewBanamexPurchase": true,
+    "storedDailyExpensesMatchingReportedAmountCardAndReceiptDate": 1,
+    "captureMovementsLinkedToThatExistingExpense": 0,
+    "existingExpenseProvesItIsTheSameReceipt": false,
+    "existingExpenseWasNotCreatedOrModifiedDuringThisInspection": true
+  },
+  "phoneAndServer": {
+    "usbDeviceConnected": true,
+    "phoneAuthorizationActive": true,
+    "listenerConnected": true,
+    "notificationAccess": true,
+    "captureActive": true,
+    "selectedSources": 8,
+    "batteryExempt": true,
+    "deliveryPaused": false,
+    "remotePauses": 0,
+    "nativePending": 0,
+    "nativeDeliveryReview": 0,
+    "nativeDelivered": 19,
+    "serverEvents": 19,
+    "nativeDiagnosticSamples": 22,
+    "bankAndWalletPurchaseSamplesReceivedWithScreenLocked": false,
+    "deliveryReviewAndFinancialReviewAreSeparateStates": true,
+    "automaticModesEnabled": 0
+  },
+  "changes": {
+    "productionInspectionReadOnly": true,
+    "normalPhoneStatusReportsMayContinue": true,
+    "financialRecordsCreatedOrModified": false,
+    "captureResolutionsModified": false,
+    "aliasesOrSettingsModified": false,
+    "automationEnabled": false,
+    "parserCodeModified": false,
+    "webDeployed": false,
+    "apkReplaced": false
+  },
+  "pending": [
+    "Prepare and validate versioned parsers from the observed Banamex and Wallet formats before enabling automation",
+    "Resolve the two new notices as evidence of one purchase, without creating duplicate expenses",
+    "Identify the existing BBVA expense explicitly before linking or creating another expense for the previous receipt",
+    "Complete the real pilot and per-card channel acceptance required by phases 6 and 7"
+  ]
+}

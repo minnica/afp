@@ -78,6 +78,12 @@ function runRegressions(url) {
 
 function assertCatalog(actual) {
   // Conserva el snapshot histórico; verifica explícitamente las columnas nuevas.
+  const datePolicy = actual.columns.find(row => row.table_name === 'capture_automations' && row.column_name === 'datePolicy');
+  assert.equal(datePolicy?.data_type, 'text'); assert.equal(datePolicy?.is_nullable, 'NO');
+  assert.equal(datePolicy?.column_default, "'BANK_OPERATION'::text");
+  assert.match(actual.constraints.find(row => row.table_name === 'capture_automations' && row.name === 'capture_automations_datePolicy_check')?.definition || '', /BANK_OPERATION.*NOTIFICATION_POSTED_AT/);
+  const analyses = actual.columns.find(row => row.table_name === 'capture_movements' && row.column_name === 'analysisHistory');
+  assert.equal(analyses?.data_type, 'jsonb'); assert.equal(analyses?.is_nullable, 'YES'); assert.equal(analyses?.column_default, null);
   const balanceColumns = ['balanceAsOf', 'balanceTracking', 'creditLimit', 'usedBalance'];
   const capturedBalanceColumns = actual.columns.filter(row => row.table_name === 'cards' && balanceColumns.includes(row.column_name));
   assert.deepEqual(capturedBalanceColumns.map(row => row.column_name), balanceColumns);

@@ -1,0 +1,12 @@
+{
+  "testedAt": "2026-10-22T07:11:14.750Z",
+  "isolatedLocalDatabase": true,
+  "fictitiousAuthAndNotifications": true,
+  "browserReinterpretationCreatedNoExpense": true,
+  "browserActivationSavedDatePolicy": true,
+  "bankThenWalletHttpRequestsCreateOneExpense": true,
+  "retryReturnsSameReceipt": true,
+  "expensePendingReconciliation": true,
+  "correctCardAndMexicoNotificationDate": true,
+  "bankEvidenceRemainsReview": true
+}

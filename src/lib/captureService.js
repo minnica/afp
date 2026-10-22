@@ -74,9 +74,10 @@ export async function getCaptureDevice(db, credential) {
   return db.$transaction(async tx => {
     const device = await lockedCaptureDevice(tx, credential);
     const state = deviceState(device);
-    const verifiedFormats = captureParsers.filter(parser => parser.verified).map(parser => parser.key);
+    const verifiedFormats = captureParsers.filter(parser => parser.verified);
     const automaticExpenses = Boolean(device.userId && verifiedFormats.length && await tx.captureAutomation.findFirst({
-      where: { userId: device.userId, mode: "AUTOMATIC", parserKey: { in: verifiedFormats } },
+      where: { userId: device.userId, mode: "AUTOMATIC", OR: verifiedFormats.map(parser => ({ parserKey: parser.key,
+        ...(parser.dateSource === "NOTIFICATION_POSTED_AT" ? { datePolicy: "NOTIFICATION_POSTED_AT" } : {}) })) },
     }));
     if (device.userId && !device.revokedAt) await tx.captureDevice.update({ where: { id: device.id }, data: { lastSeenAt: new Date() } });
     return { deviceId: device.id, ownerId: device.userId, state,
