@@ -36,6 +36,53 @@ test('préstamos: GET conserva el saldo bancario al registrar reembolsos o gasto
   assert.equal(payable.reimbursementReceivableId, 'receivable-linked');
   assert.equal((await ok(f, 'receivables', 'GET')).receivables[0].pendingBalance, 72000);
 });
+
+test('préstamos: desglose usa los ingresos vigentes sin descontarlos del banco ni modificar el historial', async () => {
+  const f = debtFixture();
+  const receivable = f.seed('receivable', { originalAmount: '100000' });
+  f.seed('payable', { originalAmount: '140000', accountType: 'LOAN', currentBalance: '114187.61', reimbursementReceivableId: receivable.id });
+  const first = (await ok(f, 'incomes', 'POST', payment('receivable', receivable, 28000))).income;
+  const latest = (await ok(f, 'incomes', 'POST', payment('receivable', receivable, 25500))).income;
+  async function check(paid, pending, status = 'ACTIVE') {
+    const beforeRead = f.state();
+    const loan = (await ok(f, 'payables', 'GET')).payables[0];
+    assert.equal(loan.pendingBalance, 114187.61);
+    assert.equal(loan.paidAmount, 25812.39);
+    assert.equal(Number(loan.originalAmount), 140000);
+    assert.equal(Number(loan.reimbursementReceivable.originalAmount), 100000);
+    assert.equal(loan.reimbursementReceivable.paidAmount, paid);
+    assert.equal(loan.reimbursementReceivable.pendingBalance, pending);
+    assert.equal(loan.reimbursementReceivable.status, status);
+    assert.equal(loan.reimbursementReceivable.excessAmount, Math.max(0, -pending));
+    assert.equal(Object.hasOwn(loan.reimbursementReceivable, 'incomes'), false);
+    const separate = (await ok(f, 'receivables', 'GET')).receivables[0];
+    assert.equal(separate.pendingBalance, pending);
+    assert.equal(separate.paidAmount, paid);
+    assert.deepEqual(f.state(), beforeRead);
+  }
+  await check(53500, 46500);
+  await ok(f, 'incomes', 'PATCH', { ...payment('receivable', receivable, 72000), id: latest.id });
+  await check(100000, 0, 'PAID_OFF');
+  await ok(f, 'incomes', 'PATCH', { ...payment('receivable', receivable, 72000.01), id: latest.id });
+  await check(100000.01, -0.01, 'PAID_OFF');
+  await ok(f, 'incomes', 'DELETE', { id: latest.id });
+  await check(28000, 72000);
+  await ok(f, 'incomes', 'DELETE', { id: first.id });
+  await check(0, 100000);
+});
+
+test('préstamos: cuenta de reembolso cancelada y préstamo propio conservan su identidad', async () => {
+  const f = debtFixture();
+  const cancelled = f.seed('receivable', { originalAmount: '100000', status: 'CANCELLED' });
+  const linked = f.seed('payable', { originalAmount: '140000', accountType: 'LOAN', currentBalance: '114187.61', reimbursementReceivableId: cancelled.id });
+  const own = f.seed('payable', { originalAmount: '100000', accountType: 'LOAN', currentBalance: '90556.17' });
+  await ok(f, 'incomes', 'POST', payment('receivable', cancelled, 53500));
+  const { payables } = await ok(f, 'payables', 'GET');
+  assert.equal(payables.find(x => x.id === linked.id).reimbursementReceivable.status, 'CANCELLED');
+  assert.equal(payables.find(x => x.id === linked.id).reimbursementReceivable.pendingBalance, 46500);
+  assert.equal(payables.find(x => x.id === own.id).reimbursementReceivable, null);
+  assert.equal(payables.find(x => x.id === own.id).pendingBalance, 90556.17);
+});
 async function ok(f, route, method, body) {
   const response = await f.call(route, method, body);
   assert.equal(response.status, 200, JSON.stringify(response.body));

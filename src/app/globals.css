@@ -523,3 +523,77 @@ body:has([data-slot="record-create-panel"]) [data-sonner-toaster][data-y-positio
   overflow-wrap: anywhere;
   text-wrap: pretty;
 }
+
+/* El detalle de deuda prioriza saldo bancario y recuperación; el contrato se
+   consulta sin perder el encabezado ni las acciones. */
+.payable-detail[data-slot="dialog-content"] {
+  display: flex;
+  width: min(44rem, calc(100vw - 2rem));
+  max-width: none;
+  max-height: min(90dvh, 58rem);
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.payable-detail-header { flex-shrink: 0; gap: .5rem; padding: 1.5rem 4rem 1.25rem 1.5rem; }
+.payable-detail-header [data-slot="dialog-title"] { font-size: 1.125rem; font-weight: 600; line-height: 1.4; text-wrap: balance; overflow-wrap: anywhere; }
+.payable-detail-header [data-slot="dialog-description"] { font-size: .875rem; }
+.payable-detail-close { position: absolute; top: .75rem; right: .75rem; width: 2.75rem; height: 2.75rem; }
+.payable-detail-body { min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 0 1.5rem 1rem; scrollbar-gutter: stable; outline-offset: -2px; }
+.payable-detail-footer { flex-shrink: 0; flex-direction: row; flex-wrap: wrap; justify-content: flex-end; gap: .5rem; padding: 1rem 1.5rem; border-top: 1px solid var(--border); }
+.payable-detail :is(button, [data-slot="button"], [data-slot="accordion-trigger"]) { min-height: 2.75rem; font-size: .875rem; }
+.payable-detail [data-slot="badge"], .loan-reimbursement [data-slot="badge"] { min-height: 1.5rem; height: auto; padding-block: .125rem; font-size: .75rem; white-space: normal; }
+
+.payable-bank-balance { display: flex; flex-direction: column; gap: .75rem; padding-bottom: 1.5rem; }
+.payable-bank-amount-row { display: flex; min-width: 0; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: .75rem 1.5rem; }
+.payable-bank-amount { font-size: 2rem; font-weight: 650; line-height: 1.15; letter-spacing: -.025em; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.payable-payment dt, .payable-condition-fields dt { color: var(--muted-foreground); font-size: .875rem; }
+.payable-payment dd { margin-top: .25rem; font-size: 1.125rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.payable-payment { text-align: right; }
+.payable-own-note { padding: 0 0 1.5rem; font-size: .875rem; color: var(--muted-foreground); }
+
+.loan-reimbursement { display: flex; min-width: 0; flex-direction: column; gap: .875rem; border: 1px solid var(--border); border-radius: .75rem; background: var(--muted); padding: 1.25rem; }
+.loan-reimbursement-amounts { display: grid; min-width: 0; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1rem; align-items: end; }
+.loan-reimbursement-amounts > div { min-width: 0; }
+.loan-reimbursement-amounts dt { font-size: .875rem; color: var(--foreground); }
+.loan-reimbursement-amounts dd { margin-top: .375rem; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.loan-reimbursement p { overflow-wrap: anywhere; }
+.loan-reimbursement-balance { font-size: 1.75rem; font-weight: 650; line-height: 1.15; letter-spacing: -.02em; }
+.loan-reimbursement-paid { font-size: 1.125rem; font-weight: 600; }
+.loan-reimbursement-compact { gap: .75rem; border: 0; border-radius: 0; border-top: 1px solid var(--border); background: transparent; padding: 1rem 0 0; }
+.loan-reimbursement-compact .loan-reimbursement-balance { font-size: 1.25rem; }
+.loan-reimbursement-compact .loan-reimbursement-paid { font-size: 1rem; }
+
+.payable-detail-sections[data-slot="accordion"] { margin-top: 1rem; border: 0; border-radius: 0; overflow: visible; }
+.payable-detail-sections [data-slot="accordion-item"] { border-bottom: 1px solid var(--border); background: transparent; }
+.payable-detail-sections [data-slot="accordion-trigger"] { align-items: center; padding: 1rem 0; font-weight: 600; }
+.payable-detail-sections [data-slot="accordion-trigger"]:hover { text-decoration: none; }
+.payable-detail-sections [data-slot="accordion-content"] { padding-inline: 0; font-size: .875rem; }
+.payable-condition-fields { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1rem; }
+.payable-condition-fields dd { margin-top: .25rem; font-size: .875rem; font-weight: 500; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.payable-detail :is([data-slot="item-title"], [data-slot="item-description"], [data-slot="empty-title"], [data-slot="empty-description"]) { font-size: .875rem; }
+.payable-detail [data-slot="empty-description"] { max-width: 44ch; text-wrap: pretty; }
+
+@media (width < 768px) {
+  .payable-detail[data-slot="dialog-content"] { width: calc(100vw - 1rem); max-height: calc(100dvh - 1rem); }
+  .payable-detail-header { padding: 1.25rem 3.75rem 1rem 1rem; }
+  .payable-detail-header [data-slot="dialog-title"] { font-size: 1rem; }
+  .payable-detail-body { padding: 0 1rem 1rem; scrollbar-gutter: auto; }
+  .payable-detail-footer { padding: .75rem 1rem; }
+  .payable-detail-footer > :is(button, [data-slot="button"]) { flex: 1 1 auto; }
+  .payable-bank-amount { font-size: 1.875rem; }
+  .payable-payment { text-align: left; }
+  .loan-reimbursement { padding: 1rem; }
+  .loan-reimbursement-compact { padding: 1rem 0 0; }
+  .loan-reimbursement-balance { font-size: 1.5rem; }
+}
+
+@media (width < 360px) {
+  .loan-reimbursement-amounts { grid-template-columns: minmax(0, 1fr); gap: .75rem; }
+  .loan-reimbursement-amounts > div:last-child { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .5rem; }
+  .loan-reimbursement-amounts > div:last-child dd { margin-top: 0; }
+  .loan-reimbursement-balance { font-size: 1.375rem; }
+  .loan-reimbursement-paid { font-size: 1rem; }
+}

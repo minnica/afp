@@ -32,7 +32,9 @@ const payableSelect = {
       id: true,
       concept: true,
       originalAmount: true,
+      status: true,
       person: { select: { id: true, name: true } },
+      incomes: { select: { amount: true } },
     },
   },
   person: {
@@ -59,7 +61,20 @@ function parseDateInput(dateValue) {
 }
 
 function formatPayable(item) {
-  return { ...item, ...getDebtAccountState(item, item.dailyExpenses) };
+  const reimbursement = item.reimbursementReceivable;
+  let reimbursementReceivable = null;
+  if (reimbursement) {
+    const { incomes, ...account } = reimbursement;
+    reimbursementReceivable = {
+      ...account,
+      ...getDebtAccountState(account, incomes || []),
+    };
+  }
+  return {
+    ...item,
+    ...getDebtAccountState(item, item.dailyExpenses),
+    reimbursementReceivable,
+  };
 }
 
 export async function GET(request) {

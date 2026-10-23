@@ -95,7 +95,7 @@ export function RecordListToolbar({ table, label, totals = [] }) {
         }}
       />
       {totals.length ? (
-        <Item variant="muted" size="sm" aria-label="Totales filtrados">
+        <Item variant="muted" size="sm" role="group" aria-label="Totales filtrados">
           <dl className="flex w-full min-w-0 flex-wrap gap-x-4 gap-y-2">
             {totals.map((total) => (
               <div key={total.key} className="min-w-0 flex-[1_1_7rem]">

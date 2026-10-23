@@ -12,7 +12,10 @@ function debtFixture() {
     const hydrate = (model, row) => {
       if (!row) return null;
       const result = structuredClone(row);
-      if (model === 'payableAccount') result.dailyExpenses = getState().dailyExpense.filter(item => item.payableAccountId === row.id);
+      if (model === 'payableAccount') {
+        result.dailyExpenses = getState().dailyExpense.filter(item => item.payableAccountId === row.id);
+        result.reimbursementReceivable = hydrate('receivableAccount', getState().receivableAccount.find(item => item.id === row.reimbursementReceivableId));
+      }
       if (model === 'receivableAccount') result.incomes = getState().income.filter(item => item.receivableAccountId === row.id);
       if (model === 'income') result._count = { cardCycleCredits: 0 };
       return result;
