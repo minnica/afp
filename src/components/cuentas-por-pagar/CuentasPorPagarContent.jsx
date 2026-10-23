@@ -42,6 +42,7 @@ import { TableCell, TableRow } from "@/components/ui/table";
 import { ResponsiveSelect } from "@/components/ui/responsive-select";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import PayableDetails, { LoanReimbursementSummary } from "@/components/cuentas-por-pagar/PayableDetails";
+import PayablesSummary from "@/components/cuentas-por-pagar/PayablesSummary";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import PageSkeleton from "@/components/layout/PageSkeleton";
 import { RecordActions, RecordCard, RecordField, RecordListCard, RecordListToolbar, RecordNote } from "@/components/ui/record-card";
@@ -119,6 +120,7 @@ export default function CuentasPorPagarContent() {
   const [user, setUser] = useState(null);
   const [people, setPeople] = useState([]);
   const [payables, setPayables] = useState([]);
+  const [hasLoadedPayables, setHasLoadedPayables] = useState(false);
 
   const [personId, setPersonId] = useState("");
   const [concept, setConcept] = useState("");
@@ -179,6 +181,7 @@ export default function CuentasPorPagarContent() {
     }
 
     setPayables(data.payables || []);
+    setHasLoadedPayables(true);
   }
 
   useEffect(() => {
@@ -362,23 +365,6 @@ export default function CuentasPorPagarContent() {
     }
   }
 
-  const summary = useMemo(() => {
-    return payables.reduce(
-      (acc, item) => {
-        acc.original += Number(item.originalAmount || 0);
-        acc.paid += Number(item.paidAmount || 0);
-        acc.pending += Number(item.pendingBalance || 0);
-
-        return acc;
-      },
-      {
-        original: 0,
-        paid: 0,
-        pending: 0,
-      },
-    );
-  }, [payables]);
-
   const filteredPayables = useMemo(() => {
     const search = filterConcept.trim().toLocaleLowerCase("es-MX");
     return payables.filter((item) => {
@@ -529,17 +515,7 @@ export default function CuentasPorPagarContent() {
             </Alert>
           ) : null}
 
-          <div className="mb-6 grid gap-4 md:grid-cols-3">
-            <SummaryCard
-              title="Monto original"
-              value={formatMoney(summary.original)}
-            />
-            <SummaryCard title="Capital abonado" value={formatMoney(summary.paid)} />
-            <SummaryCard
-              title="Pendiente"
-              value={formatMoney(summary.pending)}
-            />
-          </div>
+          {hasLoadedPayables ? <PayablesSummary payables={payables} /> : null}
 
           <div className={`grid min-w-0 gap-5 ${compactEntry ? "" : "xl:grid-cols-[360px_1fr]"}`}>
             <CreateRecordSurface
@@ -806,17 +782,6 @@ export default function CuentasPorPagarContent() {
         </section>
       </div>
     </>
-  );
-}
-
-function SummaryCard({ title, value }) {
-  return (
-    <Card className="rounded-2xl border-border bg-card">
-      <CardHeader className="pb-2">
-        <CardDescription>{title}</CardDescription>
-        <CardTitle className="text-2xl">{value}</CardTitle>
-      </CardHeader>
-    </Card>
   );
 }
 

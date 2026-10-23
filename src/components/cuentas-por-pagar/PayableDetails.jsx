@@ -14,6 +14,7 @@ import { Progress } from "@/components/ui/progress";
 import { BreakdownHelp } from "@/components/ui/responsive-breakdown";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
+import ReceivableBalanceAdjustment from "@/components/cuentas-por-cobrar/ReceivableBalanceAdjustment";
 
 const money = (value) => new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" }).format(Number(value || 0));
 const date = (value) => value ? new Intl.DateTimeFormat("es-MX", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).format(new Date(value)) : "Sin definir";
@@ -28,7 +29,8 @@ export function LoanReimbursementSummary({ payable, compact = false }) {
   const account = payable.reimbursementReceivable;
   if (!account) return null;
   const name = account.person?.name || "Esta persona";
-  const progress = percentage(account.paidAmount, account.originalAmount);
+  const adjustedAmount = Number(account.originalAmount) + Number(account.balanceAdjustment || 0);
+  const progress = percentage(account.paidAmount, adjustedAmount);
   const ownAmount = Math.max(0, Number(payable.originalAmount) - Number(account.originalAmount));
   const cancelled = account.status === "CANCELLED";
   const excess = Number(account.pendingBalance) < 0;
@@ -48,8 +50,9 @@ export function LoanReimbursementSummary({ payable, compact = false }) {
         <div><dt>{balanceLabel}</dt><dd className={cn("loan-reimbursement-balance", !cancelled && !settled && !excess && "text-warning", (settled || excess) && "text-success")}>{money(Math.abs(Number(account.pendingBalance || 0)))}</dd></div>
         <div><dt>Ya recibiste</dt><dd className="loan-reimbursement-paid text-success">{money(account.paidAmount)}</dd></div>
       </dl>
-      <Progress variant="success" value={progress} aria-label={`Recuperado de ${name}`} aria-valuetext={`${money(account.paidAmount)} de ${money(account.originalAmount)}`} className="h-2" />
+      <Progress variant="success" value={progress} aria-label={`Recuperado de ${name}`} aria-valuetext={`${money(account.paidAmount)} de ${money(adjustedAmount)}`} className="h-2" />
       <p className="text-sm text-muted-foreground">Importe original: {money(account.originalAmount)}</p>
+      <ReceivableBalanceAdjustment receivable={account} />
       {!compact ? (
         <>
           <Separator />

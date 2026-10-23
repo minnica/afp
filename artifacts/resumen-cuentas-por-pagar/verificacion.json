@@ -1,0 +1,44 @@
+{
+  "scope": "Resumen de cuentas por pagar: deuda total, reembolsos pendientes vinculados y deuda neta personal.",
+  "data": "Interfaz y GET /api/payables reales; sesión y persistencia simuladas localmente, sin escrituras en Supabase.",
+  "checks": {
+    "tests": {
+      "passed": 20,
+      "failed": 0,
+      "command": "node --test --experimental-test-isolation=none tests/payables-summary.test.cjs tests/debt-accounts.test.cjs"
+    },
+    "build": "pnpm exec next build --webpack: correcto",
+    "lint": "Sin errores; aviso previo de TanStack Table en data-table.jsx. Archivos modificados sin advertencias.",
+    "browser": {
+      "widths": [
+        320,
+        390,
+        768,
+        1024,
+        1280
+      ],
+      "horizontalOverflow": false,
+      "amountsFit": true,
+      "minimumSummaryTextContrast": 6.938930345767489,
+      "helpTouchTargetPx": 44,
+      "escapeAndFocusReturn": true,
+      "filtersLeaveSummaryUnchanged": true,
+      "empty": "Tres importes de cero y texto sin reembolsos pendientes.",
+      "loadFailure": "API con fallo simulado, recuperación cancelada mediante Ahora no: error visible y resumen ausente, sin saldo cero ficticio.",
+      "javascriptErrorsDuringNormalFlow": 0
+    }
+  },
+  "rules": [
+    "Sumas y restas a centavos.",
+    "No descuenta ingresos ya recibidos otra vez.",
+    "Cancela saldos cancelados y evita compensar excedentes pagados.",
+    "Deduplica cuentas por cobrar vinculadas a más de un préstamo.",
+    "Conserva cobros pendientes de préstamos liquidados.",
+    "Si lo recuperable supera la deuda, cero a cargo y sobrante visible."
+  ],
+  "limits": [
+    "Los ejemplos de las capturas son ficticios.",
+    "El neto supone recuperar todos los reembolsos pendientes; no es el capital propio original ni un pago al banco.",
+    "Sin cambios de API, migraciones ni despliegue."
+  ]
+}

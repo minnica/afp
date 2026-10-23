@@ -1,0 +1,51 @@
+{
+  "completedAt": "2026-10-23T04:29:08.771Z",
+  "localDate": "2026-10-22",
+  "state": "APPLIED_AND_PUBLISHED",
+  "authorization": "Autorización explícita del propietario para migración, carga y publicación.",
+  "deployment": {
+    "url": "https://finanzas.garatachia.com",
+    "state": "READY",
+    "approvedSnapshot": true,
+    "commitOrPushPerformed": false,
+    "apkUpdated": false
+  },
+  "migration": {
+    "name": "20261023050000_receivable_balance_adjustment",
+    "appliedToProduction": true,
+    "additiveColumns": 2,
+    "originalTableDataPreservedDuringMigration": true,
+    "existingRlsPreserved": true,
+    "schemaDiffEmpty": true
+  },
+  "batch": {
+    "committed": true,
+    "estimatedPaymentsInserted": 38,
+    "estimatedPaymentsMarked": true,
+    "nonCashReconciliationSeparateFromIncome": true,
+    "previousIncomesPreserved": 67,
+    "payablesPreserved": 9,
+    "otherReceivablesAllFieldsPreserved": 27,
+    "otherFinancialTablesFingerprintsPreserved": 13,
+    "backupAndPrivateReceipts": "estados_cuenta/ (excluido de Git)"
+  },
+  "localValidation": {
+    "tests": { "passed": 498, "failed": 0, "skipped": 0 },
+    "database": "PostgreSQL 16 desechable",
+    "freshMigrationAndHistoricalUpgrade": true,
+    "batchRollbackAndIdempotence": true,
+    "build": "Correcto con webpack; publicación remota correcta con Turbopack.",
+    "lint": "Sin errores; advertencia previa de TanStack Table.",
+    "browser": "API y base locales reales, sesión simulada; notas visibles y diálogo sin desbordamiento a 320 px."
+  },
+  "productionValidation": {
+    "directDatabaseReadOnlyVerification": true,
+    "balanceConsistentAcrossRoutes": ["receivables", "payables", "gastos/bootstrap", "dashboard"],
+    "routeVerificationScope": "Handlers reales y Prisma contra producción dentro de transacción de solo lectura; autenticación simulada exclusivamente en el verificador local.",
+    "publishedPagesRespond200": ["/login", "/cuentas-por-cobrar", "/cuentas-por-pagar"],
+    "financialApisRejectUnauthenticatedRequests": true,
+    "publishedBundleContainsReconciliationUi": true,
+    "runtimeErrorAndFatalLogsReturned": false,
+    "limitations": "La comprobación pública no incluye un recorrido autenticado del sitio de producción."
+  }
+}

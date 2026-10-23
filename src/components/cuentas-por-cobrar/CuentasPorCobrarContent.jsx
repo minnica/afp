@@ -1,5 +1,7 @@
 "use client";
 
+import ReceivableBalanceAdjustment from "@/components/cuentas-por-cobrar/ReceivableBalanceAdjustment";
+
 import { apiFetch } from "@/lib/apiFetch";
 
 import { useCreationDraft } from "@/hooks/use-creation-draft";
@@ -445,6 +447,7 @@ export default function CuentasPorCobrarContent() {
           <RecordField label="Origen">{getOriginLabel(item.originType)}</RecordField>
         </dl>
         <RecordNote>{item.notes}</RecordNote>
+        <ReceivableBalanceAdjustment receivable={item} />
       </RecordCard>
     ),
     mobileToolbar: (table) => <RecordListToolbar table={table} label="cuentas por cobrar" totals={[{ key: "originalAmount", label: "Monto original" }, { key: "paidAmount", label: "Cobrado" }, { key: "pendingBalance", label: "Pendiente" }]} />,
@@ -473,6 +476,7 @@ export default function CuentasPorCobrarContent() {
                 Persona: {item.person?.name} · Origen:{" "}
                 {formatDate(item.originDate)}
               </p>
+              <ReceivableBalanceAdjustment receivable={item} />
 
               {item.expectedMonthlyPayment ? (
                 <p className="mt-1 text-sm text-muted-foreground">
@@ -977,9 +981,10 @@ export default function CuentasPorCobrarContent() {
             </DialogHeader>
 
             {paymentsDialogReceivable ? (
-              <ReceivablePaymentsBreakdown
-                receivable={paymentsDialogReceivable}
-              />
+              <>
+                <ReceivableBalanceAdjustment receivable={paymentsDialogReceivable} />
+                <ReceivablePaymentsBreakdown receivable={paymentsDialogReceivable} />
+              </>
             ) : null}
           </DialogContent>
         </Dialog>
@@ -1028,6 +1033,7 @@ function ReceivablePaymentsBreakdown({ receivable }) {
               {formatDate(payment.date)}
               {payment.source ? ` · ${payment.source}` : ""}
             </ItemDescription>
+            {payment.notes ? <ItemDescription className="line-clamp-none whitespace-pre-wrap break-words">{payment.notes}</ItemDescription> : null}
           </ItemContent>
 
           <p className="font-semibold">{formatMoney(payment.amount)}</p>

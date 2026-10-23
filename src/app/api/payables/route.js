@@ -32,6 +32,8 @@ const payableSelect = {
       id: true,
       concept: true,
       originalAmount: true,
+      balanceAdjustment: true,
+      balanceAdjustmentNotes: true,
       status: true,
       person: { select: { id: true, name: true } },
       incomes: { select: { amount: true } },

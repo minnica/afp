@@ -441,6 +441,9 @@ model ReceivableAccount {
   personId               String
   concept                String
   originalAmount         Decimal
+  // Conciliación no monetaria: conserva principal e ingresos reales.
+  balanceAdjustment      Decimal                 @default(0)
+  balanceAdjustmentNotes String?
   originDate             DateTime
   expectedMonthlyPayment Decimal?
   expectedChargeDays     Int[]                   @default([])

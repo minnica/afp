@@ -13,9 +13,10 @@ export function getDebtAccountState(account, payments) {
   )), new Prisma.Decimal(0));
   const balanceCents = isLoan && account.currentBalance != null
     ? cents(account.currentBalance)
-    : principalCents.sub(paidCents);
+    : principalCents.add(cents(account.balanceAdjustment)).sub(paidCents);
   return {
-    paidAmount: principalCents.sub(balanceCents).div(100).toNumber(),
+    // Una conciliación no es dinero recibido ni debe cambiar el total de abonos.
+    paidAmount: (isLoan ? principalCents.sub(balanceCents) : paidCents).div(100).toNumber(),
     // Se conserva el saldo firmado del contrato anterior; negativo = excedente.
     pendingBalance: balanceCents.div(100).toNumber(),
     excessAmount: balanceCents.isNegative() ? balanceCents.neg().div(100).toNumber() : 0,

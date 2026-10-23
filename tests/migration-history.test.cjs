@@ -22,6 +22,7 @@ test('A11: recupera la migración original y conserva los trece checksums aplica
     '20261023020000_capture_nu_cfe_policy',
     '20261023030000_capture_card_payments',
     '20261023040000_automatic_payment_receipts',
+    '20261023050000_receivable_balance_adjustment',
   ]);
 });
 

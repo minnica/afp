@@ -524,6 +524,30 @@ body:has([data-slot="record-create-panel"]) [data-sonner-toaster][data-y-positio
   text-wrap: pretty;
 }
 
+/* Deuda bruta − reembolsos pendientes = parte personal. */
+.payables-summary { container-type: inline-size; margin-bottom: 1.5rem; border-radius: .875rem; }
+.payables-summary-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.payables-summary-header h2 { font-size: .875rem; font-weight: 600; text-wrap: balance; }
+.payables-summary-content { display: flex; min-width: 0; flex-direction: column; gap: 1rem; }
+.payables-summary-equation { display: grid; min-width: 0; grid-template-columns: minmax(0, 1fr); gap: 1.25rem; }
+.payables-summary-part { display: flex; min-width: 0; flex-direction: column; gap: .625rem; }
+.payables-summary-part h3 { display: flex; align-items: baseline; gap: .5rem; font-size: .875rem; font-weight: 500; text-wrap: balance; }
+.payables-summary-part h3 > span { color: var(--muted-foreground); }
+.payables-summary-amount { font-size: 1.75rem; font-weight: 600; line-height: 1.2; letter-spacing: -.025em; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.payables-summary-breakdown { display: flex; min-width: 0; flex-direction: column; gap: .375rem; margin-top: .25rem; }
+.payables-summary-row { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .25rem 1rem; font-size: .8125rem; }
+.payables-summary-row dt { min-width: 0; color: var(--muted-foreground); overflow-wrap: anywhere; }
+.payables-summary-row dd { font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.payables-summary-note { max-width: 38ch; font-size: .8125rem; line-height: 1.5; color: var(--muted-foreground); text-wrap: pretty; overflow-wrap: anywhere; }
+.payables-summary-own .payables-summary-amount { font-weight: 700; }
+.payables-summary-footnote { max-width: 75ch; font-size: .75rem; line-height: 1.5; color: var(--muted-foreground); text-wrap: pretty; }
+.payables-summary-divider-vertical { display: none; }
+@container (min-width: 44rem) {
+  .payables-summary-equation { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr); gap: 1.5rem; }
+  .payables-summary-divider-horizontal { display: none; }
+  .payables-summary-divider-vertical { display: block; }
+}
+
 /* El detalle de deuda prioriza saldo bancario y recuperación; el contrato se
    consulta sin perder el encabezado ni las acciones. */
 .payable-detail[data-slot="dialog-content"] {

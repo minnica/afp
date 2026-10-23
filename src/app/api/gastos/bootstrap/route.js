@@ -66,6 +66,8 @@ const receivableSelect = {
   personId: true,
   concept: true,
   originalAmount: true,
+  balanceAdjustment: true,
+  balanceAdjustmentNotes: true,
   originDate: true,
   expectedMonthlyPayment: true,
   expectedChargeDays: true,
@@ -88,6 +90,7 @@ const receivableSelect = {
       source: true,
       concept: true,
       amount: true,
+      notes: true,
     },
   },
 };

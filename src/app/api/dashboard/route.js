@@ -825,6 +825,7 @@ export async function GET(request) {
           personId: true,
           concept: true,
           originalAmount: true,
+          balanceAdjustment: true,
           originDate: true,
           expectedMonthlyPayment: true,
           expectedChargeDays: true,
