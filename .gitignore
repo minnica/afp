@@ -62,3 +62,6 @@ next-env.d.ts
 
 # Contexto y capturas locales de Impeccable
 /.impeccable/
+
+# Comprobantes reales privados; conservar solo en el equipo local
+/artifacts/comprobantes-reales-prestamos/
