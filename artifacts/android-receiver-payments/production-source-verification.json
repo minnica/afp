@@ -1,0 +1,73 @@
+{
+  "deploymentId": "dpl_AJ2nZG5NLXx9e59bn8RbBtuxUqVc",
+  "verifiedModules": 11,
+  "allMatch": true,
+  "checks": [
+    {
+      "file": "src/lib/captureConfiguration.js",
+      "sha1": "c770463701649f26df89fb595ba3341ed3e5f5d4",
+      "deployedSha1": "c770463701649f26df89fb595ba3341ed3e5f5d4",
+      "matches": true
+    },
+    {
+      "file": "src/lib/captureIdentity.js",
+      "sha1": "a7601261683d51ca2b54a6fee60b932021f83e86",
+      "deployedSha1": "a7601261683d51ca2b54a6fee60b932021f83e86",
+      "matches": true
+    },
+    {
+      "file": "src/lib/captureParsers.js",
+      "sha1": "b4c734de40e3179e89c7a131a55b4f9e34247c76",
+      "deployedSha1": "b4c734de40e3179e89c7a131a55b4f9e34247c76",
+      "matches": true
+    },
+    {
+      "file": "src/lib/capturePaymentAutomation.js",
+      "sha1": "45bf36eb7e0ae6dbe3185381e374efb6d4afc939",
+      "deployedSha1": "45bf36eb7e0ae6dbe3185381e374efb6d4afc939",
+      "matches": true
+    },
+    {
+      "file": "src/lib/capturePaymentParsers.js",
+      "sha1": "75d53ab9b2ebfb631e9d04e230652d1df4c65dfd",
+      "deployedSha1": "75d53ab9b2ebfb631e9d04e230652d1df4c65dfd",
+      "matches": true
+    },
+    {
+      "file": "src/lib/capturePayments.js",
+      "sha1": "1f778e7b1aab8038e64015f35e878a5fcd35876e",
+      "deployedSha1": "1f778e7b1aab8038e64015f35e878a5fcd35876e",
+      "matches": true
+    },
+    {
+      "file": "src/lib/capturePresentation.js",
+      "sha1": "6bb91f9fd13da564fe5f3784870fee0757712c4d",
+      "deployedSha1": "6bb91f9fd13da564fe5f3784870fee0757712c4d",
+      "matches": true
+    },
+    {
+      "file": "src/lib/captureProcessing.js",
+      "sha1": "e9e91cc8dbb19d64f2ff06b596f8c4e5fe2006e7",
+      "deployedSha1": "e9e91cc8dbb19d64f2ff06b596f8c4e5fe2006e7",
+      "matches": true
+    },
+    {
+      "file": "src/lib/captureProtocol.js",
+      "sha1": "ee99b342a83a235ab04bb1f34320d1ed8b6f2af2",
+      "deployedSha1": "ee99b342a83a235ab04bb1f34320d1ed8b6f2af2",
+      "matches": true
+    },
+    {
+      "file": "src/lib/captureService.js",
+      "sha1": "fb2f7f9f489f1840d79afbf76a808c5303c35b9f",
+      "deployedSha1": "fb2f7f9f489f1840d79afbf76a808c5303c35b9f",
+      "matches": true
+    },
+    {
+      "file": "src/lib/cardBalanceTracking.js",
+      "sha1": "e282a7a1c387670e545b2efdf010b33a67bf4b43",
+      "deployedSha1": "e282a7a1c387670e545b2efdf010b33a67bf4b43",
+      "matches": true
+    }
+  ]
+}

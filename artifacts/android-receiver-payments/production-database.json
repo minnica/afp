@@ -1,0 +1,13 @@
+{
+  "verifiedAt": "2026-10-23T07:11:39.635Z",
+  "migrations": 30,
+  "pendingMigrations": 0,
+  "checksumsMatch": true,
+  "rlsTables": 32,
+  "publicPolicies": 0,
+  "unchangedTablesVerified": 26,
+  "previousFinancialRowsPreserved": true,
+  "previousPaymentPoliciesPreserved": true,
+  "newRulesCreated": 0,
+  "schemaDiffEmpty": true
+}

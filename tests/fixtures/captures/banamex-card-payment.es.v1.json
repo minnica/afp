@@ -1,0 +1,20 @@
+{
+  "evidence": "REAL_REVIEWED_ANONYMIZED",
+  "limitations": [
+    "La moneda y el corte no aparecen en el aviso.",
+    "Tres cifras de tarjeta; requiere alias bancario verificado sin ambigüedad.",
+    "La referencia y autorización abreviadas no identifican globalmente una transferencia.",
+    "Importes, terminaciones, referencias y horarios son ficticios."
+  ],
+  "event": {
+    "sourcePackage": "com.citibanamex.banamexmobile",
+    "postedAt": "2026-10-23T06:10:03.000Z",
+    "receivedAt": "2026-10-23T06:10:03.300Z",
+    "fields": {
+      "android.title": "Notificacion",
+      "android.text": "Deposito SPEI 001234 JOY BANAMEX 123 monto $123.45 el 23/10/26 00:10:00 AM. Auto. 654321",
+      "android.title.big": "Notificacion",
+      "android.bigText": "Deposito SPEI 001234 JOY BANAMEX 123 monto $123.45 el 23/10/26 00:10:00 AM. Auto. 654321"
+    }
+  }
+}

@@ -4,19 +4,38 @@ import { paymentReceiptSource } from "@/lib/paymentReceipts";
 import { getCyclePaymentState } from "@/lib/calculations/cardCyclePayments";
 import { resolveCapturePayment } from "@/lib/capturePayments";
 
+const noticeFormats = {
+  "nu.card-payment.es.v1": { source: "NU_NOTICE", package: "com.nu.production" },
+  "banamex.card-payment.es.v1": { source: "BANAMEX_NOTICE", package: "com.citibanamex.banamexmobile", aliasRequired: true },
+  "mercadopago.card-payment.es.v1": { source: "MERCADOPAGO_NOTICE", package: "com.mercadopago.wallet" },
+};
+
 export async function automateCapturePayment(tx, event, movement) {
   const proposal = movement.proposal;
   const receipt = event.sourcePackage === paymentReceiptSource;
-  if (!(receipt && movement.reason === "PAYMENT_RECEIPT") && !(event.sourcePackage === "com.nu.production" && movement.reason === "PAYMENT_REVIEW")) return movement;
-  const source = receipt ? "BBVA_RECEIPT" : "NU_NOTICE";
-  const policies = await tx.capturePaymentPolicy.findMany({ where: { userId: event.userId, source, mode: "AUTOMATIC",
-    acceptedAt: { not: null }, ...(receipt ? { destinationLast4: proposal.destinationLast4 } : {}) } });
-  const policy = policies.length === 1 ? policies[0] : null;
+  const notice = noticeFormats[movement.parserKey];
+  if (!(receipt && movement.reason === "PAYMENT_RECEIPT") && !(notice && event.sourcePackage === notice.package && movement.reason === "PAYMENT_REVIEW")) return movement;
+  const source = receipt ? "BBVA_RECEIPT" : notice.source;
   const review = reason => tx.captureMovement.update({ where: { id: movement.id }, data: { reason } });
+  if (notice?.aliasRequired && !proposal.cardId) return review("PAYMENT_POLICY_REQUIRED");
+  const policies = await tx.capturePaymentPolicy.findMany({ where: { userId: event.userId, source, mode: "AUTOMATIC",
+    acceptedAt: { not: null }, ...(receipt ? { destinationLast4: proposal.destinationLast4 } : {}),
+    ...(notice?.aliasRequired ? { cardId: proposal.cardId } : {}) } });
+  const policy = policies.length === 1 ? policies[0] : null;
   if (!policy || (policy.destinationHash && policy.destinationHash !== proposal.destinationHash)) return review("PAYMENT_POLICY_REQUIRED");
   const p = { ...proposal, cardId: policy.cardId, currency: "MXN", paymentPolicyId: policy.id,
-    policyAcceptedAt: policy.acceptedAt.toISOString(), cardSource: "OWNER_PAYMENT_POLICY", currencySource: "OWNER_PAYMENT_POLICY" };
+    policyAcceptedAt: policy.acceptedAt.toISOString(), cardSource: notice?.aliasRequired ? "VERIFIED_BANK_ALIAS" : "OWNER_PAYMENT_POLICY", currencySource: "OWNER_PAYMENT_POLICY" };
   movement = await tx.captureMovement.update({ where: { id: movement.id }, data: { proposal: p, cardId: policy.cardId } });
+  const receiverNotice = source === "BANAMEX_NOTICE" || source === "MERCADOPAGO_NOTICE";
+  // Android puede reutilizar la misma clave para pagos posteriores. Solo una
+  // actualización cercana se considera revisión; la clave no identifica una
+  // operación bancaria de forma permanente.
+  const posted = new Date(event.postedAt).getTime();
+  if (receiverNotice && await tx.captureEvent.findFirst({ where: { userId: event.userId, deviceId: event.deviceId,
+    sourcePackage: event.sourcePackage, notificationKeyHash: event.notificationKeyHash, id: { not: event.id },
+    postedAt: { gte: new Date(posted - 5 * 60000), lte: new Date(posted + 5 * 60000) } } })) {
+    return review("NOTIFICATION_REVISION");
+  }
   if (receipt) {
     const referenceKey = captureHash(`payment-transfer:${p.sourceAccountHash}:${p.transferReference}`);
     const existing = await tx.captureMovement.findUnique({ where: { userId_referenceKey: { userId: event.userId, referenceKey } } });
@@ -43,15 +62,17 @@ export async function automateCapturePayment(tx, event, movement) {
   const prior = await tx.cardCyclePayment.findMany({ where: { userId: event.userId, cycleId: cycle.id, reversedAt: null } });
   const identified = prior.reduce((total, row) => total.add(row.amount), new Prisma.Decimal(0));
   if (!identified.equals(current.paidAmount || 0)) return review("PAYMENT_MANUAL_TOTAL");
-  const duplicate = await tx.cardCyclePayment.findFirst({ where: { userId: event.userId, cycle: { cardId: policy.cardId }, amount: p.amount, reversedAt: null,
+  const duplicate = await tx.cardCyclePayment.findFirst({ where: { userId: event.userId, cycle: { cardId: policy.cardId }, amount: p.amount,
+    ...(receiverNotice ? {} : { reversedAt: null }),
     date: { gte: new Date(at.getTime() - 3 * 86400000), lte: new Date(at.getTime() + 3 * 86400000) } } });
   if (duplicate) return review("PAYMENT_POSSIBLE_DUPLICATE");
   if (Number(getCyclePaymentState(current).pendingAmount) < Number(p.amount)) return review("PAYMENT_EXCESS_REVIEW");
+  if (p.paymentCoverage === "FULL" && !new Prisma.Decimal(getCyclePaymentState(current).pendingAmount).equals(p.amount)) return review("PAYMENT_TOTAL_MISMATCH");
   const resolved = await resolveCapturePayment(tx, movement, { action: "registerPayment", payment: { cycleId: cycle.id, amount: p.amount,
     date: p.date, currency: "MXN", confirmedApplied: true, expectedPaidAmount: String(current.paidAmount || 0),
     expectedPaidAt: current.paidAt?.toISOString().slice(0, 10) || null, distinct: true,
     ...(receipt ? { statementConcept: p.statementConcept } : {}) } });
   return tx.captureMovement.update({ where: { id: resolved.id }, data: { reason: "PAYMENT_AUTOMATIC", correction: {
-    ...resolved.correction, dateSource: receipt ? "BANK_OPERATION" : "NOTIFICATION_POSTED_AT", currencySource: "OWNER_PAYMENT_POLICY", paymentPolicyId: policy.id,
+    ...resolved.correction, dateSource: receipt ? "BANK_OPERATION" : p.dateSource, currencySource: "OWNER_PAYMENT_POLICY", paymentPolicyId: policy.id,
   } } });
 }

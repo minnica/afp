@@ -1,0 +1,16 @@
+{
+  "evidence": "REAL_REVIEWED_ANONYMIZED",
+  "limitations": [
+    "Solo acredita una salida de débito; no identifica tarjeta receptora ni corte.",
+    "Importes, terminaciones, referencias y horarios son ficticios."
+  ],
+  "event": {
+    "sourcePackage": "com.bancomer.mbanking",
+    "postedAt": "2026-10-23T06:11:00.000Z",
+    "receivedAt": "2026-10-23T06:11:00.300Z",
+    "fields": {
+      "android.title": "Compra con TDD",
+      "android.text": "Compra con TDD 0123 en MERPAGO*TARJETADE $67.89 23 octubre 00:11h"
+    }
+  }
+}

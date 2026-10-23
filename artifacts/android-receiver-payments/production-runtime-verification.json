@@ -1,0 +1,15 @@
+{
+  "verifiedAt": "2026-10-23T07:29:40.454Z",
+  "deploymentId": "dpl_AJ2nZG5NLXx9e59bn8RbBtuxUqVc",
+  "since": "2026-10-23T07:16:04.257Z",
+  "projectId": "prj_FUBRDkPPFpOgJG9zuLLhTwm3JHKV",
+  "routes": [
+    "/api/captures/events",
+    "/api/captures/configuration",
+    "/api/captures/movements",
+    "/api/card-cycles",
+    "/api/cards",
+    "/api/dashboard"
+  ],
+  "runtimeErrorClusters": 0
+}

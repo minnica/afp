@@ -1,0 +1,110 @@
+{
+  "verifiedAt": "2026-10-23T07:03:05.491359+00:00",
+  "status": "PUBLISHED_RULES_ACTIVE_INITIAL_PAYMENTS_SETTLED",
+  "story": "Aviso bancario receptor → captura Android existente → API nativa → regla explícita → abono único → corte y deuda actualizados.",
+  "phone": {
+    "apk": "0.6.0 / 8",
+    "usbVerified": true,
+    "notificationAccess": true,
+    "batteryExempt": true,
+    "listenerConnected": true,
+    "sources": 8,
+    "pendingDeliveries": 0,
+    "deliveryErrors": 0,
+    "deliveredReceipts": 36,
+    "targetNoticesReceivedByServer": 4
+  },
+  "checks": {
+    "tests": {
+      "passed": 539,
+      "failed": 0,
+      "skipped": 0,
+      "newCases": 20
+    },
+    "migrationReproduction": {
+      "migrations": 30,
+      "rlsTables": 32,
+      "freshInstall": true,
+      "historicalUpgrade": true,
+      "checksumsMatch": true,
+      "schemaDiffEmpty": true,
+      "previousRowsPreserved": true
+    },
+    "build": "NEXT_WEBPACK_PASSED",
+    "lint": {
+      "errors": 0,
+      "warnings": [
+        "PREEXISTING_TANSTACK_TABLE_REACT_COMPILER"
+      ]
+    },
+    "realNoticesLocalReplay": {
+      "environment": "LOCAL_ONLY",
+      "originalNotices": 4,
+      "deliveriesEach": 3,
+      "paymentsCreated": 2,
+      "cyclesPaid": 2,
+      "expensesCreated": 0,
+      "incomesCreated": 0,
+      "privateEvidence": "estados_cuenta/avisos_pagos_2026-10-23/"
+    }
+  },
+  "production": {
+    "codePublished": true,
+    "financialChangesApplied": true,
+    "newRulesActivated": true,
+    "deploymentId": "dpl_AJ2nZG5NLXx9e59bn8RbBtuxUqVc",
+    "deploymentState": "READY",
+    "domain": "https://finanzas.garatachia.com",
+    "sourceFiles": 301,
+    "testedCoreModulesMatchPublished": 11,
+    "activePaymentRules": 9,
+    "newPaymentRules": 2,
+    "initialPaymentsApplied": 2,
+    "initialProcessing": "EXPLICIT_OWNER_AUTHORIZATION_FOR_ORIGINAL_EVENTS",
+    "originalEventsAndReceiptsPreserved": true,
+    "previousFinancialRowsAndOtherCyclesPreserved": true,
+    "estimatedDebtUpdated": true,
+    "newExpenses": 0,
+    "newIncomes": 0,
+    "migrations": 30,
+    "pendingMigrations": 0,
+    "checksumsMatch": true,
+    "schemaDiffEmpty": true,
+    "rlsTables": 32,
+    "publicPolicies": 0,
+    "calendarSynced": true,
+    "nativeApkUpdated": false,
+    "authenticatedPhonePageVerified": true
+  },
+  "supportedFormats": {
+    "banamex": "Deposito SPEI / JOY BANAMEX, alias verificado sin ambigüedad, MXN por regla aceptada y fecha bancaria",
+    "mercadopago": "Pago total confirmado; tarjeta/MXN/fecha del aviso en México por regla aceptada",
+    "bbva": "Los dos formatos de débito permanecen por revisar sin otro gasto o abono"
+  },
+  "limitations": [
+    "Mercado Pago: otros textos y pagos parciales requieren otra muestra real.",
+    "Los casos ambiguos conservan revisión.",
+    "Falta observar un pago futuro normal después de publicar; no se generaron notificaciones ficticias en producción."
+  ],
+  "evidence": {
+    "browser": "browser-api-verification.json",
+    "screenshots": [
+      "banamex-rule-mobile.png",
+      "mercadopago-rule-mobile.png",
+      "paid-cycles-mobile.png",
+      "credit-balances-mobile.png",
+      "mercadopago-rule-desktop.png"
+    ],
+    "production": [
+      "production-deployment.json",
+      "production-database.json",
+      "production-source-verification.json",
+      "production-http-verification.json",
+      "production-financial-verification.json",
+      "production-calendar-verification.json",
+      "production-runtime-verification.json",
+      "production-phone-verification.json"
+    ]
+  },
+  "updatedAt": "2026-10-23T07:27:34.810190+00:00"
+}

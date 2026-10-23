@@ -5,6 +5,7 @@ export const captureReasons = {
   PAYMENT_MANUAL_TOTAL: "El corte ya tiene pagos manuales; revisa si este abono está incluido.",
   PAYMENT_POSSIBLE_DUPLICATE: "Ya hay un pago de ese importe en fechas cercanas; revisa su evidencia.",
   PAYMENT_EXCESS_REVIEW: "El importe supera el saldo pendiente del corte; requiere revisión.",
+  PAYMENT_TOTAL_MISMATCH: "El banco indica pago total, pero el importe no coincide con el saldo pendiente del corte en AFP.",
   PAYMENT_FUTURE: "La fecha de pago es futura; requiere revisión.",
   RECEIPT_UNKNOWN_FORMAT: "Comprobante con formato no reconocido; revisa su contenido.",
   RECEIPT_INCOMPLETE: "No se pudieron leer con certeza los campos del comprobante.",
@@ -38,6 +39,18 @@ export const captureSources = {
   "com.citibanamex.banamexmobile": "Banamex", "mx.bancosantander.supermovil": "Santander", "com.nu.production": "Nu",
   "com.didiglobal.cashloan": "DiDi Finanzas", "com.mercadopago.wallet": "Mercado Pago",
 };
+export const capturePaymentSources = {
+  BBVA_RECEIPT: "Comprobante compartido de BBVA",
+  NU_NOTICE: "Aviso de pago recibido de Nu",
+  BANAMEX_NOTICE: "Depósito SPEI de Banamex",
+  MERCADOPAGO_NOTICE: "Pago recibido de Mercado Pago",
+};
+export function capturePaymentPolicyDescription(policy) {
+  if (policy.source === "BBVA_RECEIPT") return `Destino •${policy.destinationLast4}. Comparte el comprobante con AFP después de transferir.`;
+  if (policy.source === "BANAMEX_NOTICE") return "MXN y fecha bancaria. Tarjeta por terminación verificada; exige un único corte pendiente.";
+  if (policy.source === "MERCADOPAGO_NOTICE") return "MXN y fecha del aviso en México. Asigna el pago total al único corte pendiente de esta tarjeta.";
+  return "Se registra al recibir un aviso de pago con un único corte pendiente identificado.";
+}
 export function captureOrigin(record) {
   const sources = [...new Set((record.captureMovements || []).flatMap(movement => (movement.events || []).map(event => captureSources[event.sourcePackage] || "Aviso")))];
   return sources.length ? `Captura: ${sources.join(" / ")}` : "";

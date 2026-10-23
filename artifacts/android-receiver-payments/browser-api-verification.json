@@ -1,0 +1,48 @@
+{
+  "verifiedAt": "2026-10-23T06:57:37.033Z",
+  "environment": "LOCAL_ONLY",
+  "authentication": {
+    "browserSupabase": "SIMULATED",
+    "nativeCapture": "REAL_VALIDATION_WITH_LOCAL_CREDENTIAL"
+  },
+  "api": "REAL_NEXT_ROUTES",
+  "database": "REAL_LOCAL_POSTGRESQL",
+  "events": 4,
+  "deliveriesPerEvent": 3,
+  "cycles": [
+    {
+      "card": "BANAMEX 1",
+      "status": "PAID",
+      "pendingAmount": 0
+    },
+    {
+      "card": "MERCADOPAGO",
+      "status": "PAID",
+      "pendingAmount": 0
+    }
+  ],
+  "paymentRulesActivatedViaUI": 2,
+  "mobile": {
+    "viewport": [
+      390,
+      844
+    ],
+    "paidLabels": 2,
+    "pendingAmountEach": 0,
+    "horizontalOverflow": false,
+    "javascriptErrors": [],
+    "estimatedBalancesAfterPayments": [
+      "876.55",
+      "932.11"
+    ],
+    "amountsAreFictitious": true
+  },
+  "desktop": {
+    "viewport": [
+      1280,
+      900
+    ],
+    "horizontalOverflow": false,
+    "javascriptErrors": []
+  }
+}

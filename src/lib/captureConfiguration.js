@@ -91,6 +91,7 @@ export async function configureCapture(db, userId, input) {
     }
     if (data.action === "automation") {
       const parser = captureParsers.find(parser => parser.key === data.parserKey);
+      if (parser?.paymentOnly) throw new ApiAccessError("Este formato corresponde a pagos de tarjeta. Usa su regla de pagos automáticos.", 409);
       if (!parser) {
         // Retirar un analizador nunca debe impedir detener su automatización.
         const identity = { userId, cardId: data.cardId, parserKey: data.parserKey };

@@ -4,7 +4,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { apiFetch } from "@/lib/apiFetch";
-import { captureSources } from "@/lib/capturePresentation";
+import { captureSources, capturePaymentSources, capturePaymentPolicyDescription } from "@/lib/capturePresentation";
 import CaptureRolloutStatus from "@/components/configuracion/CaptureRolloutStatus";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -42,8 +42,8 @@ export default function CaptureConfigurationPanel({ configuration, userId, refre
       {(configuration.paymentPolicies || []).some(row => row.cardId === cardId) && <>
         <h3 className="font-medium">Pagos de tarjeta</h3>
         <ItemGroup>{configuration.paymentPolicies.filter(row => row.cardId === cardId).map(policy => <Item key={policy.id} role="listitem"><ItemContent>
-          <ItemTitle>{policy.source === "BBVA_RECEIPT" ? "Comprobante compartido de BBVA" : "Aviso de pago recibido de Nu"}<Badge variant={policy.mode === "AUTOMATIC" ? "secondary" : "warning"}>{policy.mode === "AUTOMATIC" ? "Automático" : "Solo revisión"}</Badge></ItemTitle>
-          <ItemDescription>{policy.source === "BBVA_RECEIPT" ? `Destino •${policy.destinationLast4}. Comparte el comprobante con AFP después de transferir.` : "Se registra al recibir un aviso de pago con un único corte pendiente identificado."} Los casos ambiguos quedan en la bandeja.</ItemDescription>
+          <ItemTitle>{capturePaymentSources[policy.source] || "Regla de pagos"}<Badge variant={policy.mode === "AUTOMATIC" ? "secondary" : "warning"}>{policy.mode === "AUTOMATIC" ? "Automático" : "Solo revisión"}</Badge></ItemTitle>
+          <ItemDescription className="line-clamp-none">{capturePaymentPolicyDescription(policy)} Los casos ambiguos quedan en la bandeja.</ItemDescription>
         </ItemContent><ItemActions><Button variant="outline" className="min-h-11" disabled={busy} onClick={() => perform({ action: "paymentAutomation", id: policy.id, mode: policy.mode === "AUTOMATIC" ? "OBSERVATION" : "AUTOMATIC" })}>{policy.mode === "AUTOMATIC" ? "Pasar a revisión" : "Activar pagos automáticos"}</Button></ItemActions></Item>)}</ItemGroup>
         <Separator />
       </>}

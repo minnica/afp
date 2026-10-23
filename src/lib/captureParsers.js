@@ -9,6 +9,11 @@ export const captureParsers = [
   { key: "wallet.purchase.es.v1", sourcePackage: "com.google.android.apps.walletnfcrel", title: "Pago realizado", verified: false },
   { key: "bbva.account-charge.es.v1", sourcePackage: "com.bancomer.mbanking", verified: false, evidence: "REAL_OUT_OF_SCOPE" },
   { key: "nu.card-payment.es.v1", sourcePackage: "com.nu.production", verified: false, evidence: "REAL_REVIEWED_PARTIAL", paymentOnly: true },
+  { key: "banamex.card-payment.es.v1", sourcePackage: "com.citibanamex.banamexmobile", verified: true, evidence: "REAL_REVIEWED_POLICY_REQUIRED", paymentOnly: true,
+    aliasKinds: ["PHYSICAL", "DIGITAL"], dateSource: "BANK_OPERATION" },
+  { key: "mercadopago.card-payment.es.v1", sourcePackage: "com.mercadopago.wallet", verified: true, evidence: "REAL_REVIEWED_POLICY_REQUIRED", paymentOnly: true,
+    dateSource: "NOTIFICATION_POSTED_AT" },
+  { key: "bbva.debit-card-charge.es.v1", sourcePackage: "com.bancomer.mbanking", verified: false, evidence: "REAL_OUT_OF_SCOPE", paymentOnly: true },
   { key: "bbva.transfer-receipt.es.v1", sourcePackage: paymentReceiptSource, verified: true, evidence: "REAL_REVIEWED", paymentOnly: true },
   { key: "nu.cfe-service-payment.es.v1", sourcePackage: "com.nu.production", verified: false, evidence: "REAL_REVIEWED_PARTIAL" },
   { key: "nu.cfe-service-payment.es.v2", sourcePackage: "com.nu.production", verified: true, evidence: "REAL_REVIEWED_POLICY_REQUIRED",
@@ -157,7 +162,7 @@ export function interpretCapture(event) {
   if (/\b(MSI|meses sin intereses|preautorizaci[oó]n|retenci[oó]n|devoluci[oó]n|reembolso|cancelaci[oó]n|abono|rechazad[ao]|promoci[oó]n|c[oó]digo de (?:acceso|verificaci[oó]n)|env[ií]o|pedido recibido)\b/i.test(texts)) {
     return { reason: "SPECIAL_MOVEMENT", proposal: {} };
   }
-  const payment = interpretPaymentNotice(event, captureAmount, captureNotificationDate);
+  const payment = interpretPaymentNotice(event, captureAmount, captureNotificationDate, captureOperationTime);
   if (payment) return payment;
   if (event.sourcePackage === "com.google.android.apps.walletnfcrel") {
     const real = realWalletPurchase(event) || realWalletSantanderPurchase(event);
@@ -175,6 +180,19 @@ export function interpretCapture(event) {
   // débito. No vincular su terminación con los alias de tarjetas de crédito.
   if (event.sourcePackage === "com.bancomer.mbanking") {
     const body = event.fields?.["android.bigText"] || event.fields?.["android.text"] || "";
+    // Evidencia de salida con débito: el descriptor comercial no identifica una
+    // tarjeta de crédito receptora ni confirma que el abono haya sido aplicado.
+    if (event.fields?.["android.title"] === "Compra con TDD" && [body, event.fields["android.text"] || ""].some(text => text.startsWith("Compra con TDD "))) {
+      const base = { parserKey: "bbva.debit-card-charge.es.v1", verified: false, proposal: {} };
+      if (conflictingBodies(event.fields)) return { ...base, reason: "CONFLICTING_FIELDS" };
+      const debit = body.match(/^Compra con TDD (\d{4}) en MERPAGO\*TARJETADE \$([\d,.]+) (\d{1,2}) ([a-z]+) (\d{2}):(\d{2})h$/);
+      const amount = debit && captureAmount(debit[2]), date = captureNotificationDate(event);
+      if (!amount || !date) return { ...base, reason: "INCOMPLETE_FORMAT" };
+      return { ...base, reason: "ACCOUNT_DEBIT_REVIEW", proposal: { movementType: "ACCOUNT_DEBIT",
+        merchant: "Cargo con débito BBVA", amount, ...date, sourceMerchant: "MERPAGO*TARJETADE",
+        paymentEvidence: "SOURCE_DEBIT_ONLY", missingFields: ["destination", "card", "currency", "statementPeriod", "operationDate"],
+      } };
+    }
     const account = body.match(/^Tienes un cargo a tu cuenta \*(\d{4}) de \$([\d,.]+)\. /);
     if (account) {
       const conflicting = event.fields["android.bigText"] && event.fields["android.text"] && !body.startsWith(event.fields["android.text"]);

@@ -23,6 +23,7 @@ test('A11: recupera la migración original y conserva los trece checksums aplica
     '20261023030000_capture_card_payments',
     '20261023040000_automatic_payment_receipts',
     '20261023050000_receivable_balance_adjustment',
+    '20261023060000_receiver_payment_notices',
   ]);
 });
 

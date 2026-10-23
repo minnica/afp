@@ -12,7 +12,57 @@ export function paymentCaptureKind(movement) {
   return ["CARD_PAYMENT", "ACCOUNT_DEBIT"].includes(type) ? type : null;
 }
 
-export function interpretPaymentNotice(event, parseAmount, notificationDate) {
+function conflictingPaymentFields(fields) {
+  return Boolean((fields["android.bigText"] && fields["android.text"] && fields["android.bigText"] !== fields["android.text"])
+    || (fields["android.title.big"] && fields["android.title.big"] !== fields["android.title"]));
+}
+
+function banamexPayment(event, parseAmount, notificationDate, operationTime) {
+  const fields = event.fields || {};
+  const body = fields["android.bigText"] || fields["android.text"] || "";
+  if (fields["android.title"] !== "Notificacion" || ![body, fields["android.text"] || ""].some(text => text.startsWith("Deposito SPEI "))) return null;
+  const base = { parserKey: "banamex.card-payment.es.v1", verified: true,
+    proposal: { movementType: "CARD_PAYMENT", merchant: "Pago de tarjeta Banamex" } };
+  if (conflictingPaymentFields(fields)) return { ...base, reason: "CONFLICTING_FIELDS" };
+  const match = body.match(/^Deposito SPEI (\d{6}) JOY BANAMEX (\d{3}) monto \$([\d,.]+) el (\d{2}\/\d{2}\/\d{2}) (\d{2}):(\d{2}):(\d{2}) (AM|PM)\. Auto\. (\d{6})$/);
+  if (!match) return { ...base, reason: "INCOMPLETE_FORMAT" };
+  const [, bankReference, suffix, rawAmount, printedDay, rawHour, minute, second, meridiem, bankAuthorization] = match;
+  const [day, month, year] = printedDay.split("/");
+  const hour = Number(rawHour);
+  // La muestra bancaria imprime medianoche como 00:xx AM. No aceptar 00 PM
+  // ni reinterpretar otras horas contradictorias como un reloj de 24 horas.
+  const validHour = (hour === 0 && meridiem === "AM") || (hour >= 1 && hour <= 12);
+  const bankHour = String(hour % 12 + (meridiem === "PM" ? 12 : 0)).padStart(2, "0");
+  const time = validHour && operationTime(`${day}/${month}/20${year} ${bankHour}:${minute}:${second}`);
+  const amount = parseAmount(rawAmount), notification = notificationDate(event);
+  if (!time || !amount || !notification) return { ...base, reason: "INVALID_FIELDS" };
+  if (new Date(time.operationAt).getTime() > new Date(event.receivedAt).getTime() + 5 * 60000) return { ...base, reason: "FUTURE_OPERATION" };
+  return { ...base, reason: "PAYMENT_REVIEW", proposal: { ...base.proposal, ...time, amount,
+    dateSource: "BANK_OPERATION", printedAlias: { value: suffix, digits: 3 },
+    aliasSourcePackage: "com.citibanamex.banamexmobile", bankReference, bankAuthorization,
+    paymentEvidence: "RECEIVER_ACKNOWLEDGEMENT", missingFields: ["currency", "statementPeriod"],
+  } };
+}
+
+function mercadoPagoPayment(event, parseAmount, notificationDate) {
+  const fields = event.fields || {}, title = fields["android.title"] || "";
+  if (!title.startsWith("Pagaste $ ")) return null;
+  const base = { parserKey: "mercadopago.card-payment.es.v1", verified: true,
+    proposal: { movementType: "CARD_PAYMENT", merchant: "Pago de tarjeta Mercado Pago" } };
+  if (conflictingPaymentFields(fields)) return { ...base, reason: "CONFLICTING_FIELDS" };
+  const match = title.match(/^Pagaste \$ ([\d,.]+) a tu tarjeta de crédito$/);
+  const body = fields["android.bigText"] || fields["android.text"] || "";
+  const amount = match && parseAmount(match[1]), date = notificationDate(event);
+  if (!amount || !date || body !== "¡Cubriste el total y liberaste límite!") return { ...base, reason: "INCOMPLETE_FORMAT" };
+  return { ...base, reason: "PAYMENT_REVIEW", proposal: { ...base.proposal, amount, ...date,
+    paymentEvidence: "RECEIVER_ACKNOWLEDGEMENT", paymentCoverage: "FULL",
+    missingFields: ["card", "currency", "statementPeriod", "operationDate"],
+  } };
+}
+
+export function interpretPaymentNotice(event, parseAmount, notificationDate, operationTime) {
+  if (event.sourcePackage === "com.citibanamex.banamexmobile") return banamexPayment(event, parseAmount, notificationDate, operationTime);
+  if (event.sourcePackage === "com.mercadopago.wallet") return mercadoPagoPayment(event, parseAmount, notificationDate);
   const fields = event.fields || {};
   const body = fields["android.bigText"] || fields["android.text"] || "";
   const title = fields["android.title"] || "";

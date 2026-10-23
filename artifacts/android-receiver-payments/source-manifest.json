@@ -1,0 +1,70 @@
+[
+  {
+    "file": "README.md",
+    "sha256": "299a71f857dfd6cd227e237254fa8fb83edeaf1ccff8483440d146ce7e8296e9"
+  },
+  {
+    "file": "prisma/migrations/20261023060000_receiver_payment_notices/migration.sql",
+    "sha256": "6b0aac052e2ad455aef0a230e02cb9036b728bfed7df12c44a5c3cfd1c6bbdbd"
+  },
+  {
+    "file": "scripts/verify-database-reproduction.cjs",
+    "sha256": "2f14a3e2fc5617a21561477c4b0ad15dbdacd6055579374cdcdca0975458ecb2"
+  },
+  {
+    "file": "src/components/configuracion/CaptureConfigurationPanel.jsx",
+    "sha256": "127525fd8ebe8dcaabf919338faa8205b7cabc16fe37c747fa0d40f78bc1d59a"
+  },
+  {
+    "file": "src/lib/captureConfiguration.js",
+    "sha256": "c6c8091c9ee64c73613b1eaeee2cbd573421042cbba9c90e6e65a4876df71769"
+  },
+  {
+    "file": "src/lib/captureParsers.js",
+    "sha256": "999c4d6ff5665df9da32dfe76d2b2cb7e616a09c697b15e1eec00db525481c25"
+  },
+  {
+    "file": "src/lib/capturePaymentAutomation.js",
+    "sha256": "32f8bc67d8b01be60761f06836264adf4c7dc0f6cbfbfac9996a6bdb90feb7b5"
+  },
+  {
+    "file": "src/lib/capturePaymentParsers.js",
+    "sha256": "7332e9ae258db967377ca2c76d03b85290f2c4cd29b3eccced2986596cdfc84f"
+  },
+  {
+    "file": "src/lib/capturePresentation.js",
+    "sha256": "b60a1cafda1c0a3e4fdb033b99c7be1991299742cabab6b12b7a22e2df8eb118"
+  },
+  {
+    "file": "src/lib/captureService.js",
+    "sha256": "b6082b2635b319779dd8f51b88b65fcc95ad1329d65310d2f83825124fc48c98"
+  },
+  {
+    "file": "tests/fixtures/captures/banamex-card-payment.es.v1.json",
+    "sha256": "1187825c047f70b5b575c379540bb401496db555698eefb8f34804e8d2e52468"
+  },
+  {
+    "file": "tests/fixtures/captures/bbva-debit-card-charge.es.v1.json",
+    "sha256": "f7c5214d629e02b6907db3932228dee3f095cd12efd6c4bba33288a087f34561"
+  },
+  {
+    "file": "tests/fixtures/captures/mercadopago-card-payment.es.v1.json",
+    "sha256": "fa76476a4c652beeaccd156f7bddbc5a6c4d68184a8204fcae72175de773890c"
+  },
+  {
+    "file": "tests/helpers/seed-receiver-payments.cjs",
+    "sha256": "1b1f5d071ec31c0557e5fea0507f5fa7bb26a3ae8cdcc96a792cc59f31dda11d"
+  },
+  {
+    "file": "tests/migration-history.test.cjs",
+    "sha256": "df4db7e6672a7bd94dcf57856bbcd19f47e91fc6aafeed9fc0f4d92df0a30caa"
+  },
+  {
+    "file": "tests/receiver-payment-notices-integration.test.cjs",
+    "sha256": "8f98d77184b5dd0af6650f51564f1fa8b1be9f9b79837f037c13e3a2d14d8075"
+  },
+  {
+    "file": "tests/receiver-payment-notices.test.cjs",
+    "sha256": "9a0b094cba2a45c8ed9218d395ad9d6b32f302dcf6827cd8f36f503e84e498c2"
+  }
+]

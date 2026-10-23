@@ -1,0 +1,35 @@
+{
+  "verifiedAt": "2026-10-23T07:19:10.965Z",
+  "results": [
+    {
+      "path": "/login",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/captures/events",
+      "method": "POST",
+      "status": 401
+    },
+    {
+      "path": "/api/captures/payment-receipts",
+      "method": "POST",
+      "status": 401
+    },
+    {
+      "path": "/api/captures/configuration",
+      "method": "GET",
+      "status": 401
+    },
+    {
+      "path": "/api/cards",
+      "method": "GET",
+      "status": 401
+    },
+    {
+      "path": "/api/card-cycles",
+      "method": "GET",
+      "status": 401
+    }
+  ]
+}

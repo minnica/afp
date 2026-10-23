@@ -1,0 +1,19 @@
+{
+  "evidence": "REAL_REVIEWED_ANONYMIZED",
+  "limitations": [
+    "Sin terminación, moneda, fecha bancaria ni corte.",
+    "La tarjeta, MXN y la fecha de publicación en México requieren una regla aceptada.",
+    "Importes, terminaciones, referencias y horarios son ficticios."
+  ],
+  "event": {
+    "sourcePackage": "com.mercadopago.wallet",
+    "postedAt": "2026-10-23T06:12:00.000Z",
+    "receivedAt": "2026-10-23T06:12:00.300Z",
+    "fields": {
+      "android.title": "Pagaste $ 67.89 a tu tarjeta de crédito",
+      "android.text": "¡Cubriste el total y liberaste límite!",
+      "android.title.big": "Pagaste $ 67.89 a tu tarjeta de crédito",
+      "android.bigText": "¡Cubriste el total y liberaste límite!"
+    }
+  }
+}

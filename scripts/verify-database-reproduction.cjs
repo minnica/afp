@@ -86,6 +86,10 @@ function assertCatalog(actual) {
   assert.equal(adjustmentColumns.find(row => row.column_name === 'balanceAdjustmentNotes').is_nullable, 'YES');
   assert.ok(actual.constraints.some(row => row.table_name === 'card_cycle_payments' && row.name === 'card_cycle_payments_amount_check'));
   assert.ok(actual.constraints.some(row => row.table_name === 'card_cycle_payments' && row.name === 'card_cycle_payments_kind_check'));
+  const paymentSources = actual.constraints.find(row => row.table_name === 'capture_payment_policies' && row.name === 'capture_payment_policies_source_check');
+  const paymentDestinations = actual.constraints.find(row => row.table_name === 'capture_payment_policies' && row.name === 'capture_payment_policies_destination_check');
+  for (const source of ['BBVA_RECEIPT', 'NU_NOTICE', 'BANAMEX_NOTICE', 'MERCADOPAGO_NOTICE']) assert.ok(paymentSources?.definition.includes(source));
+  for (const source of ['BANAMEX_NOTICE', 'MERCADOPAGO_NOTICE']) assert.ok(paymentDestinations?.definition.includes(source));
   // Conserva el snapshot histórico; verifica explícitamente las columnas nuevas.
   const datePolicy = actual.columns.find(row => row.table_name === 'capture_automations' && row.column_name === 'datePolicy');
   assert.equal(datePolicy?.data_type, 'text'); assert.equal(datePolicy?.is_nullable, 'NO');

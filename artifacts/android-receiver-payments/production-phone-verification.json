@@ -1,0 +1,26 @@
+{
+  "verifiedAt": "2026-10-23T07:27:34.734871+00:00",
+  "method": "USB_ADB_SCREEN_CAPTURE",
+  "apk": "0.6.0 / 8",
+  "apkUpdated": false,
+  "authenticatedProductionPageObserved": true,
+  "domain": "finanzas.garatachia.com",
+  "route": "/tarjetas",
+  "cycles": [
+    {
+      "card": "BANAMEX 1",
+      "month": 10,
+      "year": 2026,
+      "visibleStatus": "Pagado",
+      "visiblePendingAmount": 0
+    },
+    {
+      "card": "MERCADOPAGO",
+      "month": 10,
+      "year": 2026,
+      "visibleStatus": "Pagado",
+      "visiblePendingAmount": 0
+    }
+  ],
+  "screenshotsContainPersonalDataAndRemainPrivate": true
+}
