@@ -1,0 +1,163 @@
+{
+  "verifiedAt": "2026-10-23T23:23:33.104Z",
+  "productionUrl": "https://finanzas.garatachia.com",
+  "deploymentId": "dpl_2Yp4BwCjZbGTxQUfkBtvHjrQ3z76",
+  "state": "READY",
+  "sourceCommit": "b35622d660ffad7cfa0aeaded0cb37f3d5391445",
+  "sourceWorkingTree": true,
+  "sourceFiles": 304,
+  "sourceBytes": 2739154,
+  "sourceManifestSha256": "6dc865b57ea0cbd65db23e4e4ff84b308e6c9c54e30ed7b5090e37e132ca770d",
+  "parserSourceSha1": "b60a139c3faa0c236cebcac00441d1ad999f6511",
+  "parserSourceSha256": "20edf50ef46f772a029d11529f045f295bf776a710f8fc2b8bee4f1921cedb4c",
+  "sourceMatchesTestedParser": true,
+  "productionAliasVerified": true,
+  "privateFilesUploaded": false,
+  "commitOrPushPerformed": false,
+  "migrationApplied": false,
+  "apkUpdated": false,
+  "personalApk": "0.6.0 / 8",
+  "publicHttpChecks": [
+    {
+      "path": "/gastos",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/configuracion",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/manifest.webmanifest",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/.well-known/assetlinks.json",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/captures/configuration",
+      "method": "GET",
+      "status": 401
+    },
+    {
+      "path": "/api/captures/movements",
+      "method": "GET",
+      "status": 401
+    },
+    {
+      "path": "/api/captures/events",
+      "method": "POST",
+      "status": 401
+    },
+    {
+      "path": "/api/captures/device",
+      "method": "GET",
+      "status": 401
+    }
+  ],
+  "runtimeErrorGroupsObserved": 0,
+  "runtimeErrorScope": "Capture routes; immediate ten-minute observation window",
+  "dataVerification": {
+    "verifiedAt": "2026-10-23T23:23:33.104Z",
+    "oneExpenseCreated": true,
+    "bothNoticesSameExpense": true,
+    "previousExpensesUnchanged": true,
+    "originalEventsAndReceiptsUnchanged": true,
+    "originalInterpretationsRetained": true,
+    "explicitBankAnalysisHistory": true,
+    "bankRemainsPartial": true,
+    "notificationDateMexico": true,
+    "onlyBanamex2WalletEnabled": true,
+    "banamex1AndOtherModesUnchanged": true,
+    "aliasesAndOtherFinancialTablesUnchanged": true,
+    "bbvaUnchanged": true,
+    "rlsUnchanged": true,
+    "pointVerificationOnly": true,
+    "completeStatementVerified": false,
+    "readinessValid": true,
+    "phoneOperationalMetadataChangesOnly": true,
+    "deviceCredentialsAndConfigurationUnchanged": true,
+    "operationalMetadataScope": [
+      "Own device lastSeenAt/reportedAt",
+      "Own device rate-limit counter/window"
+    ],
+    "tablesCompared": 32,
+    "differences": [
+      {
+        "table": "capture_automations",
+        "before": 4,
+        "after": 5,
+        "allowed": true
+      },
+      {
+        "table": "capture_devices",
+        "before": 1,
+        "after": 1,
+        "allowed": true
+      },
+      {
+        "table": "capture_movements",
+        "before": 43,
+        "after": 43,
+        "allowed": true
+      },
+      {
+        "table": "capture_rate_limits",
+        "before": 4,
+        "after": 4,
+        "allowed": true
+      },
+      {
+        "table": "capture_statements",
+        "before": 4,
+        "after": 5,
+        "allowed": true
+      },
+      {
+        "table": "daily_expenses",
+        "before": 646,
+        "after": 647,
+        "allowed": true
+      },
+      {
+        "table": "google_calendar_connections",
+        "before": 1,
+        "after": 1,
+        "allowed": true
+      }
+    ]
+  },
+  "activation": {
+    "card": "BANAMEX 2",
+    "parserKey": "wallet.banamex-purchase.es.v1",
+    "sharedWithBanamex1": true,
+    "mode": "AUTOMATIC",
+    "datePolicy": "NOTIFICATION_POSTED_AT",
+    "timeZone": "America/Mexico_City",
+    "datePolicyExplicitlyAcceptedByOwner": true,
+    "bankJoyFormatAutomatic": false,
+    "initialPurchaseResolvedExplicitly": true,
+    "firstFutureAutomaticPurchaseStillToObserve": true,
+    "fullStatementReconciliationStillPending": true
+  },
+  "phoneVerification": {
+    "physicalDevice": true,
+    "appOrigin": "https://finanzas.garatachia.com",
+    "screen": "Gastos",
+    "singlePurchaseVisible": true,
+    "correctOwnerConfirmedAmount": true,
+    "card": "BANAMEX 2",
+    "category": "Por clasificar",
+    "sources": [
+      "Google Wallet",
+      "Banamex"
+    ],
+    "pointReconciled": true,
+    "existingCredentialsUsed": true,
+    "financialScreenshotPublished": false
+  }
+}

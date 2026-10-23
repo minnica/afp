@@ -9,9 +9,9 @@ Todas las aplicaciones de esta tabla están instaladas en el perfil actual del S
 | Fuente / ficha oficial | Paquete | Versión instalada | Tarjetas actuales de AFP / alcance | Formato real |
 |---|---|---|---|---|
 | [BBVA México](https://play.google.com/store/apps/details?id=com.bancomer.mbanking) | `com.bancomer.mbanking` | `26.90.14` | BBVA | Sin aviso de crédito; aviso de cuenta de débito excluido |
-| [Google Wallet](https://play.google.com/store/apps/details?id=com.google.android.apps.walletnfcrel) | `com.google.android.apps.walletnfcrel` | `26.41.996630916` (reconsulta Fase 7) | Seis alias virtuales configurados; compras BANAMEX 1, Santander y DiDi observadas | Banamex verificado; Santander parcial no activable; `wallet.didi-purchase.es.v1` publicado y habilitado, con fecha aceptada |
+| [Google Wallet](https://play.google.com/store/apps/details?id=com.google.android.apps.walletnfcrel) | `com.google.android.apps.walletnfcrel` | `26.41.996630916` (reconsulta Fase 7) | Seis alias virtuales configurados; compras BANAMEX 1/2, Santander y DiDi observadas | BANAMEX 1/2 comparten analizador, habilitado por separado con fecha aceptada. Santander parcial no activable; DiDi habilitado |
 | [HSBC México](https://play.google.com/store/apps/details?id=mx.hsbc.hsbcmexico) | `mx.hsbc.hsbcmexico` | `3.75.14` | HSBC 1 y HSBC 2 | Pendiente; distinguir ambas |
-| [Banamex](https://play.google.com/store/apps/details?id=com.citibanamex.banamexmobile) | `com.citibanamex.banamexmobile` | `136.0.0` | BANAMEX 1 y BANAMEX 2 | `banamex.card-charge.es.v1` parcial, solo evidencia; BANAMEX 2 pendiente |
+| [Banamex](https://play.google.com/store/apps/details?id=com.citibanamex.banamexmobile) | `com.citibanamex.banamexmobile` | `136.0.0` | BANAMEX 1 y BANAMEX 2 | `ADICIONAL` y `banamex.joy-card-charge.es.v1` parciales de evidencia; JOY publicado y vinculado a un gasto Wallet, sin automatización bancaria |
 | [Santander México](https://play.google.com/store/apps/details?id=mx.bancosantander.supermovil) | `mx.bancosantander.supermovil` | `12.2` | SANTANDER | `santander.card-purchase.es.v1` publicado y habilitado; muestra resuelta; primera compra automática futura pendiente |
 | [Nu](https://play.google.com/store/apps/details?id=com.nu.production) | `com.nu.production` | `10.8.43-minApi28` | NU | CFE v2 con regla expresa y suscripción; modo preparado, publicación pendiente. V1 parcial conservado |
 | [DiDi Finanzas](https://play.google.com/store/apps/details?id=com.didiglobal.cashloan) | `com.didiglobal.cashloan` | `3.2.2` | DIDI | Sin muestra de compra propia; Wallet DiDi se documenta por separado |
@@ -29,6 +29,8 @@ Los campos siguientes se refieren a **compras o pagos con crédito**. El aviso B
 |---|---|---|---|---|---|---|
 | BBVA | Sin observar | Sin observar | Sin observar | Sin observar | Alias de crédito configurados; sin aviso de compra | Sin observar |
 | Wallet (BANAMEX 1) | Presente | MXN explícito | Presente en título | Ausente; fecha de publicación México aceptada expresamente | Título/terminación digital BANAMEX 1; distinto del token NFC | Sin referencia explícita observada |
+| Wallet (BANAMEX 2) | Presente | MXN explícito | Presente en título | Ausente; publicación México aceptada expresamente | Joy Banamex y cuatro cifras bancarias verificadas; distinto del token NFC | Ausente |
+| Banamex (JOY, BANAMEX 2) | Presente | Solo símbolo `$` | Presente con descriptor completo | Fecha/hora bancarias AM/PM impresas | Tres cifras; alias bancario verificado y no ambiguo | Autorización abreviada conservada sin unicidad supuesta |
 | HSBC | Sin observar | Sin observar | Sin observar | Sin observar | Alias de ambas configurados; falta muestra de compra | Sin observar |
 | Banamex (compra cotejada con Wallet) | Presente | Solo símbolo `$` | Presente | Fecha/hora impresas | Tres cifras, resueltas por alias bancario sin colisiones; BANAMEX 1 contrastada con Wallet | Autorización abreviada conservada como evidencia, sin unicidad supuesta |
 | Santander | Presente | MXN explícito | Presente | Fecha/hora bancarias impresas, México | Cuatro cifras; alias físicos/digitales Santander comprobados | Ausente |

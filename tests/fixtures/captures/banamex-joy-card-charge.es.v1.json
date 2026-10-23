@@ -1,0 +1,16 @@
+{
+  "kind": "ANONYMIZED_REAL_NOTIFICATION",
+  "reviewedOn": "2026-10-23",
+  "scope": "Aviso bancario de la compra BANAMEX 2 confirmada por el propietario y contrastada con Wallet. Comercio, importe, terminación, autorización, fechas y encabezado sustituidos por datos ficticios. Se conservan JOY BANAMEX sin espacio antes de las tres cifras, estructura y espacios internos del comercio. Retiro/Compra no distingue el tipo de movimiento y $ no fija moneda; evidencia parcial no activable.",
+  "event": {
+    "sourcePackage": "com.citibanamex.banamexmobile",
+    "postedAt": "2026-10-20T22:21:25.052Z",
+    "receivedAt": "2026-10-20T22:21:25.816Z",
+    "fields": {
+      "android.title": "Aviso bancario ficticio",
+      "android.text": "Retiro/Compra COMERCIO FICTICIO     CIUDAD JOY BANAMEX456 monto $123.45 el 20/10/26 04:21:22 PM. Auto. 999222",
+      "android.bigText": "Retiro/Compra COMERCIO FICTICIO     CIUDAD JOY BANAMEX456 monto $123.45 el 20/10/26 04:21:22 PM. Auto. 999222",
+      "android.title.big": "Aviso bancario ficticio"
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "kind": "ANONYMIZED_REAL_NOTIFICATION",
+  "reviewedOn": "2026-10-23",
+  "scope": "Compra BANAMEX 2 por Wallet confirmada por el propietario. Conserva la misma gramática Joy Banamex ya validada para BANAMEX 1; comercio, importe, terminación y fechas ficticios. La terminación es bancaria, no el token NFC. No necesita otro analizador Wallet.",
+  "parserKey": "wallet.banamex-purchase.es.v1",
+  "datePolicy": "La publicación en America/Mexico_City se propone con origen explícito. Habilitar BANAMEX 2 requiere su propia aceptación NOTIFICATION_POSTED_AT; la de BANAMEX 1 no se hereda.",
+  "event": {
+    "sourcePackage": "com.google.android.apps.walletnfcrel",
+    "postedAt": "2026-10-20T22:21:27.134Z",
+    "receivedAt": "2026-10-20T22:21:27.401Z",
+    "fields": {
+      "android.title": "COMERCIO FICTICIO",
+      "android.text": "MXN123.45 con Joy Banamex ••0456"
+    }
+  }
+}

@@ -331,7 +331,7 @@ Para cerrar: recopilar avisos normales del uso real, revisar y anonimizar muestr
 | HSBC 1 | Física y digital; Wallet incompatible según propietario | Sin muestra verificada | Diagnóstico |
 | HSBC 2 | Física y digital; Wallet incompatible según propietario | Sin muestra verificada | Diagnóstico |
 | BANAMEX 1 | Física, digital y Wallet | Wallet verificado con fecha de publicación aceptada; banco parcial de evidencia | Compra registrada y evidencias vinculadas; modo automático preparado, publicación web pendiente |
-| BANAMEX 2 | Física, digital y Wallet | Sin muestra verificada | Diagnóstico |
+| BANAMEX 2 | Física, digital y Wallet | Wallet real con analizador compartido; banco JOY parcial de evidencia | Publicado READY, muestra registrada una vez con dos evidencias y cotejo puntual; Wallet habilitado con fecha aceptada |
 | SANTANDER | Física, digital y Wallet | Aviso bancario completo verificado; Wallet LikeU parcial de evidencia | Publicado READY, muestra resuelta una vez y formato bancario habilitado; primera compra automática futura y corte completo pendientes |
 | NU | Física, digital y Wallet | CFE v2 con regla expresa y suscripción; v1 parcial conservado | Cobro de octubre confirmado; modo Nu/CFE preparado, publicación web pendiente |
 | DIDI | Física, digital y Wallet | Sin muestra verificada | Diagnóstico |
@@ -414,6 +414,18 @@ La aceptación local usó datos ficticios; la aplicación posterior a producció
 - [ ] Observar una compra futura normal registrada automáticamente y conciliar un corte completo; otros formatos y canales DiDi siguen pendientes.
 
 La aplicación a producción se realizó después de la autorización explícita. La interpretación inicial del aviso y su recibo permanecen intactos; el movimiento conserva historial del nuevo análisis y su gasto vinculado. Las pantallas públicas usan valores ficticios. Sin migración ni APK nueva; personal **0.6.0 / 8** comprobada por USB. [Producción](artifacts/android-didi-wallet/production.json) y [evidencia técnica](artifacts/android-didi-wallet/verification.json).
+
+### BANAMEX 2 por Wallet · implementación del 23 de octubre de 2026
+
+- [x] Contrastar avisos Wallet/banco con la evidencia del propietario y verificar entrega: 44 eventos en servidor y teléfono, cero pendientes y errores de envío. Wallet identifica BANAMEX 2 sin crear gasto en observación.
+- [x] Reutilizar `wallet.banamex-purchase.es.v1` y añadir muestras anonimizadas propias. Incorporar `banamex.joy-card-charge.es.v1` como evidencia parcial no activable; conservar `ADICIONAL`, alias bancarios/NFC y controles de duplicados.
+- [x] Verificar 553 pruebas sin fallos ni omisiones, incluidas 14 nuevas de BANAMEX 2, lint y build Webpack. Las 30 migraciones existentes se aplicaron en PostgreSQL local; no hay migración ni APK nueva.
+- [x] Navegador móvil → API → PostgreSQL reales, Auth ficticia: un gasto BANAMEX 2 con dos evidencias, aceptación de fecha y habilitación local. Nueve entregas crean un gasto; igual importe en ambas tarjetas conserva un gasto por tarjeta y la configuración BANAMEX 1. Sin errores JavaScript ni desbordamiento a 390 px. Originales contrastados sin conexión.
+- [x] Autorizar publicación y fecha Wallet en México para BANAMEX 2. Publicado `dpl_2Yp4BwCjZbGTxQUfkBtvHjrQ3z76`, `READY`, dominio AFP y analizador probado verificados; 304 archivos públicos sobre `b35622d6`, sin commit ni push.
+- [x] Tras respaldo privado de 32 tablas, revisar/registrar la compra original una sola vez en **Por clasificar**, vincular el banco explícitamente, documentar cotejo puntual y habilitar solo BANAMEX 2 / Wallet con `NOTIFICATION_POSTED_AT`. Comparación posterior: originales, otras reglas, gastos anteriores, alias y RLS conservados. Gastos del celular muestra una compra con ambas fuentes y cotejo.
+- [ ] Observar una compra futura normal registrada automáticamente y conciliar un corte completo. Banco JOY parcial y otros canales no quedan habilitados.
+
+La aplicación a producción fue autorizada expresamente. Originales y respaldo permanecen privados; las pantallas públicas usan datos ficticios. Se conservan interpretaciones iniciales y recibos; el banco tiene un nuevo análisis explícito. El teléfono solo renovó metadatos de conexión y su límite de solicitudes; el trigger existente marcó Calendar. Sin migración ni APK nueva; BBVA conserva sus pendientes y datos. [Producción](artifacts/android-banamex2/production.json) y [evidencia técnica](artifacts/android-banamex2/verification.json).
 
 ## 4. Pruebas y aceptación
 

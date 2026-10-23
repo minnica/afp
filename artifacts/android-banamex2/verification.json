@@ -1,0 +1,158 @@
+{
+  "reviewedOn": "2026-10-23",
+  "status": "PRODUCTION_READY_INITIAL_PURCHASE_RESOLVED_BANAMEX2_WALLET_ENABLED",
+  "scope": "BANAMEX 2 shares the verified Joy Banamex Wallet grammar with BANAMEX 1. New bank JOY grammar is complementary partial evidence; each card requires its own review, point reconciliation and notification-date acceptance.",
+  "parsers": {
+    "wallet.banamex-purchase.es.v1": {
+      "sharedBy": [
+        "BANAMEX 1",
+        "BANAMEX 2"
+      ],
+      "verified": true,
+      "implementationReused": true,
+      "dateSource": "NOTIFICATION_POSTED_AT",
+      "timeZone": "America/Mexico_City",
+      "aliasScope": "Verified bank PHYSICAL/DIGITAL aliases; not the Wallet NFC token",
+      "activationScopedToOwnerCardAndParser": true,
+      "datePolicyAcceptanceRequiredPerCard": true,
+      "fixture": "../../tests/fixtures/captures/wallet-banamex2-purchase.es.v1.json"
+    },
+    "banamex.joy-card-charge.es.v1": {
+      "verified": false,
+      "evidenceOnly": true,
+      "evidence": "ANONYMIZED_REAL_NOTIFICATION",
+      "dateSource": "BANK_OPERATION",
+      "missingFields": [
+        "currency",
+        "purchaseType"
+      ],
+      "bankAuthorizationUnique": false,
+      "canEnable": false,
+      "fixture": "../../tests/fixtures/captures/banamex-joy-card-charge.es.v1.json",
+      "previousAdditionalFormatPreserved": true
+    }
+  },
+  "inspection": {
+    "readOnly": true,
+    "walletState": "OBSERVED / OBSERVATION",
+    "bankState": "REVIEW / UNKNOWN_FORMAT",
+    "expenseLinked": false,
+    "phoneDelivered": 44,
+    "serverEvents": 44,
+    "pending": 0,
+    "deliveryErrors": 0,
+    "sourceScreenshotPrivatelyPreserved": true,
+    "otherFinancialCandidates": 0
+  },
+  "verification": {
+    "unitAndIntegration": {
+      "command": "node --test --env-file=<local-test-env> --experimental-test-isolation=none tests/*.test.cjs",
+      "database": "Disposable local PostgreSQL 16; all 30 existing migrations applied",
+      "productionEnvironmentLoaded": false,
+      "passed": 553,
+      "failed": 0,
+      "skipped": 0,
+      "newBanamex2Checks": 14,
+      "covers": [
+        "Shared Wallet parser with distinct verified card aliases; BANAMEX 1 activation does not enable BANAMEX 2",
+        "Explicit idempotent reinterpretation preserves unknown original bank event and native receipt without creating money",
+        "Review and registration create one expense; explicit bank linking preserves the partial proposal",
+        "Own point reconciliation plus NOTIFICATION_POSTED_AT acceptance required for BANAMEX 2 activation",
+        "Both arrival orders, eight concurrent native API deliveries and one retry create one expense per purchase",
+        "Equal amounts across cards retain separate purchases; three-digit and four-digit alias ambiguities are distinguished",
+        "Equal purchases, manual matches, personal corrections, authentication and owner isolation",
+        "Bank JOY stays partial and unactivatable, even with a forced automatic database mode",
+        "Returning BANAMEX 2 to observation retains BANAMEX 1 configuration, original evidence and decisions"
+      ]
+    },
+    "lint": {
+      "exitCode": 0,
+      "errors": 0,
+      "preexistingWarnings": 1,
+      "warning": "TanStack Table react-hooks/incompatible-library"
+    },
+    "build": {
+      "command": "pnpm exec next build --webpack",
+      "exitCode": 0
+    },
+    "mobileBrowser": {
+      "tool": "agent-browser, isolated named session",
+      "environment": "Isolated local Next.js production build; real UI, HTTP APIs and PostgreSQL; fake Supabase Auth and fictitious financial data, no production environment files",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "javascriptErrors": 0,
+      "horizontalOverflow": false,
+      "captureHttpRequests": 32,
+      "allCaptureBrowserHttpStatus": 200,
+      "boundaries": {
+        "uiRenders": "Wallet card/date/amount and notification-date warning shown; new bank JOY fields recognized",
+        "clientToApi": "Movement GET/PATCH and configuration PATCH returned 200",
+        "apiToData": "Real routes persisted review/registration, explicit bank link and activation in local PostgreSQL",
+        "dataToResponse": "One BANAMEX 2 pilot expense with two evidence movements; future equal amounts stored separately by card",
+        "responseToUi": "Resolved bank evidence and per-card activation with notification-date confirmation displayed"
+      },
+      "pointReconciliation": "Explicit local service call; not a complete statement",
+      "proof": {
+        "browserAndRealHttpVerified": true,
+        "manualPilots": 2,
+        "initialBanamex2ExpenseWithBothSources": true,
+        "banamex2BankOriginalRetained": true,
+        "banamex2BankAnalysisHistory": 1,
+        "concurrentBanamex2Deliveries": 8,
+        "lostResponseRetry": 1,
+        "identicalReceipts": true,
+        "futureAutomaticBanamex2Expenses": 1,
+        "futureAutomaticBanamex1Expenses": 1,
+        "equalAmountsKeptSeparateByCard": true,
+        "newExpensesPending": true,
+        "bankPartialRemainsReview": true,
+        "firstCardModeUnchanged": true,
+        "totalExpenses": 4,
+        "totalEvents": 6
+      },
+      "screenshots": [
+        "bank-mobile.png",
+        "wallet-mobile.png",
+        "linked-mobile.png",
+        "date-policy-mobile.png"
+      ]
+    },
+    "originalSampleOfflineAnalysis": {
+      "productionConnectionOpened": false,
+      "mutations": 0,
+      "walletSharedParserRecognized": true,
+      "bankJoyPartialRecognized": true,
+      "amountsAndCardsAndDatesMatch": true,
+      "bankCurrencyNotInvented": true,
+      "originalFinancialTextPublished": false
+    }
+  },
+  "parserSourceSha256": "20edf50ef46f772a029d11529f045f295bf776a710f8fc2b8bee4f1921cedb4c",
+  "migrationRequired": false,
+  "nativeContractChanged": false,
+  "apkUpdated": false,
+  "personalApk": "0.6.0 / 8",
+  "production": {
+    "deployed": true,
+    "deploymentId": "dpl_2Yp4BwCjZbGTxQUfkBtvHjrQ3z76",
+    "productionAliasVerified": true,
+    "financialRowsWritten": true,
+    "previousFinancialRowsPreserved": true,
+    "aliasesChanged": false,
+    "banamex2AutomationEnabled": true,
+    "banamex2NotificationDatePolicyAccepted": true,
+    "originalNoticesResolved": true,
+    "oneExpenseWithBothSources": true,
+    "otherModesChanged": false,
+    "bbvaChanged": false,
+    "bankJoyFormatAutomatic": false,
+    "firstFutureAutomaticPurchaseStillToObserve": true
+  },
+  "remaining": [
+    "Observe a future normal automatic purchase for BANAMEX 2 using the verified Wallet format",
+    "Reconcile a full period; bank JOY remains partial and other channels are unverified"
+  ],
+  "productionEvidence": "production.json"
+}

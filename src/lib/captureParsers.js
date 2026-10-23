@@ -22,6 +22,8 @@ export const captureParsers = [
     aliasSourcePackage: "com.citibanamex.banamexmobile", aliasKinds: ["PHYSICAL", "DIGITAL"], dateSource: "NOTIFICATION_POSTED_AT" },
   { key: "banamex.card-charge.es.v1", sourcePackage: "com.citibanamex.banamexmobile", verified: false, evidence: "REAL_REVIEWED_PARTIAL",
     aliasSourcePackage: "com.citibanamex.banamexmobile", aliasKinds: ["PHYSICAL", "DIGITAL"], evidenceOnly: true },
+  { key: "banamex.joy-card-charge.es.v1", sourcePackage: "com.citibanamex.banamexmobile", verified: false, evidence: "REAL_REVIEWED_PARTIAL",
+    aliasSourcePackage: "com.citibanamex.banamexmobile", aliasKinds: ["PHYSICAL", "DIGITAL"], evidenceOnly: true },
   { key: "santander.card-purchase.es.v1", sourcePackage: "mx.bancosantander.supermovil", verified: true, evidence: "REAL_REVIEWED",
     aliasKinds: ["PHYSICAL", "DIGITAL"], dateSource: "BANK_OPERATION" },
   { key: "wallet.santander-purchase.es.v1", sourcePackage: "com.google.android.apps.walletnfcrel", verified: false, evidence: "REAL_REVIEWED_PARTIAL",
@@ -94,9 +96,10 @@ function realWalletPurchase(event) {
 
 function realBanamexCharge(event) {
   const fields = event.fields || {}, body = fields["android.bigText"] || fields["android.text"] || "";
-  const match = body.match(/^Retiro\/Compra (.{1,200}) -\s+ADICIONAL (\d{3}) monto \$\s*([\d,.]+) el (\d{2}\/\d{2}\/\d{2}) (\d{2}):(\d{2}):(\d{2}) (AM|PM)\. Auto\. (\d{6})$/);
+  const additional = body.match(/^Retiro\/Compra (.{1,200}) -\s+ADICIONAL (\d{3}) monto \$\s*([\d,.]+) el (\d{2}\/\d{2}\/\d{2}) (\d{2}):(\d{2}):(\d{2}) (AM|PM)\. Auto\. (\d{6})$/);
+  const match = additional || body.match(/^Retiro\/Compra (.{1,200}) JOY BANAMEX(\d{3}) monto \$([\d,.]+) el (\d{2}\/\d{2}\/\d{2}) (\d{2}):(\d{2}):(\d{2}) (AM|PM)\. Auto\. (\d{6})$/);
   if (!match) return null;
-  const parserKey = "banamex.card-charge.es.v1";
+  const parserKey = additional ? "banamex.card-charge.es.v1" : "banamex.joy-card-charge.es.v1";
   if (conflictingBodies(fields)) return { parserKey, verified: false, reason: "CONFLICTING_FIELDS", proposal: {} };
   const [, merchant, suffix, rawAmount, printedDay, rawHour, minute, second, meridiem, authorization] = match;
   const [day, month, year] = printedDay.split("/");
