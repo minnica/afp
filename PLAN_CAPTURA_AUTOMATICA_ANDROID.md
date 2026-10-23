@@ -402,6 +402,19 @@ Esta cobertura solo acredita el formato observado de Wallet/BANAMEX 1. El aviso 
 
 La aceptación local usó datos ficticios; la aplicación posterior a producción fue autorizada expresamente. La transacción creó un gasto y vinculó ambas evidencias, con cotejo puntual y habilitación solo Santander; el trigger existente marcó Calendar. La lectura posterior comparó las 32 tablas y confirmó la conservación de registros anteriores. Originales y respaldo excluidos de Git. [Verificación de producción](artifacts/android-santander/production.json) y [evidencia técnica](artifacts/android-santander/verification.json).
 
+### DiDi por Google Wallet · implementación del 22 de octubre de 2026
+
+- [x] Revisar el aviso real Wallet y comprobar su alias digital bancario DiDi sin sustituir el número virtual NFC. No se encontró aviso bancario asociado entre los eventos consultados. El teléfono y servidor coinciden en 30 entregados, cero pendientes y cero errores de envío; inspección de solo lectura.
+- [x] Incorporar `wallet.didi-purchase.es.v1` con muestra real anonimizada: comercio, importe, MXN y cuatro cifras explícitos. La fecha se propone desde la publicación Wallet en México, con origen visible; no representa una fecha bancaria.
+- [x] Reutilizar los controles de observación, análisis explícito de avisos antiguos, revisión, cotejo y aceptación de `NOTIFICATION_POSTED_AT` por tarjeta/formato. No se habilita DiDi al publicar el código ni por la aprobación previa de otra tarjeta.
+- [x] Verificar **519 pruebas correctas sin omisiones**, incluidas 21 nuevas de DiDi: política de fecha, alias, aislamiento, concurrencia, reintentos, duplicados, borrado y conservación de decisiones. Lint y build correctos. Las 29 migraciones existentes se aplicaron en PostgreSQL local; sin migración ni APK nueva.
+- [x] Comprobar navegador móvil → API → PostgreSQL reales con Auth y datos ficticios: cero gastos al interpretar, uno tras revisar/registrar, habilitación con fecha aceptada y una compra futura automática por conciliar. Nueve entregas del mismo evento producen un recibo y un gasto; sin errores JavaScript ni desbordamiento a 390 px. Analizador contrastado sin conexión contra el original privado.
+- [x] Autorizar expresamente la política de fecha Wallet para DiDi y la publicación web. Publicado `dpl_2qUBTHbQSE4J7otGKDeDNdxW58sf`, `READY`, dominio AFP y huella del analizador verificados; 303 archivos públicos sobre `4f07e077`, sin commit ni push.
+- [x] Tras respaldo privado de 32 tablas, resolver la muestra original como un único gasto en **Por clasificar**, documentar el cotejo puntual y habilitar únicamente DIDI / `wallet.didi-purchase.es.v1` con `NOTIFICATION_POSTED_AT`. Comparación posterior: originales, recibos, alias, otras reglas, gastos anteriores y RLS conservados. El trigger existente marcó Calendar; no representa un corte completo.
+- [ ] Observar una compra futura normal registrada automáticamente y conciliar un corte completo; otros formatos y canales DiDi siguen pendientes.
+
+La aplicación a producción se realizó después de la autorización explícita. La interpretación inicial del aviso y su recibo permanecen intactos; el movimiento conserva historial del nuevo análisis y su gasto vinculado. Las pantallas públicas usan valores ficticios. Sin migración ni APK nueva; personal **0.6.0 / 8** comprobada por USB. [Producción](artifacts/android-didi-wallet/production.json) y [evidencia técnica](artifacts/android-didi-wallet/verification.json).
+
 ## 4. Pruebas y aceptación
 
 | Escenario | Resultado requerido |

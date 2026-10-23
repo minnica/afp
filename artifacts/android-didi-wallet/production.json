@@ -1,0 +1,118 @@
+{
+  "verifiedAt": "2026-10-23T04:57:23.878Z",
+  "productionUrl": "https://finanzas.garatachia.com",
+  "deploymentId": "dpl_2qUBTHbQSE4J7otGKDeDNdxW58sf",
+  "state": "READY",
+  "sourceCommit": "4f07e077976bd22ced700ecba36db955db64a61d",
+  "sourceWorkingTree": true,
+  "sourceFiles": 303,
+  "sourceBytes": 2726138,
+  "sourceManifestSha256": "f2c4d5f73e2ec443d93acad4b136abc8712c74122790abb676fff93400820437",
+  "parserSourceSha1": "0620e7eddc00c30e1699d7b53467bec0eec21a8c",
+  "sourceMatchesTestedParser": true,
+  "productionAliasVerified": true,
+  "privateFilesUploaded": false,
+  "commitOrPushPerformed": false,
+  "migrationApplied": false,
+  "apkUpdated": false,
+  "personalApk": "0.6.0 / 8",
+  "publicHttpChecks": [
+    {
+      "path": "/gastos",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/configuracion",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/manifest.webmanifest",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/.well-known/assetlinks.json",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/captures/movements",
+      "method": "GET",
+      "status": 401
+    },
+    {
+      "path": "/api/captures/events",
+      "method": "POST",
+      "status": 401
+    }
+  ],
+  "runtimeErrorGroupsObserved": 0,
+  "runtimeErrorScope": "Capture routes, immediate ten-minute observation window",
+  "dataVerification": {
+    "verifiedAt": "2026-10-23T04:57:23.878Z",
+    "oneExpenseCreated": true,
+    "previousExpensesUnchanged": true,
+    "originalEventsAndReceiptsUnchanged": true,
+    "originalUnknownInterpretationRetained": true,
+    "explicitAnalysisHistory": true,
+    "notificationDateMexico": true,
+    "bankDateInvented": false,
+    "onlyDidiWalletEnabled": true,
+    "otherAliasesRulesAndFinancialTablesUnchanged": true,
+    "rlsUnchanged": true,
+    "pointVerificationOnly": true,
+    "completeStatementVerified": false,
+    "tablesCompared": 32,
+    "differences": [
+      {
+        "table": "capture_automations",
+        "before": 3,
+        "after": 4,
+        "allowed": true
+      },
+      {
+        "table": "capture_movements",
+        "before": 29,
+        "after": 29,
+        "allowed": true
+      },
+      {
+        "table": "capture_statements",
+        "before": 3,
+        "after": 4,
+        "allowed": true
+      },
+      {
+        "table": "daily_expenses",
+        "before": 644,
+        "after": 645,
+        "allowed": true
+      },
+      {
+        "table": "google_calendar_connections",
+        "before": 1,
+        "after": 1,
+        "allowed": true
+      }
+    ]
+  },
+  "activation": {
+    "card": "DIDI",
+    "parserKey": "wallet.didi-purchase.es.v1",
+    "mode": "AUTOMATIC",
+    "datePolicy": "NOTIFICATION_POSTED_AT",
+    "timeZone": "America/Mexico_City",
+    "datePolicyExplicitlyAcceptedByOwner": true,
+    "initialPurchaseResolvedExplicitly": true,
+    "firstFutureAutomaticPurchaseStillToObserve": true,
+    "fullStatementReconciliationStillPending": true
+  },
+  "phoneVerification": {
+    "usbConnected": true,
+    "installedApkVersion": "0.6.0 / 8",
+    "physicalFinancialUiVerified": false,
+    "reason": "The connected device was asleep with keyguard present; no unlock attempted. Mobile UI was verified using fictitious local data; production purchase and automation were checked directly."
+  }
+}

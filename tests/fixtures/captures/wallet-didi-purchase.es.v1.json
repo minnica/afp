@@ -1,0 +1,15 @@
+{
+  "kind": "ANONYMIZED_REAL_NOTIFICATION",
+  "reviewedOn": "2026-10-22",
+  "scope": "Compra con DiDi por Google Wallet comunicada por el propietario. Comercio, importe, terminación y fechas sustituidos por valores ficticios; texto DIDI Credit Card y estructura observados conservados. La terminación corresponde al alias bancario digital DiDi verificado, no al número virtual NFC. No se observó un aviso bancario asociado a esta compra.",
+  "datePolicy": "El aviso no contiene fecha bancaria. Su publicación en America/Mexico_City es una propuesta con origen explícito; requiere aceptación por tarjeta/formato antes de automatizar.",
+  "event": {
+    "sourcePackage": "com.google.android.apps.walletnfcrel",
+    "postedAt": "2026-10-21T03:49:09.934Z",
+    "receivedAt": "2026-10-21T03:49:10.160Z",
+    "fields": {
+      "android.title": "COMERCIO FICTICIO",
+      "android.text": "MXN123.45 con DIDI Credit Card ••0123"
+    }
+  }
+}

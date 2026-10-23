@@ -1,0 +1,151 @@
+{
+  "reviewedOn": "2026-10-22",
+  "status": "PRODUCTION_READY_INITIAL_PURCHASE_RESOLVED_WALLET_DIDI_ENABLED",
+  "scope": "Compra DiDi comunicada por el propietario tras pagar con Google Wallet. Desarrollo basado en un aviso real revisado; pruebas y pantallas públicas con valores ficticios.",
+  "parser": {
+    "key": "wallet.didi-purchase.es.v1",
+    "sourcePackage": "com.google.android.apps.walletnfcrel",
+    "verified": true,
+    "evidence": "ANONYMIZED_REAL_NOTIFICATION",
+    "fixture": "../../tests/fixtures/captures/wallet-didi-purchase.es.v1.json",
+    "explicitFields": [
+      "merchant",
+      "amount",
+      "currency",
+      "bankCardLastFour"
+    ],
+    "missingFields": [
+      "bankOperationDate",
+      "uniqueReference"
+    ],
+    "aliasSourcePackage": "com.didiglobal.cashloan",
+    "aliasKinds": [
+      "PHYSICAL",
+      "DIGITAL"
+    ],
+    "observedAliasKind": "DIGITAL",
+    "walletVirtualNfcTokenUsedAsBankIdentity": false,
+    "dateSource": "NOTIFICATION_POSTED_AT",
+    "timeZone": "America/Mexico_City",
+    "datePolicyAcceptanceRequiredPerCardAndParser": true,
+    "automationRequires": "Explicit reviewed/reconciled own observation preserving interpreted financial fields, verified unambiguous bank alias, notification-date acceptance and explicit enable",
+    "didiBankAppPurchaseFormatVerified": false
+  },
+  "inspection": {
+    "readOnly": true,
+    "associatedBankPurchaseNoticeFound": false,
+    "nativeDelivered": 30,
+    "serverEvents": 30,
+    "nativePending": 0,
+    "nativeDeliveryErrors": 0,
+    "limitation": "Only the queried captured events were checked; absence of a bank notice does not prove the bank never emits one. Delivery success is separate from financial review."
+  },
+  "verification": {
+    "unitAndIntegration": {
+      "command": "node --test --env-file=<local-test-env> --experimental-test-isolation=none tests/*.test.cjs",
+      "database": "Disposable local PostgreSQL 16, afp_test_didi_wallet; all 29 existing migrations applied",
+      "productionEnvironmentLoaded": false,
+      "passed": 519,
+      "failed": 0,
+      "skipped": 0,
+      "newDidiChecks": 21,
+      "covers": [
+        "Exact Wallet DiDi grammar, cents, malformed amounts, midnight in Mexico and delayed delivery",
+        "Missing, conflicting, invalid and future fields, foreign currencies and special movements",
+        "Bank digital/physical alias resolution, cross-kind ambiguity, unverified/unknown identities and NFC token separation",
+        "No date-policy acceptance means review, even with a forced automatic mode",
+        "Original unknown receipt remains immutable on replay; explicit reinterpretation is idempotent and creates no expense",
+        "Manual review, registration, explicit point reconciliation and activation scoped to one owner/card/parser/date policy",
+        "Eight concurrent native API deliveries plus lost-response retry create one expense and receipt",
+        "Second device, equal legitimate purchases, manual duplicates and notification revisions retain explicit resolution",
+        "Linking preserves personal notes, category, concept and cash contributions",
+        "Cross-owner, cross-bank, other-card, unsupported-source and authentication boundaries",
+        "Deletion tombstone prevents replay or late notification from silently recreating an expense",
+        "Personal corrections, previous analyses and data survive return to observation"
+      ]
+    },
+    "lint": {
+      "command": "pnpm lint",
+      "exitCode": 0,
+      "errors": 0,
+      "preexistingWarnings": 1,
+      "warning": "TanStack Table react-hooks/incompatible-library"
+    },
+    "build": {
+      "command": "pnpm exec next build --webpack",
+      "exitCode": 0
+    },
+    "mobileBrowser": {
+      "tool": "agent-browser, isolated named session",
+      "environment": "Local isolated Next.js production build; real UI and HTTP capture APIs, fake Supabase Auth, disposable PostgreSQL; no production environment files",
+      "developmentRunIssue": "One transient GET movements 500 with Unexpected end of JSON input was observed in the development server. The full flow was repeated with a fresh local database and isolated production build; the failure did not recur. No production service was involved.",
+      "productionBuildRepeatPassed": true,
+      "productionBuildBrowserCaptureRequests": 23,
+      "productionBuildBrowserCaptureStatuses": 200,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "javascriptErrors": 0,
+      "horizontalOverflow": false,
+      "boundaries": {
+        "uiRenders": "Wallet original and recognized proposal displayed with notification-date warning",
+        "clientToApi": "Movement GET/PATCH and configuration PATCH returned HTTP 200; unauthenticated capture routes HTTP 401",
+        "apiToDatabase": "Explicit reinterpretation, correction, registration and automatic-mode activation persisted in local PostgreSQL",
+        "databaseToResponse": "One manual pilot; one future automatic purchase pending reconciliation; nine deliveries return one identical receipt",
+        "responseToUi": "Recognized amount/date/card and preserved history shown; activation confirms notification date; new automatic capture shown resolved"
+      },
+      "expensesAfterInterpretation": 0,
+      "expensesAfterExplicitRegistration": 1,
+      "pilotReconciliation": "Explicit local service call after registration; point check only, not a complete statement",
+      "activationFromUi": true,
+      "storedDatePolicy": "NOTIFICATION_POSTED_AT",
+      "futureEventHttpDeliveries": 9,
+      "futureEventConcurrentDeliveries": 8,
+      "futureEventHttpStatus": 200,
+      "futureEventIdenticalReceipts": true,
+      "futureAutomaticExpenses": 1,
+      "futureExpenseReconciliationStatus": "PENDING",
+      "totalExpensesAfterFutureEvent": 2,
+      "screenshots": [
+        "review-mobile.png",
+        "date-policy-mobile.png",
+        "automatic-mobile.png"
+      ]
+    },
+    "originalSampleOfflineAnalysis": {
+      "parserAndCurrencyAndAmountMatch": true,
+      "notificationDayInMexicoMatches": true,
+      "bankOperationDateInvented": false,
+      "verifiedBankDigitalAliasMatches": true,
+      "virtualNfcAliasChanged": false,
+      "productionConnectionOpened": false,
+      "productionMutations": 0,
+      "originalFinancialTextPublished": false
+    }
+  },
+  "migrationRequired": false,
+  "nativeContractChanged": false,
+  "installedApkUpdated": false,
+  "personalApk": "0.6.0 / 8",
+  "production": {
+    "deployed": true,
+    "deploymentId": "dpl_2qUBTHbQSE4J7otGKDeDNdxW58sf",
+    "productionAliasVerified": true,
+    "financialRowsWritten": true,
+    "previousFinancialRowsPreserved": true,
+    "aliasesChanged": false,
+    "automationEnabled": true,
+    "automaticParser": "wallet.didi-purchase.es.v1",
+    "originalNoticeResolved": true,
+    "originalNoticeStatus": "REGISTERED with preserved original UNKNOWN_FORMAT interpretation",
+    "didiNotificationDatePolicyAccepted": true,
+    "initialPurchaseResolvedExplicitly": true,
+    "firstFutureAutomaticPurchaseStillToObserve": true
+  },
+  "remaining": [
+    "Observe a future normal purchase captured automatically with wallet.didi-purchase.es.v1",
+    "Reconcile a full period; other DiDi formats and channels remain unverified"
+  ],
+  "productionEvidence": "production.json"
+}

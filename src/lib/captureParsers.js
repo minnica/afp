@@ -21,6 +21,8 @@ export const captureParsers = [
     aliasKinds: ["PHYSICAL", "DIGITAL"], dateSource: "BANK_OPERATION" },
   { key: "wallet.santander-purchase.es.v1", sourcePackage: "com.google.android.apps.walletnfcrel", verified: false, evidence: "REAL_REVIEWED_PARTIAL",
     aliasSourcePackage: "mx.bancosantander.supermovil", aliasKinds: ["PHYSICAL", "DIGITAL"], evidenceOnly: true },
+  { key: "wallet.didi-purchase.es.v1", sourcePackage: "com.google.android.apps.walletnfcrel", verified: true, evidence: "REAL_REVIEWED",
+    aliasSourcePackage: "com.didiglobal.cashloan", aliasKinds: ["PHYSICAL", "DIGITAL"], dateSource: "NOTIFICATION_POSTED_AT" },
 ];
 
 export function normalizeMerchant(value) {
@@ -67,9 +69,11 @@ export function captureNotificationDate(event) {
 
 function realWalletPurchase(event) {
   const fields = event.fields || {}, body = fields["android.bigText"] || fields["android.text"] || "";
-  const match = body.match(/^(MXN|USD|EUR)([\d,.]+) con Joy Banamex ••(\d{4})$/);
+  const match = body.match(/^(MXN|USD|EUR)([\d,.]+) con (Joy Banamex|DIDI Credit Card) ••(\d{4})$/);
   if (!match) return null;
-  const parserKey = "wallet.banamex-purchase.es.v1";
+  const [parserKey, aliasSourcePackage] = match[3] === "DIDI Credit Card"
+    ? ["wallet.didi-purchase.es.v1", "com.didiglobal.cashloan"]
+    : ["wallet.banamex-purchase.es.v1", "com.citibanamex.banamexmobile"];
   if (conflictingBodies(fields)) return { parserKey, verified: true, reason: "CONFLICTING_FIELDS", proposal: {} };
   const merchant = fields["android.title"];
   const amount = captureAmount(match[2]), date = captureNotificationDate(event);
@@ -79,7 +83,7 @@ function realWalletPurchase(event) {
   return { parserKey, verified: true, reason: match[1] === "MXN" ? "PURCHASE" : "FOREIGN_CURRENCY", proposal: {
     ...date, amount, currency: match[1], merchant: merchant.trim(),
     // Wallet muestra la terminación del título, no el token de pagos NFC.
-    printedAlias: { value: match[3], digits: 4 }, aliasSourcePackage: "com.citibanamex.banamexmobile", reference: null,
+    printedAlias: { value: match[4], digits: 4 }, aliasSourcePackage, reference: null,
   } };
 }
 
