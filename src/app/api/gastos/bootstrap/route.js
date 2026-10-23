@@ -93,6 +93,8 @@ const receivableSelect = {
 };
 
 const payableSelect = {
+  accountType: true,
+  currentBalance: true,
   id: true,
   userId: true,
   personId: true,
@@ -119,6 +121,7 @@ const payableSelect = {
       date: true,
       concept: true,
       amount: true,
+      loanPrincipalAmount: true,
     },
   },
 };

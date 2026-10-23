@@ -17,6 +17,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Pencil, Trash2, X } from "lucide-react";
@@ -434,7 +435,7 @@ export default function CuentasPorPagarContent() {
               title="Monto original"
               value={formatMoney(summary.original)}
             />
-            <SummaryCard title="Pagado" value={formatMoney(summary.paid)} />
+            <SummaryCard title="Capital abonado" value={formatMoney(summary.paid)} />
             <SummaryCard
               title="Pendiente"
               value={formatMoney(summary.pending)}
@@ -749,9 +750,9 @@ function PayablesList({
             >
               <dl className="grid grid-cols-2 gap-3">
                 <RecordField label="Monto original">{formatMoney(item.originalAmount)}</RecordField>
-                <RecordField label="Pagado">{formatMoney(item.paidAmount)}</RecordField>
+                <RecordField label={item.accountType === "LOAN" ? "Capital abonado" : "Pagado"}>{formatMoney(item.paidAmount)}</RecordField>
                 {item.expectedMonthlyPayment ? <RecordField label="Pago esperado">{formatMoney(item.expectedMonthlyPayment)}</RecordField> : null}
-                {item.expectedDate ? <RecordField label="Fecha esperada">{formatDate(item.expectedDate)}</RecordField> : null}
+                {item.expectedDate ? <RecordField label={item.accountType === "LOAN" ? "Vencimiento del contrato" : "Fecha esperada"}>{formatDate(item.expectedDate)}</RecordField> : null}
                 <RecordField label="Fecha de origen">{formatDate(item.originDate)}</RecordField>
                 <RecordField label="Origen">{getOriginLabel(item.originType)}</RecordField>
               </dl>
@@ -782,7 +783,7 @@ function PayablesList({
 
               {item.expectedDate ? (
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Fecha esperada: {formatDate(item.expectedDate)}
+                  {item.accountType === "LOAN" ? "Vencimiento del contrato" : "Fecha esperada"}: {formatDate(item.expectedDate)}
                 </p>
               ) : null}
 
@@ -835,7 +836,7 @@ function PayablesList({
             </div>
 
             <div className="rounded-lg border border-border bg-muted/30 px-3 py-3">
-              <p className="text-xs text-muted-foreground">Pagado</p>
+              <p className="text-xs text-muted-foreground">{item.accountType === "LOAN" ? "Capital abonado" : "Pagado"}</p>
               <p className="mt-1 font-medium">{formatMoney(item.paidAmount)}</p>
             </div>
 
@@ -849,6 +850,8 @@ function PayablesList({
 
           </>
           )}
+
+          {item.accountType === "LOAN" ? <LoanDetails payable={item} /> : null}
 
           <CollapsibleContent>
             <PayablePaymentsBreakdown payable={item} />
@@ -983,6 +986,36 @@ function PayablesList({
   );
 }
 
+function LoanDetails({ payable }) {
+  const reimbursement = payable.reimbursementReceivable;
+  const ownOriginalAmount = reimbursement?.originalAmount != null
+    ? Math.max(0, Number(payable.originalAmount) - Number(reimbursement.originalAmount)) : 0;
+  const days = payable.paymentDays?.map(day => day === 31 ? "fin de mes" : String(day)).join(" y ");
+  const remaining = payable.totalPayments != null && payable.paymentsMade != null
+    ? Math.max(0, payable.totalPayments - payable.paymentsMade) : null;
+  return (
+    <div className="mt-4 flex flex-col gap-3">
+      <Badge variant="outline">Préstamo de nómina</Badge>
+      <dl className="grid grid-cols-2 gap-3">
+        {payable.paymentAmount != null ? <RecordField label="Descuento quincenal">{formatMoney(payable.paymentAmount)}</RecordField> : null}
+        {remaining != null ? <RecordField label="Pagos pendientes">{remaining} de {payable.totalPayments}</RecordField> : null}
+        {days ? <RecordField label="Días de descuento">{days}</RecordField> : null}
+        {payable.annualInterestRate != null ? <RecordField label="Tasa anual">{Number(payable.annualInterestRate)} %</RecordField> : null}
+      </dl>
+      <p className="text-sm text-muted-foreground">
+        Saldo de la última conciliación de nómina. El descuento incluye capital e intereses; los reembolsos se registran por separado.
+      </p>
+      {reimbursement ? (
+        <div className="text-sm">
+          <p>Reembolso de {reimbursement.person?.name}: {reimbursement.concept} · {formatMoney(reimbursement.originalAmount)} originales.</p>
+          {ownOriginalAmount > 0 ? <p>Tu parte del capital original: {formatMoney(ownOriginalAmount)}.</p> : null}
+          <Link href="/cuentas-por-cobrar" className="inline-flex min-h-11 items-center underline underline-offset-4">Ver cuenta por cobrar</Link>
+        </div>
+      ) : <p className="text-sm text-muted-foreground">A cargo propio.</p>}
+    </div>
+  );
+}
+
 function PayablePaymentsBreakdown({ payable }) {
   const payments = [...(payable.dailyExpenses || [])].sort((a, b) => {
     return new Date(b.date).getTime() - new Date(a.date).getTime();
@@ -995,7 +1028,9 @@ function PayablePaymentsBreakdown({ payable }) {
       {payments.length === 0 ? (
         <Empty>
           <EmptyDescription>
-            Todavía no hay pagos vinculados a esta cuenta por pagar.
+            {payable.accountType === "LOAN"
+              ? "El capital abonado está incluido en el saldo bancario conciliado. No se han creado gastos adicionales por los descuentos de nómina."
+              : "Todavía no hay pagos vinculados a esta cuenta por pagar."}
           </EmptyDescription>
         </Empty>
       ) : (

@@ -309,6 +309,16 @@ Verificación: `node --test --experimental-test-isolation=none tests/*.test.cjs`
 
 No se modificó Supabase ni se desplegó producción. A06 completa la protección de los flujos relacionados, incluida la creación desde compras a meses, como se describe a continuación.
 
+### Préstamos de nómina — saldo conciliado y reembolsos
+
+**Registro de tres préstamos solicitado y aplicado · 22 de octubre de 2026.** Las cuentas por pagar de tipo `LOAN` conservan el principal original y usan `currentBalance` como capital pendiente de la última conciliación bancaria, incluido cero. `paidAmount` representa capital amortizado, no la suma de cuotas con intereses. Sin saldo capturado solo se descuentan los importes explícitos `loanPrincipalAmount`; no se deduce capital de una cuota sin desglose. Las cuentas simples conservan su cálculo anterior. API, bootstrap de Gastos, actualización de estado y Calendar comparten esta regla.
+
+La pantalla muestra descuento quincenal, tasa anual, días de pago y cuotas pendientes informadas por el banco. `paymentDays: [15, 31]` representa el día quince y fin de mes. `expectedMonthlyPayment` conserva dos cuotas y `expectedDate` el vencimiento contractual; esta carga no proyecta pagos futuros como gastos ni genera otro ingreso por el préstamo. El saldo capturado requiere otra conciliación de nómina para actualizarse: registrar un gasto o recibir un reembolso no reemplaza ese saldo.
+
+`reimbursementReceivableId` vincula una cuenta por cobrar existente, conservando sus movimientos, principal y cálculo. El vínculo muestra la persona, importe original por cobrar y parte propia del capital original cuando corresponde; no convierte un cobro en un pago al banco. Los tres préstamos se registraron con el proveedor Banco ya existente; dos quedaron vinculados y el personal conserva el vínculo vacío. Se preservaron íntegramente los 45 ingresos, las 28 cuentas por cobrar, las seis cuentas por pagar anteriores y todos los gastos. No requiere migración. Contratos, cuatro nóminas, aclaración del propietario, respaldo y verificación privados permanecen en `estados_cuenta/prestamos_nomina_2026-10-22/`, excluido de Git.
+
+La adaptación web está comprobada localmente y **pendiente de publicación autorizada**. [Verificación y alcance](artifacts/prestamos-nomina/verificacion.json). No se ha publicado código ni cambiado la APK en esta tarea.
+
 ### Operaciones relacionadas — transacciones (A06)
 
 **Actividad concluida · implementación local · 17 de octubre de 2026.** El alta de compras a meses guarda la cuenta por cobrar opcional, la compra y `ReceivableAccount.originId` en una sola transacción `ReadCommitted`, mediante `runDebtAccountOperation`. Si falla cualquier escritura, se revierten todas; reintentar una operación revertida no deja cuentas huérfanas. Las compras sin persona también se crean dentro de la transacción.

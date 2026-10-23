@@ -18,6 +18,23 @@ const payableSelect = {
   originId: true,
   createdAt: true,
   updatedAt: true,
+  accountType: true,
+  annualInterestRate: true,
+  currentBalance: true,
+  firstPaymentDate: true,
+  paymentAmount: true,
+  paymentDays: true,
+  paymentsMade: true,
+  totalPayments: true,
+  reimbursementReceivableId: true,
+  reimbursementReceivable: {
+    select: {
+      id: true,
+      concept: true,
+      originalAmount: true,
+      person: { select: { id: true, name: true } },
+    },
+  },
   person: {
     select: {
       id: true,
@@ -30,6 +47,8 @@ const payableSelect = {
       date: true,
       concept: true,
       amount: true,
+      loanPrincipalAmount: true,
+      loanInterestAmount: true,
     },
   },
 };

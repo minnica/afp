@@ -8,6 +8,34 @@ const payment = (kind, account, amount) => ({ date: '2026-10-17', concept: 'Abon
   ...(kind === 'payable' ? { paymentMethod: 'CASH', categoryId: 'category-a', payableAccountId: account.id }
     : { source: 'Persona', incomeTypeId: 'incomeType-a', receivableAccountId: account.id }) });
 const configs = [ ['payable', 'expenses', 'payables', 'expense', 'dailyExpense'], ['receivable', 'incomes', 'receivables', 'income', 'income'] ];
+
+test('préstamos: saldo bancario conciliado conserva capital e intereses separados, incluido cero', () => {
+  const account = { originalAmount: '140000', accountType: 'LOAN', currentBalance: '114187.61', status: 'ACTIVE' };
+  const payments = [{ amount: '1351.85', loanPrincipalAmount: '1063.73', loanInterestAmount: '288.12' }];
+  const state = getDebtAccountState(account, payments);
+  assert.equal(state.pendingBalance, 114187.61);
+  assert.equal(state.paidAmount, 25812.39);
+  assert.equal(state.status, 'ACTIVE');
+  assert.equal(getDebtAccountState(account, [...payments, { amount: '100000' }]).pendingBalance, 114187.61);
+  assert.equal(getDebtAccountState({ ...account, currentBalance: '0' }, payments).status, 'PAID_OFF');
+  assert.equal(getDebtAccountState({ ...account, currentBalance: '0', status: 'CANCELLED' }, payments).status, 'CANCELLED');
+  const noSnapshot = getDebtAccountState({ ...account, currentBalance: null }, payments);
+  assert.equal(noSnapshot.pendingBalance, 138936.27);
+  assert.equal(noSnapshot.paidAmount, 1063.73);
+});
+
+test('préstamos: GET conserva el saldo bancario al registrar reembolsos o gastos', async () => {
+  const f = debtFixture();
+  const account = f.seed('payable', { originalAmount: '140000', accountType: 'LOAN', currentBalance: '114187.61', reimbursementReceivableId: 'receivable-linked' });
+  f.seed('receivable', { id: 'receivable-linked', originalAmount: '100000' });
+  await ok(f, 'incomes', 'POST', { ...payment('receivable', { id: 'receivable-linked' }, 28000) });
+  await ok(f, 'expenses', 'POST', payment('payable', account, 1351.85));
+  const payable = (await ok(f, 'payables', 'GET')).payables[0];
+  assert.equal(payable.pendingBalance, 114187.61);
+  assert.equal(payable.paidAmount, 25812.39);
+  assert.equal(payable.reimbursementReceivableId, 'receivable-linked');
+  assert.equal((await ok(f, 'receivables', 'GET')).receivables[0].pendingBalance, 72000);
+});
 async function ok(f, route, method, body) {
   const response = await f.call(route, method, body);
   assert.equal(response.status, 200, JSON.stringify(response.body));

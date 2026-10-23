@@ -23,7 +23,10 @@ export async function refreshDebtAccount(tx, userId, kind, id) {
   const relation = kind === "payable" ? "payableAccountId" : "receivableAccountId";
   const account = await tx[model].findUnique({ where: { id, userId } });
   if (!account) return;
-  const payments = await tx[movement].findMany({ where: { [relation]: id, userId }, select: { amount: true } });
+  const payments = await tx[movement].findMany({
+    where: { [relation]: id, userId },
+    select: { amount: true, ...(kind === "payable" ? { loanPrincipalAmount: true } : {}) },
+  });
   const state = getDebtAccountState(account, payments);
   if (account.status !== state.status) {
     await tx[model].update({ where: { id, userId }, data: { status: state.status } });

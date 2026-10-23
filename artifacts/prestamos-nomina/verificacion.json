@@ -1,0 +1,45 @@
+{
+  "date": "2026-10-22",
+  "scope": "Tres préstamos de nómina conciliados con contratos, cuatro recibos y una captura del portal; adaptación de lectura de préstamos existente.",
+  "database": {
+    "applied": true,
+    "createdPayables": 3,
+    "reimbursementLinks": 2,
+    "preservedIncomes": 45,
+    "preservedReceivables": 28,
+    "preservedExistingPayables": 6,
+    "createdExpenses": 0,
+    "createdIncomes": 0,
+    "tablesCompared": 32,
+    "onlyFinancialTableChanged": "payable_accounts: tres altas",
+    "calendar": "Los triggers existentes marcan la revisión; no se modificaron eventos de Google directamente.",
+    "migrations": 0,
+    "backupAndEvidence": "estados_cuenta/prestamos_nomina_2026-10-22/ (privado, excluido de Git)",
+    "routeVerification": "GET payables y bootstrap reales contra Prisma y Supabase reales, con autenticación simulada exclusivamente en el verificador local; lecturas sin escrituras."
+  },
+  "checks": {
+    "tests": { "passed": 308, "failed": 0, "skipped": 30, "skipReason": "Integraciones sin AFP_TEST_DATABASE_URL local." },
+    "build": "next build --webpack correcto, repetido tras la última modificación de pantalla/API.",
+    "lint": "Cero errores; advertencia anterior de TanStack Table. Archivos cambiados sin advertencias.",
+    "diffCheck": "correcto",
+    "browser": {
+      "data": "ficticios; interfaz y GET payables reales, autenticación y persistencia simuladas",
+      "widths": [320, 390, 1280],
+      "overflow": false,
+      "javascriptErrors": 0,
+      "balance": "Muestra capital pendiente conciliado, no el principal original ni una resta de cuotas con intereses.",
+      "reimbursement": "Dos vínculos, importe original por cobrar y parte propia diferenciada.",
+      "paymentHistory": "Abrir/cerrar el desglose conserva saldo y explica que la conciliación ya incluye capital amortizado.",
+      "touchLinks": "44 px",
+      "axe": { "violations": 0, "incomplete": "Contraste del botón existente de navegación, parcialmente cubierto por la cabecera." },
+      "screenshots": ["movil.png", "escritorio.png"]
+    }
+  },
+  "limits": [
+    "El saldo se conserva como última conciliación bancaria; no se estima otra amortización por el paso del tiempo.",
+    "Los reembolsos no modifican automáticamente el banco ni reconstruyen cobros anteriores no registrados.",
+    "Seguros e IVA globales no se asignan por préstamo sin evidencia del desglose.",
+    "Los otros dos Flex 3 en 1 no forman parte de los tres préstamos solicitados.",
+    "Código web pendiente de publicación autorizada; sin commit, push ni actualización de APK."
+  ]
+}
