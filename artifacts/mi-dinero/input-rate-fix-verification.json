@@ -1,0 +1,41 @@
+{
+  "verifiedAt": "2026-10-24T06:59:28.342Z",
+  "scope": "Auth ficticia, API real, PostgreSQL local desechable",
+  "keyboard": {
+    "initialZeroDeleted": true,
+    "typedDigitsSeparately": "15",
+    "typedDecimalSeparately": "0.15",
+    "discountZeroDeleted": true
+  },
+  "savedAccount": {
+    "annualYield": 15,
+    "yieldTaxPercent": 0,
+    "firstDailyYield": 4.11
+  },
+  "testsPassed": 31,
+  "webpackBuild": "passed",
+  "lint": "passed",
+  "productionFinancialWrites": 0,
+  "production": {
+    "verifiedAt": "2026-10-24T07:02:18.249Z",
+    "origin": "https://finanzas.garatachia.com",
+    "deploymentId": "dpl_mKj1cLUP81jkNrwbZXH4A13UtVfQ",
+    "state": "READY",
+    "aliasVerified": true,
+    "migrationsRequired": false,
+    "databaseWrites": 0,
+    "sourceCommit": "37227c82e97161c7e0d56eead49135550948c55a",
+    "workingTree": true,
+    "commitOrPushPerformed": false,
+    "sourceFiles": 322,
+    "sourceManifestSha256": "19648074300844230a75544c691cf288c7c6d180adcfff5ec48a4de7cafb3dba",
+    "changedRuntimeFile": "src/components/mi-dinero/MoneyEditor.jsx",
+    "changedRuntimeFileSha256": "e50eb66cdb561fe99b537356f1076570d921d5d089cc73f4e0562ea41f8e287e",
+    "publicScriptBefore": "https://finanzas.garatachia.com/_next/static/immutable/chunks/2hju0r7ika66b.js",
+    "publicScriptAfter": "https://finanzas.garatachia.com/_next/static/chunks/app/mi-dinero/page-4826fb20cae7175e.js",
+    "oldCoercionPresentBefore": true,
+    "oldCoercionAbsentAfter": true,
+    "errorOrFatalRuntimeLogsFound": 0,
+    "scope": "Teclado y guardado verificados en fixture local; en producción se verificaron alias, compilación y código JavaScript servido."
+  }
+}

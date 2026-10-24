@@ -20,7 +20,7 @@ La app utiliza saldos capturados por el usuario y movimientos registrados en AFP
 
 ## Capabilities and Constraints
 
-Mi dinero incorpora cuentas, conciliaciones, transferencias, asignación de movimientos, calendario de ingresos y gastos, proyección diaria resumida por mes y escenarios. Los pagos de crédito no duplican el consumo; los cobros pendientes no forman parte del saldo actual. La proyección depende de las condiciones configuradas. La interfaz está en español. El proyecto utiliza JavaScript, Next.js, Prisma y los componentes shadcn locales.
+Mi dinero incorpora cuentas, conciliaciones, transferencias, asignación de movimientos, calendario de ingresos y gastos, proyección diaria resumida por mes y escenarios. Los pagos de crédito no duplican el consumo; los cobros pendientes no forman parte del saldo actual. Los rendimientos diarios pueden incorporarse automáticamente como cálculos de AFP, con tramos y calendario de abonos; los abonos reales y las conciliaciones los sustituyen sin duplicarlos. La nómina puede adelantarse al día hábil bancario anterior. La proyección depende de las condiciones configuradas. La interfaz está en español. El proyecto utiliza JavaScript, Next.js, Prisma y los componentes shadcn locales.
 
 ## Evidence on Hand
 

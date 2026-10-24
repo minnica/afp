@@ -1,0 +1,74 @@
+{
+  "scope": "PAYROLL-only option advances a nominal payday to the previous Mexican banking day; source receipts and user amounts remain private.",
+  "tests": {
+    "passed": 687,
+    "failed": 0,
+    "skipped": 0,
+    "newUnitCases": 4,
+    "newPostgreSQLCases": 1
+  },
+  "database": {
+    "freshAndHistorical13Upgrade": true,
+    "migrations": 36,
+    "rlsTables": 41,
+    "diffEmpty": true
+  },
+  "checks": [
+    "weekends",
+    "bank holidays",
+    "February",
+    "nominal validity bounds",
+    "bimonthly phase",
+    "one-time payroll",
+    "payment advanced into previous month",
+    "actual-income substitution",
+    "skipped occurrences",
+    "explicit matches",
+    "scenario stop date",
+    "idempotent writes"
+  ],
+  "browser": {
+    "viewports": [
+      390,
+      1440
+    ],
+    "source": "Local fixture with fake Auth, real API and disposable PostgreSQL",
+    "allAmountsSynthetic": true,
+    "newOptionSavedAndReopened": true,
+    "firstExpectedDate": "2026-10-30",
+    "noActualIncomeCreated": true,
+    "horizontalOverflow": false
+  },
+  "lint": "passed",
+  "webpackBuild": "passed",
+  "detectorFindings": 0,
+  "reviewDisposition": "ship",
+  "reviewScope": "Ordinary payroll-calendar extension and list semantics, not the entire financial app",
+  "axe": {
+    "form": {
+      "counts": {
+        "inapplicable": 55,
+        "incomplete": 2,
+        "passes": 34,
+        "violations": 0
+      },
+      "violations": []
+    },
+    "plans": {
+      "counts": {
+        "inapplicable": 52,
+        "incomplete": 0,
+        "passes": 37,
+        "violations": 1
+      },
+      "violations": [
+        {
+          "id": "region",
+          "nodeCount": 13
+        }
+      ]
+    }
+  },
+  "a11yLimits": "Shared sidebar region remains outside scope; incomplete checks are retained. A separate transient success-toast check found pre-existing shared toast contrast below 4.5:1; no global theme change made.",
+  "privacy": "No net salary, bank balance, personal IDs or receipts are included; screenshots use fictional payroll of 5000."
+}

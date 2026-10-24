@@ -28,6 +28,8 @@ test('A11: recupera la migración original y conserva los trece checksums aplica
     '20261024020000_capture_bank_fallback',
     '20261025000000_add_money_accounts',
     '20261025010000_money_account_yields',
+    '20261025020000_automatic_money_yields',
+    '20261025030000_payroll_business_days',
   ]);
 });
 

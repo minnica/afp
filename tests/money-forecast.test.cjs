@@ -99,11 +99,11 @@ test('Mi dinero: rendimiento diario compuesto, redondeo, topes y reservas a la v
 test('Mi dinero: abono real del rendimiento sustituye estimación de ese día; vigencia termina', () => {
   const d = data({ incomes: [income({ amount: 8, date: '2026-10-25', incomeTypeId: 'yield' })] });
   Object.assign(d.accounts[0], { annualYield: 36.5, yieldBasis: 365, yieldIncomeTypeId: 'yield', yieldEndDate: '2026-10-26' });
-  const r = buildForecast(d, today); assert.equal(r.daily[1].balance, 10008); assert.equal(r.events.filter(e => e.kind === 'YIELD').length, 1); assert.equal(r.daily[2].balance, 10018.01);
+  const r = buildForecast(d, today); assert.equal(r.daily[1].balance, 10008); assert.equal(r.events.filter(e => e.kind === 'YIELD').length, 2); assert.equal(r.daily[2].balance, 10018.01); assert.ok(!r.events.some(e => e.kind === 'YIELD' && e.date > '2026-10-27'));
 });
 test('Mi dinero: retirar todo no bloquea dinero ni genera rendimiento sobre saldo negativo', () => {
   const d = data({ plans: [plan({ kind: 'EXPENSE', amount: 11000, frequencyMonths: 0, startDate: '2026-10-25' })] }); d.accounts[0].annualYield = 10;
-  const r = buildForecast(d, today); assert.equal(r.daily[1].balance, -1000); assert.equal(r.events.filter(e => e.kind === 'YIELD').length, 0);
+  const r = buildForecast(d, today); assert.equal(r.daily[1].balance, -997.26); assert.equal(r.events.filter(e => e.kind === 'YIELD').length, 1); assert.ok(!r.events.some(e => e.kind === 'YIELD' && e.date > '2026-10-25'));
 });
 test('Mi dinero: ausencia de cuentas y datos faltantes no simulan un saldo verificado', () => {
   const d = data({ routes: [], incomes: [income({})], plans: [plan({ accountId: 'missing' })] });
@@ -116,6 +116,10 @@ test('Mi dinero: fin de mes y año bisiesto sin duplicar días ajustados', () =>
 test('Mi dinero: validación de saldos, tasas y planes', () => {
   const valid = { name: 'Cuenta', kind: 'BANK', openingBalance: 0, reservedAmount: 0, asOf: today };
   assert.ok(accountSchema.safeParse(valid).success);
+  for (const [draft, expected] of [['', 0], ['15', 15], ['0.15', 0.15], ['15.125', 15.125]]) {
+    const account = accountSchema.parse({ ...valid, annualYield: draft, yieldTaxPercent: draft });
+    assert.equal(account.annualYield, expected); assert.equal(account.yieldTaxPercent, expected);
+  }
   for (const values of [{ openingBalance: true }, { openingBalance: '1.001' }, { asOf: '2026-02-30' }, { annualYield: -1 }, { yieldBasis: 0 }, { yieldFrequency: 'MONTHLY' }, { yieldCap: -1 }, { yieldStartDate: '2026-11-01', yieldEndDate: '2026-10-01' }]) assert.equal(accountSchema.safeParse({ ...valid, ...values }).success, false);
   assert.ok(planSchema.safeParse(plan()).success); assert.equal(planSchema.safeParse(plan({ kind: 'VARIABLE', categoryId: '' })).success, false);
 });

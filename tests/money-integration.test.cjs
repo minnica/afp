@@ -82,7 +82,7 @@ test('Mi dinero: API, PostgreSQL, aislamiento, cuentas, abonos, conciliación y 
     });
     await t.test('aislamiento entre usuarios, referencias ajenas y sin filtración por userId', async () => {
       actor = other.id; assert.equal((await read(`userId=${user.id}`)).forecast.accounts.length, 0);
-      for (const payload of [{ action: 'RECONCILE', accountId: account, version: 1, bankBalance: 1, reason: 'Ataque' }, { action: 'ROUTE', key: 'default:income', accountId: account, excluded: false }, { action: 'CARD_PAYMENT', cycleId: cycle.id, accountId: account, amount: 1, date: today, additional: true }]) assert.equal((await write(payload)).status, 404);
+      for (const payload of [{ action: 'RECONCILE', accountId: account, version: 1, bankBalance: 1, reason: 'Ataque' }, { action: 'UPDATE_ACCOUNT', id: account, version: 1, openingBalance: 1 }, { action: 'ROUTE', key: 'default:income', accountId: account, excluded: false }, { action: 'CARD_PAYMENT', cycleId: cycle.id, accountId: account, amount: 1, date: today, additional: true }]) assert.equal((await write(payload)).status, 404);
       assert.equal((await write({ action: 'CREATE_ACCOUNT', name: 'Ajena', kind: 'BANK', openingBalance: 1, reservedAmount: 0, asOf: today, yieldIncomeTypeId: type.id })).status, 404);
       actor = user.id; assert.equal((await read()).forecast.accounts.length, 2);
     });
@@ -91,6 +91,47 @@ test('Mi dinero: API, PostgreSQL, aislamiento, cuentas, abonos, conciliación y 
       assert.equal(rows.length, 8); assert.ok(rows.every(r => r.relrowsecurity));
       const before = await db.moneyAccount.findMany({ where: { userId: user.id } }); await read(); await read(); assert.deepEqual(await db.moneyAccount.findMany({ where: { userId: user.id } }), before);
       const headers = (await route.GET(request())).headers; assert.equal(headers.get('Cache-Control'), 'private, no-store');
+    });
+    await t.test('editar el saldo de referencia conserva movimientos, historial, versiones y reintentos', async () => {
+      const before = (await read()).forecast.accounts.find(a => a.id === account);
+      const incomeCount = await db.income.count({ where: { userId: user.id } });
+      const expenseCount = await db.dailyExpense.count({ where: { userId: user.id } });
+      const historyCount = await db.moneyReconciliation.count({ where: { accountId: account } });
+      const body = { action: 'UPDATE_ACCOUNT', operationId: randomUUID(), id: account, version: before.version, openingBalance: '11000.10' };
+      ok(await route.POST(request(body))); ok(await route.POST(request(body)));
+      let after = (await read()).forecast.accounts.find(a => a.id === account);
+      assert.equal(Number(after.openingBalance), 11000.10); assert.equal(after.balance, 11002.35);
+      assert.equal(after.delta, before.delta); assert.deepEqual(after.baseline, before.baseline); assert.equal(after.asOf, before.asOf);
+      assert.equal(after.version, before.version + 1);
+      assert.equal(await db.income.count({ where: { userId: user.id } }), incomeCount);
+      assert.equal(await db.dailyExpense.count({ where: { userId: user.id } }), expenseCount);
+      assert.equal(await db.moneyReconciliation.count({ where: { accountId: account } }), historyCount + 1);
+      const correction = after.reconciliations.find(r => r.reason.startsWith('Corrección del saldo de referencia'));
+      assert.equal(Number(correction.previousBalance), before.balance); assert.equal(Number(correction.bankBalance), after.balance);
+      assert.equal(Number(correction.snapshot.openingBalance), Number(before.openingBalance));
+      assert.equal(correction.snapshot.reconciliations, undefined);
+      assert.equal((await write({ ...body, operationId: randomUUID() })).status, 409);
+      assert.equal((await write({ ...body, operationId: randomUUID(), version: after.version, openingBalance: 'no es dinero' })).status, 400);
+      // La corrección y su historial se revierten juntos si falla otra parte de la edición.
+      assert.equal((await write({ ...body, operationId: randomUUID(), version: after.version, openingBalance: 1, name: 'Efectivo' })).status, 409);
+      after = (await read()).forecast.accounts.find(a => a.id === account);
+      assert.equal(Number(after.openingBalance), 11000.10);
+      assert.equal(await db.moneyReconciliation.count({ where: { accountId: account } }), historyCount + 1);
+      ok(await write({ action: 'UPDATE_ACCOUNT', id: account, version: after.version, name: 'Nómina corregida' }));
+      assert.equal(await db.moneyReconciliation.count({ where: { accountId: account } }), historyCount + 1);
+    });
+    await t.test('corregir una referencia anterior no repite ingresos ni transferencias posteriores', async () => {
+      const backdated = ok(await write({ action: 'CREATE_ACCOUNT', name: 'Referencia anterior', kind: 'BANK', openingBalance: 100, asOf: yesterday, reservedAmount: 0 })).id;
+      const deposit = await db.income.create({ data: { userId: user.id, incomeTypeId: type.id, source: 'QA', concept: 'Ingreso posterior a la referencia', date: new Date(today), amount: '7.89' } });
+      ok(await write({ action: 'ROUTE', key: `income:${deposit.id}`, accountId: backdated, excluded: false }));
+      ok(await write({ action: 'TRANSFER', fromAccountId: backdated, toAccountId: second, date: today, concept: 'Movimiento posterior', amount: 5 }));
+      const before = (await read()).forecast.accounts.find(a => a.id === backdated);
+      assert.equal(before.balance, 102.89);
+      ok(await write({ action: 'UPDATE_ACCOUNT', id: backdated, version: before.version, openingBalance: '300.01', asOf: today }));
+      const after = (await read()).forecast.accounts.find(a => a.id === backdated);
+      assert.equal(after.balance, 302.90); assert.equal(after.delta, 2.89);
+      assert.equal(after.asOf, before.asOf); assert.deepEqual(after.baseline, before.baseline);
+      assert.equal(after.reconciliations.length, 1);
     });
   } finally { await db.user.deleteMany({ where: { id: { in: [user.id, other.id] } } }); await db.$disconnect(); }
 });

@@ -6,12 +6,13 @@ import { accountSchema, reconcileSchema, planSchema, transferSchema, paymentSche
 import { todayInMexico, day, validDay } from '@/lib/money/dates';
 import { buildSources, accountBalances, exposure, cents, amount } from '@/lib/money/sources';
 import { planDates } from '@/lib/money/forecast';
+import { yieldRule, changedYieldHistory } from '@/lib/money/yieldRules';
 
 export async function loadMoneyData(db, userId) {
   const names = ['accounts', 'routes', 'plans', 'transfers', 'cards', 'cycles', 'incomes', 'expenses', 'subscriptions', 'purchases', 'receivables', 'payables', 'incomeTypes', 'categories'];
   const where = { userId };
   const values = await Promise.all([
-    db.moneyAccount.findMany({ where, orderBy: { createdAt: 'asc' }, include: { reconciliations: { orderBy: { createdAt: 'desc' }, take: 20 } } }),
+    db.moneyAccount.findMany({ where, orderBy: { createdAt: 'asc' }, include: { reconciliations: { orderBy: { createdAt: 'desc' } } } }),
     db.moneyRoute.findMany({ where }), db.moneyPlan.findMany({ where, include: { occurrences: true } }), db.moneyTransfer.findMany({ where }),
     db.card.findMany({ where }), db.cardCycle.findMany({ where, include: { card: true, credits: { include: { income: true } }, payments: true, moneyPayments: true } }),
     db.income.findMany({ where, orderBy: { date: 'desc' } }),
@@ -36,6 +37,10 @@ function requireRecord(rows, id) {
 }
 function version(record, value) { if (value !== record.version) throw new ApiAccessError('Este registro cambió. Actualiza la página y vuelve a intentarlo.', 409); }
 function canonical(value) { if (Array.isArray(value)) return value.map(canonical); if (value && typeof value === 'object') return Object.fromEntries(Object.keys(value).sort().map(key => [key, canonical(value[key])])); return value; }
+function accountSnapshot(account) {
+  const { reconciliations: _history, ...snapshot } = account;
+  return JSON.parse(JSON.stringify(snapshot));
+}
 
 export function routingOptions(data) {
   return [
@@ -54,29 +59,41 @@ export async function mutateMoney(db, userId, body, today = todayInMexico()) {
   return runDebtAccountOperation(db, userId, async tx => {
     const previous = await tx.moneyOperation.findUnique({ where: { userId_operationId: { userId, operationId: body.operationId } } });
     if (previous) { if (previous.fingerprint !== fingerprint) throw new ApiAccessError('El identificador ya corresponde a otra operación.', 409); return previous.result; }
-    const data = await loadMoneyData(tx, userId), { events } = buildSources(data);
+    const data = await loadMoneyData(tx, userId), { events } = buildSources(data, today);
     let result = { ok: true };
     if (body.action === 'CREATE_ACCOUNT') {
       const values = parsed(accountSchema, body);
       if (values.yieldIncomeTypeId) requireRecord(data.incomeTypes, values.yieldIncomeTypeId);
       if (values.asOf > today) throw new ApiAccessError('La fecha del saldo no puede ser futura.', 400);
-      const baseline = exposure(events, values.asOf, values.asOf);
-      const account = await tx.moneyAccount.create({ data: { ...values, yieldCap: values.yieldCap || null, yieldStartDate: values.yieldStartDate ? new Date(values.yieldStartDate) : null, yieldEndDate: values.yieldEndDate ? new Date(values.yieldEndDate) : null, yieldIncomeTypeId: values.yieldIncomeTypeId || null, asOf: new Date(values.asOf), userId, baseline } });
+      const baseline = exposure(events, values.asOf, values.asOf, false);
+      const account = await tx.moneyAccount.create({ data: { ...values, yieldDailyAmount: values.yieldDailyAmount === '' ? null : values.yieldDailyAmount, yieldInitialPendingDays: values.yieldInitialPendingDays ?? null, yieldHistory: [{ from: values.asOf, rule: yieldRule(values) }], yieldCap: values.yieldCap || null, yieldStartDate: values.yieldStartDate ? new Date(values.yieldStartDate) : null, yieldEndDate: values.yieldEndDate ? new Date(values.yieldEndDate) : null, yieldIncomeTypeId: values.yieldIncomeTypeId || null, asOf: new Date(values.asOf), userId, baseline } });
       // Un saldo de un día anterior se interpreta al cierre de ese día.
       result = { ok: true, id: account.id };
     } else if (body.action === 'UPDATE_ACCOUNT') {
       const account = requireRecord(data.accounts, body.id); version(account, body.version);
-      const values = parsed(accountSchema, { ...account, asOf: day(account.asOf), ...body, openingBalance: String(account.openingBalance) });
+      const values = parsed(accountSchema, { ...account, openingBalance: String(account.openingBalance), reservedAmount: String(account.reservedAmount), yieldCap: account.yieldCap == null ? null : String(account.yieldCap), yieldDailyAmount: account.yieldDailyAmount == null ? null : String(account.yieldDailyAmount), yieldStartDate: day(account.yieldStartDate), yieldEndDate: day(account.yieldEndDate), ...body, asOf: day(account.asOf) });
       if (values.yieldIncomeTypeId) requireRecord(data.incomeTypes, values.yieldIncomeTypeId);
-      await tx.moneyAccount.update({ where: { id: account.id, userId }, data: { name: values.name, kind: values.kind, reservedAmount: values.reservedAmount, annualYield: values.annualYield, yieldTaxPercent: values.yieldTaxPercent, yieldBasis: values.yieldBasis, yieldFrequency: values.yieldFrequency, yieldPayDay: values.yieldPayDay, yieldCap: values.yieldCap || null, yieldStartDate: values.yieldStartDate ? new Date(values.yieldStartDate) : null, yieldEndDate: values.yieldEndDate ? new Date(values.yieldEndDate) : null, yieldIncomeTypeId: values.yieldIncomeTypeId || null, version: { increment: 1 } } });
+      const history = changedYieldHistory(account, values, today);
+      const correction = cents(values.openingBalance) - cents(account.openingBalance);
+      const pendingCorrection = (values.yieldInitialPendingDays ?? null) !== account.yieldInitialPendingDays;
+      if (correction || pendingCorrection) {
+        const current = accountBalances([account], events, today)[0];
+        const revised = { ...account, ...values, asOf: account.asOf, yieldHistory: history };
+        const revisedData = { ...data, accounts: data.accounts.map(a => a.id === account.id ? revised : a) };
+        const corrected = accountBalances([revised], buildSources(revisedData, today).events, today)[0];
+        const reason = correction ? `Corrección del saldo de referencia del ${day(account.asOf)}: ${account.openingBalance} → ${values.openingBalance}.` : `Ajuste de días de rendimiento pendientes en la referencia del ${day(account.asOf)}: ${account.yieldInitialPendingDays ?? 'según historial'} → ${values.yieldInitialPendingDays ?? 'según historial'}.`;
+        await tx.moneyReconciliation.create({ data: { accountId: account.id, date: new Date(today), previousBalance: current.balance, bankBalance: corrected.balance, reason, snapshot: accountSnapshot(account) } });
+      }
+      await tx.moneyAccount.update({ where: { id: account.id, userId }, data: { name: values.name, kind: values.kind, openingBalance: values.openingBalance, reservedAmount: values.reservedAmount, annualYield: values.annualYield, yieldTaxPercent: values.yieldTaxPercent, yieldBasis: values.yieldBasis, yieldFrequency: values.yieldFrequency, yieldPayDay: values.yieldPayDay, autoYield: values.autoYield, yieldMethod: values.yieldMethod, yieldDailyAmount: values.yieldDailyAmount === '' ? null : values.yieldDailyAmount, yieldExcessRate: values.yieldExcessRate, yieldPayout: values.yieldPayout, yieldRounding: values.yieldRounding, yieldInitialPendingDays: values.yieldInitialPendingDays ?? null, yieldHistory: history, yieldCap: values.yieldCap || null, yieldStartDate: values.yieldStartDate ? new Date(values.yieldStartDate) : null, yieldEndDate: values.yieldEndDate ? new Date(values.yieldEndDate) : null, yieldIncomeTypeId: values.yieldIncomeTypeId || null, version: { increment: 1 } } });
     } else if (body.action === 'RECONCILE') {
       const values = parsed(reconcileSchema, body), account = requireRecord(data.accounts, values.accountId); version(account, values.version);
       const current = accountBalances([account], events, today)[0];
-      await tx.moneyReconciliation.create({ data: { accountId: account.id, date: new Date(today), previousBalance: current.balance, bankBalance: values.bankBalance, reason: values.reason, snapshot: JSON.parse(JSON.stringify(account)) } });
-      await tx.moneyAccount.update({ where: { id: account.id, userId }, data: { openingBalance: values.bankBalance, asOf: new Date(today), baseline: exposure(events, today, today), version: { increment: 1 } } });
+      await tx.moneyReconciliation.create({ data: { accountId: account.id, date: new Date(today), previousBalance: current.balance, bankBalance: values.bankBalance, reason: values.reason, snapshot: accountSnapshot(account) } });
+      await tx.moneyAccount.update({ where: { id: account.id, userId }, data: { openingBalance: values.bankBalance, asOf: new Date(today), baseline: exposure(events, today, today, false), yieldInitialPendingDays: null, version: { increment: 1 } } });
     } else if (body.action === 'ROUTE') {
       const event = events.find(e => e.key === body.key);
       if (!event && !routingOptions(data).some(r => r.key === body.key)) throw new ApiAccessError('Movimiento no encontrado.', 404);
+      if (event?.automaticYield) throw new ApiAccessError('El rendimiento calculado pertenece a esta cuenta. Ajusta su configuración o concilia el saldo.', 409);
       if (event?.ownPaymentId || event?.transferId) throw new ApiAccessError('Revierte el movimiento para cambiar su cuenta.', 409);
       if (body.clear === true) { await tx.moneyRoute.deleteMany({ where: { userId, key: body.key } }); }
       else {

@@ -1,0 +1,40 @@
+{
+  "verifiedAt": "2026-10-24T08:05:46.264Z",
+  "accountsConfigured": 3,
+  "linkedIncomeTypes": 3,
+  "automaticRoutes": 3,
+  "openingBalancesDatesAndBaselinesPreserved": true,
+  "currentBalancesUnchangedOnActivation": true,
+  "newIncomeRows": 0,
+  "newExpenseRows": 0,
+  "diDi": {
+    "annualYield": 15,
+    "cap": 10000,
+    "excessRate": 7,
+    "basis": 360,
+    "rounding": "DOWN",
+    "payout": "MX_BUSINESS",
+    "initialPendingDays": 1
+  },
+  "mercadoPago": {
+    "advertisedAnnualYield": 15,
+    "cap": 25000,
+    "observedDailyAmount": 9.7,
+    "payout": "MX_BUSINESS",
+    "initialPendingDays": 1,
+    "estimated": true
+  },
+  "nu": {
+    "capturedConditionsPreserved": true,
+    "comparisonPendingNextDay": true
+  },
+  "readOnlyForecastDates": [
+    "2026-10-24",
+    "2026-10-25",
+    "2026-10-26"
+  ],
+  "allExistingFinancialDataPreserved": true,
+  "existingIncomeTypesAndRoutesPreserved": true,
+  "dedicatedYieldTypesVerified": true,
+  "nonYieldingAccountUnchanged": true
+}

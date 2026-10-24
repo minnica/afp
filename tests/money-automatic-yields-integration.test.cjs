@@ -1,0 +1,50 @@
+const assert = require('node:assert/strict');
+const { test } = require('node:test');
+const { randomUUID } = require('node:crypto');
+const { PrismaClient } = require('@prisma/client');
+const { PrismaPg } = require('@prisma/adapter-pg');
+const { sourceLoader } = require('./helpers/load-source.cjs');
+const connectionString = process.env.AFP_TEST_DATABASE_URL;
+
+test('rendimientos automáticos: reglas históricas, abono real, conciliación y referencia en PostgreSQL', { skip: !connectionString }, async () => {
+  const url = new URL(connectionString);
+  assert.ok(['127.0.0.1', 'localhost'].includes(url.hostname) && /^\/afp_test[a-zA-Z0-9_]*$/.test(url.pathname) && !url.search);
+  const db = new PrismaClient({ adapter: new PrismaPg({ connectionString }) });
+  const user = await db.user.create({ data: { email: `auto-yield-${randomUUID()}@example.test` } });
+  const load = sourceLoader({ '@/lib/prisma': { prisma: db }, '@/lib/calendar/schedule': { scheduleCalendarSync: () => {} } });
+  const { mutateMoney, loadMoneyData } = load('src/lib/money/service.js'), { buildForecast } = load('src/lib/money/forecast.js');
+  const write = (body, date = '2026-10-26') => mutateMoney(db, user.id, { operationId: randomUUID(), ...body }, date);
+  const read = date => db.$transaction(async tx => { await tx.$executeRawUnsafe('SET TRANSACTION READ ONLY'); return buildForecast(await loadMoneyData(tx, user.id), date); }, { isolationLevel: 'RepeatableRead' });
+  try {
+    const { id } = await write({ action: 'CREATE_ACCOUNT', name: 'Cuenta automática ficticia', kind: 'BANK', openingBalance: 10000, asOf: '2026-10-23', reservedAmount: 0, annualYield: 36.5, autoYield: true });
+    let result = await read('2026-10-26'), account = result.accounts.find(a => a.id === id);
+    assert.equal(account.balance, 10030.03); assert.equal(await db.income.count({ where: { userId: user.id } }), 0);
+    await write({ action: 'UPDATE_ACCOUNT', id, version: account.version, annualYield: 18.25 }, '2026-10-25');
+    result = await read('2026-10-26'); account = result.accounts.find(a => a.id === id);
+    assert.equal(account.balance, 10025.02); assert.equal(account.yieldHistory.length, 2);
+    const type = await db.incomeType.create({ data: { userId: user.id, name: 'Rendimiento real ficticio' } });
+    await write({ action: 'UPDATE_ACCOUNT', id, version: account.version, yieldIncomeTypeId: type.id });
+    const income = await db.income.create({ data: { userId: user.id, incomeTypeId: type.id, source: 'QA', concept: 'Abono real ficticio', amount: 4.5, date: new Date('2026-10-26') } });
+    await write({ action: 'ROUTE', key: `income:${income.id}`, accountId: id, excluded: false });
+    result = await read('2026-10-26'); account = result.accounts.find(a => a.id === id);
+    assert.equal(account.balance, 10024.51); assert.equal(account.calculatedYield, 20.01);
+    await write({ action: 'RECONCILE', accountId: id, version: account.version, bankBalance: 11000, reason: 'Saldo bancario ficticio' });
+    result = await read('2026-10-26'); account = result.accounts.find(a => a.id === id);
+    assert.equal(account.balance, 11000); assert.equal(account.calculatedYield, 0);
+    assert.equal((await read('2026-10-27')).accounts.find(a => a.id === id).balance, 11005.50);
+    const correction = { action: 'UPDATE_ACCOUNT', operationId: randomUUID(), id, version: account.version, openingBalance: 11100 };
+    await write(correction); await write(correction);
+    assert.equal((await read('2026-10-26')).accounts.find(a => a.id === id).balance, 11100);
+    assert.equal((await read('2026-10-27')).accounts.find(a => a.id === id).balance, 11105.55);
+    assert.equal(await db.moneyReconciliation.count({ where: { accountId: id } }), 2);
+    await assert.rejects(write({ action: 'ROUTE', key: `yield:auto:${id}:2026-10-24`, accountId: id, excluded: false }), e => e.status === 409);
+    const before = await db.moneyAccount.findMany({ where: { userId: user.id } });
+    await Promise.all(Array.from({ length: 5 }, () => read('2026-10-27')));
+    assert.deepEqual(await db.moneyAccount.findMany({ where: { userId: user.id } }), before);
+    assert.equal(await db.income.count({ where: { userId: user.id } }), 1);
+    const stopped = await write({ action: 'CREATE_ACCOUNT', name: 'Activación posterior', kind: 'BANK', openingBalance: 5000, asOf: '2026-10-23', reservedAmount: 0, annualYield: 36.5, autoYield: false });
+    await write({ action: 'UPDATE_ACCOUNT', id: stopped.id, version: 1, autoYield: true });
+    assert.equal((await read('2026-10-26')).accounts.find(a => a.id === stopped.id).balance, 5000);
+    assert.equal((await read('2026-10-27')).accounts.find(a => a.id === stopped.id).balance, 5005);
+  } finally { await db.user.delete({ where: { id: user.id } }); await db.$disconnect(); }
+});

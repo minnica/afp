@@ -1,12 +1,13 @@
 import { Prisma } from '@prisma/client';
-import { day } from '@/lib/money/dates';
+import { day, addDays, todayInMexico } from '@/lib/money/dates';
+import { yieldHistory, ruleAt, dailyYieldCents, roundedYieldCents, paysOn, isRecordedYield } from '@/lib/money/yieldRules';
 export function cents(value) { return new Prisma.Decimal(value || 0).toDecimalPlaces(2, Prisma.Decimal.ROUND_HALF_UP).mul(100).toNumber(); }
 export function amount(value) { return value / 100; }
 export function resolveRoute(data, keys, fallback = {}) {
   for (const key of keys) { const route = data.routes.find(r => r.key === key); if (route) return route; }
   return fallback;
 }
-export function buildSources(data) {
+function rawSources(data) {
   const events = [], issues = [];
   const add = (event, keys, fallback) => {
     const route = resolveRoute(data, [event.key, ...keys], fallback);
@@ -43,11 +44,50 @@ export function buildSources(data) {
   return { events, issues };
 }
 
+// Los rendimientos son una vista calculada y reproducible, no ingresos bancarios
+// inventados. Consultar varias veces o recuperar días sin abrir AFP no duplica nada.
+export function buildSources(data, today = todayInMexico()) {
+  const result = rawSources(data), pendingYields = {};
+  for (const account of data.accounts || []) {
+    let pending = new Prisma.Decimal(0);
+    pendingYields[account.id] = pending;
+    if (!yieldHistory(account).some(r => r.rule.autoYield)) continue;
+    const references = new Map();
+    for (const reconciliation of [...(account.reconciliations || [])].reverse()) {
+      const snapshot = reconciliation.snapshot;
+      if (snapshot?.asOf && snapshot.openingBalance != null) references.set(day(snapshot.asOf), { ...snapshot, id: account.id });
+    }
+    references.set(day(account.asOf), account);
+    const ordered = [...references.values()].sort((a, b) => day(a.asOf).localeCompare(day(b.asOf)));
+    const calculated = [];
+    for (let date = day(ordered[0].asOf); date <= today; date = addDays(date, 1)) {
+      const reference = [...ordered].reverse().find(r => day(r.asOf) <= date);
+      const from = day(reference.asOf), rule = ruleAt(account, date);
+      const cashAt = target => target < from ? cents(reference.openingBalance) : cents(accountBalances([reference], [...result.events.filter(e => !e.automaticYield), ...calculated.filter(e => e.date > from)], target)[0].balance);
+      const firstEnabled = yieldHistory(account).filter(r => r.rule.autoYield && r.from >= from).sort((a, b) => a.from.localeCompare(b.from))[0]?.from;
+      const seedDate = firstEnabled && firstEnabled > from ? firstEnabled : from;
+      const seededPending = date === seedDate && reference.yieldInitialPendingDays != null;
+      if (seededPending) pending = dailyYieldCents(cashAt(addDays(date, -1)), rule, addDays(date, -1)).mul(reference.yieldInitialPendingDays);
+      // Lo indicado expresamente como pendiente aún no está en la referencia,
+      // incluso si se capturó en un día de abono. Se liquida en el próximo.
+      if (paysOn(rule, date) && !seededPending) {
+        const value = roundedYieldCents(pending, rule);
+        pending = new Prisma.Decimal(0);
+        if (value > 0 && date > from && !isRecordedYield(account, result.events, date)) calculated.push({ key: `yield:auto:${account.id}:${date}`, date, cents: value, label: `Rendimiento calculado · ${account.name}`, kind: 'AUTO_YIELD', accountId: account.id, automaticYield: true, excluded: false, status: 'CALCULATED', route: '/mi-dinero' });
+      }
+      if (date < today && rule.autoYield) pending = pending.add(dailyYieldCents(cashAt(date), rule, date));
+    }
+    result.events.push(...calculated);
+    pendingYields[account.id] = pending;
+  }
+  return { ...result, pendingYields };
+}
+
 // Agrupar abonos por corte impide que vincular evidencia al acumulado cree dinero.
-export function exposure(events, from, to) {
+export function exposure(events, from, to, includeAutomatic = true) {
   const result = {};
   for (const e of events) {
-    if (e.excluded || !e.date || e.date < from || e.date > to) continue;
+    if (e.excluded || !e.date || e.date < from || e.date > to || (!includeAutomatic && e.automaticYield)) continue;
     const key = e.paymentGroup ? `card-flow:${e.paymentGroup}` : e.key;
     result[key] ||= {};
     const account = e.accountId || 'UNASSIGNED';
@@ -57,7 +97,8 @@ export function exposure(events, from, to) {
 }
 export function accountBalances(accounts, events, today) {
   return accounts.map(account => {
-    const base = account.baseline || {}, current = exposure(events, day(account.asOf), today);
+    const applicable = events.filter(e => !e.automaticYield || e.date > day(account.asOf));
+    const base = account.baseline || {}, current = exposure(applicable, day(account.asOf), today);
     let delta = 0;
     for (const key of new Set([...Object.keys(base), ...Object.keys(current)])) {
       const now = current[key] || {}, before = base[key] || {};
@@ -72,6 +113,7 @@ export function accountBalances(accounts, events, today) {
       }
     }
     const balance = cents(account.openingBalance) + delta;
-    return { ...account, balance: amount(balance), available: amount(balance - cents(account.reservedAmount)), delta: amount(delta) };
+    const calculatedYield = applicable.filter(e => e.automaticYield && e.accountId === account.id && e.date <= today && !e.excluded).reduce((sum, e) => sum + e.cents, 0);
+    return { ...account, balance: amount(balance), available: amount(balance - cents(account.reservedAmount)), delta: amount(delta), calculatedYield: amount(calculatedYield), recordedBalance: amount(balance - calculatedYield) };
   });
 }

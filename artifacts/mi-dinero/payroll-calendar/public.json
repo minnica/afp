@@ -1,0 +1,39 @@
+{
+  "verifiedAt": "2026-10-24T08:23:05.648Z",
+  "domain": "https://finanzas.garatachia.com",
+  "routeStatus": 200,
+  "featureScript": "https://finanzas.garatachia.com/_next/static/chunks/app/mi-dinero/page-400a2ae731448a9a.js",
+  "featureScriptSha256": "23d0be4e7e326731256e1907649c678793d35f8a6d655722dc840fa9576efe28",
+  "payrollCalendarAndExistingYieldMarkersPresent": [
+    "payrollBusinessDays",
+    "yieldDailyAmount",
+    "MX_BUSINESS"
+  ],
+  "api": [
+    {
+      "method": "GET",
+      "authentication": "none",
+      "status": 401,
+      "cacheControl": "private, no-store"
+    },
+    {
+      "method": "GET",
+      "authentication": "invalid token",
+      "status": 401,
+      "cacheControl": "private, no-store"
+    },
+    {
+      "method": "POST",
+      "authentication": "none",
+      "status": 401,
+      "cacheControl": "private, no-store"
+    },
+    {
+      "method": "POST",
+      "authentication": "invalid token",
+      "status": 401,
+      "cacheControl": "private, no-store"
+    }
+  ],
+  "limitation": "Public deployment code and unauthenticated rejection verified. Real financial calculations are separately verified against production data in read-only PostgreSQL transactions; no valid production browser session used."
+}

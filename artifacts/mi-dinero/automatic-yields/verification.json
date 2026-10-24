@@ -1,0 +1,76 @@
+{
+  "scope": "Automatic derived daily yields; all browser financial data are fictitious; Auth stub, real API and local disposable PostgreSQL",
+  "tests": {
+    "passed": 682,
+    "failed": 0,
+    "skipped": 0,
+    "fullPostgreSQLSuite": true,
+    "newAutomaticYieldUnitCases": 14,
+    "newPostgreSQLIntegrationCases": 1
+  },
+  "databaseReproduction": {
+    "freshAndHistoric13Upgrade": true,
+    "migrations": 35,
+    "rlsTables": 41,
+    "diffEmpty": true,
+    "testsAtReproduction": 680,
+    "finalSuiteAfterAdditionalCases": 682
+  },
+  "lint": "passed",
+  "webpackBuild": "passed",
+  "browser": {
+    "viewports": [
+      320,
+      390,
+      1440
+    ],
+    "numericClearAndSave": true,
+    "datedRuleChangePreservesPast": true,
+    "recordedComponentsReplaceCalculatedDay": true,
+    "reconciliationAbsorbsCalculatedAndPreservesPending": true,
+    "overflowAt320": false
+  },
+  "axe": {
+    "accounts": {
+      "counts": {
+        "inapplicable": 55,
+        "incomplete": 1,
+        "passes": 34,
+        "violations": 0
+      },
+      "violations": []
+    },
+    "form": {
+      "counts": {
+        "inapplicable": 56,
+        "incomplete": 2,
+        "passes": 33,
+        "violations": 0
+      },
+      "violations": []
+    },
+    "projection": {
+      "counts": {
+        "inapplicable": 48,
+        "incomplete": 1,
+        "passes": 41,
+        "violations": 1
+      },
+      "violations": [
+        {
+          "id": "region",
+          "nodeCount": 13
+        }
+      ]
+    }
+  },
+  "axeLimitation": "Projection region finding concerns 13 shared sidebar nodes outside this extension. Some contrast checks are incomplete for occluded/offscreen elements. No claim of complete accessibility compliance.",
+  "detectorFindings": 0,
+  "review": {
+    "initialDisposition": "fix",
+    "materialFix": "Explain daily generation separately from account payout calendar",
+    "finalDisposition": "ship",
+    "scope": "Verdict pass of the single material copy fix"
+  },
+  "privacy": "No bank balances, IDs, private captures, tokens or connection strings are included. Screenshots contain synthetic QA data."
+}

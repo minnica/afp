@@ -1,0 +1,26 @@
+{
+  "verifiedAt": "2026-10-24T08:22:49.558Z",
+  "payrollPlansAdded": 1,
+  "existingIncomeTypeReused": true,
+  "destinationVerified": true,
+  "nominalDays": [
+    15,
+    31
+  ],
+  "advanceToPreviousBankingDay": true,
+  "futureDeposits": 23,
+  "firstDates": [
+    "2026-10-30",
+    "2026-11-13",
+    "2026-11-30"
+  ],
+  "currentBalancesUnchanged": true,
+  "allOtherFinancialSectionsPreserved": true,
+  "nonPayrollRoutesPreserved": true,
+  "payrollLoansNotSubtractedAgain": 3,
+  "newActualIncomes": 0,
+  "newActualExpenses": 0,
+  "idempotentRetriesVerified": true,
+  "privateSourceReceipts": 4,
+  "estimateMethod": "Median of verified net amounts; source amounts retained locally and omitted here"
+}

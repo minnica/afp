@@ -4,17 +4,21 @@ import { getDebtAccountState } from '@/lib/calculations/debtAccounts';
 import { calculateCycleAmount } from '@/lib/calculations/cardCycles';
 import { buildSubscriptionCharges } from '@/lib/subscriptionCharges';
 import { Prisma } from '@prisma/client';
+import { ruleAt, dailyYieldCents, roundedYieldCents, paysOn, isRecordedYield, previousBankingDay } from '@/lib/money/yieldRules';
 
+function planPayDate(plan, date) { return plan.kind === 'PAYROLL' && plan.payrollBusinessDays ? previousBankingDay(date) : date; }
 export function planDates(plan, from, to) {
   if (!plan.isActive) return [];
-  const start = day(plan.startDate), end = day(plan.endDate) || to;
-  if (!plan.frequencyMonths) return start >= from && start <= to && start <= end ? [start] : [];
+  const start = day(plan.startDate), end = day(plan.endDate);
+  if (!plan.frequencyMonths) { const date = planPayDate(plan, start); return date >= from && date <= to && (!end || start <= end) ? [date] : []; }
   const [sy, sm] = start.split('-').map(Number);
-  return monthRange(from, to).flatMap(month => {
+  // Un pago del primer día del mes siguiente puede adelantarse a este mes.
+  const lookahead = plan.kind === 'PAYROLL' && plan.payrollBusinessDays ? `${addMonths(to, 1)}-01` : to;
+  return [...new Set(monthRange(from, lookahead).flatMap(month => {
     const [y, m] = month.split('-').map(Number);
     if ((y * 12 + m - sy * 12 - sm) % plan.frequencyMonths !== 0) return [];
-    return [...new Set(plan.days.map(n => monthDay(month, n)))].filter(d => d >= from && d >= start && d <= end && d <= to);
-  }).sort();
+    return [...new Set(plan.days.map(n => monthDay(month, n)))].filter(d => d >= start && (!end || d <= end)).map(d => planPayDate(plan, d)).filter(d => d >= from && d <= to);
+  }))].sort();
 }
 function syntheticCycles(data, today, end) {
   const cycles = [...data.cycles];
@@ -35,8 +39,8 @@ function syntheticCycles(data, today, end) {
 export function buildForecast(data, today, options = {}) {
   const end = monthDay(addMonths(today, 11), 31), months = monthRange(today, end);
   const scenario = { collectionDelay: 0, variablePercent: 100, stopPayrollDate: '', extraAmount: 0, extraDate: '', extraAccountId: '', ...options };
-  const { events: actual, issues } = buildSources(data);
-  const accounts = accountBalances(data.accounts, actual, today);
+  const { events: actual, issues, pendingYields } = buildSources(data, today);
+  const accounts = accountBalances(data.accounts, actual, today).map(a => ({ ...a, pendingYield: amount(roundedYieldCents(pendingYields[a.id] || new Prisma.Decimal(0), ruleAt(a, today))) }));
   const future = actual.filter(e => !e.excluded && e.date > today && e.date <= end).map(e => ({ ...e, status: 'REGISTERED_FUTURE' }));
   const plannedCardExpenses = [];
   const add = event => { if (event.cents && event.date <= end) future.push({ ...event, date: event.date < today ? today : event.date, originalDate: event.date, status: event.status || 'EXPECTED' }); };
@@ -61,10 +65,11 @@ export function buildForecast(data, today, options = {}) {
       }
       continue;
     }
-    const dates = planDates(plan, plan.frequencyMonths ? currentStart : day(plan.startDate), end);
+    const effectiveStart = planPayDate(plan, day(plan.startDate)), effectiveEnd = plan.endDate ? planPayDate(plan, day(plan.endDate)) : null;
+    const dates = planDates(plan, plan.frequencyMonths ? currentStart : effectiveStart, end);
     const autoPaid = new Map();
     if (isIncome && plan.incomeTypeId) {
-      for (const e of actual.filter(e => e.incomeTypeId === plan.incomeTypeId && !e.planId && !e.excluded && e.date >= day(plan.startDate) && (!plan.endDate || e.date <= day(plan.endDate)))) {
+      for (const e of actual.filter(e => e.incomeTypeId === plan.incomeTypeId && !e.planId && !e.excluded && e.date >= effectiveStart && (!effectiveEnd || e.date <= effectiveEnd))) {
         const month = e.date.slice(0, 7); autoPaid.set(month, (autoPaid.get(month) || 0) + Math.abs(e.cents));
       }
     }
@@ -175,30 +180,27 @@ export function buildForecast(data, today, options = {}) {
   }
   const balances = Object.fromEntries(accounts.map(a => [a.id, cents(a.balance)]));
   const reserve = accounts.reduce((sum, a) => sum + cents(a.reservedAmount), 0), daily = [];
-  const accrued = Object.fromEntries(accounts.map(a => [a.id, new Prisma.Decimal(0)]));
+  const accrued = Object.fromEntries(accounts.map(a => [a.id, pendingYields[a.id] || new Prisma.Decimal(0)]));
   for (let date = today; date <= end; date = addDays(date, 1)) {
     let incoming = 0, outgoing = 0;
-    for (const e of future.filter(e => e.date === date && accountIds.has(e.accountId))) {
-      balances[e.accountId] += e.cents;
-      if (e.kind !== 'TRANSFER') { if (e.cents > 0) incoming += e.cents; else outgoing -= e.cents; }
-    }
-    // Rendimiento sobre saldo de cierre, disponible únicamente al abonarse.
-    // La reserva personal permanece en la cuenta y también genera rendimiento.
+    const flows = future.filter(e => e.date === date && accountIds.has(e.accountId));
+    // El abono usa los días previamente acumulados. Los movimientos de hoy
+    // cambian el capital de hoy, cuyo rendimiento se abonará después.
     for (const account of accounts) {
-      if (date <= today || !Number(account.annualYield)) continue;
-      const active = (!account.yieldStartDate || date >= day(account.yieldStartDate)) && (!account.yieldEndDate || date <= day(account.yieldEndDate));
-      if (active) {
-        const principal = Math.max(0, Math.min(balances[account.id], account.yieldCap == null ? Infinity : cents(account.yieldCap)));
-        accrued[account.id] = accrued[account.id].add(new Prisma.Decimal(principal).mul(account.annualYield).div(100).div(account.yieldBasis || 365).mul(new Prisma.Decimal(100).sub(account.yieldTaxPercent || 0)).div(100));
-      }
-      const recorded = actual.some(e => e.accountId === account.id && !e.excluded && account.yieldIncomeTypeId && e.incomeTypeId === account.yieldIncomeTypeId && e.date === date);
-      const value = recorded ? 0 : accrued[account.id].toDecimalPlaces(0, Prisma.Decimal.ROUND_HALF_UP).toNumber();
+      const rule = ruleAt(account, date);
+      if (date <= today || !paysOn(rule, date)) continue;
+      const value = isRecordedYield(account, actual, date) ? 0 : roundedYieldCents(accrued[account.id], rule);
       accrued[account.id] = new Prisma.Decimal(0);
       if (value > 0) {
         balances[account.id] += value; incoming += value;
         future.push({ key: `yield:${account.id}:${date}`, date, cents: value, label: `Rendimiento · ${account.name}`, kind: 'YIELD', accountId: account.id, status: 'ESTIMATED' });
       }
     }
+    for (const e of flows) {
+      balances[e.accountId] += e.cents;
+      if (e.kind !== 'TRANSFER') { if (e.cents > 0) incoming += e.cents; else outgoing -= e.cents; }
+    }
+    for (const account of accounts) accrued[account.id] = accrued[account.id].add(dailyYieldCents(balances[account.id], ruleAt(account, date), date));
     const total = Object.values(balances).reduce((a, b) => a + b, 0);
     daily.push({ date, balance: amount(total), available: amount(total - reserve), incoming: amount(incoming), outgoing: amount(outgoing), accounts: Object.fromEntries(Object.entries(balances).map(([id, n]) => [id, amount(n)])) });
   }

@@ -168,6 +168,7 @@ function assertCatalog(actual) {
   const moneyTables = ['money_accounts', 'money_reconciliations', 'money_routes', 'money_plans', 'money_occurrences', 'money_transfers', 'money_card_payments', 'money_operations'];
   for (const table of moneyTables) assert.ok(actual.security.some(row => row.table_name === table && row.rls));
   assert.ok(actual.constraints.some(row => row.name === 'money_accounts_yield_check'));
+  assert.ok(actual.constraints.some(row => row.name === 'money_accounts_automatic_yield_check'));
   assert.ok(actual.constraints.some(row => row.name === 'money_transfers_values_check'));
   assert.equal(actual.security.length, before.security.length + 25);
   for (const row of actual.security) {

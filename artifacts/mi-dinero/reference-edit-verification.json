@@ -1,0 +1,66 @@
+{
+  "verifiedAt": "2026-10-24T07:09:39.554Z",
+  "scope": "Auth ficticia, API real y PostgreSQL local desechable",
+  "viewport": 390,
+  "openingBefore": 10000,
+  "openingAfter": 9000.5,
+  "currentBefore": 10300.15,
+  "currentAfter": 9300.65,
+  "subsequentIncome": 500.25,
+  "subsequentExpense": 200.1,
+  "movementsPreserved": true,
+  "referenceDatePreserved": true,
+  "baselinePreserved": true,
+  "correctionHistoryCount": 1,
+  "auditContainsPreviousReference": true,
+  "focusReturnedToEdit": true,
+  "testsPassed": 33,
+  "failed": 0,
+  "skipped": 0,
+  "additionalChecks": [
+    "UUID idempotency",
+    "version conflict",
+    "cross-user isolation",
+    "rollback of reference and audit on failure",
+    "backdated reference with subsequent transfer"
+  ],
+  "lint": "passed",
+  "webpackBuild": "passed",
+  "migrationsRequired": false,
+  "productionFinancialWrites": 0,
+  "production": {
+    "verifiedAt": "2026-10-24T07:13:12.467Z",
+    "deploymentId": "dpl_6HShaM4uzRW9P5HsaU6tDmgYhUYr",
+    "state": "READY",
+    "domain": "https://finanzas.garatachia.com",
+    "aliasVerified": true,
+    "sourceCommit": "37227c82e97161c7e0d56eead49135550948c55a",
+    "workingTree": true,
+    "commitOrPushPerformed": false,
+    "files": 322,
+    "sourceManifestSha256": "98a9d0cdb6fcc493fa503a4b7e53364a26cda01de32cb891ac484f1be309572a",
+    "changedSourceHashes": {
+      "src/components/mi-dinero/MoneyContent.jsx": "63be70c2388c8d8b08aca08508c130f3d937833bf6465f05063de785204e1e47",
+      "src/lib/money/service.js": "5b767a9fa053c28940578b11d088e170af7dd30cb72351be493980078eb3bf4c"
+    },
+    "publicHelperAbsentBefore": true,
+    "publicHelperPresentAfter": true,
+    "publicScript": "https://finanzas.garatachia.com/_next/static/chunks/app/mi-dinero/page-d1b0a255314b7610.js",
+    "authenticationChecks": [
+      {
+        "method": "GET",
+        "status": 401,
+        "cacheControl": "private, no-store"
+      },
+      {
+        "method": "POST",
+        "status": 401,
+        "cacheControl": "private, no-store"
+      }
+    ],
+    "errorOrFatalRuntimeLogsFound": 0,
+    "migrationsRequired": false,
+    "financialWritesByAgent": 0,
+    "scope": "Flujo autenticado y datos verificados en fixture local; producción comprobada mediante compilación, alias, código servido y rechazo sin sesión."
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "deploymentId": "dpl_C28JwPsx1jSzN6tu95LLCoRvvc6Q",
+  "url": "https://finanzas.garatachia.com/mi-dinero",
+  "deploymentUrl": "https://afp-pvfzb5t2n-minnicas-projects.vercel.app",
+  "status": "READY",
+  "target": "production",
+  "framework": "nextjs",
+  "head": "37227c82e97161c7e0d56eead49135550948c55a",
+  "workingTree": true,
+  "commitOrPushPerformed": false,
+  "publishedFiles": 324,
+  "sourceManifestSha256": "01e810fb039d49507d774e2dbc1f714c5f6280a61685ec47d70c79cb3fb5843c",
+  "aliasVerified": true,
+  "migrations": 35,
+  "rlsTables": 41,
+  "newFinancialRows": 0,
+  "automaticAccounts": 3,
+  "readOnlyEngineDates": [
+    "2026-10-24",
+    "2026-10-25",
+    "2026-10-26"
+  ],
+  "runtimeScan": "## Runtime Logs\n\n**Project:** prj_FUBRDkPPFpOgJG9zuLLhTwm3JHKV\n**Deployment:** dpl_C28JwPsx1jSzN6tu95LLCoRvvc6Q\n**Time range:** 2026-10-24T08:02:33.336Z → 2026-10-24T08:05:43.195Z\n\nNo logs found for the specified criteria.",
+  "limitations": "The runtime scan covers only the immediate post-deployment window. Authenticated browser QA used a local fixture; production financial calculations were tested in read-only transactions."
+}
