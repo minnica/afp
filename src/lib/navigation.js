@@ -7,6 +7,7 @@ function CreditBalancesIcon(props) {
 }
 
 export const navItems = [
+  { label: "Mi dinero", href: "/mi-dinero", icon: CircleDollarSign },
   {
     label: "Gastos",
     href: "/gastos",

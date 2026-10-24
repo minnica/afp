@@ -1,0 +1,153 @@
+{
+  "feature": "Mi dinero",
+  "verifiedAt": "2026-10-24T06:34:51.870Z",
+  "status": "verificado localmente; publicación posterior documentada en production.json",
+  "bankSynchronization": false,
+  "currency": "MXN",
+  "interest": {
+    "frequency": "DAILY",
+    "availability": "a la vista, sin bloqueo",
+    "rateInput": "tasa anual nominal convertible a diaria",
+    "currentBalance": "solo referencia y movimientos registrados",
+    "future": "estimación diaria con capitalización, redondeo, tope y vigencia"
+  },
+  "automated": {
+    "command": "AFP_TEST_DATABASE_URL=<PostgreSQL local afp_test> pnpm test",
+    "tests": 665,
+    "passed": 665,
+    "failed": 0,
+    "skipped": 0,
+    "focusedTests": 31,
+    "databaseReproduction": {
+      "command": "AFP_MIGRATION_TEST_DATABASE_URL=<PostgreSQL local afp_test> pnpm db:verify",
+      "testsAtExecution": 664,
+      "migrations": 34,
+      "rlsTables": 41,
+      "emptyInstall": true,
+      "upgradeFromHistoricalMigrations": 13,
+      "prismaDiff": "empty",
+      "historyChecksums": true,
+      "oldRowsPreserved": true
+    },
+    "build": "pnpm exec next build --webpack: passed",
+    "lint": {
+      "full": "0 errors; 2 pre-existing TanStack warnings",
+      "changedTargets": "0 errors or warnings"
+    }
+  },
+  "browser": {
+    "fixture": "tests/helpers/money-browser-server.cjs",
+    "authentication": "ficticia y aislada",
+    "persistence": "API de Next y PostgreSQL reales, únicamente en localhost",
+    "data": "datos sintéticos de prueba; ninguna operación bancaria real",
+    "viewports": [
+      320,
+      390,
+      1280,
+      1440
+    ],
+    "documentOverflow": false,
+    "flows": [
+      {
+        "name": "Cuenta con rendimiento",
+        "openingBalance": 15000,
+        "reserve": 3000,
+        "annualRate": 10,
+        "cap": 10000,
+        "firstFutureDailyYield": 2.74,
+        "passed": true
+      },
+      {
+        "name": "Nómina",
+        "amountPerDeposit": 8000,
+        "days": [
+          15,
+          31
+        ],
+        "savedFromUI": true
+      },
+      {
+        "name": "Transferencia",
+        "amount": 250,
+        "sourceAfter": 14750,
+        "destinationAfter": 1250,
+        "totalPreserved": true
+      },
+      {
+        "name": "Abono a tarjeta",
+        "amount": 500,
+        "sourceAfter": 14250,
+        "cardPendingAfter": 2000,
+        "duplicateExpenseCreated": false
+      },
+      {
+        "name": "Validación del formulario",
+        "draftPreserved": true,
+        "inlineErrors": true,
+        "focusReturned": true
+      },
+      {
+        "name": "Sin nómina",
+        "reserveDate": "2026-11-06",
+        "zeroDate": "2026-11-16",
+        "actualBalanceUnchanged": true
+      }
+    ],
+    "accessibility": {
+      "axeVersion": "4.12.1",
+      "counts": {
+        "inapplicable": 51,
+        "incomplete": 1,
+        "passes": 38,
+        "violations": 0
+      },
+      "violations": [],
+      "manualChartContrast": {
+        "ticks": 6.94,
+        "line": 4.46
+      },
+      "limit": "Axe dejó comprobaciones de contraste incompletas. Se midieron manualmente ejes y línea; no representa una certificación completa de accesibilidad."
+    },
+    "screenshots": [
+      "desktop.png",
+      "mobile.png",
+      "user-320.png",
+      "user-1280.png",
+      "accounts-mobile.png",
+      "payment-error-mobile.png"
+    ]
+  },
+  "review": {
+    "skill": "impeccable",
+    "disposition": "ship",
+    "scope": "verdict pass: resuelto el único arreglo material de contraste; capturas de Proyección en cuatro anchos",
+    "detectorFindings": [],
+    "documentation": "extensión del sistema vigente; sin nuevo mundo visual"
+  },
+  "limitations": [
+    "Las proyecciones dependen de los importes, fechas y tasas capturados; no garantizan el saldo bancario futuro.",
+    "Los pagos acumulados antiguos sin historial individual conservan una fecha aproximada.",
+    "No se acreditó conciliación con saldos reales ni despliegue en producción."
+  ],
+  "sourceSha256": {
+    "prisma/schema.prisma": "b63af123d6293d9651d740d02b4d0e0e759fc942fb57ace151cb93bbce506786",
+    "src/lib/navigation.js": "814da01e90f7165167a795d436120280ddc21a84c3cbd06aa9b0a94e966cacef",
+    "src/lib/apiAuth.js": "412742410ae861b3455a750e1838c8a4fc4010ee06bf6e7d47f3904a0d126b52",
+    "src/app/api/money/route.js": "f468a033ea19b2ed81be91fb4ea938a219743dc330dca7c85a22feb6c00d89c2",
+    "src/app/mi-dinero/page.js": "5b235223cb6494e2970251cbb96f7e355768fa31385a528685d39a6dadea4706",
+    "src/lib/money/dates.js": "863efd8c6e30f10a9c5be5af9b584620f122c893c131a77755755a797cc571a5",
+    "src/lib/money/forecast.js": "263ecbbe8e0c0b128c180a5bbab38f20546a53e8ae092b06fa6226a8b6d06c28",
+    "src/lib/money/schema.js": "a63c9f640c5fb6f95676a910f33e07cb4a0024d67bfde977a23215e2875cc0b6",
+    "src/lib/money/service.js": "3097e28172bc1cde56a7057e4d391eb14f6eeddac229ddb63bbc45f811ee2c8a",
+    "src/lib/money/sources.js": "8e6537ed4682af89a61fd8f790916e78cd312542ade0fcfe86503ccd664db5ff",
+    "src/components/mi-dinero/MoneyContent.jsx": "78511e2178146fbcefef66d368197a89124c0bd110c109ce87f4bcf7ce99af9b",
+    "src/components/mi-dinero/MoneyEditor.jsx": "f795c132b6e6027f03aa34205d8097aec0212bfe181c5c87bb9f08d0cc04e2dd",
+    "src/components/mi-dinero/MoneyProjection.jsx": "f38227dccbdbd380c22e6d50d4c0a5dab5758020b97b5cb11bf29ca91c7332ca",
+    "src/components/mi-dinero/format.js": "166e53ace0ec09a31e1ad6c7f74f85a41667eaef67312de9e39ed305169ee787",
+    "prisma/migrations/20261025000000_add_money_accounts/migration.sql": "9c6c16b3095279e819a0028ab7ea139aa36cd1c420b1ef00fec66f89aded8eb5",
+    "prisma/migrations/20261025010000_money_account_yields/migration.sql": "187f6827879e60af3a4dac5589b3bd302b1bc9cddb237adaa94a53f9c2304518"
+  },
+  "scope": "Verificación local anterior a la publicación",
+  "productionModifiedDuringLocalVerification": false,
+  "productionReleaseEvidence": "production.json"
+}

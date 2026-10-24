@@ -1,0 +1,34 @@
+# AFP
+
+<!-- impeccable:product-schema 1 -->
+
+## Platform
+
+web
+
+## Users
+
+El propietario utiliza AFP para controlar sus finanzas personales, con acceso desde escritorio y celular.
+
+## Product Purpose
+
+Registrar gastos, ingresos y deudas y anticipar si el dinero disponible alcanza para los pagos futuros.
+
+## Operating Context
+
+La app utiliza saldos capturados por el usuario y movimientos registrados en AFP. El usuario eligió este mecanismo para Mi dinero; la sincronización directa con bancos queda fuera de este alcance.
+
+## Capabilities and Constraints
+
+Mi dinero incorpora cuentas, conciliaciones, transferencias, asignación de movimientos, calendario de ingresos y gastos, proyección diaria resumida por mes y escenarios. Los pagos de crédito no duplican el consumo; los cobros pendientes no forman parte del saldo actual. La proyección depende de las condiciones configuradas. La interfaz está en español. El proyecto utiliza JavaScript, Next.js, Prisma y los componentes shadcn locales.
+
+## Evidence on Hand
+
+README.md, prisma/schema.prisma y los módulos financieros existentes. Los datos financieros reales no se sustituyen por ejemplos; las pruebas usan datos ficticios aislados.
+
+## Product Principles
+
+- Explicar el origen y la fecha de cada importe.
+- Conservar la diferencia entre confirmado, previsto y pendiente de completar.
+- Evitar contabilizar dos veces una misma operación.
+- Mantener el acceso y la interacción utilizables desde el celular.

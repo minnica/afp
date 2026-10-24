@@ -1,0 +1,50 @@
+{
+  "verifiedAt": "2026-10-24T06:45:03.080Z",
+  "origin": "https://finanzas.garatachia.com",
+  "checks": [
+    {
+      "path": "/mi-dinero",
+      "method": "GET",
+      "invalidToken": false,
+      "status": 200,
+      "cacheControl": "public, max-age=0, must-revalidate",
+      "newNavigationPresent": true
+    },
+    {
+      "path": "/login",
+      "method": "GET",
+      "invalidToken": false,
+      "status": 200,
+      "cacheControl": "public, max-age=0, must-revalidate"
+    },
+    {
+      "path": "/api/money",
+      "method": "GET",
+      "invalidToken": false,
+      "status": 401,
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/money",
+      "method": "POST",
+      "invalidToken": false,
+      "status": 401,
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/money",
+      "method": "GET",
+      "invalidToken": true,
+      "status": 401,
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/incomes",
+      "method": "GET",
+      "invalidToken": false,
+      "status": 401,
+      "cacheControl": "private, no-store"
+    }
+  ],
+  "authenticatedProductionMutationPerformed": false
+}

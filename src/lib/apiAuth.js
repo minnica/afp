@@ -36,6 +36,9 @@ export function apiAccessErrorResponse(error) {
   if (error instanceof ApiAccessError) return apiResponse.json({ error: error.message }, { status: error.status });
   // Un ID ajeno y uno inexistente producen la misma respuesta.
   if (error.code === "P2025") return apiResponse.json({ error: "Registro no encontrado." }, { status: 404 });
+  if (String(error.message).includes("El total no puede ser menor que los abonos identificados")) {
+    return apiResponse.json({ error: "Este total incluye abonos identificados. Revierte primero el abono en Mi dinero o en Captura automática antes de reducir el total." }, { status: 409 });
+  }
   return null;
 }
 

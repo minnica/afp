@@ -20,6 +20,7 @@ La página inicial es `/dashboard`: `/` redirige allí, el login navega al Dashb
 |---|---|---|
 | `/gastos` | `GastosContent.jsx` | Registro y gestión de gastos diarios |
 | `/dashboard` | `DashboardContent.jsx` | Resumen financiero del período |
+| `/mi-dinero` | `MoneyContent.jsx` | Cuentas a la vista, movimientos, rendimiento diario y proyección de liquidez |
 | `/analisis` | `AnalysisContent.jsx` | Comparativos mensuales por semana, tarjeta y categoría |
 | `/compras-a-meses` | `ComprasAMesesContent.jsx` | Compras a meses / MSI en tarjeta |
 | `/suscripciones` | `SuscripcionesContent.jsx` | Suscripciones recurrentes |
@@ -59,6 +60,7 @@ La página inicial es `/dashboard`: `/` redirige allí, el login navega al Dashb
 | `GET/POST/PATCH/DELETE /api/cards` | `src/app/api/cards/route.js` — saldo estimado automático desde una captura bancaria inicial |
 | `GET /api/card-cycles` | `src/app/api/card-cycles/route.js` |
 | `GET /api/incomes` | `src/app/api/incomes/route.js` |
+| `GET/POST /api/money` | `src/app/api/money/route.js` — saldos, asignaciones, planes, conciliaciones, transferencias, abonos y escenarios |
 | `GET /api/installment-purchases` | `src/app/api/installment-purchases/route.js` |
 | `GET /api/subscriptions` | `src/app/api/subscriptions/route.js` |
 | `GET/POST /api/subscription-charges` | `src/app/api/subscription-charges/route.js` — cobros mensuales y acciones confirmar/omitir/restaurar; valida la sesión Supabase mediante Bearer |
@@ -132,6 +134,14 @@ Archivo: [`prisma/schema.prisma`](prisma/schema.prisma)
 | `ReceivableAccount` | `receivable_accounts` | Cuentas por cobrar |
 | `PayableAccount` | `payable_accounts` | Cuentas por pagar (simple o préstamo) |
 | `Income` | `incomes` | Ingresos registrados |
+| `MoneyAccount` | `money_accounts` | Cuenta a la vista, referencia bancaria, reserva voluntaria y tasa de rendimiento diario |
+| `MoneyReconciliation` | `money_reconciliations` | Historial de referencias de saldo; conserva la configuración anterior |
+| `MoneyRoute` | `money_routes` | Cuenta de destino/origen por regla o movimiento y vínculo opcional con una previsión |
+| `MoneyPlan` | `money_plans` | Nómina neta, ingreso, gasto previsto o presupuesto variable por categoría |
+| `MoneyOccurrence` | `money_occurrences` | Omisiones y cierres explícitos de fechas previstas |
+| `MoneyTransfer` | `money_transfers` | Transferencias entre cuentas propias con reversión conservada |
+| `MoneyCardPayment` | `money_card_payments` | Abonos individuales desde una cuenta a un corte, con fecha y reversión |
+| `MoneyOperation` | `money_operations` | Recibos idempotentes de operaciones por usuario y UUID |
 | `NoticeDismissal` | `notice_dismissals` | Aviso concreto oculto por usuario y mes calendario; no modifica registros financieros |
 | `CaptureDevice` | `capture_devices` | Identidad nativa revocable y propietario inmutable tras autorizar |
 | `CapturePairing` | `capture_pairings` | Código temporal de un solo uso, conservado como hash |
@@ -143,6 +153,38 @@ Archivo: [`prisma/schema.prisma`](prisma/schema.prisma)
 | `CaptureStatement` | `capture_statements` | Cotejo manual por tarjeta/período, huellas por movimiento y recibos de cargos faltantes |
 | `ExpenseTombstone` | `expense_tombstones` | Huella de borrados desde Fase 4 para revisar avisos tardíos |
 | `CaptureRateLimit` | `capture_rate_limits` | Límites de intentos persistentes entre instancias del servidor |
+
+### Mi dinero — cuentas, liquidez y rendimiento diario
+
+**Publicado en producción con autorización del propietario · 24 de octubre de 2026 UTC.** La nueva ruta `/mi-dinero` parte de saldos capturados y de los movimientos de AFP, según la elección del propietario. No conecta directamente con bancos. Presenta saldo registrado, disponible después de la reserva voluntaria, mínimo diario previsto, fecha de saldo cero y fecha en que se cruza la reserva. Proyecta desde hoy hasta el cierre del duodécimo mes calendario, con gráfica diaria, selector de cuenta/mes, movimientos explicados y resumen mensual. El mes actual es parcial, desde hoy.
+
+Para empezar:
+
+1. En **Cuentas**, agrega bancos, cajitas y efectivo. Un saldo fechado hoy representa lo que tienes al capturarlo, con los movimientos ya registrados incluidos; una fecha anterior representa el cierre de ese día. El historial anterior a la referencia no se vuelve a sumar.
+2. En **Asignación automática**, elige qué cuenta recibe cada tipo de ingreso/cobro y cuál paga cada tarjeta, suscripción o deuda. Las reglas específicas prevalecen sobre las generales. En **Movimientos**, corrige excepciones y revisa los registros sin cuenta. Para débito, registra el gasto con el método Efectivo de AFP y asigna la cuenta bancaria de salida.
+3. En **Planes**, configura la nómina neta depositada, otros ingresos, gastos previstos y presupuesto variable mensual por categoría. Una nómina con días `15, 31` usa el importe por depósito y ajusta el 31 al último día del mes. Se permiten pagos únicos, vigencia, pausas, omisiones y cierre de fechas. Las sugerencias de presupuesto muestran el promedio de los tres meses completos anteriores y cuántos tienen registros; no acreditan que el historial esté completo.
+4. En **Rendimiento diario**, captura la tasa anual nominal que informa el banco, su base de días, un tope remunerado opcional y vigencia. La tasa anual es solo la forma de expresar la tasa: **el cálculo y el abono proyectado siempre son diarios**. No existe una opción de abono mensual o anual, plazo forzoso ni bloqueo para retirar.
+5. Registra los abonos efectivamente recibidos en Ingresos o usa **Conciliar saldo** para cotejar con el banco. Una conciliación conserva saldo anterior, nuevo saldo, motivo y referencia previa. No crea un ingreso artificial. Los saldos actuales nunca incluyen intereses futuros estimados.
+
+Reglas de dinero y precisión:
+
+- Las cuentas trabajan en MXN. El cálculo usa centavos y redondeo decimal; no mezcla monedas. Una transferencia cambia la distribución entre cuentas y no modifica el ingreso, gasto ni patrimonio total. La reserva solo es una meta personal, no dinero congelado. Se avisa cuando una cuenta necesita fondos aunque el total de todas sea positivo.
+- Cada interés futuro se estima sobre el saldo positivo al cierre de ese día, después de los movimientos, hasta el tope remunerado si existe: `saldo remunerado × tasa anual / 100 / base de días`. Incluye el dinero de la reserva. El abono redondeado se suma ese día y puede generar rendimiento al siguiente. Se empieza mañana porque el saldo de hoy es la referencia registrada. Si se configura un descuento porcentual del interés, se aplica antes de redondear; no representa por sí mismo las reglas fiscales de un banco. La tasa se supone vigente hasta su fecha final o durante todo el horizonte si no hay vencimiento.
+- Vincular un tipo de ingreso de rendimiento a una cuenta permite sustituir la estimación de una fecha por su abono registrado para esa misma cuenta, evitando sumarlo dos veces. No se inventan ni persisten ingresos bancarios mediante una lectura. Las variaciones de tasa, retenciones y el método exacto de cálculo del banco pueden producir diferencias; la conciliación mantiene el saldo real como referencia.
+- Los ingresos y cobros registrados alimentan el saldo según su cuenta. Los pendientes por cobrar solo son previsión, limitados al saldo pendiente y sus fechas de cobro. Los ingresos aplicados como bonificación de tarjeta no se vuelven a sumar como efectivo.
+- Una compra con tarjeta no retira dinero de la cuenta. Las cuotas MSI, suscripciones y compras se incorporan al corte; la salida se produce al abonar la tarjeta. Para cortes futuros se reutiliza el cálculo existente sin crear ciclos en la BD. Un estado de cuenta capturado tiene prioridad sobre la estimación. Los abonos reducen el pendiente de ese corte; no crean otro gasto de consumo.
+- **Abonar a tarjeta** exige un pago nuevo ya aplicado por el banco y conserva su importe, fecha y cuenta. Los pagos individuales de captura automática se reutilizan. El resto de un acumulado histórico se representa con la última fecha de pago, marcada como aproximada; AFP no puede reconstruir las fechas ausentes. La evidencia de un pago ya incluido no cambia el saldo otra vez. Un trigger diferido protege el total identificado frente a ediciones incompatibles del acumulado en otros módulos.
+- Los préstamos de nómina se consideran descontados del ingreso neto de forma predeterminada. Su regla puede cambiarlos a pagos desde una cuenta. Una cuota de préstamo no se confunde con su saldo de capital; si faltan condiciones se solicita completar la previsión. No se infiere automáticamente un aumento futuro de la nómina al terminar un préstamo.
+- Los ingresos reales del tipo vinculado cubren las ocurrencias de un plan en orden dentro de su mes. El vínculo manual permite cobros parciales y fechas de otro mes. El presupuesto variable descuenta lo ya gastado en la categoría, excluye suscripciones/deudas y distribuye el resto entre los días restantes. Conviene completar el presupuesto para no tratar los gastos conocidos como el total del consumo futuro.
+- Los movimientos sin cuenta, compromisos sin fecha y posibles solapamientos generan avisos de cobertura. No se promete exactitud sobre cobros, ingresos, gastos o tasas que todavía no ocurrieron. Los escenarios de fin de nómina, retraso de cobros, cambio del presupuesto y compra extraordinaria solo cambian la proyección consultada.
+
+Persistencia y seguridad: ocho tablas propias con RLS sin políticas públicas, referencias validadas por propietario, identidad exclusiva del token Supabase y respuestas sin caché. Las mutaciones usan UUID y recibo idempotente, bloqueo transaccional por usuario y versiones para detectar ediciones concurrentes de cuentas/planes. Las lecturas consultan todos los ingresos necesarios, sin el límite de paginación de la pantalla Ingresos; una lectura o simulación no crea movimientos. Los cambios se recargan al volver a la pestaña, recuperar conexión y cada minuto visible.
+
+Migraciones aditivas: `20261025000000_add_money_accounts` y `20261025010000_money_account_yields`. Aplicar `prisma migrate deploy` y regenerar Prisma antes de usar esta versión. Conservan las tablas, movimientos y migraciones anteriores. **Aplicadas en producción con autorización del propietario.**
+
+Verificación local: reconstrucción de BD vacía y actualización desde las 13 migraciones históricas, **34 migraciones, 41 tablas con RLS y diff vacío**; **664 pruebas correctas, cero fallos y omisiones**. Después de los ajustes finales del cálculo y la interfaz, **665 pruebas completas y 31 dirigidas correctas**, sin fallos ni omisiones. Compilación Webpack correcta y lint sin errores nuevos. Pantalla revisada a 320, 390, 1280 y 1440 px; axe sin infracciones detectadas y contraste de ejes/línea medido manualmente. La revisión visual cerró con `ship` para el arreglo de contraste evaluado. El navegador usa Auth y datos ficticios, API real y PostgreSQL local desechable; no constituye una conciliación con saldos bancarios reales. [Evidencia y alcance](artifacts/mi-dinero/verificacion.json).
+
+**Publicación verificada:** Vercel `dpl_7r5Qq6i7RkGSgqo5yP693u8kT94x`, estado `READY`, sirve [Mi dinero](https://finanzas.garatachia.com/mi-dinero). Se publicaron 322 archivos del árbol probado sobre `098c3a6c`, sin commit ni push. Tras el respaldo privado de las 33 tablas anteriores se aplicaron las dos migraciones: 34 completas, diff vacío y 41 tablas con RLS sin políticas públicas. Los registros financieros, esquema y permisos anteriores y las automatizaciones se conservaron; solo variaron los datos operativos de dispositivos y límites de captura por su actividad concurrente. Las consultas y el cálculo de proyección se ejecutaron contra los datos reales en una transacción de solo lectura. No se crearon cuentas, saldos ni movimientos ficticios en producción: el propietario captura sus referencias bancarias al comenzar. La ruta responde 200 y la API rechaza GET/POST sin sesión y tokens inválidos con 401 y sin caché. No se observaron errores de runtime en la ventana inmediata revisada. El listado remoto permite cotejar 117 hashes sin diferencias, y el contenido de la página nueva coincide; su límite de profundidad/truncamiento impide afirmar una relectura íntegra de los 322 archivos. [Evidencia de producción](artifacts/mi-dinero/production.json), [migraciones](artifacts/mi-dinero/production-migration.json) y [lectura real sin escrituras](artifacts/mi-dinero/production-engine-read-only.json).
 
 ### Enums relevantes
 

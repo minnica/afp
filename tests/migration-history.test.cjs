@@ -26,6 +26,8 @@ test('A11: recupera la migración original y conserva los trece checksums aplica
     '20261023060000_receiver_payment_notices',
     '20261024010000_capture_mercadopago_purchase_policy',
     '20261024020000_capture_bank_fallback',
+    '20261025000000_add_money_accounts',
+    '20261025010000_money_account_yields',
   ]);
 });
 

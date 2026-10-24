@@ -1,0 +1,45 @@
+{
+  "deploymentId": "dpl_7r5Qq6i7RkGSgqo5yP693u8kT94x",
+  "deploymentState": "READY",
+  "projectId": "prj_FUBRDkPPFpOgJG9zuLLhTwm3JHKV",
+  "teamId": "team_5jQEAASyPb5wB0LxR9KsHf5X",
+  "productionDomain": "https://finanzas.garatachia.com",
+  "productionAliasVerified": true,
+  "previousDeployment": "dpl_8yKcSGBvDXXzxEoYbZ47AL9oCZcc",
+  "source": {
+    "baseCommit": "098c3a6c3ecff03b852056d455ce22da750f807b",
+    "workingTree": true,
+    "gitCommitOrPushPerformed": false,
+    "files": 322,
+    "manifestSha256": "0d1e4c6ced5028cebfbef66701b9d1e71dbf7609280005c10a396ba55438b8ec",
+    "manifest": "production-source-manifest.json",
+    "privateFilesUploaded": false,
+    "remoteSourceHashesMatched": 117,
+    "remoteSourceHashMismatches": 0,
+    "remotePageExact": true,
+    "remoteDatesModuleExact": true,
+    "limitation": "MCP limita profundidad del listado y trunca los contenidos largos; no se afirma haber releído íntegros los 322 archivos desde Vercel."
+  },
+  "database": {
+    "evidence": "production-migration.json",
+    "migrations": 34,
+    "rlsTables": 41,
+    "pending": 0,
+    "prismaDiff": "empty",
+    "oldFinancialRowsPreserved": true,
+    "newMoneyTables": 8,
+    "existingAutomationPreserved": true,
+    "backupPrivate": true
+  },
+  "runtime": {
+    "since": "2026-10-24T06:41:39.854Z",
+    "errorsFound": 0,
+    "errorOrFatalLogEntriesFound": 0,
+    "limitation": "Ventana inmediata y filtros de la función de Mi dinero/despliegue; no garantiza disponibilidad futura."
+  },
+  "http": "production-http.json",
+  "testFinancialDataInserted": false,
+  "accountsCreatedByAgent": 0,
+  "bankDataReconciled": false,
+  "verifiedAt": "2026-10-24T06:45:47.778Z"
+}

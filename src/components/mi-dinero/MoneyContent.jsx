@@ -1,0 +1,165 @@
+'use client';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { z } from 'zod';
+import { Plus, ArrowLeftRight, Pencil, RefreshCw, CreditCard, Wallet, TrendingUp } from 'lucide-react';
+import { apiFetch } from '@/lib/apiFetch';
+import { supabase } from '@/lib/supabase';
+import { ensureUserSetup } from '@/lib/userSetup';
+import { useDialogFocus } from '@/hooks/use-dialog-focus';
+import { accountSchema, reconcileSchema, planSchema, transferSchema, paymentSchema, scenarioSchema } from '@/lib/money/schema';
+import { day } from '@/lib/money/dates';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyContent, EmptyMedia } from '@/components/ui/empty';
+import { Item, ItemContent, ItemTitle, ItemDescription, ItemActions, ItemGroup, ItemSeparator } from '@/components/ui/item';
+import { ResponsiveSelect } from '@/components/ui/responsive-select';
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
+import { toast } from '@/components/ui/sonner';
+import MoneyEditor from './MoneyEditor';
+import MoneyProjection from './MoneyProjection';
+import { money, dateLabel, monthLabel, accountOptions } from './format';
+
+const routeSchema = z.object({ accountId: z.string().min(1, 'Selecciona una cuenta o un tratamiento.'), planChoice: z.string().optional() });
+const optional = (label, values) => [{ value: 'NONE', label }, ...values];
+const field = (name, label, extra = {}) => ({ name, label, ...extra });
+const amountField = (name, label, extra = {}) => field(name, label, { type: 'number', money: true, ...extra });
+
+export default function MoneyContent() {
+  const router = useRouter(), [data, setData] = useState(null), [userId, setUserId] = useState(null);
+  const [error, setError] = useState(''), [loading, setLoading] = useState(true), [editor, setEditor] = useState(null), [confirmation, setConfirmation] = useState(null), [confirming, setConfirming] = useState(false);
+  const [scenario, setScenario] = useState(null), [movementFilter, setMovementFilter] = useState('PENDING'), [query, setQuery] = useState(''), [limit, setLimit] = useState(30), [planMonth, setPlanMonth] = useState('');
+  const requestRef = useRef(null), savingRef = useRef(false), actorRef = useRef(null), scenarioRef = useRef(null);
+  const { captureFocus, restoreFocus } = useDialogFocus();
+  const load = useCallback(async (id, options = {}) => {
+    requestRef.current?.abort(); const controller = new AbortController(); requestRef.current = controller;
+    const params = new URLSearchParams(scenarioRef.current || {});
+    try {
+      const response = await apiFetch(`/api/money?${params}`, { expectedUserId: id, signal: controller.signal, ...options });
+      const body = await response.json(); if (controller.signal.aborted || actorRef.current !== id) return;
+      if (!response.ok) throw new Error(body.error || 'No se pudo cargar Mi dinero.');
+      setData(body); setError('');
+    } catch (failure) { if (!controller.signal.aborted) { setError(failure.message || 'No se pudo cargar Mi dinero.'); throw failure; } }
+  }, []);
+  useEffect(() => {
+    let cancelled = false;
+    async function initialize() {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (cancelled) return;
+        if (!session) { router.replace('/login'); return; }
+        actorRef.current = session.user.id; setUserId(session.user.id);
+        await ensureUserSetup(session.user); if (!cancelled) await load(session.user.id);
+      } catch (failure) { if (!cancelled) setError(failure.message || 'No se pudo cargar Mi dinero.'); }
+      finally { if (!cancelled) setLoading(false); }
+    }
+    void initialize();
+    const { data: subscription } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT' || (actorRef.current && session?.user.id && session.user.id !== actorRef.current)) {
+        actorRef.current = null; requestRef.current?.abort(); setData(null); setEditor(null); router.replace('/login');
+      }
+    });
+    return () => { cancelled = true; requestRef.current?.abort(); subscription.subscription.unsubscribe(); };
+  }, [load, router]);
+  useEffect(() => {
+    if (!userId) return;
+    const refresh = () => { if (!savingRef.current && document.visibilityState === 'visible') void load(userId, { errorMode: 'inline' }).catch(() => {}); };
+    window.addEventListener('focus', refresh); window.addEventListener('online', refresh); document.addEventListener('visibilitychange', refresh);
+    const timer = window.setInterval(refresh, 60000);
+    return () => { window.removeEventListener('focus', refresh); window.removeEventListener('online', refresh); document.removeEventListener('visibilitychange', refresh); clearInterval(timer); };
+  }, [userId, load]);
+  async function save(payload) {
+    if (payload.action === 'SCENARIO') {
+      const { action: _action, operationId: _operationId, ...values } = payload;
+      scenarioRef.current = values; setScenario(values); await load(userId); return;
+    }
+    if (payload.action === 'ROUTE') {
+      const [planId, occurrenceDate] = (payload.planChoice || '').split('|');
+      payload = { ...payload, excluded: payload.accountId === 'EXCLUDED', accountId: ['EXCLUDED', 'DEFAULT'].includes(payload.accountId) ? null : payload.accountId, clear: payload.accountId === 'DEFAULT', planId: planId || null, occurrenceDate: occurrenceDate || null };
+    }
+    savingRef.current = true; requestRef.current?.abort();
+    try {
+      const response = await apiFetch('/api/money', { method: 'POST', expectedUserId: userId, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      const result = await response.json(); if (!response.ok) throw new Error(result.error || 'No se pudo guardar.');
+      toast.success('Cambio guardado');
+      await load(userId, { mutationCompleted: true }).catch(() => {});
+    } finally { savingRef.current = false; }
+  }
+  function openAccount(account) {
+    const today = data.forecast.today;
+    setEditor({ title: account ? `Editar ${account.name}` : 'Agregar cuenta', description: 'Captura tu saldo disponible. Todo el dinero está a la vista; la reserva es una referencia personal.', action: account ? 'UPDATE_ACCOUNT' : 'CREATE_ACCOUNT', schema: accountSchema,
+      extra: account ? { id: account.id, version: account.version } : {},
+      values: { name: account?.name || '', kind: account?.kind || 'BANK', openingBalance: String(account?.openingBalance ?? ''), asOf: account ? day(account.asOf) : today, reservedAmount: String(account?.reservedAmount ?? 0), annualYield: Number(account?.annualYield || 0), yieldTaxPercent: Number(account?.yieldTaxPercent || 0), yieldBasis: account?.yieldBasis || 365, yieldFrequency: 'DAILY', yieldPayDay: 1, yieldCap: account?.yieldCap == null ? '' : String(account.yieldCap), yieldStartDate: day(account?.yieldStartDate) || '', yieldEndDate: day(account?.yieldEndDate) || '', yieldIncomeTypeId: account?.yieldIncomeTypeId || '' },
+      fields: [field('name', 'Nombre de la cuenta'), field('kind', 'Tipo', { options: [{ value: 'BANK', label: 'Cuenta bancaria' }, { value: 'SAVINGS', label: 'Ahorro a la vista / cajita' }, { value: 'CASH', label: 'Efectivo' }] }), ...(!account ? [amountField('openingBalance', 'Saldo de referencia'), field('asOf', 'Fecha del saldo', { type: 'date', help: 'Hoy: saldo actual con los movimientos ya registrados incluidos. Una fecha anterior: saldo al cierre de ese día.' })] : []), amountField('reservedAmount', 'Reserva personal', { help: 'Puedes usar este dinero cuando quieras. Sirve para avisarte si bajas de ese importe.' }),
+        amountField('annualYield', 'Tasa anual del banco (%)', { advanced: true, numeric: true, step: '0.0001', help: 'Se convierte en rendimiento diario y se suma cada día. Usa 0 si no genera rendimiento.' }),
+        field('yieldBasis', 'Días usados por el banco para calcular la tasa', { advanced: true, numeric: true, options: [365, 360, 366].map(n => ({ value: String(n), label: `${n} días` })) }),
+        amountField('yieldCap', 'Saldo máximo que genera rendimiento', { advanced: true, help: 'Opcional. No limita cuánto puedes retirar ni el saldo de la cuenta.' }),
+        amountField('yieldTaxPercent', 'Descuento sobre el rendimiento (%)', { advanced: true, numeric: true, help: 'Opcional: solo si el banco descuenta un porcentaje del interés generado. Con 0 se estima el rendimiento bruto.' }),
+        field('yieldStartDate', 'Inicio de vigencia de la tasa', { type: 'date', advanced: true }), field('yieldEndDate', 'Fin de vigencia de la tasa', { type: 'date', advanced: true, help: 'Opcional. Sin fecha, la proyección supone que la tasa se mantiene.' }),
+        field('yieldIncomeTypeId', 'Tipo de ingreso para los abonos de rendimiento', { advanced: true, nullable: true, options: optional('Sin vincular', data.incomeTypes.map(t => ({ value: t.id, label: t.name }))), help: 'Asigna cada abono a esta cuenta. El abono registrado sustituye el rendimiento estimado de ese día.' })] });
+  }
+  function openReconcile(account) {
+    setEditor({ title: `Conciliar ${account.name}`, description: `AFP calcula ${money(account.balance)}. Indica el saldo que ves ahora en el banco; la diferencia se conservará en el historial.`, action: 'RECONCILE', schema: reconcileSchema,
+      values: { accountId: account.id, version: account.version, bankBalance: String(account.balance), reason: '' }, fields: [amountField('bankBalance', 'Saldo actual del banco'), field('reason', 'Motivo o referencia')] });
+  }
+  function openTransfer() {
+    setEditor({ title: 'Transferir entre mis cuentas', description: 'Registra una transferencia realizada o programada. El total de tu dinero no cambia.', action: 'TRANSFER', schema: transferSchema,
+      values: { fromAccountId: '', toAccountId: '', amount: '', date: data.forecast.today, concept: 'Transferencia entre mis cuentas' }, fields: [field('fromAccountId', 'Cuenta de origen', { options: accountOptions(data.forecast.accounts) }), field('toAccountId', 'Cuenta de destino', { options: accountOptions(data.forecast.accounts) }), amountField('amount', 'Importe'), field('date', 'Fecha', { type: 'date' }), field('concept', 'Concepto')] });
+  }
+  function openPayment() {
+    setEditor({ title: 'Registrar abono a tarjeta', description: 'Este abono sale de tu cuenta y reduce el pendiente del corte. No crea otro gasto de consumo.', action: 'CARD_PAYMENT', schema: paymentSchema,
+      values: { cycleId: '', accountId: '', amount: '', date: data.forecast.today, additional: false }, fields: [field('cycleId', 'Corte a pagar', { options: data.cycles.filter(c => c.pending > 0).map(c => ({ value: c.id, label: `${c.cardName} · ${c.month}/${c.year} · ${money(c.pending)}` })) }), field('accountId', 'Cuenta de salida', { options: accountOptions(data.forecast.accounts) }), amountField('amount', 'Importe del nuevo abono'), field('date', 'Fecha del pago', { type: 'date' }), field('additional', 'El banco ya aplicó este pago y es adicional a los abonos registrados.', { type: 'checkbox' })] });
+  }
+  function openRoute(key, label, event) {
+    const route = data.routes.find(r => r.key === key);
+    setEditor({ title: label, description: 'La cuenta asignada actualiza sus movimientos automáticamente. Las excepciones de un movimiento tienen prioridad sobre las reglas generales.', action: 'ROUTE', schema: routeSchema, extra: { key }, values: { accountId: route?.excluded ? 'EXCLUDED' : route?.accountId || 'DEFAULT', planChoice: route?.planId ? `${route.planId}|${day(route.occurrenceDate)}` : '' }, fields: [field('accountId', 'Tratamiento del movimiento', { options: [{ value: 'DEFAULT', label: 'Usar regla general / quitar excepción' }, ...accountOptions(data.forecast.accounts), { value: 'EXCLUDED', label: 'Sin movimiento de dinero / ya descontado en nómina' }] }), ...(event ? [field('planChoice', 'Previsión que cubre este movimiento', { nullable: true, options: optional('Sin vínculo explícito', data.forecast.planOccurrences.filter(o => (event.amount > 0) === ['PAYROLL', 'INCOME'].includes(o.kind)).map(o => ({ value: `${o.planId}|${o.date}`, label: `${o.label} · ${dateLabel(o.date)} · ${money(o.pending)}` }))), help: 'Vincular sustituye el importe previsto; permite abonos parciales y cobros en otra fecha.' })] : [])] });
+  }
+  function openPlan(plan, suggestion) {
+    setEditor({ title: plan ? 'Editar previsión' : 'Agregar previsión', description: 'Configura ingresos, gastos o presupuesto variable. Las tarjetas, deudas y suscripciones de AFP ya se incluyen; evita registrarlas otra vez.', action: 'SAVE_PLAN', schema: planSchema, extra: plan ? { id: plan.id, version: plan.version } : {},
+      values: { name: plan?.name || suggestion?.name || '', kind: plan?.kind || (suggestion ? 'VARIABLE' : 'PAYROLL'), amount: String(plan?.amount ?? suggestion?.amount ?? ''), accountId: plan?.accountId || '', cardId: plan?.cardId || '', incomeTypeId: plan?.incomeTypeId || '', categoryId: plan?.categoryId || suggestion?.categoryId || '', startDate: day(plan?.startDate) || data.forecast.today, endDate: day(plan?.endDate) || '', frequencyMonths: plan?.frequencyMonths ?? 1, days: plan?.days || [15, 31], isActive: plan?.isActive ?? true },
+      fields: [field('name', 'Concepto'), field('kind', 'Tipo', { options: [{ value: 'PAYROLL', label: 'Nómina neta depositada' }, { value: 'INCOME', label: 'Otro ingreso previsto' }, { value: 'EXPENSE', label: 'Gasto previsto' }, { value: 'VARIABLE', label: 'Presupuesto de gastos variables' }] }), amountField('amount', 'Importe por fecha / presupuesto mensual', { help: 'Para nómina, usa lo que recibes después de los descuentos. En presupuesto variable, indica el total del mes.' }), field('accountId', 'Cuenta de entrada o salida', { options: accountOptions(data.forecast.accounts) }), field('frequencyMonths', 'Frecuencia', { numeric: true, options: [{ value: '0', label: 'Una sola vez' }, { value: '1', label: 'Cada mes' }, { value: '2', label: 'Cada dos meses' }, { value: '3', label: 'Cada tres meses' }, { value: '12', label: 'Cada año' }] }), field('days', 'Días del mes', { type: 'days', recurringDays: true, help: 'Ejemplo: 15, 31. El 31 se ajusta al último día del mes. No se usa para un pago único o presupuesto variable.' }), field('startDate', 'Desde', { type: 'date' }), field('endDate', 'Hasta (opcional)', { type: 'date' }), field('incomeTypeId', 'Tipo de ingreso a conciliar automáticamente', { nullable: true, kinds: ['PAYROLL', 'INCOME'], options: optional('Sin conciliación por tipo', data.incomeTypes.map(t => ({ value: t.id, label: t.name }))), help: 'Los ingresos de este tipo cubren las fechas previstas del mismo mes, en orden. Para otro mes, vincula el movimiento manualmente.' }), field('categoryId', 'Categoría del presupuesto variable', { nullable: true, kinds: ['VARIABLE'], options: optional('Sin categoría', data.categories.map(c => ({ value: c.id, label: c.name }))), help: 'El gasto registrado descuenta el presupuesto restante. Excluye suscripciones y pagos de deuda.' }), field('cardId', 'Si el gasto se hará con tarjeta', { nullable: true, kinds: ['EXPENSE', 'VARIABLE'], options: optional('Sale directamente de la cuenta', data.cards.map(c => ({ value: c.id, label: c.name }))), help: 'El importe se incorpora al corte y sale de tu cuenta al pagar la tarjeta.' }), field('isActive', 'Incluir esta previsión', { type: 'checkbox' })] });
+  }
+  function openScenario() {
+    setEditor({ title: 'Simular cambios', description: 'Compara con el plan actual. Este escenario solo modifica la proyección que estás viendo.', action: 'SCENARIO', schema: scenarioSchema,
+      values: scenario || { stopPayrollDate: '', collectionDelay: 0, variablePercent: 100, extraAmount: '0', extraDate: '', extraAccountId: '' }, fields: [field('stopPayrollDate', 'Dejar de recibir nómina desde', { type: 'date' }), field('collectionDelay', 'Retrasar cobros (días)', { type: 'number', numeric: true }), field('variablePercent', 'Gasto variable respecto al plan (%)', { type: 'number', numeric: true, help: '100 mantiene el presupuesto; 80 reduce un 20 %.' }), amountField('extraAmount', 'Compra adicional simulada'), field('extraDate', 'Fecha de la compra', { type: 'date' }), field('extraAccountId', 'Cuenta para la compra', { nullable: true, options: optional('Sin compra adicional', accountOptions(data.forecast.accounts)) })] });
+  }
+  function confirmAction(title, description, payload) { setConfirmation({ title, description, payload: { ...payload, operationId: crypto.randomUUID() } }); }
+  async function performConfirmed() { setConfirming(true); try { await save(confirmation.payload); setConfirmation(null); } catch (failure) { toast.error(failure.message); } finally { setConfirming(false); } }
+  const accounts = data?.forecast.accounts || [];
+  const movements = (data?.forecast.actual || []).filter(e => (movementFilter === 'ALL' || (movementFilter === 'PENDING' && e.needsAccount) || (movementFilter === 'EXCLUDED' && e.excluded)) && e.label.toLocaleLowerCase('es').includes(query.toLocaleLowerCase('es'))).sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+  return <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-5 md:py-8" onClickCapture={captureFocus}>
+    {loading ? <div className="flex flex-col gap-5" role="status" aria-label="Cargando Mi dinero"><Skeleton className="h-8 w-40" /><Skeleton className="h-32 w-full" /><Skeleton className="h-64 w-full" /></div> : error ? <Alert variant="destructive"><AlertDescription><p>{error}</p><Button variant="outline" onClick={() => void load(userId).catch(() => {})} className="mt-3 min-h-11">Reintentar</Button></AlertDescription></Alert> : data && <>
+      <div className="flex flex-wrap items-center justify-between gap-3"><div><h2 className="text-2xl font-semibold">Mi dinero</h2><p className="text-sm text-muted-foreground">Tus cuentas hoy y lo que viene después.</p></div><Button onClick={() => openAccount()} className="min-h-11"><Plus data-icon="inline-start" />Agregar cuenta</Button></div>
+      {!accounts.length ? <Empty><EmptyHeader><EmptyMedia variant="icon"><Wallet /></EmptyMedia><EmptyTitle>Empieza con lo que tienes hoy</EmptyTitle><EmptyDescription>Agrega tus cuentas, cajitas y efectivo con un saldo de referencia. Después podrás asignar los movimientos de AFP y proyectar tus próximos meses.</EmptyDescription></EmptyHeader><EmptyContent><Button onClick={() => openAccount()} className="min-h-11">Capturar mi primera cuenta</Button></EmptyContent></Empty> : <Tabs defaultValue="projection" className="flex flex-col gap-5">
+        <div className="overflow-x-auto"><TabsList className="w-max" variant="line">{[['projection', 'Proyección'], ['accounts', 'Cuentas'], ['movements', 'Movimientos'], ['plans', 'Planes'], ['routes', 'Asignación automática']].map(([value, label]) => <TabsTrigger key={value} value={value} className="min-h-11">{label}</TabsTrigger>)}</TabsList></div>
+        <TabsContent value="projection"><MoneyProjection data={data} onScenario={openScenario} onResetScenario={() => { scenarioRef.current = null; setScenario(null); void load(userId).catch(() => {}); }} /></TabsContent>
+        <TabsContent value="accounts" className="flex flex-col gap-5">
+          <div className="flex flex-wrap gap-2"><Button variant="outline" onClick={openTransfer} disabled={accounts.length < 2} className="min-h-11"><ArrowLeftRight data-icon="inline-start" />Transferir</Button><Button variant="outline" onClick={openPayment} className="min-h-11"><CreditCard data-icon="inline-start" />Abonar a tarjeta</Button></div>
+          <div className="grid gap-4 md:grid-cols-2">{accounts.map(account => <Card key={account.id}><CardHeader><div className="flex items-start justify-between gap-2"><CardTitle>{account.name}</CardTitle><Badge variant="outline">A la vista</Badge></div><CardDescription>Referencia: {dateLabel(day(account.asOf))}</CardDescription></CardHeader><CardContent className="flex flex-col gap-4"><div><p className="text-2xl font-semibold tabular-nums">{money(account.balance)}</p><p className="text-sm text-muted-foreground">Disponible tras tu reserva: {money(account.available)}</p></div>{Number(account.annualYield) > 0 && <div className="flex items-start gap-2"><TrendingUp className="size-4 shrink-0" /><p className="text-sm">Rendimiento diario · tasa anual {Number(account.annualYield)} %{account.yieldCap != null ? ` hasta ${money(account.yieldCap)}` : ''}. Los abonos futuros son estimados.</p></div>}<div className="flex flex-wrap gap-2"><Button variant="outline" onClick={() => openReconcile(account)} className="min-h-11"><RefreshCw data-icon="inline-start" />Conciliar saldo</Button><Button variant="ghost" onClick={() => openAccount(account)} className="min-h-11"><Pencil data-icon="inline-start" />Editar</Button></div>{!!account.reconciliations.length && <div className="flex flex-col gap-2"><h3 className="text-sm font-medium">Últimas conciliaciones</h3>{account.reconciliations.slice(0, 5).map(r => <p key={r.id} className="text-sm text-muted-foreground">{dateLabel(day(r.date))}: {money(r.previousBalance)} → {money(r.bankBalance)}. {r.reason}</p>)}</div>}</CardContent></Card>)}</div>
+          <p className="text-sm text-muted-foreground">Los saldos actuales usan movimientos registrados. Los rendimientos estimados aparecen en la proyección; registra los abonos reales como ingresos o concilia el saldo con el banco.</p>
+        </TabsContent>
+        <TabsContent value="movements" className="flex flex-col gap-4">
+          <div className="flex flex-wrap gap-2"><Button asChild variant="outline" className="min-h-11"><Link href="/ingresos">Registrar ingreso</Link></Button><Button asChild variant="outline" className="min-h-11"><Link href="/gastos">Registrar gasto</Link></Button><Button variant="outline" onClick={openPayment} className="min-h-11">Registrar abono a tarjeta</Button></div>
+          <div className="grid gap-4 sm:grid-cols-2"><div className="flex flex-col gap-2"><Label htmlFor="money-movement-filter">Mostrar</Label><ResponsiveSelect className="min-h-11" id="money-movement-filter" title="Filtrar movimientos" value={movementFilter} onValueChange={v => { setMovementFilter(v); setLimit(30); }} options={[{ value: 'PENDING', label: 'Sin cuenta asignada' }, { value: 'ALL', label: 'Todos los movimientos' }, { value: 'EXCLUDED', label: 'Sin efecto en cuentas' }]} /></div><div className="flex flex-col gap-2"><Label htmlFor="money-search">Buscar concepto</Label><Input id="money-search" value={query} onChange={e => { setQuery(e.target.value); setLimit(30); }} className="min-h-11" /></div></div>
+          <p className="text-sm text-muted-foreground">{movements.length} movimientos. Las compras con crédito salen de tu cuenta al pagar la tarjeta. Los movimientos anteriores a tu referencia no se vuelven a aplicar.</p>
+          <ItemGroup>{movements.slice(0, limit).map((event, index) => <div key={event.key}>{index > 0 && <ItemSeparator />}<Item className="flex-wrap px-0"><ItemContent><ItemTitle>{event.label}</ItemTitle><ItemDescription>{dateLabel(event.date)} · {event.excluded ? 'Sin efecto en cuentas' : accounts.find(a => a.id === event.accountId)?.name || 'Sin cuenta'}{event.approximateDate ? ' · fecha del último abono; detalle histórico incompleto' : ''}</ItemDescription></ItemContent><ItemActions className="flex-wrap"><span className="font-medium tabular-nums">{money(event.amount)}</span>{event.ownPaymentId || event.transferId ? <Button variant="ghost" className="min-h-11" onClick={() => confirmAction('Revertir movimiento', 'Se conservará el historial y se retirará su efecto sobre tus saldos.', { action: event.ownPaymentId ? 'REVERSE_PAYMENT' : 'REVERSE_TRANSFER', id: event.ownPaymentId || event.transferId })}>Revertir</Button> : <Button variant="outline" className="min-h-11" onClick={() => openRoute(event.key, 'Asignar movimiento', event)}>Asignar</Button>}</ItemActions></Item></div>)}</ItemGroup>
+          {!movements.length && <Empty><EmptyHeader><EmptyTitle>Sin movimientos en esta vista</EmptyTitle><EmptyDescription>Cambia el filtro o configura las cuentas por defecto.</EmptyDescription></EmptyHeader></Empty>}{movements.length > limit && <Button variant="outline" onClick={() => setLimit(v => v + 30)} className="min-h-11">Mostrar más</Button>}
+        </TabsContent>
+        <TabsContent value="plans" className="flex flex-col gap-4"><div className="flex flex-wrap items-center justify-between gap-3"><h2 className="text-lg font-semibold">Tus previsiones</h2><Button onClick={() => openPlan()} className="min-h-11"><Plus data-icon="inline-start" />Agregar previsión</Button></div><p className="text-sm text-muted-foreground">Las suscripciones, cuotas y cobros de AFP se incluyen automáticamente. Los préstamos de nómina se consideran ya descontados; puedes cambiarlo en Asignación automática.</p><ItemGroup>{data.plans.map(plan => <Item key={plan.id} variant="outline"><ItemContent><ItemTitle>{plan.name}</ItemTitle><ItemDescription>{money(plan.amount)} · {plan.isActive ? 'Activa' : 'Pausada'} · {accounts.find(a => a.id === plan.accountId)?.name}</ItemDescription></ItemContent><ItemActions><Button variant="outline" onClick={() => openPlan(plan)} className="min-h-11">Editar</Button></ItemActions></Item>)}</ItemGroup>{!data.plans.length && <Empty><EmptyHeader><EmptyTitle>Agrega tu próxima nómina</EmptyTitle><EmptyDescription>Configura el depósito neto y sus fechas. Después puedes añadir gastos variables y movimientos extraordinarios.</EmptyDescription></EmptyHeader><EmptyContent><Button onClick={() => openPlan()} className="min-h-11">Configurar previsión</Button></EmptyContent></Empty>}
+          {!!data.budgetSuggestions?.length && <div className="flex flex-col gap-3"><h3 className="text-lg font-semibold">Referencia para gastos variables</h3><p className="text-sm text-muted-foreground">Promedio de los tres meses completos anteriores, sin suscripciones ni pagos de deuda. Revisa que el historial esté completo antes de usarlo.</p><ItemGroup>{data.budgetSuggestions.map(s => <Item key={s.categoryId}><ItemContent><ItemTitle>{s.name}</ItemTitle><ItemDescription>{money(s.amount)} por mes · registros en {s.monthsWithRecords} de 3 meses</ItemDescription></ItemContent><ItemActions><Button variant="outline" className="min-h-11" onClick={() => openPlan(null, s)}>Usar referencia</Button></ItemActions></Item>)}</ItemGroup></div>}
+          {!!data.forecast.planOccurrences.length && <><h3 className="mt-4 text-lg font-semibold">Fechas previstas</h3><div className="max-w-sm"><Label htmlFor="money-plan-month">Mes de las previsiones</Label><ResponsiveSelect className="min-h-11" id="money-plan-month" title="Mes de las previsiones" value={planMonth || data.forecast.today.slice(0, 7)} onValueChange={setPlanMonth} options={[...new Set([data.forecast.today.slice(0, 7), ...data.forecast.planOccurrences.map(o => o.date.slice(0, 7))])].sort().map(m => ({ value: m, label: monthLabel(m) }))} /></div><ItemGroup>{data.forecast.planOccurrences.filter(o => o.date.slice(0, 7) === (planMonth || data.forecast.today.slice(0, 7))).map(o => <Item key={`${o.planId}:${o.date}`}><ItemContent><ItemTitle>{o.label}</ItemTitle><ItemDescription>{dateLabel(o.date)} · {o.status === 'PENDING' ? `pendiente ${money(o.pending)}` : o.status === 'MATCHED' ? 'Cubierta por movimientos' : o.status === 'SKIPPED' ? 'Omitida' : 'Cerrada con el importe real'}</ItemDescription></ItemContent><ItemActions>{o.status === 'PENDING' ? <><Button variant="ghost" className="min-h-11" onClick={() => confirmAction('Omitir esta fecha', 'Retira solo esta ocurrencia de la proyección. No registra dinero.', { action: 'OCCURRENCE', planId: o.planId, date: o.date, status: 'SKIPPED' })}>Omitir</Button><Button variant="outline" className="min-h-11" onClick={() => confirmAction('Cerrar previsión', 'Confirma que ya registraste el importe real en AFP y no esperas más dinero para esta fecha.', { action: 'OCCURRENCE', planId: o.planId, date: o.date, status: 'CLOSED' })}>Cerrar</Button></> : ['SKIPPED', 'CLOSED'].includes(o.status) && <Button variant="ghost" className="min-h-11" onClick={() => confirmAction('Restaurar previsión', 'Volverá a incluir el importe que falte para esta fecha.', { action: 'OCCURRENCE', planId: o.planId, date: o.date, status: 'RESTORE' })}>Restaurar</Button>}</ItemActions></Item>)}</ItemGroup></>}
+        </TabsContent>
+        <TabsContent value="routes" className="flex flex-col gap-4"><h2 className="text-lg font-semibold">Cuentas por defecto</h2><p className="text-sm text-muted-foreground">Una regla específica tiene prioridad sobre la general. Para gastos con débito, usa el método Efectivo en AFP y asigna aquí la cuenta bancaria de salida. Puedes corregir cada movimiento por separado.</p><ItemGroup>{data.routingOptions.map((option, index) => { const rule = data.routes.find(r => r.key === option.key); return <div key={option.key}>{index > 0 && <ItemSeparator />}<Item className="flex-wrap px-0"><ItemContent><ItemTitle>{option.label}</ItemTitle><ItemDescription>{rule ? rule.excluded ? 'Sin efecto en cuentas / descontado en nómina' : accounts.find(a => a.id === rule.accountId)?.name : option.payrollDefault ? 'Ya descontado de la nómina neta (por defecto)' : 'Usar regla general; sin asignación propia'}</ItemDescription></ItemContent><ItemActions><Button variant="outline" className="min-h-11" onClick={() => openRoute(option.key, option.label)}>Configurar</Button></ItemActions></Item></div>; })}</ItemGroup></TabsContent>
+      </Tabs>}
+    </>}
+    {editor && <MoneyEditor key={`${editor.action}:${editor.extra?.id || editor.extra?.key || editor.title}`} editor={editor} onClose={() => setEditor(null)} onSave={save} restoreFocus={restoreFocus} />}
+    <AlertDialog open={!!confirmation} onOpenChange={open => { if (!open && !confirming) setConfirmation(null); }}><AlertDialogContent onCloseAutoFocus={restoreFocus}><AlertDialogHeader><AlertDialogTitle>{confirmation?.title}</AlertDialogTitle><AlertDialogDescription>{confirmation?.description}</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel disabled={confirming}>Cancelar</AlertDialogCancel><AlertDialogAction disabled={confirming} onClick={e => { e.preventDefault(); void performConfirmed(); }}>{confirming ? 'Guardando…' : 'Confirmar'}</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
+  </div>;
+}
