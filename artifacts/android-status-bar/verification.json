@@ -1,0 +1,114 @@
+{
+  "checkedAt": "2026-10-24T05:31:24.052314+00:00",
+  "scope": "Barra de estado de AFP Android y metadatos de tema web",
+  "device": {
+    "model": "Samsung Galaxy S24 Ultra (SM-S928B)",
+    "android": 16,
+    "api": 36,
+    "physicalDevice": true
+  },
+  "preparedApk": {
+    "versionName": "0.7.1",
+    "versionCode": 10,
+    "path": "android/app/build/outputs/apk/release/app-release.apk",
+    "sha256": "eba6fcbc7cefea1a0beb2104ece9c9d7a3001ab0b33414f50f5f28905082c594",
+    "existingProductionCertificatePreserved": true
+  },
+  "personalInstallation": {
+    "versionName": "0.7.1",
+    "versionCode": 10,
+    "updateStatus": "installed-and-verified-after-explicit-user-approval",
+    "method": "adb install -r",
+    "firstInstallTimePreserved": "2026-10-20 23:45:31",
+    "notificationAccessGranted": true,
+    "batteryOptimizationExempt": true,
+    "domain": "finanzas.garatachia.com",
+    "domainVerificationState": "verified",
+    "bindingStillAuthorized": true,
+    "existingDataCleared": false
+  },
+  "verification": {
+    "webBuild": "pnpm build: passed",
+    "webLint": "pnpm exec eslint src/app/layout.js: passed",
+    "webAndroidTests": {
+      "passed": 3,
+      "failed": 0
+    },
+    "builtHtml": {
+      "routes": [
+        "/login",
+        "/dashboard",
+        "/gastos"
+      ],
+      "themeColor": "#09090b",
+      "colorScheme": "dark",
+      "zoomRestrictionsAdded": false
+    },
+    "androidBuild": "debug and release: passed",
+    "androidJvmTests": {
+      "passed": 19,
+      "failed": 0,
+      "skipped": 1,
+      "skipReason": "Optional HTTPS integration fixture not configured"
+    },
+    "androidLint": {
+      "errors": 0,
+      "warnings": 9,
+      "warningsPreExisting": true
+    },
+    "instrumentedTests": {
+      "passed": 3,
+      "failed": 0,
+      "applicationId": "com.garatachia.afp.dev",
+      "classes": [
+        "TwaNavigationTest",
+        "DiagnosticStoreTest#twaUrlIsResolvedAsTextInTheInstalledManifest",
+        "DiagnosticStoreTest#twaAuxiliaryComponentsCanBeManagedByBrowserHelper"
+      ]
+    },
+    "impeccableDetector": {
+      "findings": 0
+    },
+    "screenshots": {
+      "personalBefore": {
+        "file": "before.png",
+        "statusBarPixel": "srgba(255,255,255,1)"
+      },
+      "debugDarkMode": {
+        "file": "debug-dark.png",
+        "statusBarPixel": "srgba(9,9,11,1)"
+      },
+      "debugLightMode": {
+        "file": "debug-light.png",
+        "statusBarPixel": "srgba(9,9,11,1)"
+      },
+      "note": "Physical-device screenshots cropped to the top 160px to exclude financial content. Debug opens a Custom Tab; release was verified in the trusted production TWA after reopening its existing Chrome window.",
+      "personalTwaDarkMode": {
+        "file": "release-dark.png",
+        "statusBarPixel": "srgba(9,9,11,1)"
+      },
+      "personalTwaLightMode": {
+        "file": "release-light.png",
+        "statusBarPixel": "srgba(9,9,11,1)"
+      },
+      "personalAfterActualOpenAfpButton": {
+        "file": "release-final.png",
+        "statusBarPixel": "srgba(9,9,11,1)"
+      }
+    },
+    "phoneNightModeRestored": "yes",
+    "productionWebPublished": false,
+    "databaseChanges": false,
+    "personalNativeStateLabels": [
+      "Teléfono autorizado para enviar eventos",
+      "Pausar recepción"
+    ],
+    "existingChromeWindow": "The 0.7.0 window retained its old color. Reopening only the AFP task applied the new parameters; no browser data was cleared.",
+    "actualOpenAfpButton": "Tapped through the native accessibility hierarchy; Chrome displayed the dark status bar.",
+    "temporaryDebugInstallationRemoved": true
+  },
+  "technicalReferences": [
+    "https://github.com/GoogleChrome/android-browser-helper/blob/main/androidbrowserhelper/src/main/java/com/google/androidbrowserhelper/trusted/LauncherActivityMetadata.java",
+    "https://nextjs.org/docs/app/api-reference/functions/generate-viewport"
+  ]
+}

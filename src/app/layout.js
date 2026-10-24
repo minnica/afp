@@ -15,6 +15,11 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+export const viewport = {
+  themeColor: "#09090b",
+  colorScheme: "dark",
+};
+
 export const metadata = {
   title: "Control de Gastos",
   description: "App personal para gastos, tarjetas y cuentas por cobrar",

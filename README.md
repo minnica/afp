@@ -533,6 +533,14 @@ El `NotificationListenerService` acepta únicamente los ocho paquetes verificado
 
 Guía de instalación, compilación, firma y pruebas: [docs/android-captura.md](docs/android-captura.md). Alcance, actividades concluidas y comprobaciones pendientes: [PLAN_CAPTURA_AUTOMATICA_ANDROID.md](PLAN_CAPTURA_AUTOMATICA_ANDROID.md). Evidencia de fuentes y campos: [matriz de formatos](android/diagnostics/format-matrix.md). La fase solo podrá cerrarse después de verificar TWA y avisos reales en el S24 Ultra; los ejemplos sintéticos no acreditan cobertura bancaria.
 
+### Barra de estado Android — tema oscuro
+
+La APK **0.7.1 / versionCode 10** configura explícitamente el fondo `#09090B` de la barra de estado de la TWA, tanto con el tema claro como con el oscuro de Android. Browser Helper usaba blanco al no encontrar esos metadatos, aunque el manifest web declarara un tema oscuro. Las pantallas nativas conservan iconos claros sobre su fondo oscuro, independientemente del tema del teléfono. La web declara también `theme-color` y `color-scheme: dark` desde el layout raíz, y `.dark` informa el esquema de color al navegador.
+
+Actualizar la APK con la firma existente aplica la corrección a la TWA sin requerir un despliegue web; las etiquetas de la PWA se aplicarán al publicar la web. La actualización conserva la instalación y los datos mediante `adb install -r`. No requiere migraciones ni cambios de captura. Estado y comprobaciones: [guía Android](docs/android-captura.md#barra-de-estado-oscura--071).
+
+**Instalada con autorización · 24 de octubre de 2026 UTC:** AFP personal **0.7.1 / 10** en el S24 Ultra. La TWA real muestra el fondo oscuro e iconos claros con Android claro y oscuro. Se conservaron la firma, fecha inicial de instalación, acceso a notificaciones, batería exenta y dominio verificado. Se reabrió desde cero la ventana anterior de AFP para retirar los parámetros de color de 0.7.0, sin borrar datos. Build web, APK debug/release, lint y pruebas dirigidas correctos; el cambio web queda sin publicar. [Evidencia](artifacts/android-status-bar/verification.json).
+
 ### Vinculación y recepción — Fase 2
 
 **Implementada, verificada y vinculada en producción en el S24 Ultra · 21 de octubre de 2026.** La APK **0.2.0 / versionCode 4**, ya instalada, incorpora vinculación nativa, estado, pausa/reanudación y desvinculación. Configuración incluye «Captura automática», con autorización de código, lista propia, pausa/reanudación y revocación confirmadas. Las pruebas automatizadas utilizaron exclusivamente desarrollo; posteriormente se actualizó y vinculó la APK de producción con autorización del usuario.
