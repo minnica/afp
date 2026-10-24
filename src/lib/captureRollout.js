@@ -7,7 +7,7 @@ import { matchesCapturePolicy } from "@/lib/captureFormatPolicy";
 export const captureActivationReasons = {
   UNVERIFIED_FORMAT: "Faltan muestras reales verificadas de este formato.",
   NO_VERIFIED_ALIAS: "Falta una terminación verificada de esta tarjeta y fuente.",
-  AMBIGUOUS_ALIAS: "Una terminación de esta fuente también pertenece a otra tarjeta. Revisa los alias.",
+  AMBIGUOUS_ALIAS: "Una terminación también pertenece a otra tarjeta. Revisa los alias.",
   NO_REVIEWED_CAPTURE: "Revisa, registra o vincula y concilia una propuesta de esta tarjeta y formato, sin corregir los datos interpretados.",
   FORMAT_POLICY_REQUIRED: "Confirma la regla del formato con tarjeta, MXN y fecha del aviso; incluye la suscripción cuando corresponda.",
 };
@@ -50,7 +50,8 @@ export function captureFormatReadiness(parser, cardId, aliases, movements, autom
   const own = aliases.filter(alias => alias.cardId === cardId && aliasSupportsParser(alias, parser));
   const verified = own.filter(alias => alias.verifiedAt);
   const ambiguous = parser.completionPolicy ? [] : own.filter(alias => aliases.some(other => other.cardId !== cardId
-    && aliasSupportsParser(other, parser) && (parser.aliasKinds || other.kind === alias.kind) && other.value === alias.value));
+    && (aliasSupportsParser(other, parser) || (parser.rejectCrossBankAliasCollision && parser.aliasKinds.includes(other.kind)))
+    && (parser.aliasKinds || other.kind === alias.kind) && other.value === alias.value));
   const reviewed = movements.filter(movement => movement.cardId === cardId && isReviewedCapture(movement, parser, aliases, automations));
   const policy = automations.find(policy => policy.cardId === cardId && matchesCapturePolicy(policy, parser));
   const blockers = [];

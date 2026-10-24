@@ -26,6 +26,12 @@ export async function resolveCaptureIdentity(tx, event, interpretation, parser) 
   if (cards.length !== 1) return { ...interpretation, reason: cards.length ? "AMBIGUOUS_CARD" : "UNKNOWN_CARD" };
   const alias = aliases.find(alias => alias.verifiedAt);
   if (!alias) return { ...interpretation, reason: "UNVERIFIED_ALIAS" };
+  // «TDC Platinum» no identifica el banco. Además del alias BBVA verificado,
+  // rechazar terminaciones compartidas con otra tarjeta bancaria del propietario.
+  if (parser?.rejectCrossBankAliasCollision && await tx.captureCardAlias.findFirst({ where: {
+    userId: event.userId, cardId: { not: cards[0] }, kind: { in: parser.aliasKinds },
+    value: printed ? { endsWith: printed.value } : proposal.alias.value,
+  } })) return { ...interpretation, reason: "AMBIGUOUS_CARD" };
   if (!await tx.card.findFirst({ where: { id: cards[0], userId: event.userId } })) return { ...interpretation, reason: "UNKNOWN_CARD" };
   return { ...interpretation, proposal: { ...proposal, cardId: cards[0],
     ...(printed ? { alias: { kind: alias.kind, value: alias.value }, aliasSourcePackage: scope.sourcePackage } : {}),

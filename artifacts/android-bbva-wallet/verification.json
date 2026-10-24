@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 1,
+  "verifiedAt": "2026-10-24T03:28:58.938Z",
+  "gitBase": "694d8158b4e18d15dff7cc9e6c345f6245cebd1f",
+  "scope": "Local BBVA Wallet implementation; original checked with production read-only query",
+  "format": {
+    "key": "wallet.bbva-purchase.es.v1",
+    "observedProductLabel": "TDC Platinum",
+    "source": "Google Wallet",
+    "aliasSource": "com.bancomer.mbanking",
+    "aliasKinds": [
+      "PHYSICAL",
+      "DIGITAL"
+    ],
+    "verifiedBankAliasRequired": true,
+    "crossBankAliasCollisionsRejected": true,
+    "walletNfcKeptSeparate": true,
+    "datePolicy": "NOTIFICATION_POSTED_AT / America/Mexico_City",
+    "operationTimeNotInvented": true,
+    "delayedReceiptDoesNotChangePublicationDay": true
+  },
+  "tests": {
+    "command": "AFP_MIGRATION_TEST_DATABASE_URL=<local afp_test DB> node scripts/verify-database-reproduction.cjs",
+    "total": 603,
+    "passed": 603,
+    "failed": 0,
+    "skipped": 0,
+    "newTests": 22,
+    "coverage": [
+      "Date-policy gate and reviewed/reconciled pilot",
+      "Cross-bank collisions, including unverified alias",
+      "Owner isolation and separate card activation",
+      "Eight concurrent deliveries and retry",
+      "Late events and Mexico midnight",
+      "Manual/repeated purchases, revisions and deleted expense",
+      "Debit/account and other bank/product formats remain separate"
+    ]
+  },
+  "database": {
+    "newMigration": false,
+    "migrations": 31,
+    "emptyDatabase": true,
+    "historicalUpgrade": true,
+    "checksumsPreserved": true,
+    "drift": false,
+    "rlsTablesIncludingHistory": 32
+  },
+  "lint": {
+    "errors": 0,
+    "existingWarning": "TanStack useReactTable incompatible-library; also reported in ignored local backup"
+  },
+  "build": {
+    "successful": true,
+    "webpack": true,
+    "production": true,
+    "isolatedCopy": true,
+    "realEnvironmentFilesLoaded": false,
+    "currentModifiedSourcesMatch": true
+  },
+  "browser": {
+    "auth": "Fictional local owner",
+    "database": "Disposable PostgreSQL 16 on localhost",
+    "api": "Real Next.js HTTP routes",
+    "viewports": [
+      390,
+      1280
+    ],
+    "horizontalOverflow": false,
+    "uncaughtJsErrors": 0,
+    "captureRequests": 23,
+    "allCaptureResponses200": true,
+    "oldUnknownNoticeReinterpretedInUi": true,
+    "reviewedAndRegisteredInUi": true,
+    "pilotPointReconciledViaHttpApi": true,
+    "enabledInUiWithDateConfirmation": true,
+    "originalEventAndReceiptPreserved": true
+  },
+  "nativeHttp": {
+    "httpResponses": 9,
+    "all200": true,
+    "concurrentDeliveries": 8,
+    "retries": 1,
+    "identicalReceipts": true,
+    "expenses": 2,
+    "pilotReviewedAndPointReconciled": true,
+    "newAutomaticExpenses": 1,
+    "newAutomaticExpensePending": true,
+    "lateEventUsesPublicationDayMexico": true,
+    "actualPurchaseTimeNotInvented": true,
+    "originalReceiptAndInterpretationPreserved": true
+  },
+  "originalCheck": {
+    "readOnly": true,
+    "formatRecognized": true,
+    "uniqueBbvaCardMatched": true,
+    "productionMovementStillUnknown": true,
+    "productionExpenseNotCreated": true
+  },
+  "production": {
+    "changed": false,
+    "deployed": false,
+    "enabled": false,
+    "originalResolutionPending": true,
+    "publicationAndDatePolicyApprovalPending": true
+  },
+  "native": {
+    "apkChange": false,
+    "contractChange": false,
+    "instrumentedTestsRerun": false,
+    "previousPhoneInspectionHealthy": true
+  },
+  "privacy": {
+    "publicFixtureAndScreenshotsFictional": true,
+    "privateOriginalsGitIgnored": true,
+    "privateValuesCopiedIntoChangedText": false
+  },
+  "pending": [
+    "Authorize production publication, notification-date policy, one-time original resolution and activation",
+    "Observe next real automatic purchase and reconcile full statement",
+    "HSBC 1/2 notification reception remains pending"
+  ],
+  "sourceSha256": {
+    "src/lib/captureIdentity.js": "d1974e9ee830fda26fa22e94e2c02a9f7425e73b9b0874ccf91a4df4fba5421f",
+    "src/lib/captureParsers.js": "a8bc3edf2949d5ae61e33d979a39beb4f60b89522ce839f37069ad357b3e50c2",
+    "src/lib/captureRollout.js": "e8feb1417777c4b1b5cd119ea30adde9a4e78b8aa11b1e100bc355ec8e062659",
+    "tests/capture-bbva-wallet-real-integration.test.cjs": "67363f727389acd57b9c0fb46a52482680236839355304704b8a72d933fe9069",
+    "tests/capture-bbva-wallet-real.test.cjs": "c7749b7376966fef807bb7c8088328ead3f99b12803e55a57121d77c24399a5d",
+    "tests/fixtures/captures/wallet-bbva-purchase.es.v1.json": "895698ba201108ebac9b0889ced471f6f3dd5346f1886ffeb1428ff434185c99"
+  },
+  "screenshots": [
+    "review-mobile.png",
+    "date-policy-mobile.png",
+    "date-policy-desktop.png"
+  ]
+}

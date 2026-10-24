@@ -1,16 +1,16 @@
 # AFP Android: plan por fases para capturar compras automáticamente
 
 **Archivo:** `PLAN_CAPTURA_AUTOMATICA_ANDROID.md`, en la raíz del proyecto.\
-**Estado:** Fases 2, 3 y 5 concluidas. Fases 1, 4, 6 y 7 conservan pendientes de cobertura real y conciliación de un corte completo. Fase 7: controles implementados y primer formato real Wallet/BANAMEX 1 validado; compra inicial registrada una vez y dos evidencias vinculadas mediante revisión explícita. Wallet/BANAMEX 1 y Nu/CFE tienen configuración automática preparada por formato. Nu/CFE usa la regla expresa de tarjeta NU, MXN, fecha del aviso y suscripción CFE; su cobro de octubre quedó confirmado sin cambiar la recurrencia habitual. **Falta publicar el código web para que opere sobre avisos nuevos.** Supabase tiene 26 migraciones, sin pendientes; APK personal 0.5.0 / versionCode 7 sin cambios. Verificación final: 440 pruebas web correctas, cero omisiones, lint y build correctos; reconstrucción y actualización de las 26 migraciones verificadas. Las tres actividades generales de cobertura/activación/canales de Fase 7 permanecen abiertas para el resto.\
+**Estado al 23 de octubre de 2026:** Fases 2, 3 y 5 concluidas. Fases 1, 4, 6 y 7 conservan pendientes de cobertura real y conciliación de un corte completo. Hay formatos de compras publicados y habilitados para **7 de 9 tarjetas**: BANAMEX 1/2, BBVA, DIDI, MERCADOPAGO, NU y SANTANDER; HSBC 1/2 continúan pendientes de avisos accesibles. Los cotejos iniciales son puntuales y no representan cortes completos. Nu/CFE conserva su regla y suscripción independientes. Última publicación BBVA: `dpl_CjPPEJKxH431AEBLph8LvUDy88GB`, `READY`, sin migración ni APK nueva. Supabase conserva 31 migraciones completas, ninguna pendiente, diff vacío y 32 tablas con RLS; APK personal 0.6.0 / versionCode 8. Pasaron 603 pruebas web sin fallos ni omisiones, lint, compilación y reconstrucción/actualización de migraciones. Falta observar compras futuras automáticas y completar la cobertura de canales y conciliación.\
 **Dispositivo inicial:** Samsung S24 Ultra, Android 16 y One UI 8.5.\
 **Cobertura prevista:** todas las tarjetas existentes en AFP, conservando sus identidades e historiales.\
-**Pilotos:** BBVA Platinum continúa pendiente de aviso de crédito. La primera configuración automática preparada es BANAMEX 1 por Wallet, por disponer de evidencia real suficiente y política de fecha aceptada.
+**Pilotos:** BANAMEX 1 por Wallet fue el primer formato preparado con evidencia propia y fecha aceptada. BBVA Platinum recibió su aviso Wallet tardío, tiene una compra registrada/cotejada una vez y su formato habilitado; el piloto de corte completo sigue abierto.
 
 ## 1. Objetivo y alcance
 
 Desarrollar una APK propia de AFP que capture las notificaciones de compras, conserve los avisos pendientes y registre los gastos automáticamente.
 
-El diseño y la recopilación de evidencia contemplarán todas las tarjetas desde la Fase 1. BBVA fue el primer piloto previsto; al no disponer de aviso de crédito, se avanza con BANAMEX 1 por Wallet, con evidencia propia. La preparación de las demás fuentes continúa en paralelo.
+El diseño y la recopilación de evidencia contemplan todas las tarjetas desde la Fase 1. BBVA fue el primer piloto previsto; BANAMEX 1 por Wallet dispuso antes de evidencia suficiente. Cada ampliación exige su propia evidencia, revisión y habilitación, como documentan los seguimientos.
 
 El funcionamiento diario dependerá de la aplicación Android y del servidor actual de AFP. No requerirá Codex, ChatGPT, Tasker, Automate, un lector de Gmail en la computadora ni una computadora encendida.
 
@@ -327,15 +327,15 @@ Para cerrar: recopilar avisos normales del uso real, revisar y anonimizar muestr
 
 | Tarjeta existente | Alias comprobados (Fase 4; Wallet corregidos en Fase 7) | Compra de crédito real / analizador activable | Estado de Fase 7 |
 |---|---|---|---|
-| BBVA | Física, digital y número virtual Wallet | Comprobante aprobado coincidente con Wallet; sin aviso de crédito capturado | Diagnóstico; piloto previo aún abierto |
-| HSBC 1 | Física y digital; Wallet incompatible según propietario | Sin muestra verificada | Diagnóstico |
-| HSBC 2 | Física y digital; Wallet incompatible según propietario | Sin muestra verificada | Diagnóstico |
-| BANAMEX 1 | Física, digital y Wallet | Wallet verificado con fecha de publicación aceptada; banco parcial de evidencia | Compra registrada y evidencias vinculadas; modo automático preparado, publicación web pendiente |
+| BBVA | Física, digital y número virtual Wallet | Aviso TDC Platinum por Wallet, alias bancario verificado y formato publicado | Una compra registrada/cotejada una vez y Wallet habilitado con fecha aceptada; compra futura y corte completo pendientes |
+| HSBC 1 | Física y digital; Wallet incompatible según propietario | Comprobante físico, sin aviso accesible verificado | Pendiente de recepción; permiso Android bloqueado en la revisión del 23 de octubre |
+| HSBC 2 | Física y digital; Wallet incompatible según propietario | Comprobante físico, sin aviso accesible verificado | Pendiente de recepción; comparte la aplicación HSBC con permiso bloqueado |
+| BANAMEX 1 | Física, digital y Wallet | Wallet verificado con fecha de publicación aceptada; banco parcial de evidencia | Publicado, compra cotejada y evidencias vinculadas; Wallet habilitado |
 | BANAMEX 2 | Física, digital y Wallet | Wallet real con analizador compartido; banco JOY parcial de evidencia | Publicado READY, muestra registrada una vez con dos evidencias y cotejo puntual; Wallet habilitado con fecha aceptada |
-| SANTANDER | Física, digital y Wallet | Aviso bancario completo verificado; Wallet LikeU parcial de evidencia | Publicado READY, muestra resuelta una vez y formato bancario habilitado; primera compra automática futura y corte completo pendientes |
-| NU | Física, digital y Wallet | CFE v2 con regla expresa y suscripción; v1 parcial conservado | Cobro de octubre confirmado; modo Nu/CFE preparado, publicación web pendiente |
-| DIDI | Física, digital y Wallet | Sin muestra verificada | Diagnóstico |
-| MERCADOPAGO | Física y digital; Wallet incompatible según propietario | Sin muestra verificada | Diagnóstico; distinguir crédito de cuenta/saldo |
+| SANTANDER | Física, digital y Wallet | Banco completo y Wallet V2 verificados, con fechas independientes | Ambos publicados/habilitados; evidencia Wallet validada sobre el mismo gasto cotejado; compra futura y corte completo pendientes |
+| NU | Física, digital y Wallet | Wallet con fecha aceptada; banco parcial de evidencia; Nu/CFE independiente | Publicado, compra cotejada y banco vinculado; Wallet y Nu/CFE habilitados |
+| DIDI | Física, digital y Wallet | Wallet real con fecha del aviso aceptada | Publicado, muestra registrada/cotejada una vez y Wallet habilitado; compra futura y corte completo pendientes |
+| MERCADOPAGO | Física y digital; Google Wallet incompatible según propietario | Compra aprobada en su propia wallet; regla expresa de tarjeta única y MXN | Publicado, muestra registrada/cotejada una vez y formato de compras habilitado; cuenta/saldo separado |
 
 **Aceptación nativa repetida:** 18 pruebas JVM y 29 instrumentadas correctas en el S24 Ultra, sin omisiones, con HTTPS/API/PostgreSQL locales y Auth/avisos ficticios. La pantalla real volvió a verificar pausa/reanudación de BBVA, selección Wallet conservada y reportes del teléfono. Se retiraron las APK dev/pruebas y el certificado temporal creados para esta aceptación; la instalación personal no se reemplazó. ADB volvió a comprobar el S24 Ultra, Android 16/One UI 8.5, las ocho aplicaciones instaladas, acceso a notificaciones y batería exenta. Wallet tiene versión `26.41.996630916` y Mercado Pago `2.458.2`; las otras seis versiones coinciden con el inventario anterior. Esa consulta técnica no lee avisos ni demuestra cobertura de compras. No se necesita migración, modificación del contrato nativo ni nueva APK personal para estos cambios web. La instalación personal conserva **0.5.0 / 7**. La aceptación técnica inicial no escribió en Supabase; el seguimiento posterior solo corrigió los seis alias Wallet. La implementación web sigue sin publicar.
 
@@ -452,6 +452,18 @@ La aplicación a producción fue autorizada expresamente. Originales y respaldo 
 
 [Evidencia técnica local](artifacts/android-santander-wallet-backup/verification.json) y [producción](artifacts/android-santander-wallet-backup/production.json). La regla bancaria y el respaldo Wallet están habilitados, con sus fechas independientes; la muestra inicial sigue siendo un único gasto cotejado.
 
+### BBVA Platinum por Google Wallet · publicada y habilitada el 23 de octubre de 2026
+
+- [x] Verificar por USB/servidor el aviso tardío: 48 entregados coincidentes, cero pendientes/errores, alias BBVA verificado y evento original conservado sin gasto.
+- [x] Implementar `wallet.bbva-purchase.es.v1` para TDC Platinum, con moneda explícita, alias bancario y fecha del aviso México. Rechazar colisiones bancarias entre tarjetas propias sin usar el token NFC ni el nombre editable.
+- [x] Separar compra Wallet de débito/cuenta y pagos BBVA. Conservar reinterpretación explícita, recibos y datos originales; avisos tardíos no inventan fecha/hora de compra.
+- [x] Verificar 603 pruebas sin fallos/omisiones, 22 nuevas de BBVA, las 31 migraciones desde vacío/actualización histórica, RLS, lint y compilación Webpack.
+- [x] Verificar navegador móvil con datos/Auth ficticios y API/PostgreSQL reales: observar, revisar, registrar/cotejar, aceptar fecha al habilitar y nueve entregas de otro aviso que producen un gasto pendiente. Interpretar el original en una consulta de solo lectura y comprobar tarjeta inequívoca.
+- [x] Con autorización expresa, publicar `dpl_CjPPEJKxH431AEBLph8LvUDy88GB`, verificar dominio/huellas, respaldar 32 tablas, descartar duplicados y resolver/cotejar el aviso como una sola compra. Habilitar únicamente BBVA/Wallet con fecha del aviso en México aceptada; sin migración ni APK nueva. Registros anteriores, originales, alias, otras reglas y RLS conservados; Calendar sincronizado. El celular muestra el gasto BBVA con Google Wallet y Conciliado.
+- [ ] Observar una compra futura automática, medir las compras sin aviso y conciliar un corte completo. HSBC 1/2 siguen pendientes de recepción accesible.
+
+[Verificación técnica local](artifacts/android-bbva-wallet/verification.json) y [producción](artifacts/android-bbva-wallet/production.json). BBVA está en `AUTOMATIC` para `wallet.bbva-purchase.es.v1`; los demás productos/canales BBVA no quedan acreditados por esta muestra.
+
 ## 4. Pruebas y aceptación
 
 | Escenario | Resultado requerido |
@@ -485,7 +497,7 @@ La verificación técnica incluirá:
 
 - La solución será personal y Android; la captura será nativa y la interfaz financiera continuará siendo web.
 - El servidor actual seguirá siendo necesario para completar registros y sincronizar datos. Sin conexión, se conservarán los avisos capturados en el teléfono.
-- Todas las tarjetas se contemplan desde el diagnóstico. BBVA Platinum fue el primer piloto previsto y sigue pendiente; BANAMEX 1 por Wallet tiene la primera configuración automática preparada con evidencia propia; se conservarán los IDs, historiales y condiciones de todas las tarjetas existentes.
+- Todas las tarjetas se contemplan desde el diagnóstico. BBVA Platinum fue el primer piloto previsto y BANAMEX 1 por Wallet tuvo la primera configuración preparada; ambas tienen una compra inicial cotejada y formato publicado/habilitado. El piloto de corte completo sigue pendiente. Se conservarán los IDs, historiales y condiciones de todas las tarjetas existentes.
 - La ampliación de la captura y la habilitación del registro automático son pasos separados. La validación y activación se documentan por tarjeta y formato; los casos sin evidencia suficiente permanecen pendientes.
 - La automatización utilizará reglas comprobables. No enviará notificaciones a modelos de IA.
 - Los datos personales y credenciales permanecerán fuera de Git y de los registros de diagnóstico.

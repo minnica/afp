@@ -1,0 +1,14 @@
+{
+  "kind": "ANONYMIZED_REAL_NOTIFICATION",
+  "reviewedOn": "2026-10-23",
+  "scope": "Aviso real Wallet para BBVA Platinum confirmado por el propietario; comercio, importe, terminación y fechas ficticios. Estructura TDC Platinum conservada. La terminación debe coincidir con un alias bancario BBVA verificado, sin colisiones con otra tarjeta bancaria; el número virtual NFC permanece separado. No incluye fecha bancaria de compra. Se propone el día de publicación en México con aceptación expresa al habilitar.",
+  "event": {
+    "sourcePackage": "com.google.android.apps.walletnfcrel",
+    "postedAt": "2026-10-21T02:49:07.000Z",
+    "receivedAt": "2026-10-21T02:49:07.250Z",
+    "fields": {
+      "android.title": "COMERCIO FICTICIO   SUCURSAL",
+      "android.text": "MXN123.45 con TDC Platinum ••0123"
+    }
+  }
+}

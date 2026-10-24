@@ -1,0 +1,186 @@
+{
+  "verifiedAt": "2026-10-24T03:37:20.379Z",
+  "productionUrl": "https://finanzas.garatachia.com",
+  "deploymentId": "dpl_CjPPEJKxH431AEBLph8LvUDy88GB",
+  "state": "READY",
+  "previousDeploymentId": "dpl_2hcPSqhJ6McY73zdkdrZ98cNwkVZ",
+  "sourceCommit": "694d8158b4e18d15dff7cc9e6c345f6245cebd1f",
+  "sourceWorkingTree": true,
+  "sourceFiles": 305,
+  "sourceBytes": 2752144,
+  "sourceManifestSha256": "615c0df3af50afbdbc3d26d68840d007d5c86e9568c854419bf3157e60c5bbed",
+  "parserSourceSha1": "d686a9a5974a53beb292f1850a4e776674729344",
+  "parserSourceSha256": "a8bc3edf2949d5ae61e33d979a39beb4f60b89522ce839f37069ad357b3e50c2",
+  "captureServerModulesMatched": 16,
+  "productionAliasVerified": true,
+  "privateFilesUploaded": false,
+  "commitOrPushPerformed": false,
+  "tests": {
+    "passed": 603,
+    "failed": 0,
+    "skipped": 0,
+    "newBbvaTests": 22,
+    "sourceSha256": {
+      "src/lib/captureIdentity.js": "d1974e9ee830fda26fa22e94e2c02a9f7425e73b9b0874ccf91a4df4fba5421f",
+      "src/lib/captureParsers.js": "a8bc3edf2949d5ae61e33d979a39beb4f60b89522ce839f37069ad357b3e50c2",
+      "src/lib/captureRollout.js": "e8feb1417777c4b1b5cd119ea30adde9a4e78b8aa11b1e100bc355ec8e062659",
+      "tests/capture-bbva-wallet-real-integration.test.cjs": "67363f727389acd57b9c0fb46a52482680236839355304704b8a72d933fe9069",
+      "tests/capture-bbva-wallet-real.test.cjs": "c7749b7376966fef807bb7c8088328ead3f99b12803e55a57121d77c24399a5d",
+      "tests/fixtures/captures/wallet-bbva-purchase.es.v1.json": "895698ba201108ebac9b0889ced471f6f3dd5346f1886ffeb1428ff434185c99"
+    },
+    "build": "Local Webpack and remote Vercel production build successful"
+  },
+  "database": {
+    "backupTables": 32,
+    "migrationApplied": false,
+    "migrationsComplete": 31,
+    "pendingMigrations": 0,
+    "schemaDiffEmpty": true,
+    "checksumsPreserved": true,
+    "rlsTables": 32,
+    "rlsUnchanged": true
+  },
+  "native": {
+    "apkUpdated": false,
+    "contractChanged": false,
+    "physicalPhoneConnected": true,
+    "runtimeUiChecked": true,
+    "checkedAt": "2026-10-24T03:37:20.379Z",
+    "connected": true,
+    "realAuthenticatedGastosScreenChecked": true,
+    "bbvaExpenseVisible": true,
+    "googleWalletSourceVisible": true,
+    "pointReconciliationVisible": true,
+    "publicScreenshots": false
+  },
+  "activation": {
+    "card": "BBVA",
+    "product": "TDC Platinum",
+    "parserKey": "wallet.bbva-purchase.es.v1",
+    "source": "Google Wallet",
+    "mode": "AUTOMATIC",
+    "datePolicy": "NOTIFICATION_POSTED_AT",
+    "timeZone": "America/Mexico_City",
+    "datePolicyExplicitlyAcceptedByOwner": true,
+    "originalExplicitlyReinterpreted": true,
+    "noMatchingExistingExpense": true,
+    "newExpenses": 1,
+    "originalRegisteredExactlyOnce": true,
+    "category": "Por clasificar",
+    "pointReconciled": true,
+    "bankOperationTimeNotInvented": true,
+    "notificationDelayCauseNotProven": true
+  },
+  "preservation": {
+    "allPriorExpensesUnchanged": true,
+    "originalEventsAndReceiptsUnchanged": true,
+    "initialInterpretationsRetained": true,
+    "explicitAnalysisHistoryAdded": true,
+    "allOtherRulesUnchanged": true,
+    "aliasesUnchanged": true,
+    "otherFinancialTablesUnchanged": true,
+    "deviceCredentialsAndSettingsUnchanged": true,
+    "calendarCredentialsAndPreferencesUnchanged": true
+  },
+  "calendar": {
+    "connected": true,
+    "synchronized": true,
+    "lastError": null,
+    "httpStatus": 200,
+    "results": [
+      "SYNCED"
+    ]
+  },
+  "rollout": {
+    "enabledPurchaseCards": 7,
+    "totalCards": 9,
+    "enabled": [
+      "BANAMEX 1",
+      "BANAMEX 2",
+      "BBVA",
+      "DIDI",
+      "MERCADOPAGO",
+      "NU",
+      "SANTANDER"
+    ],
+    "pending": [
+      "HSBC 1",
+      "HSBC 2"
+    ],
+    "nextRealAutomaticPurchaseStillToObserve": true,
+    "fullStatementVerified": false
+  },
+  "publicHttpChecks": [
+    {
+      "path": "/gastos",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/configuracion",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/manifest.webmanifest",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/.well-known/assetlinks.json",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/captures/configuration",
+      "method": "GET",
+      "status": 401
+    },
+    {
+      "path": "/api/captures/movements",
+      "method": "GET",
+      "status": 401
+    },
+    {
+      "path": "/api/captures/events",
+      "method": "POST",
+      "status": 401
+    },
+    {
+      "path": "/api/captures/device",
+      "method": "GET",
+      "status": 401
+    }
+  ],
+  "runtimeErrorGroupsObserved": 0,
+  "runtimeErrorScope": "Capture routes in the ten-minute window immediately after deployment",
+  "privacy": {
+    "originalsAndBackupGitIgnored": true,
+    "realNotificationTextPublished": false,
+    "realCardSuffixesPublished": false,
+    "publicScreenshots": "Fictional local fixtures only"
+  },
+  "dependencyAudit": {
+    "prod": {
+      "info": 0,
+      "low": 2,
+      "moderate": 2,
+      "high": 1,
+      "critical": 2
+    },
+    "all": {
+      "info": 0,
+      "low": 2,
+      "moderate": 2,
+      "high": 2,
+      "critical": 2
+    },
+    "status": "Previously reported findings remain open; no dependency change in this release"
+  },
+  "pending": [
+    "Observe the next normal automatic purchase",
+    "Reconcile a complete statement",
+    "HSBC 1/2 notification reception",
+    "Separately reported dependency maintenance"
+  ]
+}

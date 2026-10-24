@@ -22,6 +22,8 @@ export const captureParsers = [
     completionPolicy: "MERCADOPAGO_CREDIT_MXN", dateSource: "NOTIFICATION_POSTED_AT" },
   { key: "wallet.nu-purchase.es.v1", sourcePackage: "com.google.android.apps.walletnfcrel", verified: true, evidence: "REAL_REVIEWED",
     aliasSourcePackage: "com.nu.production", aliasKinds: ["PHYSICAL", "DIGITAL"], dateSource: "NOTIFICATION_POSTED_AT" },
+  { key: "wallet.bbva-purchase.es.v1", sourcePackage: "com.google.android.apps.walletnfcrel", verified: true, evidence: "REAL_REVIEWED",
+    aliasSourcePackage: "com.bancomer.mbanking", aliasKinds: ["PHYSICAL", "DIGITAL"], dateSource: "NOTIFICATION_POSTED_AT", rejectCrossBankAliasCollision: true },
   { key: "nu.card-purchase.es.v1", sourcePackage: "com.nu.production", verified: false, evidence: "REAL_REVIEWED_PARTIAL",
     aliasKinds: ["PHYSICAL", "DIGITAL"], evidenceOnly: true },
   { key: "wallet.banamex-purchase.es.v1", sourcePackage: "com.google.android.apps.walletnfcrel", verified: true, evidence: "REAL_REVIEWED",
@@ -84,12 +86,13 @@ export function captureNotificationDate(event) {
 
 function realWalletPurchase(event) {
   const fields = event.fields || {}, body = fields["android.bigText"] || fields["android.text"] || "";
-  const match = body.match(/^(MXN|USD|EUR)([\d,.]+) con (Joy Banamex|DIDI Credit Card|Nu Mastercard Gold) ••(\d{4})$/);
+  const match = body.match(/^(MXN|USD|EUR)([\d,.]+) con (Joy Banamex|DIDI Credit Card|Nu Mastercard Gold|TDC Platinum) ••(\d{4})$/);
   if (!match) return null;
   const [parserKey, aliasSourcePackage] = {
     "DIDI Credit Card": ["wallet.didi-purchase.es.v1", "com.didiglobal.cashloan"],
     "Joy Banamex": ["wallet.banamex-purchase.es.v1", "com.citibanamex.banamexmobile"],
     "Nu Mastercard Gold": ["wallet.nu-purchase.es.v1", "com.nu.production"],
+    "TDC Platinum": ["wallet.bbva-purchase.es.v1", "com.bancomer.mbanking"],
   }[match[3]];
   if (conflictingBodies(fields)) return { parserKey, verified: true, reason: "CONFLICTING_FIELDS", proposal: {} };
   const merchant = fields["android.title"];
