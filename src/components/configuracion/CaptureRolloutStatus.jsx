@@ -10,7 +10,7 @@ const reasons = {
   NO_VERIFIED_ALIAS: "Falta una terminación verificada para esta fuente.",
   AMBIGUOUS_ALIAS: "Hay una terminación compartida con otra tarjeta; revisa los alias.",
   NO_REVIEWED_CAPTURE: "Falta una propuesta de esta tarjeta y formato revisada y conciliada sin corregir los datos interpretados.",
-  FORMAT_POLICY_REQUIRED: "Confirma la tarjeta, MXN, fecha del aviso y suscripción para Nu/CFE.",
+  FORMAT_POLICY_REQUIRED: "Configura la regla de este formato con tarjeta, MXN y fecha del aviso.",
 };
 
 export default function CaptureRolloutStatus({ coverage, cardId, busy, onAutomation }) {
@@ -28,9 +28,15 @@ export default function CaptureRolloutStatus({ coverage, cardId, busy, onAutomat
           <ItemDescription className="break-all">{format.parserKey}</ItemDescription>
           <div><Badge variant={format.mode === "AUTOMATIC" ? "default" : "secondary"}>{format.mode === "AUTOMATIC" ? "Automático" : format.verified ? "Observación" : "Diagnóstico"}</Badge></div>
           {format.dateSource === "NOTIFICATION_POSTED_AT" && <ItemDescription className="line-clamp-none">Usa la fecha del aviso de {captureSources[source.sourcePackage]} en hora de México. El aviso no incluye una fecha bancaria de operación.</ItemDescription>}
-          {format.completionPolicy && <><ItemDescription className="line-clamp-none">La regla asigna los pagos CFE a esta tarjeta, en MXN, y confirma el cobro pendiente de la suscripción elegida. Conserva la configuración habitual de la suscripción.</ItemDescription>
+          {format.completionPolicy && <><ItemDescription className="line-clamp-none">{format.policyRequiresSubscription
+            ? "La regla asigna los pagos CFE a esta tarjeta, en MXN, y confirma el cobro pendiente de la suscripción elegida. Conserva la configuración habitual de la suscripción."
+            : "La regla asigna los avisos de compra aprobada de Mercado Pago a esta única tarjeta de crédito y a MXN, según tu declaración. El aviso no incluye tarjeta ni moneda."}</ItemDescription>
             <ItemActions><Button variant="outline" className="min-h-11" disabled={busy} onClick={() => onAutomation({ action: "formatPolicy", cardId, parserKey: format.parserKey,
-              completionPolicy: format.completionPolicy, datePolicy: "NOTIFICATION_POSTED_AT", subscriptionId: format.policySubscriptionId || "", label: "Configurar regla Nu/CFE" })}>{format.hasFormatPolicy ? "Revisar regla Nu/CFE" : "Configurar regla Nu/CFE"}</Button></ItemActions></>}
+              completionPolicy: format.completionPolicy, datePolicy: "NOTIFICATION_POSTED_AT",
+              ...(format.policyRequiresSubscription ? { subscriptionId: format.policySubscriptionId || "" } : {}),
+              label: `Configurar regla ${format.policyRequiresSubscription ? "Nu/CFE" : "Mercado Pago"}` })}>
+              {format.hasFormatPolicy ? "Revisar" : "Configurar"} regla {format.policyRequiresSubscription ? "Nu/CFE" : "Mercado Pago"}
+            </Button></ItemActions></>}
           <ItemDescription className="line-clamp-none">{format.reviewedCaptures} {format.reviewedCaptures === 1 ? "propuesta conciliada sin cambios en los datos interpretados" : "propuestas conciliadas sin cambios en los datos interpretados"}</ItemDescription>
           {format.mode !== "AUTOMATIC" && format.blockers.map(reason => <ItemDescription key={reason} className="line-clamp-none">{reasons[reason]}</ItemDescription>)}
           <ItemActions><Button variant="outline" className="min-h-11" disabled={busy || (format.mode !== "AUTOMATIC" && !format.canEnable)} onClick={() => onAutomation({ action: "automation", cardId, parserKey: format.parserKey,

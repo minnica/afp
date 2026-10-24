@@ -427,6 +427,19 @@ La aplicación a producción se realizó después de la autorización explícita
 
 La aplicación a producción fue autorizada expresamente. Originales y respaldo permanecen privados; las pantallas públicas usan datos ficticios. Se conservan interpretaciones iniciales y recibos; el banco tiene un nuevo análisis explícito. El teléfono solo renovó metadatos de conexión y su límite de solicitudes; el trigger existente marcó Calendar. Sin migración ni APK nueva; BBVA conserva sus pendientes y datos. [Producción](artifacts/android-banamex2/production.json) y [evidencia técnica](artifacts/android-banamex2/verification.json).
 
+### Nu por Wallet y compras Mercado Pago · publicación del 23 de octubre de 2026
+
+- [x] Contrastar cinco compras y tres avisos recibidos; 47 entregas coincidentes, cero pendientes/errores. Identificar ausencia de aviso BBVA y bloqueo Android de HSBC sin modificar esos permisos.
+- [x] Incorporar Nu Mastercard Gold por Wallet con alias bancario; conservar aviso Nu como evidencia parcial no activable y Nu/CFE como regla independiente.
+- [x] Incorporar compra aprobada Mercado Pago con regla expresa de tarjeta de crédito única/MXN, según declaración del propietario; fecha de publicación explícita, sin suscripción, sin gastos al guardar y vuelta a observación al cambiar destinatario.
+- [x] Probar 569 casos sin fallos/omisiones, incluidos concurrencia, originales intactos, aislamiento y conservación de Nu/CFE. Verificar 31 migraciones desde vacío/actualización histórica y 32 tablas con RLS, lint y compilación Webpack.
+- [x] Verificar pantalla móvil con datos/Auth ficticios y API/PostgreSQL reales: configurar regla, revisar compra, cotejar y aceptar fecha al habilitar. Conservar evidencias reales fuera de Git.
+- [x] Autorizar publicación/migración y fecha del aviso en México para ambos formatos; aplicar con respaldo privado. Publicado `dpl_8PsycW1qZLMD7EQu1y6pVHJuZWJq`, READY, dominio AFP y 16 módulos de captura verificados; 31 migraciones completas, diff vacío y RLS conservado.
+- [x] Reinterpretar y resolver una sola compra por original, vincular evidencia Nu, cotejar puntualmente y habilitar únicamente Nu/Wallet y Mercado Pago/compras. Dos gastos nuevos, originales y gastos anteriores conservados, Nu/CFE y demás reglas intactas; Calendar sincronizado sin error.
+- [ ] Observar compras futuras automáticas, conciliar corte completo y resolver recepción de avisos BBVA/HSBC antes de desarrollar sus formatos pendientes.
+
+[Evidencia técnica local](artifacts/android-nu-mercadopago/verification.json) y [producción](artifacts/android-nu-mercadopago/production.json). Sin actualización de APK. La auditoría previa detectó alertas de dependencias ya existentes; actualización de seguridad pendiente, documentada en la evidencia.
+
 ## 4. Pruebas y aceptación
 
 | Escenario | Resultado requerido |

@@ -21,7 +21,7 @@ export const captureReasons = {
   SPECIAL_MOVEMENT: "Movimiento especial o aviso sin compra aprobada; requiere revisión.", FOREIGN_CURRENCY: "Moneda distinta de MXN; requiere revisión.",
   FUTURE_OPERATION: "La fecha de operación es posterior a la recepción.", UNKNOWN_CARD: "Falta identificar la tarjeta.", AMBIGUOUS_CARD: "La terminación coincide con varias tarjetas.",
   DATE_POLICY_REQUIRED: "Confirma el uso de la fecha del aviso para habilitar este registro automático.",
-  FORMAT_POLICY_REQUIRED: "Falta una regla vigente para asignar tarjeta, moneda, fecha y suscripción al aviso Nu/CFE.",
+  FORMAT_POLICY_REQUIRED: "Falta una regla vigente para asignar tarjeta, moneda y fecha a este formato; Nu/CFE requiere además una suscripción.",
   UNVERIFIED_ALIAS: "La terminación aún no está verificada.", UNVERIFIED_FORMAT: "Formato de prueba; faltan muestras reales verificadas.",
   OBSERVATION: "Tarjeta y formato en observación; no se crea un gasto.", POSSIBLE_DUPLICATE: "Hay movimientos con tarjeta, importe y fechas próximos. Revisa si es la misma compra.",
   NOTIFICATION_REVISION: "Posible actualización de un aviso anterior.", REFERENCE_CONFLICT: "La referencia coincide, pero los datos son diferentes.",

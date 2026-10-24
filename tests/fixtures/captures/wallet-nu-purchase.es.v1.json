@@ -1,0 +1,14 @@
+{
+  "kind": "ANONYMIZED_REAL_NOTIFICATION",
+  "reviewedOn": "2026-10-23",
+  "scope": "Texto y estructura observados; comercio, importe, terminaciones y fechas sustituidos por valores ficticios. Originales fuera de Git.",
+  "event": {
+    "postedAt": "2026-10-21T00:14:26.000Z",
+    "receivedAt": "2026-10-21T00:14:26.400Z",
+    "sourcePackage": "com.google.android.apps.walletnfcrel",
+    "fields": {
+      "android.title": "COMERCIO FICTICIO",
+      "android.text": "MXN123.45 con Nu Mastercard Gold ••0123"
+    }
+  }
+}

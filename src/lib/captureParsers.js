@@ -17,7 +17,13 @@ export const captureParsers = [
   { key: "bbva.transfer-receipt.es.v1", sourcePackage: paymentReceiptSource, verified: true, evidence: "REAL_REVIEWED", paymentOnly: true },
   { key: "nu.cfe-service-payment.es.v1", sourcePackage: "com.nu.production", verified: false, evidence: "REAL_REVIEWED_PARTIAL" },
   { key: "nu.cfe-service-payment.es.v2", sourcePackage: "com.nu.production", verified: true, evidence: "REAL_REVIEWED_POLICY_REQUIRED",
-    completionPolicy: "NU_CFE_MXN", dateSource: "NOTIFICATION_POSTED_AT" },
+    completionPolicy: "NU_CFE_MXN", policyRequiresSubscription: true, dateSource: "NOTIFICATION_POSTED_AT" },
+  { key: "mercadopago.card-purchase.es.v1", sourcePackage: "com.mercadopago.wallet", verified: true, evidence: "REAL_REVIEWED_POLICY_REQUIRED",
+    completionPolicy: "MERCADOPAGO_CREDIT_MXN", dateSource: "NOTIFICATION_POSTED_AT" },
+  { key: "wallet.nu-purchase.es.v1", sourcePackage: "com.google.android.apps.walletnfcrel", verified: true, evidence: "REAL_REVIEWED",
+    aliasSourcePackage: "com.nu.production", aliasKinds: ["PHYSICAL", "DIGITAL"], dateSource: "NOTIFICATION_POSTED_AT" },
+  { key: "nu.card-purchase.es.v1", sourcePackage: "com.nu.production", verified: false, evidence: "REAL_REVIEWED_PARTIAL",
+    aliasKinds: ["PHYSICAL", "DIGITAL"], evidenceOnly: true },
   { key: "wallet.banamex-purchase.es.v1", sourcePackage: "com.google.android.apps.walletnfcrel", verified: true, evidence: "REAL_REVIEWED",
     aliasSourcePackage: "com.citibanamex.banamexmobile", aliasKinds: ["PHYSICAL", "DIGITAL"], dateSource: "NOTIFICATION_POSTED_AT" },
   { key: "banamex.card-charge.es.v1", sourcePackage: "com.citibanamex.banamexmobile", verified: false, evidence: "REAL_REVIEWED_PARTIAL",
@@ -76,11 +82,13 @@ export function captureNotificationDate(event) {
 
 function realWalletPurchase(event) {
   const fields = event.fields || {}, body = fields["android.bigText"] || fields["android.text"] || "";
-  const match = body.match(/^(MXN|USD|EUR)([\d,.]+) con (Joy Banamex|DIDI Credit Card) ••(\d{4})$/);
+  const match = body.match(/^(MXN|USD|EUR)([\d,.]+) con (Joy Banamex|DIDI Credit Card|Nu Mastercard Gold) ••(\d{4})$/);
   if (!match) return null;
-  const [parserKey, aliasSourcePackage] = match[3] === "DIDI Credit Card"
-    ? ["wallet.didi-purchase.es.v1", "com.didiglobal.cashloan"]
-    : ["wallet.banamex-purchase.es.v1", "com.citibanamex.banamexmobile"];
+  const [parserKey, aliasSourcePackage] = {
+    "DIDI Credit Card": ["wallet.didi-purchase.es.v1", "com.didiglobal.cashloan"],
+    "Joy Banamex": ["wallet.banamex-purchase.es.v1", "com.citibanamex.banamexmobile"],
+    "Nu Mastercard Gold": ["wallet.nu-purchase.es.v1", "com.nu.production"],
+  }[match[3]];
   if (conflictingBodies(fields)) return { parserKey, verified: true, reason: "CONFLICTING_FIELDS", proposal: {} };
   const merchant = fields["android.title"];
   const amount = captureAmount(match[2]), date = captureNotificationDate(event);
@@ -159,6 +167,41 @@ function realWalletSantanderPurchase(event) {
   } };
 }
 
+function realNuPurchase(event) {
+  const fields = event.fields || {}, title = fields["android.title"]?.match(/^Compra aprobada por \$([\d,.]+)$/);
+  if (!title) return null;
+  const parserKey = "nu.card-purchase.es.v1", base = { parserKey, verified: false, proposal: {} };
+  if (conflictingBodies(fields)) return { ...base, reason: "CONFLICTING_FIELDS" };
+  const body = fields["android.bigText"] || fields["android.text"] || "";
+  const match = body.match(/^Compraste en (.{1,200}) con tu tarjeta con terminación (\d{4}) por \$([\d,.]+)\.$/);
+  if (!match) return { ...base, reason: "INCOMPLETE_FORMAT" };
+  const amount = captureAmount(match[3]), notification = captureNotificationDate(event);
+  if (!amount || !captureAmount(title[1]) || !notification || !match[1].trim()) return { ...base, reason: "INVALID_FIELDS" };
+  if (amount !== captureAmount(title[1])) return { ...base, reason: "CONFLICTING_FIELDS" };
+  return { ...base, reason: "INCOMPLETE_FORMAT", proposal: { amount, merchant: match[1].trim(),
+    printedAlias: { value: match[2], digits: 4 }, aliasSourcePackage: "com.nu.production",
+    notificationAt: notification.notificationAt, timeZone: notification.timeZone,
+    evidenceOnly: true, missingFields: ["currency", "operationDate"],
+  } };
+}
+
+function realMercadoPagoPurchase(event) {
+  const fields = event.fields || {}, title = fields["android.title"]?.match(/^Compra por \$ ([\d,.]+) fue aprobada$/);
+  if (!title) return null;
+  const parserKey = "mercadopago.card-purchase.es.v1", base = { parserKey, verified: false, proposal: {} };
+  if (conflictingBodies(fields)) return { ...base, reason: "CONFLICTING_FIELDS" };
+  const match = (fields["android.bigText"] || fields["android.text"] || "").match(/^Ve los detalles de tu compra en (.{1,200}) aquí\.$/);
+  if (!match) return { ...base, reason: "INCOMPLETE_FORMAT" };
+  // La muestra admite pesos enteros. Los centavos, cuando estén impresos,
+  // deben tener dos cifras; no redondear ni interpretar separadores ambiguos.
+  const amount = captureAmount(title[1].includes(".") ? title[1] : `${title[1]}.00`);
+  if (!amount || !match[1].trim()) return { ...base, reason: "INVALID_FIELDS" };
+  if (/\b(?:USD|EUR|d[oó]lares|euros)\b|US\$/i.test(Object.values(fields).join("\n"))) return { ...base, reason: "FOREIGN_CURRENCY" };
+  return { ...base, reason: "FORMAT_POLICY_REQUIRED", proposal: { amount, merchant: match[1].trim(),
+    missingFields: ["currency", "card", "operationDate"],
+  } };
+}
+
 export function interpretCapture(event) {
   if (event.sourcePackage === paymentReceiptSource) return parsePaymentReceipt(event);
   const texts = Object.values(event.fields || {}).join("\n");
@@ -167,6 +210,14 @@ export function interpretCapture(event) {
   }
   const payment = interpretPaymentNotice(event, captureAmount, captureNotificationDate, captureOperationTime);
   if (payment) return payment;
+  if (event.sourcePackage === "com.nu.production") {
+    const real = realNuPurchase(event);
+    if (real) return real;
+  }
+  if (event.sourcePackage === "com.mercadopago.wallet") {
+    const real = realMercadoPagoPurchase(event);
+    if (real) return real;
+  }
   if (event.sourcePackage === "com.google.android.apps.walletnfcrel") {
     const real = realWalletPurchase(event) || realWalletSantanderPurchase(event);
     if (real) return real;

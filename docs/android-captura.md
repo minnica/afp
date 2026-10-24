@@ -533,21 +533,21 @@ Con la autorización de esta tarea se respaldaron AFP en `public`, metadatos, pe
 
 **Cobertura al 22 de octubre de 2026.** Se conservan nueve tarjetas, sus IDs, 24 alias y ocho aplicaciones. Wallet/BANAMEX 1 tiene un formato real verificado, la compra inicial registrada una vez y ambas evidencias vinculadas por revisión explícita. Solo esa tarjeta/formato tiene modo automático preparado con la fecha Wallet aceptada; **falta publicar el código web**. Nu/CFE también tiene una regla expresa y su cobro de octubre confirmado, como se detalla abajo. BBVA y los demás formatos/canales siguen pendientes. Los seis alias virtuales Wallet permanecen corregidos y contrastados en el teléfono. Las ampliaciones Wallet/Banamex y Nu/CFE añaden migraciones aditivas ya aplicadas en Supabase (26 completas); no cambia el contrato nativo v1 ni requiere actualizar la APK personal 0.5.0 / 7.
 
-### Cobertura comprobada y pendiente
+### Cobertura comprobada y pendiente — actualización del 23 de octubre
 
 | Tarjeta | Alias configurados y verificados por el propietario | Muestras reales de crédito / formato activable |
 |---|---|---|
 | BBVA | Física, digital, número virtual Wallet | Comprobante aprobado coincidente con Wallet, sin aviso asociado; sin formato activable; aviso de débito excluido |
-| HSBC 1 | Física, digital | Ninguna; Wallet incompatible según propietario |
-| HSBC 2 | Física, digital | Ninguna; Wallet incompatible según propietario |
-| BANAMEX 1 | Física, digital, Wallet | Wallet real verificado, con fecha del aviso aceptada; banco parcial de evidencia; modo preparado, publicación pendiente |
+| HSBC 1 | Física, digital | Compra física comprobada, sin aviso recibido; permiso de notificaciones Android bloqueado en la revisión del 23 de octubre |
+| HSBC 2 | Física, digital | Compra física comprobada, sin aviso recibido; comparte la aplicación HSBC con permiso bloqueado |
+| BANAMEX 1 | Física, digital, Wallet | Wallet publicado/habilitado con fecha del aviso aceptada; banco parcial de evidencia, con ambas fuentes vinculadas al mismo gasto |
 | BANAMEX 2 | Física, digital, Wallet | Wallet publicado/habilitado con el analizador compartido y fecha aceptada; muestra registrada una vez con ambas evidencias y cotejo puntual. Banco JOY parcial no activable |
 | SANTANDER | Física, digital, Wallet | Banco completo publicado/habilitado y Wallet parcial vinculado al mismo gasto; compra futura automática y corte completo pendientes |
-| NU | Física, digital, Wallet | CFE v2 con regla expresa y suscripción: cobro confirmado y modo preparado; publicación pendiente. V1 parcial conservado |
+| NU | Física, digital, Wallet | Nu/CFE habilitado independientemente. Compras Wallet publicadas/habilitadas con fecha aceptada; muestra inicial registrada/cotejada una vez y banco vinculado como evidencia parcial no activable |
 | DIDI | Física, digital, Wallet | Wallet publicado/habilitado con fecha aceptada; muestra inicial registrada/cotejada una vez; compra futura automática y corte completo pendientes; sin muestra bancaria de compra propia |
-| MERCADOPAGO | Física, digital | Ninguna; Wallet incompatible según propietario; distinguir crédito de cuenta/saldo |
+| MERCADOPAGO | Física, digital | Compra aprobada en su propia wallet publicada/habilitada. Regla expresa de tarjeta de crédito única, MXN y fecha del aviso aceptada; muestra inicial registrada/cotejada una vez |
 
-**Para cada tarjeta**, los canales presencial, en línea, cargos parciales y suscripciones continúan pendientes de aceptación real completa. BANAMEX 1/2, Santander y DiDi tienen una compra Wallet revisada, registrada y cotejada puntualmente. Las otras dos tarjetas con alias Wallet siguen sin compra observada en ese canal. Falta observar compras futuras automáticas y conciliar un corte completo. Los alias por sí solos no demuestran una compra. Amazon y Mercado Libre/Mercado Pago se revisan por los cargos efectivos a la tarjeta identificada, conservando los parciales; avisos de pedido/envío no crean gastos. Validar una aplicación no valida todas las tarjetas de su banco ni todas las de Wallet.
+**Para cada tarjeta**, los canales presencial, en línea, cargos parciales y suscripciones continúan pendientes de aceptación real completa. BANAMEX 1/2, Santander, DiDi y Nu tienen una compra Wallet revisada, registrada y cotejada puntualmente; Mercado Pago tiene una compra de su propia wallet resuelta mediante regla expresa. BBVA sigue sin aviso asociado. Falta observar compras futuras automáticas y conciliar un corte completo. Los alias por sí solos no demuestran una compra. Amazon y Mercado Libre/Mercado Pago se revisan por los cargos efectivos a la tarjeta identificada, conservando los parciales; avisos de pedido/envío no crean gastos. Validar una aplicación no valida todas las tarjetas de su banco ni todas las de Wallet.
 
 El S24 Ultra mantiene Android 16/API 36, One UI 8.5, acceso a notificaciones y batería exenta. ADB comprobó las ocho fuentes instaladas: Wallet actualizó a `26.41.996630916` y Mercado Pago a `2.458.2`; las demás versiones coinciden con la matriz anterior. La consulta no leyó avisos ni acredita recepción con pantalla bloqueada.
 
@@ -626,6 +626,20 @@ Para otros avisos pendientes elegibles, revisar Wallet, guardar categoría y reg
 Pasaron **553 pruebas sin omisiones**, incluidas 14 nuevas, lint y build. Navegador de 390 px con Auth ficticia y API/PostgreSQL locales: un gasto con ambas evidencias y fecha aceptada al habilitar; nuevas compras iguales por importe en dos tarjetas crean un gasto por tarjeta y BANAMEX 1 conserva su configuración. Reintentos, ambigüedades, datos personales y límites de la evidencia bancaria comprobados. Sin errores JavaScript ni desbordamiento. Sin migración ni APK nueva; 30 migraciones existentes y personal **0.6.0 / 8** compatibles. [Evidencia y pantallas](../artifacts/android-banamex2/verification.json).
 
 En producción, `dpl_2Yp4BwCjZbGTxQUfkBtvHjrQ3z76` está `READY` en el dominio AFP con la huella del analizador probado. Tras respaldo privado de 32 tablas se resolvió la muestra como un gasto en **Por clasificar**, con ambas evidencias y cotejo puntual; solo BANAMEX 2 / Wallet quedó habilitado con su fecha aceptada. Gastos del celular muestra una compra, ambas fuentes y cotejo. Registros anteriores, eventos/recibos e interpretaciones iniciales, alias, otras reglas y RLS conservados. Solo cambiaron metadatos operativos de conexión/límites del teléfono y la revisión de Calendar activada por el trigger. BBVA quedó sin cambios. Falta observar una compra futura normal registrada automáticamente y conciliar un corte completo. [Verificación de producción](../artifacts/android-banamex2/production.json).
+
+### Nu por Wallet y compras Mercado Pago — publicados y habilitados
+
+El 23 de octubre se recibieron tres avisos de las cinco compras de prueba: Nu, Wallet/Nu y Mercado Pago. Sus comprobantes se contrastaron privadamente. No hubo aviso BBVA; HSBC tiene bloqueado el permiso Android. No se modificaron esos permisos ni las tarjetas de Wallet. La APK personal 0.6.0 / 8 y el contrato v1 siguen siendo suficientes.
+
+`wallet.nu-purchase.es.v1` reconoce **Nu Mastercard Gold** y resuelve las cifras impresas contra alias bancarios Nu físicos/digitales verificados, conservando el número NFC separado. Propone importe, MXN, comercio y día del aviso en México. `nu.card-purchase.es.v1` queda como evidencia parcial sin fecha/moneda supuestas; ambos avisos requieren vinculación expresa para compartir el gasto. El banco por sí solo no habilita compras automáticas ni interfiere con Nu/CFE.
+
+Para `mercadopago.card-purchase.es.v1`, **Tarjetas y reglas → Configurar regla Mercado Pago** permite aceptar una tarjeta de crédito única, MXN y fecha de publicación en México. Importe/comercio proceden del aviso; tarjeta/MXN de la declaración del propietario. La regla `MERCADOPAGO_CREDIT_MXN` no necesita suscripción y solo permite un destinatario por propietario/formato. No se identifica una tarjeta a partir de un ticket borroso. Sin regla vigente se mantiene `FORMAT_POLICY_REQUIRED`; cambiar el destinatario detiene la automatización anterior y exige otra muestra propia revisada/cotejada. Si cambia la moneda o la fuente de fondos, volver a observación y revisar la regla.
+
+Guardar la regla no crea gastos ni habilita el formato. Para avisos antiguos: **Interpretar con el formato actual**, revisar/guardar, registrar una compra o vincular una existente, cotejar puntualmente y habilitar el formato aceptando su fecha. Se conservan evento, recibo e interpretación original, con historial explícito. Un cotejo puntual no equivale a un corte completo.
+
+La migración `20261024010000_capture_mercadopago_purchase_policy` amplía la restricción de reglas sin borrar filas ni activar formatos; Nu/CFE conserva la suscripción obligatoria y su configuración. Pasaron 569 pruebas sin fallos ni omisiones, 31 migraciones desde vacío/actualización histórica, RLS y flujo móvil con datos ficticios. [Verificación local](../artifacts/android-nu-mercadopago/verification.json).
+
+**Producción autorizada y verificada:** `dpl_8PsycW1qZLMD7EQu1y6pVHJuZWJq`, `READY`, sirve AFP con los 16 módulos de captura coincidentes por huella. Tras respaldo privado de 32 tablas se aplicó la migración, con 31 completas, diff vacío y RLS intacto; se resolvieron dos compras en Por clasificar, una por tarjeta, y se vinculó el banco Nu al gasto Wallet. Ambos cotejos son puntuales; el propietario aceptó la fecha del aviso en México y se habilitaron únicamente esos dos formatos de compra. Los originales, gastos anteriores, alias, Nu/CFE y demás reglas se conservaron. Calendar terminó sincronizado sin error. Sin APK nueva. Falta observar compras futuras automáticas, conciliar corte completo y resolver recepción BBVA/HSBC. [Verificación de producción y auditoría de dependencias pendiente](../artifacts/android-nu-mercadopago/production.json).
 
 ### Validar y habilitar una tarjeta y formato
 

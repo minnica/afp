@@ -1,0 +1,31 @@
+{
+  "verifiedAt": "2026-10-24T00:55:30.260Z",
+  "commands": [
+    "pnpm audit:prod",
+    "pnpm audit:all"
+  ],
+  "prod": {
+    "exitCode": 1,
+    "total": 7,
+    "critical": 2,
+    "high": 1,
+    "moderate": 2,
+    "low": 2
+  },
+  "all": {
+    "exitCode": 1,
+    "total": 8,
+    "critical": 2,
+    "high": 2,
+    "moderate": 2,
+    "low": 2
+  },
+  "packagesUnchangedByCaptureImplementation": true,
+  "nextVersion": "16.3.8",
+  "patchReportedByRegistry": "16.4.1",
+  "criticalAdvisories": [
+    "https://github.com/advisories/GHSA-2464-fhr4-w9xw",
+    "https://github.com/advisories/GHSA-673q-mjm6-r5xr"
+  ],
+  "status": "Unresolved dependency maintenance; findings reported by pnpm audit, exploitability not assessed in this capture task"
+}

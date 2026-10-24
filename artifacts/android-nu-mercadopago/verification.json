@@ -1,0 +1,146 @@
+{
+  "schemaVersion": 1,
+  "verifiedAt": "2026-10-24T00:47:12.523Z",
+  "scope": "Local implementation; no production writes, deployment or activation",
+  "gitBase": "11f6139a23d3d78d3c37ba0bed47b2e4f4344315",
+  "formats": [
+    {
+      "parserKey": "wallet.nu-purchase.es.v1",
+      "identity": "Verified Nu physical/digital bank alias; NFC remains separate",
+      "date": "NOTIFICATION_POSTED_AT / America/Mexico_City"
+    },
+    {
+      "parserKey": "nu.card-purchase.es.v1",
+      "evidenceOnly": true,
+      "automatic": false,
+      "missing": [
+        "currency",
+        "operationDate"
+      ],
+      "bankWalletLink": "Explicit owner resolution"
+    },
+    {
+      "parserKey": "mercadopago.card-purchase.es.v1",
+      "completionPolicy": "MERCADOPAGO_CREDIT_MXN",
+      "identityAndCurrency": "Owner declaration: single credit card, MXN",
+      "date": "NOTIFICATION_POSTED_AT / America/Mexico_City",
+      "subscriptionRequired": false,
+      "policyChange": "Resets OBSERVATION; invalidates prior proposals and pilot for new destination"
+    }
+  ],
+  "regressions": {
+    "command": "AFP_MIGRATION_TEST_DATABASE_URL=<local afp_test database> node scripts/verify-database-reproduction.cjs",
+    "tests": 569,
+    "passed": 569,
+    "failed": 0,
+    "skipped": 0,
+    "migrations": 31,
+    "rlsTablesIncludingHistory": 32,
+    "emptyDatabase": true,
+    "historicalUpgrade": true,
+    "checksumsPreserved": true,
+    "drift": false,
+    "recordsPreserved": true
+  },
+  "finalDirectedCheck": {
+    "tests": 19,
+    "passed": 19,
+    "failed": 0,
+    "skipped": 0
+  },
+  "build": {
+    "harness": "tests/helpers/capture-browser-server.cjs",
+    "environment": "AFP_CAPTURE_TEST_PRODUCTION=1; disposable localhost afp_test DB; no project .env",
+    "webpack": true,
+    "successful": true,
+    "finalModifiedSourceHashesMatch": true
+  },
+  "lint": {
+    "errors": 0,
+    "existingWarnings": "TanStack useReactTable incompatible-library; also reported for identical file in ignored local backup",
+    "finalModifiedUiCheck": "passed"
+  },
+  "browser": {
+    "auth": "Fictional local owner",
+    "api": "Real Next.js routes",
+    "database": "Disposable PostgreSQL 16 on localhost",
+    "viewports": [
+      390,
+      1280
+    ],
+    "horizontalOverflow": false,
+    "uncaughtJsErrors": 0,
+    "completedCaptureRequests": 43,
+    "completedCaptureResponsesAll200": true,
+    "readOnlyPollingRequestsInterruptedDuringLocalServerRebuild": 2,
+    "mercadoPagoPolicySavedInUi": true,
+    "mercadoPagoReviewedAndRegisteredInUi": true,
+    "nuReviewedAndLinkedViaHttpApi": true,
+    "bothPilotsPointReconciledViaHttpApi": true,
+    "bothEnabledInUiWithDateConfirmation": true,
+    "concurrentDeliveriesPerFormat": 8,
+    "retriesPerFormat": 1,
+    "expenses": 4,
+    "reviewedPilots": 2,
+    "newAutomaticExpenses": 2,
+    "newAutomaticExpensesPendingReconciliation": 2,
+    "nuBankEvidenceLinkedToPilot": true
+  },
+  "offlineOriginalCheck": {
+    "events": 3,
+    "nuWalletIdentified": true,
+    "nuBankPartial": true,
+    "mercadoPagoRequiresOwnerPolicy": true,
+    "productionConnection": false
+  },
+  "privacy": {
+    "publicSamples": "Fictional merchant, amounts, dates, aliases and credentials",
+    "originalsGitIgnored": true,
+    "privateEvidenceCopiedToChangedText": false
+  },
+  "production": {
+    "changed": false,
+    "migrationApplied": false,
+    "newFormatsEnabled": false,
+    "ownerCardAndMxnDeclarationReceived": true,
+    "datePolicyApprovalPending": true,
+    "initialPurchasesResolutionPending": true
+  },
+  "native": {
+    "apkChange": false,
+    "contractChange": false,
+    "regressionRerun": false
+  },
+  "pending": [
+    "Authorize production migration/deployment and notification-day policy",
+    "Resolve original Nu and Mercado Pago once each; link Nu evidence; point reconciliation; enable these two purchase formats",
+    "Observe future automatic purchases and reconcile complete statement",
+    "BBVA notification absent; HSBC notifications blocked in inspected Android settings"
+  ],
+  "sourceSha256": {
+    "scripts/verify-database-reproduction.cjs": "e2c8f969b4c8b7a45442c1dd0f555d3dacf4e4e0fdf7064ef74b46bdccada3e1",
+    "src/components/configuracion/CaptureConfigurationPanel.jsx": "9709caac2766ac18678c3904c3ae9c2489478f56626b88a7e3e2c90a5539d990",
+    "src/components/configuracion/CaptureMovementEditor.jsx": "96ec6a6d575ea444aa3d00566d75ff73f457415f5c10910edb0355fa012eb078",
+    "src/components/configuracion/CaptureRolloutStatus.jsx": "36aaa5d4a2be2bd36e207896fcc42c29757fb85ca28751bf9ccae3a9eea5ecfd",
+    "src/lib/captureConfiguration.js": "e58244e2ef50303b77f8ceb81ce20f074801e6940c7fce727a4b428152e8fc09",
+    "src/lib/captureFormatPolicy.js": "e3913a36d32343ae9c7ff6e399561aa822606e404c6599b18f23371392b39547",
+    "src/lib/captureParsers.js": "26ef8becaadd4a53e0d0c29518ec74cc5a61280f7e857b80fba4faf942372a3a",
+    "src/lib/capturePresentation.js": "eecbc8b970216a2c92a21e2678cb31da04a1634cc4d00b2bdc4162c30878dc44",
+    "src/lib/captureProcessing.js": "6b13a4dc6148e5277320c42f4b8b1e1f6bd6f7075d8278613d9678ee7b668d5f",
+    "src/lib/captureRollout.js": "ed8b7e6ed2c441bed72ebcf1e68115ed5e5557cd97df74423450b0851d9b76b8",
+    "src/lib/captureService.js": "d8f7b73192dbacf1fb3aa02e78b35009f3cc763df0dde3301b0715a218311788",
+    "tests/migration-history.test.cjs": "0f4cc1c5c4aadff6b4460f81f0f152340c454ba32a090bd9b3c80cacc87eb01a",
+    "prisma/migrations/20261024010000_capture_mercadopago_purchase_policy/migration.sql": "166646abdaa37e67228d0133740cb0eb451f9134306faef8e4672e8ce8552978",
+    "tests/capture-nu-mercadopago-real-integration.test.cjs": "155d32e106ed4aa4d9d912c79488471d76c42be1d130135f89afeddf99733fd3",
+    "tests/capture-nu-mercadopago-real.test.cjs": "1a06d80da5dfac9b264fcaa727b137ae4696f7f39d2404c53e9f62fee95a2a71",
+    "tests/fixtures/captures/mercadopago-card-purchase.es.v1.json": "31887737c39a7e651820c2968ea5de684a37784679d6d3a8d54c0e0c3c03ea68",
+    "tests/fixtures/captures/nu-card-purchase.es.v1.json": "feb970481280948bda369a8a9b674de98d2db03818a85a13ffb56258759d91c6",
+    "tests/fixtures/captures/wallet-nu-purchase.es.v1.json": "f5de67a1038d3a9f27b2ef1b65a7a34f54c929c75b1ffef7ce4b9cda849dae11"
+  },
+  "screenshots": [
+    "policy-mobile.png",
+    "review-mobile.png",
+    "enable-mobile.png",
+    "policy-desktop.png"
+  ]
+}

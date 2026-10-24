@@ -1,0 +1,15 @@
+{
+  "kind": "ANONYMIZED_REAL_NOTIFICATION",
+  "reviewedOn": "2026-10-23",
+  "scope": "Texto y estructura observados; comercio, importe, terminaciones y fechas sustituidos por valores ficticios. Originales fuera de Git. Aviso bancario de evidencia parcial: no incluye moneda explícita ni fecha bancaria.",
+  "event": {
+    "postedAt": "2026-10-21T00:14:26.000Z",
+    "receivedAt": "2026-10-21T00:14:26.400Z",
+    "sourcePackage": "com.nu.production",
+    "fields": {
+      "android.title": "Compra aprobada por $123.45",
+      "android.text": "Compraste en COMERCIO FICTICIO con tu tarjeta con terminación 0123 por $123.45.",
+      "android.bigText": "Compraste en COMERCIO FICTICIO con tu tarjeta con terminación 0123 por $123.45."
+    }
+  }
+}

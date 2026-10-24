@@ -151,7 +151,7 @@ async function captureExpenseData(tx, movement) {
   const policySubscription = policyParser && proposal.subscriptionId ? await tx.subscription.findFirst({ where: { id: proposal.subscriptionId, userId } }) : null;
   if (policyParser) {
     const policy = await tx.captureAutomation.findFirst({ where: { userId, cardId: proposal.cardId, parserKey: policyParser.key } });
-    if (!matchesCapturePolicy(policy, policyParser, proposal) || !policySubscription) return { reason: "FORMAT_POLICY_REQUIRED" };
+    if (!matchesCapturePolicy(policy, policyParser, proposal) || (policyParser.policyRequiresSubscription && !policySubscription)) return { reason: "FORMAT_POLICY_REQUIRED" };
   }
   let categoryId = movement.correction?.categoryId || policySubscription?.categoryId || rule?.categoryId;
   if (!categoryId) categoryId = (await tx.category.upsert({ where: { userId_name: { userId, name: "Por clasificar" } },

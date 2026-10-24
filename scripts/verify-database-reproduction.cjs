@@ -102,6 +102,7 @@ function assertCatalog(actual) {
     assert.equal(column?.data_type, type); assert.equal(column?.is_nullable, 'YES'); assert.equal(column?.column_default, null);
   }
   assert.match(actual.constraints.find(row => row.name === 'capture_automations_completion_policy_check')?.definition || '', /NU_CFE_MXN/);
+  assert.match(actual.constraints.find(row => row.name === 'capture_automations_completion_policy_check')?.definition || '', /MERCADOPAGO_CREDIT_MXN/);
   assert.match(actual.constraints.find(row => row.name === 'capture_automations_policySubscriptionId_fkey')?.definition || '', /REFERENCES subscriptions.*ON DELETE SET NULL/);
   assert.ok(actual.indexes.some(row => row.indexname === 'capture_automations_owner_format_policy_key'));
   const balanceColumns = ['balanceAsOf', 'balanceTracking', 'creditLimit', 'usedBalance'];

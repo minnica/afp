@@ -9,7 +9,7 @@ export const captureActivationReasons = {
   NO_VERIFIED_ALIAS: "Falta una terminación verificada de esta tarjeta y fuente.",
   AMBIGUOUS_ALIAS: "Una terminación de esta fuente también pertenece a otra tarjeta. Revisa los alias.",
   NO_REVIEWED_CAPTURE: "Revisa, registra o vincula y concilia una propuesta de esta tarjeta y formato, sin corregir los datos interpretados.",
-  FORMAT_POLICY_REQUIRED: "Confirma la regla Nu/CFE con tarjeta, MXN, fecha del aviso y suscripción.",
+  FORMAT_POLICY_REQUIRED: "Confirma la regla del formato con tarjeta, MXN y fecha del aviso; incluye la suscripción cuando corresponda.",
 };
 
 function matchingAlias(alias, proposal, sourcePackage) {
@@ -27,7 +27,8 @@ export function isReviewedCapture(movement, parser, aliases, automations = []) {
     || !(p.operationAt || (parser.dateSource === "NOTIFICATION_POSTED_AT" && p.dateSource === parser.dateSource && p.notificationAt))
     || p.cardId !== movement.cardId || p.cardId !== expense.cardId) return false;
   if (parser.completionPolicy) {
-    if (!automations.some(policy => matchesCapturePolicy(policy, parser, p)) || expense.subscriptionId !== p.subscriptionId) return false;
+    if (!automations.some(policy => matchesCapturePolicy(policy, parser, p))
+      || (parser.policyRequiresSubscription && expense.subscriptionId !== p.subscriptionId)) return false;
   } else if (!aliases.some(alias => matchingAlias(alias, p, parser.sourcePackage))) return false;
   if (!movement.events.some(event => {
     const analyses = [event.interpretation, ...(movement.analysisHistory || []).filter(analysis => event.id && analysis.eventId === event.id
@@ -59,7 +60,7 @@ export function captureFormatReadiness(parser, cardId, aliases, movements, autom
   if (ambiguous.length) blockers.push("AMBIGUOUS_ALIAS");
   if (!reviewed.length) blockers.push("NO_REVIEWED_CAPTURE");
   return { parserKey: parser.key, sourcePackage: parser.sourcePackage, verified: Boolean(parser.verified), dateSource: parser.dateSource || "BANK_OPERATION",
-    ...(parser.completionPolicy ? { completionPolicy: parser.completionPolicy, hasFormatPolicy: Boolean(policy), policySubscriptionId: policy?.policySubscriptionId || null } : {}),
+    ...(parser.completionPolicy ? { completionPolicy: parser.completionPolicy, policyRequiresSubscription: Boolean(parser.policyRequiresSubscription), hasFormatPolicy: Boolean(policy), policySubscriptionId: policy?.policySubscriptionId || null } : {}),
     verifiedAliases: verified.length, ambiguousAliases: ambiguous.length, reviewedCaptures: reviewed.length,
     blockers, canEnable: blockers.length === 0 };
 }

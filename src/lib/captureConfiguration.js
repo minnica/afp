@@ -21,8 +21,8 @@ const actionSchema = z.discriminatedUnion("action", [
   z.object({ action: z.literal("importAliases"), inventory: captureInventorySchema }).strict(),
   z.object({ action: z.literal("automation"), cardId: z.string().min(1), parserKey: z.string(), mode: z.enum(["OBSERVATION", "AUTOMATIC"]),
     datePolicy: z.enum(["BANK_OPERATION", "NOTIFICATION_POSTED_AT"]).optional() }).strict(),
-  z.object({ action: z.literal("formatPolicy"), cardId: z.string().min(1), parserKey: z.literal("nu.cfe-service-payment.es.v2"),
-    completionPolicy: z.literal("NU_CFE_MXN"), datePolicy: z.literal("NOTIFICATION_POSTED_AT"), subscriptionId: z.string().min(1) }).strict(),
+  z.object({ action: z.literal("formatPolicy"), cardId: z.string().min(1), parserKey: z.enum(["nu.cfe-service-payment.es.v2", "mercadopago.card-purchase.es.v1"]),
+    completionPolicy: z.enum(["NU_CFE_MXN", "MERCADOPAGO_CREDIT_MXN"]), datePolicy: z.literal("NOTIFICATION_POSTED_AT"), subscriptionId: z.string().min(1).optional() }).strict(),
   z.object({ action: z.literal("rule"), cardId: z.string().min(1), merchant: z.string().trim().min(1).max(200), categoryId: z.string().min(1), subscriptionId: z.string().nullable().optional() }).strict(),
 ]);
 
@@ -75,10 +75,12 @@ export async function configureCapture(db, userId, input) {
     if (data.action === "formatPolicy") {
       const parser = captureParsers.find(parser => parser.key === data.parserKey && parser.completionPolicy === data.completionPolicy);
       if (!parser) throw new ApiAccessError("Regla de formato no disponible.", 400);
+      if (Boolean(parser.policyRequiresSubscription) !== Boolean(data.subscriptionId)) throw new ApiAccessError("Revisa si la regla requiere una suscripción.", 400);
       const aliases = await tx.captureCardAlias.findMany({ where: { userId, cardId: data.cardId, sourcePackage: parser.sourcePackage, verifiedAt: { not: null } } });
-      if (!aliases.length) throw new ApiAccessError("Configura y verifica la fuente Nu de esta tarjeta antes de guardar la regla.", 409);
+      if (!aliases.length) throw new ApiAccessError("Configura y verifica la fuente bancaria de esta tarjeta antes de guardar la regla.", 409);
       const existing = await tx.captureAutomation.findFirst({ where: { userId, parserKey: parser.key, completionPolicy: parser.completionPolicy } });
-      if (existing?.cardId === data.cardId && existing.policySubscriptionId === data.subscriptionId && matchesCapturePolicy(existing, parser)) return existing;
+      const subscriptionId = data.subscriptionId || null;
+      if (existing?.cardId === data.cardId && existing.policySubscriptionId === subscriptionId && matchesCapturePolicy(existing, parser)) return existing;
       // Cambiar el destinatario detiene la automatización anterior y exige un
       // piloto propio. Nunca hay dos tarjetas receptoras para este aviso sin alias.
       await tx.captureAutomation.updateMany({ where: { userId, parserKey: parser.key }, data: {
@@ -86,7 +88,7 @@ export async function configureCapture(db, userId, input) {
       } });
       const identity = { userId, cardId: data.cardId, parserKey: parser.key };
       const policy = { mode: "OBSERVATION", datePolicy: data.datePolicy, completionPolicy: data.completionPolicy,
-        policyAcceptedAt: new Date(), policySubscriptionId: data.subscriptionId };
+        policyAcceptedAt: new Date(), policySubscriptionId: subscriptionId };
       return tx.captureAutomation.upsert({ where: { userId_cardId_parserKey: identity }, create: { ...identity, ...policy }, update: policy });
     }
     if (data.action === "automation") {
@@ -107,7 +109,7 @@ export async function configureCapture(db, userId, input) {
         const aliases = await tx.captureCardAlias.findMany({ where: { userId } });
         const automations = await tx.captureAutomation.findMany({ where: { userId } });
         if (parser.completionPolicy && !automations.some(policy => policy.cardId === data.cardId && matchesCapturePolicy(policy, parser))) {
-          throw new ApiAccessError("Confirma la tarjeta, moneda, fecha y suscripción de la regla Nu/CFE.", 409);
+          throw new ApiAccessError("Confirma la regla de este formato: tarjeta, MXN, fecha del aviso y suscripción cuando corresponda.", 409);
         }
         const movements = await captureRolloutMovements(tx, userId, { cardId: data.cardId, parserKey: parser.key });
         const readiness = captureFormatReadiness(parser, data.cardId, aliases, movements, automations);

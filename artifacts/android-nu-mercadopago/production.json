@@ -1,0 +1,184 @@
+{
+  "verifiedAt": "2026-10-24T00:55:30.260Z",
+  "productionUrl": "https://finanzas.garatachia.com",
+  "deploymentId": "dpl_8PsycW1qZLMD7EQu1y6pVHJuZWJq",
+  "state": "READY",
+  "previousDeploymentId": "dpl_2vqaq9RdLGKu5wto4wvwv77pkfie",
+  "sourceCommit": "11f6139a23d3d78d3c37ba0bed47b2e4f4344315",
+  "sourceWorkingTree": true,
+  "sourceFiles": 305,
+  "sourceBytes": 2746299,
+  "sourceManifestSha256": "da9bb5f73336f585800994c8448e9d0d09bc155178d551daa66dd8c8e12cb110",
+  "parserSourceSha1": "889382f381fc4f81745b419dfbfc94b2d1ce68f3",
+  "parserSourceSha256": "26ef8becaadd4a53e0d0c29518ec74cc5a61280f7e857b80fba4faf942372a3a",
+  "captureServerModulesMatched": 16,
+  "productionAliasVerified": true,
+  "privateFilesUploaded": false,
+  "commitOrPushPerformed": false,
+  "migrationApplied": true,
+  "migration": "20261024010000_capture_mercadopago_purchase_policy",
+  "migrationsComplete": 31,
+  "schemaDiffEmpty": true,
+  "checksumsPreserved": true,
+  "privateBackupTables": 32,
+  "publicHttpChecks": [
+    {
+      "path": "/gastos",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/configuracion",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/manifest.webmanifest",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/.well-known/assetlinks.json",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/captures/configuration",
+      "method": "GET",
+      "status": 401
+    },
+    {
+      "path": "/api/captures/movements",
+      "method": "GET",
+      "status": 401
+    },
+    {
+      "path": "/api/captures/events",
+      "method": "POST",
+      "status": 401
+    },
+    {
+      "path": "/api/captures/device",
+      "method": "GET",
+      "status": 401
+    }
+  ],
+  "runtimeErrorGroupsObserved": 0,
+  "runtimeErrorScope": "Capture routes; ten-minute observation window immediately after release",
+  "dataVerification": {
+    "verifiedAt": "2026-10-24T00:53:16.203Z",
+    "newExpenses": 2,
+    "nuAndMercadoPagoEachExactlyOnce": true,
+    "nuBankLinkedToWalletExpense": true,
+    "previousExpensesUnchanged": true,
+    "originalEventsAndReceiptsUnchanged": true,
+    "originalInterpretationsRetained": true,
+    "explicitAnalysisHistoryForThreeNotices": true,
+    "nuBankRemainsPartial": true,
+    "onlyTwoPurchaseFormatsEnabled": true,
+    "nuCfeAndOtherRulesUnchanged": true,
+    "aliasesAndOtherFinancialTablesUnchanged": true,
+    "bbvaAndHsbcUnchanged": true,
+    "notificationDateMexicoAccepted": true,
+    "migrations": 31,
+    "rlsTables": 32,
+    "rlsUnchanged": true,
+    "pointVerificationOnly": true,
+    "completeStatementVerified": false,
+    "readinessValid": true,
+    "deviceCredentialsAndConfigurationUnchanged": true,
+    "tablesCompared": 32,
+    "differences": [
+      {
+        "table": "_prisma_migrations",
+        "allowed": true
+      },
+      {
+        "table": "capture_automations",
+        "allowed": true
+      },
+      {
+        "table": "capture_devices",
+        "allowed": true
+      },
+      {
+        "table": "capture_movements",
+        "allowed": true
+      },
+      {
+        "table": "capture_rate_limits",
+        "allowed": true
+      },
+      {
+        "table": "capture_statements",
+        "allowed": true
+      },
+      {
+        "table": "daily_expenses",
+        "allowed": true
+      },
+      {
+        "table": "google_calendar_connections",
+        "allowed": true
+      }
+    ],
+    "calendar": {
+      "status": "CONNECTED",
+      "synchronized": true,
+      "lastError": null
+    }
+  },
+  "activation": [
+    {
+      "card": "NU",
+      "parserKey": "wallet.nu-purchase.es.v1",
+      "mode": "AUTOMATIC",
+      "datePolicy": "NOTIFICATION_POSTED_AT",
+      "timeZone": "America/Mexico_City",
+      "initialPurchaseResolvedExactlyOnce": true,
+      "bankEvidenceExplicitlyLinked": true,
+      "bankFormatAutomatic": false
+    },
+    {
+      "card": "MERCADOPAGO",
+      "parserKey": "mercadopago.card-purchase.es.v1",
+      "mode": "AUTOMATIC",
+      "completionPolicy": "MERCADOPAGO_CREDIT_MXN",
+      "policyOrigin": "Owner declaration: single credit card and MXN",
+      "datePolicy": "NOTIFICATION_POSTED_AT",
+      "timeZone": "America/Mexico_City",
+      "subscriptionRequired": false,
+      "initialPurchaseResolvedExactlyOnce": true
+    }
+  ],
+  "datePolicyExplicitlyAcceptedByOwner": true,
+  "pointReconciliationOnly": true,
+  "fullStatementStillPending": true,
+  "firstFutureAutomaticPurchaseStillToObserve": true,
+  "phoneVerification": {
+    "physicalDevice": true,
+    "appOrigin": "https://finanzas.garatachia.com",
+    "screen": "Gastos",
+    "bothCardsAndCorrectAmountsVisible": true,
+    "category": "Por clasificar",
+    "pointReconciled": true,
+    "existingSessionUsed": true,
+    "financialScreenshotPublished": false
+  },
+  "apkUpdated": false,
+  "personalApk": "0.6.0 / 8",
+  "calendarSync": {
+    "status": 200,
+    "results": [
+      "SYNCED"
+    ],
+    "connectionSynchronized": true,
+    "error": null
+  },
+  "dependencyAudit": {
+    "status": "Findings remain open",
+    "prodAdvisories": 7,
+    "critical": 2,
+    "details": "dependency-audit.json"
+  }
+}

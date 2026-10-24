@@ -1,0 +1,17 @@
+{
+  "kind": "ANONYMIZED_REAL_NOTIFICATION",
+  "reviewedOn": "2026-10-23",
+  "scope": "Texto y estructura observados; comercio, importe, terminaciones y fechas sustituidos por valores ficticios. Originales fuera de Git.",
+  "event": {
+    "postedAt": "2026-10-21T00:14:26.000Z",
+    "receivedAt": "2026-10-21T00:14:26.400Z",
+    "sourcePackage": "com.mercadopago.wallet",
+    "fields": {
+      "android.title": "Compra por $ 123 fue aprobada",
+      "android.title.big": "Compra por $ 123 fue aprobada",
+      "android.text": "Ve los detalles de tu compra en COMERCIO FICTICIO aquí.",
+      "android.bigText": "Ve los detalles de tu compra en COMERCIO FICTICIO aquí."
+    }
+  },
+  "policy": "El propietario declara una única tarjeta de crédito y MXN para estas compras. La regla y la fecha de publicación México requieren aceptación explícita; el aviso por sí solo no identifica tarjeta, moneda ni día bancario."
+}
