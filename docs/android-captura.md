@@ -1,6 +1,6 @@
 # AFP Android · diagnóstico, vinculación y sincronización
 
-**Versión personal instalada: 0.6.0 / versionCode 8**, verificada por USB el 22 de octubre de 2026; incorpora comprobantes compartidos y conserva captura, vinculación y ocho fuentes. Los seguimientos de publicación están en el README. El formato bancario Santander ya está publicado y habilitado; su compra inicial se resolvió expresamente como un gasto con dos evidencias. La primera compra futura automática y la conciliación de un corte completo siguen pendientes.
+**Versión personal instalada: 0.7.0 / versionCode 9**, actualizada con autorización y verificada por USB el 23 de octubre de 2026 (24 UTC). Conserva la vinculación y los canales bancarios; añade Uber, DiDi viajes y Uber Eats para revisión de futuros avisos. El servidor confirma once fuentes seleccionadas, lector conectado y captura activa. Los seguimientos de publicación están en el README.
 
 La Fase 1 añade una APK Kotlin/Compose en `android/`. Abre la interfaz financiera actual mediante Trusted Web Activity (TWA) y permite comprobar qué notificaciones entregan BBVA México, Google Wallet, HSBC, Banamex, Santander, Nu, DiDi Finanzas y Mercado Pago. La pantalla nativa incluye activación, selección de fuentes, estado del permiso y del lector, muestras locales e instrucciones para Samsung.
 
@@ -9,6 +9,8 @@ El diagnóstico está **pausado por defecto**. La Fase 2 añade vinculación ind
 El plan se ajustó el 21 de octubre de 2026 para preparar el diagnóstico de todas las tarjetas desde la Fase 1 y conservar la activación automática gradual por tarjeta/formato, empezando por BBVA. La APK **0.1.2 / versionCode 3** amplió el diagnóstico a ocho paquetes verificados; posteriormente se actualizó a **0.2.0 / versionCode 4**, vinculada en el S24 Ultra; la Fase 3 actualiza la APK a **0.3.0 / versionCode 5**. El inventario actual, leído mediante una transacción de solo lectura, contiene nueve tarjetas de siete emisores. La [matriz de fuentes](../android/diagnostics/format-matrix.md) relaciona esos nombres existentes con las aplicaciones y mantiene separados los paquetes verificados de los formatos aún sin muestras reales.
 
 ## Compilación y firma
+
+**Ampliación publicada e instalada 0.7.0 / 9:** añade Uber, DiDi viajes y Uber Eats como fuentes de evidencia para revisión. El catálogo tiene once paquetes; la selección anterior se conserva y las tres nuevas fuentes quedaron activadas explícitamente después de publicar la API compatible. Sus avisos no generan gastos, no identifican tarjetas y no alteran los canales bancarios. La muestra real se validará en el próximo viaje/pedido. Véase [alcance y estado](../README.md#avisos-de-uber-didi-viajes-y-uber-eats--publicado-y-activo).
 
 Requisitos: un **JDK completo** 17 o superior compatible con Gradle 9.3.1 (compilador local: Temurin 21.0.12.1), Android SDK Platform 37 y Build Tools 36.0.0. Un JRE sin `javac` no basta. El `targetSdk` es 36 (Android 16) y el mínimo es 28. AGP 9.1.1 incorpora Kotlin 2.2.10; el plugin de Compose usa esa misma versión. Las dependencias tienen versiones fijadas.
 

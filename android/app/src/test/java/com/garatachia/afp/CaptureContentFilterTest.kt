@@ -22,6 +22,16 @@ class CaptureContentFilterTest {
         assertFalse(excluded("Compra en PROMOCIONES COMERCIALES SA"))
         assertFalse(CaptureContentFilter.excluded(mapOf("android.title" to "Promociones Comerciales SA", "android.text" to "Compra aprobada por $120")))
     }
+    @Test fun serviceEvidenceCanBeCollectedWithoutClaimingACompletedPurchase() {
+        // Textos hipotéticos: verifican conservación, no acreditan formatos reales.
+        for (text in listOf("Tu conductor está llegando", "Viaje finalizado",
+            "Pedido entregado", "Tarifa estimada: $150", "Recibo de tu viaje",
+            "Cargo por $150", "Cancelación del viaje", "Reembolso por $150")) {
+            assertFalse(text, excluded(text))
+        }
+        assertTrue(excluded("Tu código de acceso es 123456"))
+        assertTrue(excluded("Aprovecha esta promoción exclusiva para tu próximo viaje"))
+    }
     @Test fun retryAfterAcceptsSecondsAndHttpDateAndBoundsMalformedValues() {
         assertEquals(300000L, CaptureApiClient.retryAfterMillis("300"))
         assertEquals(0L, CaptureApiClient.retryAfterMillis("invalid"))

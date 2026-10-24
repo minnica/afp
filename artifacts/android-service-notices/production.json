@@ -1,0 +1,66 @@
+{
+  "verifiedAt": "2026-10-24T05:19:36.793166+00:00",
+  "deploymentId": "dpl_2EgXgjEH9mDhmMsyrot2MYNv2d87",
+  "state": "READY",
+  "productionUrl": "https://finanzas.garatachia.com",
+  "sourceCommit": "08bcc7fa9a5c209d5a78e7dd55f9bd08119b0b9d",
+  "publishedFiles": 310,
+  "sourceManifestSha256": "94780446c6af15a81b2742df1c0f40586174e43c8c820e14e0ec1acde85d2695",
+  "captureModulesComparedBySha1": 19,
+  "apk": {
+    "versionName": "0.7.0",
+    "versionCode": 9,
+    "installed": true,
+    "sameSigningIdentity": true,
+    "firstInstallTimePreserved": true
+  },
+  "phone": {
+    "model": "Samsung SM-S928B",
+    "deviceAndCredentialPreserved": true,
+    "notificationPermissionPreserved": true,
+    "reportedAt": "2026-10-24T05:18:38.387Z",
+    "report": {
+      "action": "report",
+      "active": true,
+      "version": 1,
+      "batteryExempt": true,
+      "deliveryPaused": false,
+      "pausedPackages": [],
+      "selectedPackages": [
+        "com.didiglobal.cashloan",
+        "mx.hsbc.hsbcmexico",
+        "com.ubercab.eats",
+        "mx.bancosantander.supermovil",
+        "com.ubercab",
+        "com.citibanamex.banamexmobile",
+        "com.nu.production",
+        "com.mercadopago.wallet",
+        "com.didiglobal.passenger",
+        "com.bancomer.mbanking",
+        "com.google.android.apps.walletnfcrel"
+      ],
+      "listenerConnected": true,
+      "notificationAccess": true
+    },
+    "pending": 0,
+    "queueErrors": 0,
+    "delivered": 48
+  },
+  "financialVerification": {
+    "expensesUnchanged": true,
+    "cardAliasesUnchanged": true,
+    "captureAutomationsUnchanged": true,
+    "bankFallbackPoliciesUnchanged": true,
+    "databaseMigrationRequired": false,
+    "cronChanges": false
+  },
+  "http": {
+    "login": 200,
+    "eventsWithoutCredential": 401,
+    "deviceWithoutCredential": 401,
+    "configurationWithoutCredential": 401
+  },
+  "runtimeErrorGroupsObserved": 0,
+  "newSourcesAutomaticExpenses": false,
+  "nextStep": "Recibir notificaciones reales de próximos viajes/pedidos para revisar sus formatos."
+}

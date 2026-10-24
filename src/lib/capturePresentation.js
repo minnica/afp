@@ -1,4 +1,5 @@
 export const captureReasons = {
+  SERVICE_NOTICE_REVIEW: "Aviso de viaje o pedido guardado para revisar su formato. No genera un gasto automáticamente. Si confirma un cobro final, revisa importe, moneda, fecha y tarjeta o vincúlalo al gasto existente.",
   BANK_FALLBACK_WAIT: "Esperando Wallet: el respaldo bancario podrá registrar después de 15 minutos desde la recepción en AFP.",
   BANK_FALLBACK_REGISTERED: "Registrado desde el banco después de esperar Wallet; pendiente de conciliar.",
   BANK_FALLBACK_PAUSED: "Respaldo detenido. Revisa la regla, Wallet y los permisos de captura antes de resolver este aviso.",
@@ -43,6 +44,9 @@ export const captureSources = {
   "com.bancomer.mbanking": "BBVA", "com.google.android.apps.walletnfcrel": "Google Wallet", "mx.hsbc.hsbcmexico": "HSBC",
   "com.citibanamex.banamexmobile": "Banamex", "mx.bancosantander.supermovil": "Santander", "com.nu.production": "Nu",
   "com.didiglobal.cashloan": "DiDi Finanzas", "com.mercadopago.wallet": "Mercado Pago",
+  "com.ubercab": "Uber · revisión",
+  "com.didiglobal.passenger": "DiDi viajes · revisión",
+  "com.ubercab.eats": "Uber Eats · revisión",
 };
 export const capturePaymentSources = {
   BBVA_RECEIPT: "Comprobante compartido de BBVA",

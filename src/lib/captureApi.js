@@ -37,8 +37,8 @@ export async function captureRequest(request, action) {
         const input = await readCaptureJson(request);
         if (input?.action === "report") {
           const parsed = z.object({ action: z.literal("report"), version: z.literal(1), active: z.boolean(), listenerConnected: z.boolean(),
-            notificationAccess: z.boolean(), batteryExempt: z.boolean(), deliveryPaused: z.boolean(), selectedPackages: z.array(z.enum(capturePackages)).max(8),
-            pausedPackages: z.array(z.enum(capturePackages)).max(8) }).strict().safeParse(input);
+            notificationAccess: z.boolean(), batteryExempt: z.boolean(), deliveryPaused: z.boolean(), selectedPackages: z.array(z.enum(capturePackages)).max(capturePackages.length),
+            pausedPackages: z.array(z.enum(capturePackages)).max(capturePackages.length) }).strict().safeParse(input);
           if (!parsed.success) throw new ApiAccessError("Estado no válido.", 400);
           result = await prisma.$transaction(async tx => {
             const device = await lockedCaptureDevice(tx, credential);

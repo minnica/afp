@@ -1,5 +1,7 @@
 # Matriz de fuentes y formatos · Fase 1
 
+**Ampliación del 23 de octubre de 2026, publicada e instalada en APK 0.7.0 / 9:** Uber (`com.ubercab`), DiDi viajes (`com.didiglobal.passenger`) y Uber Eats (`com.ubercab.eats`) se confirmaron instaladas por USB y se añaden como fuentes **solo de revisión**, sin muestras reales de cobro todavía. El catálogo pasa de ocho a once aplicaciones. Se activaron expresamente las tres nuevas fuentes con autorización; no se consideran emisores de tarjetas. Las filas y resultados siguientes documentan el inventario bancario previo; DiDi viajes es independiente de DiDi Finanzas.
+
 Actualización de cobertura: **22 de octubre de 2026**. Inventario contrastado el día 21 mediante una transacción PostgreSQL **READ ONLY**, limitada a los nombres de tarjetas del único propietario de AFP. Resultado: **9 tarjetas, 7 emisores y 8 aplicaciones de diagnóstico incluyendo Wallet**. Esa consulta inicial no leyó movimientos; el seguimiento de avisos reales posterior se documenta al final. No se renombraron tarjetas ni se dedujo su producto comercial.
 
 ## Inventario y aplicaciones verificadas

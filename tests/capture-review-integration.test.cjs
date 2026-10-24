@@ -192,7 +192,7 @@ test('Fase 5 PostgreSQL: revisión, fuentes y cotejo manual sin alterar decision
       await assert.rejects(service.changeCaptureDevice(db, other.id, { deviceId: device.id, action: 'source', sourcePackage: 'com.bancomer.mbanking', paused: true }), e => e.status === 404);
       await service.changeCaptureDevice(db, user.id, { deviceId: device.id, action: 'source', sourcePackage: 'com.bancomer.mbanking', paused: true });
       const status = await service.getCaptureDevice(db, credential);
-      assert.deepEqual(status.configuration.pausedPackages, ['com.bancomer.mbanking']); assert.equal(status.configuration.allowedPackages.length, 8);
+      assert.deepEqual(status.configuration.pausedPackages, ['com.bancomer.mbanking']); assert.deepEqual(Array.from(status.configuration.allowedPackages), Array.from(protocol.capturePackages));
       await assert.rejects(service.changeCaptureDevice(db, user.id, { deviceId: device.id, action: 'source', sourcePackage: 'unknown', paused: true }), e => e.status === 400);
     });
     await t.test('reporte nativo guarda datos acotados, nunca secretos; usuario web no suplanta el reporte', async () => {

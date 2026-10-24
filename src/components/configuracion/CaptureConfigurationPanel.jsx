@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { apiFetch } from "@/lib/apiFetch";
 import { captureSources, capturePaymentSources, capturePaymentPolicyDescription } from "@/lib/capturePresentation";
+import { reviewOnlyCapturePackages } from "@/lib/captureSourcePolicy";
 import CaptureRolloutStatus from "@/components/configuracion/CaptureRolloutStatus";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -79,7 +80,7 @@ export default function CaptureConfigurationPanel({ configuration, userId, refre
         <FieldGroup>
           <Field><FieldLabel htmlFor="alias-source">Aplicación emisora</FieldLabel><Controller name="sourcePackage" control={aliasForm.control} render={({ field }) => <ResponsiveSelect id="alias-source" value={field.value} disabled={busy} onValueChange={value => {
             field.onChange(value); aliasForm.setValue("kind", value === "com.google.android.apps.walletnfcrel" ? "WALLET" : "PHYSICAL");
-          }} options={Object.entries(captureSources).filter(([value]) => value !== "com.garatachia.afp.paymentreceipts").map(([value, label]) => ({ value, label }))} />} /></Field>
+          }} options={Object.entries(captureSources).filter(([value]) => value !== "com.garatachia.afp.paymentreceipts" && !reviewOnlyCapturePackages.includes(value)).map(([value, label]) => ({ value, label }))} />} /></Field>
           <Field><FieldLabel htmlFor="alias-kind">Tipo de terminación</FieldLabel><Controller name="kind" control={aliasForm.control} render={({ field }) => <ResponsiveSelect id="alias-kind" value={field.value} disabled={busy} onValueChange={field.onChange} options={Object.entries(kinds).map(([value, label]) => ({ value, label }))} />} /></Field>
           {[['value', 'Últimas cuatro cifras'], ['evidence', 'Dónde la verificaste']].map(([name, label]) => <Field key={name} data-invalid={Boolean(aliasForm.formState.errors[name])}><FieldLabel htmlFor={`alias-${name}`}>{label}</FieldLabel><Input className="min-h-11" id={`alias-${name}`} maxLength={name === 'value' ? 4 : 500} inputMode={name === 'value' ? 'numeric' : undefined} disabled={busy} aria-invalid={Boolean(aliasForm.formState.errors[name])} {...aliasForm.register(name)} /><FieldError errors={[aliasForm.formState.errors[name]]} /></Field>)}
           <Field orientation="horizontal"><Controller name="verified" control={aliasForm.control} render={({ field }) => <Checkbox id="alias-verified" checked={field.value} onCheckedChange={field.onChange} disabled={busy} />} /><FieldLabel htmlFor="alias-verified" className="min-h-11">Comprobé esta terminación</FieldLabel></Field>

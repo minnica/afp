@@ -2,11 +2,12 @@ import { createHash, timingSafeEqual } from "node:crypto";
 import { Buffer } from "node:buffer";
 import { z } from "zod";
 import { ApiAccessError } from "@/lib/apiAuth";
+import { reviewOnlyCapturePackages } from "@/lib/captureSourcePolicy";
 
 export const capturePackages = [
   "com.bancomer.mbanking", "com.google.android.apps.walletnfcrel", "mx.hsbc.hsbcmexico",
   "com.citibanamex.banamexmobile", "mx.bancosantander.supermovil", "com.nu.production",
-  "com.didiglobal.cashloan", "com.mercadopago.wallet",
+  "com.didiglobal.cashloan", "com.mercadopago.wallet", ...reviewOnlyCapturePackages,
 ];
 export const pairingLifetimeMs = 5 * 60 * 1000;
 export const deviceSelect = { id: true, name: true, createdAt: true, approvedAt: true, pausedAt: true, revokedAt: true, lastSeenAt: true, pausedPackages: true, reportedState: true, reportedAt: true };

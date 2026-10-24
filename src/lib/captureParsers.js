@@ -3,6 +3,7 @@
 // solo se completa mediante la regla expresa de tarjeta, moneda y suscripción.
 import { interpretPaymentNotice } from "@/lib/capturePaymentParsers";
 import { parsePaymentReceipt, paymentReceiptSource } from "@/lib/paymentReceipts";
+import { reviewOnlyCapturePackages } from "@/lib/captureSourcePolicy";
 
 export const captureParsers = [
   { key: "bbva.purchase.es.v1", sourcePackage: "com.bancomer.mbanking", title: "Compra aprobada", verified: false },
@@ -209,6 +210,9 @@ function realMercadoPagoPurchase(event) {
 
 export function interpretCapture(event) {
   if (event.sourcePackage === paymentReceiptSource) return parsePaymentReceipt(event);
+  // Fuente habilitada para reunir evidencia real. Un aviso de viaje no acredita
+  // un cobro final ni su tarjeta; no aplicar gramáticas bancarias a este paquete.
+  if (reviewOnlyCapturePackages.includes(event.sourcePackage)) return { reason: "SERVICE_NOTICE_REVIEW", proposal: {} };
   const texts = Object.values(event.fields || {}).join("\n");
   if (/\b(MSI|meses sin intereses|preautorizaci[oó]n|retenci[oó]n|devoluci[oó]n|reembolso|cancelaci[oó]n|abono|rechazad[ao]|promoci[oó]n|c[oó]digo de (?:acceso|verificaci[oó]n)|env[ií]o|pedido recibido)\b/i.test(texts)) {
     return { reason: "SPECIAL_MOVEMENT", proposal: {} };

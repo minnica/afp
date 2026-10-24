@@ -124,6 +124,39 @@ test("Captura PostgreSQL: vinculación, recepción y autorización completa", { 
       assert.equal((await call("device", "POST", phone.credential, { action: "pause" })).body.state, "PAUSED");
       assert.equal((await call("devices", "PATCH", "Bearer a", { deviceId: phone.deviceId, action: "resume" })).status, 200);
     });
+    await t.test("viajes y pedidos: once fuentes, recepción idempotente, pausa por fuente y evidencia sin gastos", async () => {
+      const { capturePackages } = load("src/lib/captureProtocol.js");
+      const { reviewOnlyCapturePackages } = load("src/lib/captureSourcePolicy.js");
+      const state = { action: "report", version: 1, active: true, listenerConnected: true, notificationAccess: true,
+        batteryExempt: true, deliveryPaused: false, selectedPackages: [...capturePackages], pausedPackages: [] };
+      for (const selectedPackages of [[], capturePackages.slice(0, 8), capturePackages]) {
+        assert.equal((await call("device", "POST", phone.credential, { ...state, selectedPackages })).status, 200);
+        assert.deepEqual((await db.captureDevice.findUnique({ where: { id: phone.deviceId } })).reportedState.selectedPackages, Array.from(selectedPackages));
+      }
+      assert.equal((await call("device", "POST", phone.credential, { ...state, pausedPackages: capturePackages })).status, 200);
+      assert.equal((await call("device", "POST", phone.credential, { ...state, selectedPackages: [...capturePackages, "com.ubercab.driver"] })).status, 400);
+      assert.equal((await call("device", "POST", phone.credential, state)).status, 200);
+      for (const sourcePackage of reviewOnlyCapturePackages) {
+        const input = { ...event(), sourcePackage };
+        assert.equal((await call("devices", "PATCH", "Bearer b", { deviceId: phone.deviceId, action: "source", sourcePackage, paused: true })).status, 404);
+        assert.equal((await call("devices", "PATCH", "Bearer a", { deviceId: phone.deviceId, action: "source", sourcePackage, paused: true })).status, 200);
+        assert.ok((await call("device", "GET", phone.credential)).body.configuration.pausedPackages.includes(sourcePackage));
+        assert.equal((await call("devices", "PATCH", "Bearer a", { deviceId: phone.deviceId, action: "source", sourcePackage, paused: false })).status, 200);
+        const first = await call("events", "POST", phone.credential, input);
+        assert.equal(first.status, 200);
+        assert.deepEqual((await call("events", "POST", phone.credential, input)).body, first.body);
+        assert.equal((await call("events", "POST", phone.credential, { ...input, fields: {} })).status, 409);
+        const stored = await db.captureEvent.findUnique({ where: { deviceId_eventId: { deviceId: phone.deviceId, eventId: input.eventId } }, include: { movement: true } });
+        assert.equal(stored.userId, users[0].id);
+        assert.deepEqual(stored.fields, input.fields);
+        assert.equal(stored.movement.reason, "SERVICE_NOTICE_REVIEW");
+        assert.equal(stored.movement.status, "REVIEW");
+        assert.equal(stored.movement.cardId, null);
+        assert.equal(stored.movement.amount, null);
+        assert.equal(stored.movement.expenseId, null);
+      }
+      assert.equal(await db.dailyExpense.count({ where: { userId: users[0].id } }), 0);
+    });
     await t.test("fallo después de persistir revierte la transacción y no devuelve recibo", async () => {
       const service = load("src/lib/captureService.js"), protocol = load("src/lib/captureProtocol.js");
       const input = protocol.validateCaptureEvent(event());

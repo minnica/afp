@@ -10,6 +10,9 @@
         <package android:name="com.nu.production" />
         <package android:name="com.didiglobal.cashloan" />
         <package android:name="com.mercadopago.wallet" />
+        <package android:name="com.ubercab" />
+        <package android:name="com.didiglobal.passenger" />
+        <package android:name="com.ubercab.eats" />
         <intent><action android:name="android.support.customtabs.action.CustomTabsService" /></intent>
     </queries>
     <application

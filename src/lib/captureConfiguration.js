@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { ApiAccessError, requireOwnedReferences } from "@/lib/apiAuth";
 import { capturePackages } from "@/lib/captureProtocol";
+import { reviewOnlyCapturePackages } from "@/lib/captureSourcePolicy";
 import { captureParsers, normalizeMerchant } from "@/lib/captureParsers";
 import { lockDebtAccounts } from "@/lib/debtAccountService";
 import { buildCaptureRollout, captureRolloutMovements, captureFormatReadiness, captureActivationReasons } from "@/lib/captureRollout";
@@ -8,7 +9,8 @@ import { matchesCapturePolicy } from "@/lib/captureFormatPolicy";
 
 import { bankFallbackFormats, bankFallbackOptions, configureBankFallback } from "@/lib/captureBankFallback";
 
-const bankPackages = capturePackages.filter(value => value !== "com.google.android.apps.walletnfcrel");
+const cardPackages = capturePackages.filter(value => !reviewOnlyCapturePackages.includes(value));
+const bankPackages = cardPackages.filter(value => value !== "com.google.android.apps.walletnfcrel");
 const lastFour = z.string().regex(/^\d{4}$/);
 export const captureInventorySchema = z.object({ version: z.literal(1), cards: z.array(z.object({
   name: z.string().min(1).max(100), bankPackage: z.enum(bankPackages), physical: z.array(lastFour).max(20),
@@ -21,7 +23,7 @@ const actionSchema = z.discriminatedUnion("action", [
     bankDatePolicy: z.enum(["BANK_OPERATION", "NOTIFICATION_POSTED_AT"]), currency: z.literal("MXN"),
     purchasesOnly: z.literal(true), waitMinutes: z.literal(15), evidenceMovementId: z.uuid() }).strict(),
   z.object({ action: z.literal("paymentAutomation"), id: z.uuid(), mode: z.enum(["OBSERVATION", "AUTOMATIC"]) }).strict(),
-  z.object({ action: z.literal("alias"), cardId: z.string().min(1), sourcePackage: z.enum(capturePackages), kind: z.enum(["PHYSICAL", "DIGITAL", "WALLET"]), value: lastFour, verified: z.boolean(), evidence: z.string().trim().max(500) }).strict(),
+  z.object({ action: z.literal("alias"), cardId: z.string().min(1), sourcePackage: z.enum(cardPackages), kind: z.enum(["PHYSICAL", "DIGITAL", "WALLET"]), value: lastFour, verified: z.boolean(), evidence: z.string().trim().max(500) }).strict(),
   z.object({ action: z.literal("deleteAlias"), id: z.uuid() }).strict(),
   z.object({ action: z.literal("deleteRule"), id: z.uuid() }).strict(),
   z.object({ action: z.literal("importAliases"), inventory: captureInventorySchema }).strict(),

@@ -1,0 +1,86 @@
+{
+  "scope": "Preparación de captura de Uber, DiDi viajes y Uber Eats para revisión de futuras muestras reales.",
+  "verifiedAt": "2026-10-24T05:12:22.058186+00:00",
+  "baseCommit": "08bcc7fa9a5c209d5a78e7dd55f9bd08119b0b9d",
+  "sources": {
+    "com.ubercab": "Uber",
+    "com.didiglobal.passenger": "DiDi viajes",
+    "com.ubercab.eats": "Uber Eats"
+  },
+  "catalogueSize": 11,
+  "automaticExpensesFromNewSources": false,
+  "realTripOrOrderSamplesAvailable": false,
+  "webTests": {
+    "passed": 633,
+    "failed": 0,
+    "skipped": 0,
+    "database": "PostgreSQL local ficticio"
+  },
+  "androidJvm": {
+    "passed": 19,
+    "failed": 0,
+    "skipped": 1,
+    "skipReason": "Prueba HTTPS optativa requiere AFP_CAPTURE_TEST_ORIGIN y certificado local; transporte no modificado."
+  },
+  "physicalPhoneTests": {
+    "model": "Samsung SM-S928B",
+    "android": 16,
+    "passed": 23,
+    "failed": 0,
+    "classes": [
+      "DiagnosticStoreTest",
+      "CaptureQueueTest",
+      "CaptureRemoteSettingsTest",
+      "ServiceSourcesScreenTest"
+    ],
+    "scope": "APK dev sin vinculación: persistencia cifrada, once identidades, cola, pausas, selección independiente y reapertura de las tres fuentes instaladas.",
+    "realNotificationCaptureVerified": false,
+    "temporaryApplicationsRemoved": true
+  },
+  "builds": {
+    "webWebpack": "passed",
+    "androidDebug": "passed",
+    "androidRelease": "passed"
+  },
+  "lint": {
+    "modifiedWebFiles": "passed",
+    "androidErrors": 0,
+    "androidWarnings": 9
+  },
+  "release": {
+    "versionName": "0.7.0",
+    "versionCode": 9,
+    "sha256": "3e5bde68788e8659d4ec449b259ad7b9e07342267a7e56658ea2d69038acb08f",
+    "signingCertificateMatchesAssetLinks": true,
+    "installedOnPersonalApplication": false
+  },
+  "deployment": {
+    "published": false,
+    "requiresDatabaseMigration": false,
+    "requiresSourceSelection": true,
+    "awaitingProductionApproval": true
+  },
+  "sourceSha256": {
+    "README.md": "d40c816bd9009e9d646b45df0c0e12304d64a7943ded352bf3e2a2a6c5084a85",
+    "android/app/build.gradle.kts": "4532adbb4e671221e9015e8496823523602644692744f4dd38bb650b82c5967a",
+    "android/app/src/androidTest/java/com/garatachia/afp/ServiceSourcesScreenTest.kt": "5c952ed2f64b129b046274b75a9d7b64f59850ed15ccdf2edfe87fcbbf7b9d34",
+    "android/app/src/main/AndroidManifest.xml": "8c82f4193b878fc0aa7db6218617ab167b91b20926e22e774e9c4ecefee3624d",
+    "android/app/src/main/java/com/garatachia/afp/CapturePolicy.kt": "1dceb9a7b1fe589f422fd09753d7208327c22530ea17e76b63bdead8ba7eaf6b",
+    "android/app/src/main/java/com/garatachia/afp/MainActivity.kt": "3733a4e18cafd6c0627c7b9b5e7456803c1e02d364d235d3d4da7f6265fb4d00",
+    "android/app/src/test/java/com/garatachia/afp/CaptureContentFilterTest.kt": "02565bdb791a04af71cb1b36831ece2376f9d96426dedfa7116e938ee9699818",
+    "android/app/src/test/java/com/garatachia/afp/CapturePolicyTest.kt": "0af2cc0fc5146791683a2ab9402a36eb4aec97e7a94ce7d0b433e1e66754d3b3",
+    "android/diagnostics/format-matrix.md": "eb6c7ac69d9ede104389dd28e75e3f6c500da23d6b7e6f8d4e0360b02e9595a5",
+    "docs/android-captura.md": "167668d855630d15bb8f8c19196843290f947cd840647eebcb330836fc017ee7",
+    "src/components/configuracion/CaptureConfigurationPanel.jsx": "6cbb967fc95ba6a163ca488070de75d023a9d3450f5e7ca3d9c281a09bcfd8ab",
+    "src/lib/captureApi.js": "8386ee1a77d51d66ab24f1b1361615244502bb938cf7a2e47e3d4ace3831d145",
+    "src/lib/captureConfiguration.js": "c09b86b41c93d6466e0e41329a27d6ad623503854ca5e5d8bd0167b175b38263",
+    "src/lib/captureParsers.js": "585fcee4aee98e8493dfae858465dc49aff6b5f16fb652647736247357f1d739",
+    "src/lib/capturePresentation.js": "6ab7d54b1e14efa0ddc5d2b1f9ba61d0f9d7e1b593e76a0b80f72b16d5168a94",
+    "src/lib/captureProtocol.js": "650ea3bf34158f7282fbccb27a25a243f0190ef30eedf78291f4ed2065fe93f1",
+    "src/lib/captureSourcePolicy.js": "680aa66c9de68d6c597a75285d6197037606cf7c8dde6665965e8eb45c24c3e6",
+    "tests/android-sources.test.cjs": "86e845ed03dd2cbeec44f5d28a460350682ed2c2f587958664ab5c5a1c108293",
+    "tests/capture-api-integration.test.cjs": "193849f2bd487e7ef9ea25224e0489e5108f279545cb27deabd80999bb6bd371",
+    "tests/capture-review-integration.test.cjs": "938dde69cd4b90291d976e6d26fe4dfa613d5826a0b64745bf0bfe770562c501",
+    "tests/capture-service-notices.test.cjs": "88fc5dc5ebed425259964de49152804ae2fe7738ddf739e6f32b4d15d81138af"
+  }
+}
