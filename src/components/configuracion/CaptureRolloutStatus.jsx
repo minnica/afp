@@ -5,6 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Item, ItemActions, ItemContent, ItemDescription, ItemGroup, ItemTitle } from "@/components/ui/item";
 
+const fallbackParserKeys = new Set([
+  "banamex.card-charge.es.v1", "banamex.joy-card-charge.es.v1", "nu.card-purchase.es.v1", "santander.card-purchase.es.v1",
+]);
+
 const reasons = {
   UNVERIFIED_FORMAT: "Faltan muestras reales y un formato comprobado.",
   NO_VERIFIED_ALIAS: "Falta una terminación verificada para esta fuente.",
@@ -13,7 +17,7 @@ const reasons = {
   FORMAT_POLICY_REQUIRED: "Configura la regla de este formato con tarjeta, MXN y fecha del aviso.",
 };
 
-export default function CaptureRolloutStatus({ coverage, cardId, busy, onAutomation }) {
+export default function CaptureRolloutStatus({ coverage, cardId, busy, onAutomation, fallbackPolicy }) {
   if (!coverage) return null;
   return <section className="flex min-w-0 flex-col gap-3" aria-label="Cobertura y activación de esta tarjeta">
     <h3 className="font-medium">Cobertura y activación</h3>
@@ -26,7 +30,7 @@ export default function CaptureRolloutStatus({ coverage, cardId, busy, onAutomat
         {source.formats.length === 0 && <ItemDescription className="line-clamp-none">Faltan muestras reales y un analizador de compras comprobado. Los avisos permanecen por revisar.</ItemDescription>}
         {source.formats.map(format => <div key={format.parserKey} className="flex min-w-0 flex-col gap-2">
           <ItemDescription className="break-all">{format.parserKey}</ItemDescription>
-          <div><Badge variant={format.mode === "AUTOMATIC" ? "default" : "secondary"}>{format.mode === "AUTOMATIC" ? "Automático" : format.verified ? "Observación" : "Diagnóstico"}</Badge></div>
+          {fallbackPolicy?.bankSourcePackage === source.sourcePackage && fallbackParserKeys.has(format.parserKey) ? <ItemDescription>Compras gestionadas por el respaldo bancario de 15 minutos. Usa sus controles arriba.</ItemDescription> : <div><Badge variant={format.mode === "AUTOMATIC" ? "default" : "secondary"}>{format.mode === "AUTOMATIC" ? "Automático" : format.verified ? "Observación" : "Diagnóstico"}</Badge></div>}
           {format.dateSource === "NOTIFICATION_POSTED_AT" && <ItemDescription className="line-clamp-none">Usa la fecha del aviso de {captureSources[source.sourcePackage]} en hora de México. El aviso no incluye una fecha bancaria de operación.</ItemDescription>}
           {format.parserKey === "wallet.santander-purchase.es.v2" && <ItemDescription className="line-clamp-none">Puede registrar desde Wallet aunque no llegue el aviso de Santander. Si ya existe un cargo coincidente, el segundo aviso queda por revisar para evitar duplicados; no cambia automáticamente la fecha del gasto existente.</ItemDescription>}
           {format.completionPolicy && <><ItemDescription className="line-clamp-none">{format.policyRequiresSubscription
@@ -39,13 +43,13 @@ export default function CaptureRolloutStatus({ coverage, cardId, busy, onAutomat
               {format.hasFormatPolicy ? "Revisar" : "Configurar"} regla {format.policyRequiresSubscription ? "Nu/CFE" : "Mercado Pago"}
             </Button></ItemActions></>}
           <ItemDescription className="line-clamp-none">{format.reviewedCaptures} {format.reviewedCaptures === 1 ? "propuesta conciliada sin cambios en los datos interpretados" : "propuestas conciliadas sin cambios en los datos interpretados"}</ItemDescription>
-          {format.mode !== "AUTOMATIC" && format.blockers.map(reason => <ItemDescription key={reason} className="line-clamp-none">{reasons[reason]}</ItemDescription>)}
-          <ItemActions><Button variant="outline" className="min-h-11" disabled={busy || (format.mode !== "AUTOMATIC" && !format.canEnable)} onClick={() => onAutomation({ action: "automation", cardId, parserKey: format.parserKey,
+          {!(fallbackPolicy?.bankSourcePackage === source.sourcePackage && fallbackParserKeys.has(format.parserKey)) && format.mode !== "AUTOMATIC" && format.blockers.map(reason => <ItemDescription key={reason} className="line-clamp-none">{reasons[reason]}</ItemDescription>)}
+          {!(fallbackPolicy?.bankSourcePackage === source.sourcePackage && fallbackParserKeys.has(format.parserKey)) && <ItemActions><Button variant="outline" className="min-h-11" disabled={busy || (format.mode !== "AUTOMATIC" && !format.canEnable)} onClick={() => onAutomation({ action: "automation", cardId, parserKey: format.parserKey,
             mode: format.mode === "AUTOMATIC" ? "OBSERVATION" : "AUTOMATIC",
             ...(format.dateSource === "NOTIFICATION_POSTED_AT" ? { datePolicy: "NOTIFICATION_POSTED_AT" } : {}),
             label: format.mode === "AUTOMATIC" ? "Volver a observación" : "Habilitar registro automático" })}>
             {format.mode === "AUTOMATIC" ? "Volver a observación" : "Habilitar"}
-          </Button></ItemActions>
+          </Button></ItemActions>}
         </div>)}
       </ItemContent>
     </Item>)}</ItemGroup>

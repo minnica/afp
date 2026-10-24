@@ -1,4 +1,9 @@
 export const captureReasons = {
+  BANK_FALLBACK_WAIT: "Esperando Wallet: el respaldo bancario podrá registrar después de 15 minutos desde la recepción en AFP.",
+  BANK_FALLBACK_REGISTERED: "Registrado desde el banco después de esperar Wallet; pendiente de conciliar.",
+  BANK_FALLBACK_PAUSED: "Respaldo detenido. Revisa la regla, Wallet y los permisos de captura antes de resolver este aviso.",
+  BANK_FALLBACK_REVIEW: "El aviso o la identificación ya no cumplen la regla de respaldo; revisa sus datos.",
+  BANK_FALLBACK_MANUAL_REVIEW: "La revisión personal detuvo la espera automática de este aviso.",
   PAYMENT_AUTOMATIC: "Pago registrado automáticamente con tu regla de pagos.",
   PAYMENT_POLICY_REQUIRED: "Falta una regla de pagos para ese destino o formato.",
   PAYMENT_CYCLE_REQUIRED: "No se pudo identificar un único corte con estado de cuenta; selecciona el período.",

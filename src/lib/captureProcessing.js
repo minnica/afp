@@ -10,6 +10,7 @@ import { effectiveCapture, correctCapture } from "@/lib/captureReview";
 import { matchesCapturePolicy } from "@/lib/captureFormatPolicy";
 import { paymentCaptureKind } from "@/lib/capturePaymentParsers";
 import { resolveCapturePayment } from "@/lib/capturePayments";
+import { bankFallbackInterpretation } from "@/lib/captureBankFallback";
 import { automateCapturePayment } from "@/lib/capturePaymentAutomation";
 
 export async function archiveCapturedExpense(tx, expense) {
@@ -33,13 +34,16 @@ export async function captureCandidates(tx, userId, proposal) {
   const installments = await tx.installmentPurchase.findMany({ where: { userId, cardId: proposal.cardId, totalAmount: proposal.amount, purchaseDate: where.date }, select: { id: true, concept: true } });
   const deleted = await tx.expenseTombstone.findMany({ where, select: { expenseId: true, concept: true, date: true, amount: true } });
   const movements = await tx.captureMovement.findMany({ where: { userId, cardId: proposal.cardId, amount: proposal.amount, operationDate: where.date },
-    select: { id: true, expenseId: true, originalExpenseId: true, installmentPurchaseId: true, status: true, parserKey: true, correction: true, proposal: true } });
+    select: { id: true, expenseId: true, originalExpenseId: true, installmentPurchaseId: true, status: true, reason: true, parserKey: true, correction: true, proposal: true } });
   // La evidencia parcial y Wallet de respaldo en observación no bloquean al
   // banco. Una corrección personal o una resolución financiera sí bloquean.
-  const financialMovements = movements.filter(row => !paymentCaptureKind(row) && !(["REVIEW", "OBSERVED"].includes(row.status)
+  const financialMovements = movements.filter(row => !paymentCaptureKind(row)
+    && !(["BANK_FALLBACK_WAIT", "BANK_FALLBACK_PAUSED"].includes(row.reason) && row.proposal?.bankFallback?.walletParserKey === proposal.primaryWalletParserKey
+      && !row.correction && !row.expenseId && !row.originalExpenseId && !row.installmentPurchaseId)
+    && !(["REVIEW", "OBSERVED"].includes(row.status)
     && !row.expenseId && !row.originalExpenseId && !row.installmentPurchaseId && !row.correction
     && captureParsers.some(parser => parser.key === row.parserKey
-      && (parser.evidenceOnly || (parser.nonBlockingInObservation && row.status === "OBSERVED")))));
+      && ((!row.proposal?.bankFallback && parser.evidenceOnly) || (parser.nonBlockingInObservation && row.status === "OBSERVED")))));
   return [
     ...expenses.map(row => ({ type: "EXPENSE", id: row.id, concept: row.concept })),
     ...installments.map(row => ({ type: "INSTALLMENT", id: row.id, concept: row.concept })),
@@ -53,7 +57,10 @@ export async function captureCandidates(tx, userId, proposal) {
 async function captureInterpretationState(tx, event, observationOnly = false) {
   const decoded = interpretCapture(event);
   const parser = captureParsers.find(parser => parser.key === decoded.parserKey);
-  const interpretation = await resolveCaptureIdentity(tx, event, decoded, parser);
+  let interpretation = await resolveCaptureIdentity(tx, event, decoded, parser);
+  const fallback = await bankFallbackInterpretation(tx, event, interpretation, observationOnly);
+  if (fallback?.primaryWalletParserKey) interpretation = { ...interpretation, proposal: { ...interpretation.proposal, ...fallback } };
+  if (fallback?.reason) return { interpretation, parserKey: interpretation.parserKey, ...fallback };
   const { parserKey = null } = interpretation;
   let { reason } = interpretation;
   const proposal = interpretation.proposal;
@@ -78,7 +85,7 @@ export async function processCaptureEvent(tx, event) {
   const { interpretation, parserKey, status } = state;
   let { reason, proposal } = state;
   let referenceKey = null;
-  if (reason === "PURCHASE") {
+  if (["PURCHASE", "BANK_FALLBACK_WAIT"].includes(reason)) {
     referenceKey = proposal.reference ? captureHash(`${proposal.cardId}:${proposal.reference}`) : null;
     const referenced = referenceKey && await tx.captureMovement.findUnique({ where: { userId_referenceKey: { userId: event.userId, referenceKey } } });
     if (referenced) {
@@ -94,15 +101,16 @@ export async function processCaptureEvent(tx, event) {
     const revision = await tx.captureEvent.findFirst({ where: { userId: event.userId, deviceId: event.deviceId,
       sourcePackage: event.sourcePackage, notificationKeyHash: event.notificationKeyHash, id: { not: event.id },
     } });
-    if (reason === "PURCHASE" && revision) reason = "NOTIFICATION_REVISION";
+    if (["PURCHASE", "BANK_FALLBACK_WAIT"].includes(reason) && revision) reason = "NOTIFICATION_REVISION";
     const candidates = await captureCandidates(tx, event.userId, proposal);
     if (candidates.length) {
       proposal = { ...proposal, candidates };
-      if (reason === "PURCHASE") reason = "POSSIBLE_DUPLICATE";
+      if (["PURCHASE", "BANK_FALLBACK_WAIT"].includes(reason)) reason = "POSSIBLE_DUPLICATE";
     }
   }
   let movement = await tx.captureMovement.create({ data: {
     userId: event.userId, parserKey, status, reason, proposal, referenceKey,
+    fallbackDueAt: reason === "BANK_FALLBACK_WAIT" ? state.fallbackDueAt : null,
     cardId: proposal.cardId || null, amount: proposal.amount || null,
     operationDate: proposal.date ? new Date(`${proposal.date}T12:00:00.000Z`) : null,
     resolvedAt: status === "DISCARDED" ? new Date() : null,
@@ -134,7 +142,7 @@ async function reinterpretCaptureMovement(tx, movement) {
     parserKey: state.parserKey, status: state.status, reason: state.reason, proposal: state.proposal,
     cardId: state.proposal.cardId || null, amount: state.proposal.amount || null,
     operationDate: state.proposal.date ? new Date(`${state.proposal.date}T12:00:00Z`) : null,
-    referenceKey: null,
+    referenceKey: null, fallbackDueAt: null,
     resolvedAt: state.status === "DISCARDED" ? new Date() : null,
     analysisHistory: [...history, { key, eventId: event.id, requestHash: event.requestHash, analyzedAt: new Date().toISOString(),
       previous: { parserKey: movement.parserKey, status: movement.status, reason: movement.reason, proposal: movement.proposal, referenceKey: movement.referenceKey },
@@ -230,7 +238,7 @@ export async function registerCaptureMovement(tx, movement, distinct) {
   if (reason) return tx.captureMovement.update({ where: { id: movement.id }, data: { status: "REVIEW", reason } });
   const { expense } = await createExpenseInTransaction(tx, movement.userId, data, { id: true }, "PENDING");
   return tx.captureMovement.update({ where: { id: movement.id }, data: { status: "REGISTERED", reason: distinct ? "USER_DISTINCT" : "AUTOMATIC",
-    expenseId: expense.id, originalExpenseId: expense.id, resolvedAt: new Date() } });
+    expenseId: expense.id, originalExpenseId: expense.id, fallbackDueAt: null, resolvedAt: new Date() } });
 }
 
 export async function resolveCaptureMovement(db, userId, input) {
@@ -246,6 +254,9 @@ export async function resolveCaptureMovement(db, userId, input) {
     if (input.action === "reinterpret") return reinterpretCaptureMovement(tx, movement);
     if (input.action === "validateWalletBackup") return validateWalletBackup(tx, movement);
     if (paymentCaptureKind(movement) && input.action !== "discard") throw new ApiAccessError("Resuelve este aviso desde Pagos de tarjeta; no se puede convertir en un gasto.", 409);
+    if (movement.fallbackDueAt) await tx.captureMovement.update({ where: { id: movement.id }, data: {
+      fallbackDueAt: null, reason: "BANK_FALLBACK_MANUAL_REVIEW",
+    } });
     if (input.action === "correct") return correctCapture(tx, movement, input);
     if (input.action === "convertToInstallments") return convertCaptureToInstallments(tx, movement, input);
     // Una decisión terminal se conserva al reintentar o ante otra pestaña.
@@ -268,7 +279,7 @@ export async function resolveCaptureMovement(db, userId, input) {
         throw new ApiAccessError("Revisa tarjeta e importe antes de vincular el aviso.", 409);
       }
       return tx.captureMovement.update({ where: { id: movement.id }, data: { status: "LINKED", reason: "USER_LINKED",
-        expenseId: expense.id, originalExpenseId: expense.id, resolvedAt: new Date() } });
+        expenseId: expense.id, originalExpenseId: expense.id, fallbackDueAt: null, resolvedAt: new Date() } });
     }
     if (input.action === "register") {
       if (!movement.correction) throw new ApiAccessError("Revisa y guarda los datos antes de registrar la compra.", 409);

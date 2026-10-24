@@ -1,0 +1,18 @@
+{
+  "production": {
+    "info": 0,
+    "low": 2,
+    "moderate": 2,
+    "high": 1,
+    "critical": 2
+  },
+  "all": {
+    "info": 0,
+    "low": 2,
+    "moderate": 2,
+    "high": 2,
+    "critical": 2
+  },
+  "dependenciesChanged": false,
+  "status": "Existing findings remain; dependency remediation is outside this feature."
+}

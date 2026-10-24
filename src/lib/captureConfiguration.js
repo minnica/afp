@@ -6,6 +6,8 @@ import { lockDebtAccounts } from "@/lib/debtAccountService";
 import { buildCaptureRollout, captureRolloutMovements, captureFormatReadiness, captureActivationReasons } from "@/lib/captureRollout";
 import { matchesCapturePolicy } from "@/lib/captureFormatPolicy";
 
+import { bankFallbackFormats, bankFallbackOptions, configureBankFallback } from "@/lib/captureBankFallback";
+
 const bankPackages = capturePackages.filter(value => value !== "com.google.android.apps.walletnfcrel");
 const lastFour = z.string().regex(/^\d{4}$/);
 export const captureInventorySchema = z.object({ version: z.literal(1), cards: z.array(z.object({
@@ -14,6 +16,10 @@ export const captureInventorySchema = z.object({ version: z.literal(1), cards: z
 }).strict()).max(100) }).strict();
 
 const actionSchema = z.discriminatedUnion("action", [
+  z.object({ action: z.literal("bankFallback"), cardId: z.string().min(1), mode: z.enum(["OBSERVATION", "AUTOMATIC"]),
+    bankSourcePackage: z.enum(["com.citibanamex.banamexmobile", "com.nu.production", "mx.bancosantander.supermovil"]),
+    bankDatePolicy: z.enum(["BANK_OPERATION", "NOTIFICATION_POSTED_AT"]), currency: z.literal("MXN"),
+    purchasesOnly: z.literal(true), waitMinutes: z.literal(15), evidenceMovementId: z.uuid() }).strict(),
   z.object({ action: z.literal("paymentAutomation"), id: z.uuid(), mode: z.enum(["OBSERVATION", "AUTOMATIC"]) }).strict(),
   z.object({ action: z.literal("alias"), cardId: z.string().min(1), sourcePackage: z.enum(capturePackages), kind: z.enum(["PHYSICAL", "DIGITAL", "WALLET"]), value: lastFour, verified: z.boolean(), evidence: z.string().trim().max(500) }).strict(),
   z.object({ action: z.literal("deleteAlias"), id: z.uuid() }).strict(),
@@ -72,6 +78,7 @@ export async function configureCapture(db, userId, input) {
       return { imported };
     }
     await requireOwnedReferences(tx, userId, data, ["cardId", "categoryId", "subscriptionId"]);
+    if (data.action === "bankFallback") return configureBankFallback(tx, userId, data);
     if (data.action === "formatPolicy") {
       const parser = captureParsers.find(parser => parser.key === data.parserKey && parser.completionPolicy === data.completionPolicy);
       if (!parser) throw new ApiAccessError("Regla de formato no disponible.", 400);
@@ -102,6 +109,9 @@ export async function configureCapture(db, userId, input) {
         return tx.captureAutomation.update({ where: { id: existing.id }, data: { mode: "OBSERVATION" } });
       }
       if (data.mode === "AUTOMATIC") {
+        if (bankFallbackFormats.some(row => row.keys.includes(data.parserKey)) && await tx.captureBankFallback.findUnique({ where: { userId_cardId: { userId, cardId: data.cardId } } })) {
+          throw new ApiAccessError("Esta tarjeta usa Wallet principal y respaldo bancario de 15 minutos. Administra su respaldo en esa sección.", 409);
+        }
         if (!parser.verified) throw new ApiAccessError("Este formato aún no tiene muestras reales verificadas. Conserva observación.", 409);
         if (parser.dateSource === "NOTIFICATION_POSTED_AT" && data.datePolicy !== "NOTIFICATION_POSTED_AT") {
           throw new ApiAccessError("Confirma el uso de la fecha del aviso en hora de México para habilitar este formato.", 409);
@@ -142,7 +152,9 @@ export async function captureConfiguration(db, userId) {
   ]);
   const movements = await captureRolloutMovements(db, userId);
   const paymentPolicies = await db.capturePaymentPolicy.findMany({ where: { userId }, orderBy: { createdAt: "asc" } });
-  return { cards, aliases, automations, rules, categories, subscriptions, paymentPolicies,
+  const fallbackPolicies = await db.captureBankFallback.findMany({ where: { userId } });
+  const fallbackOptions = await bankFallbackOptions(db, userId);
+  return { cards, aliases, automations, rules, categories, subscriptions, paymentPolicies, fallbackPolicies, fallbackOptions,
     rollout: buildCaptureRollout(cards, aliases, automations, captureParsers, movements),
     parsers: captureParsers.filter(parser => parser.evidence !== "REAL_OUT_OF_SCOPE" && !parser.paymentOnly).map(({ key, sourcePackage, verified, dateSource }) => ({ key, sourcePackage, verified, dateSource: dateSource || "BANK_OPERATION" })) };
 }

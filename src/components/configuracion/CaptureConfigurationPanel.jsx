@@ -47,7 +47,27 @@ export default function CaptureConfigurationPanel({ configuration, userId, refre
         </ItemContent><ItemActions><Button variant="outline" className="min-h-11" disabled={busy} onClick={() => perform({ action: "paymentAutomation", id: policy.id, mode: policy.mode === "AUTOMATIC" ? "OBSERVATION" : "AUTOMATIC" })}>{policy.mode === "AUTOMATIC" ? "Pasar a revisión" : "Activar pagos automáticos"}</Button></ItemActions></Item>)}</ItemGroup>
         <Separator />
       </>}
-      <CaptureRolloutStatus coverage={configuration.rollout?.find(row => row.cardId === cardId)} cardId={cardId} busy={busy} onAutomation={setConfirmation} />
+      <section className="flex flex-col gap-3" aria-label="Prioridad Wallet y respaldo bancario">
+        <h2 className="font-medium">Wallet principal · Respaldo bancario</h2>
+        <p className="text-sm text-muted-foreground">Wallet registra primero. Si falta su aviso, el banco puede registrar al vencer 15 minutos desde que AFP lo recibe. La espera continúa aunque cierres la aplicación. Los casos ambiguos quedan por revisar.</p>
+        {(configuration.fallbackPolicies || []).filter(row => row.cardId === cardId).map(policy => <Item key={policy.id} variant="outline" className="flex-wrap"><ItemContent>
+          <ItemTitle>{captureSources[policy.bankSourcePackage]}<Badge variant="secondary">{policy.mode === "AUTOMATIC" ? "Respaldo activo · 15 min" : "Respaldo pausado"}</Badge></ItemTitle>
+          <ItemDescription className="line-clamp-none">Compras en MXN. {policy.bankDatePolicy === "BANK_OPERATION" ? "Fecha de operación del banco." : "Fecha de publicación del aviso en hora de México."} Pausar detiene las esperas pendientes; reactivar solo se aplica a avisos nuevos.</ItemDescription>
+        </ItemContent><ItemActions><Button variant="outline" className="min-h-11" disabled={busy || (policy.mode !== "AUTOMATIC" && !configuration.fallbackOptions?.some(row => row.cardId === cardId && row.bankSourcePackage === policy.bankSourcePackage))} onClick={() => setConfirmation({
+          action: "bankFallback", cardId, bankSourcePackage: policy.bankSourcePackage, bankDatePolicy: policy.bankDatePolicy,
+          evidenceMovementId: configuration.fallbackOptions?.find(row => row.cardId === cardId && row.bankSourcePackage === policy.bankSourcePackage)?.evidenceMovementId || policy.evidenceMovementId,
+          currency: "MXN", purchasesOnly: true, waitMinutes: 15, mode: policy.mode === "AUTOMATIC" ? "OBSERVATION" : "AUTOMATIC",
+          label: policy.mode === "AUTOMATIC" ? "Pausar respaldo bancario" : "Activar respaldo bancario",
+        })}>{policy.mode === "AUTOMATIC" ? "Pausar respaldo" : "Activar respaldo"}</Button></ItemActions></Item>)}
+        {!configuration.fallbackPolicies?.some(row => row.cardId === cardId) && <>
+          {(configuration.fallbackOptions || []).filter(row => row.cardId === cardId).map(option => <Button key={option.bankSourcePackage} variant="outline" className="min-h-11 self-start" disabled={busy} onClick={() => setConfirmation({
+            ...option, action: "bankFallback", mode: "AUTOMATIC", currency: "MXN", purchasesOnly: true, waitMinutes: 15, label: "Activar respaldo bancario",
+          })}>Activar respaldo de {captureSources[option.bankSourcePackage]}</Button>)}
+          {!configuration.fallbackOptions?.some(row => row.cardId === cardId) && <p className="text-sm text-muted-foreground">Disponible para los formatos comprobados de Banamex, Nu y Santander. Requiere Wallet activo y una muestra bancaria de esta tarjeta vinculada a un gasto cotejado, con terminación verificada e inequívoca.</p>}
+        </>}
+      </section>
+      <Separator />
+      <CaptureRolloutStatus fallbackPolicy={configuration.fallbackPolicies?.find(row => row.cardId === cardId)} coverage={configuration.rollout?.find(row => row.cardId === cardId)} cardId={cardId} busy={busy} onAutomation={setConfirmation} />
       <Separator />
       <h3 className="font-medium">Terminaciones de la tarjeta</h3>
       <ItemGroup>{configuration.aliases.filter(row => row.cardId === cardId).map(alias => <Item key={alias.id} className="flex-wrap"><ItemContent>
@@ -89,7 +109,10 @@ export default function CaptureConfigurationPanel({ configuration, userId, refre
     <AlertDialog open={Boolean(confirmation)} onOpenChange={open => { if (!open && !busy) setConfirmation(null); }}>
       <AlertDialogContent onCloseAutoFocus={restoreFocus}>
         <AlertDialogHeader><AlertDialogTitle>{confirmation?.label}</AlertDialogTitle>
-          <AlertDialogDescription>{confirmation?.action === "formatPolicy" ? (
+          <AlertDialogDescription>{confirmation?.action === "bankFallback" ? (confirmation.mode === "AUTOMATIC"
+            ? <>Wallet será principal para {configuration.cards.find(row => row.id === confirmation.cardId)?.name}. El banco esperará 15 minutos desde la recepción en AFP y registrará en la siguiente ejecución del servidor. Confirmas compras en MXN; el signo $ se interpretará como pesos mexicanos. {confirmation.bankSourcePackage === "com.citibanamex.banamexmobile" && "Declaras que usas esta tarjeta solo para compras: «Retiro/Compra» se considera compra; los retiros explícitos requieren revisión. "}Se usará {confirmation.bankDatePolicy === "BANK_OPERATION" ? "la fecha de operación bancaria" : "la fecha de publicación del aviso en hora de México"}. Si Wallet llega tarde, se conservarán el gasto y tus ediciones. Las coincidencias ambiguas requieren vinculación manual. Se aplica a avisos nuevos y sustituye el registro bancario inmediato.</>
+            : <>Se detendrán las esperas bancarias pendientes y los nuevos avisos no usarán el respaldo. Wallet seguirá con su configuración actual. Reactivar no registra avisos anteriores.</>
+          ) : confirmation?.action === "formatPolicy" ? (
             confirmation.completionPolicy === "MERCADOPAGO_CREDIT_MXN"
               ? <>Los avisos exactos de compra aprobada de Mercado Pago se asignarán a {configuration.cards.find(row => row.id === confirmation.cardId)?.name}, en pesos mexicanos (MXN). Confirmas que esta cuenta usa una única tarjeta de crédito para estas compras y que todas son en MXN. La tarjeta y moneda proceden de tu declaración; la fecha será la publicación del aviso en hora de México. Si cambia la tarjeta, la moneda o la fuente de fondos, vuelve a observación y revisa la regla. Cambiar la regla requiere una nueva muestra revisada.</>
               : <>Los avisos exactos de pago CFE de Nu se asignarán a {configuration.cards.find(row => row.id === confirmation.cardId)?.name}, en pesos mexicanos (MXN), con la fecha de publicación en hora de México. La tarjeta y moneda proceden de esta regla, porque el aviso no las incluye. Se confirmará el cobro pendiente de la suscripción elegida, usando el importe real. La configuración habitual de la suscripción se conserva. Cambiar la regla vuelve a observación y requiere revisar una muestra propia.</>

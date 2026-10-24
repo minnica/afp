@@ -1,0 +1,43 @@
+{
+  "verifiedAt": "2026-10-24T04:54:13.542Z",
+  "activeCards": [
+    "NU",
+    "BANAMEX 2",
+    "SANTANDER",
+    "BANAMEX 1"
+  ],
+  "waitMinutes": 15,
+  "primary": "Google Wallet",
+  "migrations": 32,
+  "rlsTables": 33,
+  "financialTablesUnchanged": true,
+  "originalEventsAndMovementsPreserved": true,
+  "otherAutomationsPreserved": true,
+  "santanderImmediateBankMode": "OBSERVATION",
+  "existingCronPreserved": true,
+  "newCronActive": true,
+  "scheduledRunsSucceeded": 1,
+  "pgNetAuthenticatedWorkerStatus": 200,
+  "newExpensesDuringActivation": 0,
+  "productionRealPurchaseStillToObserve": true,
+  "deploymentId": "dpl_8v3jS7fKgWYaEzePEur5Qwb4hy1B",
+  "deploymentState": "READY",
+  "productionDomain": "https://finanzas.garatachia.com",
+  "productionAliasVerified": true,
+  "sourceCommit": "8ac588c76f3a2dde209d80372ec6e4ef8dff9fd2",
+  "sourceWorkingTree": true,
+  "sourceFiles": 309,
+  "sourceManifestSha256": "78e8eac40a1b09e6ad2ebb57efbe2d6bafa466ec2ffa54ad388f4ffc7a0d1a14",
+  "sourceVerification": {
+    "captureModulesMatchedBySha1": 18,
+    "workerRouteContentExact": true,
+    "sourceTreeFilesMatchedBySha1": 117,
+    "remainingTreeDetailsLimitedByMcpDepthAndStringTruncation": true
+  },
+  "httpAuthorizationVerified": true,
+  "noRuntimeErrorsObservedInCheckedWindow": true,
+  "newApkRequired": false,
+  "privateBackupTables": 32,
+  "financialTestRecordsInsertedInProduction": false,
+  "gitCommitOrPushPerformed": false
+}

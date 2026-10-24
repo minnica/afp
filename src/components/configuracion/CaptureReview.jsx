@@ -37,6 +37,7 @@ function CaptureInbox({ userId, configuration }) {
         {proposal.dateSource === 'NOTIFICATION_POSTED_AT' && <ItemDescription>Fecha de publicación del aviso · hora de México</ItemDescription>}
         {proposal.subscriptionId && <ItemDescription>Cobro de {configuration.subscriptions.find(row => row.id === proposal.subscriptionId)?.name || 'suscripción'}</ItemDescription>}
         {(movement.originalExpenseId && !movement.expenseId && movement.status !== 'CONVERTED') && <ItemDescription>Gasto eliminado; el aviso conserva su resolución y no lo recrea.</ItemDescription>}
+        {movement.reason === 'BANK_FALLBACK_WAIT' && movement.fallbackDueAt && <ItemDescription>Disponible desde {new Intl.DateTimeFormat('es-MX', { timeZone: 'America/Mexico_City', dateStyle: 'short', timeStyle: 'short' }).format(new Date(movement.fallbackDueAt))} (hora de México). Guardar una corrección o descartar este aviso detiene su espera.</ItemDescription>}
         {movement.status === 'CONVERTED' && <ItemDescription>{movement.reason === 'USER_LINKED_INSTALLMENT' ? 'Vinculado a una compra a meses existente.' : 'Convertido a MSI; el gasto completo fue sustituido.'}</ItemDescription>}
       </ItemContent><ItemActions className="flex-wrap"><Button variant="outline" className="min-h-11" disabled={busy} onClick={async () => {
         setBusy(true); setError('');

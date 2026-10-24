@@ -84,6 +84,7 @@ model User {
   captureEvents        CaptureEvent[]
   captureAliases       CaptureCardAlias[]
   captureAutomations   CaptureAutomation[]
+  captureBankFallbacks CaptureBankFallback[]
   captureRules         CaptureMerchantRule[]
   captureMovements     CaptureMovement[]
   captureStatements    CaptureStatement[]
@@ -204,6 +205,7 @@ model Card {
   subscriptions        Subscription[]
   captureAliases       CaptureCardAlias[]
   captureAutomations   CaptureAutomation[]
+  captureBankFallbacks CaptureBankFallback[]
   captureRules         CaptureMerchantRule[]
   captureStatements    CaptureStatement[]
 
@@ -641,6 +643,27 @@ model CaptureMerchantRule {
   @@map("capture_merchant_rules")
 }
 
+// Respaldo bancario aceptado por tarjeta. Publicar no activa reglas ni gastos.
+model CaptureBankFallback {
+  id String @id @default(uuid()) @db.Uuid
+  userId String
+  cardId String
+  bankSourcePackage String
+  mode String @default("OBSERVATION")
+  currency String @default("MXN")
+  bankDatePolicy String
+  purchasesOnly Boolean
+  waitMinutes Int @default(15)
+  acceptedAt DateTime
+  evidenceMovementId String @db.Uuid
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  card Card @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  evidence CaptureMovement @relation(fields: [evidenceMovementId], references: [id], onDelete: Restrict)
+
+  @@unique([userId, cardId])
+  @@map("capture_bank_fallbacks")
+}
+
 // El análisis inicial (en el evento), el historial solicitado y originalExpenseId
 // sobreviven a ediciones/borrados. proposal contiene el análisis vigente.
 // No se vuelve a interpretar automáticamente un evento ya recibido.
@@ -662,6 +685,8 @@ model CaptureMovement {
   installmentPurchaseId String?
   createdAt             DateTime             @default(now())
   resolvedAt            DateTime?
+  fallbackDueAt         DateTime?
+  fallbackEvidenceFor   CaptureBankFallback[]
   user                  User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
   expense               DailyExpense?        @relation(fields: [expenseId], references: [id], onDelete: SetNull)
   installmentPurchase   InstallmentPurchase? @relation(fields: [installmentPurchaseId], references: [id], onDelete: SetNull)
@@ -670,6 +695,7 @@ model CaptureMovement {
   @@unique([userId, referenceKey])
   @@index([userId, status, createdAt])
   @@index([userId, cardId, operationDate])
+  @@index([fallbackDueAt])
   @@map("capture_movements")
   cardPayment CardCyclePayment?
 

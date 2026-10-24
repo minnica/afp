@@ -1,0 +1,119 @@
+{
+  "status": "LOCAL_VERIFIED_NOT_DEPLOYED",
+  "date": "2026-10-24 UTC",
+  "cards": [
+    "BANAMEX 1",
+    "BANAMEX 2",
+    "NU",
+    "SANTANDER"
+  ],
+  "rules": {
+    "primary": "Google Wallet",
+    "bankFallbackDelayMinutes": 15,
+    "delayStartsAt": "server receipt",
+    "bankDate": "BANK_OPERATION for Banamex/Santander; NOTIFICATION_POSTED_AT in America/Mexico_City for Nu",
+    "automaticCrossSourceLinkByAmount": false,
+    "lateWallet": "possible duplicates require review; existing expense and edits are preserved",
+    "candidateDateWindowDays": 3,
+    "retroactiveActivation": false
+  },
+  "tests": {
+    "total": 630,
+    "passed": 630,
+    "failed": 0,
+    "skipped": 0,
+    "database": "disposable local PostgreSQL 16",
+    "coverage": [
+      "per-card activation and owner isolation",
+      "exact 15-minute boundary",
+      "both arrival orders and simultaneous arrivals",
+      "concurrent workers and Wallet arrival",
+      "retry after transient failure",
+      "rollback after expense insert",
+      "immutable original receipt",
+      "personal edits and deleted expense",
+      "pause and reactivation",
+      "device revocation and source pause",
+      "alias ambiguity at deadline",
+      "changed notification during wait",
+      "foreign currency and explicit cash withdrawals",
+      "Nu publication day in Mexico",
+      "scheduler authentication",
+      "cron configuration idempotence and SQL conditional dispatch"
+    ]
+  },
+  "databaseVerification": {
+    "migrations": 32,
+    "tablesWithRLS": 33,
+    "emptyAndHistoricalUpgrade": true,
+    "prismaDiffEmpty": true,
+    "historicalChecksumsAndRecordsPreserved": true
+  },
+  "browser": {
+    "authenticationAndData": "fictional only",
+    "realAPIAndLocalPostgreSQL": true,
+    "productionWebpackBuild": true,
+    "builtSourcesMatchWorkspace": true,
+    "widthsWithoutHorizontalOverflow": [
+      390,
+      1280
+    ],
+    "activationPauseReactivation": true,
+    "concurrentEventDeliveriesPerScenario": 8,
+    "concurrentWorkerRequestsPerScenario": 4,
+    "newExpensesPerScenario": 1,
+    "lateWalletRequiresReview": true,
+    "expenseUnchanged": true,
+    "httpDeadlineAcceleratedOnlyInLocalFixture": true,
+    "newPolicySectionAccessibility": {
+      "inapplicable": 77,
+      "incomplete": 0,
+      "passes": 11,
+      "violations": 0
+    },
+    "surroundingPageAccessibility": "Four existing violations outside new policy section: list children and nested/duplicate main landmarks; contrast review incomplete."
+  },
+  "scheduler": {
+    "sqlVerifiedInPostgreSQL": true,
+    "extensionsInTests": "local adapters of cron/net/Vault; real extension scheduler clock not exercised",
+    "productionExtensionsPresentReadOnlyCheck": true,
+    "productionConfigured": false,
+    "interval": "every minute; HTTP only when pending deadline exists",
+    "retry": "persisted deadline survives failed transaction"
+  },
+  "productionReadOnlyPreflight": {
+    "allFourCardsReady": true,
+    "financialDataModified": false,
+    "policyActivated": false
+  },
+  "deploymentRemaining": [
+    "private backup",
+    "apply one migration",
+    "publish server",
+    "configure pg_cron + pg_net + Vault job",
+    "enable four per-card policies",
+    "verify real scheduled execution"
+  ],
+  "newApkRequired": false,
+  "dependenciesChanged": false,
+  "dependencyAudit": "dependency-audit.json",
+  "sourceSha256": {
+    "README.md": "69d9e292e7b723207ff24857c2f9e317043e6c95a44114482baeb604480fa02a",
+    "prisma/migrations/20261024020000_capture_bank_fallback/migration.sql": "fe792871e3417ac18e0ddf5a9fa264769e49c63c3c298cfe8097b4d4750a0f16",
+    "prisma/schema.prisma": "7f2af8e35cc8ab231075615ba627b457e385066d54d1243f217a0037badfa0f7",
+    "scripts/configure-capture-bank-fallback-cron.cjs": "407c588cd98b920695b633a4e6bc0db9996a64f37f7f764c384176d214b31535",
+    "scripts/verify-database-reproduction.cjs": "d76e8cc6f9480c528927efebc47fd336616528ccc27a3cb055ff985ee1567b02",
+    "src/app/api/cron/capture-bank-fallback/route.js": "2f4a03a75083072a20f1e811fc2129ac06679d13f3ccba0f2dafd35605b77e39",
+    "src/components/configuracion/CaptureConfigurationPanel.jsx": "829c26ee776fe3d887d2e23420c75bb6fae99b9bd2e5a6d25892dc9b333f2ff0",
+    "src/components/configuracion/CaptureReview.jsx": "eac2f9b257d100d9af6dfa8f5263bd43f8e77ca4a1725d2f26f98ce485d712b4",
+    "src/components/configuracion/CaptureRolloutStatus.jsx": "60c08ed39fc4ccc534ce5bee17b708211a28316cf1cf077fc14faad8837ed60d",
+    "src/lib/captureBankFallback.js": "86cf9e26a5a77fdafca544b9cbd0ee7d55e98e54c2fd4ad101fc4c71d4d15d3a",
+    "src/lib/captureBankFallbackWorker.js": "da377f02cd5494fe1a5184e95105e648774d96e6f71eb7d89f66eee695187494",
+    "src/lib/captureConfiguration.js": "240b0a25614c3aed2c0989e2415555ea15f46200ab794e42fd8fdbfb60cabf69",
+    "src/lib/capturePresentation.js": "7957b6905c8ac242753949ba3a109d7a734ec438df3321d09067439036b26576",
+    "src/lib/captureProcessing.js": "e57cb263c1f5a96ca78cbd77140c89004c9a5d8f6717b0cb452639eb96102960",
+    "tests/capture-bank-fallback-cron.test.cjs": "c9a612fd07dd4eb5157687321a5070fdc8599b8f30a946115cbffefdbcd37a48",
+    "tests/capture-bank-fallback-integration.test.cjs": "ac5f5591ef0bf4717d228e7a3ffcd6df6c61645e8d6c7f9ca4829350b4055081",
+    "tests/migration-history.test.cjs": "50d30d62fc39aa7d44246ff9a691b4088b78707458f77928ba0e9de78f558956"
+  }
+}

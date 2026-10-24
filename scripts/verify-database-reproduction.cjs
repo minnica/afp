@@ -140,7 +140,7 @@ function assertCatalog(actual) {
     const rows = actual[section].filter(row => (row.table_name || row.tablename) !== 'expense_operations'
       && !['capture_devices', 'capture_pairings', 'capture_events', 'capture_rate_limits', 'capture_card_aliases',
         'capture_automations', 'capture_merchant_rules', 'capture_movements', 'expense_tombstones', 'capture_statements',
-        'google_calendar_connections', 'calendar_oauth_states', 'google_calendar_events', 'card_cycle_payments', 'capture_payment_policies'].includes(row.table_name || row.tablename)
+        'google_calendar_connections', 'calendar_oauth_states', 'google_calendar_events', 'card_cycle_payments', 'capture_payment_policies', 'capture_bank_fallbacks'].includes(row.table_name || row.tablename)
       && !(section === 'columns' && row.table_name === 'card_cycles' && creditColumns.includes(row.column_name))
       && !(section === 'columns' && row.table_name === 'cards' && balanceColumns.includes(row.column_name))
       && !(section === 'columns' && row.table_name === 'receivable_accounts' && ['balanceAdjustment', 'balanceAdjustmentNotes'].includes(row.column_name))
@@ -151,7 +151,12 @@ function assertCatalog(actual) {
       && !(section === 'constraints' && row.name === 'daily_expenses_cash_contribution_check'));
     assert.deepEqual(rows, before[section], `Catálogo distinto en ${section}`);
   }
-  assert.equal(actual.security.length, before.security.length + 16);
+  const fallbackColumns = actual.columns.filter(row => row.table_name === 'capture_bank_fallbacks');
+  assert.equal(fallbackColumns.length, 11);
+  assert.ok(fallbackColumns.every(row => row.is_nullable === 'NO'));
+  assert.match(actual.constraints.find(row => row.name === 'capture_bank_fallbacks_policy_check')?.definition || '', /CHECK.*waitMinutes.*15/s);
+  assert.ok(actual.indexes.some(row => row.indexname === 'capture_movements_fallbackDueAt_idx'));
+  assert.equal(actual.security.length, before.security.length + 17);
   for (const row of actual.security) {
     assert.equal(row.rls, true, `RLS desactivado: ${row.table_name}`);
     assert.equal(row.force_rls, false);
@@ -341,7 +346,7 @@ async function main() {
         console.log(`OK ${i ? 'actualización desde las 13 migraciones aplicadas' : 'base vacía'}: catálogo equivalente, diff vacío, checksums, deploy repetible, registros intactos y RLS.`);
       } finally { await db.$disconnect(); }
     }
-    console.log(`Reconstrucción y actualización verificadas; ${localMigrations().length} migraciones y ${before.security.length + 16} tablas con RLS, incluido el historial.`);
+    console.log(`Reconstrucción y actualización verificadas; ${localMigrations().length} migraciones y ${before.security.length + 17} tablas con RLS, incluido el historial.`);
   } finally {
     // Solo elimina bases/roles con sufijo aleatorio creados por esta ejecución.
     for (const name of createdDatabases.reverse()) await admin.$executeRawUnsafe(`DROP DATABASE "${name}" WITH (FORCE)`);
