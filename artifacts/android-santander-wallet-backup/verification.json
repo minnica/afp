@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 1,
+  "verifiedAt": "2026-10-24T01:18:08.243Z",
+  "gitBase": "57fdb9adb266e5af20c1ac5942d2c2f19348de00",
+  "scope": "Local Santander Wallet backup implementation; production read-only preflight only",
+  "format": {
+    "key": "wallet.santander-purchase.es.v2",
+    "bankParser": "santander.card-purchase.es.v1",
+    "bankDateUnchanged": "BANK_OPERATION",
+    "walletDate": "NOTIFICATION_POSTED_AT / America/Mexico_City",
+    "identity": "Verified Santander physical/digital bank alias; NFC kept separate",
+    "legacyV1": "Preserved as non-automatic partial evidence",
+    "matchingSources": "Second matching notice stays in review; explicit linkage; no automatic merge or date overwrite"
+  },
+  "linkedLegacyValidation": {
+    "action": "validateWalletBackup",
+    "requires": [
+      "Explicitly linked legacy Wallet V1",
+      "Reconciled card expense",
+      "Complete Santander bank evidence",
+      "Verified bank alias",
+      "Matching card, MXN, amount and date",
+      "No personal correction"
+    ],
+    "financialWrites": false,
+    "initialEvidencePreserved": true,
+    "historyPreservedAndAppended": true,
+    "idempotent": true,
+    "activationSeparate": true
+  },
+  "tests": {
+    "command": "AFP_MIGRATION_TEST_DATABASE_URL=<local afp_test DB> node scripts/verify-database-reproduction.cjs",
+    "total": 581,
+    "passed": 581,
+    "failed": 0,
+    "skipped": 0,
+    "newTests": 12
+  },
+  "database": {
+    "newMigration": false,
+    "migrationsReproduced": 31,
+    "emptyDatabase": true,
+    "historicalUpgrade": true,
+    "drift": false,
+    "checksumsPreserved": true,
+    "rlsTablesIncludingHistory": 32
+  },
+  "lint": {
+    "errors": 0,
+    "existingWarning": "TanStack useReactTable incompatible-library; repeated for ignored local backup"
+  },
+  "build": {
+    "webpack": true,
+    "production": true,
+    "isolatedCopy": true,
+    "modifiedSourceHashesMatch": true,
+    "realSecretsLoaded": false
+  },
+  "browser": {
+    "auth": "Fictional local owner",
+    "database": "Disposable PostgreSQL 16 on localhost",
+    "api": "Real Next.js HTTP routes",
+    "viewports": [
+      390,
+      1280
+    ],
+    "horizontalOverflow": false,
+    "uncaughtJsErrors": 0,
+    "captureRequests": 21,
+    "allCaptureResponses200": true,
+    "legacyValidatedInUi": true,
+    "dateAcceptedAndEnabledInUi": true,
+    "returnToObservationAndReenableInUi": true,
+    "bankRuleAndOriginalExpenseUnchanged": true
+  },
+  "nativeHttp": {
+    "httpResponses": 12,
+    "all200": true,
+    "concurrentWalletDeliveries": 8,
+    "walletRetries": 1,
+    "identicalReceipts": true,
+    "originalExpenseUnchanged": true,
+    "walletOnlyCreatedOneExpense": true,
+    "bankOnlyCreatedOneExpense": true,
+    "secondSourceStayedForReview": true,
+    "bankAutomationUnchanged": true,
+    "expenses": 3
+  },
+  "originalPreflight": {
+    "productionReadOnly": true,
+    "linkedWalletExists": true,
+    "bankExpenseReconciled": true,
+    "datesAgree": true,
+    "completeBankProofMatches": true,
+    "eligibleWithoutNewPurchase": true,
+    "walletV2NotYetActive": true
+  },
+  "privacy": {
+    "originalsGitIgnored": true,
+    "publicSamplesFictional": true,
+    "privateValuesCopiedIntoChangedText": false,
+    "phoneFinancialScreenshotsPublished": false
+  },
+  "production": {
+    "deployed": false,
+    "changed": false,
+    "walletV2Enabled": false,
+    "datePolicyApprovalPending": true,
+    "publicationApprovalPending": true
+  },
+  "native": {
+    "apkChange": false,
+    "contractChange": false,
+    "instrumentedTestsRerun": false
+  },
+  "pending": [
+    "Explicit production publication/date approval",
+    "Validate existing linked Wallet evidence and enable only Santander Wallet V2",
+    "Observe a future normal automatic purchase and reconcile full statement"
+  ],
+  "sourceSha256": {
+    "src/components/configuracion/CaptureMovementEditor.jsx": "a0d63900da0a556fe9f08b229c6601fc8e97efd621a629e237c3fe857970ccb8",
+    "src/components/configuracion/CaptureRolloutStatus.jsx": "3bb6a9c89c677e848f6b7830aa7e65efdbad6b31dea9d507a1b6f849f0bee2d2",
+    "src/lib/captureParsers.js": "c75b8f62e03b0dd564ecf4f3eb531b4b2254a030be754ecec72c55fbfbc09089",
+    "src/lib/captureProcessing.js": "09ffe38f3308e4a1474baa096f5c0d751dc18dfefd8d389f63fb83c2695f0b43",
+    "tests/capture-didi-wallet-real.test.cjs": "d06de66494ffc5a4257a7c8616c7395e4d2c0eef875517fac46e91bef25b6972",
+    "tests/capture-santander-real-integration.test.cjs": "ccdac3e43826c18dc64f0cdf2ad271905ec5f98ae0422550c73a5df556f2fd66",
+    "tests/capture-santander-real.test.cjs": "8eee937b3c291e4c477b3435164fb1953ac1ba76d20f61b10961c4cc8b51419b",
+    "tests/capture-santander-wallet-backup-integration.test.cjs": "396401d179fb8aa524d2704cf76c65f1deee796f9f2c352209cefa30813d5c95",
+    "tests/fixtures/captures/wallet-santander-purchase.es.v2.json": "f5f933a7fef804cc19a993c5be2a74b5a2faeda6eeaa5f16231a3782f24bf653"
+  },
+  "screenshots": [
+    "validate-mobile.png",
+    "validated-mobile.png",
+    "date-policy-mobile.png",
+    "date-policy-desktop.png"
+  ]
+}

@@ -34,11 +34,12 @@ export async function captureCandidates(tx, userId, proposal) {
   const deleted = await tx.expenseTombstone.findMany({ where, select: { expenseId: true, concept: true, date: true, amount: true } });
   const movements = await tx.captureMovement.findMany({ where: { userId, cardId: proposal.cardId, amount: proposal.amount, operationDate: where.date },
     select: { id: true, expenseId: true, originalExpenseId: true, installmentPurchaseId: true, status: true, parserKey: true, correction: true, proposal: true } });
-  // Los avisos bancarios de solo evidencia no representan un gasto pendiente de
-  // creación automática. Si se resolvieron manualmente, sí bloquean duplicados.
+  // La evidencia parcial y Wallet de respaldo en observación no bloquean al
+  // banco. Una corrección personal o una resolución financiera sí bloquean.
   const financialMovements = movements.filter(row => !paymentCaptureKind(row) && !(["REVIEW", "OBSERVED"].includes(row.status)
     && !row.expenseId && !row.originalExpenseId && !row.installmentPurchaseId && !row.correction
-    && captureParsers.some(parser => parser.key === row.parserKey && parser.evidenceOnly)));
+    && captureParsers.some(parser => parser.key === row.parserKey
+      && (parser.evidenceOnly || (parser.nonBlockingInObservation && row.status === "OBSERVED")))));
   return [
     ...expenses.map(row => ({ type: "EXPENSE", id: row.id, concept: row.concept })),
     ...installments.map(row => ({ type: "INSTALLMENT", id: row.id, concept: row.concept })),
@@ -141,6 +142,45 @@ async function reinterpretCaptureMovement(tx, movement) {
   } });
 }
 
+async function validateWalletBackup(tx, movement) {
+  const oldKey = "wallet.santander-purchase.es.v1", newKey = "wallet.santander-purchase.es.v2";
+  if (movement.parserKey === newKey && movement.status === "LINKED"
+    && movement.analysisHistory?.some(analysis => analysis.validation === "LINKED_WALLET_BACKUP")) return movement;
+  if (movement.parserKey !== oldKey || movement.status !== "LINKED" || !movement.expenseId || movement.correction || movement.installmentPurchaseId) {
+    throw new ApiAccessError("Valida únicamente el aviso Wallet Santander anterior que ya vinculaste a un gasto bancario cotejado.", 409);
+  }
+  const expense = await tx.dailyExpense.findFirst({ where: { id: movement.expenseId, userId: movement.userId } });
+  if (!expense?.reconciledAt || expense.reconciliationStatus !== "CONFIRMED" || expense.paymentMethod !== "CARD") {
+    throw new ApiAccessError("Coteja primero el gasto bancario vinculado a este aviso.", 409);
+  }
+  const events = await tx.captureEvent.findMany({ where: { userId: movement.userId, movementId: movement.id } });
+  if (events.length !== 1) throw new ApiAccessError("Revisa manualmente las evidencias de este aviso.", 409);
+  const event = events[0], state = await captureInterpretationState(tx, event, true), p = state.proposal;
+  if (state.parserKey !== newKey || state.reason !== "OBSERVATION" || p.currency !== "MXN"
+    || p.cardId !== movement.cardId || p.cardId !== expense.cardId || !new Prisma.Decimal(p.amount).equals(expense.amount)) {
+    throw new ApiAccessError("El formato actual no confirma tarjeta, moneda e importe del gasto vinculado. Revisa sus datos y alias.", 409);
+  }
+  if (p.date !== expense.date.toISOString().slice(0, 10)) {
+    throw new ApiAccessError("La fecha del aviso Wallet difiere de la fecha del gasto bancario. Se conserva el gasto; revisa otra muestra para habilitar Wallet.", 409);
+  }
+  const bank = await tx.captureMovement.findFirst({ where: { userId: movement.userId, expenseId: expense.id,
+    parserKey: "santander.card-purchase.es.v1", status: { in: ["REGISTERED", "LINKED"] } } });
+  if (!bank?.proposal?.operationAt || bank.proposal.cardId !== p.cardId || bank.proposal.currency !== "MXN"
+    || bank.proposal.date !== p.date || !new Prisma.Decimal(bank.proposal.amount).equals(p.amount)) {
+    throw new ApiAccessError("Falta el aviso bancario completo que respalda este gasto cotejado.", 409);
+  }
+  const history = movement.analysisHistory || [];
+  if (history.length >= 50) throw new ApiAccessError("El historial de análisis está completo. Conserva la evidencia y revisa otra muestra.", 409);
+  const interpretation = { ...state.interpretation, reason: state.reason, proposal: p };
+  const key = captureHash(JSON.stringify({ validation: "LINKED_WALLET_BACKUP", eventId: event.id, requestHash: event.requestHash, interpretation }));
+  return tx.captureMovement.update({ where: { id: movement.id }, data: { parserKey: newKey, proposal: p,
+    operationDate: new Date(`${p.date}T12:00:00Z`), analysisHistory: [...history, {
+      key, validation: "LINKED_WALLET_BACKUP", eventId: event.id, requestHash: event.requestHash, analyzedAt: new Date().toISOString(),
+      previous: { parserKey: movement.parserKey, status: movement.status, reason: movement.reason, proposal: movement.proposal, referenceKey: movement.referenceKey },
+      interpretation,
+    }] } });
+}
+
 async function captureExpenseData(tx, movement) {
   const { userId } = movement;
   const proposal = effectiveCapture(movement);
@@ -195,7 +235,7 @@ export async function registerCaptureMovement(tx, movement, distinct) {
 
 export async function resolveCaptureMovement(db, userId, input) {
   if (!input || typeof input.id !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(input.id)
-    || !["link", "linkInstallment", "distinct", "discard", "convertToInstallments", "correct", "register", "reinterpret", "registerPayment", "linkPayment", "reversePayment"].includes(input.action)) {
+    || !["link", "linkInstallment", "distinct", "discard", "convertToInstallments", "correct", "register", "reinterpret", "validateWalletBackup", "registerPayment", "linkPayment", "reversePayment"].includes(input.action)) {
     throw new ApiAccessError("Resolución no válida.", 400);
   }
   return db.$transaction(async tx => {
@@ -204,6 +244,7 @@ export async function resolveCaptureMovement(db, userId, input) {
     if (!movement) throw new ApiAccessError("Aviso no encontrado.", 404);
     if (["registerPayment", "linkPayment", "reversePayment"].includes(input.action)) return resolveCapturePayment(tx, movement, input);
     if (input.action === "reinterpret") return reinterpretCaptureMovement(tx, movement);
+    if (input.action === "validateWalletBackup") return validateWalletBackup(tx, movement);
     if (paymentCaptureKind(movement) && input.action !== "discard") throw new ApiAccessError("Resuelve este aviso desde Pagos de tarjeta; no se puede convertir en un gasto.", 409);
     if (input.action === "correct") return correctCapture(tx, movement, input);
     if (input.action === "convertToInstallments") return convertCaptureToInstallments(tx, movement, input);

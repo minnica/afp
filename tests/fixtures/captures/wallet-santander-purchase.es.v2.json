@@ -1,0 +1,14 @@
+{
+  "kind": "ANONYMIZED_REAL_NOTIFICATION",
+  "reviewedOn": "2026-10-22",
+  "scope": "Misma estructura Wallet Santander revisada con el propietario; valores exclusivamente ficticios. La v2 propone fecha de publicación en México y requiere aceptación por tarjeta/formato. No incluye fecha bancaria ni referencia compartida para fusionar avisos automáticamente.",
+  "event": {
+    "sourcePackage": "com.google.android.apps.walletnfcrel",
+    "postedAt": "2026-10-20T20:49:07.663Z",
+    "receivedAt": "2026-10-20T20:49:07.891Z",
+    "fields": {
+      "android.title": "COMERCIO FICTICIO",
+      "android.text": "MXN123.45 con Santander LikeU ••0123"
+    }
+  }
+}

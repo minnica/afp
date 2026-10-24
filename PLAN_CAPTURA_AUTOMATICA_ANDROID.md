@@ -440,6 +440,18 @@ La aplicación a producción fue autorizada expresamente. Originales y respaldo 
 
 [Evidencia técnica local](artifacts/android-nu-mercadopago/verification.json) y [producción](artifacts/android-nu-mercadopago/production.json). Sin actualización de APK. La auditoría previa detectó alertas de dependencias ya existentes; actualización de seguridad pendiente, documentada en la evidencia.
 
+### Respaldo Santander por Wallet · publicación del 23 de octubre de 2026
+
+- [x] Incorporar Wallet V2 con alias bancario y fecha del aviso en México, conservando V1 parcial y fecha/automatización bancarias independientes.
+- [x] Conservar un gasto con Wallet solo, ambas fuentes en ambos órdenes/concurrentes y entregas repetidas; coincidencias requieren revisión y vínculo expreso, sin cambiar fechas automáticamente.
+- [x] Validar expresamente una evidencia V1 ya vinculada/cotejada mediante `validateWalletBackup`, sin crear gasto ni alterar originales, resolución o cotejo. Conservar historial y rechazar correcciones personales, diferencias de fecha y ausencia de evidencia bancaria.
+- [x] Confirmar en una consulta de solo lectura que el aviso real anterior es elegible; no hace falta otra compra para habilitar este respaldo.
+- [x] Verificar 581 pruebas sin fallos/omisiones, 31 migraciones desde vacío/actualización histórica, RLS, lint, build Webpack y flujo móvil con datos/Auth ficticios y API/BD reales.
+- [x] Autorizar publicación y fecha Wallet para Santander; validar expresamente la evidencia existente y habilitar únicamente Wallet V2, sin otra compra ni migración/APK nueva. Publicado `dpl_FSUf1kGToCZSAXujgR7bB6tTePWU`, READY, dominio AFP y 16 módulos verificados. Tras respaldo privado de 32 tablas: cero gastos nuevos, registro/cotejo bancarios y originales intactos, un análisis Wallet añadido y nueva regla V2 con fecha aceptada; otras reglas conservadas. Siguen 31 migraciones completas, cero pendientes y diff vacío.
+- [ ] Observar una compra futura automática; conciliación de corte completo y recepción BBVA/HSBC siguen pendientes.
+
+[Evidencia técnica local](artifacts/android-santander-wallet-backup/verification.json) y [producción](artifacts/android-santander-wallet-backup/production.json). La regla bancaria y el respaldo Wallet están habilitados, con sus fechas independientes; la muestra inicial sigue siendo un único gasto cotejado.
+
 ## 4. Pruebas y aceptación
 
 | Escenario | Resultado requerido |

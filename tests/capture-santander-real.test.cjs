@@ -57,18 +57,30 @@ test('Santander real: títulos y cuerpos contradictorios no eligen datos; otra m
   }
 });
 
-test('Wallet Santander real: conserva importe, MXN, comercio y alias bancario sin inventar fecha o referencia', () => {
+test('Wallet Santander v2: propone fecha del aviso México con alias bancario, sin fecha bancaria inventada', () => {
   const parsed = interpretCapture(wallet.event);
-  assert.equal(parsed.parserKey, 'wallet.santander-purchase.es.v1');
-  assert.equal(parsed.reason, 'INCOMPLETE_FORMAT'); assert.equal(parsed.verified, false);
+  assert.equal(parsed.parserKey, 'wallet.santander-purchase.es.v2');
+  assert.equal(parsed.reason, 'PURCHASE'); assert.equal(parsed.verified, true);
   assert.equal(parsed.proposal.amount, '123.45'); assert.equal(parsed.proposal.currency, 'MXN');
   assert.equal(parsed.proposal.merchant, 'COMERCIO FICTICIO'); assert.equal(parsed.proposal.printedAlias.value, '0123');
-  assert.equal(parsed.proposal.aliasSourcePackage, bank.event.sourcePackage); assert.equal(parsed.proposal.evidenceOnly, true);
+  assert.equal(parsed.proposal.aliasSourcePackage, bank.event.sourcePackage); assert.equal(parsed.proposal.evidenceOnly, undefined);
   assert.equal(parsed.proposal.notificationAt, wallet.event.postedAt);
-  assert.deepEqual(Array.from(parsed.proposal.missingFields), ['operationDate']);
-  for (const key of ['date', 'dateSource', 'operationAt', 'reference', 'cardId', 'alias']) assert.equal(parsed.proposal[key], undefined);
+  assert.equal(parsed.proposal.date, '2026-10-20'); assert.equal(parsed.proposal.dateSource, 'NOTIFICATION_POSTED_AT');
+  assert.equal(parsed.proposal.reference, null);
+  for (const key of ['operationAt', 'cardId', 'alias']) assert.equal(parsed.proposal[key], undefined);
   const parser = captureParsers.find(p => p.key === parsed.parserKey);
-  assert.equal(parser.verified, false); assert.equal(parser.evidenceOnly, true);
+  assert.equal(parser.verified, true); assert.equal(parser.nonBlockingInObservation, true);
+  assert.equal(parser.dateSource, 'NOTIFICATION_POSTED_AT');
+  const legacy = captureParsers.find(p => p.key === 'wallet.santander-purchase.es.v1');
+  assert.equal(legacy.verified, false); assert.equal(legacy.evidenceOnly, true);
+});
+
+test('Wallet Santander v2: la publicación define el día México incluso con entrega tardía o cambio UTC de día', () => {
+  const event = { ...wallet.event, postedAt: '2026-10-21T00:49:07Z', receivedAt: '2026-10-22T02:00:00Z' };
+  const p = interpretCapture(event).proposal;
+  assert.equal(p.date, '2026-10-20'); assert.equal(p.notificationAt, new Date(event.postedAt).toISOString());
+  assert.equal(p.timeZone, 'America/Mexico_City'); assert.equal(p.operationAt, undefined);
+  assert.equal(interpretCapture(bank.event).proposal.dateSource, 'BANK_OPERATION');
 });
 
 test('Wallet Santander real: otra tarjeta, moneda, estructura, fecha o contenido contradictorio conserva revisión', () => {

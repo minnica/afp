@@ -34,6 +34,8 @@ export const captureParsers = [
     aliasKinds: ["PHYSICAL", "DIGITAL"], dateSource: "BANK_OPERATION" },
   { key: "wallet.santander-purchase.es.v1", sourcePackage: "com.google.android.apps.walletnfcrel", verified: false, evidence: "REAL_REVIEWED_PARTIAL",
     aliasSourcePackage: "mx.bancosantander.supermovil", aliasKinds: ["PHYSICAL", "DIGITAL"], evidenceOnly: true },
+  { key: "wallet.santander-purchase.es.v2", sourcePackage: "com.google.android.apps.walletnfcrel", verified: true, evidence: "REAL_REVIEWED",
+    aliasSourcePackage: "mx.bancosantander.supermovil", aliasKinds: ["PHYSICAL", "DIGITAL"], dateSource: "NOTIFICATION_POSTED_AT", nonBlockingInObservation: true },
   { key: "wallet.didi-purchase.es.v1", sourcePackage: "com.google.android.apps.walletnfcrel", verified: true, evidence: "REAL_REVIEWED",
     aliasSourcePackage: "com.didiglobal.cashloan", aliasKinds: ["PHYSICAL", "DIGITAL"], dateSource: "NOTIFICATION_POSTED_AT" },
 ];
@@ -152,18 +154,18 @@ function realWalletSantanderPurchase(event) {
   const fields = event.fields || {}, body = fields["android.bigText"] || fields["android.text"] || "";
   const match = body.match(/^(MXN|USD|EUR)([\d,.]+) con Santander LikeU ••(\d{4})$/);
   if (!match) return null;
-  const parserKey = "wallet.santander-purchase.es.v1";
-  if (conflictingBodies(fields)) return { parserKey, verified: false, reason: "CONFLICTING_FIELDS", proposal: {} };
+  const parserKey = "wallet.santander-purchase.es.v2";
+  if (conflictingBodies(fields)) return { parserKey, verified: true, reason: "CONFLICTING_FIELDS", proposal: {} };
   const merchant = fields["android.title"], amount = captureAmount(match[2]), notification = captureNotificationDate(event);
   if (!amount || !notification || typeof merchant !== "string" || !merchant.trim() || merchant.length > 200 || /[\r\n]/.test(merchant)) {
-    return { parserKey, verified: false, reason: "INVALID_FIELDS", proposal: {} };
+    return { parserKey, verified: true, reason: "INVALID_FIELDS", proposal: {} };
   }
-  // El título muestra la terminación bancaria, no el token NFC. La publicación
-  // se conserva como evidencia: no completa la fecha bancaria ni crea un gasto.
-  return { parserKey, verified: false, reason: match[1] === "MXN" ? "INCOMPLETE_FORMAT" : "FOREIGN_CURRENCY", proposal: {
+  // La fecha del aviso es una política explícita por tarjeta/formato; nunca se
+  // presenta como fecha bancaria. La v1 histórica conserva su evidencia parcial.
+  return { parserKey, verified: true, reason: match[1] === "MXN" ? "PURCHASE" : "FOREIGN_CURRENCY", proposal: {
+    ...notification,
     amount, currency: match[1], merchant: merchant.trim(), printedAlias: { value: match[3], digits: 4 },
-    aliasSourcePackage: "mx.bancosantander.supermovil", notificationAt: notification.notificationAt, timeZone: notification.timeZone,
-    evidenceOnly: true, missingFields: ["operationDate"],
+    aliasSourcePackage: "mx.bancosantander.supermovil", reference: null,
   } };
 }
 

@@ -1,0 +1,157 @@
+{
+  "verifiedAt": "2026-10-24T01:24:05.482Z",
+  "productionUrl": "https://finanzas.garatachia.com",
+  "deploymentId": "dpl_FSUf1kGToCZSAXujgR7bB6tTePWU",
+  "state": "READY",
+  "previousDeploymentId": "dpl_41GEJL9LXCTPz8UauzcvmSZzQzwh",
+  "sourceCommit": "57fdb9adb266e5af20c1ac5942d2c2f19348de00",
+  "sourceWorkingTree": true,
+  "sourceFiles": 305,
+  "sourceBytes": 2751198,
+  "sourceManifestSha256": "da22a9f103aef044c5a9263c075324d245d838c1c1c8cdcc3b45ad478c55d3d1",
+  "parserSourceSha1": "944e03f602e1682f8d4c3635a75773ffab23c6f9",
+  "parserSourceSha256": "c75b8f62e03b0dd564ecf4f3eb531b4b2254a030be754ecec72c55fbfbc09089",
+  "captureServerModulesMatched": 16,
+  "productionAliasVerified": true,
+  "privateFilesUploaded": false,
+  "commitOrPushPerformed": false,
+  "backupTables": 32,
+  "migrationApplied": false,
+  "migrationsComplete": 31,
+  "pendingMigrations": 0,
+  "schemaDiffEmpty": true,
+  "checksumsPreserved": true,
+  "apkUpdated": false,
+  "nativeContractChanged": false,
+  "activation": {
+    "card": "SANTANDER",
+    "parserKey": "wallet.santander-purchase.es.v2",
+    "mode": "AUTOMATIC",
+    "datePolicy": "NOTIFICATION_POSTED_AT",
+    "timeZone": "America/Mexico_City",
+    "datePolicyExplicitlyAcceptedByOwner": true,
+    "bankParser": "santander.card-purchase.es.v1",
+    "bankMode": "AUTOMATIC",
+    "bankDatePolicy": "BANK_OPERATION",
+    "previousLinkedEvidenceValidatedExplicitly": true,
+    "existingExpensePreserved": true,
+    "newExpenses": 0,
+    "secondMatchingNotice": "Stays for review; explicit linkage; no automatic merge or date overwrite"
+  },
+  "dataVerification": {
+    "verifiedAt": "2026-10-24T01:23:13.319Z",
+    "newExpenses": 0,
+    "allExpensesUnchanged": true,
+    "existingExpenseAndPointReconciliationPreserved": true,
+    "originalEventsAndReceiptsUnchanged": true,
+    "originalInterpretationsRetained": true,
+    "existingHistoryPreserved": true,
+    "oneExplicitWalletValidationAdded": true,
+    "onlySantanderWalletV2Enabled": true,
+    "bankRuleAndBankDateUnchanged": true,
+    "otherRulesAndFinancialTablesUnchanged": true,
+    "deviceCredentialsAndConfigurationPreserved": true,
+    "migrations": 31,
+    "newMigration": false,
+    "rlsUnchanged": true,
+    "tablesCompared": 32,
+    "differences": [
+      {
+        "table": "capture_automations",
+        "allowed": true
+      },
+      {
+        "table": "capture_devices",
+        "allowed": true
+      },
+      {
+        "table": "capture_movements",
+        "allowed": true
+      },
+      {
+        "table": "capture_rate_limits",
+        "allowed": true
+      }
+    ],
+    "readinessValid": true,
+    "pointVerificationOnly": true,
+    "fullStatementStillPending": true,
+    "firstFutureAutomaticPurchaseStillToObserve": true
+  },
+  "publicHttpChecks": [
+    {
+      "path": "/gastos",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/configuracion",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/manifest.webmanifest",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/.well-known/assetlinks.json",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/captures/configuration",
+      "method": "GET",
+      "status": 401
+    },
+    {
+      "path": "/api/captures/movements",
+      "method": "GET",
+      "status": 401
+    },
+    {
+      "path": "/api/captures/events",
+      "method": "POST",
+      "status": 401
+    },
+    {
+      "path": "/api/captures/device",
+      "method": "GET",
+      "status": 401
+    }
+  ],
+  "publicUiChunksChecked": 18,
+  "newWalletValidationUiPresent": true,
+  "backupExplanationPresent": true,
+  "runtimeErrorGroupsObserved": 0,
+  "runtimeErrorScope": "Capture routes in the ten-minute window immediately after deployment",
+  "physicalPhoneConnectedDuringRelease": false,
+  "phoneRuntimeUiChecked": false,
+  "privacy": {
+    "privateOriginalsAndBackupGitIgnored": true,
+    "realNotificationTextPublished": false,
+    "publicScreenshots": "Fictional local fixtures only"
+  },
+  "dependencyAudit": {
+    "prod": {
+      "info": 0,
+      "low": 2,
+      "moderate": 2,
+      "high": 1,
+      "critical": 2
+    },
+    "all": {
+      "info": 0,
+      "low": 2,
+      "moderate": 2,
+      "high": 2,
+      "critical": 2
+    },
+    "status": "Previously reported findings remain open; no dependency change in this release"
+  },
+  "pending": [
+    "Observe the next normal automatic purchase",
+    "Reconcile a complete statement",
+    "BBVA/HSBC notification reception and separately reported dependency maintenance"
+  ]
+}

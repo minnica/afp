@@ -28,6 +28,7 @@ export default function CaptureRolloutStatus({ coverage, cardId, busy, onAutomat
           <ItemDescription className="break-all">{format.parserKey}</ItemDescription>
           <div><Badge variant={format.mode === "AUTOMATIC" ? "default" : "secondary"}>{format.mode === "AUTOMATIC" ? "Automático" : format.verified ? "Observación" : "Diagnóstico"}</Badge></div>
           {format.dateSource === "NOTIFICATION_POSTED_AT" && <ItemDescription className="line-clamp-none">Usa la fecha del aviso de {captureSources[source.sourcePackage]} en hora de México. El aviso no incluye una fecha bancaria de operación.</ItemDescription>}
+          {format.parserKey === "wallet.santander-purchase.es.v2" && <ItemDescription className="line-clamp-none">Puede registrar desde Wallet aunque no llegue el aviso de Santander. Si ya existe un cargo coincidente, el segundo aviso queda por revisar para evitar duplicados; no cambia automáticamente la fecha del gasto existente.</ItemDescription>}
           {format.completionPolicy && <><ItemDescription className="line-clamp-none">{format.policyRequiresSubscription
             ? "La regla asigna los pagos CFE a esta tarjeta, en MXN, y confirma el cobro pendiente de la suscripción elegida. Conserva la configuración habitual de la suscripción."
             : "La regla asigna los avisos de compra aprobada de Mercado Pago a esta única tarjeta de crédito y a MXN, según tu declaración. El aviso no incluye tarjeta ni moneda."}</ItemDescription>

@@ -77,8 +77,8 @@ test('Santander real anonimizado: API, revisión, activación y un gasto por com
       const bank = (await read(bankInput)).movement, wallet = (await read(walletInput)).movement;
       assert.equal(bank.status, 'OBSERVED'); assert.equal(bank.reason, 'OBSERVATION');
       assert.equal(bank.proposal.dateSource, 'BANK_OPERATION'); assert.equal(bank.proposal.date, '2026-10-20');
-      assert.equal(wallet.status, 'REVIEW'); assert.equal(wallet.reason, 'INCOMPLETE_FORMAT');
-      assert.equal(wallet.proposal.date, undefined); assert.equal(wallet.operationDate, null);
+      assert.equal(wallet.status, 'OBSERVED'); assert.equal(wallet.reason, 'OBSERVATION');
+      assert.equal(wallet.proposal.date, '2026-10-20'); assert.equal(wallet.proposal.dateSource, 'NOTIFICATION_POSTED_AT');
       assert.equal((await db.captureCardAlias.findFirst({ where: { cardId: card.id, kind: 'WALLET' } })).value, '4242');
       assert.equal(await count(), 0); assert.equal((await readiness()).canEnable, false);
       await assert.rejects(mode('AUTOMATIC'), error => error.status === 409);
@@ -115,7 +115,7 @@ test('Santander real anonimizado: API, revisión, activación y un gasto por com
         const inputs = { bank: event(bankFixture, amount), wallet: event(walletFixture, amount) }, result = {};
         for (const source of order) result[source] = await send(inputs[source]);
         assert.equal(result.bank.status, 'REGISTERED'); assert.equal(result.bank.reason, 'AUTOMATIC');
-        assert.equal(result.wallet.status, 'REVIEW'); assert.equal(result.wallet.expenseId, null);
+        assert.equal(result.wallet.status, 'OBSERVED'); assert.equal(result.wallet.expenseId, null);
         const expense = await db.dailyExpense.findUnique({ where: { id: result.bank.expenseId } });
         assert.equal(expense.reconciliationStatus, 'PENDING'); assert.equal(expense.date.toISOString(), '2026-10-20T12:00:00.000Z');
         assert.equal(String(expense.amount), amount); assert.equal(expense.cardId, card.id);
@@ -178,10 +178,10 @@ test('Santander real anonimizado: API, revisión, activación y un gasto por com
       assert.equal(await count(), before); assert.equal(await db.dailyExpense.count({ where: { userId: other.id } }), 0);
     });
 
-    await t.test('Wallet parcial no automatiza aunque se fuerce el modo; una corrección personal conserva revisión', async () => {
+    await t.test('forzar el modo histórico Wallet v1 no habilita v2; una corrección personal conserva revisión', async () => {
       await db.captureAutomation.create({ data: { userId: user.id, cardId: card.id, parserKey: walletParserKey, mode: 'AUTOMATIC', datePolicy: 'NOTIFICATION_POSTED_AT' } });
       const before = await count(), wallet = await send(event(walletFixture, '601.25'));
-      assert.equal(wallet.reason, 'INCOMPLETE_FORMAT'); assert.equal(wallet.expenseId, null); assert.equal(await count(), before);
+      assert.equal(wallet.reason, 'OBSERVATION'); assert.equal(wallet.expenseId, null); assert.equal(await count(), before);
       assert.equal((await resolve({ id: wallet.id, action: 'correct', expectedCorrection: 'null', correction: {
         cardId: card.id, amount: '601.25', date: '2026-10-20', currency: 'MXN', merchant: 'Corrección personal', categoryId: category.id,
       } })).status, 200);

@@ -73,6 +73,7 @@ test('Wallet: Banamex, DiDi y Santander conservan perfiles, bancos y políticas 
   const b = interpretCapture(banamex.event), d = interpretCapture(fixture.event), s = interpretCapture(santander.event);
   assert.equal(b.parserKey, 'wallet.banamex-purchase.es.v1'); assert.equal(b.proposal.aliasSourcePackage, 'com.citibanamex.banamexmobile');
   assert.equal(d.parserKey, 'wallet.didi-purchase.es.v1'); assert.equal(d.proposal.aliasSourcePackage, 'com.didiglobal.cashloan');
-  assert.equal(s.parserKey, 'wallet.santander-purchase.es.v1'); assert.equal(s.reason, 'INCOMPLETE_FORMAT');
-  assert.equal(s.verified, false); assert.equal(s.proposal.date, undefined); assert.equal(s.proposal.evidenceOnly, true);
+  assert.equal(s.parserKey, 'wallet.santander-purchase.es.v2'); assert.equal(s.reason, 'PURCHASE');
+  assert.equal(s.proposal.aliasSourcePackage, 'mx.bancosantander.supermovil');
+  assert.equal(s.verified, true); assert.equal(s.proposal.dateSource, 'NOTIFICATION_POSTED_AT'); assert.equal(s.proposal.operationAt, undefined);
 });
