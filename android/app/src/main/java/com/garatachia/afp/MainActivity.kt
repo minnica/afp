@@ -1,5 +1,6 @@
 package com.garatachia.afp
 
+import android.Manifest
 import android.app.NotificationManager
 import android.app.ActivityManager
 import android.content.ComponentName
@@ -7,6 +8,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.os.Build
 import android.os.PowerManager
 import android.provider.Settings
 import android.service.notification.NotificationListenerService
@@ -64,6 +66,7 @@ class MainActivity : ComponentActivity() {
     private var batteryExempt by mutableStateOf(false)
     private var backgroundRestricted by mutableStateOf(false)
     private var powerSave by mutableStateOf(false)
+    private var notificationsAllowed by mutableStateOf(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -87,6 +90,8 @@ class MainActivity : ComponentActivity() {
         powerSave = power.isPowerSaveMode
         backgroundRestricted = getSystemService(ActivityManager::class.java).isBackgroundRestricted
         app.reload()
+        notificationsAllowed = app.importantNotices.permitted()
+        ImportantNoticeScheduler.enqueue(this)
     }
 
     @Suppress("DEPRECATION")
@@ -111,6 +116,16 @@ class MainActivity : ComponentActivity() {
         var confirmClear by remember { mutableStateOf(false) }
         var exportError by remember { mutableStateOf(false) }
         var exportJson by remember { mutableStateOf("") }
+        var noticesEnabled by remember { mutableStateOf(app.importantNotices.enabled) }
+        val noticeStatus by app.importantNotices.status.collectAsStateWithLifecycle()
+        val bindingState by app.bindingController.state.collectAsStateWithLifecycle()
+        val notificationPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            notificationsAllowed = granted && app.importantNotices.permitted()
+            if (notificationsAllowed) {
+                app.importantNotices.setEnabled(true)
+                noticesEnabled = true
+            } else app.importantNotices.status.value = "Permite las notificaciones en Ajustes de Android para recibir los avisos."
+        }
         val exporter = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
             if (uri != null) app.scope.launch {
                 val result = runCatching {
@@ -149,6 +164,33 @@ class MainActivity : ComponentActivity() {
                 }
                 item { QueueSection(app) }
                 item {
+                    Section("Avisos importantes") {
+                        Text("Recibe en tu celular los avisos del Dashboard, como el pago de una tarjeta. Toca una notificación para abrir su sección en AFP.")
+                        ToggleRow("Recibir avisos importantes", noticesEnabled) { value ->
+                            if (!value || app.importantNotices.permitted()) {
+                                app.importantNotices.setEnabled(value)
+                                noticesEnabled = value
+                            } else if (Build.VERSION.SDK_INT >= 33) {
+                                notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+                            } else startActivity(Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                                .putExtra(Settings.EXTRA_APP_PACKAGE, packageName))
+                        }
+                        if (!notificationsAllowed) Text("Falta permitir que AFP muestre notificaciones. Este permiso es independiente del acceso para leer avisos bancarios.")
+                        if (bindingState.binding?.state != "ACTIVE") Text("El teléfono debe estar vinculado, autorizado y sin pausa en AFP.")
+                        Text(noticeStatus, style = MaterialTheme.typography.bodySmall)
+                        Text("Se revisan con conexión aproximadamente cada 15 minutos, también con la app cerrada. Android puede retrasar la revisión por batería o reposo.",
+                            style = MaterialTheme.typography.bodySmall)
+                        OutlinedButton(onClick = { ImportantNoticeScheduler.enqueue(this@MainActivity) },
+                            enabled = noticesEnabled && notificationsAllowed && bindingState.binding?.state == "ACTIVE") {
+                            Text("Revisar avisos ahora")
+                        }
+                        TextButton(onClick = {
+                            startActivity(Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                                .putExtra(Settings.EXTRA_APP_PACKAGE, packageName))
+                        }) { Text("Ajustes de notificaciones") }
+                    }
+                }
+                item {
                     Section("Activación") {
                         ToggleRow("Guardar avisos y diagnóstico", active) {
                             active = it
@@ -162,7 +204,7 @@ class MainActivity : ComponentActivity() {
                             !connected -> "Acceso permitido; lector desconectado"
                             else -> "Lector conectado; esperando avisos nuevos"
                         })
-                        Text("El acceso a notificaciones permite leer avisos. Es distinto del permiso para mostrar notificaciones propias, que AFP no solicita en esta fase.")
+                        Text("El acceso a notificaciones permite leer avisos bancarios. Para recibir los avisos de AFP, activa Avisos importantes en esta pantalla.")
                         OutlinedButton(onClick = { openSettings(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS) }) {
                             Text("Configurar acceso a notificaciones")
                         }

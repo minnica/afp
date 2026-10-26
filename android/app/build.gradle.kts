@@ -18,8 +18,8 @@ android {
         applicationId = "com.garatachia.afp"
         minSdk = 28
         targetSdk = 36
-        versionCode = 10
-        versionName = "0.7.1"
+        versionCode = 11
+        versionName = "0.8.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         manifestPlaceholders["webHost"] = "finanzas.garatachia.com"
         resValue("string", "web_url", "https://finanzas.garatachia.com/dashboard")

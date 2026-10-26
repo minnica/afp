@@ -31,7 +31,10 @@ class CaptureSyncWorker(context: Context, params: WorkerParameters) : CoroutineW
                 val engine = CaptureSyncEngine(app.captureQueue, { BindingStore(applicationContext).read() },
                     CaptureApiClient(applicationContext.getString(R.string.capture_origin))::sendEvent,
                     { app.deliveryPaused }, { isStopped })
-                if (engine.drain() == SyncOutcome.RETRY) Result.retry() else Result.success()
+                if (engine.drain() == SyncOutcome.RETRY) Result.retry() else {
+                    ImportantNoticeScheduler.enqueue(applicationContext)
+                    Result.success()
+                }
             } catch (error: kotlinx.coroutines.CancellationException) { throw error }
             catch (error: CaptureApiException) {
                 if (error.status == 429 && error.retryAfterMs > 0) {

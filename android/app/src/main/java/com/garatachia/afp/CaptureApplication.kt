@@ -21,6 +21,7 @@ class CaptureApplication : Application() {
     val queueStorageError = MutableStateFlow(false)
     val recoveryNotice = MutableStateFlow("Al reconectar se revisan solo los avisos que siguen activos; no es un historial completo.")
     val syncMutex = Mutex()
+    val importantNotices by lazy { ImportantNoticeCenter(this) }
     val captureQueue by lazy { CaptureQueue(CaptureQueueDatabase.open(this)) }
     private val bindingScope = CoroutineScope(SupervisorJob() + Dispatchers.IO.limitedParallelism(1))
     val bindingController by lazy { BindingController(this, bindingScope) { binding ->
@@ -28,6 +29,8 @@ class CaptureApplication : Application() {
             runCatching {
                 captureQueue.authorized(binding)
                 CaptureSyncScheduler.enqueue(this@CaptureApplication, manual = true)
+                if (binding.state != "ACTIVE") importantNotices.clear()
+                ImportantNoticeScheduler.enqueue(this@CaptureApplication)
             }.onFailure { queueStorageError.value = true }
         }
     } }
@@ -76,6 +79,8 @@ class CaptureApplication : Application() {
         runCatching { remotePauses.value = remotePausedPackages }.onFailure { queueStorageError.value = true }
         reload()
         CaptureSyncScheduler.recover(this)
+        importantNotices.createChannel()
+        ImportantNoticeScheduler.recover(this)
     }
 
     fun reload() { scope.launch {

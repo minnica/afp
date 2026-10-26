@@ -1,0 +1,31 @@
+{
+  "checkedAt": "2026-10-26T07:20:54.996741+00:00",
+  "applicationId": "com.garatachia.afp",
+  "action": "adb install -r",
+  "before": {
+    "versionName": "0.7.1",
+    "versionCode": "10",
+    "firstInstallTime": "2026-10-20 23:45:31",
+    "notificationListenerAllowed": true,
+    "batteryExempt": true,
+    "domainVerified": true
+  },
+  "after": {
+    "versionName": "0.8.0",
+    "versionCode": "11",
+    "firstInstallTime": "2026-10-20 23:45:31",
+    "notificationListenerAllowed": true,
+    "batteryExempt": true,
+    "domainVerified": true
+  },
+  "screenshots": false,
+  "visualVerification": false,
+  "backendStatus": 404,
+  "backendPublishedInThisSession": false,
+  "notificationsActivated": false,
+  "pending": [
+    "Publicar backend con autorización explícita",
+    "Activar Recibir avisos importantes en el teléfono",
+    "Confirmar recepción de un aviso real"
+  ]
+}

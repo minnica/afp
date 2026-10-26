@@ -11,7 +11,7 @@ test("Captura: todos los métodos protegidos separan sesión web y credencial na
     "@supabase/supabase-js": { createClient: () => ({ auth: { getUser: async () => ({ data: { user: null }, error: new Error("invalid") }) } }) },
   });
   const native = `Capture ${randomUUID()}.${randomBytes(32).toString("base64url")}`;
-  for (const name of ["pairings", "devices", "device", "events", "payment-receipts"]) {
+  for (const name of ["pairings", "devices", "device", "events", "payment-receipts", "notices"]) {
     const handlers = load(`src/app/api/captures/${name}/route.js`);
     for (const [method, handler] of Object.entries(handlers)) {
       if (name === "pairings" && method === "POST") continue;

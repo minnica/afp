@@ -39,7 +39,9 @@ function routeContext(file) {
     .split("export async function GET")[0]
     .replace(/^import[\s\S]*?from\s+["'][^"']+["'];\r?\n/gm, "");
   const context = vm.createContext({});
-  vm.runInContext(helper + "\n" + creditHelper + "\n" + cycleHelpers + "\n" + source, context);
+  const notices = fs.readFileSync(path.join(root, "src/lib/importantNotices.js"), "utf8")
+    .replace(/^import[\s\S]*?from\s+["'][^"']+["'];\r?\n/gm, "").replace(/^export /gm, "");
+  vm.runInContext(notices + "\n" + helper + "\n" + creditHelper + "\n" + cycleHelpers + "\n" + source, context);
   return context;
 }
 

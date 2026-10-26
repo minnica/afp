@@ -22,7 +22,7 @@ class CaptureApiClient(private val origin: String,
         require(url.protocol == "https" && url.userInfo == null && url.query == null && url.ref == null)
         require(url.path.isEmpty() || url.path == "/")
     }
-    private fun request(path: String, method: String = "GET", binding: CaptureBinding? = null, body: JSONObject? = null): JSONObject {
+    private fun request(path: String, method: String = "GET", binding: CaptureBinding? = null, body: JSONObject? = null, maxBytes: Int = 64 * 1024): JSONObject {
         val connection = connectionFactory(URL("${origin.trimEnd('/')}/api/captures/$path"))
         try {
             connection.requestMethod = method
@@ -46,7 +46,7 @@ class CaptureApiClient(private val origin: String,
                 while (true) {
                     val count = input.read(buffer)
                     if (count == -1) break
-                    require(output.size() + count <= 64 * 1024)
+                    require(output.size() + count <= maxBytes)
                     output.write(buffer, 0, count)
                 }
                 output.toByteArray()
@@ -67,6 +67,10 @@ class CaptureApiClient(private val origin: String,
         return current
     }
     fun report(binding: CaptureBinding, report: JSONObject) { request("device", "POST", binding, report) }
+    fun notices(binding: CaptureBinding): JSONObject {
+        val zone = java.net.URLEncoder.encode(java.time.ZoneId.systemDefault().id, "UTF-8")
+        return request("notices?timeZone=$zone", binding = binding, maxBytes = 512 * 1024)
+    }
     fun change(binding: CaptureBinding, action: String): CaptureBinding {
         require(action in setOf("pause", "resume", "revoke"))
         return merge(binding, request("device", if (action == "revoke") "DELETE" else "POST", binding,

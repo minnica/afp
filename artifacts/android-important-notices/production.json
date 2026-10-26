@@ -1,0 +1,48 @@
+{
+  "checkedAt": "2026-10-26T07:29:30.386Z",
+  "status": "published",
+  "deployment": {
+    "id": "dpl_FUwkVEC8keq6S2BQ5L8Tyv6z8VBH",
+    "url": "https://afp-pqdpefzdk-minnicas-projects.vercel.app",
+    "productionUrl": "https://finanzas.garatachia.com",
+    "state": "READY",
+    "target": "production",
+    "projectId": "prj_FUBRDkPPFpOgJG9zuLLhTwm3JHKV",
+    "teamId": "team_5jQEAASyPb5wB0LxR9KsHf5X",
+    "sourceCommit": "8bcd6ef0b3e7b5bf76d22305e9d7d5c257e004c2",
+    "sourceMode": "working-tree",
+    "sourceFiles": 344,
+    "sourceManifestSha256": "afa7e07140192def16a4820acff644c9f16ef3e39e8ebf5fd34e3d8fbada4640",
+    "commitOrPushPerformed": false,
+    "buildCommand": "pnpm exec prisma generate && pnpm exec next build --webpack"
+  },
+  "database": {
+    "schemaChanged": false,
+    "migrationsExecuted": false,
+    "financialRecordsWrittenByRelease": false
+  },
+  "http": {
+    "checks": 6,
+    "passed": 6,
+    "newEndpointWithoutAuthorization": 401,
+    "invalidCredentialsRejected": true,
+    "privateNoStore": true
+  },
+  "observability": {
+    "runtimeErrorGroupsObserved": 0,
+    "scope": "new deployment; immediate verification window"
+  },
+  "android": {
+    "installedVersion": "0.8.0",
+    "versionCode": 11,
+    "notificationPermissionGranted": false,
+    "optionActivationConfirmed": false,
+    "realNotificationDeliveryConfirmed": false
+  },
+  "screenshots": false,
+  "visualVerification": false,
+  "pending": [
+    "Activar Recibir avisos importantes y conceder el permiso de Android",
+    "Tocar Revisar avisos ahora y confirmar la recepción"
+  ]
+}

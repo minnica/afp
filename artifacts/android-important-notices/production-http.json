@@ -1,0 +1,47 @@
+{
+  "checkedAt": "2026-10-26T07:26:58.470Z",
+  "checks": [
+    {
+      "path": "/api/captures/notices",
+      "status": 401,
+      "expected": 401,
+      "authorization": "absent",
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/captures/notices",
+      "status": 401,
+      "expected": 401,
+      "authorization": "invalid",
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/captures/notices",
+      "status": 401,
+      "expected": 401,
+      "authorization": "invalid",
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/dashboard",
+      "status": 401,
+      "expected": 401,
+      "authorization": "absent",
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/gastos/bootstrap",
+      "status": 401,
+      "expected": 401,
+      "authorization": "absent",
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/login",
+      "status": 200,
+      "expected": 200,
+      "authorization": "absent",
+      "cacheControl": "public, max-age=0, must-revalidate"
+    }
+  ]
+}

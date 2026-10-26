@@ -11,7 +11,7 @@ function context(route = "dashboard", globals = {}) {
   const ctx = vm.createContext({ URL, console, requireApiUser: async () => ({ id: "u" }), apiAccessErrorResponse: () => null, ...globals });
   const helpers = ["../sharedExpenses", "../subscriptionCharges", "installmentStatements", "subscriptionStatements", "cardCredits", "cardCycles", "cardCyclePayments", "cycleDataQuality", "cardUsageWaivers"]
     .map((name) => read(`src/lib/calculations/${name}.js`)).join("\n");
-  vm.runInContext(helpers + "\n" + read(`src/app/api/${route}/route.js`), ctx);
+  vm.runInContext(helpers + "\n" + read("src/lib/importantNotices.js") + "\n" + read(`src/app/api/${route}/route.js`), ctx);
   return ctx;
 }
 const ctx = context();

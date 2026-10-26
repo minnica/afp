@@ -1,0 +1,2066 @@
+[
+  {
+    "file": "components.json",
+    "bytes": 525,
+    "sha1": "5e86874249f57e02427f70f41b8fcab80d385d4e",
+    "sha256": "2fdb3bea7b419c07719ab90625255d092f940b3d79cb1cca755a233156d9b6d0"
+  },
+  {
+    "file": "eslint.config.mjs",
+    "bytes": 400,
+    "sha1": "cd75aa7aed9445d40d942532b05d163ddd4ade9f",
+    "sha256": "d1257bff0b0aa0cb73034a730f33405d4de7d440678564d0183c5ca1244bb639"
+  },
+  {
+    "file": "jsconfig.json",
+    "bytes": 77,
+    "sha1": "0bf40be13518f30f011bbbb4acd2f1addd343a4b",
+    "sha256": "56123956b551c203af11a2a5a985e82bcfdf6d4e619acbdd0a5e2bf1e79aba58"
+  },
+  {
+    "file": "next.config.mjs",
+    "bytes": 213,
+    "sha1": "b6602e5627ba732b0c03ec06edd019a961206960",
+    "sha256": "f345a66b345633579b8d90bc0c9cf1616e62a661f2c2297cdc9ae6e577a3891e"
+  },
+  {
+    "file": "package.json",
+    "bytes": 1726,
+    "sha1": "d455c2b597f6d32e77d472435a6419d027b536a7",
+    "sha256": "31c8e9057436300d0777fe0a70f528dffc20fd839923a30b145f3880e35c3ae3"
+  },
+  {
+    "file": "pnpm-lock.yaml",
+    "bytes": 327701,
+    "sha1": "59d1f4b1568764a3696e2c5e4f9666c40124f834",
+    "sha256": "6663c1353de805b65d19860c473b6b62a09982f9fdc3822ab54c45fcb002819d"
+  },
+  {
+    "file": "pnpm-workspace.yaml",
+    "bytes": 105,
+    "sha1": "dd36a7f1ac69aeb6243ca97ac9be2a53df3e7d64",
+    "sha256": "ec67255f09579296caee3b73aebb037f59905f4a3ef8d2fc312bd04e92d9f890"
+  },
+  {
+    "file": "postcss.config.mjs",
+    "bytes": 94,
+    "sha1": "8f8be689e9af58f80351df6e6b551146822f42a4",
+    "sha256": "dfac7ac2d86d326a0e5adb024e7943c181393ed17a5fcb8f0315b24c7da6ddde"
+  },
+  {
+    "file": "prisma.config.ts",
+    "bytes": 192,
+    "sha1": "870e21fc22bf01ad64653745c1fead3ee361719d",
+    "sha256": "326b4dac52be010b563dc2f61c596246c04db26dafe890bd35a85b1f8c1c689d"
+  },
+  {
+    "file": "prisma/migrations/20260509070227_init/migration.sql",
+    "bytes": 11802,
+    "sha1": "d3472cf1fe2af07e6af63870e66c2455c11a2b9d",
+    "sha256": "1ff8bca46c1f428981d455d8f4078194aa7dd47e6c58319c54fc584ae70c2b41"
+  },
+  {
+    "file": "prisma/migrations/20260517045000_add_payable_accounts/migration.sql",
+    "bytes": 1772,
+    "sha1": "d9f66e5d07f42df4e377ddcb0170da47bdce1088",
+    "sha256": "50c239f9c08407ed7107a926a660b785583849dbe729c290b1691ecfb0556e30"
+  },
+  {
+    "file": "prisma/migrations/20260517222440_add_subscription_frequency/migration.sql",
+    "bytes": 217,
+    "sha1": "84eda35c8a722d59df209a668d03b5f4b57bc352",
+    "sha256": "ab2fce6df5b4b14baac3c10e4d83df85ddda1167140c2d0aa321605b885c3f56"
+  },
+  {
+    "file": "prisma/migrations/20260517235633_replace_receivable_expected_date_with_charge_day/migration.sql",
+    "bytes": 269,
+    "sha1": "1fdbc7e15770e038832f37b12650e028282734f3",
+    "sha256": "1e1f4decb4b19bc185906545755cbd43b6510c3919408e3d077f88446c77c502"
+  },
+  {
+    "file": "prisma/migrations/20260518002802_replace_receivable_charge_day_with_charge_days/migration.sql",
+    "bytes": 303,
+    "sha1": "7d36424664fea2e116246aa882a7ace2b6b0aa63",
+    "sha256": "9a4e80ec04bd471c5f8616da3a38feed07e0d156e128afdcf4c34a0579d9369a"
+  },
+  {
+    "file": "prisma/migrations/20260518041110_add_expense_subscription_relation/migration.sql",
+    "bytes": 282,
+    "sha1": "ca6362c0fbee5b37a09323ebbee2dd4042ddd2c5",
+    "sha256": "12c4fe245e66a08076d473b58fa48e07431b93e39e440ade52ba10c07c8fa86b"
+  },
+  {
+    "file": "prisma/migrations/20260518234708_add_payable_loan_support/migration.sql",
+    "bytes": 1261,
+    "sha1": "27977b021b4a2505676caeef90898788053fcb02",
+    "sha256": "8ef7dcd79b9e4439e96092a131bbb569cb04b405721054e6916e71479a8c40b1"
+  },
+  {
+    "file": "prisma/migrations/20260604000000_add_subscription_active_fields/migration.sql",
+    "bytes": 164,
+    "sha1": "5af908e27901d10cf6130140f89d6db552605fe2",
+    "sha256": "a7a8905cf9facf6135d2b095dff53a0d63392adef65519cfc919f060cd5affb8"
+  },
+  {
+    "file": "prisma/migrations/20261009000000_add_installment_statement_reconciliations/migration.sql",
+    "bytes": 99,
+    "sha1": "b04646fef252eeb3a90c145ecf29fffa1d199b7d",
+    "sha256": "c5b70602e66ac44fff6f46d7d432e06277d4d5927227c7935383506099216b5b"
+  },
+  {
+    "file": "prisma/migrations/20261010000000_add_card_cycle_credits/migration.sql",
+    "bytes": 1275,
+    "sha1": "c36ac5e910784c1e14ebe5dc8139f02c560c2fb7",
+    "sha256": "bce78dbd21bdae948e03b1a314ab18586da68d7c7ea63088c39ef34bca349497"
+  },
+  {
+    "file": "prisma/migrations/20261011000000_add_card_usage_verification/migration.sql",
+    "bytes": 203,
+    "sha1": "98a3d1b6415f1ffdbcd7a2f029f4642f8e443a83",
+    "sha256": "ab7b6a61669a4910c4c6af563e02912944daf58416198f1dbcdb8fddd5032fb3"
+  },
+  {
+    "file": "prisma/migrations/20261015000000_add_notice_dismissals/migration.sql",
+    "bytes": 1006,
+    "sha1": "accd7253f28dcc9f0befeafc3c8b95f8bf6b5b2a",
+    "sha256": "8b082a23fdd3e10c8712590b6c0c1529640c9328f386fc7a5902689ac2cded87"
+  },
+  {
+    "file": "prisma/migrations/20261016000000_add_subscription_charges/migration.sql",
+    "bytes": 1685,
+    "sha1": "48db9a669b2dfc93f02f30fae1cfd37d84ea641f",
+    "sha256": "fe3d2bdd2e3fe3b495e51c5a8a29e398e47e6ee26595ec7a1b91f156ed5add21"
+  },
+  {
+    "file": "prisma/migrations/20261017000000_add_expense_operations/migration.sql",
+    "bytes": 646,
+    "sha1": "785e223c637eed4c0c9a8be6a3b331329d90cd61",
+    "sha256": "ae45ef363c01fd0fbe514c0f29f6ecdcacb57e3f21039d4aebf8036931e01dcf"
+  },
+  {
+    "file": "prisma/migrations/20261017020000_enable_application_rls/migration.sql",
+    "bytes": 3017,
+    "sha1": "adc1b84a306a4acaed58caf9a6bd95bb139a374c",
+    "sha256": "69325502c6b19dacccf07e518c9f520638b5a3a5f59b8022c71547219952489e"
+  },
+  {
+    "file": "prisma/migrations/20261017030000_add_post_cut_credits/migration.sql",
+    "bytes": 329,
+    "sha1": "f60757c82bda8578dbb26ce6ab76d0493fe98714",
+    "sha256": "d878d5420a86740d69643722d6150bb10e6db784bd6058618beaf15c660231a3"
+  },
+  {
+    "file": "prisma/migrations/20261020000000_add_cash_expense_contributions/migration.sql",
+    "bytes": 458,
+    "sha1": "8342f81eba0f48ecd788732a76baac3655c3f647",
+    "sha256": "86f61ad5d5b818a17199a22343516e14961e2f837c849be8fcdfd6752cf336fd"
+  },
+  {
+    "file": "prisma/migrations/20261021000000_add_android_capture_linking/migration.sql",
+    "bytes": 4133,
+    "sha1": "0ba2f4d528959febcfc3d26f63ceac1065c82a27",
+    "sha256": "c80f3d004d6b34fede13ca5afa2d6f3107eb192fbcf09042cf5df4bc6338d8aa"
+  },
+  {
+    "file": "prisma/migrations/20261021010000_add_capture_processing/migration.sql",
+    "bytes": 6532,
+    "sha1": "da9d5d6ee0e77ec8fa5aeb3b512d559ac3182fa4",
+    "sha256": "64882d0b153c5a10f94251b5544f5bc2d77b081f34ec5eec9f67a5afa1843dc5"
+  },
+  {
+    "file": "prisma/migrations/20261021020000_capture_installment_reconciliation/migration.sql",
+    "bytes": 278,
+    "sha1": "8d5ebb0e53b6384ea43674011e6221e6cc58c670",
+    "sha256": "4a42bc36c68e092ad788481f0757bcc6c1d472bb6ed12a67b77d768486bdca2e"
+  },
+  {
+    "file": "prisma/migrations/20261021030000_capture_review_and_reconciliation/migration.sql",
+    "bytes": 1401,
+    "sha1": "9dfef021cfbd4c625ea03282fe436d7769302b82",
+    "sha256": "34f04b1ce08cc388006205fbfcbb8e0e8b91de2389ad11c05011767a49cc1c4f"
+  },
+  {
+    "file": "prisma/migrations/20261021040000_add_card_credit_balances/migration.sql",
+    "bytes": 594,
+    "sha1": "3cee9d378809af69b16093d9933e1bbac1122a54",
+    "sha256": "5f042600ecc8c93230b8b7ea0814498b22717b892bbadd8a568d577310dafb22"
+  },
+  {
+    "file": "prisma/migrations/20261022000000_add_card_balance_tracking/migration.sql",
+    "bytes": 2529,
+    "sha1": "b411294bf6c562f9fe745f4d1bd2a28cb3967234",
+    "sha256": "013fcbd00be5ef700fd210e561153523343d5bd64d4788e742fa3b852262492c"
+  },
+  {
+    "file": "prisma/migrations/20261023000000_add_google_calendar_sync/migration.sql",
+    "bytes": 5455,
+    "sha1": "b72503f35f1094f90fdd7a7232018d82941e86b0",
+    "sha256": "7482699faa47bb271aa7a0f51429b9a881464f8c6306a7e794070855b32e8790"
+  },
+  {
+    "file": "prisma/migrations/20261023010000_capture_wallet_date_policy/migration.sql",
+    "bytes": 645,
+    "sha1": "2ba326a635f1e9bf71dc9a9e7ca3b15a43e89d3a",
+    "sha256": "8a91d0ca16506aeb08adb6783569bcf414b051b85c8d294d80ee7f136c3eaec2"
+  },
+  {
+    "file": "prisma/migrations/20261023020000_capture_nu_cfe_policy/migration.sql",
+    "bytes": 1205,
+    "sha1": "3829fd262f1985644d30af0b49af0221cf9b6e8f",
+    "sha256": "cf111147b0ee4786093ae2c3b7e65e5585a3da9773f341726a40b00d020b4353"
+  },
+  {
+    "file": "prisma/migrations/20261023030000_capture_card_payments/migration.sql",
+    "bytes": 1615,
+    "sha1": "ff5154faa1ae0ca85838535e2b2f5def41c76d40",
+    "sha256": "18956971f1b4f4b0f6a2be404fb9e50240521f81b6349b1eb99921d7e75aac3f"
+  },
+  {
+    "file": "prisma/migrations/20261023040000_automatic_payment_receipts/migration.sql",
+    "bytes": 1987,
+    "sha1": "c8dc50e919f7b606e782ee9756298a1b7e651b2a",
+    "sha256": "30377945f2a3e9f7af3acef63dcf3df6ce3237aa80acf66dae5de19c64bf6111"
+  },
+  {
+    "file": "prisma/migrations/20261023050000_receivable_balance_adjustment/migration.sql",
+    "bytes": 210,
+    "sha1": "fd3fb8cd774e5494ec5f5856216f6ac7d192a4a8",
+    "sha256": "7576dd3b6d7bef160ec348e8c890563dae89797014678b1326638c887e90f902"
+  },
+  {
+    "file": "prisma/migrations/20261023060000_receiver_payment_notices/migration.sql",
+    "bytes": 862,
+    "sha1": "2714d77a0e6a1c04d79dc39b10e81bb90d3b12f8",
+    "sha256": "6b0aac052e2ad455aef0a230e02cb9036b728bfed7df12c44a5c3cfd1c6bbdbd"
+  },
+  {
+    "file": "prisma/migrations/20261024010000_capture_mercadopago_purchase_policy/migration.sql",
+    "bytes": 924,
+    "sha1": "421b6bc164da44145c19fea637a9f29acce4e164",
+    "sha256": "166646abdaa37e67228d0133740cb0eb451f9134306faef8e4672e8ce8552978"
+  },
+  {
+    "file": "prisma/migrations/20261024020000_capture_bank_fallback/migration.sql",
+    "bytes": 2064,
+    "sha1": "8f5accb44ca75d00a68faa54a9d05514e58009cd",
+    "sha256": "fe792871e3417ac18e0ddf5a9fa264769e49c63c3c298cfe8097b4d4750a0f16"
+  },
+  {
+    "file": "prisma/migrations/20261025000000_add_money_accounts/migration.sql",
+    "bytes": 9976,
+    "sha1": "e7b27cc10307541437c74b12163c99eb36f8550e",
+    "sha256": "9c6c16b3095279e819a0028ab7ea139aa36cd1c420b1ef00fec66f89aded8eb5"
+  },
+  {
+    "file": "prisma/migrations/20261025010000_money_account_yields/migration.sql",
+    "bytes": 827,
+    "sha1": "425d6b4ba25d7262507930f84247012351c08639",
+    "sha256": "187f6827879e60af3a4dac5589b3bd302b1bc9cddb237adaa94a53f9c2304518"
+  },
+  {
+    "file": "prisma/migrations/20261025020000_automatic_money_yields/migration.sql",
+    "bytes": 1166,
+    "sha1": "08cc14744393b7038f8be88683e3c8e650026f90",
+    "sha256": "a4d21aab627389c21e9a639dde5348d5222766416166830ea5fd1562bb6bfdc7"
+  },
+  {
+    "file": "prisma/migrations/20261025030000_payroll_business_days/migration.sql",
+    "bytes": 165,
+    "sha1": "5b7ad112d91dcce3a494e72e3ee9de5bcdbc2e37",
+    "sha256": "244c3f541242990d5137bd45c23f2313d282fb8b40e550670cee37aea3829285"
+  },
+  {
+    "file": "prisma/migrations/20261026000000_expense_refunds/migration.sql",
+    "bytes": 1532,
+    "sha1": "692a056a25c125f5a05b1e700cb73c666e922416",
+    "sha256": "ebd2a9695a6a7d3d2aa2e4558b4d466769ad5ec538ed347c659b2e976760bea2"
+  },
+  {
+    "file": "prisma/migrations/20261026010000_debit_payment_method/migration.sql",
+    "bytes": 122,
+    "sha1": "a50839b69dfc0211b7ee141c300ac94857b16406",
+    "sha256": "6d6cf09901b68930b6eacc11d6e687869a769f0acdf18b4188a7cedce855721a"
+  },
+  {
+    "file": "prisma/migrations/20261026020000_capture_account_movements/migration.sql",
+    "bytes": 6134,
+    "sha1": "a3af5197642d688e19bc7a8f526a9fa0d92a4e0f",
+    "sha256": "dc74a0bf84fa66803575d91b18550765f46c110aabff7d375636d6c6566ed536"
+  },
+  {
+    "file": "prisma/migrations/migration_lock.toml",
+    "bytes": 128,
+    "sha1": "7abbf1b5bc2ed90d381336ef493ef3a44c488e3d",
+    "sha256": "99836963713b4f5b269ad49af0ed3d7b0b2e336115c2f92dc9ac683d139d0900"
+  },
+  {
+    "file": "prisma/schema.prisma",
+    "bytes": 34972,
+    "sha1": "a8f7e78f469607b600bf422ac9ee380a8d3af53d",
+    "sha256": "2e09459177c82675503f4c65d011362d65996512aa8257f1f42db905c5c270bc"
+  },
+  {
+    "file": "public/.well-known/assetlinks.json",
+    "bytes": 338,
+    "sha1": "83ec07e1c907014c459be789267fe9510a8727f6",
+    "sha256": "a2c63c131378f1e94abdcdfbe177b171f62bfd870aef0fb9c72b4fe5af498d2c"
+  },
+  {
+    "file": "public/card-brands/banamex-wordmark.webp",
+    "bytes": 1692,
+    "sha1": "135428908c6b8c7c3f5b4fe2e641beff11729911",
+    "sha256": "5c8960748fdef38582684d4d28e45aa6ae02c7e2a3bb8ffac4277c364ecb8a21"
+  },
+  {
+    "file": "public/card-brands/bbva-platinum-motif.webp",
+    "bytes": 1666,
+    "sha1": "bf2b4c5dd74634c9eb5e909d15ab95fb7b04bd94",
+    "sha256": "6a5e09a74d41ef0bd0adc6588509110551f00abe5b0eca063aa927cca10f44c0"
+  },
+  {
+    "file": "public/card-brands/bbva.svg",
+    "bytes": 1917,
+    "sha1": "8326877fcdd733026ef4e87a424f38e13ebbe91f",
+    "sha256": "4ee5636798d6a50c59de6f3869f0d5560c2cc5b60395847f18244e22bb5107c3"
+  },
+  {
+    "file": "public/card-brands/didi-card-wordmark.webp",
+    "bytes": 1924,
+    "sha1": "fb4944e4b5fb312f5fef9f952346f65ef51bbf95",
+    "sha256": "57dfb5e87805ffa99472126c8c7fec7d8bc0fa9b1ae9b1277674dad62a5a6736"
+  },
+  {
+    "file": "public/card-brands/didi.svg",
+    "bytes": 17094,
+    "sha1": "eb4c8de0b634db2f9283fbb536e6f2b1888ddf2d",
+    "sha256": "4d9cd1c3456628f67f4ca8eaf9e17ef00b5f3b2076dda40c35d36f5c54d14cf2"
+  },
+  {
+    "file": "public/card-brands/hsbc-zero-motif.webp",
+    "bytes": 2228,
+    "sha1": "c8b40f462b142466e2b2165410865a8aacecc896",
+    "sha256": "16585f22e64e789300f8b9de1664bc6b9c6cdf1de9a646286a390bdfd0b3e5df"
+  },
+  {
+    "file": "public/card-brands/hsbc.svg",
+    "bytes": 5004,
+    "sha1": "376a66328c052d4398e827814bc99b0d2ed62d92",
+    "sha256": "392961169ed068757ca4ccfba64f9a1e5cfd0e5c2467039ec5f0315afcb4de50"
+  },
+  {
+    "file": "public/card-brands/joy-petals.svg",
+    "bytes": 2704,
+    "sha1": "8cf7394368538aadf34738fd4fc3e87112962d90",
+    "sha256": "f9a4f6a7299191af7aa858c33f1538f602108b19216b8479e6f8b75baa5535a5"
+  },
+  {
+    "file": "public/card-brands/joy-reference-petals.webp",
+    "bytes": 7890,
+    "sha1": "942938482c081af47e77b2714365cb457f0c5700",
+    "sha256": "2ded0d77f0423687cda49f81d5895505ed44ef6fd0cd9aa44d962832514d120b"
+  },
+  {
+    "file": "public/card-brands/joy.png",
+    "bytes": 29641,
+    "sha1": "2e63fa779778fcd223a43ba3f60b26e4e4185f79",
+    "sha256": "cf32a708ef52e6dd220620934e6c958e6a2019ef92d6268ae1fb4891dcb1944e"
+  },
+  {
+    "file": "public/card-brands/likeu-pearl-motif.webp",
+    "bytes": 26542,
+    "sha1": "731dbe7ad00022920378bebc7f1053b8c27bb4d1",
+    "sha256": "a4386dfdc5a33bffc683e4f2c453a5aaa2bc828c87d5d015392d894a8f91a532"
+  },
+  {
+    "file": "public/card-brands/likeu-pearl-pattern.svg",
+    "bytes": 89227,
+    "sha1": "ddfa293e65f7e415c203d4d4fd22ce93490b071b",
+    "sha256": "4f16d17c4198a083b19406845f892e067c8a0ee2c06dab25b1ca961dbd768c02"
+  },
+  {
+    "file": "public/card-brands/likeu-red.webp",
+    "bytes": 739058,
+    "sha1": "54fcf140eda2e1246212eb257dcdb85aa6ad05eb",
+    "sha256": "a8eff696ed10fe0f14d34ed31035b89450fcdef2d33fe43384e9cb11513c9807"
+  },
+  {
+    "file": "public/card-brands/likeu-wordmark.svg",
+    "bytes": 3190,
+    "sha1": "b72a96680ca871c63f310e6b3f15bf75624d37c4",
+    "sha256": "7054228d48ea94816c5884a6a873929bc42539fd602dd2244cd5a7d1beefa21a"
+  },
+  {
+    "file": "public/card-brands/likeu-wordmark.webp",
+    "bytes": 1940,
+    "sha1": "5f71f6b861b4e87ad83529644c01606d41ede9f3",
+    "sha256": "4168231ecdffb0897e91431e5bbf83018094a2951fd471358793f1dcdfadd574"
+  },
+  {
+    "file": "public/card-brands/mastercard.svg",
+    "bytes": 263,
+    "sha1": "d85f9f0d2363285b7e4b9dc7da916fdfa0069acb",
+    "sha256": "a86c86fe8578a7e30356d7747e925d375d94c7f5f9bdab67fe3cd3f704f69c95"
+  },
+  {
+    "file": "public/card-brands/mercado-pago-motif.webp",
+    "bytes": 3812,
+    "sha1": "92cd3eded4e7b362f304a60ee6dd8af06a1533c7",
+    "sha256": "09d249fa681a6fcdbf71d0d1fb6dbd7eea01c4b0630a96aada834d69dea89d65"
+  },
+  {
+    "file": "public/card-brands/nu.png",
+    "bytes": 811,
+    "sha1": "ba54cfb13560a3a27686a10b19b9dfe7d699045c",
+    "sha256": "c4add1a523dc2baeb9272ed0c2c7d859b28e8d72a1c8fe4a7d7a545bd51eadb1"
+  },
+  {
+    "file": "public/card-brands/nu.svg",
+    "bytes": 1362,
+    "sha1": "5a382ce7c12b9e7029c5653b3c29768c5beab381",
+    "sha256": "e94c26a758ccc38d4d0c946136c011f32b5e92b98415c95ba97694506107e7aa"
+  },
+  {
+    "file": "public/card-brands/santander-flame.svg",
+    "bytes": 1392,
+    "sha1": "b162049824741e475d6f9410ae83e673fee1750d",
+    "sha256": "3ec6c36ecde532bd64a2bfb2625bf34970c0c59b39b82c8a1a497a8f92bdee02"
+  },
+  {
+    "file": "public/card-brands/santander-wordmark.webp",
+    "bytes": 3738,
+    "sha1": "780067a907716069dff1d0f8f026174e9614b83d",
+    "sha256": "9a652e43f553328ad3231d115a186b4ae5306233a2c4245f2ee4f6d1267a4ef5"
+  },
+  {
+    "file": "public/card-brands/santander.svg",
+    "bytes": 7430,
+    "sha1": "1e2df30a3d6b9845f6ef5da734ac422f67f5b46e",
+    "sha256": "9880e53b6138536662d3b3f2dc35e327a56a821068c1c48c89c49ce451d3c227"
+  },
+  {
+    "file": "public/card-brands/sources.json",
+    "bytes": 7539,
+    "sha1": "3686ef883cfbc3d04df1cd09a69f3d294af907de",
+    "sha256": "c94e3f89ba2715e68a7d81f8cff3adbc1bc16bc76d844960a804747700d0efe4"
+  },
+  {
+    "file": "public/card-brands/visa.svg",
+    "bytes": 852,
+    "sha1": "b791d4456f47e6c84c5f2a46cae0cd253263b079",
+    "sha256": "a9800215097d4cfa792c723af023dbcbec92cd656e0f95df62af21c78f48b060"
+  },
+  {
+    "file": "public/file.svg",
+    "bytes": 391,
+    "sha1": "fb380eeffe87d50b597383664c02982964d0d28c",
+    "sha256": "2b67812c325c199a02536cdbeea0c593a72f707d323b72ee3e08dbab06753bd4"
+  },
+  {
+    "file": "public/globe.svg",
+    "bytes": 1035,
+    "sha1": "2eba23b01a46733bb8423e6d38ebf5f7e95abec5",
+    "sha256": "b614b9bf183925957661ac851498fe1d8029fd43a62fbfed86f9e2624a57e7cf"
+  },
+  {
+    "file": "public/icons/app-icon-v3-1024.png",
+    "bytes": 21381,
+    "sha1": "4800e97915f00211507b42e2558ec1c91241bbf8",
+    "sha256": "5420ef0a2afb8f441fc7cdfdec79a1703c19a77b48daac19989b32aec2fd61aa"
+  },
+  {
+    "file": "public/icons/app-icon-v3-192.png",
+    "bytes": 3151,
+    "sha1": "e3e36c6b2df2267a9366872b0e9dff465da068e7",
+    "sha256": "4df64c2bedb358202e85a5a658e43ee3fd9b61463a2d5b387df1305798565d0a"
+  },
+  {
+    "file": "public/icons/app-icon-v3-512.png",
+    "bytes": 9576,
+    "sha1": "f85335996016f4c4ed3dfb9c93aa609fb3224f65",
+    "sha256": "39a577283d9c362377413f23df75d8fd2a05751623ed19e4bdb7b6a9b70344c8"
+  },
+  {
+    "file": "public/icons/app-icon-v3-maskable-512.png",
+    "bytes": 8110,
+    "sha1": "a0f576ea0c97dfcb89523e841fb47cac4a6e8774",
+    "sha256": "e82c162c5790b89712fe4468bc986c249f003291d284f168873d69a813522c8e"
+  },
+  {
+    "file": "public/icons/app-icon.svg",
+    "bytes": 803,
+    "sha1": "ee660ccc61ae642401b79cb4c917945fea4e298f",
+    "sha256": "5a69a7d77b8cb5f12207776123105ee2ca5c8b2e8577ee19e3ad9777cd0e36f2"
+  },
+  {
+    "file": "public/icons/apple-touch-icon-v3.png",
+    "bytes": 2999,
+    "sha1": "2f8cef4995036b5269a630aaa4c1e8268c461cdf",
+    "sha256": "40155cd8e371835c3d447c89c7145ed5804c392fabee96aae8f06a822d2f1b59"
+  },
+  {
+    "file": "public/manifest.webmanifest",
+    "bytes": 831,
+    "sha1": "124e62e419dc741d931ee83a7d3b25464146d382",
+    "sha256": "a6a3301e5781029d2351c97d1351634da322611a3fbfe77150d35759f62ffd9b"
+  },
+  {
+    "file": "public/next.svg",
+    "bytes": 1375,
+    "sha1": "3f3e95622612b989c5bd6a03299a308c6f3c7e6b",
+    "sha256": "55995dfad6ecb4945a1e856ddca03c5e16aa5bf13fd21b4df6a74ae79357bcfc"
+  },
+  {
+    "file": "public/sw.js",
+    "bytes": 2473,
+    "sha1": "95fd05a05971aa0c2116f5bf44bd3a4be3592782",
+    "sha256": "03f2a85166e175193f80d8c4db478c4c0a71a5290532f8b2da612cebf8ecf15d"
+  },
+  {
+    "file": "public/vercel.svg",
+    "bytes": 128,
+    "sha1": "cebb8852d58c8886be3e9051a26957f42bb82f1a",
+    "sha256": "f081337b2fee635b455b63275406a3e7f39d6a014e25ad90dab5a67e62a12ac4"
+  },
+  {
+    "file": "public/window.svg",
+    "bytes": 385,
+    "sha1": "54c48e0daa6caa317fe1b4c419007fd93e948db9",
+    "sha256": "644768c4aaeb4767bce293344eeb0c125fb804a94d801440424072202d85e3a1"
+  },
+  {
+    "file": "src/actions/cardCycles.js",
+    "bytes": 0,
+    "sha1": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "file": "src/actions/cards.js",
+    "bytes": 0,
+    "sha1": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "file": "src/actions/expenses.js",
+    "bytes": 0,
+    "sha1": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "file": "src/actions/incomes.js",
+    "bytes": 0,
+    "sha1": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "file": "src/actions/installmentPurchases.js",
+    "bytes": 0,
+    "sha1": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "file": "src/actions/receivables.js",
+    "bytes": 0,
+    "sha1": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "file": "src/actions/settings.js",
+    "bytes": 0,
+    "sha1": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "file": "src/actions/subscriptions.js",
+    "bytes": 0,
+    "sha1": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "file": "src/app/acerca/page.jsx",
+    "bytes": 1544,
+    "sha1": "e6dcff035d02cb5858a367e19cb288aeb51191ff",
+    "sha256": "06d7cc901e9b747ff446bdc8788d9eba03cd9af28a526a47a541111a3202b264"
+  },
+  {
+    "file": "src/app/analisis/page.js",
+    "bytes": 217,
+    "sha1": "de0371e05ff5d2a4310e0828966a250337d56ba6",
+    "sha256": "378fbd3ce8619bff6eed5316a91560ec415bb93f9c4d2d8aec05cf752029eab7"
+  },
+  {
+    "file": "src/app/api/calendar/google/callback/route.js",
+    "bytes": 1257,
+    "sha1": "143790811b495d6a71cea084457239f838859402",
+    "sha256": "b4180ced01acf8cf1a7cf15460360328c8104878e846145ad431b5e90f8db625"
+  },
+  {
+    "file": "src/app/api/calendar/google/connect/route.js",
+    "bytes": 982,
+    "sha1": "de9690ecb4aa4052faebbb45222d9d482f07ec3b",
+    "sha256": "eb919fd1a442724880e847bff6a2c195b2f34a4fc5e0eff8145e879a2129898d"
+  },
+  {
+    "file": "src/app/api/calendar/google/disconnect/route.js",
+    "bytes": 829,
+    "sha1": "4675da1905913802a66d854af54e021234a9eb8e",
+    "sha256": "8f7f03a48dc47955bea1a63b2e01e265531a8d4f746d5e143f632487454f4850"
+  },
+  {
+    "file": "src/app/api/calendar/google/route.js",
+    "bytes": 1337,
+    "sha1": "396fea1140dd35e09ad372ed427fd1e16c5baaff",
+    "sha256": "e8b1274d3ad4bc5b2a10016c4c103b1ec1cc89b388395a57d7fb32bf89c3de55"
+  },
+  {
+    "file": "src/app/api/calendar/google/sync/route.js",
+    "bytes": 1498,
+    "sha1": "5022558634661cdd24456a80d61692f20f273cac",
+    "sha256": "9730f49652a913e66628cc0335745ed2700e5c3b27059eab676a5cf58ed831d4"
+  },
+  {
+    "file": "src/app/api/captures/configuration/route.js",
+    "bytes": 965,
+    "sha1": "2b54ef5c5d2bafda26827c6091bd443ea51b1199",
+    "sha256": "9c9472f0a7bb5ff22b75523318e0a9b4dd71ce5af5ff01404a1f36a24ac0272d"
+  },
+  {
+    "file": "src/app/api/captures/device/route.js",
+    "bytes": 288,
+    "sha1": "081a8c9d247f9e67d61dffc03b00bbad76fe7104",
+    "sha256": "a9f5feaa2cab415f66eaeb3aba675059c0a1a31521e9ab0b46458b8803d4ffbc"
+  },
+  {
+    "file": "src/app/api/captures/devices/route.js",
+    "bytes": 202,
+    "sha1": "11046eed921eb7eff220354542cd54d083bb2e7a",
+    "sha256": "da22415a26195a71dc46a3e6ed55c1e5ae36ed6bfd3f985ca4a00cf117acabb9"
+  },
+  {
+    "file": "src/app/api/captures/events/route.js",
+    "bytes": 127,
+    "sha1": "e74cd2d5cbbbbb364f6768dcfa5b374c34e45627",
+    "sha256": "b4993c5cee9e03b39810f38f12994dcdcfc8976a1ffcd02e8ba07b8992a509d7"
+  },
+  {
+    "file": "src/app/api/captures/movements/route.js",
+    "bytes": 4751,
+    "sha1": "6fc63ece524925d324acde61449b82e33ba9b07e",
+    "sha256": "1a447e9d6646f6db5c4de33453547d17e95cddde6612dd6d2f08be4a19409850"
+  },
+  {
+    "file": "src/app/api/captures/notices/route.js",
+    "bytes": 1363,
+    "sha1": "95fec15c6ef8f2d82fcc168bfc173f3053c6180b",
+    "sha256": "a17cbb5cdfd9e40c9802a5bcf0af43ed557a7acb060d8110c3c9deafbc293fa7"
+  },
+  {
+    "file": "src/app/api/captures/pairings/route.js",
+    "bytes": 205,
+    "sha1": "e51fbd8196514482f6386cef62cfd2f0a647596c",
+    "sha256": "cdb4a5e268030f2dbf6b90ba93452d0fda4312bc355a38adb9b6df20c71d9195"
+  },
+  {
+    "file": "src/app/api/captures/payment-receipts/route.js",
+    "bytes": 3360,
+    "sha1": "61db9e34fec75b95db608e2a6ae9e0efecd6ff01",
+    "sha256": "0d7d7753570bf1d90fafdf0a7217bedc680b05dc3c12563e6a88ce70176c7f74"
+  },
+  {
+    "file": "src/app/api/captures/reconciliation/route.js",
+    "bytes": 1020,
+    "sha1": "de1949bb5a8061193db0e1e14ab5cd692187f1b2",
+    "sha256": "bf39247c1e7ef1437d35168db3444ccb41eca3b33b85ff227e83716384bbd576"
+  },
+  {
+    "file": "src/app/api/card-cycles/route.js",
+    "bytes": 16117,
+    "sha1": "d24d03bc0ee989c4b82ec78b78cc7bd05ebca513",
+    "sha256": "233092742bfa14cac3cc2bdb7e83fd33c2ef392e41d0f80fb3004e7e7e304af4"
+  },
+  {
+    "file": "src/app/api/cards/route.js",
+    "bytes": 8395,
+    "sha1": "5f756f63f4e95d6456769ac8706a56bfed4b8bb7",
+    "sha256": "ad26b232566111473e9fde87214f91ae9ad6f6ec5f632f506157e6ab83ccb606"
+  },
+  {
+    "file": "src/app/api/cron/calendar-sync/route.js",
+    "bytes": 1445,
+    "sha1": "92c9878a53a456cbbfde3f9ee26285999ed3035d",
+    "sha256": "6a9c7c80eb5f911eb3edddd5a282c28cd5281d541ecfedfc7f2d66598f3a00ba"
+  },
+  {
+    "file": "src/app/api/cron/capture-bank-fallback/route.js",
+    "bytes": 959,
+    "sha1": "424e1cc1ead3de43049c4d14054b5e626aec11c6",
+    "sha256": "2f4a03a75083072a20f1e811fc2129ac06679d13f3ccba0f2dafd35605b77e39"
+  },
+  {
+    "file": "src/app/api/dashboard/route.js",
+    "bytes": 25694,
+    "sha1": "7c658f10c1db686ee628a29cb4e8a87240282958",
+    "sha256": "ef971e727412f36e23697b0a67d18fb1769093e3b98ff7c9eed8b72d2195a6bf"
+  },
+  {
+    "file": "src/app/api/expenses/route.js",
+    "bytes": 13166,
+    "sha1": "95865b7a6def9e4d4194b3e642129113310b3c24",
+    "sha256": "36c07dabfafc01870f1b5b52decf193a12be03aed4df2fa31cc380ccf709def0"
+  },
+  {
+    "file": "src/app/api/gastos/bootstrap/route.js",
+    "bytes": 7052,
+    "sha1": "c6597c0908fc1141cab0b50e05aa7750e3d35118",
+    "sha256": "cee891dcd4121734d498853450d12d8c25f5138971bbf0124345be51d546dd0a"
+  },
+  {
+    "file": "src/app/api/incomes/route.js",
+    "bytes": 8193,
+    "sha1": "5bbd2597d9b9882c36512c22d797ab6fc56e4487",
+    "sha256": "3102092b204cba7045a5b18af3ab9b0a0f1b90ae0858c3a486a482ca68a76d7d"
+  },
+  {
+    "file": "src/app/api/installment-purchases/route.js",
+    "bytes": 12932,
+    "sha1": "0c307796dff9ecf946e8fb841db79f6e745d2e7c",
+    "sha256": "5d4f64535aec53058c063e49929414177c5de2443d494fba8efc44156cacc729"
+  },
+  {
+    "file": "src/app/api/money/route.js",
+    "bytes": 3293,
+    "sha1": "63bba00e797e49d1e3adc8665d78474cc3cfc83a",
+    "sha256": "f468a033ea19b2ed81be91fb4ea938a219743dc330dca7c85a22feb6c00d89c2"
+  },
+  {
+    "file": "src/app/api/notice-dismissals/route.js",
+    "bytes": 1918,
+    "sha1": "3f5f89afb079e8b6cc610860044280c4a0bdb0c8",
+    "sha256": "f601575bbdb4113d9aa48d565f89ae7dae8f6547e86df9d889c52604365b54ea"
+  },
+  {
+    "file": "src/app/api/payables/route.js",
+    "bytes": 9499,
+    "sha1": "d0fad5abc7ab562ddc6e0973c64ffca8003be092",
+    "sha256": "f04068dc9f9fd95e62f8e1bc3ffa95c24bd202766ff97096dbe3b24e5279f008"
+  },
+  {
+    "file": "src/app/api/receivables/route.js",
+    "bytes": 9253,
+    "sha1": "a56f5221cff21f34f003ba7298a7dd33f92f44d6",
+    "sha256": "00a7027d5c9b8ef0ec7bdd3bab5fb70f7a7585181e7c668470df4639d7978b38"
+  },
+  {
+    "file": "src/app/api/settings/route.js",
+    "bytes": 4745,
+    "sha1": "048b364fa732023a2671430d184c38ba00c693b4",
+    "sha256": "490f36dd2595ddc8e440cafbc2f815bb16c517661ad481a903b55512c5838325"
+  },
+  {
+    "file": "src/app/api/setup-user/route.js",
+    "bytes": 1686,
+    "sha1": "0180f04259a999228006916806bee91b13963796",
+    "sha256": "94c7042fdfa6af5d192bdc91e04049a1334406b4677d40a7aea24db11fe8fb63"
+  },
+  {
+    "file": "src/app/api/subscription-charges/route.js",
+    "bytes": 2196,
+    "sha1": "d0d8ddb236e745dcfdc4615cd0bb6d9c93c5c728",
+    "sha256": "35030507e9ee652401ff2c5ec7ef75c44639e849235265d458e97ecebeac200c"
+  },
+  {
+    "file": "src/app/api/subscriptions/route.js",
+    "bytes": 9313,
+    "sha1": "d18e92959bbf913a9eec2e46250f75917cca0310",
+    "sha256": "163e0a022e108c6fe83c4abc0b297100811e85c357cdb6201d490122563db582"
+  },
+  {
+    "file": "src/app/compras-a-meses/page.js",
+    "bytes": 266,
+    "sha1": "b9b56bbdbeb35d61ba863ee8f7ff20a4e57f733e",
+    "sha256": "5b03e3a6e6f59eebdfbc128e0ee559d46f8ffbd17a719d6aca3b588c0d088f32"
+  },
+  {
+    "file": "src/app/configuracion/page.js",
+    "bytes": 249,
+    "sha1": "1681dd21427a48613359e253051133c6604dc15c",
+    "sha256": "e9227616b9c9d1a734ce8d0f59ed0a1acf12db390945499ee7d9bceb79c6a6eb"
+  },
+  {
+    "file": "src/app/credito-y-deuda/page.js",
+    "bytes": 248,
+    "sha1": "2905c222c759b1a8f58e6814a7733a74b91fe83d",
+    "sha256": "41afe9f187f60247adb78e114d5e9f59df802eb2932c84b7242b03cb70ca0270"
+  },
+  {
+    "file": "src/app/cuentas-por-cobrar/page.js",
+    "bytes": 281,
+    "sha1": "25d5e20ec72c71f3f7d443b4e163ee887d7f4c20",
+    "sha256": "76335df457005c5813966d4e725ee47ab3100927d43dc974f6ab2eab4bbe3d75"
+  },
+  {
+    "file": "src/app/cuentas-por-pagar/page.jsx",
+    "bytes": 276,
+    "sha1": "2709249e782db3367d835a2a6f4a06f587dece76",
+    "sha256": "2524354918831e5d6df133d08ca92c4e6c850cfad6d27468ce666d0bb0682daf"
+  },
+  {
+    "file": "src/app/dashboard/page.js",
+    "bytes": 244,
+    "sha1": "0676ab2edac4ad9c5e9515b37676ea2e1827c29b",
+    "sha256": "1cf1698d6575ce9c4695ab04ff994dc11f888d129e2ecb5a5ee77ea062f612c0"
+  },
+  {
+    "file": "src/app/favicon.ico",
+    "bytes": 10294,
+    "sha1": "23e3df23f3c2a53edd4d3c9092b2452514a095ab",
+    "sha256": "46a92aa95783420845668eddbf5184336bc4eeb1ff817eeb5ba4a612db7315ee"
+  },
+  {
+    "file": "src/app/gastos/page.js",
+    "bytes": 229,
+    "sha1": "6a970f564b7356f5f66cc189f5724f09c4a7f500",
+    "sha256": "4ba603648951f63144fd7be72a6f5cc3fd0fa8d1adca154ff65c9feb18cee613"
+  },
+  {
+    "file": "src/app/globals.css",
+    "bytes": 28368,
+    "sha1": "077fd56fe3bf498e51bc48b800d2ef84e6d0aaa0",
+    "sha256": "36845adf761d5669cb5f91b4b264f12f8afa9d8931393eb3f6a52a5e364e894e"
+  },
+  {
+    "file": "src/app/ingresos/page.js",
+    "bytes": 239,
+    "sha1": "3470dfd342ffad68d0a2194e2a431bbc8a830096",
+    "sha256": "a8d6fb4606f3b4372e2c72597d61733c20648e916596cd58ee35e96a0dae0516"
+  },
+  {
+    "file": "src/app/layout.js",
+    "bytes": 1572,
+    "sha1": "7700f1794436995df88a5eed3e97efc7b304baa2",
+    "sha256": "e38507a2fd8c48c03d29a1503b628b6ed1b36699a0afe5d413950050b2309de2"
+  },
+  {
+    "file": "src/app/login/page.js",
+    "bytes": 6060,
+    "sha1": "82b9f32bbf34ee53717ce2b098a363b6a44d9922",
+    "sha256": "40edfce2e403c9b6a3cc32daa54781f8d64b8b471adcd5155289c9f91882fea6"
+  },
+  {
+    "file": "src/app/mi-dinero/page.js",
+    "bytes": 205,
+    "sha1": "c1c51861dbde786120737c97906580731ab2e126",
+    "sha256": "5b235223cb6494e2970251cbb96f7e355768fa31385a528685d39a6dadea4706"
+  },
+  {
+    "file": "src/app/page.js",
+    "bytes": 110,
+    "sha1": "c0a104f05eda3ec09874ce47389b212ddf27ceb8",
+    "sha256": "72c4bba09586cace009ad965105687a54c8b155c47e336b70f839ff421dea34f"
+  },
+  {
+    "file": "src/app/privacidad/page.jsx",
+    "bytes": 4750,
+    "sha1": "f7a2946b2870a91d1cf9fd3f8b5028430cf7bf8f",
+    "sha256": "b7468134f18fa9613823fe5399c26e762a036d1aec0a98c49b36f751d98fc8d2"
+  },
+  {
+    "file": "src/app/registro-automatico/page.js",
+    "bytes": 406,
+    "sha1": "b95d9683d43ccac4845c70646ac6e675f07fe6dc",
+    "sha256": "a33845e798e394f0c5f92e3370a994e235be78bdbca7bdb5ff733122c9d23a2f"
+  },
+  {
+    "file": "src/app/suscripciones/page.js",
+    "bytes": 264,
+    "sha1": "74123d2f38f204e2ff33c9493b3f4d8f285dd53a",
+    "sha256": "9cfaa808022e9a571e4e63cbcce5bfed03fd15b8ee408e5474656e25b3ae87f4"
+  },
+  {
+    "file": "src/app/tarjetas/page.js",
+    "bytes": 239,
+    "sha1": "5580fa72f8aab6c1a3f8c0b4e02e7af2714a9471",
+    "sha256": "4daa06c271cd0a7585875ed3ccd9b6610ba4fe57f0ca780108dc0eea8c72c9a1"
+  },
+  {
+    "file": "src/components/PublicInfoPage.jsx",
+    "bytes": 1160,
+    "sha1": "9326964b72345c9acf3142fabcb35befcc8ad535",
+    "sha256": "fd59f332e3613142e792ba64c892ec1e53fcf9a9ea77177441cf4f652d2f7403"
+  },
+  {
+    "file": "src/components/analisis/AnalysisCharts.jsx",
+    "bytes": 10390,
+    "sha1": "3b61a1c1edf9652b7791e06f9ecb05c5fea5717b",
+    "sha256": "9b5844cafa416b04c0434d67f1ea08f18193214c22541035f5c7c768e99b4620"
+  },
+  {
+    "file": "src/components/analisis/AnalysisContent.jsx",
+    "bytes": 3363,
+    "sha1": "ea678a1285f730f9a37c564ec3e3a1cdece5675d",
+    "sha256": "2741c7a6f6a01cd9b861a8eaa8312883f84faa0082cb96003de3aff08c38bfa0"
+  },
+  {
+    "file": "src/components/analisis/AnalysisError.jsx",
+    "bytes": 504,
+    "sha1": "3408483a26299b767f29aafe4d47f09007e6239e",
+    "sha256": "e7018f1040cb41daa6fb0b6a974655d0be53172129bce61f0518ccc960f82945"
+  },
+  {
+    "file": "src/components/analisis/AnalysisSkeleton.jsx",
+    "bytes": 466,
+    "sha1": "9dfad168e010b4afd4a2eba16e34bca6116f5631",
+    "sha256": "bf541241a4f61dea27d99ad9f533a54e173f8d4203c8f131e1ebab9e571f2ea0"
+  },
+  {
+    "file": "src/components/analisis/MonthSelector.jsx",
+    "bytes": 654,
+    "sha1": "f171d5145249e14b1874ba04222989ca443bd863",
+    "sha256": "907ccf1ab420eb6088c8f60d3c0cad3f73a02a19ec6143f8c5c8aee495aacf28"
+  },
+  {
+    "file": "src/components/compras-a-meses/ComprasAMesesContent.jsx",
+    "bytes": 38478,
+    "sha1": "1bb8831cc7abefeb5e022c19e4443a1ca6781979",
+    "sha256": "91c8aacec3ea9c9e58e65bd9c98de1b5895b99e22854aae9e3bc407eba8b468b"
+  },
+  {
+    "file": "src/components/configuracion/AutomaticRecordingContent.jsx",
+    "bytes": 1197,
+    "sha1": "f37f3140b0fb641b31f8be64ba496f0ab7620745",
+    "sha256": "e142906f2e3af4cf28b64f31ada429faf3768de41a7f9b8601fb86d4a217b9f5"
+  },
+  {
+    "file": "src/components/configuracion/AutomaticRecordingLink.jsx",
+    "bytes": 779,
+    "sha1": "c7be193053854d88de6dcf0d8756629455035955",
+    "sha256": "76303b1687e997f6f4d95257b30534c12494ad6ef58c4121d6702f50cab7940c"
+  },
+  {
+    "file": "src/components/configuracion/CaptureConfigurationPanel.jsx",
+    "bytes": 19643,
+    "sha1": "60b4996214182c028153fdfb7e9badb06a3f0a57",
+    "sha256": "d7943d0cf0b1e32b66e4e3b7874f9b12ae74d2cfff5564e95a6ccb1cc77beb5d"
+  },
+  {
+    "file": "src/components/configuracion/CaptureDevices.jsx",
+    "bytes": 12753,
+    "sha1": "f59716dcabc34c351759177d2fd8319f621f18fb",
+    "sha256": "7129ba06f974ec83c6853dc3ca96b736b459c5153d86583076b6db357138c11c"
+  },
+  {
+    "file": "src/components/configuracion/CaptureFields.jsx",
+    "bytes": 1963,
+    "sha1": "172a18974cd34387d3252529380ada576ff45a73",
+    "sha256": "a85fd2ab52130810af064da5019e1eef54e46ed765e4631a58f96c4c933eb481"
+  },
+  {
+    "file": "src/components/configuracion/CaptureMoneyEditor.jsx",
+    "bytes": 9477,
+    "sha1": "e8e9676d1f4832278dd532c3b86c74b7c143a72b",
+    "sha256": "5fd7b9a85866bccf45e3e2edd446aab040f6e7a01482a9878b2c01a31142e0fb"
+  },
+  {
+    "file": "src/components/configuracion/CaptureMoneySettings.jsx",
+    "bytes": 7715,
+    "sha1": "860eaaf82926bc7d0936fc8cd6e94793ee5e55a5",
+    "sha256": "55bf0cc9d01e90516d4d69d9cc5a8fd5e4e5e546070faebae869bb83245dd7f6"
+  },
+  {
+    "file": "src/components/configuracion/CaptureMovementEditor.jsx",
+    "bytes": 15849,
+    "sha1": "f6c6bcd81e990912d626b8db38ca533b93c30c87",
+    "sha256": "a739654f65314ea9a0f46497f90eca446d6f1b400f2df17c7277e34da97ab809"
+  },
+  {
+    "file": "src/components/configuracion/CaptureNotificationDetails.jsx",
+    "bytes": 1668,
+    "sha1": "51f430420bd970381c69d7a2c629571a1d4acc18",
+    "sha256": "297277a081700d40c1edc07eb94d936edbbcef170aae810d86df51ad70f99824"
+  },
+  {
+    "file": "src/components/configuracion/CapturePaymentEditor.jsx",
+    "bytes": 11311,
+    "sha1": "0d7f89ba4da8652f6218fc83e888e7820b960905",
+    "sha256": "8876195a5567133fa3e308e6135a98ad9022f00eef76b9c97e9d84c41b024e71"
+  },
+  {
+    "file": "src/components/configuracion/CapturePilotSummary.jsx",
+    "bytes": 3172,
+    "sha1": "a36d6f3c3cb87e91f6aff83b7175ca6976053788",
+    "sha256": "61d144ad9c299fec1b7d83996145859fd5683628d2475aa844634d93b999a45b"
+  },
+  {
+    "file": "src/components/configuracion/CaptureReconciliation.jsx",
+    "bytes": 11212,
+    "sha1": "dfd6b3ee9a59969dd400a5034269ad45261629cf",
+    "sha256": "70347c72108430e387ded795fd35c610a416c87c8cf6b9225a68ab06672bae1b"
+  },
+  {
+    "file": "src/components/configuracion/CaptureRefundEditor.jsx",
+    "bytes": 8787,
+    "sha1": "bfb878b2d05ce3071c3014853b03c86be6a98a01",
+    "sha256": "25e31301208a19a556da1eb3721006e39d57dd274f0702e6a72e0e9498921d26"
+  },
+  {
+    "file": "src/components/configuracion/CaptureReview.jsx",
+    "bytes": 16793,
+    "sha1": "3bbf1f6ec1030de3db0de17fe573478811cb345d",
+    "sha256": "93ebca258014729a2c0801e6511dc91db745be03c8740d558a18121324ebfd12"
+  },
+  {
+    "file": "src/components/configuracion/CaptureRolloutStatus.jsx",
+    "bytes": 8942,
+    "sha1": "5ebf5be5b06ab85d07c9337850338603cca46aae",
+    "sha256": "b50ffb21567599bb447638a143e57ad296fc6e870b19481a9a3057e352066b20"
+  },
+  {
+    "file": "src/components/configuracion/GoogleCalendarSettings.jsx",
+    "bytes": 12036,
+    "sha1": "2469321de9acab855e06a22ad1ea05e04e5e60c6",
+    "sha256": "d540b1cfa806d3407d7dff05ddc0d52ced22cc363183926f3ec4ab919da0c06e"
+  },
+  {
+    "file": "src/components/configuracion/SettingsContent.jsx",
+    "bytes": 15289,
+    "sha1": "5e3a57f6425ccfc5f97e3b15cc8f13c81403d1c9",
+    "sha256": "795e44f3b395449899d3123275b1328e561b7efec192096e9a93314fe4f669c5"
+  },
+  {
+    "file": "src/components/credito-y-deuda/CardBalances.jsx",
+    "bytes": 19054,
+    "sha1": "24b57785317e5c32ed54bc60f24357cc24d289ca",
+    "sha256": "e7c48615488bc48db3686442206843d8ff6a28634172a22494c3ec22c083afe1"
+  },
+  {
+    "file": "src/components/credito-y-deuda/CreditBalancesContent.jsx",
+    "bytes": 4846,
+    "sha1": "4db88613c1f9fd16d48f12aa57dbb926a835b621",
+    "sha256": "52f31b60a711bb67a3bad8fb5562710ff71d432f014f6d774e2ae792ca3e37f3"
+  },
+  {
+    "file": "src/components/credito-y-deuda/MobileCreditCard.jsx",
+    "bytes": 3672,
+    "sha1": "6d7ba07db3efb1b081a727d8b2fcd2b10690a83d",
+    "sha256": "3f617b02b300c465fd6714c21adf72498a8a4f9492452d341cfba06fe6048c51"
+  },
+  {
+    "file": "src/components/cuentas-por-cobrar/CuentasPorCobrarContent.jsx",
+    "bytes": 35993,
+    "sha1": "fe46b5f4f57eee0587cfdd89f32f2ba77daeb33d",
+    "sha256": "d4284c5d8ba13aa439c267ea2cc47587e428f18477b107e45a71a663390d0e9a"
+  },
+  {
+    "file": "src/components/cuentas-por-cobrar/ReceivableBalanceAdjustment.jsx",
+    "bytes": 815,
+    "sha1": "423fb9f0f5afa0d562c58aced98accfbe0ec5b06",
+    "sha256": "b717cbca25578ba20a2a1652f142f2109db0dfbc7b57438872058cd753f05760"
+  },
+  {
+    "file": "src/components/cuentas-por-pagar/CuentasPorPagarContent.jsx",
+    "bytes": 31773,
+    "sha1": "bb45ec6b020b4ca3004062cfc4453998362d2c04",
+    "sha256": "e3f842f5343940f041c717e2d8ca86835b552c1ca911a9d00c70eb8c01c7577c"
+  },
+  {
+    "file": "src/components/cuentas-por-pagar/PayableDetails.jsx",
+    "bytes": 13001,
+    "sha1": "2b0fd0ec05f9a8237278571de56ec8a0903674ef",
+    "sha256": "fceb6cde9d36008bcd8b699881348c97ae408edbbb85fb1536c979405ebb64f6"
+  },
+  {
+    "file": "src/components/cuentas-por-pagar/PayablesSummary.jsx",
+    "bytes": 7098,
+    "sha1": "cb129526e2b7964f5546a8908c3a1940b1144bee",
+    "sha256": "5fdee186a3b5a589f9c2fe8fb702b993137f03fe6d2d1291c84456de6e6dc8d2"
+  },
+  {
+    "file": "src/components/dashboard/CardUsageWaiverBreakdown.jsx",
+    "bytes": 6279,
+    "sha1": "12e4d0fb24043baa53bf192848626490f05256f4",
+    "sha256": "66dc40d4a9ab46dbd6e80ab59cd7f44dbd467f1c2aa64f188e26c020aab30f6b"
+  },
+  {
+    "file": "src/components/dashboard/CardUsageWaiverProgress.jsx",
+    "bytes": 16527,
+    "sha1": "aa7baace0df1ad5b22a10abd1c8a643781aee535",
+    "sha256": "9925ca1f3aa6888ce17c495e3fe3abe760034b3a6e12b2291b5847c8ff68721f"
+  },
+  {
+    "file": "src/components/dashboard/CyclePeriodHelp.jsx",
+    "bytes": 2950,
+    "sha1": "25c4c79c2bc19df3c8491713ff1f5de5f509b358",
+    "sha256": "65698250309aa4532486ca802d888a98dc6158a8f4e932120193c9d2f9a52a0c"
+  },
+  {
+    "file": "src/components/dashboard/DashboardContent.jsx",
+    "bytes": 15216,
+    "sha1": "1d2fb8e4671495a790aa6d9551371055e3d76d72",
+    "sha256": "44776c025c40f9dd1380bbdfa6c5fc2d72efa2e24ea5e17709ff2172ad8903d3"
+  },
+  {
+    "file": "src/components/dashboard/DashboardPanels.jsx",
+    "bytes": 4535,
+    "sha1": "42a6080ca6649e0eadab5c67761e7c1492635150",
+    "sha256": "77e2c7839df78a4a902168d4be81328f5cd9687789b1963fab85a84633966265"
+  },
+  {
+    "file": "src/components/dashboard/DashboardProvider.jsx",
+    "bytes": 6619,
+    "sha1": "38b8a4d5c1f8aa4927d14a9b8e72a0276eef7880",
+    "sha256": "51b062cc14afdab594e1f50eeab67596c4da950c0a3ca14b74efc4c660a8892d"
+  },
+  {
+    "file": "src/components/dashboard/ImportantNotices.jsx",
+    "bytes": 12923,
+    "sha1": "1f1c50859698df6dae113d59a49d01201cb583be",
+    "sha256": "00cf6079b4b115e19cba6ebb1963e275b0eea1e47200616ebdac5409a5241459"
+  },
+  {
+    "file": "src/components/dashboard/NuTurboUsage.jsx",
+    "bytes": 5898,
+    "sha1": "a3fc42506c17cd4f92304e99777c7c75c37e81f0",
+    "sha256": "69512f790b2afbd358e03d32d464326257c7224e7d2e50c91a569ca1041ee840"
+  },
+  {
+    "file": "src/components/gastos/CaptureStatus.jsx",
+    "bytes": 855,
+    "sha1": "0ed2ef36c5b2871e65184fc3b7ad0d3dfcef23b5",
+    "sha256": "6e413ab9854f3291ae7a0c18e980cb3c6e2651986b77da5d10c8c8c3c6463731"
+  },
+  {
+    "file": "src/components/gastos/DailyExpenseCards.jsx",
+    "bytes": 10113,
+    "sha1": "2fdc419a812d38e1ff5a631c911f07f421ed403c",
+    "sha256": "38ac6bddde0eea8e8891846c1c5b91251314442397ae23dc8db79326248d5bdd"
+  },
+  {
+    "file": "src/components/gastos/ExpenseCreateSurface.jsx",
+    "bytes": 676,
+    "sha1": "8bee3ec54be99bdf5ad6cad191395657366e25ca",
+    "sha256": "d99ce73afbc0978613c29898437fe11290e9eac1b8741e1d74f6b3c151adec6b"
+  },
+  {
+    "file": "src/components/gastos/GastosContent.jsx",
+    "bytes": 74351,
+    "sha1": "b493749abdc4bf6647471f33a128e672910a0eee",
+    "sha256": "939de6e5e8a23d8e27576da45c48ff7e04fcb9cad9802706f3745827bcbfb034"
+  },
+  {
+    "file": "src/components/gastos/OfflineCaptureConflicts.jsx",
+    "bytes": 3189,
+    "sha1": "627d991cb30f7af170a87c9e4e97587bb6d65402",
+    "sha256": "deed647150f7fd5e82aadd2225b7dd478ce6ffd0dd7c1123b5473313607f6045"
+  },
+  {
+    "file": "src/components/gastos/SharedExpenseFields.jsx",
+    "bytes": 2914,
+    "sha1": "2ef750ad5375de0c4e4bad5ec8dc5eb73ceee5f6",
+    "sha256": "9d43b6b66ebd16c076d42f7a5e9d593f1f97cc5a1478e3bd3fad55bbf596beab"
+  },
+  {
+    "file": "src/components/gastos/SubscriptionCharges.jsx",
+    "bytes": 26281,
+    "sha1": "2ba7f07f517be9c2ea397fa6a39ae22e827e6cca",
+    "sha256": "b538b40c65aa210831cba53e75053d26acb73ce2313530a4c903bb8fb49dc5a5"
+  },
+  {
+    "file": "src/components/ingresos/IngresosContent.jsx",
+    "bytes": 27674,
+    "sha1": "2fa064f363e4cf75026f1994e5352dfe1a0e646c",
+    "sha256": "0dfd05bc373d55d43f5cb5091e622268ebe381dacfc3925e7190e2e46573b5af"
+  },
+  {
+    "file": "src/components/layout/AppHeader.jsx",
+    "bytes": 1161,
+    "sha1": "326910b488b57c80e758b2e8ec442dfdc84f53ae",
+    "sha256": "c70494162f37ddff7925cf41b9d7bf6204be77171efb2f999dbd673f8709e040"
+  },
+  {
+    "file": "src/components/layout/AppHeaderActions.jsx",
+    "bytes": 4783,
+    "sha1": "25a35070efb24a92e21fa8657147d1f8b19783e4",
+    "sha256": "6911f405760f8f7b31c5ac3a468e138bed00a4347768fa49ae937626d94c8afe"
+  },
+  {
+    "file": "src/components/layout/AppShell.jsx",
+    "bytes": 575,
+    "sha1": "8e2cced3ee008df09354f3fad29ae94b6c6112ec",
+    "sha256": "25a6f7ae3953e4bbc9ebe23f68f40164e4fdcda11157ed8e235c6f1bd3840955"
+  },
+  {
+    "file": "src/components/layout/AppSidebar.jsx",
+    "bytes": 2050,
+    "sha1": "ac1c71db683fcc550bfda917d0cac37bae23058c",
+    "sha256": "398e55fa2ebb8c0c4560fa717ac2459b55bef8812794ec1618c5b4dd9872f230"
+  },
+  {
+    "file": "src/components/layout/MobileNavigationSheet.jsx",
+    "bytes": 6990,
+    "sha1": "4cd234a732a21608d88dbecd1aa090fe3480cecd",
+    "sha256": "80458e64fec0b3f88815b4bd01246e76e003a4d2123e573d0864271dc97a9d41"
+  },
+  {
+    "file": "src/components/layout/PageSkeleton.jsx",
+    "bytes": 7102,
+    "sha1": "8f991f74a08218eb57378e889dfc7cc675467029",
+    "sha256": "f9d1e83064005f9366fd496255c55f048261d77803a29de6f450824e365fa8da"
+  },
+  {
+    "file": "src/components/mi-dinero/MoneyContent.jsx",
+    "bytes": 36140,
+    "sha1": "004577bcb583d876a97148b94b4f39a73cae69c8",
+    "sha256": "87d2b6cee43754f8f73eb19d131ed74fa6cf1af91e2e61d23e064ea851207f2e"
+  },
+  {
+    "file": "src/components/mi-dinero/MoneyEditor.jsx",
+    "bytes": 7309,
+    "sha1": "06d545e6a6135b62291a1225b8d59942960f1b84",
+    "sha256": "db86f461cc2a5f485a07b71f4f300c16fc36941a2498f8ee207562d0f9c98696"
+  },
+  {
+    "file": "src/components/mi-dinero/MoneyProjection.jsx",
+    "bytes": 9873,
+    "sha1": "4064d472ca85b490e40500fcd77a19bad90d59b7",
+    "sha256": "9d61a267a2f977f643c2d69778b005a37878a424b546c112060047f950865e66"
+  },
+  {
+    "file": "src/components/mi-dinero/format.js",
+    "bytes": 630,
+    "sha1": "8c6a41ad747f5351c80bbfdade8e729e903c3440",
+    "sha256": "166e53ace0ec09a31e1ad6c7f74f85a41667eaef67312de9e39ed305169ee787"
+  },
+  {
+    "file": "src/components/pwa/ServiceWorkerRegistration.jsx",
+    "bytes": 1203,
+    "sha1": "d2eae598627f641475ad074820f9fa487352a644",
+    "sha256": "d21f2fc99241effaae1b1d75caed25b1e33ff2fc5a29e1144ba7d9577aad4e06"
+  },
+  {
+    "file": "src/components/suscripciones/SuscripcionesContent.jsx",
+    "bytes": 40167,
+    "sha1": "7f4488fad794e70406f356635cfe84c41703dd27",
+    "sha256": "19c93eafa18fedcfeb62f57b9127c67a13f41c53b8cf9e1d8594c98d94017a10"
+  },
+  {
+    "file": "src/components/tarjetas/CycleBreakdown.jsx",
+    "bytes": 8813,
+    "sha1": "748f4e9c51dd056d4f98c74f63b63d9635a20105",
+    "sha256": "f6a4daacd425e574b1f3dc4251bb72e26c22669d4c87044c25aa0f1c70dc384a"
+  },
+  {
+    "file": "src/components/tarjetas/CyclesDataTable.jsx",
+    "bytes": 35148,
+    "sha1": "db1718696ed0703347d02fd2c516c7dc05622f02",
+    "sha256": "00f91dd0247f32d42ea24cec9541a18eb5ccf032e232b82a240baa6a2eccc4b6"
+  },
+  {
+    "file": "src/components/tarjetas/TarjetasContent.jsx",
+    "bytes": 24293,
+    "sha1": "a3ca019a531264d4cf9bd80a8a7dd03a75d42599",
+    "sha256": "2601ed40f84b72b917f8864987ea8bd27cfe8237edfe679b70af6ecacfdbafad"
+  },
+  {
+    "file": "src/components/ui/accordion.jsx",
+    "bytes": 2586,
+    "sha1": "f47bcd285af0014dae3004dc3830f88faf61ed03",
+    "sha256": "2a57c16f948151e37a22479553534580d6330924a764183f7d7b7a66e6527a48"
+  },
+  {
+    "file": "src/components/ui/alert-dialog.jsx",
+    "bytes": 5104,
+    "sha1": "c7a506a17a92647f72d014af7abc3a8c80ded477",
+    "sha256": "4201bd3fa2da46fc49092b9f5281fd32a4de45fc8c900051a430adbb11941a5e"
+  },
+  {
+    "file": "src/components/ui/alert.jsx",
+    "bytes": 2005,
+    "sha1": "84fa80df9aa40eda348c5d064e1b5fc2adcfd8ae",
+    "sha256": "b71d7ac936f42109a15f94f848efc73f01209d3d5990ccaf29c27540467ef968"
+  },
+  {
+    "file": "src/components/ui/badge.jsx",
+    "bytes": 1905,
+    "sha1": "f25153e624ed34ffde48bbdb12713eddf6421e12",
+    "sha256": "2b8f0e8912bab1771a1f72056d7e0937ffd334407f2d7d0277dfa907c2d99ce0"
+  },
+  {
+    "file": "src/components/ui/button.jsx",
+    "bytes": 3348,
+    "sha1": "2992476fa727669abe2ac7569c93268ba8f4208c",
+    "sha256": "c52b2bcd79dc8a4e33d453ee9e79c1d04533f2e52689fc4ae0fcb8471bf8801a"
+  },
+  {
+    "file": "src/components/ui/calendar.jsx",
+    "bytes": 7961,
+    "sha1": "552c952ef8715ddc26962bad53298fa1022a8020",
+    "sha256": "3245d8c785a7691e5bdf6e60bf5740bbfa045ff974cbad51f14ce8b202427049"
+  },
+  {
+    "file": "src/components/ui/card.jsx",
+    "bytes": 2274,
+    "sha1": "55b5eaa9fe16c7a918341d15a31816666de9e4b3",
+    "sha256": "117444ddea8d9c9a2ab30e42d7bf8a9531040911aa9df2ab76ae4bcc9473e360"
+  },
+  {
+    "file": "src/components/ui/chart.jsx",
+    "bytes": 9279,
+    "sha1": "94d2e1883f81b05d0325eb00cf8dce221ad19c8d",
+    "sha256": "b843391a1fdcfe3eeef11cec9552b67548237862c75a943000f6533820c017fe"
+  },
+  {
+    "file": "src/components/ui/checkbox.jsx",
+    "bytes": 1622,
+    "sha1": "8c147be84a67d1914fec21d137e5babda464010a",
+    "sha256": "35807d4d36cf51d43bd887294d4c13cbecc92badf913d6245544ed7b62ca08ca"
+  },
+  {
+    "file": "src/components/ui/collapsible.jsx",
+    "bytes": 599,
+    "sha1": "a08eb9aa421151c23413cb066b91a93c8a56327d",
+    "sha256": "95517832cd82247b18dfcb3fdc173013db56e778d937fee8db145ab330fc0936"
+  },
+  {
+    "file": "src/components/ui/combobox.jsx",
+    "bytes": 8736,
+    "sha1": "3f92c8bf6b05133c05ba2cb83c177eae67240b61",
+    "sha256": "484167429b33cde8d940d8a3bd526a126fa12ec35fd7f37457c4151bb4697b2c"
+  },
+  {
+    "file": "src/components/ui/command.jsx",
+    "bytes": 4633,
+    "sha1": "dd5362a24f294c2efeb621463b503d9f4a18b264",
+    "sha256": "5c9bb6a37bbda17e82f07fb0d2856caa533526a1e1075d2b7326dbea58a23f63"
+  },
+  {
+    "file": "src/components/ui/create-record-surface.jsx",
+    "bytes": 10158,
+    "sha1": "7c989f36c01fa6755f7ce1305634452dd7a8943d",
+    "sha256": "690d046d689174a91494cb5ec74f5f582f3bd8a961d924a0a5aca298c857ee93"
+  },
+  {
+    "file": "src/components/ui/data-table.jsx",
+    "bytes": 9678,
+    "sha1": "28c56e9ca16dfb256fa32bac3a38f37792cec9ee",
+    "sha256": "de6427eccc3534356e4187740e527ed3d148bc7147282d2f7a160bc27b334934"
+  },
+  {
+    "file": "src/components/ui/date-picker.jsx",
+    "bytes": 4229,
+    "sha1": "593aa2021ed9635d1338bccd837ad1a25b7f3c06",
+    "sha256": "478fcacf3560fb13b59ae04dab99133786f735211f82571c35a982a6029d1353"
+  },
+  {
+    "file": "src/components/ui/dialog.jsx",
+    "bytes": 3615,
+    "sha1": "27d9713ecd7c29f19a0a70302a5b0931625c9582",
+    "sha256": "eeae482b5f695c4676ec4c2dd793e0618c036621a9dabf62ba9164724cf82994"
+  },
+  {
+    "file": "src/components/ui/dropdown-menu.jsx",
+    "bytes": 7922,
+    "sha1": "328182b1c5032b20e7b17ca644bb838f15e0167a",
+    "sha256": "16223a4ad36d293901437555ad22a1e295512703c1aea9a8d48a4e0d20b78cf7"
+  },
+  {
+    "file": "src/components/ui/empty.jsx",
+    "bytes": 2169,
+    "sha1": "7fe7edc9065c6b7627ea4e98d7fa2f95ee49519f",
+    "sha256": "1b2b3d4cdbed6f661038761c2b4068395e27a674659d11b87ac5ea690f4193aa"
+  },
+  {
+    "file": "src/components/ui/expense-filter-combobox.jsx",
+    "bytes": 5814,
+    "sha1": "a1141c89d63bc347df2abf441d515f674377a60b",
+    "sha256": "e57f151b5f0db8321612ed9b8aaa2e154e8903d7e40478a7c607e24fe2dd1af7"
+  },
+  {
+    "file": "src/components/ui/field.jsx",
+    "bytes": 5761,
+    "sha1": "7f22e00dc5da1b6c05d42f37d77ccf12fc86178a",
+    "sha256": "97b0e271ac5b5b3c62e92ba42942faa402f4d24c30e0ecc0ecd0c6977f391ba2"
+  },
+  {
+    "file": "src/components/ui/header-dialog.jsx",
+    "bytes": 3003,
+    "sha1": "3d02e100c5dcf73dc5ea0be32c0e23d011edefb9",
+    "sha256": "ecfbda566d3e69c94e1d3b683803a0457969a6d158b23d423c4630a8c63d7fa1"
+  },
+  {
+    "file": "src/components/ui/input-group.jsx",
+    "bytes": 4875,
+    "sha1": "d90181e191045b13aab01cb0e84e253e36f4dc3a",
+    "sha256": "9d456025200a28c5f08a9d26b2209501f1118cdda488d1a191460793ae3b117e"
+  },
+  {
+    "file": "src/components/ui/input.jsx",
+    "bytes": 1427,
+    "sha1": "18f6105c8b392ec4614f3b002bbd7fa61f45ceaf",
+    "sha256": "06fe1d5b574944985149b0206478cce7c9f54bb3b75740786f991043549c0b1f"
+  },
+  {
+    "file": "src/components/ui/item.jsx",
+    "bytes": 4337,
+    "sha1": "aa850e9035c404a6b58e59ac9118bb7bfc22b696",
+    "sha256": "01fc3bdf10f2a0c19a14bc72383aa157a983c659a3af251d902f2d12a1b225cf"
+  },
+  {
+    "file": "src/components/ui/label.jsx",
+    "bytes": 561,
+    "sha1": "f2ce860bc5c7c4f9398cc0e3ef1967754acd71ca",
+    "sha256": "69fb1b7d6d4a6f7c9ec47809b767e815a3a58c342d013438a58d641d25470e1f"
+  },
+  {
+    "file": "src/components/ui/number-input.jsx",
+    "bytes": 3972,
+    "sha1": "c9d24697e5d51e937ae0c7046090d0303d57c69e",
+    "sha256": "e6e8084e5599c2cf4ed52695d3f84ecd910648f48b6a214b02e19e4730f3b504"
+  },
+  {
+    "file": "src/components/ui/payment-method-selector.jsx",
+    "bytes": 1584,
+    "sha1": "8d2f5d450407aa42e2187112d78a86917176eb77",
+    "sha256": "9cff9d7cc13764782ba65da9e0d8194c4742eb39e443c119b15f68bfb818c1e4"
+  },
+  {
+    "file": "src/components/ui/popover.jsx",
+    "bytes": 2075,
+    "sha1": "564882e19164494f783e242d4cc8e13f3a95a0c5",
+    "sha256": "319a169ad64e8b941bdda22a63a5cf4764d635d0e1110e46ac9adb5f4278b968"
+  },
+  {
+    "file": "src/components/ui/progress.jsx",
+    "bytes": 808,
+    "sha1": "6d6d803551c4db49565556710367e710f1ee16ac",
+    "sha256": "842a8777acc33965ef4d82cee336a775a4794a69d965eb51d215a8b00e9ff114"
+  },
+  {
+    "file": "src/components/ui/radio-group.jsx",
+    "bytes": 1701,
+    "sha1": "bb1b2bfe02697057caee311cd4d74e3c52bffeb0",
+    "sha256": "9e9b13bb8899924f6c3309c1cdd4a64ea6ed333d0caf7966a7df3110cf817e3a"
+  },
+  {
+    "file": "src/components/ui/record-card.jsx",
+    "bytes": 5388,
+    "sha1": "2ebdcd7a7f2568b7775803b98db3d041ac9f2172",
+    "sha256": "ce4433945915fba2838f958aa1c41852d63bdfadbac648984f7fef75c3fc697a"
+  },
+  {
+    "file": "src/components/ui/request-error-dialog.jsx",
+    "bytes": 5264,
+    "sha1": "4b17b955938b8e0cb99b07fc8c643d9125471d9b",
+    "sha256": "cdd342f98c4e5662fcac4f4f51317f6b1d2615c74219e8e3438d09fe10a6fcae"
+  },
+  {
+    "file": "src/components/ui/responsive-breakdown.jsx",
+    "bytes": 8716,
+    "sha1": "f29140bfbb706a07e310ee1926ad9e9c3520ca19",
+    "sha256": "413da3cf02bad13b5bcadaac430884efd793c8f918581321d8e31788efe9b0fe"
+  },
+  {
+    "file": "src/components/ui/responsive-select.jsx",
+    "bytes": 15060,
+    "sha1": "eb97462279dc4781a0732251927d4e0aaf85d8d8",
+    "sha256": "c0ae4f5d6399f1977f41f9ef98471b889eb475fca73ac8dcc7db33a3cceca5f4"
+  },
+  {
+    "file": "src/components/ui/searchable-select.jsx",
+    "bytes": 298,
+    "sha1": "914bf78b4ae10a0f2e6204dca15af06c576d1bda",
+    "sha256": "f7a0a289d5070d2681b3355263f08bdd215bf2c038562b2285590b0d291c7564"
+  },
+  {
+    "file": "src/components/ui/select.jsx",
+    "bytes": 6305,
+    "sha1": "c8c24b37f290b6b6edda90a62211e742d0166e44",
+    "sha256": "d3f4bb60f4f3cd4fb7aaff86d9eb085fac814d4e22c229f9b1932cc274f332fd"
+  },
+  {
+    "file": "src/components/ui/separator.jsx",
+    "bytes": 587,
+    "sha1": "a022cf0994bc7008ec2229984fdef247ad7851b0",
+    "sha256": "a4cc0f58806937c49233bee81b752a5192a8a65b3f5c795165a64a6a0faa5c3f"
+  },
+  {
+    "file": "src/components/ui/sheet.jsx",
+    "bytes": 4035,
+    "sha1": "b60e5791e475529582a11274e7e871b634e7d9fa",
+    "sha256": "78314936b51bf232e25b8fccedd6d5eb56943908c14b153e6dbeafbcc02f19d9"
+  },
+  {
+    "file": "src/components/ui/sidebar.jsx",
+    "bytes": 19562,
+    "sha1": "cdccc62e88dc4a74cc285723abe6c5c124970cf5",
+    "sha256": "83cb1befb076cae90f4a231f8d26134311d934b552b2b889489f9fe71d7a4419"
+  },
+  {
+    "file": "src/components/ui/skeleton.jsx",
+    "bytes": 247,
+    "sha1": "87a0e3d949e46983343417eea3b1cbb61bc5e6cd",
+    "sha256": "d0af97e7d16247716bededa32b5df48779ccca5904733f3f54040fe39e15fe4f"
+  },
+  {
+    "file": "src/components/ui/sonner.jsx",
+    "bytes": 1485,
+    "sha1": "d6a3259c8809f456e116a8b02b7fcda11302dec7",
+    "sha256": "7cc1bd4bf6298024e74786f1493061443671a076b5f281b217f4579263871910"
+  },
+  {
+    "file": "src/components/ui/spinner.jsx",
+    "bytes": 445,
+    "sha1": "a172221b24bbb40109db9393867d02a3df4d735d",
+    "sha256": "f018abd1732b23c5780cea15368324bb7b56a0b7b7fa577e2c293ab56d8d9e32"
+  },
+  {
+    "file": "src/components/ui/table.jsx",
+    "bytes": 2122,
+    "sha1": "8f5e3788791752bd6f778fbd5674b3a3d905cc5f",
+    "sha256": "ad8feb036f2cfad4560b7bc436a09ed6e6cf937414cd4bc9a0a8c6c8ad9632d4"
+  },
+  {
+    "file": "src/components/ui/tabs.jsx",
+    "bytes": 3365,
+    "sha1": "f39a6865d5b3c7409ef87a80e3416ea005bd1532",
+    "sha256": "845b55ffbd51ed9df87035eff8e7e6ffcb655d366b2dac00e432e3bc035d2a47"
+  },
+  {
+    "file": "src/components/ui/textarea.jsx",
+    "bytes": 775,
+    "sha1": "8662bcdcea66b5905a131320453f4c27e42b70de",
+    "sha256": "2770e7881da9d2ec449afd6b566d0b76534b36852e67a2feb3693ea5b53791ad"
+  },
+  {
+    "file": "src/components/ui/tooltip.jsx",
+    "bytes": 1870,
+    "sha1": "5fe84af2afe2cdba9130a02c330fe12f98649ee3",
+    "sha256": "73794ba39faeb9da75adb204f3ecef5623f6d904f5c061436bdb0ff3fdeacafd"
+  },
+  {
+    "file": "src/hooks/use-analysis.js",
+    "bytes": 229,
+    "sha1": "36e3edd6b57ad34844b3a74b9511df3b6df4e283",
+    "sha256": "ed8f8b7f6315da134538dcb58ba3f0eb3f460e8ba91eae1b5bb85fb92bfdbbe6"
+  },
+  {
+    "file": "src/hooks/use-capture-resource.js",
+    "bytes": 2091,
+    "sha1": "d5a52f8864aac3f2e02db4e42505cd50e6f94922",
+    "sha256": "d45666ef2f3f730ebd89347b8addd22af8fc0236633ce6585385d1696b08e005"
+  },
+  {
+    "file": "src/hooks/use-creation-draft.js",
+    "bytes": 1765,
+    "sha1": "55e51696a3a57e8740c488aa3c44db8333ed8329",
+    "sha256": "a21a19b53ce0928593fabf20e29f3c020130a1b267b845ca8be0ab07bae57abc"
+  },
+  {
+    "file": "src/hooks/use-dialog-focus.js",
+    "bytes": 701,
+    "sha1": "858ecd4088e6a6a48072039536c241403444dbe0",
+    "sha256": "fdcd5a69e8320c031b744db94d88773e041fb70e8c3e4da79bf6a3776eb96abf"
+  },
+  {
+    "file": "src/hooks/use-mobile.js",
+    "bytes": 748,
+    "sha1": "49342a0fdcc5934f40eb041a11f4193098ef881d",
+    "sha256": "0b32061267eb935dba05911540a3a0024eeaf108b6e63493f87bfce91d718e74"
+  },
+  {
+    "file": "src/hooks/use-notice-dismissals.js",
+    "bytes": 4044,
+    "sha1": "df0f9eb2ac46e5668c77a8529cd3a0287b17182c",
+    "sha256": "1cc72c1425aea3a310df9fffbe7ecf69cdc2f0c6676749fb144125ad565ab963"
+  },
+  {
+    "file": "src/lib/analysisPresentation.js",
+    "bytes": 1102,
+    "sha1": "cfef5892716d335b4d90502a38c8e9a38f1a4212",
+    "sha256": "9d418960811a3df8c1ebcebf274972ac5267ec031ea0e1ad7001be1bc8f72a5c"
+  },
+  {
+    "file": "src/lib/androidNotices.js",
+    "bytes": 3492,
+    "sha1": "f6f51138ea95f06458eddc54c9f1555787049d03",
+    "sha256": "23381e38c03048aa79a75ab994bef74adcb1781e1bb597848c8d30c7c2546159"
+  },
+  {
+    "file": "src/lib/apiAuth.js",
+    "bytes": 3204,
+    "sha1": "34d100af434ef41438bd62353be945ac6e770e84",
+    "sha256": "1a0e689929cb47456821ad8a98bbc85d307f8158c2e493e4ad37de46222d3fcd"
+  },
+  {
+    "file": "src/lib/apiFetch.js",
+    "bytes": 4088,
+    "sha1": "c198eacf64920e0019255a45a3156e24b483b81f",
+    "sha256": "a02542c5c124b0b802cb042a4d8a4c08e748e132503ab7f4fe34a7bc1c069a46"
+  },
+  {
+    "file": "src/lib/calculations/cardCredits.js",
+    "bytes": 2018,
+    "sha1": "14e1b5b4bd3bb17b68b3cad6f38960d0eda2cdc9",
+    "sha256": "f8456f2815d6d99f8c4b43660a6a168a6ba88af52df7d0de9b4c91e14b1991e7"
+  },
+  {
+    "file": "src/lib/calculations/cardCyclePayments.js",
+    "bytes": 2736,
+    "sha1": "5683e9b7745f3c1b7c88c751915bbd35d56b77ed",
+    "sha256": "57c2a2222dcb01033d53d00b95a783f9c0a450cd63cee78f9545e97e069bc407"
+  },
+  {
+    "file": "src/lib/calculations/cardCycles.js",
+    "bytes": 8213,
+    "sha1": "4db1c6ca0bb4cbf7e0b52a41fe1a28621c5b0c7b",
+    "sha256": "42d7d81e4d6aa418384a2e4273a1371d1d3e57b482efef40a540a5c9724a1c12"
+  },
+  {
+    "file": "src/lib/calculations/cardUsageWaivers.js",
+    "bytes": 20957,
+    "sha1": "830393eabdf330a1f01386829c822a87cc01d6ba",
+    "sha256": "8adfae345e7552d9407cae8a56891d2b7978760a6dcf8ec852c0566e27dd8da1"
+  },
+  {
+    "file": "src/lib/calculations/cycleDataQuality.js",
+    "bytes": 1105,
+    "sha1": "de9751614f3bfdcfa4dee4d7e80c690a78870a5d",
+    "sha256": "8c1d70261d8cdf49fa13eaadb2cccf8f9a812c18338bc50483558e2666ae1571"
+  },
+  {
+    "file": "src/lib/calculations/dashboard.js",
+    "bytes": 0,
+    "sha1": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "file": "src/lib/calculations/debtAccounts.js",
+    "bytes": 1489,
+    "sha1": "d9faef941028de8e296c3906d5cc1599d8f0b2c7",
+    "sha256": "e82d0781275869f68f6204719f73b64d1c2a50793d8dddb0a6595876234b7a04"
+  },
+  {
+    "file": "src/lib/calculations/installmentStatements.js",
+    "bytes": 2003,
+    "sha1": "49d1d1aa14c9036cb2660b05a0306322e9cb71b9",
+    "sha256": "c764e3b01e9d9879d98e14b1f17d9443a926f33794ef89408ea783ab1e159a04"
+  },
+  {
+    "file": "src/lib/calculations/installments.js",
+    "bytes": 0,
+    "sha1": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "file": "src/lib/calculations/receivables.js",
+    "bytes": 0,
+    "sha1": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "file": "src/lib/calculations/subscriptionStatements.js",
+    "bytes": 1974,
+    "sha1": "81ec9550b3d5295b966f84a0e380d1678e1a3621",
+    "sha256": "bca9070b6a6ce953c233dbb56bfc6691a3846661379e6ed217259e914fc5070f"
+  },
+  {
+    "file": "src/lib/calendar/config.js",
+    "bytes": 4849,
+    "sha1": "8a7fa325bc99710008de548df96d8d9fdba765ae",
+    "sha256": "a4eafb5242ec45c2d838b1555f7e99096393716e640a6f55e327879ca92dc5ca"
+  },
+  {
+    "file": "src/lib/calendar/events.js",
+    "bytes": 9293,
+    "sha1": "bf4d05cc9cff235e7f0d9ba9b944bd1f274d1c14",
+    "sha256": "25bd1ecb5748b3f2241d38a2106e8f2ccf2922c37453a699da224ecba7c96bd4"
+  },
+  {
+    "file": "src/lib/calendar/google.js",
+    "bytes": 3249,
+    "sha1": "35dfb9e8b249a5f2b13398fa82cb1d0b797f307d",
+    "sha256": "c27b50f520b5a88645885c54f10fc22ddb1c7bd9666a559974dd41d320976c89"
+  },
+  {
+    "file": "src/lib/calendar/pending.js",
+    "bytes": 1029,
+    "sha1": "2fc6d25d7897853f14d48ee911864d47b3ef952a",
+    "sha256": "4a7b99ab21a3d9194cfe4025306498d368bdd8843710d2bbc6f4608384e59bfc"
+  },
+  {
+    "file": "src/lib/calendar/schedule.js",
+    "bytes": 473,
+    "sha1": "73a56ddf8732ce6b06bac80c428992e502396cf3",
+    "sha256": "81adb4f04b20555e00185ede7efd9417478aa59cf722f5b4ca52fd0af605e911"
+  },
+  {
+    "file": "src/lib/calendar/service.js",
+    "bytes": 5459,
+    "sha1": "7b26e9ba0825f70b0f30d7e700426100ea97e0b0",
+    "sha256": "bbfc2d67712cf523304a8d868a539a8dd765d46794d6b29167d3bc739634034f"
+  },
+  {
+    "file": "src/lib/calendar/sync.js",
+    "bytes": 9872,
+    "sha1": "69236c9fcc87eb433b37da5879bff3329e9f4de2",
+    "sha256": "6b188cd94bcd6feb5d851799db1cd2e877ec527118b85b7fe79b1047d87ba637"
+  },
+  {
+    "file": "src/lib/calendar/worker.js",
+    "bytes": 1419,
+    "sha1": "621470415ad69140c9037cf419dc680b2b45f011",
+    "sha256": "f8a1ac39b59e6a0240da47b6ff18460eb49ef035187397d35c3cedb6ad6ef8c7"
+  },
+  {
+    "file": "src/lib/captureApi.js",
+    "bytes": 5451,
+    "sha1": "423719704dd8a2418c117e9a6ae1deed51a55252",
+    "sha256": "8386ee1a77d51d66ab24f1b1361615244502bb938cf7a2e47e3d4ace3831d145"
+  },
+  {
+    "file": "src/lib/captureBankFallback.js",
+    "bytes": 9086,
+    "sha1": "f543291a2eade6bcfaf1e96f1e2b3e2b85ee39c6",
+    "sha256": "86cf9e26a5a77fdafca544b9cbd0ee7d55e98e54c2fd4ad101fc4c71d4d15d3a"
+  },
+  {
+    "file": "src/lib/captureBankFallbackWorker.js",
+    "bytes": 4259,
+    "sha1": "3aefe114d1ddb73a6c813d984012e7bcff323f2d",
+    "sha256": "da377f02cd5494fe1a5184e95105e648774d96e6f71eb7d89f66eee695187494"
+  },
+  {
+    "file": "src/lib/captureConfiguration.js",
+    "bytes": 14838,
+    "sha1": "ec37c5332ee9007298266657b2a1d8ef8e0be2d2",
+    "sha256": "46abfb1b65cea99df4f80a0fcc08e7bab430ef1d8247c8debfe92ff1823b552d"
+  },
+  {
+    "file": "src/lib/captureFormatPolicy.js",
+    "bytes": 2224,
+    "sha1": "9229cbbd4861285a0977b5ae127782ca2e10d3f4",
+    "sha256": "e3913a36d32343ae9c7ff6e399561aa822606e404c6599b18f23371392b39547"
+  },
+  {
+    "file": "src/lib/captureIdentity.js",
+    "bytes": 2442,
+    "sha1": "3d888aa3e4e2d8ca415f56ed0f1af7bde0014cb1",
+    "sha256": "d1974e9ee830fda26fa22e94e2c02a9f7425e73b9b0874ccf91a4df4fba5421f"
+  },
+  {
+    "file": "src/lib/captureInbox.js",
+    "bytes": 2580,
+    "sha1": "882d7f92f6ebd1aec126cd253f4f4332e3c7c67b",
+    "sha256": "3a534a699e73d4d5742a9737a14d53c70cb39c1c34f1c88d81d74f1716703073"
+  },
+  {
+    "file": "src/lib/captureMoney.js",
+    "bytes": 12224,
+    "sha1": "320de4a57d20414dc2e82da3e1e58d7ae892e868",
+    "sha256": "56d8710a6090d6fbdf4c230fa649862f32be15e7cb881f9bd6cb4ca38c567bac"
+  },
+  {
+    "file": "src/lib/captureMoneyParsers.js",
+    "bytes": 2758,
+    "sha1": "12a8f7e1815d3ae8f638968846e678cb53d343f2",
+    "sha256": "4bd1801adb000ca3f4b9e37086800e56d71d680caa5a320f6bcddd4d88aaebc9"
+  },
+  {
+    "file": "src/lib/captureParsers.js",
+    "bytes": 24473,
+    "sha1": "0fe81072dfb05f8fe9ec16ed38e8427535bd6fd7",
+    "sha256": "44591998d02e645d654e75100d4adda431a99b2453388121b4a17a8cc746c9da"
+  },
+  {
+    "file": "src/lib/capturePaymentAutomation.js",
+    "bytes": 6412,
+    "sha1": "45bf36eb7e0ae6dbe3185381e374efb6d4afc939",
+    "sha256": "32f8bc67d8b01be60761f06836264adf4c7dc0f6cbfbfac9996a6bdb90feb7b5"
+  },
+  {
+    "file": "src/lib/capturePaymentParsers.js",
+    "bytes": 5903,
+    "sha1": "75d53ab9b2ebfb631e9d04e230652d1df4c65dfd",
+    "sha256": "7332e9ae258db967377ca2c76d03b85290f2c4cd29b3eccced2986596cdfc84f"
+  },
+  {
+    "file": "src/lib/capturePayments.js",
+    "bytes": 8522,
+    "sha1": "1f778e7b1aab8038e64015f35e878a5fcd35876e",
+    "sha256": "dbce21945f031825b0a48aacc9d5ca2836f99a74bd3529aecd36a94616ef9ee9"
+  },
+  {
+    "file": "src/lib/capturePilot.js",
+    "bytes": 5420,
+    "sha1": "664e5f20d302cab06c05da4d71971ed4e07b89c6",
+    "sha256": "e1ffa35d74817ffc120e435c0dce80fa95970308adfba2f7bc37cb9baadbd0c6"
+  },
+  {
+    "file": "src/lib/capturePresentation.js",
+    "bytes": 7229,
+    "sha1": "1fba61f5b2cdc04cca80852687cde4e7c0357c5b",
+    "sha256": "16ea6d026219df75ead9e0fff11eace91af9fce8b6b153ccc25d9cee78120145"
+  },
+  {
+    "file": "src/lib/captureProcessing.js",
+    "bytes": 26125,
+    "sha1": "66c64a6a05f9ae82e035546c23734cb35934166f",
+    "sha256": "61681aad4a6cc58d466a48d96a2238e7b0232f49f910849adc1615b46fb017f3"
+  },
+  {
+    "file": "src/lib/captureProtocol.js",
+    "bytes": 4028,
+    "sha1": "a0d4d9174dee47d5aa26589eeaecb7ceb6edc050",
+    "sha256": "650ea3bf34158f7282fbccb27a25a243f0190ef30eedf78291f4ed2065fe93f1"
+  },
+  {
+    "file": "src/lib/captureReconciliation.js",
+    "bytes": 8032,
+    "sha1": "ab3e830a5977724fdb30e25f9d95d3ea41a1a916",
+    "sha256": "756c7e585577dd02d5f9ee87c546dac27217e56a1ecea30f84650f1071615304"
+  },
+  {
+    "file": "src/lib/captureRefundParsers.js",
+    "bytes": 2884,
+    "sha1": "fb64b38e563b8130aba19aacfbb3ab15155feae3",
+    "sha256": "183c42ab081818499b58edbcdc4a88f0a3d5dbad9140c91ae64b6ed0719cf04a"
+  },
+  {
+    "file": "src/lib/captureRefunds.js",
+    "bytes": 11165,
+    "sha1": "13de0469ca7926435943e23989670da4d36a78a3",
+    "sha256": "36e28d1b9fbffe7d33c2491cd1bc5d4b160822bfad078bf11e512e3e2563dcea"
+  },
+  {
+    "file": "src/lib/captureReview.js",
+    "bytes": 2671,
+    "sha1": "3fb116f16616f3d1c17a8b1a56d4d6a7d184f23c",
+    "sha256": "55383b5927b73c8e1b2987e6fb2a62cf4f3fbdaad45dff048678317648bbfafe"
+  },
+  {
+    "file": "src/lib/captureRollout.js",
+    "bytes": 7557,
+    "sha1": "675f5339da4cba8c49b137e9ed9c15f88f29e7ae",
+    "sha256": "375b5c87aeaa0df59eebb399436116e4a93a01cc2eb63f105ce507f999c9cd9e"
+  },
+  {
+    "file": "src/lib/captureService.js",
+    "bytes": 8731,
+    "sha1": "8959034131cb0755720d92eb13b13b6975476e94",
+    "sha256": "2ba2236f8a02c0c71b9d9086e1b7a6f3249e99befaa5523b0f4d38d03de6935d"
+  },
+  {
+    "file": "src/lib/captureSourcePolicy.js",
+    "bytes": 270,
+    "sha1": "94d6023d12d61031999cfdd68225fa14e995fa19",
+    "sha256": "680aa66c9de68d6c597a75285d6197037606cf7c8dde6665965e8eb45c24c3e6"
+  },
+  {
+    "file": "src/lib/cardAppearance.js",
+    "bytes": 2186,
+    "sha1": "4dfb9c9b871dc6bc693f25180188cbe4533fe257",
+    "sha256": "bda2c027bec70218a60e7f77520ab96ffd7c319a73f66b8d64115f50f8e28ff8"
+  },
+  {
+    "file": "src/lib/cardBalanceTracking.js",
+    "bytes": 4984,
+    "sha1": "e282a7a1c387670e545b2efdf010b33a67bf4b43",
+    "sha256": "c2fea8d09cf05411ea7a70c74ec7cdb06344aa534e562e4d25671ff038bb5dfd"
+  },
+  {
+    "file": "src/lib/cardBalances.js",
+    "bytes": 3136,
+    "sha1": "ed4a7f603ac40d745df43b6f5530120d94724c5e",
+    "sha256": "9b5ca454754425651140ecc9bb18f54b5ed29ca84f6e594a73c7e1f9530292e1"
+  },
+  {
+    "file": "src/lib/cardPaymentPresentation.js",
+    "bytes": 1788,
+    "sha1": "f854eb10b120e238a8a0f1abee120edca7409b95",
+    "sha256": "46cc50008582f8982a62e5a13b4b13c31441f13e9d349df0c0dafdfa9f327e5a"
+  },
+  {
+    "file": "src/lib/cardUsagePresentation.js",
+    "bytes": 1993,
+    "sha1": "5cd9090d8b8caa72adc65c31e38d1cc65ac9aee8",
+    "sha256": "5624be17856d01b8871b1a29ec3470e4eae18503c5946c720253963e6463ebc6"
+  },
+  {
+    "file": "src/lib/dashboardPresentation.js",
+    "bytes": 1135,
+    "sha1": "812e516a81fec6275ff7513e0c15c021cf067ed9",
+    "sha256": "8c8d95a8f04a40a7d58fe8e489532e5314bc915b80f226a6bc25947b9d9fef3f"
+  },
+  {
+    "file": "src/lib/dates.js",
+    "bytes": 0,
+    "sha1": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "file": "src/lib/debtAccountService.js",
+    "bytes": 1599,
+    "sha1": "f54f42669bfe9a4fe1964c5c22afc64ee8c05eca",
+    "sha256": "36ac5847711dfa45fd5034c853d6ceef3ab130a1f34bfce1f6479d4557a2e4e5"
+  },
+  {
+    "file": "src/lib/expenseFilters.js",
+    "bytes": 1605,
+    "sha1": "8d8ebc44ace8a96f4feaaea157809f3118a0f03e",
+    "sha256": "d9f59fb7e73d0304c943f388c52186bdddd6f799925756c4f5e2fc732ac70c4e"
+  },
+  {
+    "file": "src/lib/expenseOperations.js",
+    "bytes": 2294,
+    "sha1": "0a08a896ed2e9642408502bd4cea9644377fd022",
+    "sha256": "f3f918eb261b013e9b30d23fa2a1b58863bd532c2cdf02fb7eac6f60a70ad574"
+  },
+  {
+    "file": "src/lib/expenseService.js",
+    "bytes": 5356,
+    "sha1": "e27769d9a2547f9caafd6038ddaafddad42d4eaa",
+    "sha256": "27573479afb2071294c718550141c8eeb2bbe87a0f696f943961340cdf2ac4a7"
+  },
+  {
+    "file": "src/lib/importantNotices.js",
+    "bytes": 12141,
+    "sha1": "e2c36fb6ddd58f9b2de843e9be2ca45663076138",
+    "sha256": "4d72877cd55f0adc6bf2cb903a99d41cc23736e17360d6d6e7805f60707f883b"
+  },
+  {
+    "file": "src/lib/money.js",
+    "bytes": 0,
+    "sha1": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "file": "src/lib/money/dates.js",
+    "bytes": 1212,
+    "sha1": "b590af5625d8157d0332b9932b7ca9cac17c8b16",
+    "sha256": "863efd8c6e30f10a9c5be5af9b584620f122c893c131a77755755a797cc571a5"
+  },
+  {
+    "file": "src/lib/money/forecast.js",
+    "bytes": 18486,
+    "sha1": "205785f805cab54bee7ccb2353a72cd149b34091",
+    "sha256": "dbea1afd3516c7d5aaa356fb4c8e8079ca840081548816059b58eed2bab45b43"
+  },
+  {
+    "file": "src/lib/money/schema.js",
+    "bytes": 5024,
+    "sha1": "1d347d8421b1c42b28d4103b5584f154a91dc147",
+    "sha256": "f975e11ced5f3181b39f4abf94ae850b2451f805dba4b1edfbe3afe9fe8658c0"
+  },
+  {
+    "file": "src/lib/money/service.js",
+    "bytes": 18366,
+    "sha1": "f6aac8659975b293261032996a5ae79d29b6fe41",
+    "sha256": "c3ce5158a24c3ea98d7bc5d2bf386601ee417e5de8dc5e5b569d8c1f70d13bec"
+  },
+  {
+    "file": "src/lib/money/sources.js",
+    "bytes": 10421,
+    "sha1": "45455106a315f28d3f30a83a2075813f471012eb",
+    "sha256": "37cc53923d20e381d07f0892007d61b4209320c93daf3d25740b7bae41697eac"
+  },
+  {
+    "file": "src/lib/money/yieldRules.js",
+    "bytes": 5654,
+    "sha1": "f18faf319cd4463584cc0696fb0705f39451fc32",
+    "sha256": "f0aa7658295a2a53f673eac7942a6372f58c3843b1636d78dfb76a5752968b98"
+  },
+  {
+    "file": "src/lib/navigation.js",
+    "bytes": 2014,
+    "sha1": "e5126015e04bad25eaae28666f8705b07c3638e5",
+    "sha256": "5f97567b372ff78535e88d59fd110646321e147889fa52482ab1cdf7e44eca15"
+  },
+  {
+    "file": "src/lib/noticeDismissals.js",
+    "bytes": 2169,
+    "sha1": "28805b4697bd1dfa49c0d798770cc9852ec0b0c1",
+    "sha256": "085ca841a3c11e303d1068fcfa7868b8d420845ffc088ddfe0b5fbee407642ff"
+  },
+  {
+    "file": "src/lib/offlineExpenses.js",
+    "bytes": 8803,
+    "sha1": "b01306952edacc149e8a3220c361fbcc5a964b3d",
+    "sha256": "5dd151faf09daec25c2ef76c30120cdcf09c7fc9584811a32a1d57c4ad4c8c77"
+  },
+  {
+    "file": "src/lib/payablesSummary.js",
+    "bytes": 1948,
+    "sha1": "d65ed017ec7988103a19aef4a02403acdfaeb5b5",
+    "sha256": "062bf812b0bbd76ec591ff19a19113545067150f8adbeeb504cdf2c02af84b9b"
+  },
+  {
+    "file": "src/lib/paymentReceipts.js",
+    "bytes": 3859,
+    "sha1": "cf8a9dd4aac022a94c94df14eec514ead84c2b44",
+    "sha256": "ec8ad6d5ad27a24dab7ccfc50ae745f53679c81db4d76d6f4aa642d1d41a1eb8"
+  },
+  {
+    "file": "src/lib/prisma.js",
+    "bytes": 407,
+    "sha1": "c8d0a275216305cc589843e312da907e9489808f",
+    "sha256": "f547ef76b5a5ea85fd9be1e73b579d1d7099b26b64570fb1cd5d450d7581de92"
+  },
+  {
+    "file": "src/lib/requestErrors.js",
+    "bytes": 4424,
+    "sha1": "f4e517ffed17c2fcd387b6c9b620dd46f4f50cd7",
+    "sha256": "305814889c8ab42d47cdf118764872eb97047daa2afaa062f9910d6dc6713adb"
+  },
+  {
+    "file": "src/lib/requestRecovery.js",
+    "bytes": 2535,
+    "sha1": "d60966abe497729c4821090ef3ea5a9e8500101d",
+    "sha256": "d51d8d42619dac51d854eb30a77e2f0be0f53b220701b36c94fbd3478ee3d801"
+  },
+  {
+    "file": "src/lib/sharedExpenses.js",
+    "bytes": 1629,
+    "sha1": "77eec90fc1c9b5da0f80c9f7efbfedcb3cf00a2b",
+    "sha256": "ad704199bee6ee392928a6dcfac39b541fd45a4e6eeb02daf529d2e3edf946f2"
+  },
+  {
+    "file": "src/lib/subscriptionChargeService.js",
+    "bytes": 6681,
+    "sha1": "70bd3be4cd83e6dc3edf1b7a0630b60ce3304a24",
+    "sha256": "58f8d0bb83acdffe5c191955474979bf39d4490de97f11b2adde10580407c5f6"
+  },
+  {
+    "file": "src/lib/subscriptionCharges.js",
+    "bytes": 4682,
+    "sha1": "2905446c7999daea35a332c1ae4fd3d48206d7da",
+    "sha256": "0ffa3a7497a81e7ea46315478a38aada6a7f69e85baa186bcab53283e26fcf81"
+  },
+  {
+    "file": "src/lib/supabase.js",
+    "bytes": 248,
+    "sha1": "def467a8c6fd6b6b29287782e6b77c4dbc7fdddf",
+    "sha256": "e609679750bfe46013968fed0b6e253c0e6b3a7c0ba3cf8b2565730e9f0a9bbb"
+  },
+  {
+    "file": "src/lib/userSetup.js",
+    "bytes": 1199,
+    "sha1": "cca42e9f21dbdc1d9a40417079ef42d3f4b9b2ef",
+    "sha256": "d38d378875fd7e0dc22b8e85dd967795a2dd5ac2208ef01cd53e3a92ad346dc4"
+  },
+  {
+    "file": "src/lib/utils.js",
+    "bytes": 137,
+    "sha1": "337eb99ab6802cef682c94528a085edf5fb738b6",
+    "sha256": "5ba0ae526d768600bbfb4a4d345c47f6208cb941adbf456de80804a4cf938350"
+  },
+  {
+    "file": "src/lib/validations.js",
+    "bytes": 0,
+    "sha1": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "file": "vercel.json",
+    "bytes": 231,
+    "sha1": "7193643b5b50da236924a9fea0ca4efe7b753daf",
+    "sha256": "814aa78c315b6a07adac1dde23c528dec0e18f02f312b737207f4f17eff2a0fd"
+  }
+]

@@ -1,6 +1,6 @@
 # AFP Android · diagnóstico, vinculación y sincronización
 
-**Versión personal instalada: 0.7.1 / versionCode 10**, actualizada con autorización y verificada por USB el 24 de octubre de 2026 UTC. Corrige la barra de estado blanca al abrir AFP y conserva los datos y permisos de la instalación anterior. La ampliación de once fuentes de 0.7.0 permanece vigente. Los seguimientos de publicación están en el README.
+**Versión personal instalada: 0.8.0 / versionCode 11**, actualizada por USB el 26 de octubre de 2026 mediante `adb install -r`. Conserva la fecha inicial de instalación, el acceso del lector, la exención de batería y el dominio verificado. Añade los controles de Avisos importantes; su backend está publicado con autorización y la opción de recepción queda pendiente de activar en el teléfono. La corrección de la barra de estado y las once fuentes anteriores permanecen vigentes. Sin capturas ni revisión visual en esta actualización. Los seguimientos de publicación están en el README.
 
 La Fase 1 añade una APK Kotlin/Compose en `android/`. Abre la interfaz financiera actual mediante Trusted Web Activity (TWA) y permite comprobar qué notificaciones entregan BBVA México, Google Wallet, HSBC, Banamex, Santander, Nu, DiDi Finanzas y Mercado Pago. La pantalla nativa incluye activación, selección de fuentes, estado del permiso y del lector, muestras locales e instrucciones para Samsung.
 
@@ -713,3 +713,32 @@ pnpm exec next build --webpack
 Resultado web de la aceptación inicial: **329 pruebas correctas sin omisiones**, incluidos 25 escenarios nuevos de integración y cinco unitarios. En aquella aceptación los analizadores reales seguían bloqueados; un cargador de pruebas aislado inyecta contratos ficticios para siete emisores y Wallet, con nueve tarjetas separadas y seis Wallet. Repite presencial, digital/en línea, parciales, suscripción explícita, reintentos, colisiones, aislamiento, versiones nuevas y recuperación. Esas pruebas no acreditan formatos ni canales reales. La preparación de navegador `tests/helpers/seed-capture-review.cjs` crea nueve tarjetas y 24 alias exclusivamente ficticios en la base local y se niega a usar una conexión remota.
 
 La regresión nativa también pasó con **18 pruebas JVM y 29 instrumentadas correctas, sin omisiones**, contra HTTPS/API/PostgreSQL locales y Auth ficticia. La prueba Compose comprobó nuevamente pausa/reanudación por fuente y reporte real del teléfono. Las APK de desarrollo y pruebas se retiraron al terminar; la personal se conserva en 0.5.0 / 7. La evidencia de compilación, navegador y regresión nativa está en [artifacts/android-fase7/verification.json](../artifacts/android-fase7/verification.json). El [plan](../PLAN_CAPTURA_AUTOMATICA_ANDROID.md#fase-7-activación-gradual-de-las-demás-tarjetas) marca solo lo concluido: documentación, controles, pruebas técnicas y recuperación. Recopilar avisos, validar formatos y canales, completar el piloto y habilitar tarjetas con evidencia propia continúan pendientes. La aceptación técnica inicial no escribió en Supabase; los seguimientos posteriores corrigieron los seis alias Wallet y prepararon Wallet/BANAMEX 1 y Nu/CFE como se detalla arriba. La publicación del nuevo código web sigue pendiente.
+
+## Avisos importantes — 0.8.0
+
+La versión **0.8.0 / 11** incorpora notificaciones propias de AFP para los avisos del Dashboard. La APK ya está instalada y `GET /api/captures/notices` está publicado con autorización en producción. Falta activar la opción y conceder el permiso de notificaciones propias en el teléfono. No requiere migraciones ni Firebase.
+
+Para activarla después de actualizar:
+
+1. Abre la pantalla nativa de AFP y comprueba que el teléfono esté vinculado y autorizado, sin pausa.
+2. Activa **Avisos importantes → Recibir avisos importantes**. En Android 13 o superior acepta el permiso. Si Android ya lo denegó, usa **Ajustes de notificaciones** para permitirlo y habilita la opción de AFP. Este permiso es independiente del lector bancario.
+3. Toca **Revisar avisos ahora** con conexión. Un aviso vigente anterior a la actualización puede notificarse en esta primera revisión. El canal **Avisos importantes** administra sonido y presentación.
+4. Toca el aviso para abrir Tarjetas, Gastos o Ingresos según su tipo. Los avisos continúan dentro de la app. La notificación no registra un pago.
+
+WorkManager consulta cada 15 minutos y al abrir la pantalla, confirmar la vinculación o completar la sincronización nativa. Puede funcionar con la app cerrada; las restricciones de batería, el reposo, la falta de conexión y la detención forzada pueden demorar o suspender las consultas. No se garantiza una hora exacta ni entrega push inmediata. No depende de activar el diagnóstico ni de seleccionar aplicaciones bancarias; sí necesita una vinculación activa con AFP.
+
+El contrato v1 devuelve `deviceId`, `ownerId` y `notices` con `key`, `title`, `body` y `path`. El servidor determina el propietario desde la credencial `Capture`, valida el estado dentro del bloqueo del dispositivo, limita las consultas y devuelve `private, no-store`. La zona IANA del teléfono determina el día calendario; sin ella se usa `America/Mexico_City`. Android valida identidad, versión, claves, textos y destinos locales antes de mostrar o cancelar avisos. Las API financieras conservan Bearer.
+
+Las claves por ocurrencia, fase y mes se guardan en el teléfono para que no suene el mismo aviso cada 15 minutos ni después de reabrir AFP. Al llegar el vencimiento, pasar a vencido o cambiar el saldo pendiente se crea una nueva clave; los detalles de un aviso todavía visible se actualizan sin sonido. Descartar en Android impide que una consulta idéntica lo restaure. Ocultar en AFP, liquidar el saldo o resolver la ocurrencia retira su aviso en la siguiente consulta correcta. Desactivar la opción cancela los publicados. Pausa, revocación o cambio de identidad retiran los avisos cuando Android conoce ese estado. Un fallo de red o contrato conserva los avisos previos y reintenta; no consume sus claves como entregadas.
+
+Comprobaciones funcionales sin capturas ni revisión visual:
+
+```bash
+node --test tests/android-notices.test.cjs tests/capture-api.test.cjs tests/dashboard-breakdowns.test.cjs tests/notice-dismissals.test.cjs
+pnpm exec next build --webpack
+pnpm lint
+# Dentro de android/, con un JDK completo configurado:
+./gradlew :app:testDebugUnitTest :app:assembleDebug :app:assembleRelease :app:lint
+```
+
+Las pruebas de servidor usan Auth/persistencia ficticias y ejecutan las funciones reales de Dashboard, avisos y autorización nativa. Cubren el saldo parcial de HSBC 1, liquidación, ocultaciones, cambios de fase/importe/mes, cobros, suscripciones omitidas, cortes, medianoche de México, identidad, pausas/revocación, límites y fallos sin vaciar avisos. Las pruebas JVM verifican contrato, destinos, separación de propietarios/dispositivos y deduplicación, incluida la actualización de avisos aún visibles. Con el backend publicado y la APK instalada, queda pendiente conceder el permiso, activar la opción y confirmar la recepción en el teléfono. [Publicación y alcance](../artifacts/android-important-notices/production.json).
