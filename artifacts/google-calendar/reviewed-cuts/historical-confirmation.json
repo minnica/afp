@@ -1,0 +1,107 @@
+{
+  "calendar": {
+    "checkedAt": "2026-10-26T22:51:21.120Z",
+    "activeEvents": 189,
+    "activeMappings": 189,
+    "agendaEvents": 187,
+    "differences": 0,
+    "idsChanged": 0,
+    "unexpectedEventChanges": 0,
+    "cutTextChanges": 27,
+    "activeCountUnchanged": true,
+    "financialDataUnchanged": true,
+    "personalLabelsPreserved": true,
+    "paletteMatches": true,
+    "eventsWithCustomPalette": 189,
+    "palette": {
+      "pending": {
+        "backgroundColor": "#003053",
+        "events": 51
+      },
+      "completed": {
+        "backgroundColor": "#003800",
+        "events": 76
+      },
+      "partial": {
+        "backgroundColor": "#4A1B00",
+        "events": 3
+      },
+      "informational": {
+        "backgroundColor": "#292929",
+        "events": 36
+      },
+      "subscription": {
+        "backgroundColor": "#352E00",
+        "events": 18
+      },
+      "overdue": {
+        "backgroundColor": "#5C0012",
+        "events": 5
+      }
+    },
+    "connectionUpToDate": true,
+    "confirmedCycles": 90,
+    "reviewedCutEventsInCalendar": 27,
+    "changedEvents": 27,
+    "unexpectedLabelOrTextChanges": 0,
+    "confirmationMarkersChanged": 90,
+    "allExpectedCutEventsChanged": true,
+    "byMonth": {
+      "2026-01": 9,
+      "2026-02": 9,
+      "2026-03": 9,
+      "2026-04": 9,
+      "2026-05": 9,
+      "2026-06": 9,
+      "2026-07": 9,
+      "2026-08": 9,
+      "2026-09": 9,
+      "2026-10": 9
+    }
+  },
+  "confirmation": {
+    "checkedAt": "2026-10-26T22:50:13.553Z",
+    "confirmedAt": "2026-10-26T22:50:10.958Z",
+    "confirmedCycles": 90,
+    "onlyConfirmationChanged": true,
+    "otherCyclesUnchanged": true,
+    "byMonth": {
+      "2026-01": 9,
+      "2026-02": 9,
+      "2026-03": 9,
+      "2026-04": 9,
+      "2026-05": 9,
+      "2026-06": 9,
+      "2026-07": 9,
+      "2026-08": 9,
+      "2026-09": 9,
+      "2026-10": 9
+    }
+  },
+  "status": "completed-and-synced",
+  "authorization": "Owner requested bulk confirmation of earlier cuts with statement amounts already captured.",
+  "scope": {
+    "operation": "One-time confirmation of existing saved dates; no independent bank reconciliation.",
+    "existingCycles": 108,
+    "confirmed": 90,
+    "unconfirmedWithoutStatement": 18,
+    "months": "2026-01 through 2026-10",
+    "onlyFieldChanged": "datesConfirmedAt",
+    "bankDatesAmountsPaymentsAndUpdatedAtPreserved": true,
+    "futureCyclesExcluded": true,
+    "otherOwnersExcluded": true,
+    "repeatableAutomaticBackfill": false
+  },
+  "deployedCodeUnchanged": true,
+  "newDeployment": false,
+  "newMigration": false,
+  "validation": {
+    "privateBackupSaved": true,
+    "transactionWithRowLocks": true,
+    "unchangedRowsCheckedBeforeCommit": true,
+    "all189RemoteEventsCompared": true,
+    "nativeCalendarMonthVerified": true,
+    "phone": "Samsung S24 Ultra",
+    "screenshots": "Private, excluded from Git"
+  }
+}

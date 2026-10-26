@@ -33,6 +33,7 @@ test('A11: recupera la migración original y conserva los trece checksums aplica
     '20261026000000_expense_refunds',
     '20261026010000_debit_payment_method',
     '20261026020000_capture_account_movements',
+    '20261026030000_card_cycle_dates_confirmation',
   ]);
 });
 

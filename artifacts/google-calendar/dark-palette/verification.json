@@ -1,0 +1,93 @@
+{
+  "status": "published-and-synced",
+  "date": "2026-10-26",
+  "userPreference": "Sobrios: azul, verde salvia, ámbar y gris",
+  "target": "Google Calendar AFP secondary calendar",
+  "source": "src/lib/calendar/palette.js",
+  "tests": {
+    "passed": 34,
+    "skipped": 0,
+    "database": "disposable PostgreSQL on localhost",
+    "google": "simulated",
+    "coverage": [
+      "preserving unrelated labels and calendar properties",
+      "ETag concurrency recovery and bounded retries",
+      "label limit without removing unrelated labels",
+      "state precedence and all four event categories",
+      "updating an existing legacy event without changing its ID",
+      "versioned label writes, idempotence, recovery and disconnect"
+    ],
+    "finalNonDatabaseTestsPassed": 24
+  },
+  "webpackBuild": "passed",
+  "targetedLint": "passed",
+  "preview": {
+    "desktopWidth": 1280,
+    "mobileWidth": 390,
+    "mobileDocumentWidth": 390,
+    "source": "local HTML with fictional data and colors measured in Google Calendar Android",
+    "data": "fictional",
+    "realGoogleRenderingVerified": true,
+    "limitation": "Actual rendering verified on the connected S24 Ultra in dark mode; other clients and themes can adapt colors.",
+    "measuredTextContrastMinimum": 4.78,
+    "measuredTextContrastMaximum": 4.84
+  },
+  "impeccableDetector": {
+    "executed": true,
+    "findings": "Preview comparison and illustrative calendar only.",
+    "fixes": [
+      "Raised mobile illustrative calendar text from 10px to 12px."
+    ],
+    "intentionalExceptions": [
+      "Legacy swatches reproduce the supplied desktop colors, including their original contrast limitations.",
+      "Compact event padding and calendar grid follow the external Google surface shown by the user.",
+      "Preview uses a platform sans font to approximate Google; typography is outside this color-only task."
+    ]
+  },
+  "production": {
+    "deployed": true,
+    "googleCalendarWritten": true,
+    "financialDataWritten": false,
+    "schemaChanged": false,
+    "apkUpdated": false,
+    "deploymentId": "dpl_yxUVVnBRyKC5jw6N2ivPELQwxf1T",
+    "activeEvents": 189,
+    "sameEventIds": true,
+    "financialDataUnchanged": true,
+    "evidence": "production.json"
+  },
+  "officialApiDocumentation": "https://developers.google.com/workspace/calendar/api/guides/labels",
+  "android": {
+    "visuallyVerified": true,
+    "device": "Samsung S24 Ultra",
+    "calendarVersion": "2026.40.0-997536344-release",
+    "foreground": "#EAF1FA",
+    "renderedPalette": {
+      "completed": {
+        "backgroundColor": "#576F5F",
+        "textContrast": 4.8,
+        "pixels": 125599,
+        "hue": 140.0
+      },
+      "pending": {
+        "backgroundColor": "#556B82",
+        "textContrast": 4.84,
+        "pixels": 86686,
+        "hue": 210.7
+      },
+      "informational": {
+        "backgroundColor": "#5F6A77",
+        "textContrast": 4.84,
+        "pixels": 83322,
+        "hue": 212.5
+      },
+      "partial": {
+        "backgroundColor": "#806451",
+        "textContrast": 4.78,
+        "pixels": 7818,
+        "hue": 24.3
+      }
+    },
+    "financialScreenshots": "private, excluded from Git"
+  }
+}

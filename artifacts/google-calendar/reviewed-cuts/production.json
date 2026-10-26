@@ -1,0 +1,149 @@
+{
+  "checkedAt": "2026-10-26T22:46:40.187Z",
+  "status": "published-and-synced",
+  "request": "Use the existing completed green for cut events after saving real cycle dates and the statement amount.",
+  "deployment": {
+    "id": "dpl_BreXuBiwGGuVQCHjRNhM5eHPftAC",
+    "url": "https://afp-7khf5fbcb-minnicas-projects.vercel.app",
+    "productionUrl": "https://finanzas.garatachia.com",
+    "state": "READY",
+    "target": "production",
+    "sourceCommit": "4587913fc8280a4e97697254c32bc3a52a64cf4f",
+    "sourceMode": "working-tree",
+    "sourceFiles": 345,
+    "manifestSha256": "0f6f63662eb6bdf7d869d74c2ffb831a2ae784adfd2851a0b44fa67865845133",
+    "sourceComparison": {
+      "returned": 124,
+      "compared": 124,
+      "mismatch": [],
+      "truncated": true
+    },
+    "changedSourceChecks": [
+      {
+        "file": "prisma/migrations/20261026030000_card_cycle_dates_confirmation/migration.sql",
+        "truncated": false,
+        "availableBase64PrefixMatches": true
+      },
+      {
+        "file": "prisma/schema.prisma",
+        "truncated": true,
+        "availableBase64PrefixMatches": true
+      },
+      {
+        "file": "src/app/api/card-cycles/route.js",
+        "truncated": true,
+        "availableBase64PrefixMatches": true
+      },
+      {
+        "file": "src/lib/calendar/events.js",
+        "truncated": true,
+        "availableBase64PrefixMatches": true
+      },
+      {
+        "file": "src/lib/calendar/palette.js",
+        "truncated": true,
+        "availableBase64PrefixMatches": true
+      }
+    ],
+    "commitOrPushPerformed": false
+  },
+  "behavior": {
+    "unreviewed": "Gray; projected dates or a captured statement amount alone are insufficient.",
+    "reviewed": "Existing green, title Corte revisado, after UPDATE_DATES confirms dates and statementAmount is non-null; zero is valid.",
+    "orderIndependent": true,
+    "unchangedDatesCanBeConfirmed": true,
+    "priorCycles": "No confirmation backfill. Save Editar fechas reales once for an existing cycle whose amount is already captured.",
+    "paymentStateIndependent": true,
+    "cutReminders": false,
+    "colorsChanged": false,
+    "newOAuthScopes": false,
+    "apkUpdated": false
+  },
+  "migration": {
+    "checkedAt": "2026-10-26T22:43:37.898Z",
+    "migration": "20261026030000_card_cycle_dates_confirmation",
+    "additive": true,
+    "existingCycleRows": 108,
+    "existingCyclesUnchanged": true,
+    "confirmationsNotInvented": true,
+    "existingStructureUnchanged": true,
+    "existingHistoryUnchanged": true,
+    "newColumnCorrect": true,
+    "schemaDiffEmpty": true,
+    "audit": {
+      "errors": [],
+      "pending": []
+    },
+    "rlsTables": 45,
+    "completedMigrations": 40,
+    "migrationHistoryRows": 41
+  },
+  "calendar": {
+    "checkedAt": "2026-10-26T22:46:40.187Z",
+    "activeEvents": 189,
+    "activeMappings": 189,
+    "agendaEvents": 187,
+    "differences": 0,
+    "idsChanged": 0,
+    "unexpectedEventChanges": 0,
+    "cutTextChanges": 63,
+    "activeCountUnchanged": true,
+    "financialDataUnchanged": true,
+    "personalLabelsPreserved": true,
+    "paletteMatches": true,
+    "eventsWithCustomPalette": 189,
+    "palette": {
+      "pending": {
+        "backgroundColor": "#003053",
+        "events": 51
+      },
+      "completed": {
+        "backgroundColor": "#003800",
+        "events": 49
+      },
+      "partial": {
+        "backgroundColor": "#4A1B00",
+        "events": 3
+      },
+      "informational": {
+        "backgroundColor": "#292929",
+        "events": 63
+      },
+      "subscription": {
+        "backgroundColor": "#352E00",
+        "events": 18
+      },
+      "overdue": {
+        "backgroundColor": "#5C0012",
+        "events": 5
+      }
+    },
+    "connectionUpToDate": true,
+    "reviewedCutEvents": 0,
+    "pendingInitialConfirmationCutEvents": 63
+  },
+  "validation": {
+    "fullSuiteTestsPassed": 741,
+    "skipped": 0,
+    "localDatabase": "Disposable PostgreSQL; clean installation and historical upgrade, 40 migrations, empty schema diff, records preserved and RLS checked.",
+    "googleInTests": "Simulated; both orders tested through API, database triggers and Calendar sync.",
+    "webpackBuild": "passed",
+    "targetedLint": "passed",
+    "impeccableDetectorFindings": 0,
+    "loginStatus": 200,
+    "calendarAnonymousStatus": 401,
+    "cardCyclesAnonymousStatus": 401,
+    "runtimeErrorGroupsObservedInImmediateWindow": 0,
+    "android": {
+      "device": "Samsung S24 Ultra",
+      "pendingCutDescriptionVerifiedInNativeCalendar": true,
+      "privateScreenshots": true,
+      "reviewedCutTransition": "Verified with fictitious local data and simulated Google; no personal cycle was confirmed by the agent."
+    }
+  },
+  "limits": [
+    "Google controls final appearance by client and theme.",
+    "Existing cycles stay gray until the owner confirms dates; older manual confirmations were not tracked.",
+    "Vercel returned a partial file tree; only the 124 available hashes and available content prefixes were compared."
+  ]
+}

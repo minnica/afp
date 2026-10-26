@@ -7,6 +7,7 @@ const plain = value => JSON.parse(JSON.stringify(value));
 const load = sourceLoader({}, globals);
 const config = load('src/lib/calendar/config.js');
 const { buildCalendarEvents, googleEvent, mexicoDay } = load('src/lib/calendar/events.js');
+const palette = load('src/lib/calendar/palette.js').CALENDAR_EVENT_PALETTE;
 const empty = () => ({ cards: [], cycles: [], subscriptions: [], receivables: [], payables: [] });
 const now = new Date('2026-10-21T18:00:00Z');
 
@@ -50,13 +51,55 @@ test('calendar: corrección de fechas mantiene clave, saldo parcial y liquidaci�
   assert.equal(buildCalendarEvents(data, { types: [] }, now).events.length, 0);
 });
 
+test('calendar: corte verde requiere fechas confirmadas y monto, conserva pago independiente y acepta cero', () => {
+  const data = empty();
+  data.cards.push({ id: 'card', name: 'Tarjeta', usualCutDay: 25, usualDueDay: 10 });
+  const cutKey = 'card:card:2026-10:cut', paymentKey = 'card:card:2026-10:payment';
+  const eventAt = key => buildCalendarEvents(data, {}, now).events.find(event => event.key === key);
+  const asGoogle = event => googleEvent(event, { id: 'c' }, env.AFP_APP_ORIGIN);
+  const projected = eventAt(cutKey);
+  assert.equal(projected.reviewed, false);
+  assert.equal(asGoogle(projected).eventLabelId, palette.informational.id);
+  const cycle = { cardId: 'card', year: 2026, month: 10, cutDate: '2026-10-25', dueDate: '2026-11-10', statementAmount: 1000 };
+  data.cycles.push(cycle);
+  assert.equal(eventAt(cutKey).reviewed, false, 'el monto y una fecha generada no bastan');
+  cycle.datesConfirmedAt = '2026-10-21T17:00:00Z';
+  const reviewed = eventAt(cutKey), pending = eventAt(paymentKey);
+  assert.equal(reviewed.key, projected.key);
+  assert.equal(reviewed.title, 'Corte revisado · Tarjeta');
+  assert.equal(reviewed.settled, false); assert.equal(reviewed.informational, true);
+  assert.equal(asGoogle(reviewed).eventLabelId, palette.completed.id);
+  assert.equal(asGoogle(reviewed).reminders.overrides.length, 0);
+  assert.equal(pending.settled, false); assert.equal(pending.amount, 1000);
+  assert.equal(asGoogle(pending).eventLabelId, palette.pending.id);
+  assert.equal(asGoogle(pending).reminders.overrides.length, 1);
+  for (const statementAmount of [null, undefined]) {
+    cycle.statementAmount = statementAmount;
+    assert.equal(eventAt(cutKey).reviewed, false, 'confirmar fechas sin monto conserva gris');
+    assert.equal(asGoogle(eventAt(cutKey)).eventLabelId, palette.informational.id);
+  }
+  cycle.statementAmount = 0;
+  assert.equal(eventAt(cutKey).reviewed, true, 'un estado de cuenta en cero sí está capturado');
+  cycle.statementAmount = 1000; cycle.paidAmount = 1000; cycle.datesConfirmedAt = null;
+  assert.equal(eventAt(paymentKey).settled, true);
+  assert.equal(asGoogle(eventAt(cutKey)).eventLabelId, palette.informational.id, 'pagar no confirma las fechas');
+  cycle.datesConfirmedAt = '2026-10-21T17:00:00Z'; cycle.paidAmount = 100;
+  assert.equal(asGoogle(eventAt(paymentKey)).eventLabelId, palette.partial.id);
+  const later = buildCalendarEvents(data, {}, new Date('2026-11-11T18:00:00Z')).events;
+  cycle.paidAmount = 0;
+  const overdue = buildCalendarEvents(data, {}, new Date('2026-11-11T18:00:00Z')).events;
+  assert.equal(asGoogle(later.find(event => event.key === cutKey)).eventLabelId, palette.completed.id);
+  assert.equal(asGoogle(overdue.find(event => event.key === paymentKey)).eventLabelId, palette.overdue.id);
+});
+
 test('calendar: cuentas cobradas, canceladas y con pago parcial respetan el saldo real', () => {
   const data = empty();
-  data.receivables.push({ id: 'r', originalAmount: 1000, originDate: '2026-10-01', expectedMonthlyPayment: 300, expectedChargeDays: [15, 30], concept: 'Reembolso', incomes: [{ date: '2026-10-10', amount: 300 }], status: 'ACTIVE' });
+  data.receivables.push({ id: 'r', originalAmount: 1000, originDate: '2026-10-01', expectedMonthlyPayment: 300, expectedChargeDays: [15, 30], concept: 'Reembolso', incomes: [{ date: '2026-10-15', amount: 300 }], status: 'ACTIVE' });
   data.payables.push({ id: 'p', originalAmount: 500, expectedDate: '2026-10-25', concept: 'Deuda', dailyExpenses: [{ amount: 200 }], status: 'ACTIVE' });
   let events = buildCalendarEvents(data, {}, now).events;
   assert.equal(events.find(e => e.key === 'payable:p').amount, 300);
-  assert.ok(events.filter(e => e.key.startsWith('receivable:r:2026-10:')).every(e => e.settled));
+  assert.equal(events.find(e => e.key === 'receivable:r:2026-10:0').settled, true);
+  assert.equal(events.find(e => e.key === 'receivable:r:2026-10:1').settled, false);
   assert.ok(events.filter(e => e.key.startsWith('receivable:r:2026-11:')).every(e => !e.settled));
   data.payables[0].status = 'CANCELLED'; data.receivables[0].incomes.push({ date: '2026-10-20', amount: 700 });
   events = buildCalendarEvents(data, {}, now).events;
@@ -68,28 +111,89 @@ test('calendar: el color representa el estado en todos los tipos y los parciales
   for (const type of types) {
     const base = { key: `${type}:test`, type, date: '2026-10-25', title: 'Evento', detail: '', route: '/tarjetas' };
     const completed = googleEvent({ ...base, settled: true, partial: true }, { id: 'c' }, env.AFP_APP_ORIGIN);
-    assert.equal(completed.colorId, '10', `${type} completado debe ser verde, incluso si antes fue parcial`);
+    assert.equal(completed.eventLabelId, palette.completed.id, `${type} completado debe ser verde, incluso si antes fue parcial`);
     assert.equal(completed.reminders.overrides.length, 0);
-    assert.equal(googleEvent({ ...base, settled: false }, { id: 'c' }, env.AFP_APP_ORIGIN).colorId, '9');
+    assert.equal(googleEvent({ ...base, settled: false }, { id: 'c' }, env.AFP_APP_ORIGIN).eventLabelId,
+      type === 'subscriptions' ? palette.subscription.id : palette.pending.id);
     const partial = googleEvent({ ...base, settled: false, partial: true }, { id: 'c' }, env.AFP_APP_ORIGIN);
-    assert.equal(partial.colorId, '6'); assert.equal(partial.reminders.overrides.length, 1);
+    assert.equal(partial.eventLabelId, palette.partial.id); assert.equal(partial.reminders.overrides.length, 1);
   }
-  assert.equal(googleEvent({ type: 'cuts', informational: true, date: '2026-10-25', title: 'Corte', detail: '', route: '/tarjetas' }, { id: 'c' }, env.AFP_APP_ORIGIN).colorId, '8');
+  assert.equal(googleEvent({ type: 'cuts', informational: true, date: '2026-10-25', title: 'Corte', detail: '', route: '/tarjetas' }, { id: 'c' }, env.AFP_APP_ORIGIN).eventLabelId, palette.informational.id);
 });
 
 test('calendar: abonos de cuentas usan naranja y texto parcial; al liquidar pasan a verde', () => {
   const data = empty();
-  const receivable = { id: 'r', originalAmount: 1000, originDate: '2026-10-01', expectedMonthlyPayment: 300, expectedChargeDays: [15, 30], concept: 'Reembolso', incomes: [{ date: '2026-10-10', amount: 100 }], status: 'ACTIVE' };
+  const receivable = { id: 'r', originalAmount: 1000, originDate: '2026-10-01', expectedMonthlyPayment: 300, expectedChargeDays: [15, 30], concept: 'Reembolso', incomes: [{ date: '2026-10-15', amount: 100 }], status: 'ACTIVE' };
   const payable = { id: 'p', originalAmount: 500, expectedDate: '2026-10-25', concept: 'Deuda', dailyExpenses: [{ amount: 200 }], status: 'ACTIVE' };
   data.receivables.push(receivable); data.payables.push(payable);
   const colors = () => buildCalendarEvents(data, {}, now).events.map(event => googleEvent(event, { id: 'c' }, env.AFP_APP_ORIGIN));
   let events = colors();
-  assert.equal(events.find(e => e.summary.startsWith('Cobro parcial')).colorId, '6');
-  assert.equal(events.find(e => e.summary.startsWith('Pago parcial')).colorId, '6');
-  assert.equal(events.find(e => e.summary.startsWith('Cobrar') && e.start.date.startsWith('2026-11')).colorId, '9');
+  assert.equal(events.find(e => e.summary.startsWith('Cobro parcial')).eventLabelId, palette.partial.id);
+  assert.equal(events.find(e => e.summary.startsWith('Pago parcial')).eventLabelId, palette.partial.id);
+  assert.equal(events.find(e => e.summary.startsWith('Cobrar') && e.start.date.startsWith('2026-11')).eventLabelId, palette.pending.id);
   receivable.incomes.push({ date: '2026-10-20', amount: 200 }); payable.dailyExpenses.push({ amount: 300 });
   events = colors();
-  assert.ok(events.filter(e => e.start.date.startsWith('2026-10')).every(e => e.colorId === '10' && e.reminders.overrides.length === 0));
+  assert.equal(events.find(e => e.start.date === '2026-10-15').eventLabelId, palette.completed.id);
+  assert.equal(events.find(e => e.start.date === '2026-10-30').eventLabelId, palette.pending.id);
+  assert.equal(events.find(e => e.summary.startsWith('Pagado')).reminders.overrides.length, 0);
+});
+
+test('calendar: un cobro quincenal no marca la siguiente fecha como cobrada, ni al llegar ese día', () => {
+  const data = empty();
+  const account = { id: 'r', originalAmount: 10000, originDate: '2026-09-01', expectedMonthlyPayment: 1730.89,
+    expectedChargeDays: [15, 30], person: { name: 'Persona' }, concept: 'Préstamo', status: 'ACTIVE',
+    incomes: [{ date: '2026-09-30', amount: 1750 }, { date: '2026-10-15', amount: 1750 }] };
+  data.receivables.push(account);
+  const eventAt = (day, date) => buildCalendarEvents(data, {}, new Date(`${day}T18:00:00Z`)).events.find(e => e.date === date);
+  const paid = eventAt('2026-10-26', '2026-10-15');
+  assert.equal(paid.title, 'Cobrado · Persona'); assert.equal(paid.amount, 0);
+  assert.equal(googleEvent(paid, { id: 'c' }, env.AFP_APP_ORIGIN).eventLabelId, palette.completed.id);
+  const pending = eventAt('2026-10-26', '2026-10-30');
+  for (const day of ['2026-10-26', '2026-10-30', '2026-11-01']) {
+    const event = eventAt(day, '2026-10-30');
+    assert.equal(event.title, 'Cobrar · Persona'); assert.equal(event.amount, 1730.89);
+    assert.equal(event.settled, false); assert.equal(event.partial, false);
+    assert.equal(event.key, pending.key);
+    const google = googleEvent(event, { id: 'c' }, env.AFP_APP_ORIGIN);
+    assert.equal(google.eventLabelId, day > '2026-10-30' ? palette.overdue.id : palette.pending.id);
+    assert.equal(google.reminders.overrides.length, 1);
+  }
+  account.incomes.push({ date: '2026-10-30', amount: 500 });
+  assert.equal(eventAt('2026-10-26', '2026-10-30').settled, false, 'un ingreso futuro no confirma el cobro');
+  let partial = eventAt('2026-10-30', '2026-10-30');
+  assert.equal(partial.title, 'Cobro parcial · Persona'); assert.equal(partial.amount, 1230.89);
+  assert.equal(googleEvent(partial, { id: 'c' }, env.AFP_APP_ORIGIN).eventLabelId, palette.partial.id);
+  account.incomes.push({ date: '2026-11-01', amount: 1230.89 });
+  assert.equal(eventAt('2026-10-30', '2026-10-30').settled, false);
+  const completed = eventAt('2026-11-01', '2026-10-30');
+  assert.equal(completed.title, 'Cobrado · Persona'); assert.equal(completed.key, pending.key);
+  assert.equal(googleEvent(completed, { id: 'c' }, env.AFP_APP_ORIGIN).reminders.overrides.length, 0);
+  assert.equal(eventAt('2026-11-15', '2026-11-15').title, 'Cobrar · Persona');
+  account.incomes.pop();
+  assert.equal(eventAt('2026-11-01', '2026-10-30').title, 'Cobro parcial · Persona', 'borrar el ingreso restaura el pendiente');
+});
+
+test('calendar: abonos se suman a centavos y los días ajustados a fin de mes no duplican cobros', () => {
+  const data = empty();
+  data.receivables.push({ id: 'r', originalAmount: 1000, originDate: '2028-02-01', expectedMonthlyPayment: 0.30,
+    expectedChargeDays: [29, 30, 31], concept: 'Reembolso', status: 'ACTIVE',
+    incomes: [{ date: '2028-02-29', amount: 0.10 }, { date: '2028-03-01', amount: 0.20 }] });
+  const events = buildCalendarEvents(data, {}, new Date('2028-03-02T18:00:00Z')).events;
+  const february = events.filter(e => e.date === '2028-02-29');
+  assert.equal(february.length, 1); assert.equal(february[0].settled, true);
+  assert.equal(february[0].key, 'receivable:r:2028-02:0');
+  assert.ok(events.filter(e => e.date.startsWith('2028-03')).every(e => !e.settled && !e.partial));
+});
+
+test('calendar: ingresos futuros no liquidan ni retiran los cobros previstos de una cuenta activa', () => {
+  const data = empty();
+  data.receivables.push({ id: 'r', originalAmount: 300, originDate: '2026-10-01', expectedMonthlyPayment: 300,
+    expectedChargeDays: [30], concept: 'Reembolso', status: 'PAID_OFF', incomes: [{ date: '2026-10-30', amount: 300 }] });
+  const before = buildCalendarEvents(data, {}, now).events.find(e => e.date === '2026-10-30');
+  assert.equal(before.title, 'Cobrar · Reembolso'); assert.equal(before.amount, 300);
+  const after = buildCalendarEvents(data, {}, new Date('2026-10-30T18:00:00Z')).events;
+  assert.equal(after.find(e => e.date === '2026-10-30').title, 'Cobrado · Reembolso');
+  assert.ok(!after.some(e => e.date > '2026-10-30'));
 });
 
 test('calendar: cuotas y denegación no revelan respuestas de Google; reintento respeta Retry-After', async () => {

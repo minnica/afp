@@ -65,6 +65,30 @@ function fixture(initial = {}) {
   };
 }
 
+test("las fechas reales se confirman al guardar, incluso sin cambiarlas; importe y pago no las confirman", async () => {
+  const f = fixture({ statementAmount: null });
+  await f.patch({ action: "UPDATE_STATEMENT", statementAmount: 1000, datesConfirmedAt: now });
+  assert.equal(f.state().datesConfirmedAt, undefined, 'no acepta confirmación enviada en otra acción');
+  await f.patch({ action: "MARK_AS_PAID", paidAmount: 1, paidAt: "2026-10-21" });
+  assert.equal(f.state().datesConfirmedAt, undefined);
+  const response = await f.patch({ action: "UPDATE_DATES", startDate: "2026-09-11", cutDate: "2026-10-10", dueDate: "2026-10-25" });
+  assert.equal(response.status, 200);
+  assert.equal(response.body.cycle.datesConfirmedAt, now.toISOString());
+  assert.equal(f.state().dueDate.slice(0, 10), "2026-10-25");
+  assert.equal(f.state().statementAmount, 1000); assert.equal(f.state().paidAmount, 1);
+  await f.patch({ action: "UPDATE_STATEMENT", statementAmount: 2000 });
+  assert.equal(f.state().datesConfirmedAt, now.toISOString(), 'corregir el importe conserva la revisión de fechas');
+});
+
+test("fechas inválidas o un guardado fallido no registran confirmación", async () => {
+  const f = fixture();
+  assert.equal((await f.patch({ action: "UPDATE_DATES", startDate: "2026-09-11", cutDate: "2026-10-10", dueDate: "2026-10-09" })).status, 400);
+  assert.equal(f.writes(), 0); assert.equal(f.state().datesConfirmedAt, undefined);
+  f.fail();
+  assert.equal((await f.patch({ action: "UPDATE_DATES", startDate: "2026-09-11", cutDate: "2026-10-10", dueDate: "2026-10-25" })).status, 500);
+  assert.equal(f.state().datesConfirmedAt, undefined);
+});
+
 test("un peso de mil conserva 999 pendientes, aun con PAID/paidAt históricos", () => {
   const partial = { ...base, paidAmount: 1, paidAt: "2026-10-20", status: "PAID" };
   const result = getCyclePaymentState(partial, now);

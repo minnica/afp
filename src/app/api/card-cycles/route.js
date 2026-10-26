@@ -16,6 +16,7 @@ const cycleSelect = {
   startDate: true,
   cutDate: true,
   dueDate: true,
+  datesConfirmedAt: true,
   statementAmount: true,
   status: true,
   paidAt: true,
@@ -432,6 +433,8 @@ export async function PATCH(request) {
 
       const cycle = await updateCycle(userId, id, () => ({
         startDate: parsedStartDate, cutDate: parsedCutDate, dueDate: parsedDueDate,
+        // Guardar también confirma las fechas cuando coinciden con las previstas.
+        datesConfirmedAt: new Date(),
       }));
 
       return NextResponse.json({ cycle });

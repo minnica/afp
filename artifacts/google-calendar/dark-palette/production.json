@@ -1,0 +1,115 @@
+{
+  "checkedAt": "2026-10-26T22:16:59.216Z",
+  "status": "published-and-synced",
+  "deployment": {
+    "id": "dpl_yxUVVnBRyKC5jw6N2ivPELQwxf1T",
+    "url": "https://afp-excazegte-minnicas-projects.vercel.app",
+    "productionUrl": "https://finanzas.garatachia.com",
+    "state": "READY",
+    "target": "production",
+    "sourceCommit": "4587913fc8280a4e97697254c32bc3a52a64cf4f",
+    "sourceMode": "working-tree",
+    "sourceFiles": 344,
+    "manifestSha256": "9d7ee79426fd8710d575b20425fea7c92e1d808ac861150c3a15c20a1ffeed90",
+    "sourceFileComparison": {
+      "returned": 124,
+      "compared": 124,
+      "mismatch": []
+    },
+    "paletteSource": {
+      "sha1": "a068bbfce640039fd29925029e35b5499ab5b2fa",
+      "availableContentMatches": true,
+      "responseTruncated": true
+    },
+    "buildDurationSeconds": 84,
+    "commitOrPushPerformed": false
+  },
+  "calendar": {
+    "activeEvents": 189,
+    "activeMappings": 189,
+    "agendaEvents": 187,
+    "eventsWithCustomPalette": 189,
+    "differences": 0,
+    "idsChanged": 0,
+    "nonColorChanges": 0,
+    "activeCountUnchanged": true,
+    "personalLabelsPreserved": true,
+    "paletteMatches": true,
+    "palette": {
+      "pending": {
+        "backgroundColor": "#00243A",
+        "events": 74
+      },
+      "completed": {
+        "backgroundColor": "#0F2719",
+        "events": 49
+      },
+      "partial": {
+        "backgroundColor": "#361D07",
+        "events": 3
+      },
+      "informational": {
+        "backgroundColor": "#18222D",
+        "events": 63
+      }
+    },
+    "connectionUpToDate": true
+  },
+  "personalLabelsBefore": 24,
+  "historicalEventsUpdated": 2,
+  "financialData": {
+    "unchanged": true,
+    "financialWritesByRelease": false,
+    "schemaChanged": false,
+    "migrationsExecuted": false
+  },
+  "android": {
+    "device": "Samsung S24 Ultra",
+    "visuallyVerified": true,
+    "calendarVersion": "2026.40.0-997536344-release",
+    "foreground": "#EAF1FA",
+    "renderedPalette": {
+      "completed": {
+        "backgroundColor": "#576F5F",
+        "textContrast": 4.8,
+        "pixels": 125599,
+        "hue": 140.0
+      },
+      "pending": {
+        "backgroundColor": "#556B82",
+        "textContrast": 4.84,
+        "pixels": 86686,
+        "hue": 210.7
+      },
+      "informational": {
+        "backgroundColor": "#5F6A77",
+        "textContrast": 4.84,
+        "pixels": 83322,
+        "hue": 212.5
+      },
+      "partial": {
+        "backgroundColor": "#806451",
+        "textContrast": 4.78,
+        "pixels": 7818,
+        "hue": 24.3
+      }
+    },
+    "textContrastMinimum": 4.78,
+    "textContrastMaximum": 4.84,
+    "screenshots": "private, excluded from Git",
+    "apkUpdated": false
+  },
+  "validation": {
+    "initialDirectedTestsPassed": 34,
+    "finalNonDatabaseTestsPassed": 24,
+    "webpackBuild": "passed",
+    "targetedLint": "passed",
+    "loginStatus": 200,
+    "calendarWithoutSessionStatus": 401,
+    "runtimeErrorGroupsObservedInImmediateWindow": 0
+  },
+  "limits": [
+    "Visual verification covers Google Calendar Android dark mode on the connected device; other clients and themes can render differently.",
+    "Deployment file tree and source content responses are partial; only the available comparisons are claimed."
+  ]
+}

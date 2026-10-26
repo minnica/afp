@@ -1,0 +1,49 @@
+{
+  "palette": {
+    "completed": {
+      "backgroundColor": "#52774B",
+      "foregroundColor": "#ECF3EA",
+      "hue": 110.5,
+      "saturation": 0.37,
+      "textContrast": 4.53
+    },
+    "informational": {
+      "backgroundColor": "#6C6C6C",
+      "foregroundColor": "#F1F1F1",
+      "hue": 0.0,
+      "saturation": 0.0,
+      "textContrast": 4.65
+    },
+    "pending": {
+      "backgroundColor": "#586F90",
+      "foregroundColor": "#ECF1FA",
+      "hue": 215.4,
+      "saturation": 0.389,
+      "textContrast": 4.53
+    },
+    "overdue": {
+      "backgroundColor": "#9F5856",
+      "foregroundColor": "#FCEEED",
+      "hue": 1.6,
+      "saturation": 0.459,
+      "textContrast": 4.64
+    },
+    "partial": {
+      "backgroundColor": "#8F614C",
+      "foregroundColor": "#FAEEE9",
+      "hue": 18.8,
+      "saturation": 0.469,
+      "textContrast": 4.64
+    },
+    "subscription": {
+      "backgroundColor": "#776E49",
+      "foregroundColor": "#F4F1E7",
+      "hue": 48.3,
+      "saturation": 0.387,
+      "textContrast": 4.52
+    }
+  },
+  "blueGrayDeltaE76Before": 6.79,
+  "blueGrayDeltaE76After": 20.74,
+  "note": "Medici\u00f3n de la captura real de Google Calendar Android en modo oscuro; \u0394E76 describe esta captura y no sustituye una prueba de percepci\u00f3n."
+}

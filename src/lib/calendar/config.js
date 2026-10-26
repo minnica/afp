@@ -78,6 +78,7 @@ export function validatePreferences(value) {
 
 export function calendarMessage(code) {
   return ({ CONFIGURATION: "La conexión con Google Calendar está pendiente de configuración.",
+    LABEL_LIMIT: "El calendario alcanzó el límite de colores personalizados. Libera espacio entre sus etiquetas en Google Calendar y vuelve a sincronizar.",
     RECONNECT: "Google necesita que vuelvas a conectar tu cuenta.",
     ACCOUNT_MISMATCH: "Conecta la misma cuenta de Google que elegiste anteriormente.",
     BUSY: "Hay una sincronización en curso. Intenta de nuevo en un momento.",

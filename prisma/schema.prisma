@@ -236,6 +236,7 @@ model CardCycle {
   startDate       DateTime
   cutDate         DateTime
   dueDate         DateTime
+  datesConfirmedAt DateTime?
   statementAmount Decimal?
   status          CardCycleStatus @default(OPEN)
   paidAt          DateTime?

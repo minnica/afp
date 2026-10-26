@@ -1,0 +1,65 @@
+{
+  "checkedAt": "2026-10-26T21:54:03.149Z",
+  "status": "published-and-synced",
+  "deployment": {
+    "id": "dpl_AuCKtLKJgJG7gvWoTsga4oTNSsHD",
+    "url": "https://afp-798z5dv7m-minnicas-projects.vercel.app",
+    "productionUrl": "https://finanzas.garatachia.com",
+    "target": "production",
+    "state": "READY",
+    "sourceCommit": "4587913fc8280a4e97697254c32bc3a52a64cf4f",
+    "sourceMode": "working-tree",
+    "sourceFiles": 343,
+    "buildDurationSeconds": 109,
+    "commitOrPushPerformed": false,
+    "sourceFileTree": {
+      "returned": 124,
+      "compared": 124,
+      "mismatch": []
+    },
+    "changedSourceResponseTruncated": true,
+    "availableChangedSourceMatches": true
+  },
+  "calendar": {
+    "syncHttpStatus": 200,
+    "syncResults": [
+      "SYNCED"
+    ],
+    "connectionUpToDate": true,
+    "activeEvents": 189,
+    "activeMappings": 189,
+    "differencesAgainstAFP": 0,
+    "targetEvent": {
+      "date": "2026-10-30",
+      "state": "pending",
+      "titlePrefix": "Cobrar",
+      "colorId": "9",
+      "reminders": [
+        {
+          "method": "popup",
+          "minutes": 1440
+        }
+      ],
+      "sameEventId": true
+    }
+  },
+  "financialData": {
+    "targetAccountAndIncomesUnchanged": true,
+    "financialRecordsWrittenByRelease": false,
+    "schemaChanged": false,
+    "migrationsExecuted": false
+  },
+  "validation": {
+    "targetedTestsPassed": 28,
+    "skippedTests": 0,
+    "webpackBuild": "passed",
+    "targetedLint": "passed",
+    "loginStatus": 200,
+    "calendarWithoutSessionStatus": 401,
+    "runtimeErrorGroupsInImmediateWindow": 0
+  },
+  "android": {
+    "apkUpdated": false,
+    "phoneVisualVerificationPerformed": false
+  }
+}

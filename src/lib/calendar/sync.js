@@ -4,6 +4,7 @@ import { calendarClient } from "@/lib/calendar/google";
 import { buildCalendarEvents, googleEvent, loadCalendarData, mexicoDay } from "@/lib/calendar/events";
 import { CalendarError, calendarConfig, decryptSecret, encryptSecret, hash, CALENDAR_TIME_ZONE } from "@/lib/calendar/config";
 import { calendarNeedsSync } from "@/lib/calendar/pending";
+import { ensureCalendarPalette } from "@/lib/calendar/palette";
 
 export async function claimConnection(db, userId) {
   const now = new Date(), token = randomUUID();
@@ -25,7 +26,7 @@ function sameEvent(remote, desired) {
   return remote.summary === desired.summary && remote.description === desired.description
     && remote.start?.date === desired.start.date && remote.end?.date === desired.end.date
     && remote.transparency === desired.transparency && remote.visibility === desired.visibility
-    && remote.colorId === desired.colorId && remote.reminders?.useDefault === false
+    && remote.eventLabelId === desired.eventLabelId && remote.reminders?.useDefault === false
     && JSON.stringify(remote.reminders?.overrides || []) === JSON.stringify(desired.reminders.overrides)
     && remote.extendedProperties?.private?.afpSource === desired.extendedProperties.private.afpSource;
 }
@@ -65,7 +66,10 @@ export async function syncGoogleCalendar(userId, { db = prisma, clientFactory = 
     }
     const path = `calendars/${encodeURIComponent(calendarId)}/events`;
     let remote;
-    try { remote = await client.all(`${path}?maxResults=2500&showDeleted=true&privateExtendedProperty=${encodeURIComponent(`afpConnection=${connection.id}`)}`); }
+    try {
+      if (connection.status !== "DISCONNECTING" && await ensureCalendarPalette(client, calendarId)) writes++;
+      remote = await client.all(`${path}?maxResults=2500&showDeleted=true&privateExtendedProperty=${encodeURIComponent(`afpConnection=${connection.id}`)}`);
+    }
     catch (error) { if ([404, 410].includes(error.status)) throw new CalendarError("CALENDAR_MISSING"); throw error; }
     const remoteById = new Map(remote.map(event => [event.id, event]));
     const agenda = connection.status === "DISCONNECTING" ? { events: [], from: mexicoDay(now) }
@@ -107,9 +111,9 @@ export async function syncGoogleCalendar(userId, { db = prisma, clientFactory = 
       }
       const desired = googleEvent(event, connection, calendarConfig().origin);
       if (!sameEvent(current, desired)) {
-        if (current) await client.request(`${path}/${mapping.eventId}?sendUpdates=none`, "PATCH", desired);
+        if (current) await client.request(`${path}/${mapping.eventId}?sendUpdates=none&eventLabelVersion=1`, "PATCH", desired);
         else {
-          try { await client.request(`${path}?sendUpdates=none`, "POST", { id: mapping.eventId, ...desired }); }
+          try { await client.request(`${path}?sendUpdates=none&eventLabelVersion=1`, "POST", { id: mapping.eventId, ...desired }); }
           catch (error) {
             if (error.status !== 409) throw error;
             // Recuperación de un POST confirmado por Google cuya respuesta se perdió.
@@ -119,7 +123,7 @@ export async function syncGoogleCalendar(userId, { db = prisma, clientFactory = 
               throw new CalendarError("CONTINUE");
             }
             if (found.extendedProperties?.private?.afpConnection !== connection.id || found.extendedProperties?.private?.afpSource !== event.key) throw new CalendarError("EVENT_CONFLICT");
-            await client.request(`${path}/${mapping.eventId}?sendUpdates=none`, "PATCH", desired);
+            await client.request(`${path}/${mapping.eventId}?sendUpdates=none&eventLabelVersion=1`, "PATCH", desired);
           }
         }
         writes++;

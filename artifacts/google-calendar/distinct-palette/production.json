@@ -1,0 +1,152 @@
+{
+  "checkedAt": "2026-10-26T22:31:56.234Z",
+  "status": "published-and-synced",
+  "request": "Six distinct color families confirmed by the owner after rejecting the muted four-color palette.",
+  "deployment": {
+    "id": "dpl_H4SLLpDqVUbzshn9bfoVcAgwLhv7",
+    "url": "https://afp-193fw538u-minnicas-projects.vercel.app",
+    "productionUrl": "https://finanzas.garatachia.com",
+    "state": "READY",
+    "target": "production",
+    "sourceCommit": "4587913fc8280a4e97697254c32bc3a52a64cf4f",
+    "sourceMode": "working-tree",
+    "sourceFiles": 344,
+    "sourceComparison": {
+      "returned": 124,
+      "compared": 124,
+      "mismatch": []
+    },
+    "manifestSha256": "a2e0f62159f107b4eea1be36c069239a43785b093e2793e95fb7b8936e0ebb52",
+    "commitOrPushPerformed": false
+  },
+  "calendar": {
+    "activeEvents": 189,
+    "activeMappings": 189,
+    "agendaEvents": 187,
+    "eventsWithCustomPalette": 189,
+    "differences": 0,
+    "idsChanged": 0,
+    "nonColorChanges": 0,
+    "activeCountUnchanged": true,
+    "personalLabelsPreserved": true,
+    "paletteMatches": true,
+    "palette": {
+      "pending": {
+        "backgroundColor": "#003053",
+        "events": 51
+      },
+      "completed": {
+        "backgroundColor": "#003800",
+        "events": 49
+      },
+      "partial": {
+        "backgroundColor": "#4A1B00",
+        "events": 3
+      },
+      "informational": {
+        "backgroundColor": "#292929",
+        "events": 63
+      },
+      "subscription": {
+        "backgroundColor": "#352E00",
+        "events": 18
+      },
+      "overdue": {
+        "backgroundColor": "#5C0012",
+        "events": 5
+      }
+    },
+    "connectionUpToDate": true
+  },
+  "labelSemantics": {
+    "pending": "blue",
+    "subscription": "yellow",
+    "partial": "orange",
+    "overdue": "red",
+    "completed": "green",
+    "informational": "neutral gray"
+  },
+  "priority": [
+    "completed",
+    "informational",
+    "partial",
+    "overdue",
+    "subscription",
+    "pending"
+  ],
+  "financialDataUnchanged": true,
+  "schemaChanged": false,
+  "migrationsExecuted": false,
+  "android": {
+    "device": "Samsung S24 Ultra",
+    "calendarVersion": "2026.40.0-997536344-release",
+    "visualVerification": true,
+    "sixRolesVisibleInMonth": true,
+    "renderedPalette": {
+      "completed": {
+        "backgroundColor": "#52774B",
+        "foregroundColor": "#ECF3EA",
+        "hue": 110.5,
+        "saturation": 0.37,
+        "textContrast": 4.53
+      },
+      "informational": {
+        "backgroundColor": "#6C6C6C",
+        "foregroundColor": "#F1F1F1",
+        "hue": 0.0,
+        "saturation": 0.0,
+        "textContrast": 4.65
+      },
+      "pending": {
+        "backgroundColor": "#586F90",
+        "foregroundColor": "#ECF1FA",
+        "hue": 215.4,
+        "saturation": 0.389,
+        "textContrast": 4.53
+      },
+      "overdue": {
+        "backgroundColor": "#9F5856",
+        "foregroundColor": "#FCEEED",
+        "hue": 1.6,
+        "saturation": 0.459,
+        "textContrast": 4.64
+      },
+      "partial": {
+        "backgroundColor": "#8F614C",
+        "foregroundColor": "#FAEEE9",
+        "hue": 18.8,
+        "saturation": 0.469,
+        "textContrast": 4.64
+      },
+      "subscription": {
+        "backgroundColor": "#776E49",
+        "foregroundColor": "#F4F1E7",
+        "hue": 48.3,
+        "saturation": 0.387,
+        "textContrast": 4.52
+      }
+    },
+    "blueGrayDeltaE76Before": 6.79,
+    "blueGrayDeltaE76After": 20.74,
+    "screenshots": "private, excluded from Git",
+    "apkUpdated": false
+  },
+  "validation": {
+    "directedTestsPassed": 36,
+    "skipped": 0,
+    "finalNonDatabaseTestsPassed": 26,
+    "localDatabase": "disposable PostgreSQL",
+    "googleInTests": "simulated",
+    "webpackBuild": "passed",
+    "targetedLint": "passed",
+    "impeccableProductionDetectorFindings": 0,
+    "loginStatus": 200,
+    "calendarWithoutSessionStatus": 401,
+    "runtimeErrorGroupsObservedInImmediateWindow": 0
+  },
+  "limits": [
+    "Google controls final rendering by client and theme.",
+    "Color distance and contrast measurements describe the captured Android rendering; they do not substitute for user perception.",
+    "The deployment file tree response is partial; only available file hashes were compared."
+  ]
+}

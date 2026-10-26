@@ -140,6 +140,10 @@ function assertCatalog(actual) {
     { ...before.columns.find(row => row.table_name === 'card_cycles' && row.column_name === 'notes'), column_name: 'postCutCreditNotes' },
   ];
   assert.deepEqual(actual.columns.filter(row => row.table_name === 'card_cycles' && creditColumns.includes(row.column_name)), expectedCredits);
+  const datesConfirmation = actual.columns.find(row => row.table_name === 'card_cycles' && row.column_name === 'datesConfirmedAt');
+  assert.equal(datesConfirmation?.data_type, 'timestamp without time zone');
+  assert.equal(datesConfirmation?.is_nullable, 'YES');
+  assert.equal(datesConfirmation?.column_default, null);
   assert.deepEqual(actual.columns.filter(row => row.table_name === 'daily_expenses' && row.column_name === 'cashContributionAmount'), [
     { ...before.columns.find(row => row.table_name === 'daily_expenses' && row.column_name === 'amount'), column_name: 'cashContributionAmount', column_default: '0' },
   ]);
@@ -161,6 +165,7 @@ function assertCatalog(actual) {
         'capture_automations', 'capture_merchant_rules', 'capture_movements', 'expense_tombstones', 'capture_statements',
         'google_calendar_connections', 'calendar_oauth_states', 'google_calendar_events', 'card_cycle_payments', 'capture_payment_policies', 'capture_bank_fallbacks', 'expense_refunds'].includes(row.table_name || row.tablename)
       && !(section === 'columns' && row.table_name === 'card_cycles' && creditColumns.includes(row.column_name))
+      && !(section === 'columns' && row.table_name === 'card_cycles' && row.column_name === 'datesConfirmedAt')
       && !(section === 'columns' && row.table_name === 'cards' && balanceColumns.includes(row.column_name))
       && !(section === 'columns' && row.table_name === 'receivable_accounts' && ['balanceAdjustment', 'balanceAdjustmentNotes'].includes(row.column_name))
       && !(section === 'constraints' && ['cards_credit_balance_complete_check', 'cards_balance_tracking_check'].includes(row.name))
@@ -328,7 +333,7 @@ async function main() {
           await db.$executeRaw`UPDATE cards SET "creditLimit" = 20000, "usedBalance" = 3000, "balanceAsOf" = ${at} WHERE id = 'a11-card'`;
           await db.dailyExpense.create({ data: { id: 'a11-existing-charge', userId: 'a11-user', cardId: 'a11-card', categoryId: 'a11-category', date: at, paymentMethod: 'CARD', concept: 'Ya incluido en banco', amount: 500 }, select: { id: true } });
           await db.installmentPurchase.create({ data: { id: 'a11-existing-msi', userId: 'a11-user', cardId: 'a11-card', categoryId: 'a11-category', purchaseDate: at, concept: 'MSI ya incluida', totalAmount: 12000, months: 12 } });
-          await db.cardCycle.create({ data: { id: 'a11-existing-cycle', userId: 'a11-user', cardId: 'a11-card', month: at.getUTCMonth() + 1, year: at.getUTCFullYear(), startDate: new Date(at.getTime() - 31 * 86400000), cutDate: new Date(at.getTime() - 86400000), dueDate: new Date(at.getTime() + 5 * 86400000), paidAmount: 1000, paidAt: null } });
+          await db.cardCycle.create({ data: { id: 'a11-existing-cycle', userId: 'a11-user', cardId: 'a11-card', month: at.getUTCMonth() + 1, year: at.getUTCFullYear(), startDate: new Date(at.getTime() - 31 * 86400000), cutDate: new Date(at.getTime() - 86400000), dueDate: new Date(at.getTime() + 5 * 86400000), paidAmount: 1000, paidAt: null }, select: { id: true } });
         }
         runPrisma(['migrate', 'deploy'], dbUrl);
         const first = await catalog(db);
@@ -351,6 +356,9 @@ async function main() {
         assert.deepEqual(await records(db), savedRecords);
         const historicalCard = await db.card.findUnique({ where: { id: 'a11-card' } });
         if (i === 1) {
+          const historicalCycle = await db.cardCycle.findUnique({ where: { id: 'a11-existing-cycle' } });
+          assert.equal(historicalCycle.datesConfirmedAt, null, 'no inventa revisiones para ciclos anteriores');
+          assert.equal(historicalCycle.paidAmount.toFixed(2), '1000.00');
           assert.equal(historicalCard.creditLimit.toFixed(2), '20000.00');
           assert.equal(historicalCard.usedBalance.toFixed(2), '3000.00');
           assert.equal(historicalCard.balanceTracking.version, 1);

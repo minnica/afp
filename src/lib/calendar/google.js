@@ -38,10 +38,10 @@ export async function exchangeCode(code, verifier) {
 export async function calendarClient(refreshToken, guard = async () => {}) {
   const tokens = await tokenRequest({ refresh_token: refreshToken, grant_type: "refresh_token" });
   if (!tokens.access_token) throw new CalendarError("RECONNECT");
-  const request = async (path, method = "GET", body) => {
+  const request = async (path, method = "GET", body, headers = {}) => {
     await guard();
     return googleRequest(`https://www.googleapis.com/calendar/v3/${path}`, { method,
-      headers: { Authorization: `Bearer ${tokens.access_token}`, "Content-Type": "application/json" },
+      headers: { ...headers, Authorization: `Bearer ${tokens.access_token}`, "Content-Type": "application/json" },
       ...(body === undefined ? {} : { body: JSON.stringify(body) }) });
   };
   const all = async path => {

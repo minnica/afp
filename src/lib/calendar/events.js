@@ -2,6 +2,7 @@ import { getCyclePaymentState } from "@/lib/calculations/cardCyclePayments";
 import { getDebtAccountState } from "@/lib/calculations/debtAccounts";
 import { buildSubscriptionCharges } from "@/lib/subscriptionCharges";
 import { preferences, CALENDAR_TIME_ZONE } from "@/lib/calendar/config";
+import { calendarEventLabel } from "@/lib/calendar/palette";
 
 export function bankDate(value) { return value ? new Date(value).toISOString().slice(0, 10) : null; }
 export function mexicoDay(now = new Date()) {
@@ -28,7 +29,7 @@ export function buildCalendarEvents(data, rawPreferences, now = new Date()) {
   const add = event => {
     if (!settings.types.includes(event.type) || !event.date || event.date > to) return;
     if (event.date < from && (event.settled || !["cardPayments", "payables"].includes(event.type))) return;
-    events.push(event);
+    events.push({ ...event, overdue: !event.settled && !event.informational && event.date < today });
   };
   const cycles = new Map(data.cycles.map(cycle => [`${cycle.cardId}:${cycle.year}-${String(cycle.month).padStart(2, "0")}`, cycle]));
   for (const card of data.cards) {
@@ -48,10 +49,17 @@ export function buildCalendarEvents(data, rawPreferences, now = new Date()) {
     }
     for (const [month, cycle] of candidates) {
       const state = getCyclePaymentState(cycle);
+      // dueDate existe incluso en ciclos generados: requiere confirmación manual.
+      // Cero es un importe capturado; un pago por sí solo no confirma las fechas.
+      const reviewed = !cycle.projected && Boolean(cycle.datesConfirmedAt && cycle.dueDate)
+        && cycle.statementAmount !== null && cycle.statementAmount !== undefined;
       const note = cycle.projected ? "Fecha prevista según los días habituales de la tarjeta. Confírmala con el banco."
         : "Fecha del ciclo registrada en AFP. Actualízala en AFP si el banco la modifica.";
       add({ key: `card:${card.id}:${month}:cut`, type: "cuts", date: bankDate(cycle.cutDate),
-        title: `Corte · ${card.name}`, detail: note, route: "/tarjetas", settled: false, informational: true });
+        title: `${reviewed ? "Corte revisado" : "Corte"} · ${card.name}`,
+        detail: reviewed ? "Fechas reales y monto del estado de cuenta registrados en AFP. Consulta el evento de pago para ver el saldo pendiente."
+          : `${note}\nPara marcar el corte como revisado, guarda las fechas reales y el monto del estado de cuenta en AFP.`,
+        route: "/tarjetas", settled: false, informational: true, reviewed });
       add({ key: `card:${card.id}:${month}:payment`, type: "cardPayments", date: bankDate(cycle.dueDate),
         title: `${state.isSettled ? "Pagado" : state.paymentStatus === "PARTIALLY_PAID" ? "Pago parcial" : "Pago"} · ${card.name}`,
         detail: `${note}\n${state.isSettled ? "Sin saldo pendiente en este corte." : state.pendingAmount === null ? "Importe del estado de cuenta por confirmar." : "Saldo pendiente del estado de cuenta, después de pagos y devoluciones aplicadas."}`,
@@ -69,22 +77,32 @@ export function buildCalendarEvents(data, rawPreferences, now = new Date()) {
         amount: charge.confirmedAmount ?? charge.amount, route: "/gastos", settled });
     }
     for (const account of data.receivables) {
-      const state = getDebtAccountState(account, account.incomes);
+      const incomes = account.incomes.filter(income => bankDate(income.date) <= today);
+      const state = getDebtAccountState(account, incomes);
       if (state.status === "CANCELLED") continue;
-      const monthlyPaid = account.incomes.filter(income => bankDate(income.date).startsWith(month) && bankDate(income.date) <= today)
-        .reduce((sum, income) => sum + Math.round(Number(income.amount) * 100), 0) / 100;
-      const expected = Number(account.expectedMonthlyPayment || 0);
-      const settled = state.status === "PAID_OFF" || (expected > 0 && monthlyPaid >= expected);
-      const partial = !settled && monthlyPaid > 0;
+      const expectedCents = Math.round(Number(account.expectedMonthlyPayment || 0) * 100);
       // Las cuentas liquidadas no siguen proyectando cobros futuros.
       const days = [...new Set(account.expectedChargeDays)].sort((a, b) => a - b);
+      const nextMonth = addDays(dayInMonth(month, 31), 1).slice(0, 7);
+      const seenDates = new Set();
       for (const [index, day] of days.entries()) {
         const date = dayInMonth(month, day);
+        // En febrero, por ejemplo, los días 30 y 31 son una sola fecha.
+        if (seenDates.has(date)) continue;
+        seenDates.add(date);
         if (date < bankDate(account.originDate) || (state.status === "PAID_OFF" && date > today)) continue;
+        const nextDate = days.slice(index + 1).map(day => dayInMonth(month, day)).find(candidate => candidate > date)
+          || dayInMonth(nextMonth, days[0]);
+        // Un abono pertenece al intervalo de una fecha, nunca a todo el mes.
+        // El límite exclusivo evita reutilizarlo para el siguiente cobro.
+        const paidCents = incomes.filter(income => bankDate(income.date) >= date && bankDate(income.date) < nextDate)
+          .reduce((sum, income) => sum + Math.round(Number(income.amount) * 100), 0);
+        const settled = state.status === "PAID_OFF" || (expectedCents > 0 && paidCents >= expectedCents);
+        const partial = !settled && paidCents > 0;
         add({ key: `receivable:${account.id}:${month}:${index}`, type: "receivables", date,
           title: `${settled ? "Cobrado" : partial ? "Cobro parcial" : "Cobrar"} · ${account.person?.name || account.concept}`,
-          detail: `${account.concept}\n${settled ? "Cobro mensual cubierto o cuenta liquidada en AFP." : "Fecha de cobro prevista. Los abonos se comparan con el importe mensual esperado; no están asignados a una fecha individual."}`,
-          amount: settled ? 0 : expected > 0 ? Math.min(Math.max(0, expected - monthlyPaid), state.pendingBalance) : state.pendingBalance,
+          detail: `${account.concept}\n${settled ? "Cobro cubierto o cuenta liquidada en AFP." : "Fecha de cobro prevista. Solo se consideran ingresos registrados desde esta fecha y antes de la siguiente fecha de cobro, hasta hoy."}`,
+          amount: settled ? 0 : expectedCents > 0 ? Math.min(Math.max(0, expectedCents - paidCents) / 100, state.pendingBalance) : state.pendingBalance,
           route: "/cuentas-por-cobrar", settled, partial });
       }
     }
@@ -111,9 +129,8 @@ export function googleEvent(event, connection, origin) {
     description: `${event.detail}${amount}\n\nGestiona este registro en AFP: ${url}`,
     start: { date: event.date }, end: { date: addDays(event.date, 1) },
     transparency: "transparent", visibility: "private",
-    // Paleta nativa de Google: estado antes que categoría. Ningún pago/cobro
-    // completado conserva colores de advertencia, aunque antes fuera parcial.
-    colorId: event.settled ? "10" : event.informational ? "8" : event.partial ? "6" : "9",
+    // La etiqueta usa el color propio de AFP, sin aproximarlo a la paleta antigua.
+    eventLabelId: calendarEventLabel(event).id,
     reminders: { useDefault: false, overrides: settings.reminders && !event.settled && !event.informational
       ? [{ method: "popup", minutes: 1440 }] : [] },
     source: { title: "AFP", url },

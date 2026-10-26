@@ -1,0 +1,46 @@
+{
+  "note": "Colores de la captura real de Google Calendar Android en modo oscuro; los valores configurados compensan su aclarado. Otros clientes pueden adaptar su presentación.",
+  "source": "src/lib/calendar/palette.js",
+  "palette": [
+    {
+      "role": "pending",
+      "id": "72fe658a-4532-4db4-a613-b969507e102b",
+      "name": "AFP · Pendiente",
+      "backgroundColor": "#556B82",
+      "foreground": "#EAF1FA",
+      "configuredColor": "#00243A",
+      "textContrast": 4.84,
+      "canvasContrast": 3.37
+    },
+    {
+      "role": "completed",
+      "id": "d8bc0c82-1db1-4f76-9caa-34696472709f",
+      "name": "AFP · Completado",
+      "backgroundColor": "#576F5F",
+      "foreground": "#EAF1FA",
+      "configuredColor": "#0F2719",
+      "textContrast": 4.8,
+      "canvasContrast": 3.4
+    },
+    {
+      "role": "partial",
+      "id": "aef6e19a-31b3-428d-b9c0-5795a080a18e",
+      "name": "AFP · Parcial",
+      "backgroundColor": "#806451",
+      "foreground": "#EAF1FA",
+      "configuredColor": "#361D07",
+      "textContrast": 4.78,
+      "canvasContrast": 3.41
+    },
+    {
+      "role": "informational",
+      "id": "57c0de45-bd92-4bf2-a9df-8dc3bc55e5b3",
+      "name": "AFP · Corte",
+      "backgroundColor": "#5F6A77",
+      "foreground": "#EAF1FA",
+      "configuredColor": "#18222D",
+      "textContrast": 4.84,
+      "canvasContrast": 3.37
+    }
+  ]
+}

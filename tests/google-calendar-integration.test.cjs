@@ -20,19 +20,27 @@ async function fixture(run) {
   const connection = await db.googleCalendarConnection.create({ data: { userId, status: 'CONNECTED', refreshToken: config.encryptSecret('private-refresh', userId), googleSubject: 'subject-test' } });
   const remote = new Map(), calendars = [], calls = [];
   let failNextPost = false;
-  const client = { all: async path => { calls.push({ path, method: 'GET' }); return path.startsWith('users/') ? calendars : [...remote.values()]; }, request: async (path, method = 'GET', body) => {
-    calls.push({ path, method, body });
+  const client = { all: async path => { calls.push({ path, method: 'GET' }); return path.startsWith('users/') ? calendars : [...remote.values()]; }, request: async (path, method = 'GET', body, headers) => {
+    calls.push({ path, method, body, headers });
     if (path === 'calendars') { const created = { ...body, id: 'afp-owned-calendar' }; calendars.push(created); return created; }
+    if (path === 'calendars/afp-owned-calendar') {
+      const calendar = calendars.find(c => c.id === 'afp-owned-calendar');
+      calendar.etag ||= '"calendar-0"';
+      if (method === 'GET') return { ...calendar };
+      assert.equal(method, 'PATCH'); assert.equal(headers['If-Match'], calendar.etag);
+      Object.assign(calendar, body, { etag: `"calendar-${calls.length}"` }); return { ...calendar };
+    }
     assert.ok(path.startsWith('calendars/afp-owned-calendar/events'));
     const id = path.split('?')[0].split('/')[3];
     if (method === 'POST') {
+      assert.ok(path.includes('eventLabelVersion=1'));
       if (remote.has(body.id)) throw new config.CalendarError('GOOGLE_UNAVAILABLE', 409);
       remote.set(body.id, { ...body, status: 'confirmed' });
       if (failNextPost) { failNextPost = false; throw new config.CalendarError('GOOGLE_UNAVAILABLE'); }
       return remote.get(body.id);
     }
     if (method === 'GET') { if (!remote.has(id)) throw new config.CalendarError('GOOGLE_UNAVAILABLE', 404); return remote.get(id); }
-    if (method === 'PATCH') { assert.ok(remote.has(id)); remote.set(id, { ...remote.get(id), ...body }); return remote.get(id); }
+    if (method === 'PATCH') { assert.ok(path.includes('eventLabelVersion=1')); assert.ok(remote.has(id)); remote.set(id, { ...remote.get(id), ...body }); return remote.get(id); }
     if (method === 'DELETE') { remote.set(id, { id, status: 'cancelled' }); return {}; }
     throw new Error('unexpected method');
   } };
@@ -90,6 +98,35 @@ integration('calendar DB: sincronización idempotente, fecha corregida, pago par
   await perform(); assert.ok([...remote.values()].every(e => e.status === 'cancelled'));
 });
 
+integration('calendar DB: corrige un cobro futuro marcado como cobrado en Google sin duplicar eventos ni ingresos', async ({ db, load, userId, perform, remote, calls, connection }) => {
+  const person = await db.person.create({ data: { userId, name: 'Persona de prueba' } });
+  const incomeType = await db.incomeType.create({ data: { userId, name: 'Cobro' } });
+  const account = await db.receivableAccount.create({ data: { userId, personId: person.id, concept: 'Préstamo', originalAmount: 10000,
+    expectedMonthlyPayment: 1730.89, expectedChargeDays: [15, 30], originDate: new Date('2026-10-01'), originType: 'MANUAL' } });
+  await db.income.create({ data: { userId, incomeTypeId: incomeType.id, receivableAccountId: account.id,
+    date: new Date('2026-10-15'), source: 'Prueba', concept: 'Primer cobro', amount: 1750 } });
+  assert.equal((await perform()).status, 'SYNCED');
+  const mappings = await db.googleCalendarEvent.findMany({ where: { connectionId: connection.id } });
+  const mapping = mappings.find(m => m.sourceKey === `receivable:${account.id}:2026-10:1`);
+  const event = remote.get(mapping.eventId);
+  // Reproduce el evento que dejó la versión anterior en el calendario existente.
+  remote.set(mapping.eventId, { ...event, summary: 'Cobrado · Persona de prueba', colorId: '10', eventLabelId: '',
+    reminders: { useDefault: false, overrides: [] } });
+  await db.googleCalendarConnection.update({ where: { userId }, data: { revision: { increment: 1 } } });
+  const start = calls.length;
+  assert.equal((await perform()).status, 'SYNCED');
+  const changed = calls.slice(start).filter(c => c.method !== 'GET');
+  assert.equal(changed.length, 1); assert.equal(changed[0].method, 'PATCH');
+  assert.ok(changed[0].path.includes(mapping.eventId));
+  const fixed = remote.get(mapping.eventId);
+  assert.equal(fixed.summary, 'Cobrar · Persona de prueba');
+  assert.equal(fixed.eventLabelId, load('src/lib/calendar/palette.js').CALENDAR_EVENT_PALETTE.pending.id);
+  assert.equal(fixed.start.date, '2026-10-30'); assert.equal(fixed.reminders.overrides.length, 1);
+  assert.equal(await db.googleCalendarEvent.count({ where: { connectionId: connection.id } }), mappings.length);
+  assert.equal(await db.income.count({ where: { userId } }), 1);
+  assert.equal((await db.receivableAccount.findUnique({ where: { id: account.id } })).status, 'ACTIVE');
+});
+
 integration('calendar eventos DB: fechas y pagos de tarjeta, cobros y gastos vinculados actualizan Google al guardar', async ({ db, load, userId, perform, remote, client }) => {
   const person = await db.person.create({ data: { userId, name: 'Persona de prueba' } });
   const type = await db.incomeType.create({ data: { userId, name: 'Cobro de prueba' } });
@@ -129,6 +166,55 @@ integration('calendar eventos DB: fechas y pagos de tarjeta, cobros y gastos vin
   await save('expenses', 'POST', { date: '2026-10-21', paymentMethod: 'CASH', categoryId: category.id, concept: 'Pago liquidado', amount: 100, payableAccountId: payable.id });
   assert.match(active(`payable:${payable.id}`).summary, /Pagado/);
   assert.equal(active(`payable:${payable.id}`).reminders.overrides.length, 0);
+});
+
+integration('calendar DB: revisar corte exige ambos guardados, conserva ID y no registra pagos', async ({ db, load, userId, perform, remote, connection }) => {
+  const palette = load('src/lib/calendar/palette.js').CALENDAR_EVENT_PALETTE;
+  const api = sourceLoader({ '@/lib/prisma': { prisma: db },
+    '@/lib/calendar/schedule': { scheduleCalendarSync: () => {} },
+    'next/server': { NextResponse: { json: (body, options = {}) => ({ body, status: options.status || 200 }) } },
+    '@supabase/supabase-js': { createClient: () => ({ auth: { getUser: async () => ({ data: { user: { id: userId } } }) } }) },
+  }, { process: { env }, URLSearchParams, AbortSignal });
+  const patch = async body => {
+    const response = await api('src/app/api/card-cycles/route.js').PATCH({ method: 'PATCH', url: 'https://afp.example.test/api/card-cycles',
+      headers: new Headers({ authorization: 'Bearer valid' }), json: async () => body });
+    assert.equal(response.status, 200, JSON.stringify(response.body));
+    assert.equal((await perform()).status, 'SYNCED');
+    return response.body.cycle;
+  };
+  for (const first of ['UPDATE_STATEMENT', 'UPDATE_DATES']) {
+    const card = await db.card.create({ data: { userId, name: first, usualCutDay: 25, usualDueDay: 10 } });
+    const cycle = await db.cardCycle.create({ data: { userId, cardId: card.id, month: 10, year: 2026,
+      startDate: new Date('2026-09-26T12:00:00Z'), cutDate: new Date('2026-10-25T12:00:00Z'), dueDate: new Date('2026-11-10T12:00:00Z') } });
+    assert.equal(cycle.datesConfirmedAt, null, 'la migración no confirma filas por defecto');
+    await perform();
+    const sourceKey = `card:${card.id}:2026-10:cut`;
+    const mapping = await db.googleCalendarEvent.findUnique({ where: { connectionId_sourceKey: { connectionId: connection.id, sourceKey } } });
+    const before = remote.get(mapping.eventId);
+    assert.equal(before.eventLabelId, palette.informational.id);
+    const actions = {
+      UPDATE_STATEMENT: { id: cycle.id, action: 'UPDATE_STATEMENT', statementAmount: 1000 },
+      UPDATE_DATES: { id: cycle.id, action: 'UPDATE_DATES', startDate: '2026-09-26', cutDate: '2026-10-25', dueDate: '2026-11-10' },
+    };
+    await patch(actions[first]);
+    assert.equal(remote.get(mapping.eventId).eventLabelId, palette.informational.id, 'un solo dato deja el corte gris');
+    await patch(actions[first === 'UPDATE_DATES' ? 'UPDATE_STATEMENT' : 'UPDATE_DATES']);
+    const after = remote.get(mapping.eventId);
+    assert.equal(after.eventLabelId, palette.completed.id);
+    assert.match(after.summary, /^Corte revisado ·/);
+    assert.equal(after.start.date, before.start.date); assert.equal(after.end.date, before.end.date);
+    assert.deepEqual(after.reminders, before.reminders);
+    assert.equal(after.extendedProperties.private.afpSource, sourceKey);
+    const payment = [...remote.values()].find(event => event.extendedProperties?.private?.afpSource === sourceKey.replace(/cut$/, 'payment'));
+    assert.equal(payment.eventLabelId, palette.pending.id); assert.match(payment.summary, /^Pago ·/);
+    assert.equal(payment.reminders.overrides.length, 1);
+    const saved = await db.cardCycle.findUnique({ where: { id: cycle.id } });
+    assert.ok(saved.datesConfirmedAt); assert.equal(saved.paidAt, null); assert.equal(saved.paidAmount, null);
+    assert.equal(await db.cardCyclePayment.count({ where: { userId } }), 0);
+    assert.equal(await db.dailyExpense.count({ where: { userId } }), 0);
+    const stable = await db.googleCalendarEvent.findUnique({ where: { connectionId_sourceKey: { connectionId: connection.id, sourceKey } } });
+    assert.equal(stable.eventId, mapping.eventId);
+  }
 });
 
 integration('calendar DB: respuesta perdida y evento borrado en Google se recuperan sin duplicados activos', async ({ db, userId, perform, losePost, remote, connection }) => {
