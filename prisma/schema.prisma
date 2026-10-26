@@ -87,6 +87,7 @@ model User {
   captureBankFallbacks CaptureBankFallback[]
   captureRules         CaptureMerchantRule[]
   captureMovements     CaptureMovement[]
+  expenseRefunds       ExpenseRefund[]
   captureStatements    CaptureStatement[]
   expenseTombstones    ExpenseTombstone[]
   googleCalendar       GoogleCalendarConnection?
@@ -477,6 +478,7 @@ model DailyExpense {
   cardId                  String?
   concept                 String
   amount                  Decimal
+  refundOriginalAmount    Decimal?
   cashContributionAmount  Decimal       @default(0)
   categoryId              String
   notes                   String?
@@ -501,6 +503,7 @@ model DailyExpense {
   subscription       Subscription?       @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
   subscriptionCharge SubscriptionCharge?
   captureMovements   CaptureMovement[]
+  refunds            ExpenseRefund[]
 
   @@index([userId, date])
   @@index([cardId])
@@ -854,7 +857,29 @@ model CaptureMovement {
   @@index([fallbackDueAt])
   @@map("capture_movements")
   cardPayment CardCyclePayment?
+  refund ExpenseRefund?
 
+}
+
+// El gasto conserva su identidad; amount es el neto y el cargo original queda
+// aquí y en refundOriginalAmount. Borrar el gasto no borra la evidencia.
+model ExpenseRefund {
+  id                String @id @default(uuid()) @db.Uuid
+  userId            String
+  expenseId         String?
+  originalExpenseId String
+  movementId        String @unique @db.Uuid
+  amount            Decimal @db.Decimal(12, 2)
+  date              DateTime @db.Date
+  expenseSnapshot   Json
+  createdAt         DateTime @default(now())
+  reversedAt        DateTime?
+  movement          CaptureMovement @relation(fields: [movementId], references: [id], onDelete: Cascade)
+  expense           DailyExpense? @relation(fields: [expenseId], references: [id], onDelete: SetNull)
+  user              User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, originalExpenseId])
+  @@map("expense_refunds")
 }
 
 model ExpenseTombstone {

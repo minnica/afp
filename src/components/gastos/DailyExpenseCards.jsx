@@ -57,7 +57,7 @@ export default function DailyExpenseCards({ expenses, isOnline, onEdit, onDelete
         <div className="flex flex-wrap items-center justify-between gap-2 text-sm" role="status">
           <span className="text-muted-foreground">{expenses.length} gastos · {days.length} días</span>
           <div className="flex flex-col gap-1 text-right">
-            <span>Total pagado <strong className="tabular-nums">{money.format(totalCents / 100)}</strong></span>
+            <span>{expenses.some(row => row.refundOriginalAmount != null) ? "Gasto neto" : "Total pagado"} <strong className="tabular-nums">{money.format(totalCents / 100)}</strong></span>
             {days.some(day => day.contributionCents > 0) ? <span>Tu parte <strong className="tabular-nums">{money.format(sumPersonalExpenses(expenses))}</strong></span> : null}
           </div>
         </div>
@@ -73,7 +73,7 @@ export default function DailyExpenseCards({ expenses, isOnline, onEdit, onDelete
               </CardDescription>
             </div>
             <div className="flex flex-col gap-1">
-              <span className="text-sm text-muted-foreground">Total pagado del día</span>
+              <span className="text-sm text-muted-foreground">{day.expenses.some(row => row.refundOriginalAmount != null) ? "Gasto neto del día" : "Total pagado del día"}</span>
               <strong className="text-xl tabular-nums" data-day-total>{money.format(day.cents / 100)}</strong>
               {day.contributionCents > 0 ? <span className="text-sm">Tu parte <strong className="tabular-nums">{money.format((day.cents - day.contributionCents) / 100)}</strong></span> : null}
             </div>

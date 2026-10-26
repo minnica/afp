@@ -4,8 +4,12 @@
 import { interpretPaymentNotice } from "@/lib/capturePaymentParsers";
 import { parsePaymentReceipt, paymentReceiptSource } from "@/lib/paymentReceipts";
 import { reviewOnlyCapturePackages } from "@/lib/captureSourcePolicy";
+import { interpretRefundNotice } from "@/lib/captureRefundParsers";
 
 export const captureParsers = [
+  { key: "mercadopago.refund.es.v1", sourcePackage: "com.mercadopago.wallet", verified: true, evidence: "REAL_REVIEWED", refundOnly: true },
+  { key: "banamex.purchase-cancellation.es.v1", sourcePackage: "com.citibanamex.banamexmobile", verified: true, evidence: "REAL_REVIEWED", refundOnly: true,
+    aliasKinds: ["PHYSICAL", "DIGITAL"], aliasSourcePackage: "com.citibanamex.banamexmobile" },
   { key: "bbva.purchase.es.v1", sourcePackage: "com.bancomer.mbanking", title: "Compra aprobada", verified: false },
   { key: "wallet.purchase.es.v1", sourcePackage: "com.google.android.apps.walletnfcrel", title: "Pago realizado", verified: false },
   { key: "bbva.account-charge.es.v1", sourcePackage: "com.bancomer.mbanking", verified: false, evidence: "REAL_OUT_OF_SCOPE" },
@@ -213,6 +217,8 @@ export function interpretCapture(event) {
   // Fuente habilitada para reunir evidencia real. Un aviso de viaje no acredita
   // un cobro final ni su tarjeta; no aplicar gramáticas bancarias a este paquete.
   if (reviewOnlyCapturePackages.includes(event.sourcePackage)) return { reason: "SERVICE_NOTICE_REVIEW", proposal: {} };
+  const refund = interpretRefundNotice(event, captureAmount, captureNotificationDate, captureOperationTime);
+  if (refund) return refund;
   const texts = Object.values(event.fields || {}).join("\n");
   if (/\b(MSI|meses sin intereses|preautorizaci[oó]n|retenci[oó]n|devoluci[oó]n|reembolso|cancelaci[oó]n|abono|rechazad[ao]|promoci[oó]n|c[oó]digo de (?:acceso|verificaci[oó]n)|env[ií]o|pedido recibido)\b/i.test(texts)) {
     return { reason: "SPECIAL_MOVEMENT", proposal: {} };

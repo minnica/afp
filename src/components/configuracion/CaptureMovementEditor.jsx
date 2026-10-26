@@ -6,6 +6,8 @@ import { z } from "zod";
 import CaptureFields from "@/components/configuracion/CaptureFields";
 import CapturePaymentEditor from "@/components/configuracion/CapturePaymentEditor";
 import { paymentCaptureKind } from "@/lib/capturePaymentParsers";
+import { refundCaptureKind } from "@/lib/captureRefundParsers";
+import CaptureRefundEditor from "@/components/configuracion/CaptureRefundEditor";
 import { apiFetch } from "@/lib/apiFetch";
 import { captureSources } from "@/lib/capturePresentation";
 import { Button } from "@/components/ui/button";
@@ -56,6 +58,7 @@ export default function CaptureMovementEditor({ detail, configuration, userId, o
     finally { setBusy(false); }
   }
   if (paymentCaptureKind(movement)) return <CapturePaymentEditor detail={current} configuration={configuration} userId={userId} onClose={onClose} onSaved={onSaved} restoreFocus={restoreFocus} />;
+  if (refundCaptureKind(movement)) return <CaptureRefundEditor detail={current} configuration={configuration} userId={userId} onClose={onClose} onSaved={onSaved} restoreFocus={restoreFocus} />;
   return <><Dialog open onOpenChange={value => { if (!value && !busy) onClose(); }}>
     <DialogContent className="flex max-h-[90dvh] flex-col overflow-hidden sm:max-w-xl" onOpenAutoFocus={event => { event.preventDefault(); titleRef.current?.focus(); }} onCloseAutoFocus={restoreFocus}
       onEscapeKeyDown={event => { if (busy) event.preventDefault(); }} onInteractOutside={event => { if (busy) event.preventDefault(); }} showCloseButton={!busy}>

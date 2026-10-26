@@ -1,4 +1,8 @@
 export const captureReasons = {
+  REFUND_REVIEW: "Devolución o cancelación recibida. Confirma el gasto original antes de descontarla.",
+  REFUND_POLICY_REQUIRED: "Falta una regla aceptada para identificar la tarjeta y moneda de esta devolución.",
+  REFUND_APPLIED: "Devolución aplicada al gasto. Se conservan el cargo original y el historial.",
+  REFUND_REVERSED: "Devolución deshecha por ti; el importe fue restituido al gasto.",
   SERVICE_NOTICE_REVIEW: "Aviso de viaje o pedido guardado para revisar su formato. No genera un gasto automáticamente. Si confirma un cobro final, revisa importe, moneda, fecha y tarjeta o vincúlalo al gasto existente.",
   BANK_FALLBACK_WAIT: "Esperando Wallet: el respaldo bancario podrá registrar después de 15 minutos desde la recepción en AFP.",
   BANK_FALLBACK_REGISTERED: "Registrado desde el banco después de esperar Wallet; pendiente de conciliar.",

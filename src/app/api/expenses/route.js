@@ -7,6 +7,7 @@ import { SubscriptionChargeError } from "@/lib/subscriptionChargeService";
 
 import { runExpenseOperation } from "@/lib/expenseOperations";
 import { getCashContributionError, sumPersonalExpenses } from "@/lib/sharedExpenses";
+import { assertRefundExpenseEdit } from "@/lib/captureRefunds";
 
 const expenseSelect = {
   reconciledAt: true,
@@ -19,6 +20,7 @@ const expenseSelect = {
   cardId: true,
   concept: true,
   amount: true,
+  refundOriginalAmount: true,
   cashContributionAmount: true,
   categoryId: true,
   notes: true,
@@ -284,7 +286,7 @@ export async function PATCH(request) {
       return NextResponse.json({ error: "Falta id." }, { status: 400 });
     }
 
-    if (!date || !paymentMethod || !concept || !amount || !categoryId) {
+    if (!date || !paymentMethod || !concept || amount === undefined || amount === null || amount === "" || !categoryId) {
       return NextResponse.json(
         { error: "Faltan datos obligatorios." },
         { status: 400 },
@@ -307,7 +309,7 @@ export async function PATCH(request) {
 
     const numericAmount = Number(amount);
 
-    if (!Number.isFinite(numericAmount) || numericAmount <= 0) {
+    if (!Number.isFinite(numericAmount) || numericAmount < 0) {
       return NextResponse.json(
         { error: "El monto debe ser mayor a 0." },
         { status: 400 },
@@ -324,6 +326,8 @@ export async function PATCH(request) {
       await requireOwnedReferences(tx, userId, body, ["cardId", "categoryId", "personId", "receivableAccountId", "payableAccountId", "subscriptionId"]);
       const existing = await tx.dailyExpense.findUnique({ where: { id, userId } });
       if (!existing) throw new SubscriptionChargeError("Gasto no encontrado.", 404);
+      if (numericAmount === 0 && existing.refundOriginalAmount == null) throw new ApiAccessError("El monto debe ser mayor a 0.", 400);
+      assertRefundExpenseEdit(existing, body);
       // Los clientes anteriores conservan la aportación al omitir el campo.
       const cashContributionAmount = body.cashContributionAmount === undefined
         ? String(existing.cashContributionAmount ?? 0) : body.cashContributionAmount;

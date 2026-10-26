@@ -84,6 +84,11 @@ function runRegressions(url) {
 }
 
 function assertCatalog(actual) {
+  const refundColumn = actual.columns.filter(row => row.table_name === 'daily_expenses' && row.column_name === 'refundOriginalAmount');
+  assert.equal(refundColumn.length, 1);
+  assert.equal(refundColumn[0].is_nullable, 'YES');
+  assert.match(actual.constraints.find(row => row.name === 'daily_expenses_refund_amount_check')?.definition || '', /refundOriginalAmount.*amount/s);
+  assert.match(actual.constraints.find(row => row.name === 'expense_refunds_amount_check')?.definition || '', /amount.*0/);
   const adjustmentColumns = actual.columns.filter(row => row.table_name === 'receivable_accounts'
     && ['balanceAdjustment', 'balanceAdjustmentNotes'].includes(row.column_name));
   assert.equal(adjustmentColumns.length, 2);
@@ -148,13 +153,15 @@ function assertCatalog(actual) {
       && !['money_accounts', 'money_reconciliations', 'money_routes', 'money_plans', 'money_occurrences', 'money_transfers', 'money_card_payments', 'money_operations'].includes(row.table_name || row.tablename)
       && !['capture_devices', 'capture_pairings', 'capture_events', 'capture_rate_limits', 'capture_card_aliases',
         'capture_automations', 'capture_merchant_rules', 'capture_movements', 'expense_tombstones', 'capture_statements',
-        'google_calendar_connections', 'calendar_oauth_states', 'google_calendar_events', 'card_cycle_payments', 'capture_payment_policies', 'capture_bank_fallbacks'].includes(row.table_name || row.tablename)
+        'google_calendar_connections', 'calendar_oauth_states', 'google_calendar_events', 'card_cycle_payments', 'capture_payment_policies', 'capture_bank_fallbacks', 'expense_refunds'].includes(row.table_name || row.tablename)
       && !(section === 'columns' && row.table_name === 'card_cycles' && creditColumns.includes(row.column_name))
       && !(section === 'columns' && row.table_name === 'cards' && balanceColumns.includes(row.column_name))
       && !(section === 'columns' && row.table_name === 'receivable_accounts' && ['balanceAdjustment', 'balanceAdjustmentNotes'].includes(row.column_name))
       && !(section === 'constraints' && ['cards_credit_balance_complete_check', 'cards_balance_tracking_check'].includes(row.name))
       && !(section === 'constraints' && row.name === 'money_cycle_total_guard')
       && !(section === 'columns' && row.table_name === 'daily_expenses' && row.column_name === 'cashContributionAmount')
+      && !(section === 'columns' && row.table_name === 'daily_expenses' && row.column_name === 'refundOriginalAmount')
+      && !(section === 'constraints' && row.name === 'daily_expenses_refund_amount_check')
       && !(section === 'columns' && ['daily_expenses', 'installment_purchases'].includes(row.table_name) && ['reconciliationStatus', 'reconciledAt'].includes(row.column_name))
       && !(section === 'constraints' && ['daily_expenses_reconciliation_check', 'installment_purchases_reconciliation_check'].includes(row.name))
       && !(section === 'constraints' && row.name === 'daily_expenses_cash_contribution_check'));
@@ -170,7 +177,7 @@ function assertCatalog(actual) {
   assert.ok(actual.constraints.some(row => row.name === 'money_accounts_yield_check'));
   assert.ok(actual.constraints.some(row => row.name === 'money_accounts_automatic_yield_check'));
   assert.ok(actual.constraints.some(row => row.name === 'money_transfers_values_check'));
-  assert.equal(actual.security.length, before.security.length + 25);
+  assert.equal(actual.security.length, before.security.length + 26);
   for (const row of actual.security) {
     assert.equal(row.rls, true, `RLS desactivado: ${row.table_name}`);
     assert.equal(row.force_rls, false);
@@ -209,7 +216,7 @@ async function records(db) {
   return {
     card: await db.card.findUnique({ where: { id: 'a11-card' }, omit: { creditLimit: true, usedBalance: true, balanceAsOf: true, balanceTracking: true } }),
     loan: await db.payableAccount.findUnique({ where: { id: 'a11-loan' } }),
-    payment: await db.dailyExpense.findUnique({ where: { id: 'a11-payment' }, omit: { cashContributionAmount: true, reconciliationStatus: true, reconciledAt: true } }),
+    payment: await db.dailyExpense.findUnique({ where: { id: 'a11-payment' }, omit: { cashContributionAmount: true, reconciliationStatus: true, reconciledAt: true, refundOriginalAmount: true } }),
     receivable: await db.receivableAccount.findUnique({ where: { id: 'a11-receivable' }, omit: { balanceAdjustment: true, balanceAdjustmentNotes: true } }),
   };
 }
@@ -309,7 +316,7 @@ async function main() {
           const today = sourceLoader()('src/lib/cardBalances.js').getBalanceToday();
           const at = new Date(`${today}T12:00:00Z`);
           await db.$executeRaw`UPDATE cards SET "creditLimit" = 20000, "usedBalance" = 3000, "balanceAsOf" = ${at} WHERE id = 'a11-card'`;
-          await db.dailyExpense.create({ data: { id: 'a11-existing-charge', userId: 'a11-user', cardId: 'a11-card', categoryId: 'a11-category', date: at, paymentMethod: 'CARD', concept: 'Ya incluido en banco', amount: 500 } });
+          await db.dailyExpense.create({ data: { id: 'a11-existing-charge', userId: 'a11-user', cardId: 'a11-card', categoryId: 'a11-category', date: at, paymentMethod: 'CARD', concept: 'Ya incluido en banco', amount: 500 }, select: { id: true } });
           await db.installmentPurchase.create({ data: { id: 'a11-existing-msi', userId: 'a11-user', cardId: 'a11-card', categoryId: 'a11-category', purchaseDate: at, concept: 'MSI ya incluida', totalAmount: 12000, months: 12 } });
           await db.cardCycle.create({ data: { id: 'a11-existing-cycle', userId: 'a11-user', cardId: 'a11-card', month: at.getUTCMonth() + 1, year: at.getUTCFullYear(), startDate: new Date(at.getTime() - 31 * 86400000), cutDate: new Date(at.getTime() - 86400000), dueDate: new Date(at.getTime() + 5 * 86400000), paidAmount: 1000, paidAt: null } });
         }
@@ -360,7 +367,7 @@ async function main() {
         console.log(`OK ${i ? 'actualización desde las 13 migraciones aplicadas' : 'base vacía'}: catálogo equivalente, diff vacío, checksums, deploy repetible, registros intactos y RLS.`);
       } finally { await db.$disconnect(); }
     }
-    console.log(`Reconstrucción y actualización verificadas; ${localMigrations().length} migraciones y ${before.security.length + 25} tablas con RLS, incluido el historial.`);
+    console.log(`Reconstrucción y actualización verificadas; ${localMigrations().length} migraciones y ${before.security.length + 26} tablas con RLS, incluido el historial.`);
   } finally {
     // Solo elimina bases/roles con sufijo aleatorio creados por esta ejecución.
     for (const name of createdDatabases.reverse()) await admin.$executeRawUnsafe(`DROP DATABASE "${name}" WITH (FORCE)`);

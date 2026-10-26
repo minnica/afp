@@ -1,0 +1,16 @@
+{
+  "kind": "ANONYMIZED_REAL_NOTIFICATION",
+  "reviewedOn": "2026-10-25",
+  "scope": "Gramática contrastada con dos avisos de devolución recibidos en el teléfono y servidor. Comercio, importe y fechas ficticios. No imprime tarjeta, moneda ni referencia de compra; requiere regla previa y confirmación del propietario.",
+  "event": {
+    "sourcePackage": "com.mercadopago.wallet",
+    "postedAt": "2026-10-24T18:00:00.000Z",
+    "receivedAt": "2026-10-24T18:00:00.250Z",
+    "fields": {
+      "android.title": "COMERCIO FICTICIO te devolvió $123.45",
+      "android.title.big": "COMERCIO FICTICIO te devolvió $123.45",
+      "android.text": "Para más detalles, entra aquí.",
+      "android.bigText": "Para más detalles, entra aquí."
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "kind": "ANONYMIZED_REAL_NOTIFICATION",
+  "reviewedOn": "2026-10-25",
+  "scope": "Gramática contrastada con avisos reales de compra cancelada de dos tarjetas JOY Banamex. Datos ficticios; tres cifras de alias, sin moneda ni referencia global. No confirma automáticamente un reembolso.",
+  "event": {
+    "sourcePackage": "com.citibanamex.banamexmobile",
+    "postedAt": "2026-10-24T18:00:00.000Z",
+    "receivedAt": "2026-10-24T18:00:00.250Z",
+    "fields": {
+      "android.title": "Notificacion",
+      "android.text": "CANCELADA compra por $ 123.45 con su tarjeta JOY BANAMEX 123 en COMERCIO FICTICIO el 24/10/2026 12:00:00 PM",
+      "android.bigText": "CANCELADA compra por $ 123.45 con su tarjeta JOY BANAMEX 123 en COMERCIO FICTICIO el 24/10/2026 12:00:00 PM",
+      "android.title.big": "Notificacion"
+    }
+  }
+}

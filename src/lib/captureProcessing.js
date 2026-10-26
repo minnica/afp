@@ -12,11 +12,13 @@ import { paymentCaptureKind } from "@/lib/capturePaymentParsers";
 import { resolveCapturePayment } from "@/lib/capturePayments";
 import { bankFallbackInterpretation } from "@/lib/captureBankFallback";
 import { automateCapturePayment } from "@/lib/capturePaymentAutomation";
+import { refundCaptureKind } from "@/lib/captureRefundParsers";
+import { completeRefundIdentity, resolveCaptureRefund } from "@/lib/captureRefunds";
 
 export async function archiveCapturedExpense(tx, expense) {
   await tx.expenseTombstone.upsert({ where: { expenseId: expense.id }, update: {}, create: {
     expenseId: expense.id, userId: expense.userId, cardId: expense.cardId, date: expense.date,
-    amount: expense.amount, concept: expense.concept,
+    amount: expense.refundOriginalAmount ?? expense.amount, concept: expense.concept,
   } });
 }
 
@@ -26,7 +28,7 @@ function dateWindow(date) {
 }
 
 export async function captureCandidates(tx, userId, proposal) {
-  if (["CARD_PAYMENT", "ACCOUNT_DEBIT"].includes(proposal.movementType)) return [];
+  if (["CARD_PAYMENT", "ACCOUNT_DEBIT", "REFUND"].includes(proposal.movementType)) return [];
   if (!proposal.cardId || !proposal.amount || !proposal.date) return [];
   const where = { userId, cardId: proposal.cardId, amount: proposal.amount, date: dateWindow(proposal.date) };
   // Una transacción usa una conexión: no iniciar consultas simultáneas sobre ella.
@@ -37,7 +39,7 @@ export async function captureCandidates(tx, userId, proposal) {
     select: { id: true, expenseId: true, originalExpenseId: true, installmentPurchaseId: true, status: true, reason: true, parserKey: true, correction: true, proposal: true } });
   // La evidencia parcial y Wallet de respaldo en observación no bloquean al
   // banco. Una corrección personal o una resolución financiera sí bloquean.
-  const financialMovements = movements.filter(row => !paymentCaptureKind(row)
+  const financialMovements = movements.filter(row => !paymentCaptureKind(row) && !refundCaptureKind(row)
     && !(["BANK_FALLBACK_WAIT", "BANK_FALLBACK_PAUSED"].includes(row.reason) && row.proposal?.bankFallback?.walletParserKey === proposal.primaryWalletParserKey
       && !row.correction && !row.expenseId && !row.originalExpenseId && !row.installmentPurchaseId)
     && !(["REVIEW", "OBSERVED"].includes(row.status)
@@ -58,6 +60,11 @@ async function captureInterpretationState(tx, event, observationOnly = false) {
   const decoded = interpretCapture(event);
   const parser = captureParsers.find(parser => parser.key === decoded.parserKey);
   let interpretation = await resolveCaptureIdentity(tx, event, decoded, parser);
+  if (refundCaptureKind(interpretation)) {
+    interpretation = await completeRefundIdentity(tx, event, interpretation);
+    return { interpretation, parserKey: interpretation.parserKey, reason: interpretation.reason,
+      proposal: interpretation.proposal, status: "REVIEW" };
+  }
   const fallback = await bankFallbackInterpretation(tx, event, interpretation, observationOnly);
   if (fallback?.primaryWalletParserKey) interpretation = { ...interpretation, proposal: { ...interpretation.proposal, ...fallback } };
   if (fallback?.reason) return { interpretation, parserKey: interpretation.parserKey, ...fallback };
@@ -228,6 +235,7 @@ async function captureExpenseData(tx, movement) {
 }
 
 export async function registerCaptureMovement(tx, movement, distinct) {
+  if (refundCaptureKind(movement)) throw new ApiAccessError("Una devolución se aplica a un gasto existente; no crea otro gasto.", 409);
   if (paymentCaptureKind(movement)) throw new ApiAccessError("Este aviso corresponde a un pago o cargo de cuenta. Usa la revisión de pagos de tarjeta.", 409);
   const p = effectiveCapture(movement);
   if (!p.cardId || !p.amount || !p.date || p.currency !== "MXN") throw new ApiAccessError("El aviso necesita tarjeta, importe, moneda y fecha verificados.", 409);
@@ -243,16 +251,18 @@ export async function registerCaptureMovement(tx, movement, distinct) {
 
 export async function resolveCaptureMovement(db, userId, input) {
   if (!input || typeof input.id !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(input.id)
-    || !["link", "linkInstallment", "distinct", "discard", "convertToInstallments", "correct", "register", "reinterpret", "validateWalletBackup", "registerPayment", "linkPayment", "reversePayment"].includes(input.action)) {
+    || !["link", "linkInstallment", "distinct", "discard", "convertToInstallments", "correct", "register", "reinterpret", "validateWalletBackup", "registerPayment", "linkPayment", "reversePayment", "applyRefund", "reverseRefund"].includes(input.action)) {
     throw new ApiAccessError("Resolución no válida.", 400);
   }
   return db.$transaction(async tx => {
     await lockDebtAccounts(tx, userId);
     const movement = await tx.captureMovement.findFirst({ where: { id: input.id, userId } });
     if (!movement) throw new ApiAccessError("Aviso no encontrado.", 404);
+    if (["applyRefund", "reverseRefund"].includes(input.action)) return resolveCaptureRefund(tx, movement, input);
     if (["registerPayment", "linkPayment", "reversePayment"].includes(input.action)) return resolveCapturePayment(tx, movement, input);
     if (input.action === "reinterpret") return reinterpretCaptureMovement(tx, movement);
     if (input.action === "validateWalletBackup") return validateWalletBackup(tx, movement);
+    if (refundCaptureKind(movement) && input.action !== "discard") throw new ApiAccessError("Resuelve este aviso desde la revisión de devoluciones.", 409);
     if (paymentCaptureKind(movement) && input.action !== "discard") throw new ApiAccessError("Resuelve este aviso desde Pagos de tarjeta; no se puede convertir en un gasto.", 409);
     if (movement.fallbackDueAt) await tx.captureMovement.update({ where: { id: movement.id }, data: {
       fallbackDueAt: null, reason: "BANK_FALLBACK_MANUAL_REVIEW",
@@ -294,7 +304,7 @@ async function convertCaptureToInstallments(tx, movement, input) {
   if (movement.status === "CONVERTED") return movement;
   if (!movement.expenseId || !Number.isInteger(input.months) || input.months < 2 || input.months > 120) throw new ApiAccessError("Selecciona un gasto y un plazo de 2 a 120 meses.", 400);
   const expense = await tx.dailyExpense.findFirst({ where: { id: movement.expenseId, userId: movement.userId } });
-  if (!expense || expense.paymentMethod !== "CARD" || !expense.cardId || expense.subscriptionId || expense.receivableAccountId
+  if (!expense || expense.refundOriginalAmount != null || expense.paymentMethod !== "CARD" || !expense.cardId || expense.subscriptionId || expense.receivableAccountId
     || expense.payableAccountId || Number(expense.cashContributionAmount) !== 0 || expense.personId) {
     throw new ApiAccessError("Este gasto tiene vínculos o aportaciones que requieren revisión antes de convertirlo.", 409);
   }

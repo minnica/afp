@@ -102,7 +102,7 @@ export async function configureCapture(db, userId, input) {
     }
     if (data.action === "automation") {
       const parser = captureParsers.find(parser => parser.key === data.parserKey);
-      if (parser?.paymentOnly) throw new ApiAccessError("Este formato corresponde a pagos de tarjeta. Usa su regla de pagos automáticos.", 409);
+      if (parser?.paymentOnly || parser?.refundOnly) throw new ApiAccessError("Este formato corresponde a pagos o devoluciones. Usa su revisión específica.", 409);
       if (!parser) {
         // Retirar un analizador nunca debe impedir detener su automatización.
         const identity = { userId, cardId: data.cardId, parserKey: data.parserKey };
@@ -158,5 +158,5 @@ export async function captureConfiguration(db, userId) {
   const fallbackOptions = await bankFallbackOptions(db, userId);
   return { cards, aliases, automations, rules, categories, subscriptions, paymentPolicies, fallbackPolicies, fallbackOptions,
     rollout: buildCaptureRollout(cards, aliases, automations, captureParsers, movements),
-    parsers: captureParsers.filter(parser => parser.evidence !== "REAL_OUT_OF_SCOPE" && !parser.paymentOnly).map(({ key, sourcePackage, verified, dateSource }) => ({ key, sourcePackage, verified, dateSource: dateSource || "BANK_OPERATION" })) };
+    parsers: captureParsers.filter(parser => parser.evidence !== "REAL_OUT_OF_SCOPE" && !parser.paymentOnly && !parser.refundOnly).map(({ key, sourcePackage, verified, dateSource }) => ({ key, sourcePackage, verified, dateSource: dateSource || "BANK_OPERATION" })) };
 }

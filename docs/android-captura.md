@@ -10,6 +10,8 @@ El plan se ajustó el 21 de octubre de 2026 para preparar el diagnóstico de tod
 
 ## Compilación y firma
 
+**Devoluciones y cancelaciones (servidor/web, publicadas con autorización):** la APK 0.7.1 ya entrega los avisos necesarios. El desarrollo reconoce los formatos observados de Mercado Pago y Banamex, propone cargos compatibles y exige confirmación personal para aplicar un reembolso total/parcial. Se conserva el cargo original y se muestra el neto, con opción de deshacer. La migración aditiva y la web están publicadas; los dos avisos anteriores se prepararon para confirmación personal. No requiere otra APK. [Alcance y operación](../README.md#devoluciones-y-cancelaciones-de-compras--publicado-y-preparado-para-confirmar).
+
 **Ampliación publicada e instalada 0.7.0 / 9:** añade Uber, DiDi viajes y Uber Eats como fuentes de evidencia para revisión. El catálogo tiene once paquetes; la selección anterior se conserva y las tres nuevas fuentes quedaron activadas explícitamente después de publicar la API compatible. Sus avisos no generan gastos, no identifican tarjetas y no alteran los canales bancarios. La muestra real se validará en el próximo viaje/pedido. Véase [alcance y estado](../README.md#avisos-de-uber-didi-viajes-y-uber-eats--publicado-y-activo).
 
 Requisitos: un **JDK completo** 17 o superior compatible con Gradle 9.3.1 (compilador local: Temurin 21.0.12.1), Android SDK Platform 37 y Build Tools 36.0.0. Un JRE sin `javac` no basta. El `targetSdk` es 36 (Android 16) y el mínimo es 28. AGP 9.1.1 incorpora Kotlin 2.2.10; el plugin de Compose usa esa misma versión. Las dependencias tienen versiones fijadas.

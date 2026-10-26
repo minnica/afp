@@ -1,0 +1,98 @@
+{
+  "verifiedAt": "2026-10-26T04:12:36.886956+00:00",
+  "sourceCommit": "ca7d2b364816e7b727c454830d5549ad3e6537a2",
+  "scope": "Devoluciones confirmadas personalmente, con importe original, neto e historial. No hay aplicación automática.",
+  "formats": [
+    "mercadopago.refund.es.v1",
+    "banamex.purchase-cancellation.es.v1"
+  ],
+  "tests": {
+    "passed": 701,
+    "failed": 0,
+    "skipped": 0,
+    "refundFocusedPassed": 14,
+    "database": "PostgreSQL local ficticio"
+  },
+  "migration": {
+    "name": "20261026000000_expense_refunds",
+    "additive": true,
+    "existingExpensesModifiedOnMigration": false,
+    "freshAndHistoricalUpgradeVerified": true,
+    "migrations": 37,
+    "rlsTables": 42,
+    "schemaDiffEmpty": true,
+    "historicalChecksumsPreserved": true
+  },
+  "build": {
+    "webpack": "passed",
+    "prismaValidation": "passed",
+    "lintErrors": 0,
+    "existingLintWarnings": 2
+  },
+  "ui": {
+    "fictitiousDataOnly": true,
+    "viewports": [
+      390,
+      1440
+    ],
+    "horizontalOverflow": false,
+    "tested": [
+      "proposal",
+      "cancel confirmation",
+      "confirm full refund",
+      "confirm partial refund",
+      "net and original expense display",
+      "zero amount edit protection",
+      "reverse refund"
+    ],
+    "screenshots": [
+      "expense-net-desktop.png",
+      "expense-net-mobile.png",
+      "full-applied-mobile.png",
+      "partial-applied-mobile.png",
+      "partial-proposal-mobile.png",
+      "reversed-mobile.png"
+    ]
+  },
+  "preflight": {
+    "readOnly": true,
+    "refundNotices": 2,
+    "eachHasSingleCandidate": true,
+    "onlyPendingMigration": "20261026000000_expense_refunds"
+  },
+  "deployment": {
+    "published": false,
+    "productionMigrationApplied": false,
+    "realExpensesChanged": false,
+    "apkUpdateRequired": false,
+    "waitingForProductionApproval": true
+  },
+  "sourceSha256": {
+    "README.md": "d70eeccb7382e2a3c628e3ece12424fda1960addde9a73a792f6dde92208fc94",
+    "docs/android-captura.md": "99c885e47ad6dcf82aed38f8ad5b02734005da8d54d774f93e5cf7fab34a9491",
+    "prisma/migrations/20261026000000_expense_refunds/migration.sql": "ebd2a9695a6a7d3d2aa2e4558b4d466769ad5ec538ed347c659b2e976760bea2",
+    "prisma/schema.prisma": "f4ca43b7d60f10d10c6e805c112972644ac29372ae8c4eb5b476408b56ecbbc1",
+    "scripts/verify-database-reproduction.cjs": "787d37882f281d8a5fcf9aafee90b85ce0b63265e51b412ff7116fdf294529df",
+    "src/app/api/captures/movements/route.js": "531c37e665b0b822592579f553ee7f0514e2810493d40e266a5fa2b894edf237",
+    "src/app/api/expenses/route.js": "9256887a7c8db0451002560f6568ad5cd70367347ed11695f8022e7d8eb89bb3",
+    "src/app/api/gastos/bootstrap/route.js": "2e38e6899b52588dd392504acb5596783bcd60132e66c6b9b4703daac172d1b9",
+    "src/components/configuracion/CaptureMovementEditor.jsx": "502005589435182c2e20ceabf6d63abfaddb66703cd827394be6f840407e0982",
+    "src/components/configuracion/CaptureRefundEditor.jsx": "b8690d28d3732621e59f3c7a0bf507592832a1c769b47619981e184d806b269a",
+    "src/components/configuracion/CaptureReview.jsx": "d163d1ad34b0464c2cd471aa717802b20d7dbd3e0d18f3a3a4f77f5ba06be0b2",
+    "src/components/gastos/CaptureStatus.jsx": "5b8f56615781710d548f3b00b5522d7ebe6ad346d4bbfd9ebb2252aff10fe302",
+    "src/components/gastos/DailyExpenseCards.jsx": "74549dc736f12b10314b5691674684761ee783f339b2e59c3f20cb68a3da346b",
+    "src/components/gastos/GastosContent.jsx": "230f889a3e324c749fb4a6357819e3af2d131e8deaacf18cce314360ee0fa92e",
+    "src/lib/captureConfiguration.js": "6e04a6ad3d627c8665638dff716f5bdc54de8351a89f6bfd9dcdaafff004ea59",
+    "src/lib/captureParsers.js": "a9ae0b97ded548a9007da33368931ce03170a2eb23889f3ac3f1cd1ea4adcfb3",
+    "src/lib/capturePresentation.js": "ff291a7c7ec9cf34356e8d42db7627ad704de096890c702f77203df05b6a19eb",
+    "src/lib/captureProcessing.js": "e4f2df41f7fee0f57d7419012e50c8e4d54af8c891e6d9c316e3a4e80863e829",
+    "src/lib/captureRefundParsers.js": "183c42ab081818499b58edbcdc4a88f0a3d5dbad9140c91ae64b6ed0719cf04a",
+    "src/lib/captureRefunds.js": "36e28d1b9fbffe7d33c2491cd1bc5d4b160822bfad078bf11e512e3e2563dcea",
+    "src/lib/captureRollout.js": "fe2fa15520499e1710ac11e3def7d02ea4297dd43283aeb2e2628159b661c079",
+    "tests/capture-refunds-integration.test.cjs": "84985c4283d13fd4cb6a1e6d371c38c7992eaf8a4426ae77d8b24fdcba0edfad",
+    "tests/capture-refunds.test.cjs": "22edc5a99ba132f254a43c9d29019893e0a959beb90e25951655c7dd58de6cce",
+    "tests/fixtures/captures/banamex-purchase-cancellation.es.v1.json": "836beff797e875ce7bd8aecb6ba62309d8062038fc3197dfe92d14a591bdfccb",
+    "tests/fixtures/captures/mercadopago-refund.es.v1.json": "48f1cd806e54287089d5193305f033738457b0d724683eecc45377543cf99713",
+    "tests/migration-history.test.cjs": "03464424ede8895fa85e66f6b2ee809106b83bdea989273f2eff115ebb8052d5"
+  }
+}

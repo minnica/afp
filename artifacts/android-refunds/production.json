@@ -1,0 +1,58 @@
+{
+  "verifiedAt": "2026-10-26T04:35:57.183Z",
+  "migrations": 37,
+  "rlsTables": 42,
+  "schemaDiffEmpty": true,
+  "existingExpensesPreserved": true,
+  "newAutomaticExpensesDuringVerification": 1,
+  "otherFinancialDataAndRulesUnchanged": true,
+  "originalEventsPreserved": true,
+  "otherMovementsPreserved": true,
+  "refundNoticesPrepared": 2,
+  "financialRefundsApplied": 0,
+  "awaitingPersonalConfirmation": true,
+  "deploymentId": "dpl_5FoTPcUpThpSU7ecq5HfXQavYAFb",
+  "state": "READY",
+  "productionUrl": "https://finanzas.garatachia.com",
+  "sourceCommit": "ca7d2b364816e7b727c454830d5549ad3e6537a2",
+  "publishedFiles": 330,
+  "sourceManifestSha256": "c15609e4fbbe780413c82519a5d1969a1a8ab144373c7f5b680ad4a889ce52c0",
+  "captureModulesComparedBySha1": 21,
+  "http": [
+    {
+      "path": "/login",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/captures/movements",
+      "method": "GET",
+      "status": 401
+    },
+    {
+      "path": "/api/captures/movements",
+      "method": "PATCH",
+      "status": 401
+    },
+    {
+      "path": "/api/captures/events",
+      "method": "POST",
+      "status": 401
+    },
+    {
+      "path": "/api/gastos/bootstrap",
+      "method": "GET",
+      "status": 401
+    }
+  ],
+  "runtimeErrorGroupsObserved": 0,
+  "phoneVerification": {
+    "authenticatedProductionPage": true,
+    "refundReviewOpened": true,
+    "candidateAndNetAfterConfirmationVisible": true,
+    "confirmationNotPressedByAgent": true,
+    "realScreenshotKeptPrivate": true
+  },
+  "apkUpdateRequired": false,
+  "pendingDeploymentsOrMigrations": false
+}

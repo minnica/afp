@@ -13,6 +13,7 @@ const expenseSelect = {
   cardId: true,
   concept: true,
   amount: true,
+  refundOriginalAmount: true,
   cashContributionAmount: true,
   categoryId: true,
   notes: true,

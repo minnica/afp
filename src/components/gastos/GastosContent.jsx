@@ -239,6 +239,7 @@ export default function GastosContent() {
   const [editIsSharedExpense, setEditIsSharedExpense] = useState(false);
   const [editCashContributionAmount, setEditCashContributionAmount] = useState("");
   const [editLinkedAccount, setEditLinkedAccount] = useState(false);
+  const [editRefunded, setEditRefunded] = useState(false);
   const [editError, setEditError] = useState("");
   const [editCategoryId, setEditCategoryId] = useState("");
   const [editNotes, setEditNotes] = useState("");
@@ -701,7 +702,8 @@ export default function GastosContent() {
     setEditPaymentMethod(expense.paymentMethod);
     setEditCardId(expense.cardId || "");
     setEditConcept(expense.concept || "");
-    setEditAmount(String(expense.amount || ""));
+    setEditAmount(String(expense.amount ?? ""));
+    setEditRefunded(expense.refundOriginalAmount != null);
     setEditIsSharedExpense(Number(expense.cashContributionAmount) > 0);
     setEditCashContributionAmount(Number(expense.cashContributionAmount) > 0 ? String(expense.cashContributionAmount) : "");
     setEditLinkedAccount(Boolean(expense.receivableAccountId || expense.payableAccountId));
@@ -715,6 +717,7 @@ export default function GastosContent() {
   function cancelEditingExpense() {
     setEditDialogOpen(false);
     setEditingExpenseId("");
+    setEditRefunded(false);
     setEditDate("");
     setEditPaymentMethod("CASH");
     setEditCardId("");
@@ -1020,7 +1023,7 @@ export default function GastosContent() {
       },
       {
         accessorKey: "amount",
-        header: "Total pagado",
+        header: ({ table }) => table.getRowModel().rows.some(row => row.original.refundOriginalAmount != null) ? "Monto neto" : "Total pagado",
         cell: ({ row }) => (
           <div className="flex flex-col gap-1 tabular-nums">
             <span className="whitespace-nowrap font-semibold">{formatMoney(row.original.amount)}</span>
@@ -1445,6 +1448,7 @@ export default function GastosContent() {
               <Label id="edit-paymentMethod-label">Método</Label>
               <PaymentMethodSelector
                 value={editPaymentMethod}
+                disabled={editRefunded}
                 onValueChange={value => {
                   setEditPaymentMethod(value);
                   if (value === "CASH") {
@@ -1462,6 +1466,7 @@ export default function GastosContent() {
                   value={editCardId}
                   onValueChange={setEditCardId}
                   id="edit-cardId"
+                  disabled={editRefunded}
                   title="Seleccionar tarjeta"
                   placeholder="Selecciona tarjeta"
                   options={cards.map(card => ({
@@ -1487,6 +1492,7 @@ export default function GastosContent() {
               <Label htmlFor="edit-amount">Monto</Label>
               <Input
                 id="edit-amount"
+                disabled={editRefunded}
                 type="number"
                 formatNumber
                 min="0"
@@ -1518,6 +1524,7 @@ export default function GastosContent() {
                 value={editSubscriptionId}
                 onValueChange={setEditSubscriptionId}
                 id="edit-subscriptionId"
+                disabled={editRefunded}
                 title="Seleccionar suscripción"
                 placeholder="Selecciona suscripción"
                 searchPlaceholder="Buscar suscripción…"
@@ -1533,7 +1540,8 @@ export default function GastosContent() {
             </div>
 
             <div className="md:col-span-2">
-              <SharedExpenseFields id="edit-cashContributionAmount" enabled={editIsSharedExpense} onEnabledChange={(enabled) => { setEditIsSharedExpense(enabled); setEditError(""); }} amount={editAmount} contribution={editCashContributionAmount} onContributionChange={(value) => { setEditCashContributionAmount(value); setEditError(""); }} disabled={isUpdating} linkedAccount={editLinkedAccount} />
+              <SharedExpenseFields id="edit-cashContributionAmount" enabled={editIsSharedExpense} onEnabledChange={(enabled) => { setEditIsSharedExpense(enabled); setEditError(""); }} amount={editAmount} contribution={editCashContributionAmount} onContributionChange={(value) => { setEditCashContributionAmount(value); setEditError(""); }} disabled={isUpdating || editRefunded} linkedAccount={editLinkedAccount} />
+              {editRefunded && <p className="text-sm text-muted-foreground">El monto es el neto después de las devoluciones. Puedes deshacer una devolución desde Capturas para cambiar monto, tarjeta o vínculos financieros.</p>}
             </div>
 
             <div className="space-y-2 md:col-span-2">
@@ -1805,7 +1813,7 @@ export default function GastosContent() {
                         return (
                           <TableRow>
                             <TableCell colSpan={4} className="text-right text-sm font-medium text-muted-foreground">
-                              Total pagado
+                              {table.getFilteredRowModel().rows.some(row => row.original.refundOriginalAmount != null) ? "Gasto neto" : "Total pagado"}
                             </TableCell>
                             <TableCell className="font-semibold tabular-nums">
                               {formatMoney(total)}
