@@ -1,4 +1,5 @@
 import { getCyclePaymentState } from "@/lib/calculations/cardCyclePayments";
+import { getDebtAccountState } from "@/lib/calculations/debtAccounts";
 import { isSubscriptionChargeResolved } from "@/lib/subscriptionCharges";
 
 export function shouldIncludeSubscriptionInMonth(subscription, year, month) {
@@ -193,6 +194,45 @@ function hasExpenseForSubscriptionFromDate(subscription, chargeDate, now) {
     const expenseStr = toUtcDateStr(expense.date);
     return expenseStr >= monthStartStr && expenseStr <= endStr;
   });
+}
+
+export function buildPayableNotices(payables, now) {
+  const notices = [];
+
+  for (const payable of payables) {
+    if (!payable.expectedDate) continue;
+    const expectedDate = new Date(payable.expectedDate);
+    if (!Number.isFinite(expectedDate.getTime())) continue;
+
+    // La fecha bancaria conserva su día UTC, comparado con el día local actual.
+    const dueDate = buildDateFromDay(
+      expectedDate.getUTCFullYear(),
+      expectedDate.getUTCMonth() + 1,
+      expectedDate.getUTCDate(),
+    );
+    const diffDays = getDaysDifference(dueDate, now);
+    if (diffDays > 2) continue;
+
+    const state = getDebtAccountState(payable, payable.dailyExpenses || []);
+    if (state.status !== "ACTIVE") continue;
+
+    const timing = getNoticeTiming(diffDays);
+    notices.push({
+      id: `payable-${payable.id}`,
+      type: "PAYABLE",
+      group: timing.group,
+      title: timing.group === "overdue"
+        ? `Pago vencido: ${payable.concept}`
+        : `Cuenta por pagar: ${payable.concept}`,
+      description: `${timing.label}\nSaldo pendiente: ${formatMoneyForNotice(state.pendingBalance)}${
+        payable.person?.name ? `\nAcreedor: ${payable.person.name}` : ""
+      }`,
+      date: payable.expectedDate,
+      amount: state.pendingBalance,
+    });
+  }
+
+  return notices;
 }
 
 export function buildReceivableNotices(receivables, now) {
@@ -392,12 +432,13 @@ export function buildDashboardPayments(cards, cyclesWithAmounts, now) {
   return payments;
 }
 
-export function buildImportantNotices({ payments, subscriptions, activeReceivables, cyclesWithAmounts, cards, now }) {
+export function buildImportantNotices({ payments, subscriptions, activeReceivables, payables = [], cyclesWithAmounts, cards, now }) {
   const priority = { overdue: 0, today: 1, upcoming: 2, cut: 3 };
   return [
     ...buildCardPaymentNotices(payments, now),
     ...buildCashSubscriptionNotices(subscriptions, now),
     ...buildReceivableNotices(activeReceivables, now),
+    ...buildPayableNotices(payables, now),
     ...buildCutCycleNotices(cyclesWithAmounts, cards, now),
   ].sort((a, b) => priority[a.group] - priority[b.group] || new Date(a.date) - new Date(b.date));
 }

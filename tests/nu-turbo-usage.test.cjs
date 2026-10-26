@@ -106,7 +106,7 @@ test("Dashboard entrega Nu con fecha local del cliente y conserva el aislamiento
   const prisma = {
     card: table("card", [card]), dailyExpense: table("dailyExpense", [expense()]), cardCycle: table("cardCycle"),
     installmentPurchase: table("installmentPurchase"), subscription: table("subscription"), income: table("income"),
-    category: table("category"), receivableAccount: table("receivableAccount"),
+    category: table("category"), receivableAccount: table("receivableAccount"), payableAccount: table("payableAccount"),
   };
   const load = sourceLoader({
     "@/lib/prisma": { prisma },

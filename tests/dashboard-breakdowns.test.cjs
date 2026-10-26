@@ -155,6 +155,7 @@ test("API conserva diciembre anterior para enero sin mezclar diciembre futuro", 
     income: { findMany: async () => [] },
     category: { findMany: async () => [{ id: "cat", name: "Gastos" }] },
     receivableAccount: { findMany: async () => [] },
+    payableAccount: { findMany: async () => [] },
   };
   const route = context("dashboard", { prisma: fake, NextResponse: { json: (body) => body } });
   const response = await route.GET({ url: "http://localhost/api/dashboard?userId=u&clientDate=2026-10-13" });
@@ -176,6 +177,7 @@ test("API separa consumo vigente e historial sin cambiar los cortes financieros"
     dailyExpense: { findMany: async () => [{ id: "actual", concept: "Compra", date: "2026-10-12", amount: 100, cardId: card.id, paymentMethod: "CARD" }] },
     subscription: { findMany: async () => [] }, installmentPurchase: { findMany: async () => [] },
     income: { findMany: async () => [] }, category: { findMany: async () => [] }, receivableAccount: { findMany: async () => [] },
+    payableAccount: { findMany: async () => [] },
   };
   const route = context("dashboard", { prisma: fake, NextResponse: { json: (body) => body } });
   const before = JSON.stringify(storedCycles);

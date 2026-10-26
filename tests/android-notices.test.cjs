@@ -17,7 +17,7 @@ function fixture() {
     startDate: "2026-09-11T12:00:00Z", cutDate: "2026-10-10T12:00:00Z", dueDate: "2026-10-26T12:00:00Z",
     statementAmount: 1000, paidAmount: 100, credits: [] };
   const rows = { card: [card], cardCycle: [cycle], dailyExpense: [], subscription: [], installmentPurchase: [],
-    receivableAccount: [], noticeDismissal: [], income: [], category: [] };
+    receivableAccount: [], payableAccount: [], noticeDismissal: [], income: [], category: [] };
   const db = Object.fromEntries(Object.keys(rows).map(model => [model, {
     findMany: async ({ where }) => {
       calls.push({ model, where: plain(where) });
@@ -130,6 +130,47 @@ test("avisos Android: fecha local de México, cambio de mes y zonas inválidas",
   assert.equal(noticeLocalDate("America/Mexico_City", new Date("2026-11-01T05:59:00Z")).getMonth(), 9);
   assert.equal(noticeLocalDate("America/Mexico_City", new Date("2026-11-01T06:00:00Z")).getMonth(), 10);
   assert.throws(() => noticeLocalDate("not-a-zone"), error => error.status === 400);
+});
+
+test("cuentas por pagar: Dashboard y Android comparten saldo, fecha, aislamiento y liquidación", async () => {
+  const { load, request, rows, cycle, db } = fixture();
+  cycle.paidAmount = 1000;
+  const payable = { id: "payable", userId: "a", concept: "Compra pendiente", originalAmount: "1000.30",
+    accountType: "SIMPLE", expectedDate: "2026-10-28T12:00:00Z", status: "ACTIVE",
+    person: { name: "Proveedor" }, dailyExpenses: [{ amount: "100.10" }, { amount: "200.20" }] };
+  rows.payableAccount.push(payable, { ...payable, id: "other", userId: "b", concept: "Cuenta ajena" });
+  const dashboard = () => load("src/app/api/dashboard/route.js").GET({
+    url: "http://localhost/api/dashboard?clientDate=2026-10-26&userId=b", headers: new Headers({ authorization: "Bearer test" }),
+  });
+  const web = await dashboard();
+  const native = await load("src/app/api/captures/notices/route.js").GET(request());
+  assert.equal(web.status, 200);
+  assert.equal(native.status, 200);
+  assert.equal(web.body.importantNotices.length, 1);
+  assert.equal(native.body.notices.length, 1);
+  const notice = web.body.importantNotices[0];
+  assert.equal(notice.type, "PAYABLE");
+  assert.equal(notice.amount, 700);
+  assert.equal(notice.group, "upcoming");
+  assert.equal(notice.date, payable.expectedDate);
+  assert.equal(native.body.notices[0].title, notice.title);
+  assert.equal(native.body.notices[0].body, notice.description);
+  assert.equal(native.body.notices[0].path, "/gastos");
+  assert.equal(web.body.payables, undefined);
+  assert.deepEqual(Object.keys(native.body.notices[0]).sort(), ["body", "key", "path", "title"]);
+
+  const { getNoticeKey } = load("src/lib/noticeDismissals.js");
+  rows.noticeDismissal.push({ userId: "a", month: "2026-10", noticeKey: getNoticeKey(notice) });
+  assert.equal((await load("src/lib/androidNotices.js").loadAndroidNotices(db, "a", today)).length, 0);
+  assert.equal((await dashboard()).body.importantNotices.length, 1, "Dashboard conserva los avisos para particionar en el cliente");
+  rows.noticeDismissal.length = 0;
+  payable.dailyExpenses.push({ amount: 700 });
+  assert.equal((await dashboard()).body.importantNotices.length, 0);
+  assert.equal((await load("src/lib/androidNotices.js").loadAndroidNotices(db, "a", today)).length, 0);
+  payable.dailyExpenses.pop();
+  payable.status = "CANCELLED";
+  assert.equal((await dashboard()).body.importantNotices.length, 0);
+  assert.equal((await load("src/lib/androidNotices.js").loadAndroidNotices(db, "a", today)).length, 0);
 });
 
 test("avisos Android: credencial, pausa y revocación se comprueban antes de leer finanzas", async () => {

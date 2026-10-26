@@ -36,6 +36,7 @@ function fixture(initial = {}) {
     installmentPurchase: { findMany: async () => [] }, income: { findMany: async () => [] },
     category: { findMany: async () => [] },
     receivableAccount: { findMany: async () => [] },
+    payableAccount: { findMany: async () => [] },
     $queryRaw: async (sql, id, userId) => {
       assert.equal(inTransaction, true);
       assert.match(sql.join("?"), /card_cycles.*FOR UPDATE/);

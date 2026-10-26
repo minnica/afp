@@ -462,6 +462,7 @@ export async function GET(request) {
       incomes,
       categories,
       receivables,
+      payables,
     ] = await Promise.all([
       prisma.card.findMany({
         where: { userId },
@@ -533,6 +534,20 @@ export async function GET(request) {
           },
         },
         orderBy: [{ status: "asc" }, { originDate: "desc" }],
+      }),
+      prisma.payableAccount.findMany({
+        where: { userId, expectedDate: { not: null } },
+        select: {
+          id: true,
+          concept: true,
+          originalAmount: true,
+          accountType: true,
+          currentBalance: true,
+          expectedDate: true,
+          status: true,
+          person: { select: { name: true } },
+          dailyExpenses: { select: { amount: true, loanPrincipalAmount: true } },
+        },
       }),
     ]);
 
@@ -732,7 +747,7 @@ export async function GET(request) {
     const cardUsageWaiversCurrent = buildCurrentCardUsageWaivers(usageArgs);
     const cardUsageWaiverHistory = buildCardUsageWaiverHistory(usageArgs);
 
-    const importantNotices = buildImportantNotices({ payments, subscriptions, activeReceivables, cyclesWithAmounts, cards, now });
+    const importantNotices = buildImportantNotices({ payments, subscriptions, activeReceivables, payables, cyclesWithAmounts, cards, now });
 
     return NextResponse.json({
       payments,

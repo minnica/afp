@@ -15,6 +15,7 @@ const NOTICE_DESTINATIONS = {
   CUT_CYCLE_UPCOMING: { href: "/tarjetas", label: "Tarjetas" },
   RECEIVABLE: { href: "/ingresos", label: "Ingresos" },
   CASH_SUBSCRIPTION: { href: "/gastos", label: "Gastos" },
+  PAYABLE: { href: "/gastos", label: "Gastos" },
 };
 
 export { default as CardUsageWaiverProgress, CardUsageWaiverTabs } from "./CardUsageWaiverProgress";

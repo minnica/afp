@@ -9,7 +9,7 @@ import { getNoticeKey, getNoticeMonth, partitionNotices } from "@/lib/noticeDism
 
 const noticePaths = {
   CARD_PAYMENT: "/tarjetas", CUT_CYCLE: "/tarjetas", CUT_CYCLE_UPCOMING: "/tarjetas",
-  CASH_SUBSCRIPTION: "/gastos", RECEIVABLE: "/ingresos",
+  CASH_SUBSCRIPTION: "/gastos", RECEIVABLE: "/ingresos", PAYABLE: "/gastos",
 };
 
 export function noticeLocalDate(timeZone = "America/Mexico_City", now = new Date()) {
@@ -27,7 +27,7 @@ export function noticeLocalDate(timeZone = "America/Mexico_City", now = new Date
 export async function loadAndroidNotices(db, userId, now) {
   const month = getNoticeMonth(now);
   const where = { userId };
-  const [cards, cycles, expenses, subscriptions, purchases, receivables, dismissals] = await Promise.all([
+  const [cards, cycles, expenses, subscriptions, purchases, receivables, dismissals, payables] = await Promise.all([
     db.card.findMany({ where, select: { id: true, name: true }, orderBy: { name: "asc" } }),
     db.cardCycle.findMany({ where, include: { credits: { select: cycleCreditSelect }, card: true }, orderBy: [{ year: "asc" }, { month: "asc" }] }),
     db.dailyExpense.findMany({ where, include: { subscriptionCharge: { select: { month: true } } } }),
@@ -36,13 +36,18 @@ export async function loadAndroidNotices(db, userId, now) {
     db.installmentPurchase.findMany({ where }),
     db.receivableAccount.findMany({ where, include: { person: { select: { name: true } }, incomes: { select: { date: true, amount: true } } } }),
     db.noticeDismissal.findMany({ where: { userId, month }, select: { month: true, noticeKey: true } }),
+    db.payableAccount.findMany({ where: { userId, expectedDate: { not: null } }, select: {
+      id: true, concept: true, originalAmount: true, accountType: true, currentBalance: true,
+      expectedDate: true, status: true, person: { select: { name: true } },
+      dailyExpenses: { select: { amount: true, loanPrincipalAmount: true } },
+    } }),
   ]);
   const cyclesWithAmounts = cycles.map(cycle => ({ ...cycle, ...getCyclePaymentState(cycle, now),
     ...calculateCycleAmount({ cycle, expenses, subscriptions, purchases, includeBreakdown: false }) }));
   const payments = buildDashboardPayments(cards, cyclesWithAmounts, now);
   const activeReceivables = receivables.map(account => ({ ...account, ...getDebtAccountState(account, account.incomes) }))
     .filter(account => account.status === "ACTIVE");
-  const all = buildImportantNotices({ payments, subscriptions, activeReceivables, cyclesWithAmounts, cards, now });
+  const all = buildImportantNotices({ payments, subscriptions, activeReceivables, payables, cyclesWithAmounts, cards, now });
   return partitionNotices(all, dismissals, month).visible.map(notice => ({
     // Una ocurrencia avisa al aparecer, al vencer y al cambiar su saldo pendiente.
     key: createHash("sha256").update(JSON.stringify([month, getNoticeKey(notice), notice.type, notice.group])).digest("hex"),

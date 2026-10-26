@@ -42,6 +42,22 @@ test("los avisos desconocidos o inválidos no se pueden ocultar", () => {
   for (const key of [null, "bad", "[]", '["NEW","a","2026-10-15",null]', '["CARD_PAYMENT","a","2026-10-15",null]']) assert.equal(ctx.isNoticeKey(key), false);
 });
 
+test("cuentas por pagar: permite ocultar y restaurar, distingue fechas y vence cada mes", async () => {
+  const payable = { ...notice, id: "payable-a", type: "PAYABLE" };
+  const noticeKey = ctx.getNoticeKey(payable);
+  assert.equal(ctx.isNoticeKey(noticeKey), true);
+  const { route, request } = api();
+  const body = { month: "2026-10", noticeKey };
+  assert.equal((await route.POST(request("valid-a", body))).status, 200);
+  const entries = (await route.GET(request("valid-a"))).body.dismissals;
+  assert.equal(ctx.partitionNotices([payable], entries, "2026-10").hidden.length, 1);
+  assert.equal(ctx.partitionNotices([{ ...payable, date: "2026-10-16" }], entries, "2026-10").visible.length, 1);
+  assert.equal(ctx.partitionNotices([payable], entries, "2026-11").visible.length, 1);
+  await route.DELETE(request("valid-a", body));
+  const restored = (await route.GET(request("valid-a"))).body.dismissals;
+  assert.equal(ctx.partitionNotices([payable], restored, "2026-10").visible.length, 1);
+});
+
 function api() {
   const entries = [];
   const calls = [];
