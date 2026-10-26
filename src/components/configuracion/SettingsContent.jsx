@@ -39,7 +39,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Item, ItemActions, ItemContent, ItemDescription, ItemGroup, ItemTitle } from "@/components/ui/item";
 import PageSkeleton from "@/components/layout/PageSkeleton";
-import CaptureDevices from "@/components/configuracion/CaptureDevices";
+import Link from "next/link";
 import GoogleCalendarSettings from "@/components/configuracion/GoogleCalendarSettings";
 
 export default function SettingsContent() {
@@ -256,12 +256,12 @@ export default function SettingsContent() {
             <TabsTrigger value="categories" className="min-h-11">Categorías</TabsTrigger>
             <TabsTrigger value="people" className="min-h-11">Personas</TabsTrigger>
             <TabsTrigger value="incomeTypes" className="min-h-11">Tipos de ingreso</TabsTrigger>
-            <TabsTrigger value="capture" className="min-h-11">Captura automática</TabsTrigger>
+            <TabsTrigger value="capture" className="min-h-11">Registro automático</TabsTrigger>
             <TabsTrigger value="calendar" className="min-h-11">Google Calendar</TabsTrigger>
           </TabsList>
 
           <TabsContent value="capture">
-            {user && <CaptureDevices key={user.id} userId={user.id} />}
+            <div className="flex flex-col items-start gap-3 py-4"><h2 className="text-lg font-semibold">El registro automático tiene su propia sección</h2><p className="text-sm text-muted-foreground">Revisa movimientos, configura tus tarjetas y administra el teléfono desde el mismo lugar.</p><Button asChild className="min-h-11"><Link href="/registro-automatico">Ir a Registro automático</Link></Button><Button variant="outline" asChild className="min-h-11"><Link href="/registro-automatico?tipo=ajustes">Configurar tarjetas y teléfono</Link></Button></div>
           </TabsContent>
 
           <TabsContent value="calendar">

@@ -20,7 +20,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import CaptureReview from "@/components/configuracion/CaptureReview";
 
 const schema = z.object({ code: z.string().transform(value => value.replace(/[\s-]/g, "").toUpperCase())
   .pipe(z.string().regex(/^[A-F0-9]{12}$/, "Escribe los doce caracteres del código de tu teléfono.")) });
@@ -66,9 +65,9 @@ export default function CaptureDevices({ userId }) {
       if (controller.current.signal.aborted) return;
       requestVersion.current++;
       setDevices(previous => [device, ...previous.filter(row => row.id !== device.id)]);
-      setNotice(action.code ? "Teléfono autorizado. Vuelve a la APK y pulsa Consultar estado."
-        : action.action === "source" ? "Preferencia guardada. Se aplicará cuando el teléfono consulte su configuración; comprueba el último estado reportado."
-        : action.action === "revoke" ? "Autorización revocada. Sus eventos recibidos conservan su propietario."
+      setNotice(action.code ? "Teléfono autorizado. Abre AFP en el teléfono y pulsa Consultar estado."
+        : action.action === "source" ? "Cambio guardado. Se aplicará cuando el teléfono sincronice con AFP."
+        : action.action === "revoke" ? "Teléfono desvinculado. Se conservan sus avisos anteriores."
           : action.action === "pause" ? "Recepción pausada para este teléfono." : "Recepción reanudada.");
       if (action.code) form.reset();
     } catch (err) {
@@ -80,11 +79,11 @@ export default function CaptureDevices({ userId }) {
 
   return <Card onClickCapture={captureFocus}>
     <CardHeader>
-      <CardTitle>Captura automática</CardTitle>
-      <CardDescription>Autoriza tu teléfono y revisa los avisos recibidos. El registro automático requiere validar cada tarjeta y formato.</CardDescription>
+      <CardTitle>Teléfono y aplicaciones</CardTitle>
+      <CardDescription>Elige qué notificaciones puede recibir AFP.</CardDescription>
     </CardHeader>
     <CardContent className="flex flex-col gap-6">
-      <form onSubmit={form.handleSubmit(value => setConfirmation(value))} className="flex flex-col gap-3">
+      <Collapsible defaultOpen={false} className="flex flex-col gap-3"><CollapsibleTrigger asChild><Button variant="outline" className="min-h-11 self-start">Vincular otro teléfono</Button></CollapsibleTrigger><CollapsibleContent><form onSubmit={form.handleSubmit(value => setConfirmation(value))} className="flex flex-col gap-3">
         <FieldGroup>
           <Field data-invalid={Boolean(form.formState.errors.code)}>
             <FieldLabel htmlFor="capture-code">Código del teléfono</FieldLabel>
@@ -94,9 +93,9 @@ export default function CaptureDevices({ userId }) {
             <FieldError id="capture-code-error" errors={[form.formState.errors.code]} />
           </Field>
         </FieldGroup>
-        <p className="text-sm text-muted-foreground">Genera el código en la pantalla nativa de AFP. Vence a los cinco minutos y solo se puede autorizar una vez.</p>
+        <p className="text-sm text-muted-foreground">Abre AFP en tu teléfono y genera un código. Tienes cinco minutos para usarlo.</p>
         <Button type="submit" className="min-h-11 self-start" disabled={busy}>Autorizar teléfono</Button>
-      </form>
+      </form></CollapsibleContent></Collapsible>
       {error && <Alert variant="destructive"><AlertDescription>{error}</AlertDescription></Alert>}
       <div role="status">{notice && <Alert><AlertDescription>{notice}</AlertDescription></Alert>}</div>
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -108,44 +107,43 @@ export default function CaptureDevices({ userId }) {
         }}>Actualizar lista</Button>
       </div>
       {loading ? <Skeleton className="h-20 w-full" /> : devices.length === 0
-        ? <Empty><EmptyDescription>No hay teléfonos vinculados. Genera un código en la APK para empezar.</EmptyDescription></Empty>
-        : <ItemGroup className="gap-3">{devices.map(device => <Item key={device.id} variant="outline" className="flex-wrap">
+        ? <Empty><EmptyDescription>No tienes teléfonos vinculados. Pulsa Vincular otro teléfono para empezar.</EmptyDescription></Empty>
+        : <ItemGroup className="gap-3">{devices.map(device => <Item role="listitem" key={device.id} variant="outline" className="flex-wrap">
           <ItemContent className="min-w-0 basis-full sm:basis-0">
             <ItemTitle className="break-words">{device.name}</ItemTitle>
-            <ItemDescription>{device.lastSeenAt ? `Última consulta o recepción: ${new Date(device.lastSeenAt).toLocaleString("es-MX")}` : "Sin comunicación confirmada desde la autorización"}</ItemDescription>
+            <ItemDescription>{device.lastSeenAt ? `Última conexión: ${new Date(device.lastSeenAt).toLocaleString("es-MX")}` : "Sin comunicación confirmada desde la autorización"}</ItemDescription>
             <Badge variant="secondary">{device.revokedAt ? "Revocado" : device.pausedAt ? "Pausado" : "Autorizado"}</Badge>
-            <ItemDescription>{device.reportedAt ? `Estado reportado: ${new Date(device.reportedAt).toLocaleString("es-MX")}. No es una comprobación en tiempo real.` : "Sin estado nativo reportado. Requiere APK 0.4.0 o posterior; consulta el estado en el teléfono."}</ItemDescription>
+            <ItemDescription>{device.reportedAt ? `Último estado: ${new Date(device.reportedAt).toLocaleString("es-MX")}. Puede haber cambiado desde entonces.` : "Abre AFP en el teléfono y pulsa Consultar estado para conocer sus permisos."}</ItemDescription>
             {device.reportedState && <ItemDescription>{device.reportedState.notificationAccess ? "Acceso a avisos concedido" : "Sin acceso a avisos"} · {device.reportedState.listenerConnected ? "Lector conectado" : "Lector desconectado"} · {device.reportedState.active ? "Captura activa" : "Captura local pausada"} · {device.reportedState.deliveryPaused ? "Envíos pausados localmente" : "Envíos habilitados"} · {device.reportedState.batteryExempt ? "Batería sin restricción" : "Revisar batería"}</ItemDescription>}
             {!device.revokedAt && <Collapsible className="flex flex-col gap-3"><CollapsibleTrigger asChild><Button variant="outline" className="min-h-11 h-auto max-w-full self-start whitespace-normal text-left">Aplicaciones de {device.name}</Button></CollapsibleTrigger><CollapsibleContent>
               <ItemGroup>{Object.entries(captureSources).filter(([sourcePackage]) => sourcePackage !== "com.garatachia.afp.paymentreceipts").map(([sourcePackage, label]) => {
                 const paused = (device.pausedPackages || []).includes(sourcePackage);
                 const applied = device.reportedState && (device.reportedState.pausedPackages || []).includes(sourcePackage) === paused;
                 const selected = device.reportedState?.selectedPackages?.includes(sourcePackage);
-                return <Item key={sourcePackage} className="flex-wrap px-0"><ItemContent className="min-w-0 basis-32"><ItemTitle>{label}</ItemTitle><ItemDescription>{paused ? "Pausa solicitada" : "Permitida por AFP"} · {device.reportedState ? selected ? "Seleccionada en el teléfono" : "No seleccionada en el teléfono" : "Selección local desconocida"} · {applied ? "Preferencia reportada como aplicada" : "Pendiente de confirmar por el teléfono"}</ItemDescription></ItemContent>
+                return <Item role="listitem" key={sourcePackage} className="flex-wrap px-0"><ItemContent className="min-w-0 basis-32"><ItemTitle>{label}</ItemTitle><ItemDescription>{paused ? "Pausa solicitada" : "Permitida por AFP"} · {device.reportedState ? selected ? "Seleccionada en el teléfono" : "No seleccionada en el teléfono" : "Selección local desconocida"} · {applied ? "Cambio aplicado" : "Cambio por confirmar"}</ItemDescription></ItemContent>
                   <ItemActions><Button variant="outline" className="min-h-11" disabled={busy} aria-label={`${paused ? 'Reanudar' : 'Pausar'} ${label} en ${device.name}`} onClick={() => setConfirmation({ deviceId: device.id, action: 'source', sourcePackage, paused: !paused, name: label })}>{paused ? "Reanudar" : "Pausar"}</Button></ItemActions></Item>;
               })}</ItemGroup>
-              <p className="text-sm text-muted-foreground">La pausa remota se aplica al consultar estado o sincronizar con conexión (recuperación periódica de Android, sin plazo exacto). Conserva los avisos ya guardados. Reanudar aquí respeta tu selección local de fuentes.</p>
+              <p className="text-sm text-muted-foreground">Los cambios se aplican cuando el teléfono sincroniza con conexión. Para hacerlo ahora, abre AFP allí y pulsa Consultar estado. Los avisos anteriores se conservan.</p>
             </CollapsibleContent></Collapsible>}
           </ItemContent>
           {!device.revokedAt && <ItemActions className="flex-wrap">
             <Button variant="outline" className="min-h-11" disabled={busy}
               onClick={() => setConfirmation({ deviceId: device.id, action: device.pausedAt ? "resume" : "pause", name: device.name })}>{device.pausedAt ? "Reanudar" : "Pausar"}</Button>
             <Button variant="destructive" className="min-h-11" disabled={busy}
-              onClick={() => setConfirmation({ deviceId: device.id, action: "revoke", name: device.name })}>Revocar</Button>
+              onClick={() => setConfirmation({ deviceId: device.id, action: "revoke", name: device.name })}>Desvincular</Button>
           </ItemActions>}
         </Item>)}</ItemGroup>}
-      <p className="text-sm text-muted-foreground">Cerrar AFP o salir de la sesión web conserva la autorización del teléfono. Usa Pausar o Revocar para detener la recepción.</p>
-      <CaptureReview key={userId} userId={userId} />
+      <p className="text-sm text-muted-foreground">El teléfono sigue enviando avisos aunque cierres esta página. Puedes pausarlo o desvincularlo aquí.</p>
     </CardContent>
     <AlertDialog open={Boolean(confirmation)} onOpenChange={open => { if (!open && !busy) setConfirmation(null); }}>
       <AlertDialogContent onCloseAutoFocus={restoreFocus}>
         <AlertDialogHeader>
-          <AlertDialogTitle>{confirmation?.code ? "¿Autorizar este teléfono?" : confirmation?.action === "revoke" ? "¿Revocar la autorización?" : "¿Cambiar la recepción?"}</AlertDialogTitle>
+          <AlertDialogTitle>{confirmation?.code ? "¿Autorizar este teléfono?" : confirmation?.action === "revoke" ? "¿Desvincular el teléfono?" : "¿Cambiar la recepción?"}</AlertDialogTitle>
           <AlertDialogDescription>{confirmation?.code
-            ? `Confirma que ${confirmation.code} coincide con el código que acabas de generar en tu APK de AFP. El teléfono quedará vinculado a esta cuenta.`
-            : confirmation?.action === "revoke" ? `${confirmation.name} ya no podrá enviar eventos. Una nueva autorización requerirá otra identidad; los datos anteriores conservan su propietario.`
-              : confirmation?.action === "source" ? `${confirmation.name}: ${confirmation.paused ? "se pausarán nuevas capturas" : "se permitirá capturar de nuevo si la fuente está seleccionada en la APK"} al recibir la configuración. Los pendientes guardados se conservan.`
-                : `${confirmation?.name}: ${confirmation?.action === "pause" ? "se detendrá la recepción de eventos" : "se permitirá recibir eventos de nuevo"}.`}</AlertDialogDescription>
+            ? `Confirma que ${confirmation.code} coincide con el código que acabas de generar en AFP en tu teléfono. El teléfono quedará vinculado a esta cuenta.`
+            : confirmation?.action === "revoke" ? `${confirmation.name} dejará de enviar avisos. Se conservarán los movimientos anteriores. Para volver a vincularlo necesitarás una nueva autorización.`
+              : confirmation?.action === "source" ? `${confirmation.name}: ${confirmation.paused ? "se pausarán nuevas capturas" : "se permitirá capturar de nuevo si la fuente está seleccionada en el teléfono"} al recibir la configuración. Los pendientes guardados se conservan.`
+                : `${confirmation?.name}: ${confirmation?.action === "pause" ? "dejará de enviar avisos" : "volverá a enviar avisos"}.`}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel disabled={busy}>Cancelar</AlertDialogCancel>

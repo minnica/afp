@@ -1,0 +1,86 @@
+{
+  "status": "PUBLISHED_AND_VERIFIED",
+  "data": "Fictitious data; isolated local auth and PostgreSQL only. No production records or phone settings changed.",
+  "implementation": {
+    "route": "/registro-automatico",
+    "default": "pendientes",
+    "views": [
+      "pendientes",
+      "gastos",
+      "pagos",
+      "devoluciones",
+      "otros",
+      "ajustes"
+    ],
+    "contextualEntries": [
+      "/gastos",
+      "/tarjetas",
+      "/configuracion?tab=capture"
+    ],
+    "financialRulesChanged": false,
+    "databaseMigrationRequired": false,
+    "apkUpdateRequired": false
+  },
+  "validation": {
+    "fullSuite": {
+      "passed": 706,
+      "failed": 0,
+      "skipped": 0
+    },
+    "finalTargeted": {
+      "passed": 37,
+      "failed": 0,
+      "skipped": 0
+    },
+    "build": "next build --webpack: pass",
+    "lint": {
+      "errors": 0,
+      "preexistingWarnings": 2
+    },
+    "browserChecks": "browser-checks.json",
+    "detector": {
+      "runs": 1,
+      "findings": 0
+    },
+    "fictitiousDatabaseAssertions": {
+      "expenseCreatedOnce": true,
+      "partialRefundNet": "70.00",
+      "paidBefore": "100.00",
+      "paidAfter": "223.45"
+    },
+    "visualReview": {
+      "disposition": "ship",
+      "materialFixes": 0,
+      "report": "review.md"
+    },
+    "documentation": "design-note.md",
+    "browserCheckCount": 22
+  },
+  "sources": {
+    "src/app/api/captures/movements/route.js": "ebd9f0e11c3feaa268b9dcf8244343a3b9699a7e318dad91add8d642ae8d05aa",
+    "src/app/registro-automatico/page.js": "a33845e798e394f0c5f92e3370a994e235be78bdbca7bdb5ff733122c9d23a2f",
+    "src/components/configuracion/AutomaticRecordingContent.jsx": "ad7d9a1cea2db5bd16ee103f824b53edf2af7f029d673b12ff7177102894f6ed",
+    "src/components/configuracion/AutomaticRecordingLink.jsx": "76303b1687e997f6f4d95257b30534c12494ad6ef58c4121d6702f50cab7940c",
+    "src/components/configuracion/CaptureConfigurationPanel.jsx": "d7943d0cf0b1e32b66e4e3b7874f9b12ae74d2cfff5564e95a6ccb1cc77beb5d",
+    "src/components/configuracion/CaptureDevices.jsx": "7129ba06f974ec83c6853dc3ca96b736b459c5153d86583076b6db357138c11c",
+    "src/components/configuracion/CaptureFields.jsx": "a85fd2ab52130810af064da5019e1eef54e46ed765e4631a58f96c4c933eb481",
+    "src/components/configuracion/CaptureMovementEditor.jsx": "ddc8eb1348aff32012f1699463da54259673f17f220ab24c2b197a3418cf748a",
+    "src/components/configuracion/CaptureNotificationDetails.jsx": "297277a081700d40c1edc07eb94d936edbbcef170aae810d86df51ad70f99824",
+    "src/components/configuracion/CapturePaymentEditor.jsx": "8876195a5567133fa3e308e6135a98ad9022f00eef76b9c97e9d84c41b024e71",
+    "src/components/configuracion/CapturePilotSummary.jsx": "61d144ad9c299fec1b7d83996145859fd5683628d2475aa844634d93b999a45b",
+    "src/components/configuracion/CaptureReconciliation.jsx": "70347c72108430e387ded795fd35c610a416c87c8cf6b9225a68ab06672bae1b",
+    "src/components/configuracion/CaptureRefundEditor.jsx": "25e31301208a19a556da1eb3721006e39d57dd274f0702e6a72e0e9498921d26",
+    "src/components/configuracion/CaptureReview.jsx": "17088e9013d172a1e14e52efc8a76e6afa95fae373387dcc9a28eacc7605670f",
+    "src/components/configuracion/CaptureRolloutStatus.jsx": "b50ffb21567599bb447638a143e57ad296fc6e870b19481a9a3057e352066b20",
+    "src/components/configuracion/SettingsContent.jsx": "795e44f3b395449899d3123275b1328e561b7efec192096e9a93314fe4f669c5",
+    "src/components/gastos/CaptureStatus.jsx": "6e413ab9854f3291ae7a0c18e980cb3c6e2651986b77da5d10c8c8c3c6463731",
+    "src/components/gastos/GastosContent.jsx": "08c96dd3621a29ee2dd42e9541e53ea4b1c83d79af1d7cabd12bc4d2491726a2",
+    "src/components/tarjetas/TarjetasContent.jsx": "2601ed40f84b72b917f8864987ea8bd27cfe8237edfe679b70af6ecacfdbafad",
+    "src/components/ui/dialog.jsx": "eeae482b5f695c4676ec4c2dd793e0618c036621a9dabf62ba9164724cf82994",
+    "src/lib/captureInbox.js": "9785f37266c56cd53b8ab48316e92f4f27cb9bd1cabf8f2a2030463b35bdcfbb",
+    "src/lib/capturePresentation.js": "f273af1d9802833fa4e9dfcb35cce87328bfd54de2bb7f2817da3ab31b730f34",
+    "src/lib/navigation.js": "5f97567b372ff78535e88d59fd110646321e147889fa52482ab1cdf7e44eca15",
+    "tests/capture-inbox-integration.test.cjs": "5518d282d7b7fc14e16a9580d99d4ebc5020ce8c4c14461cda88d1faf50c7133"
+  },
+  "production": "production.json"
+}

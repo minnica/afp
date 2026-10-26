@@ -1,10 +1,11 @@
 import { BarChart3, CircleDollarSign, CreditCard, HandCoins, Home, ListChecks, ReceiptText, Settings, WalletCards } from "lucide-react";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Wallet02Icon } from "@hugeicons/core-free-icons";
+import { Wallet02Icon, TransactionHistoryIcon } from "@hugeicons/core-free-icons";
 
 function CreditBalancesIcon(props) {
   return <HugeiconsIcon icon={Wallet02Icon} {...props} />;
 }
+function AutomaticRecordingIcon(props) { return <HugeiconsIcon icon={TransactionHistoryIcon} {...props} />; }
 
 export const navItems = [
   { label: "Mi dinero", href: "/mi-dinero", icon: CircleDollarSign },
@@ -12,6 +13,11 @@ export const navItems = [
     label: "Gastos",
     href: "/gastos",
     icon: ReceiptText,
+  },
+  {
+    label: "Registro automático",
+    href: "/registro-automatico",
+    icon: AutomaticRecordingIcon,
   },
   {
     label: "Dashboard",

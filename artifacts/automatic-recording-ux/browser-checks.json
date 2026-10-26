@@ -1,0 +1,155 @@
+{
+  "data": "Fictitious, local auth and disposable PostgreSQL only",
+  "checks": [
+    {
+      "name": "pending390",
+      "width": 390,
+      "scroll": 390,
+      "dialog": []
+    },
+    {
+      "name": "pending-mobile",
+      "axe": {
+        "inapplicable": 67,
+        "incomplete": 0,
+        "passes": 21,
+        "violations": 0
+      }
+    },
+    {
+      "name": "payment390",
+      "width": 390,
+      "scroll": 390,
+      "dialog": [
+        {
+          "x": 16,
+          "right": 374,
+          "top": 42.203125,
+          "bottom": 801.796875,
+          "height": 844
+        }
+      ]
+    },
+    {
+      "name": "payment-mobile",
+      "axe": {
+        "inapplicable": 66,
+        "incomplete": 1,
+        "passes": 22,
+        "violations": 0
+      }
+    },
+    {
+      "name": "payment-add-confirmed"
+    },
+    {
+      "name": "refund390",
+      "width": 390,
+      "scroll": 390,
+      "dialog": [
+        {
+          "x": 16,
+          "right": 374,
+          "top": 163.75,
+          "bottom": 680.25,
+          "height": 844
+        }
+      ]
+    },
+    {
+      "name": "refund-mobile",
+      "axe": {
+        "inapplicable": 66,
+        "incomplete": 1,
+        "passes": 22,
+        "violations": 0
+      }
+    },
+    {
+      "name": "empty-status-filter"
+    },
+    {
+      "name": "service-notice-separated"
+    },
+    {
+      "name": "settings390",
+      "width": 390,
+      "scroll": 390,
+      "dialog": []
+    },
+    {
+      "name": "settings-mobile",
+      "axe": {
+        "inapplicable": 67,
+        "incomplete": 0,
+        "passes": 21,
+        "violations": 0
+      }
+    },
+    {
+      "name": "pairing-validation-no-mutation"
+    },
+    {
+      "name": "pending320",
+      "width": 320,
+      "scroll": 320,
+      "dialog": []
+    },
+    {
+      "name": "refund320",
+      "width": 320,
+      "scroll": 320,
+      "dialog": [
+        {
+          "x": 16,
+          "right": 304,
+          "top": 111.75,
+          "bottom": 628.25,
+          "height": 740
+        }
+      ]
+    },
+    {
+      "name": "pending1280",
+      "width": 1280,
+      "scroll": 1280,
+      "dialog": []
+    },
+    {
+      "name": "pending-desktop",
+      "axe": {
+        "inapplicable": 67,
+        "incomplete": 0,
+        "passes": 21,
+        "violations": 0
+      }
+    },
+    {
+      "name": "statement1280",
+      "width": 1280,
+      "scroll": 1280,
+      "dialog": []
+    },
+    {
+      "name": "expenses-context-link",
+      "url": "/registro-automatico?tipo=pendientes"
+    },
+    {
+      "name": "cards-context-link",
+      "url": "/registro-automatico?tipo=pagos"
+    },
+    {
+      "name": "expense-save-and-register",
+      "validationBeforeSubmission": true,
+      "result": "Gasto registrado; separate existing PATCH correct/register operations"
+    },
+    {
+      "name": "offline-recovery",
+      "result": "Inline error, recorded data retained; automatic refresh after reconnect clears error."
+    },
+    {
+      "name": "keyboard-tabs-url",
+      "result": "ArrowRight from Gastos selects Pagos and updates tipo=pagos without losing the surface."
+    }
+  ]
+}

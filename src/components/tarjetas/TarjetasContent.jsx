@@ -1,4 +1,5 @@
 "use client";
+import AutomaticRecordingLink from "@/components/configuracion/AutomaticRecordingLink";
 
 import { apiFetch } from "@/lib/apiFetch";
 import { useDashboard } from "@/components/dashboard/DashboardProvider";
@@ -413,6 +414,7 @@ export default function TarjetasContent() {
         </AlertDialogContent>
       </AlertDialog>
       <section className="mx-auto flex w-full max-w-7xl flex-col px-4 py-5 md:py-8">
+        <AutomaticRecordingLink payments />
         {error ? (
           <Alert variant="destructive" className="mb-6">
             <AlertDescription>{error}</AlertDescription>

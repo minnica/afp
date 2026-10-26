@@ -12,7 +12,7 @@ export default function CaptureFields({ form, configuration, disabled = false, p
       const id = `${prefix}-${name}`;
       return <Field key={name} data-invalid={Boolean(error)}>
         <FieldLabel htmlFor={id}>{label}</FieldLabel>
-        {['cardId', 'categoryId'].includes(name) ? <Controller name={name} control={form.control} render={({ field }) => <ResponsiveSelect id={id} value={field.value} onValueChange={field.onChange} disabled={disabled}
+        {['cardId', 'categoryId'].includes(name) ? <Controller name={name} control={form.control} render={({ field }) => <ResponsiveSelect className="min-h-11" id={id} value={field.value} onValueChange={field.onChange} disabled={disabled}
           aria-invalid={Boolean(error)} aria-label={label} searchable="auto" options={(name === 'cardId' ? configuration.cards : configuration.categories).map(row => ({ value: row.id, label: row.name }))} />}
         /> : name === 'date' ? <Controller name="date" control={form.control} render={({ field }) => <DatePicker id={id} className="min-h-11" value={field.value} onChange={field.onChange} disabled={disabled} aria-label={label} />} />
           : name === 'amount' ? <Controller name="amount" control={form.control} render={({ field }) => <Input {...field} id={id} className="min-h-11" type="number" formatNumber min="0.01" step="0.01" disabled={disabled} aria-invalid={Boolean(error)} />} />

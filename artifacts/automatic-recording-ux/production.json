@@ -1,0 +1,116 @@
+{
+  "verifiedAt": "2026-10-26T05:42:38.678341+00:00",
+  "deploymentId": "dpl_He9wcP4hjQwMHZVgAGPJqmBt1vq1",
+  "state": "READY",
+  "target": "production",
+  "framework": "nextjs",
+  "productionUrl": "https://finanzas.garatachia.com",
+  "sectionUrl": "https://finanzas.garatachia.com/registro-automatico",
+  "deploymentUrl": "https://afp-j7taa3rda-minnicas-projects.vercel.app",
+  "sourceCommit": "f9bc306c5e6a078ba80c8cc6ce89b71fc3aa95d9",
+  "sourceIncludesVerifiedWorkingTreeChanges": true,
+  "commitOrPushPerformed": false,
+  "publishedFiles": 335,
+  "sourceManifestSha256": "4d62fdac9cefd51aa35a872df797dd923956124f9603619b3981ad6366e64a61",
+  "deploymentSourceDigestVerification": {
+    "matchedReturnedFiles": 121,
+    "allReturnedMatch": true,
+    "fileTreeResponseWasDepthTruncated": true
+  },
+  "prismaFilesUnchanged": 39,
+  "databaseMigrationsExecuted": 0,
+  "apkUpdatePerformed": false,
+  "financialWritesPerformed": 0,
+  "http": [
+    {
+      "path": "/registro-automatico",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/login",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/captures/movements?kind=PENDING",
+      "method": "GET",
+      "status": 401
+    },
+    {
+      "path": "/api/captures/movements?kind=REFUND",
+      "method": "GET",
+      "status": 401
+    },
+    {
+      "path": "/api/captures/movements",
+      "method": "PATCH",
+      "status": 401
+    },
+    {
+      "path": "/api/captures/configuration",
+      "method": "GET",
+      "status": 401
+    },
+    {
+      "path": "/api/captures/devices",
+      "method": "GET",
+      "status": 401
+    }
+  ],
+  "authenticatedPhone": {
+    "newSectionVisible": true,
+    "tabs": [
+      "Pendientes",
+      "Gastos",
+      "Pagos",
+      "Devoluciones",
+      "Otros avisos",
+      "Ajustes"
+    ],
+    "apis": [
+      {
+        "kind": "PENDING",
+        "status": 200,
+        "ownerMatches": true,
+        "classificationMatches": true
+      },
+      {
+        "kind": "EXPENSE",
+        "status": 200,
+        "ownerMatches": true,
+        "classificationMatches": true
+      },
+      {
+        "kind": "PAYMENT",
+        "status": 200,
+        "ownerMatches": true,
+        "classificationMatches": true
+      },
+      {
+        "kind": "REFUND",
+        "status": 200,
+        "ownerMatches": true,
+        "classificationMatches": true
+      },
+      {
+        "kind": "OTHER",
+        "status": 200,
+        "ownerMatches": true,
+        "classificationMatches": true
+      }
+    ],
+    "configurationStatus": 200,
+    "refundsRemainPendingPersonalConfirmation": true,
+    "viewport": {
+      "width": 384,
+      "scroll": 384
+    },
+    "visibleErrors": 0,
+    "remoteControl": "Chrome DevTools fallback after agent-browser daemon timeout"
+  },
+  "runtimeErrorGroupsObserved": 0,
+  "runtimeLogWindow": "15m filtered to this deployment",
+  "pendingDeploymentsOrMigrations": false,
+  "buildDurationSeconds": 124.238
+}

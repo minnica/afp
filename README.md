@@ -19,6 +19,7 @@ La página inicial es `/dashboard`: `/` redirige allí, el login navega al Dashb
 | Ruta | Componente principal | Descripción |
 |---|---|---|
 | `/gastos` | `GastosContent.jsx` | Registro y gestión de gastos diarios |
+| `/registro-automatico` | `AutomaticRecordingContent.jsx` | Pendientes, gastos detectados, pagos de tarjeta, devoluciones y ajustes del teléfono |
 | `/dashboard` | `DashboardContent.jsx` | Resumen financiero del período |
 | `/mi-dinero` | `MoneyContent.jsx` | Cuentas a la vista, movimientos, rendimiento diario y proyección de liquidez |
 | `/analisis` | `AnalysisContent.jsx` | Comparativos mensuales por semana, tarjeta y categoría |
@@ -581,6 +582,19 @@ En un entorno nuevo, configurar `DIRECT_URL`, aplicar `pnpm exec prisma migrate 
 La reconstrucción cubre el esquema `public` de AFP y su RLS, no usuarios/datos financieros, configuración de Supabase Auth, roles administrados por el proveedor ni secretos. [Evidencia y cierre A11](artifacts/auditoria-2026-10-15/informe.md#A11-seguimiento). Referencias: [historial de Prisma 7](https://www.prisma.io/docs/orm/v7/prisma-migrate/understanding-prisma-migrate/migration-histories) y [RLS en PostgreSQL](https://www.postgresql.org/docs/16/ddl-rowsecurity.html) y [event triggers de Supabase](https://supabase.com/docs/guides/database/postgres/event-triggers).
 
 ---
+
+## Registro automático — experiencia de revisión
+
+**Publicado con autorización y verificado en producción.** La revisión diaria vive en **Registro automático** (`/registro-automatico`), con accesos desde Gastos, Tarjetas y el menú principal. La antigua pestaña de Configuración conserva enlaces a la nueva sección. Las rutas descritas en las fases históricas de abajo corresponden a la interfaz anterior.
+
+- **Pendientes** reúne gastos, pagos y devoluciones por resolver. **Gastos**, **Pagos** y **Devoluciones** incluyen su historial y filtros por tarjeta y estado. **Otros avisos** conserva las notificaciones sin un movimiento financiero identificado, incluidos los avisos de viaje o pedido. Los filtros se aplican en PostgreSQL antes de paginar; los contadores también respetan el propietario y la tarjeta.
+- **Ajustes → Tarjetas y reglas** concentra activación, respaldo bancario, terminaciones y categorías por comercio. **Ajustes → Teléfono** permite vincular, pausar, desvincular y elegir aplicaciones. Los identificadores de formatos y los textos originales se consultan desplegando sus detalles.
+- **Guardar y registrar gasto** guarda primero los datos y solicita el registro con las operaciones existentes; las coincidencias siguen requiriendo resolución. **Guardar sin registrar** permite conservar una corrección. En los pagos, **Sumar este pago** agrega un abono y **Ya lo había registrado** vincula el aviso sin volver a sumarlo. Las devoluciones muestran el gasto actual y el importe posterior antes de pedir confirmación.
+- **Gastos → Comparar con estado de cuenta** conserva la conciliación individual y el registro de faltantes. La prioridad de Wallet, los 15 minutos del respaldo, las reglas financieras, las protecciones contra duplicados y la confirmación personal de devoluciones se conservan.
+
+No requiere migración de base de datos, cambios de trabajos programados ni una APK nueva. La publicación web aplica también a la TWA del teléfono. Pruebas y capturas con datos ficticios: [`artifacts/automatic-recording-ux`](artifacts/automatic-recording-ux). Suite completa: **706 pruebas correctas**, sin fallos ni omisiones; 37 dirigidas repetidas al finalizar, build Webpack válido y lint sin errores (dos avisos previos). Navegador a 320/390/1280 px, filtros, confirmaciones, guardado, conexión y teclado comprobados con Auth y PostgreSQL locales. La revisión visual independiente concluyó **ship**, sin correcciones materiales. [Verificación](artifacts/automatic-recording-ux/verification.json).
+
+**Publicación autorizada · 26 de octubre de 2026 UTC:** `dpl_He9wcP4hjQwMHZVgAGPJqmBt1vq1`, `READY`, sirve `https://finanzas.garatachia.com`. Se publicaron 335 archivos del árbol verificado sobre `f9bc306`, sin commit ni push. Las huellas de los 121 archivos devueltos por el árbol de Vercel coinciden; la respuesta del árbol es parcial por profundidad. Los 39 archivos Prisma se conservan respecto de la publicación anterior, sin ejecutar migraciones ni actualizar la APK. La sección real del teléfono muestra las seis pestañas, sin desbordamiento a 384 px ni errores visibles; las cinco listas y la configuración responden 200 con la sesión del propietario y conservan su ámbito. Las rutas protegidas rechazan consultas sin sesión. La verificación utilizó solo consultas; no registró gastos, pagos ni devoluciones. Los reembolsos siguen esperando confirmación personal. No se observaron errores de runtime en la ventana consultada. [Verificación de producción](artifacts/automatic-recording-ux/production.json).
 
 ## Captura automática Android — Fase 1
 

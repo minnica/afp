@@ -1,4 +1,5 @@
 "use client";
+import AutomaticRecordingLink from "@/components/configuracion/AutomaticRecordingLink";
 import CaptureStatus from "@/components/gastos/CaptureStatus";
 import OfflineCaptureConflicts from "@/components/gastos/OfflineCaptureConflicts";
 
@@ -1578,6 +1579,7 @@ export default function GastosContent() {
 
       <main onClickCapture={captureFocus}>
         <section className={`mx-auto flex w-full max-w-full flex-col px-4 py-5 md:py-8 ${compactEntry ? "pb-28!" : ""}`}>
+          <AutomaticRecordingLink />
           {error ? (
             <Alert variant="destructive" className="mb-6">
               <AlertDescription>{error}</AlertDescription>

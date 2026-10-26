@@ -1,7 +1,8 @@
 "use client";
 import { useRef, useState } from "react";
 import { apiFetch } from "@/lib/apiFetch";
-import { captureReasons, captureSources } from "@/lib/capturePresentation";
+import { captureReasons } from "@/lib/capturePresentation";
+import CaptureNotificationDetails from "@/components/configuracion/CaptureNotificationDetails";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -17,6 +18,7 @@ export default function CaptureRefundEditor({ detail, configuration, userId, onC
   const [current, setCurrent] = useState(detail), [busy, setBusy] = useState(false), [error, setError] = useState("");
   const [confirmation, setConfirmation] = useState(null), [distinct, setDistinct] = useState(false), [notice, setNotice] = useState("");
   const titleRef = useRef(null), p = current.movement.proposal, refund = current.refundDetail?.refund;
+  const selectedExpense = current.refundDetail?.candidates.find(row => row.id === confirmation?.expenseId);
   const duplicates = current.refundDetail?.possibleDuplicates || [];
   async function act(action) {
     if (busy) return;
@@ -32,33 +34,30 @@ export default function CaptureRefundEditor({ detail, configuration, userId, onC
     finally { setBusy(false); }
   }
   return <><Dialog open onOpenChange={value => { if (!value && !busy) onClose(); }}>
-    <DialogContent className="flex max-h-[90dvh] flex-col overflow-hidden sm:max-w-xl" onOpenAutoFocus={event => { event.preventDefault(); titleRef.current?.focus(); }}
+    <DialogContent className="flex [&_[data-slot=dialog-close]]:size-11 max-h-[90dvh] flex-col overflow-hidden sm:max-w-xl" onOpenAutoFocus={event => { event.preventDefault(); titleRef.current?.focus(); }}
       onCloseAutoFocus={restoreFocus} onEscapeKeyDown={event => { if (busy) event.preventDefault(); }} onInteractOutside={event => { if (busy) event.preventDefault(); }} showCloseButton={!busy}>
-      <DialogHeader><DialogTitle ref={titleRef} tabIndex={-1}>Revisar devolución</DialogTitle><DialogDescription>Comprueba el aviso y confirma a qué gasto pertenece. El cargo original y tus datos se conservan.</DialogDescription></DialogHeader>
+      <DialogHeader><DialogTitle ref={titleRef} tabIndex={-1}>{refund?.reversedAt ? "Devolución deshecha" : refund ? "Devolución aplicada" : "Revisar devolución"}</DialogTitle><DialogDescription>{configuration.cards.find(card => card.id === p.cardId)?.name || "Tarjeta sin identificar"}{p.date && ` · ${p.date}`}</DialogDescription></DialogHeader>
       <div className="flex min-h-0 flex-col gap-4 overflow-y-auto">
         {error && <Alert variant="destructive"><AlertDescription>{error}</AlertDescription></Alert>}
-        <p role="status" className="text-sm">{notice}</p>
-        <p className="text-sm">{p.merchant || "Comercio por identificar"}{p.amount && ` · ${money(p.amount)}`} · {configuration.cards.find(card => card.id === p.cardId)?.name || "Tarjeta por identificar"}</p>
-        <p className="text-sm text-muted-foreground">{captureReasons[current.movement.reason] || "El formato está incompleto; revisa sus datos antes de resolverlo."}</p>
-        <ItemGroup>{current.movement.events.map(event => <Item key={event.id}><ItemContent>
-          <ItemTitle>{captureSources[event.sourcePackage]}</ItemTitle>
-          <ItemDescription>{new Date(event.postedAt).toLocaleString("es-MX", { timeZone: "America/Mexico_City" })} · publicación en hora de México</ItemDescription>
-          <p className="whitespace-pre-wrap break-words text-sm">{Object.values(event.fields).join("\n")}</p>
-        </ItemContent></Item>)}</ItemGroup>
+        {notice && <p role="status" className="text-sm">{notice}</p>}
+        <div className="flex flex-col gap-1"><p className="text-2xl font-semibold tabular-nums">{p.amount ? money(p.amount) : "Importe sin identificar"}</p><p className="break-words text-sm font-medium">{p.merchant || "Comercio sin identificar"}</p></div>
         {!refund && current.movement.status === "REVIEW" && <>
-          <Alert><AlertDescription>El aviso no incluye una referencia única de compra. Revisa comercio, tarjeta e importe: una coincidencia es una propuesta, requiere tu confirmación.</AlertDescription></Alert>
-          {duplicates.length > 0 && <Alert variant="destructive"><AlertDescription>Ya revisaste otra devolución de este importe y comercio. Comprueba que este aviso corresponde a una devolución distinta.</AlertDescription></Alert>}
-          <ItemGroup>{current.refundDetail?.candidates.map(candidate => <Item key={candidate.id} variant="outline" className="flex-wrap">
-            <ItemContent><ItemTitle className="break-words">{candidate.concept}</ItemTitle><ItemDescription>{new Date(candidate.date).toLocaleDateString("es-MX", { timeZone: "UTC" })} · original {money(candidate.originalAmount)} · neto actual {money(candidate.amount)}</ItemDescription>
-              <ItemDescription>Después de la devolución: {money(Number(candidate.amount) - Number(p.amount))}</ItemDescription></ItemContent>
-            <ItemActions><Button variant="outline" disabled={busy} className="min-h-11" onClick={() => { setError(""); setConfirmation({ action: "applyRefund", expenseId: candidate.id, expectedExpenseUpdatedAt: candidate.updatedAt }); }}>Aplicar devolución</Button></ItemActions>
+          <Alert><AlertDescription>Elige el gasto al que pertenece. AFP no descontará dinero hasta que lo confirmes.</AlertDescription></Alert>
+          {duplicates.length > 0 && <Alert variant="destructive"><AlertDescription>Hay otra devolución del mismo importe y comercio. Confirma que son devoluciones distintas.</AlertDescription></Alert>}
+          <ItemGroup>{current.refundDetail?.candidates.map(candidate => <Item role="listitem" key={candidate.id} variant="outline" className="flex-wrap">
+            <ItemContent className="basis-full"><ItemTitle className="line-clamp-none break-words">{candidate.concept}</ItemTitle><ItemDescription className="line-clamp-none">{new Date(candidate.date).toLocaleDateString("es-MX", { timeZone: "UTC" })} · cargo original {money(candidate.originalAmount)}</ItemDescription>
+              <dl className="mt-2 grid grid-cols-2 gap-3 text-sm"><div><dt className="text-xs text-muted-foreground">Gasto actual</dt><dd className="font-medium tabular-nums">{money(candidate.amount)}</dd></div><div><dt className="text-xs text-muted-foreground">Tras la devolución</dt><dd className="font-semibold tabular-nums">{money(Number(candidate.amount) - Number(p.amount))}</dd></div></dl></ItemContent>
+            <ItemActions className="w-full justify-end"><Button disabled={busy} className="min-h-11" onClick={() => { setError(""); setConfirmation({ action: "applyRefund", expenseId: candidate.id, expectedExpenseUpdatedAt: candidate.updatedAt }); }}>Elegir este gasto</Button></ItemActions>
           </Item>)}</ItemGroup>
-          {!current.refundDetail?.candidates.length && <p className="text-sm text-muted-foreground">No hay un cargo capturado compatible en los 30 días anteriores con saldo suficiente para esta devolución. Los gastos con suscripciones, aportaciones o cuentas vinculadas requieren una revisión aparte.</p>}
+          {!current.refundDetail?.candidates.length && <p className="text-sm text-muted-foreground">No encontramos un gasto compatible. Comprueba que la compra esté registrada con la misma tarjeta y comercio, en los últimos 30 días. Los gastos con suscripciones, aportaciones o cuentas vinculadas se revisan aparte.</p>}
         </>}
-        {refund && <Alert><AlertDescription>{refund.reversedAt ? "Deshiciste esta devolución. Se conserva la evidencia y este aviso no volverá a aplicarse." : `Devolución de ${money(refund.amount)} aplicada al gasto original. Puedes deshacerla si seleccionaste el gasto equivocado.`}</AlertDescription></Alert>}
+        {refund && <Alert><AlertDescription>{refund.reversedAt ? "El importe volvió al gasto. Este aviso conserva el historial y no se aplicará de nuevo." : `Se descontaron ${money(refund.amount)} del gasto original. Puedes deshacerlo si elegiste otro gasto.`}</AlertDescription></Alert>}
+        {!["REFUND_REVIEW", "REFUND_APPLIED", "REFUND_REVERSED"].includes(current.movement.reason) && <p className="text-sm text-muted-foreground">{captureReasons[current.movement.reason] || "Revisa los datos del aviso."}</p>}
+        <CaptureNotificationDetails movement={current.movement}>
+          {!refund && current.movement.status === "REVIEW" && <Button variant="outline" className="min-h-11 self-start" disabled={busy} onClick={() => act({ action: "reinterpret" })}>Buscar coincidencias de nuevo</Button>}
+        </CaptureNotificationDetails>
       </div>
       <DialogFooter className="flex-wrap">
-        {!refund && current.movement.status === "REVIEW" && <Button variant="outline" className="min-h-11" disabled={busy} onClick={() => act({ action: "reinterpret" })}>Actualizar propuesta</Button>}
         {refund && !refund.reversedAt && <Button variant="outline" className="min-h-11" disabled={busy} onClick={() => setConfirmation({ action: "reverseRefund" })}>Deshacer devolución</Button>}
         <Button variant="outline" className="min-h-11" disabled={busy} onClick={onClose}>Cerrar</Button>
       </DialogFooter>
@@ -66,10 +65,10 @@ export default function CaptureRefundEditor({ detail, configuration, userId, onC
   </Dialog>
   <AlertDialog open={Boolean(confirmation)} onOpenChange={open => { if (!open && !busy) { setConfirmation(null); setDistinct(false); } }}>
     <AlertDialogContent><AlertDialogHeader><AlertDialogTitle>{confirmation?.action === "reverseRefund" ? "Deshacer devolución" : "Confirmar devolución"}</AlertDialogTitle>
-      <AlertDialogDescription>{confirmation?.action === "reverseRefund" ? "Se restituirá el importe de esta devolución al neto del gasto. El historial se conserva." : `Se descontarán ${money(p.amount)} del gasto seleccionado. Si es un reembolso total, su neto quedará en cero. El concepto, la categoría y el cargo original se conservan; quedará pendiente de conciliar.`}</AlertDialogDescription></AlertDialogHeader>
-      {confirmation?.action === "applyRefund" && duplicates.length > 0 && <Field orientation="horizontal"><Checkbox id="distinct-refund" disabled={busy} checked={distinct} onCheckedChange={setDistinct} /><FieldLabel htmlFor="distinct-refund">Comprobé que es otra devolución, no un aviso repetido</FieldLabel></Field>}
+      <AlertDialogDescription>{confirmation?.action === "reverseRefund" ? "El importe de la devolución volverá a sumarse al gasto. Se conservará el historial." : `${selectedExpense?.concept || "Gasto seleccionado"}: pasará de ${money(selectedExpense?.amount || 0)} a ${money(Number(selectedExpense?.amount || 0) - Number(p.amount))}. Se conservarán sus datos y quedará pendiente de comprobar en el estado de cuenta.`}</AlertDialogDescription></AlertDialogHeader>
+      {confirmation?.action === "applyRefund" && duplicates.length > 0 && <Field orientation="horizontal"><Checkbox id="distinct-refund" disabled={busy} checked={distinct} onCheckedChange={setDistinct} /><FieldLabel htmlFor="distinct-refund">Confirmo que es otra devolución</FieldLabel></Field>}
       {error && <Alert variant="destructive"><AlertDescription>{error}</AlertDescription></Alert>}
-      <AlertDialogFooter><AlertDialogCancel className="min-h-11" disabled={busy}>Cancelar</AlertDialogCancel><AlertDialogAction className="min-h-11" disabled={busy || (confirmation?.action === "applyRefund" && duplicates.length > 0 && !distinct)} onClick={event => { event.preventDefault(); void act({ ...confirmation, distinctRefund: distinct }); }}>{busy && <Spinner />}Confirmar</AlertDialogAction></AlertDialogFooter>
+      <AlertDialogFooter><AlertDialogCancel className="min-h-11" disabled={busy}>Cancelar</AlertDialogCancel><AlertDialogAction className="min-h-11" disabled={busy || (confirmation?.action === "applyRefund" && duplicates.length > 0 && !distinct)} onClick={event => { event.preventDefault(); void act({ ...confirmation, distinctRefund: distinct }); }}>{busy && <Spinner />}{confirmation?.action === "reverseRefund" ? "Deshacer devolución" : `Descontar ${money(p.amount)}`}</AlertDialogAction></AlertDialogFooter>
     </AlertDialogContent>
   </AlertDialog></>;
 }
