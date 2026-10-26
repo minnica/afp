@@ -20,7 +20,7 @@ test('pagos capturados: recepción, revisión y acumulados transaccionales con P
     creditLimit: '10000', usedBalance: '2000', balanceAsOf: new Date('2026-10-20'),
     balanceTracking: { version: 1, day: '2026-10-20', captureId: randomUUID(), startedAt: '2026-10-20T12:00:00Z', baseExposureCents: '0' } } });
   const cycle = await db.cardCycle.create({ data: { userId: user.id, cardId: card.id, month: 10, year: 2026,
-    startDate: new Date('2026-09-11'), cutDate: new Date('2026-10-10'), dueDate: new Date('2026-10-25'), statementAmount: '1000' } });
+    startDate: new Date('2026-09-11'), cutDate: new Date('2026-10-10'), dueDate: new Date(Date.now() + 30 * 86400000), statementAmount: '1000' } });
   const noStatement = await db.cardCycle.create({ data: { userId: user.id, cardId: card.id, month: 11, year: 2026,
     startDate: new Date('2026-10-11'), cutDate: new Date('2026-11-10'), dueDate: new Date('2026-11-25') } });
   const device = await db.captureDevice.create({ data: { userId: user.id, name: 'Ficticio', approvedAt: new Date(), secretHash: protocol.captureHash(randomBytes(32).toString('base64url')) } });

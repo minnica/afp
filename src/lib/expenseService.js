@@ -7,12 +7,13 @@ import { getCashContributionError } from "@/lib/sharedExpenses";
 // El estado de conciliación es un argumento interno, nunca un campo confiado del cuerpo.
 export async function createExpenseInTransaction(tx, userId, body, expenseSelect, reconciliationStatus = "CONFIRMED") {
   await lockDebtAccounts(tx, userId);
-  await requireOwnedReferences(tx, userId, body, ["cardId", "categoryId", "personId", "receivableAccountId", "payableAccountId", "subscriptionId"]);
+  await requireOwnedReferences(tx, userId, body, ["debitAccountId", "cardId", "categoryId", "personId", "receivableAccountId", "payableAccountId", "subscriptionId"]);
 
   const {
     date,
     paymentMethod,
     cardId,
+    debitAccountId,
     concept,
     amount,
     categoryId,
@@ -35,7 +36,7 @@ export async function createExpenseInTransaction(tx, userId, body, expenseSelect
     throw new ApiAccessError("Faltan datos obligatorios.", 400);
   }
 
-  if (!["CASH", "CARD"].includes(paymentMethod)) {
+  if (!["CASH", "CARD", "DEBIT"].includes(paymentMethod)) {
     throw new ApiAccessError("Método de pago no válido.", 400);
   }
 
@@ -43,6 +44,8 @@ export async function createExpenseInTransaction(tx, userId, body, expenseSelect
     throw new ApiAccessError("Debes seleccionar una tarjeta.", 400);
   }
 
+  if (paymentMethod === "DEBIT" && !debitAccountId) throw new ApiAccessError("Selecciona la cuenta de débito.", 400);
+  if (paymentMethod === "DEBIT" && (subscriptionId || payableAccountId || receivableAccountId || createReceivable)) throw new ApiAccessError("Revisa por separado los vínculos de este gasto con débito.", 400);
   const numericAmount = Number(amount);
 
   if (!Number.isFinite(numericAmount) || numericAmount <= 0) {
@@ -107,6 +110,7 @@ export async function createExpenseInTransaction(tx, userId, body, expenseSelect
       date: parsedDate,
       paymentMethod,
       cardId: paymentMethod === "CARD" ? cardId : null,
+      debitAccountId: paymentMethod === "DEBIT" ? debitAccountId : null,
       concept: concept.trim(),
       amount: storedAmount,
       cashContributionAmount,

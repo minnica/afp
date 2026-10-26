@@ -43,7 +43,7 @@ export function apiAccessErrorResponse(error) {
 }
 
 const referenceModels = {
-  cardId: "card", categoryId: "category", personId: "person", incomeTypeId: "incomeType",
+  debitAccountId: "moneyAccount", cardId: "card", categoryId: "category", personId: "person", incomeTypeId: "incomeType",
   receivableAccountId: "receivableAccount", payableAccountId: "payableAccount", subscriptionId: "subscription",
 };
 

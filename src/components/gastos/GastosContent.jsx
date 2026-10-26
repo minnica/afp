@@ -162,6 +162,7 @@ function formatExpenseDate(dateString) {
 }
 
 function getPaymentMethodLabel(paymentMethod) {
+  if (paymentMethod === "DEBIT") return "Débito";
   if (paymentMethod === "CARD") return "Tarjeta";
   return "Efectivo";
 }
@@ -187,12 +188,14 @@ export default function GastosContent() {
   const [user, setUser] = useState(null);
   const [categories, setCategories] = useState([]);
   const [cards, setCards] = useState([]);
+  const [moneyAccounts, setMoneyAccounts] = useState([]);
   const [expenses, setExpenses] = useState([]);
   const [availableMonths, setAvailableMonths] = useState([]);
 
   const [date, setDate] = useState(getTodayInputValue());
   const [paymentMethod, setPaymentMethod] = useState("CASH");
   const [cardId, setCardId] = useState("");
+  const [debitAccountId, setDebitAccountId] = useState("");
   const [concept, setConcept] = useState("");
   const [amount, setAmount] = useState("");
   const [isSharedExpense, setIsSharedExpense] = useState(false);
@@ -226,8 +229,8 @@ export default function GastosContent() {
     name: "gastos",
     userId: user?.id,
     enabled: mobileNavigation,
-    values: { date, paymentMethod, cardId, concept, amount, isSharedExpense, cashContributionAmount, categoryId, notes, showMoreOptions, personId, receivableMode, receivableAccountId, payableAccountId, subscriptionId },
-    setters: { date: setDate, paymentMethod: setPaymentMethod, cardId: setCardId, concept: setConcept, amount: setAmount, isSharedExpense: setIsSharedExpense, cashContributionAmount: setCashContributionAmount, categoryId: setCategoryId, notes: setNotes, showMoreOptions: setShowMoreOptions, personId: setPersonId, receivableMode: setReceivableMode, receivableAccountId: setReceivableAccountId, payableAccountId: setPayableAccountId, subscriptionId: setSubscriptionId },
+    values: { date, paymentMethod, cardId, debitAccountId, concept, amount, isSharedExpense, cashContributionAmount, categoryId, notes, showMoreOptions, personId, receivableMode, receivableAccountId, payableAccountId, subscriptionId },
+    setters: { date: setDate, paymentMethod: setPaymentMethod, cardId: setCardId, debitAccountId: setDebitAccountId, concept: setConcept, amount: setAmount, isSharedExpense: setIsSharedExpense, cashContributionAmount: setCashContributionAmount, categoryId: setCategoryId, notes: setNotes, showMoreOptions: setShowMoreOptions, personId: setPersonId, receivableMode: setReceivableMode, receivableAccountId: setReceivableAccountId, payableAccountId: setPayableAccountId, subscriptionId: setSubscriptionId },
   });
 
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -235,6 +238,7 @@ export default function GastosContent() {
   const [editDate, setEditDate] = useState("");
   const [editPaymentMethod, setEditPaymentMethod] = useState("CASH");
   const [editCardId, setEditCardId] = useState("");
+  const [editDebitAccountId, setEditDebitAccountId] = useState("");
   const [editConcept, setEditConcept] = useState("");
   const [editAmount, setEditAmount] = useState("");
   const [editIsSharedExpense, setEditIsSharedExpense] = useState(false);
@@ -285,6 +289,7 @@ export default function GastosContent() {
       setCategories(data.categories || []);
       setPeople(data.people || []);
       setCards(data.cards || []);
+      setMoneyAccounts(data.moneyAccounts || []);
       setExpenses(data.expenses || []);
       setAvailableMonths(data.availableMonths || []);
       setReceivables(data.receivables || []);
@@ -300,6 +305,7 @@ export default function GastosContent() {
       setCategories(cachedData.categories || []);
       setPeople(cachedData.people || []);
       setCards(cachedData.cards || []);
+      setMoneyAccounts(cachedData.moneyAccounts || []);
       setExpenses(cachedData.expenses || []);
       setAvailableMonths(cachedData.availableMonths || []);
       setReceivables(cachedData.receivables || []);
@@ -333,7 +339,8 @@ export default function GastosContent() {
       params.set("concept", filterConcept.trim());
     }
 
-    if (filterCardId === "CASH") {
+    if (filterCardId === "DEBIT" || filterCardId.startsWith("DEBIT:")) { params.set("paymentMethod", "DEBIT"); if (filterCardId.startsWith("DEBIT:")) params.set("debitAccountId", filterCardId.slice(6)); }
+    else if (filterCardId === "CASH") {
       params.set("paymentMethod", "CASH");
     } else if (filterCardId) {
       params.set("paymentMethod", "CARD");
@@ -414,6 +421,7 @@ export default function GastosContent() {
       date,
       paymentMethod,
       cardId,
+      debitAccountId: paymentMethod === "DEBIT" ? debitAccountId : null,
       concept,
       amount,
       cashContributionAmount: isSharedExpense ? cashContributionAmount : 0,
@@ -605,6 +613,7 @@ export default function GastosContent() {
       setCreateError({ field: "categoryId", message: "La categoría es requerida." });
       return false;
     }
+    if (paymentMethod === "DEBIT" && !debitAccountId) { setCreateError({ field: "debit-account", message: "Selecciona la cuenta de débito." }); return; }
     if (paymentMethod === "CARD" && !cardId) {
       setCreateError({ field: "cardId", message: "Debes seleccionar una tarjeta." });
       return false;
@@ -701,6 +710,7 @@ export default function GastosContent() {
     setEditingExpenseId(expense.id);
     setEditDate(toDateInputValue(expense.date));
     setEditPaymentMethod(expense.paymentMethod);
+    setEditDebitAccountId(expense.debitAccountId || "");
     setEditCardId(expense.cardId || "");
     setEditConcept(expense.concept || "");
     setEditAmount(String(expense.amount ?? ""));
@@ -753,6 +763,7 @@ export default function GastosContent() {
           date: editDate,
           paymentMethod: editPaymentMethod,
           cardId: editCardId,
+          debitAccountId: editPaymentMethod === "DEBIT" ? editDebitAccountId : null,
           concept: editConcept,
           amount: editAmount,
           cashContributionAmount: editIsSharedExpense ? editCashContributionAmount : 0,
@@ -832,6 +843,8 @@ export default function GastosContent() {
       date: `${payload.date}T12:00:00.000Z`,
       paymentMethod: payload.paymentMethod,
       cardId: payload.paymentMethod === "CARD" ? payload.cardId : null,
+      debitAccountId: payload.paymentMethod === "DEBIT" ? payload.debitAccountId : null,
+      debitAccount: moneyAccounts.find(a => a.id === payload.debitAccountId) || null,
       concept: payload.concept,
       amount: Number(payload.amount || 0),
       cashContributionAmount: Number(payload.cashContributionAmount || 0),
@@ -882,6 +895,8 @@ export default function GastosContent() {
       return false;
     }
 
+    if (filterCardId === "DEBIT" && expense.paymentMethod !== "DEBIT") return false;
+    if (filterCardId.startsWith("DEBIT:") && (expense.paymentMethod !== "DEBIT" || expense.debitAccountId !== filterCardId.slice(6))) return false;
     if (filterCardId === "CASH" && expense.paymentMethod !== "CASH") {
       return false;
     }
@@ -889,6 +904,7 @@ export default function GastosContent() {
     if (
       filterCardId &&
       filterCardId !== "CASH" &&
+      filterCardId !== "DEBIT" && !filterCardId.startsWith("DEBIT:") &&
       (expense.paymentMethod !== "CARD" || expense.cardId !== filterCardId)
     ) {
       return false;
@@ -1008,12 +1024,12 @@ export default function GastosContent() {
       {
         id: "paymentMethod",
         accessorFn: (row) =>
-          getPaymentMethodLabel(row.paymentMethod) +
+          getPaymentMethodLabel(row.paymentMethod) + (row.paymentMethod === "DEBIT" ? ` ${row.debitAccount?.name || ""}` : "") +
           (row.card ? ` · ${row.card.name}` : ""),
         header: "Método",
         cell: ({ row }) => (
           <span className="text-sm">
-            {getPaymentMethodLabel(row.original.paymentMethod)}
+            {getPaymentMethodLabel(row.original.paymentMethod)}{row.original.paymentMethod === "DEBIT" && row.original.debitAccount?.name ? ` · ${row.original.debitAccount.name}` : ""}
             {row.original.card ? (
               <span className="text-muted-foreground">
                 {" "}· {row.original.card.name}
@@ -1119,17 +1135,20 @@ export default function GastosContent() {
       <div className="space-y-2">
         <Label id="paymentMethod-label">Método de pago</Label>
         <PaymentMethodSelector
+          includeDebit
           value={paymentMethod}
           onValueChange={value => {
             setPaymentMethod(value);
             if (value === "CASH") {
               setCardId("");
+    setDebitAccountId("");
             }
           }}
           id="paymentMethod"
         />
       </div>
 
+      {paymentMethod === "DEBIT" && <div className="flex flex-col gap-2"><Label htmlFor="debit-account">Cuenta de débito</Label><ResponsiveSelect className="min-h-11" id="debit-account" value={debitAccountId} onValueChange={setDebitAccountId} options={moneyAccounts.map(a => ({ value: a.id, label: a.name }))} />{!moneyAccounts.length && <p className="text-sm text-muted-foreground">Agrega la cuenta en Mi dinero antes de registrar un gasto con débito.</p>}</div>}
       {paymentMethod === "CARD" ? (
         <div className="space-y-2">
           <Label htmlFor="cardId">Tarjeta</Label>
@@ -1448,18 +1467,19 @@ export default function GastosContent() {
             <div className="space-y-2">
               <Label id="edit-paymentMethod-label">Método</Label>
               <PaymentMethodSelector
+          includeDebit
                 value={editPaymentMethod}
                 disabled={editRefunded}
                 onValueChange={value => {
                   setEditPaymentMethod(value);
-                  if (value === "CASH") {
-                    setEditCardId("");
-                  }
+                  if (value !== "CARD") setEditCardId("");
+                  if (value !== "DEBIT") setEditDebitAccountId("");
                 }}
                 id="edit-paymentMethod"
               />
             </div>
 
+            {editPaymentMethod === "DEBIT" && <div className="flex flex-col gap-2"><Label htmlFor="edit-debit-account">Cuenta de débito</Label><ResponsiveSelect className="min-h-11" id="edit-debit-account" value={editDebitAccountId} onValueChange={setEditDebitAccountId} options={moneyAccounts.map(a => ({ value: a.id, label: a.name }))} /></div>}
             {editPaymentMethod === "CARD" ? (
               <div className="space-y-2">
                 <Label htmlFor="edit-cardId">Tarjeta</Label>
@@ -1577,7 +1597,7 @@ export default function GastosContent() {
         </DialogContent>
       </Dialog>
 
-      <main onClickCapture={captureFocus}>
+      <div onClickCapture={captureFocus}>
         <section className={`mx-auto flex w-full max-w-full flex-col px-4 py-5 md:py-8 ${compactEntry ? "pb-28!" : ""}`}>
           <AutomaticRecordingLink />
           {error ? (
@@ -1745,14 +1765,14 @@ export default function GastosContent() {
                       aria-label="Filtrar por método de pago"
                       className="w-full sm:w-[180px]"
                       title="Filtrar por método de pago"
-                      placeholder="Todas las tarjetas"
+                      placeholder="Todos los métodos"
                       options={[{
                         value: "ALL",
-                        label: "Todas las tarjetas"
+                        label: "Todos los métodos"
                       }, {
                         value: "CASH",
                         label: "Efectivo"
-                      }, ...cards.map(card => ({
+                      }, { value: "DEBIT", label: "Débito" }, ...moneyAccounts.map(a => ({ value: `DEBIT:${a.id}`, label: `Débito · ${a.name}` })), ...cards.map(card => ({
                         value: String(card.id),
                         label: String(card.name)
                       }))]}
@@ -1782,6 +1802,7 @@ export default function GastosContent() {
                       key={mobileFilterResetKey}
                       categories={categories}
                       cards={cards}
+                      moneyAccounts={moneyAccounts}
                       expenses={expenseRows.filter((expense) => {
                         const day = String(expense.date).split("T")[0];
                         return filterDate ? day === filterDate : !filterMonth || day.startsWith(filterMonth);
@@ -1832,14 +1853,14 @@ export default function GastosContent() {
             </div>
           </div>
         </section>
-      </main>
+      </div>
     </>
   );
 }
 
 function GastosPageSkeleton() {
   return (
-    <main>
+    <div>
       <section className="mx-auto flex w-full max-w-full flex-col px-4 py-5 md:py-8">
         <div className="grid min-w-0 gap-5 xl:grid-cols-[360px_1fr]">
           <Card className="hidden rounded-2xl border-border bg-card md:flex">
@@ -1883,7 +1904,7 @@ function GastosPageSkeleton() {
           </div>
         </div>
       </section>
-    </main>
+    </div>
   );
 }
 

@@ -4,6 +4,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import CaptureFields from "@/components/configuracion/CaptureFields";
+import CaptureMoneyEditor from "@/components/configuracion/CaptureMoneyEditor";
+import { moneyCaptureKind, accountDebitNotice } from "@/lib/captureMoneyParsers";
 import CapturePaymentEditor from "@/components/configuracion/CapturePaymentEditor";
 import { paymentCaptureKind } from "@/lib/capturePaymentParsers";
 import { refundCaptureKind } from "@/lib/captureRefundParsers";
@@ -71,6 +73,7 @@ export default function CaptureMovementEditor({ detail, configuration, userId, o
     }
     finally { setBusy(false); }
   }
+  if (moneyCaptureKind(movement) || accountDebitNotice(movement)) return <CaptureMoneyEditor detail={current} configuration={configuration} userId={userId} onClose={onClose} onSaved={onSaved} restoreFocus={restoreFocus} />;
   if (paymentCaptureKind(movement)) return <CapturePaymentEditor detail={current} configuration={configuration} userId={userId} onClose={onClose} onSaved={onSaved} restoreFocus={restoreFocus} />;
   if (refundCaptureKind(movement)) return <CaptureRefundEditor detail={current} configuration={configuration} userId={userId} onClose={onClose} onSaved={onSaved} restoreFocus={restoreFocus} />;
   return <><Dialog open onOpenChange={value => { if (!value && !busy) onClose(); }}>

@@ -9,6 +9,7 @@ datasource db {
 enum PaymentMethod {
   CASH
   CARD
+  DEBIT
 }
 
 enum SubscriptionChargeStatus {
@@ -104,6 +105,9 @@ model User {
   moneyTransfers MoneyTransfer[]
   moneyCardPayments MoneyCardPayment[]
   moneyOperations MoneyOperation[]
+  moneyWithdrawals MoneyWithdrawal[]
+  captureMoneyPolicies CaptureMoneyPolicy[]
+  captureMoneyPostings CaptureMoneyPosting[]
 
 }
 
@@ -293,6 +297,10 @@ model MoneyAccount {
   transfersOut MoneyTransfer[] @relation("MoneyTransferOut")
   transfersIn MoneyTransfer[] @relation("MoneyTransferIn")
   payments MoneyCardPayment[]
+  debitExpenses DailyExpense[] @relation("DebitAccountExpenses")
+  withdrawals MoneyWithdrawal[]
+  capturePoliciesFrom CaptureMoneyPolicy[] @relation("CaptureMoneyFrom")
+  capturePoliciesTo CaptureMoneyPolicy[] @relation("CaptureMoneyTo")
   @@unique([userId, name])
   @@map("money_accounts")
 }
@@ -374,6 +382,7 @@ model MoneyTransfer {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   fromAccount MoneyAccount @relation("MoneyTransferOut", fields: [fromAccountId], references: [id], onDelete: Restrict)
   toAccount MoneyAccount @relation("MoneyTransferIn", fields: [toAccountId], references: [id], onDelete: Restrict)
+  capturePostings CaptureMoneyPosting[]
   @@index([userId, date])
   @@map("money_transfers")
 }
@@ -476,6 +485,7 @@ model DailyExpense {
   date                    DateTime
   paymentMethod           PaymentMethod
   cardId                  String?
+  debitAccountId          String?
   concept                 String
   amount                  Decimal
   refundOriginalAmount    Decimal?
@@ -502,6 +512,8 @@ model DailyExpense {
   payableAccount     PayableAccount?     @relation(fields: [payableAccountId], references: [id], onDelete: SetNull)
   subscription       Subscription?       @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
   subscriptionCharge SubscriptionCharge?
+  debitAccount       MoneyAccount? @relation("DebitAccountExpenses", fields: [debitAccountId], references: [id], onDelete: Restrict)
+  moneyCapturePostings CaptureMoneyPosting[]
   captureMovements   CaptureMovement[]
   refunds            ExpenseRefund[]
 
@@ -858,6 +870,7 @@ model CaptureMovement {
   @@map("capture_movements")
   cardPayment CardCyclePayment?
   refund ExpenseRefund?
+  moneyPosting CaptureMoneyPosting?
 
 }
 
@@ -962,4 +975,65 @@ model CapturePaymentPolicy {
   @@unique([userId, cardId, source])
   @@unique([userId, source, destinationLast4])
   @@map("capture_payment_policies")
+}
+
+// Salida de una cuenta que no representa una compra ni un pago de crédito.
+model MoneyWithdrawal {
+  id String @id @default(uuid())
+  userId String
+  accountId String
+  amount Decimal @db.Decimal(12, 2)
+  date DateTime @db.Date
+  concept String
+  reversedAt DateTime?
+  createdAt DateTime @default(now())
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  account MoneyAccount @relation(fields: [accountId], references: [id], onDelete: Restrict)
+  capturePostings CaptureMoneyPosting[]
+  @@index([userId, date])
+  @@map("money_withdrawals")
+}
+
+model CaptureMoneyPolicy {
+  id String @id @default(uuid())
+  userId String
+  kind String
+  mode String @default("OBSERVATION")
+  fromAccountId String
+  toAccountId String?
+  destinationLabel String @default("")
+  accountLast4 String?
+  currency String @default("MXN")
+  datePolicy String @default("NOTIFICATION_POSTED_AT")
+  acceptedAt DateTime
+  verifiedMovementId String? @db.Uuid
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fromAccount MoneyAccount @relation("CaptureMoneyFrom", fields: [fromAccountId], references: [id], onDelete: Restrict)
+  toAccount MoneyAccount? @relation("CaptureMoneyTo", fields: [toAccountId], references: [id], onDelete: Restrict)
+  @@unique([userId, kind, destinationLabel])
+  @@map("capture_money_policies")
+}
+
+// Una decisión financiera por aviso. No se pierde al borrar el gasto vinculado.
+model CaptureMoneyPosting {
+  id String @id @default(uuid()) @db.Uuid
+  userId String
+  movementId String @unique @db.Uuid
+  sourceKey String
+  kind String
+  transferId String?
+  withdrawalId String?
+  expenseId String?
+  originalRecordId String
+  snapshot Json
+  createdAt DateTime @default(now())
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  movement CaptureMovement @relation(fields: [movementId], references: [id], onDelete: Cascade)
+  transfer MoneyTransfer? @relation(fields: [transferId], references: [id], onDelete: Restrict)
+  withdrawal MoneyWithdrawal? @relation(fields: [withdrawalId], references: [id], onDelete: Restrict)
+  expense DailyExpense? @relation(fields: [expenseId], references: [id], onDelete: SetNull)
+  @@unique([userId, sourceKey])
+  @@map("capture_money_postings")
 }

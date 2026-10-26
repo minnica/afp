@@ -18,7 +18,7 @@ function option(type, value, label) {
   return { id: `${type}:${normalizeExpenseSearch(value)}`, type, value: String(value), label };
 }
 
-export function ExpenseFilterCombobox({ categories, cards, expenses, value, onValueChange }) {
+export function ExpenseFilterCombobox({ categories, cards, moneyAccounts = [], expenses, value, onValueChange }) {
   const [query, setQuery] = useState("");
   const anchor = useComboboxAnchor();
   const id = useId();
@@ -26,6 +26,8 @@ export function ExpenseFilterCombobox({ categories, cards, expenses, value, onVa
     const options = [
       ...categories.map((category) => option("category", category.id, category.name)),
       option("payment", "CASH", "Efectivo"),
+      option("payment", "DEBIT", "Débito"),
+      ...moneyAccounts.map(a => option("payment", `DEBIT:${a.id}`, `Débito · ${a.name}`)),
       ...cards.map((card) => option("payment", card.id, card.name)),
       ...expenses.map((expense) => option("concept", expense.concept, expense.concept)),
       ...expenses.map((expense) => {
@@ -53,7 +55,7 @@ export function ExpenseFilterCombobox({ categories, cards, expenses, value, onVa
       items: matching.filter((item) => item.type === type).sort((a, b) => type === "amount"
         ? Number(a.value) - Number(b.value) : collator.compare(a.label, b.label)),
     })).filter((group) => group.items.length);
-  }, [categories, cards, expenses, query, value]);
+  }, [categories, cards, moneyAccounts, expenses, query, value]);
 
   return (
     <Field>

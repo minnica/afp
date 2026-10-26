@@ -1,0 +1,72 @@
+{
+  "status": "published-and-applied",
+  "productionFinancialWrites": true,
+  "productionMigrationsApplied": true,
+  "commitOrPushPerformed": false,
+  "database": {
+    "migrationCount": 39,
+    "rlsTables": 45,
+    "freshAndHistoricalUpgrade": "passed",
+    "schemaDiff": "empty",
+    "previousRecords": "preserved",
+    "destructiveChanges": false
+  },
+  "tests": {
+    "fullSuite": {
+      "passed": 716,
+      "failed": 0,
+      "skipped": 0
+    },
+    "newAccountCaptureIntegration": {
+      "passed": 10,
+      "failed": 0,
+      "skipped": 0
+    },
+    "atomicBatchRollback": "passed",
+    "reversedWithdrawalSamplePausesRule": "passed"
+  },
+  "build": {
+    "webpack": "passed before final display-label and semantic-wrapper corrections",
+    "finalCorrections": "targeted eslint passed",
+    "productionWebpack": "passed for all published sources, including final label and landmark corrections"
+  },
+  "lint": {
+    "errors": 0,
+    "existingWarnings": 2
+  },
+  "functionalBrowser": {
+    "data": "fictional; isolated local PostgreSQL and Auth",
+    "transferAndWithdrawalReview": "passed",
+    "genericDebitExpenseDecision": "passed",
+    "manualWithdrawalAndBalance": "passed",
+    "nuNewNoticeAutomation": "registered",
+    "explicitWithdrawalWithConfirmedSample": "registered",
+    "futureGenericBbvaNotice": "review",
+    "accountsOverflow": {
+      "320": false,
+      "390": false,
+      "1280": false
+    },
+    "accountPageAndSettingsAxeViolations": 0
+  },
+  "visualReview": {
+    "additionalValidation": "stopped at user request",
+    "independentFinishReview": "not performed at user request",
+    "screenshots": "intermediate evidence; no final visual approval",
+    "inheritedGastosLandmarks": "semantic wrappers corrected after detection; not recaptured"
+  },
+  "realDataPreflight": {
+    "readOnly": true,
+    "fiveOriginalNoticesStillPending": true,
+    "noMatchingExpensesOrTransfers": true,
+    "originalAccountsUnchanged": true,
+    "privateApplicationPlan": "stored outside Git"
+  },
+  "limitations": [
+    "No verified real withdrawal notification exists yet. First explicit notice must be confirmed before enabling withdrawal automation.",
+    "Future generic BBVA charges remain in review.",
+    "Historical captures are not posted by enabling a rule.",
+    "No APK update required."
+  ],
+  "productionEvidence": "production.json"
+}

@@ -1,0 +1,60 @@
+{
+  "counts": {
+    "inapplicable": 66,
+    "incomplete": 1,
+    "passes": 22,
+    "violations": 0
+  },
+  "violations": [],
+  "incomplete": [
+    {
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.12/color-contrast?application=axeAPI",
+      "id": "color-contrast",
+      "impact": "serious",
+      "nodeCount": 4,
+      "nodes": [
+        {
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements",
+          "html": "<p class=\"text-sm text-muted-foreground\">Primero comprueba este aviso de retiro. Los siguientes podrán usar una regla verificada.</p>",
+          "target": [
+            ".min-h-0 > p"
+          ]
+        },
+        {
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements",
+          "html": "<p class=\"text-xs text-muted-foreground\">La fecha procede del aviso, en hora de México. La moneda MXN y las cuentas las confirmas al registrar.</p>",
+          "target": [
+            ".group\\/field-group > p"
+          ]
+        },
+        {
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements",
+          "html": "<label data-slot=\"field-label\" class=\"items-center text-xs...\" for=\"money-distinct\">",
+          "target": [
+            "label[for=\"money-distinct\"]"
+          ]
+        },
+        {
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements",
+          "html": "<div data-slot=\"alert-description\" class=\"text-xs/relaxed text-balance text-muted-foreground md:text-pretty [&_a]:underline [&_a]:underline-offset-3 [&_a]:hover:text-foreground [&_p:not(:last-child)]:mb-4\">",
+          "target": [
+            ".text-balance"
+          ]
+        }
+      ],
+      "tags": [
+        "cat.color",
+        "wcag2aa",
+        "wcag143",
+        "TTv5",
+        "TT13.c",
+        "EN-301-549",
+        "EN-9.1.4.3",
+        "ACT",
+        "RGAAv4",
+        "RGAA-3.2.1"
+      ]
+    }
+  ]
+}

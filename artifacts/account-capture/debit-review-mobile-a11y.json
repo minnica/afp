@@ -1,0 +1,10 @@
+{
+  "counts": {
+    "inapplicable": 65,
+    "incomplete": 0,
+    "passes": 23,
+    "violations": 0
+  },
+  "violations": [],
+  "incomplete": []
+}

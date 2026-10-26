@@ -1,0 +1,75 @@
+{
+  "fictitious": true,
+  "localPostgreSQL": true,
+  "checks": [
+    {
+      "name": "accounts-width",
+      "overflow": false,
+      "scroll": 390,
+      "width": 390
+    },
+    {
+      "name": "accounts-390",
+      "axe": {
+        "inapplicable": 64,
+        "incomplete": 0,
+        "passes": 24,
+        "violations": 0
+      }
+    },
+    {
+      "name": "accounts-width",
+      "overflow": false,
+      "scroll": 320,
+      "width": 320
+    },
+    {
+      "name": "accounts-320",
+      "axe": {
+        "inapplicable": 64,
+        "incomplete": 0,
+        "passes": 24,
+        "violations": 0
+      }
+    },
+    {
+      "name": "accounts-width",
+      "overflow": false,
+      "scroll": 1280,
+      "width": 1280
+    },
+    {
+      "name": "accounts-1280",
+      "axe": {
+        "inapplicable": 64,
+        "incomplete": 0,
+        "passes": 24,
+        "violations": 0
+      }
+    },
+    {
+      "name": "account-settings-mobile",
+      "axe": {
+        "inapplicable": 61,
+        "incomplete": 0,
+        "passes": 27,
+        "violations": 0
+      }
+    },
+    {
+      "name": "legacy-gastos-landmarks",
+      "violations": 3,
+      "ids": [
+        "landmark-main-is-top-level",
+        "landmark-no-duplicate-main",
+        "landmark-unique"
+      ],
+      "preexisting": true
+    },
+    {
+      "name": "debit-display-owned-account"
+    }
+  ],
+  "additionalValidation": "stopped at user request",
+  "finalLabelAndLandmarkCorrections": "source corrected; no additional screenshots"
+}

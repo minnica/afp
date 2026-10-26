@@ -8,6 +8,8 @@ import { paymentCaptureKind } from "@/lib/capturePaymentParsers";
 import { capturePaymentDetail } from "@/lib/capturePayments";
 import { refundCaptureKind } from "@/lib/captureRefundParsers";
 import { refundDetail } from "@/lib/captureRefunds";
+import { moneyCaptureKind, accountDebitNotice } from "@/lib/captureMoneyParsers";
+import { moneyCaptureDetail } from "@/lib/captureMoney";
 import { captureKinds, captureKindWhere, captureMovementKind } from "@/lib/captureInbox";
 
 export async function GET(request) {
@@ -29,6 +31,7 @@ export async function GET(request) {
         include: { events: { orderBy: { createdAt: "asc" }, select: { id: true, sourcePackage: true, postedAt: true, receivedAt: true, fields: true } } } });
       if (!movement) throw new ApiAccessError("Aviso no encontrado.", 404);
       return apiResponse.json({ movement, candidates: await captureCandidates(prisma, user.id, effectiveCapture(movement)),
+        ...((moneyCaptureKind(movement) || accountDebitNotice(movement)) ? { moneyDetail: await moneyCaptureDetail(prisma, user.id, movement) } : {}),
         ...(refundCaptureKind(movement) ? { refundDetail: await refundDetail(prisma, user.id, movement) } : {}),
         ...(paymentCaptureKind(movement) ? { paymentDetail: await capturePaymentDetail(prisma, user.id, movement) } : {}) });
     }
@@ -39,7 +42,7 @@ export async function GET(request) {
       orderBy: [{ createdAt: "desc" }, { id: "desc" }], take: 51, include: { expense: { select: { id: true, concept: true, reconciliationStatus: true, reconciledAt: true } },
         installmentPurchase: { select: { id: true, concept: true, reconciliationStatus: true, reconciledAt: true } },
         events: { take: 1, orderBy: { createdAt: "asc" }, select: { sourcePackage: true, receivedAt: true, fields: true } } } }),
-      Promise.all(["EXPENSE", "PAYMENT", "REFUND", "OTHER"].map(async type => [type, await prisma.captureMovement.count({ where: { ...scope, AND: [captureInboxWhere("REVIEW"), captureKindWhere(type)] } })])),
+      Promise.all(["EXPENSE", "PAYMENT", "REFUND", "MONEY", "OTHER"].map(async type => [type, await prisma.captureMovement.count({ where: { ...scope, AND: [captureInboxWhere("REVIEW"), captureKindWhere(type)] } })])),
     ]);
     return apiResponse.json({ movements: rows.slice(0, 50).map(row => ({ ...row, kind: captureMovementKind(row), inboxState: captureInboxState(row) })),
       pendingCounts: Object.fromEntries(counts), nextCursor: rows.length > 50 ? rows[49].id : null });

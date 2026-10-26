@@ -21,7 +21,7 @@ export default function AutomaticRecordingContent() {
     return () => { mounted = false; subscription.unsubscribe(); };
   }, [router]);
   if (!user) return <PageSkeleton />;
-  return <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-5 md:py-8">
+  return <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-5 md:py-8">
     <CaptureReview key={user.id} userId={user.id} initialTab={params.get("tipo")} initialCardId={params.get("tarjeta")} />
-  </main>;
+  </div>;
 }

@@ -4,9 +4,12 @@
 import { interpretPaymentNotice } from "@/lib/capturePaymentParsers";
 import { parsePaymentReceipt, paymentReceiptSource } from "@/lib/paymentReceipts";
 import { reviewOnlyCapturePackages } from "@/lib/captureSourcePolicy";
+import { interpretMoneyNotice } from "@/lib/captureMoneyParsers";
 import { interpretRefundNotice } from "@/lib/captureRefundParsers";
 
 export const captureParsers = [
+  { key: "nu.account-transfer.es.v1", sourcePackage: "com.nu.production", verified: true, evidence: "REAL_REVIEWED", moneyOnly: true },
+  { key: "bbva.atm-withdrawal.es.v1", sourcePackage: "com.bancomer.mbanking", verified: false, evidence: "AWAITING_REAL_NOTICE", moneyOnly: true },
   { key: "mercadopago.refund.es.v1", sourcePackage: "com.mercadopago.wallet", verified: true, evidence: "REAL_REVIEWED", refundOnly: true },
   { key: "banamex.purchase-cancellation.es.v1", sourcePackage: "com.citibanamex.banamexmobile", verified: true, evidence: "REAL_REVIEWED", refundOnly: true,
     aliasKinds: ["PHYSICAL", "DIGITAL"], aliasSourcePackage: "com.citibanamex.banamexmobile" },
@@ -217,6 +220,8 @@ export function interpretCapture(event) {
   // Fuente habilitada para reunir evidencia real. Un aviso de viaje no acredita
   // un cobro final ni su tarjeta; no aplicar gramáticas bancarias a este paquete.
   if (reviewOnlyCapturePackages.includes(event.sourcePackage)) return { reason: "SERVICE_NOTICE_REVIEW", proposal: {} };
+  const money = interpretMoneyNotice(event, captureAmount, captureNotificationDate);
+  if (money) return money;
   const refund = interpretRefundNotice(event, captureAmount, captureNotificationDate, captureOperationTime);
   if (refund) return refund;
   const texts = Object.values(event.fields || {}).join("\n");

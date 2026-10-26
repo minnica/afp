@@ -2,18 +2,18 @@ import { createHash } from 'node:crypto';
 import { ApiAccessError } from '@/lib/apiAuth';
 import { runDebtAccountOperation } from '@/lib/debtAccountService';
 import { getStoredCycleStatus } from '@/lib/calculations/cardCyclePayments';
-import { accountSchema, reconcileSchema, planSchema, transferSchema, paymentSchema } from '@/lib/money/schema';
+import { accountSchema, reconcileSchema, planSchema, transferSchema, withdrawalSchema, paymentSchema } from '@/lib/money/schema';
 import { todayInMexico, day, validDay } from '@/lib/money/dates';
 import { buildSources, accountBalances, exposure, cents, amount } from '@/lib/money/sources';
 import { planDates } from '@/lib/money/forecast';
 import { yieldRule, changedYieldHistory } from '@/lib/money/yieldRules';
 
 export async function loadMoneyData(db, userId) {
-  const names = ['accounts', 'routes', 'plans', 'transfers', 'cards', 'cycles', 'incomes', 'expenses', 'subscriptions', 'purchases', 'receivables', 'payables', 'incomeTypes', 'categories'];
+  const names = ['accounts', 'routes', 'plans', 'transfers', 'withdrawals', 'cards', 'cycles', 'incomes', 'expenses', 'subscriptions', 'purchases', 'receivables', 'payables', 'incomeTypes', 'categories'];
   const where = { userId };
   const values = await Promise.all([
     db.moneyAccount.findMany({ where, orderBy: { createdAt: 'asc' }, include: { reconciliations: { orderBy: { createdAt: 'desc' } } } }),
-    db.moneyRoute.findMany({ where }), db.moneyPlan.findMany({ where, include: { occurrences: true } }), db.moneyTransfer.findMany({ where }),
+    db.moneyRoute.findMany({ where }), db.moneyPlan.findMany({ where, include: { occurrences: true } }), db.moneyTransfer.findMany({ where }), db.moneyWithdrawal.findMany({ where }),
     db.card.findMany({ where }), db.cardCycle.findMany({ where, include: { card: true, credits: { include: { income: true } }, payments: true, moneyPayments: true } }),
     db.income.findMany({ where, orderBy: { date: 'desc' } }),
     db.dailyExpense.findMany({ where, include: { subscriptionCharge: true } }),
@@ -44,7 +44,7 @@ function accountSnapshot(account) {
 
 export function routingOptions(data) {
   return [
-    { key: 'default:income', label: 'Ingresos generales' }, { key: 'default:expense', label: 'Gastos en efectivo o débito' },
+    { key: 'default:income', label: 'Ingresos generales' }, { key: 'default:expense', label: 'Gastos en efectivo' },
     { key: 'default:contribution', label: 'Efectivo recibido en gastos compartidos' }, { key: 'default:card', label: 'Pagos de tarjetas' },
     ...data.incomeTypes.map(t => ({ key: `incomeType:${t.id}`, label: `Ingreso · ${t.name}` })),
     ...data.cards.map(c => ({ key: `card:${c.id}`, label: `Pago · ${c.name}` })),
@@ -94,7 +94,7 @@ export async function mutateMoney(db, userId, body, today = todayInMexico()) {
       const event = events.find(e => e.key === body.key);
       if (!event && !routingOptions(data).some(r => r.key === body.key)) throw new ApiAccessError('Movimiento no encontrado.', 404);
       if (event?.automaticYield) throw new ApiAccessError('El rendimiento calculado pertenece a esta cuenta. Ajusta su configuración o concilia el saldo.', 409);
-      if (event?.ownPaymentId || event?.transferId) throw new ApiAccessError('Revierte el movimiento para cambiar su cuenta.', 409);
+      if (event?.ownPaymentId || event?.transferId || event?.withdrawalId || event?.debitExpenseId) throw new ApiAccessError('Revierte el movimiento para cambiar su cuenta.', 409);
       if (body.clear === true) { await tx.moneyRoute.deleteMany({ where: { userId, key: body.key } }); }
       else {
         if (typeof body.excluded !== 'boolean') throw new ApiAccessError('Selecciona cómo afecta al dinero.', 400);
@@ -124,6 +124,16 @@ export async function mutateMoney(db, userId, body, today = todayInMexico()) {
       const date = new Date(body.date);
       if (body.status === 'RESTORE') await tx.moneyOccurrence.deleteMany({ where: { planId: plan.id, date } });
       else await tx.moneyOccurrence.upsert({ where: { planId_date: { planId: plan.id, date } }, create: { planId: plan.id, date, status: body.status }, update: { status: body.status } });
+    } else if (body.action === 'WITHDRAWAL') {
+      const values = parsed(withdrawalSchema, body), account = requireRecord(data.accounts, values.accountId);
+      if (values.date > today || values.date < day(account.asOf)) throw new ApiAccessError('El retiro debe tener una fecha real desde el saldo de referencia.', 400);
+      const saved = await tx.moneyWithdrawal.create({ data: { ...values, userId, date: new Date(values.date) } }); result.id = saved.id;
+    } else if (body.action === 'REVERSE_WITHDRAWAL') {
+      const withdrawal = requireRecord(data.withdrawals, body.id);
+      if (day(requireRecord(data.accounts, withdrawal.accountId).asOf) > day(withdrawal.date)) throw new ApiAccessError('El retiro ya quedó incluido en una conciliación posterior. Revisa el saldo de la cuenta.', 409);
+      await tx.moneyWithdrawal.update({ where: { id: withdrawal.id, userId }, data: { reversedAt: withdrawal.reversedAt || new Date() } });
+      const samples = await tx.captureMoneyPosting.findMany({ where: { userId, withdrawalId: withdrawal.id }, select: { movementId: true } });
+      if (samples.length) await tx.captureMoneyPolicy.updateMany({ where: { userId, kind: 'BBVA_WITHDRAWAL', verifiedMovementId: { in: samples.map(s => s.movementId) } }, data: { mode: 'OBSERVATION', verifiedMovementId: null } });
     } else if (body.action === 'TRANSFER') {
       const values = parsed(transferSchema, body); requireRecord(data.accounts, values.fromAccountId); requireRecord(data.accounts, values.toAccountId);
       for (const id of [values.fromAccountId, values.toAccountId]) if (values.date < day(requireRecord(data.accounts, id).asOf)) throw new ApiAccessError('La transferencia debe ser posterior al saldo inicial de ambas cuentas.', 400);

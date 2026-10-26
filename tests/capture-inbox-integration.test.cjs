@@ -36,13 +36,13 @@ test('bandeja por tipo: filtros antes de paginar, contadores e independencia de 
       const result = await route.GET(request('kind=PENDING'));
       assert.equal(result.status, 200);
       assert.deepEqual(new Set(result.body.movements.map(row => row.id)), new Set([refund.id, purchase.id, payment.id, fixed.id]));
-      assert.deepEqual(result.body.pendingCounts, { EXPENSE: 2, PAYMENT: 1, REFUND: 1, OTHER: 58 });
+      assert.deepEqual(result.body.pendingCounts, { EXPENSE: 2, PAYMENT: 1, REFUND: 1, MONEY: 0, OTHER: 58 });
       assert.equal(result.body.movements.find(row => row.id === refund.id).kind, 'REFUND');
     });
     await t.test('filtro de devoluciones se aplica antes del límite de 50 y respeta tarjeta', async () => {
       const result = await route.GET(request(`kind=REFUND&cardId=${cards[0].id}`));
       assert.deepEqual(result.body.movements.map(row => row.id), [refund.id]);
-      assert.deepEqual(result.body.pendingCounts, { EXPENSE: 1, PAYMENT: 0, REFUND: 1, OTHER: 0 });
+      assert.deepEqual(result.body.pendingCounts, { EXPENSE: 1, PAYMENT: 0, REFUND: 1, MONEY: 0, OTHER: 0 });
       assert.equal(result.body.nextCursor, null);
       assert.equal((await route.GET(request(`kind=REFUND&cardId=${cards[1].id}`))).status, 404);
     });

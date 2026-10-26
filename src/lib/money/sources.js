@@ -20,9 +20,13 @@ function rawSources(data) {
     if (value) add({ key: `income:${income.id}`, date: day(income.date), cents: value, label: income.concept, kind: income.receivableAccountId ? 'COLLECTION' : 'INCOME', incomeTypeId: income.incomeTypeId, receivableId: income.receivableAccountId, route: '/ingresos' }, [income.receivableAccountId && `receivable:${income.receivableAccountId}`, `incomeType:${income.incomeTypeId}`, 'default:income'].filter(Boolean));
   }
   for (const expense of data.expenses) {
-    if (expense.paymentMethod === 'CASH') {
+    if (['CASH', 'DEBIT'].includes(expense.paymentMethod)) {
       const loan = data.payables.find(p => p.id === expense.payableAccountId && p.accountType === 'LOAN');
       add({ key: `expense:${expense.id}`, date: day(expense.date), cents: -cents(expense.amount), label: expense.concept, kind: 'EXPENSE', categoryId: expense.categoryId, payableId: expense.payableAccountId, subscriptionId: expense.subscriptionId, route: '/gastos' }, [expense.payableAccountId && `payable:${expense.payableAccountId}`, expense.subscriptionId && `subscription:${expense.subscriptionId}`, !loan && 'default:expense'].filter(Boolean), loan ? { excluded: true } : {});
+    }
+    if (expense.paymentMethod === 'DEBIT') {
+      const event = events.find(e => e.key === `expense:${expense.id}`);
+      event.accountId = expense.debitAccountId || null; event.excluded = false; event.debitExpenseId = expense.id;
     }
     if (cents(expense.cashContributionAmount) > 0) add({ key: `contribution:${expense.id}`, date: day(expense.date), cents: cents(expense.cashContributionAmount), label: `Efectivo recibido · ${expense.concept}`, kind: 'CONTRIBUTION', route: '/gastos' }, ['default:contribution']);
   }
@@ -41,6 +45,7 @@ function rawSources(data) {
   for (const transfer of data.transfers.filter(t => !t.reversedAt)) {
     for (const [suffix, accountId, sign] of [['out', transfer.fromAccountId, -1], ['in', transfer.toAccountId, 1]]) events.push({ key: `transfer:${transfer.id}:${suffix}`, date: day(transfer.date), cents: sign * cents(transfer.amount), label: transfer.concept, kind: 'TRANSFER', accountId, transferId: transfer.id, excluded: false, status: 'ACTUAL' });
   }
+  for (const withdrawal of (data.withdrawals || []).filter(t => !t.reversedAt)) events.push({ key: `withdrawal:${withdrawal.id}`, date: day(withdrawal.date), cents: -cents(withdrawal.amount), label: withdrawal.concept, kind: 'WITHDRAWAL', accountId: withdrawal.accountId, withdrawalId: withdrawal.id, excluded: false, status: 'ACTUAL', route: '/mi-dinero' });
   return { events, issues };
 }
 

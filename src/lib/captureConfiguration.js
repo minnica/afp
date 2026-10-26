@@ -1,3 +1,4 @@
+import { configureMoneyCapture, moneyPolicySchema } from "@/lib/captureMoney";
 import { z } from "zod";
 import { ApiAccessError, requireOwnedReferences } from "@/lib/apiAuth";
 import { capturePackages } from "@/lib/captureProtocol";
@@ -18,6 +19,7 @@ export const captureInventorySchema = z.object({ version: z.literal(1), cards: z
 }).strict()).max(100) }).strict();
 
 const actionSchema = z.discriminatedUnion("action", [
+  moneyPolicySchema,
   z.object({ action: z.literal("bankFallback"), cardId: z.string().min(1), mode: z.enum(["OBSERVATION", "AUTOMATIC"]),
     bankSourcePackage: z.enum(["com.citibanamex.banamexmobile", "com.nu.production", "mx.bancosantander.supermovil"]),
     bankDatePolicy: z.enum(["BANK_OPERATION", "NOTIFICATION_POSTED_AT"]), currency: z.literal("MXN"),
@@ -40,6 +42,7 @@ export async function configureCapture(db, userId, input) {
   const data = parsed.data;
   return db.$transaction(async tx => {
     await lockDebtAccounts(tx, userId);
+    if (data.action === "moneyPolicy") return configureMoneyCapture(tx, userId, data);
     if (data.action === "paymentAutomation") {
       const policy = await tx.capturePaymentPolicy.findFirst({ where: { id: data.id, userId } });
       if (!policy) throw new ApiAccessError("Regla de pagos no encontrada.", 404);
@@ -102,7 +105,7 @@ export async function configureCapture(db, userId, input) {
     }
     if (data.action === "automation") {
       const parser = captureParsers.find(parser => parser.key === data.parserKey);
-      if (parser?.paymentOnly || parser?.refundOnly) throw new ApiAccessError("Este formato corresponde a pagos o devoluciones. Usa su revisión específica.", 409);
+      if (parser?.moneyOnly || parser?.paymentOnly || parser?.refundOnly) throw new ApiAccessError("Este formato corresponde a pagos o devoluciones. Usa su revisión específica.", 409);
       if (!parser) {
         // Retirar un analizador nunca debe impedir detener su automatización.
         const identity = { userId, cardId: data.cardId, parserKey: data.parserKey };
@@ -156,7 +159,10 @@ export async function captureConfiguration(db, userId) {
   const paymentPolicies = await db.capturePaymentPolicy.findMany({ where: { userId }, orderBy: { createdAt: "asc" } });
   const fallbackPolicies = await db.captureBankFallback.findMany({ where: { userId } });
   const fallbackOptions = await bankFallbackOptions(db, userId);
-  return { cards, aliases, automations, rules, categories, subscriptions, paymentPolicies, fallbackPolicies, fallbackOptions,
+  const moneyAccounts = await db.moneyAccount.findMany({ where: { userId }, select: { id: true, name: true, kind: true, asOf: true } });
+  const moneyPolicies = await db.captureMoneyPolicy.findMany({ where: { userId } });
+  const moneyWithdrawalSamples = await db.captureMovement.findMany({ where: { userId, parserKey: "bbva.atm-withdrawal.es.v1", status: "REGISTERED", moneyPosting: { is: { kind: "WITHDRAWAL" } } }, select: { id: true, proposal: true, moneyPosting: { select: { snapshot: true, withdrawal: { select: { reversedAt: true } } } } } });
+  return { moneyWithdrawalSamples, moneyAccounts, moneyPolicies, cards, aliases, automations, rules, categories, subscriptions, paymentPolicies, fallbackPolicies, fallbackOptions,
     rollout: buildCaptureRollout(cards, aliases, automations, captureParsers, movements),
-    parsers: captureParsers.filter(parser => parser.evidence !== "REAL_OUT_OF_SCOPE" && !parser.paymentOnly && !parser.refundOnly).map(({ key, sourcePackage, verified, dateSource }) => ({ key, sourcePackage, verified, dateSource: dateSource || "BANK_OPERATION" })) };
+    parsers: captureParsers.filter(parser => parser.evidence !== "REAL_OUT_OF_SCOPE" && !parser.moneyOnly && !parser.paymentOnly && !parser.refundOnly).map(({ key, sourcePackage, verified, dateSource }) => ({ key, sourcePackage, verified, dateSource: dateSource || "BANK_OPERATION" })) };
 }

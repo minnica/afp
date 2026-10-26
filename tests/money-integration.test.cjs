@@ -88,7 +88,7 @@ test('Mi dinero: API, PostgreSQL, aislamiento, cuentas, abonos, conciliación y 
     });
     await t.test('RLS y lecturas sin escritura', async () => {
       const rows = await db.$queryRaw`SELECT relname, relrowsecurity FROM pg_class WHERE relname LIKE 'money_%' AND relkind = 'r'`;
-      assert.equal(rows.length, 8); assert.ok(rows.every(r => r.relrowsecurity));
+      assert.equal(rows.length, 9); assert.ok(rows.every(r => r.relrowsecurity));
       const before = await db.moneyAccount.findMany({ where: { userId: user.id } }); await read(); await read(); assert.deepEqual(await db.moneyAccount.findMany({ where: { userId: user.id } }), before);
       const headers = (await route.GET(request())).headers; assert.equal(headers.get('Cache-Control'), 'private, no-store');
     });

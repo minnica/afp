@@ -11,7 +11,7 @@ const routes = fs.readdirSync(path.join(__dirname, "../src/app/api"), { recursiv
   // OAuth valida estado+cookie de un solo uso y cron su secreto; tienen pruebas propias.
   .filter(file => file.endsWith("route.js") && !file.startsWith("captures/") && !["calendar/google/callback/route.js", "cron/calendar-sync/route.js"].includes(file))
   .map(file => file.replace(/\/route.js$/, ""));
-const models = ["card", "cardCycle", "dailyExpense", "category", "person", "incomeType", "income",
+const models = ["moneyAccount", "card", "cardCycle", "dailyExpense", "category", "person", "incomeType", "income",
   "subscription", "subscriptionCharge", "installmentPurchase", "receivableAccount", "payableAccount", "cardCycleCredit", "noticeDismissal", "user", "expenseTombstone"];
 function fixture({ empty = false } = {}) {
   const calls = [], writes = [];

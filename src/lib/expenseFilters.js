@@ -20,7 +20,7 @@ export function matchesExpenseFilters(expense, filters) {
   // Alternativas dentro de un campo; intersección entre campos distintos.
   return [...groups].every(([type, values]) => values.some((value) => {
     if (type === "category") return expense.categoryId === value;
-    if (type === "payment") return value === "CASH"
+    if (type === "payment") return value === "DEBIT" ? expense.paymentMethod === "DEBIT" : value.startsWith("DEBIT:") ? expense.paymentMethod === "DEBIT" && expense.debitAccountId === value.slice(6) : value === "CASH"
       ? expense.paymentMethod === "CASH"
       : expense.paymentMethod === "CARD" && expense.cardId === value;
     if (type === "concept") return normalizeExpenseSearch(expense.concept).includes(normalizeExpenseSearch(value));

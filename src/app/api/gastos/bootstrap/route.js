@@ -11,6 +11,8 @@ const expenseSelect = {
   date: true,
   paymentMethod: true,
   cardId: true,
+  debitAccountId: true,
+  debitAccount: { select: { id: true, name: true } },
   concept: true,
   amount: true,
   refundOriginalAmount: true,
@@ -226,6 +228,7 @@ export async function GET(request) {
       receivables,
       payables,
       subscriptions,
+      moneyAccounts,
     ] = await Promise.all([
       prisma.category.findMany({
         where: { userId },
@@ -298,6 +301,7 @@ export async function GET(request) {
         select: subscriptionSelect,
         orderBy: [{ chargeDay: "asc" }, { name: "asc" }],
       }),
+      prisma.moneyAccount.findMany({ where: { userId }, select: { id: true, name: true, kind: true }, orderBy: { name: "asc" } }),
     ]);
 
     return NextResponse.json({
@@ -309,6 +313,7 @@ export async function GET(request) {
       receivables: receivables.map(formatReceivable),
       payables: payables.map(formatPayable),
       subscriptions,
+      moneyAccounts,
     });
   } catch (error) {
     const accessResponse = apiAccessErrorResponse(error);

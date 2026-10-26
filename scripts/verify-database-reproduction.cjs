@@ -84,6 +84,12 @@ function runRegressions(url) {
 }
 
 function assertCatalog(actual) {
+  const debit = actual.columns.find(row => row.table_name === 'daily_expenses' && row.column_name === 'debitAccountId');
+  assert.equal(debit?.is_nullable, 'YES'); assert.equal(debit?.data_type, 'text');
+  assert.match(actual.constraints.find(row => row.name === 'daily_expenses_debit_account_check')?.definition || '', /DEBIT.*debitAccountId/s);
+  for (const table of ['money_withdrawals', 'capture_money_policies', 'capture_money_postings']) assert.ok(actual.security.some(row => row.table_name === table && row.rls));
+  assert.match(actual.constraints.find(row => row.name === 'money_withdrawals_amount_check')?.definition || '', /amount.*0/);
+  assert.match(actual.constraints.find(row => row.name === 'capture_money_postings_kind_check')?.definition || '', /TRANSFER.*WITHDRAWAL.*DEBIT_EXPENSE/s);
   const refundColumn = actual.columns.filter(row => row.table_name === 'daily_expenses' && row.column_name === 'refundOriginalAmount');
   assert.equal(refundColumn.length, 1);
   assert.equal(refundColumn[0].is_nullable, 'YES');
@@ -149,8 +155,8 @@ function assertCatalog(actual) {
     assert.match(constraint.definition, /CONFIRMED.*PENDING/);
   }
   for (const section of ['columns', 'constraints', 'indexes', 'enums']) {
-    const rows = actual[section].filter(row => (row.table_name || row.tablename) !== 'expense_operations'
-      && !['money_accounts', 'money_reconciliations', 'money_routes', 'money_plans', 'money_occurrences', 'money_transfers', 'money_card_payments', 'money_operations'].includes(row.table_name || row.tablename)
+    let rows = actual[section].filter(row => (row.table_name || row.tablename) !== 'expense_operations'
+      && !['money_withdrawals', 'capture_money_policies', 'capture_money_postings', 'money_accounts', 'money_reconciliations', 'money_routes', 'money_plans', 'money_occurrences', 'money_transfers', 'money_card_payments', 'money_operations'].includes(row.table_name || row.tablename)
       && !['capture_devices', 'capture_pairings', 'capture_events', 'capture_rate_limits', 'capture_card_aliases',
         'capture_automations', 'capture_merchant_rules', 'capture_movements', 'expense_tombstones', 'capture_statements',
         'google_calendar_connections', 'calendar_oauth_states', 'google_calendar_events', 'card_cycle_payments', 'capture_payment_policies', 'capture_bank_fallbacks', 'expense_refunds'].includes(row.table_name || row.tablename)
@@ -160,11 +166,15 @@ function assertCatalog(actual) {
       && !(section === 'constraints' && ['cards_credit_balance_complete_check', 'cards_balance_tracking_check'].includes(row.name))
       && !(section === 'constraints' && row.name === 'money_cycle_total_guard')
       && !(section === 'columns' && row.table_name === 'daily_expenses' && row.column_name === 'cashContributionAmount')
-      && !(section === 'columns' && row.table_name === 'daily_expenses' && row.column_name === 'refundOriginalAmount')
-      && !(section === 'constraints' && row.name === 'daily_expenses_refund_amount_check')
+      && !(section === 'columns' && row.table_name === 'daily_expenses' && ['refundOriginalAmount', 'debitAccountId'].includes(row.column_name))
+      && !(section === 'constraints' && ['daily_expenses_refund_amount_check', 'daily_expenses_debit_account_check', 'daily_expenses_debitAccountId_fkey'].includes(row.name))
       && !(section === 'columns' && ['daily_expenses', 'installment_purchases'].includes(row.table_name) && ['reconciliationStatus', 'reconciledAt'].includes(row.column_name))
       && !(section === 'constraints' && ['daily_expenses_reconciliation_check', 'installment_purchases_reconciliation_check'].includes(row.name))
       && !(section === 'constraints' && row.name === 'daily_expenses_cash_contribution_check'));
+    if (section === 'enums') {
+      assert.deepEqual(rows.find(row => row.name === 'PaymentMethod')?.values, ['CASH', 'CARD', 'DEBIT']);
+      rows = rows.map(row => row.name === 'PaymentMethod' ? { ...row, values: row.values.filter(value => value !== 'DEBIT') } : row);
+    }
     assert.deepEqual(rows, before[section], `Catálogo distinto en ${section}`);
   }
   const fallbackColumns = actual.columns.filter(row => row.table_name === 'capture_bank_fallbacks');
@@ -177,7 +187,7 @@ function assertCatalog(actual) {
   assert.ok(actual.constraints.some(row => row.name === 'money_accounts_yield_check'));
   assert.ok(actual.constraints.some(row => row.name === 'money_accounts_automatic_yield_check'));
   assert.ok(actual.constraints.some(row => row.name === 'money_transfers_values_check'));
-  assert.equal(actual.security.length, before.security.length + 26);
+  assert.equal(actual.security.length, before.security.length + 29);
   for (const row of actual.security) {
     assert.equal(row.rls, true, `RLS desactivado: ${row.table_name}`);
     assert.equal(row.force_rls, false);
@@ -216,7 +226,7 @@ async function records(db) {
   return {
     card: await db.card.findUnique({ where: { id: 'a11-card' }, omit: { creditLimit: true, usedBalance: true, balanceAsOf: true, balanceTracking: true } }),
     loan: await db.payableAccount.findUnique({ where: { id: 'a11-loan' } }),
-    payment: await db.dailyExpense.findUnique({ where: { id: 'a11-payment' }, omit: { cashContributionAmount: true, reconciliationStatus: true, reconciledAt: true, refundOriginalAmount: true } }),
+    payment: await db.dailyExpense.findUnique({ where: { id: 'a11-payment' }, omit: { cashContributionAmount: true, reconciliationStatus: true, reconciledAt: true, refundOriginalAmount: true, debitAccountId: true } }),
     receivable: await db.receivableAccount.findUnique({ where: { id: 'a11-receivable' }, omit: { balanceAdjustment: true, balanceAdjustmentNotes: true } }),
   };
 }
@@ -367,7 +377,7 @@ async function main() {
         console.log(`OK ${i ? 'actualización desde las 13 migraciones aplicadas' : 'base vacía'}: catálogo equivalente, diff vacío, checksums, deploy repetible, registros intactos y RLS.`);
       } finally { await db.$disconnect(); }
     }
-    console.log(`Reconstrucción y actualización verificadas; ${localMigrations().length} migraciones y ${before.security.length + 26} tablas con RLS, incluido el historial.`);
+    console.log(`Reconstrucción y actualización verificadas; ${localMigrations().length} migraciones y ${before.security.length + 29} tablas con RLS, incluido el historial.`);
   } finally {
     // Solo elimina bases/roles con sufijo aleatorio creados por esta ejecución.
     for (const name of createdDatabases.reverse()) await admin.$executeRawUnsafe(`DROP DATABASE "${name}" WITH (FORCE)`);

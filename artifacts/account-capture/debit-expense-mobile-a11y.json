@@ -1,0 +1,86 @@
+{
+  "axeVersion": "4.12.1",
+  "counts": {
+    "inapplicable": 61,
+    "incomplete": 0,
+    "passes": 26,
+    "violations": 3
+  },
+  "incomplete": [],
+  "lifecycle": {
+    "effectiveLaunch": {
+      "browserLaunched": true,
+      "engine": "chrome",
+      "launchHash": 11677035664275012000
+    },
+    "launched": false,
+    "relaunchedBrowser": false,
+    "restartedBackground": false,
+    "restoreStatus": "not_configured",
+    "reused": true,
+    "saveStatus": "not_attempted"
+  },
+  "url": "http://127.0.0.1:4216/gastos",
+  "violations": [
+    {
+      "help": "Main landmark should not be contained in another landmark",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.12/landmark-main-is-top-level?application=axeAPI",
+      "id": "landmark-main-is-top-level",
+      "impact": "moderate",
+      "nodeCount": 1,
+      "nodes": [
+        {
+          "failureSummary": "Fix any of the following:\n  The main landmark is contained in another landmark.",
+          "html": "<main>",
+          "target": [
+            ".min-h-\\[calc\\(100dvh-3rem\\)\\] > main"
+          ]
+        }
+      ],
+      "tags": [
+        "cat.semantics",
+        "best-practice"
+      ]
+    },
+    {
+      "help": "Document should not have more than one main landmark",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.12/landmark-no-duplicate-main?application=axeAPI",
+      "id": "landmark-no-duplicate-main",
+      "impact": "moderate",
+      "nodeCount": 1,
+      "nodes": [
+        {
+          "failureSummary": "Fix any of the following:\n  Document has more than one main landmark",
+          "html": "<main data-slot=\"sidebar-inset\" class=\"relative flex w-full...\">",
+          "target": [
+            ".md\\:peer-data-\\[variant\\=inset\\]\\:m-2"
+          ]
+        }
+      ],
+      "tags": [
+        "cat.semantics",
+        "best-practice"
+      ]
+    },
+    {
+      "help": "Landmarks should have a unique role or role/label/title (i.e. accessible name) combination",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.12/landmark-unique?application=axeAPI",
+      "id": "landmark-unique",
+      "impact": "moderate",
+      "nodeCount": 1,
+      "nodes": [
+        {
+          "failureSummary": "Fix any of the following:\n  The landmark must have a unique aria-label, aria-labelledby, or title to make landmarks distinguishable",
+          "html": "<main data-slot=\"sidebar-inset\" class=\"relative flex w-full...\">",
+          "target": [
+            ".md\\:peer-data-\\[variant\\=inset\\]\\:m-2"
+          ]
+        }
+      ],
+      "tags": [
+        "cat.semantics",
+        "best-practice"
+      ]
+    }
+  ]
+}

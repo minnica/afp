@@ -18,6 +18,8 @@ const expenseSelect = {
   date: true,
   paymentMethod: true,
   cardId: true,
+  debitAccountId: true,
+  debitAccount: { select: { id: true, name: true } },
   concept: true,
   amount: true,
   refundOriginalAmount: true,
@@ -110,6 +112,7 @@ export async function GET(request) {
     const categoryId = searchParams.get("categoryId");
     const paymentMethod = searchParams.get("paymentMethod");
     const cardId = searchParams.get("cardId");
+    const debitAccountId = searchParams.get("debitAccountId");
     const concept = searchParams.get("concept");
     const amount = searchParams.get("amount");
 
@@ -136,6 +139,7 @@ export async function GET(request) {
       where.paymentMethod = paymentMethod;
     }
 
+    if (debitAccountId) where.debitAccountId = debitAccountId;
     if (cardId && cardId !== "ALL") {
       where.cardId = cardId;
     }
@@ -275,6 +279,7 @@ export async function PATCH(request) {
       date,
       paymentMethod,
       cardId,
+      debitAccountId,
       concept,
       amount,
       categoryId,
@@ -293,7 +298,7 @@ export async function PATCH(request) {
       );
     }
 
-    if (!["CASH", "CARD"].includes(paymentMethod)) {
+    if (!["CASH", "CARD", "DEBIT"].includes(paymentMethod)) {
       return NextResponse.json(
         { error: "Método de pago no válido." },
         { status: 400 },
@@ -307,6 +312,8 @@ export async function PATCH(request) {
       );
     }
 
+    if (paymentMethod === "DEBIT" && !debitAccountId) throw new ApiAccessError("Selecciona la cuenta de débito.", 400);
+    if (paymentMethod === "DEBIT" && subscriptionId) throw new ApiAccessError("Revisa la suscripción por separado.", 400);
     const numericAmount = Number(amount);
 
     if (!Number.isFinite(numericAmount) || numericAmount < 0) {
@@ -323,11 +330,12 @@ export async function PATCH(request) {
     }
 
     const expense = await runDebtAccountOperation(prisma, userId, async tx => {
-      await requireOwnedReferences(tx, userId, body, ["cardId", "categoryId", "personId", "receivableAccountId", "payableAccountId", "subscriptionId"]);
+      await requireOwnedReferences(tx, userId, body, ["debitAccountId", "cardId", "categoryId", "personId", "receivableAccountId", "payableAccountId", "subscriptionId"]);
       const existing = await tx.dailyExpense.findUnique({ where: { id, userId } });
       if (!existing) throw new SubscriptionChargeError("Gasto no encontrado.", 404);
       if (numericAmount === 0 && existing.refundOriginalAmount == null) throw new ApiAccessError("El monto debe ser mayor a 0.", 400);
       assertRefundExpenseEdit(existing, body);
+      if (paymentMethod === "DEBIT" && (existing.payableAccountId || existing.receivableAccountId)) throw new ApiAccessError("Revisa los vínculos de este gasto por separado.", 400);
       // Los clientes anteriores conservan la aportación al omitir el campo.
       const cashContributionAmount = body.cashContributionAmount === undefined
         ? String(existing.cashContributionAmount ?? 0) : body.cashContributionAmount;
@@ -357,10 +365,10 @@ export async function PATCH(request) {
       const updated = await tx.dailyExpense.update({
         where: { id, userId },
         data: {
-          date: parsedDate, paymentMethod, cardId: paymentMethod === "CARD" ? cardId : null,
+          date: parsedDate, paymentMethod, cardId: paymentMethod === "CARD" ? cardId : null, debitAccountId: paymentMethod === "DEBIT" ? debitAccountId : null,
           concept: concept.trim(), amount: numericAmount, categoryId, notes: notes?.trim() || null,
           cashContributionAmount: Number(cashContributionAmount),
-          ...(existing.reconciledAt && (String(existing.amount) !== String(numericAmount) || existing.cardId !== (paymentMethod === "CARD" ? cardId : null)
+          ...(existing.reconciledAt && (String(existing.amount) !== String(numericAmount) || existing.debitAccountId !== (paymentMethod === "DEBIT" ? debitAccountId : null) || existing.cardId !== (paymentMethod === "CARD" ? cardId : null)
             || existing.date.toISOString().slice(0, 10) !== date) ? { reconciledAt: null, reconciliationStatus: "PENDING" } : {}),
           subscriptionId: subscriptionId || null,
         },

@@ -9,7 +9,7 @@ const PAYMENT_METHODS = [
   { value: "CARD", label: "Tarjeta" },
 ]
 
-function PaymentMethodSelector({ id, value, onValueChange, disabled = false, className }) {
+function PaymentMethodSelector({ id, value, onValueChange, disabled = false, includeDebit = false, className }) {
   return (
     <RadioGroup
       id={id}
@@ -21,7 +21,7 @@ function PaymentMethodSelector({ id, value, onValueChange, disabled = false, cla
       data-slot="payment-method-selector"
       className={cn("inline-flex w-auto max-w-full flex-wrap gap-6", className)}
     >
-      {PAYMENT_METHODS.map((method) => (
+      {[...PAYMENT_METHODS, ...(includeDebit ? [{ value: "DEBIT", label: "Débito" }] : [])].map((method) => (
         <Label
           key={method.value}
           htmlFor={`${id}-${method.value}`}

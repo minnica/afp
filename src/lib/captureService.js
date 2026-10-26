@@ -74,7 +74,7 @@ export async function getCaptureDevice(db, credential) {
   return db.$transaction(async tx => {
     const device = await lockedCaptureDevice(tx, credential);
     const state = deviceState(device);
-    const verifiedFormats = captureParsers.filter(parser => parser.verified && !parser.paymentOnly);
+    const verifiedFormats = captureParsers.filter(parser => parser.verified && !parser.moneyOnly && !parser.paymentOnly);
     const automaticExpenses = Boolean(device.userId && verifiedFormats.length && await tx.captureAutomation.findFirst({
       where: { userId: device.userId, mode: "AUTOMATIC", OR: verifiedFormats.map(parser => ({ parserKey: parser.key,
         ...(parser.completionPolicy ? { completionPolicy: parser.completionPolicy, policyAcceptedAt: { not: null }, policySubscriptionId: parser.policyRequiresSubscription ? { not: null } : null } : {}),

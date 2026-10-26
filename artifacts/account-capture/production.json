@@ -1,0 +1,80 @@
+{
+  "status": "published-and-applied",
+  "deployment": {
+    "id": "dpl_BB4SfW3EKExnr7h6SQRMezFiWUQd",
+    "state": "READY",
+    "target": "production",
+    "domain": "https://finanzas.garatachia.com",
+    "sourceCommit": "d9b843bcbd1f0b743c0dfee7f2a68462fc01b05b",
+    "sourceMode": "working-tree",
+    "sourceFiles": 341,
+    "sourceManifestSha256": "2278266ce8a397caa592310d5d094d39d45f968bb58c49e9a8d02e02722a3225",
+    "commitOrPushPerformed": false,
+    "buildCommand": "pnpm exec prisma generate && pnpm exec next build --webpack"
+  },
+  "database": {
+    "appliedMigrations": 39,
+    "newAdditiveMigrations": 2,
+    "rlsTables": 45,
+    "schemaDiffEmpty": true,
+    "previousRowsPreserved": true,
+    "privateBackupSaved": true
+  },
+  "financialApplication": {
+    "atomic": true,
+    "transfers": 2,
+    "debitExpenses": 3,
+    "manualWithdrawals": 1,
+    "sourceNotices": 5,
+    "allSixOperationsVerified": true,
+    "duplicateFinancialRecords": 0,
+    "originalNotificationEvidencePreserved": true,
+    "openingBalancesAndAccountConfigurationPreserved": true,
+    "nuTransferRule": "AUTOMATIC",
+    "bbvaWithdrawalRule": "OBSERVATION",
+    "futureGenericBbvaCharges": "REVIEW",
+    "realAmountsAndIdentifiers": "kept in private application evidence outside Git"
+  },
+  "calendar": {
+    "httpStatus": 200,
+    "processed": 1,
+    "results": [
+      "SYNCED"
+    ]
+  },
+  "http": [
+    {
+      "path": "/registro-automatico",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/captures/movements",
+      "method": "GET",
+      "status": 401
+    },
+    {
+      "path": "/api/captures/movements",
+      "method": "PATCH",
+      "status": 401
+    },
+    {
+      "path": "/api/captures/configuration",
+      "method": "PATCH",
+      "status": 401
+    },
+    {
+      "path": "/api/money",
+      "method": "POST",
+      "status": 401
+    },
+    {
+      "path": "/api/gastos/bootstrap",
+      "method": "GET",
+      "status": 401
+    }
+  ],
+  "additionalScreenshots": false,
+  "apkUpdateRequired": false,
+  "verifiedAt": "2026-10-26T06:56:55.462Z"
+}

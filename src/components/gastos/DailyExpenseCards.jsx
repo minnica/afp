@@ -94,7 +94,7 @@ export default function DailyExpenseCards({ expenses, isOnline, onEdit, onDelete
                           {expense.category?.name ? <Badge variant="secondary">{expense.category.name}</Badge> : null}
                           <CaptureStatus record={expense} />
                           <span className="break-words text-sm text-muted-foreground">
-                            {expense.paymentMethod === "CARD" ? `Tarjeta${expense.card ? ` · ${expense.card.name}` : ""}` : "Efectivo"}
+                            {expense.paymentMethod === "DEBIT" ? `Débito${expense.debitAccount?.name ? ` · ${expense.debitAccount.name}` : ""}` : expense.paymentMethod === "CARD" ? `Tarjeta${expense.card ? ` · ${expense.card.name}` : ""}` : "Efectivo"}
                           </span>
                         </div>
                         {expense._offlineStatus !== "pending" ? (
