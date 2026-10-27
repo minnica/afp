@@ -26,11 +26,13 @@ export const planSchema = z.object({
   accountId: text, cardId: z.string().nullable().optional(), incomeTypeId: z.string().nullable().optional(), categoryId: z.string().nullable().optional(),
   startDate: date, endDate: z.union([date, z.literal(''), z.null()]).optional(),
   frequencyMonths: z.number().int().min(0).max(12), days: z.array(z.number().int().min(1).max(31)).max(4), payrollBusinessDays: z.boolean().default(false), isActive: z.boolean().default(true),
+  useHistoricalPayments: z.boolean().optional(), referenceMonths: z.array(z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/, 'Indica meses válidos.')).min(1).max(12).optional(),
 }).superRefine((v, ctx) => {
   if (v.endDate && v.endDate < v.startDate) ctx.addIssue({ code: 'custom', path: ['endDate'], message: 'El fin debe ser posterior al inicio.' });
   if (v.frequencyMonths > 0 && !v.days.length && v.kind !== 'VARIABLE') ctx.addIssue({ code: 'custom', path: ['days'], message: 'Indica los días del mes.' });
   if (v.kind === 'VARIABLE' && (!v.categoryId || v.frequencyMonths !== 1)) ctx.addIssue({ code: 'custom', path: ['categoryId'], message: 'El presupuesto variable requiere categoría y frecuencia mensual.' });
   if (v.cardId && ['INCOME', 'PAYROLL'].includes(v.kind)) ctx.addIssue({ code: 'custom', path: ['cardId'], message: 'El ingreso se recibe en una cuenta.' });
+  if (v.useHistoricalPayments && (v.kind !== 'VARIABLE' || v.cardId)) ctx.addIssue({ code: 'custom', path: ['useHistoricalPayments'], message: 'La estimación histórica requiere un presupuesto variable sin tarjeta fija.' });
 });
 export const transferSchema = z.object({ fromAccountId: text, toAccountId: text, amount: positive, date, concept: text }).refine(v => v.fromAccountId !== v.toAccountId, { path: ['toAccountId'], message: 'Selecciona otra cuenta de destino.' });
 export const withdrawalSchema = z.object({ accountId: text, amount: positive, date, concept: text });

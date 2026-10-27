@@ -705,7 +705,7 @@ export default function CuentasPorCobrarContent() {
               </div>
 
               <div className="space-y-2">
-              <Label htmlFor="cuentas-por-cobrar-field-4">Pago mensual esperado opcional</Label>
+              <Label htmlFor="cuentas-por-cobrar-field-4">Pago esperado por fecha (opcional)</Label>
               <Input
                 id="cuentas-por-cobrar-field-4"
                 value={expectedMonthlyPayment}
@@ -906,7 +906,7 @@ export default function CuentasPorCobrarContent() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="cuentas-por-cobrar-field-10">Pago mensual esperado opcional</Label>
+                <Label htmlFor="cuentas-por-cobrar-field-10">Pago esperado por fecha (opcional)</Label>
                 <Input
                   id="cuentas-por-cobrar-field-10"
                   value={editExpectedMonthlyPayment}

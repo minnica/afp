@@ -1,0 +1,105 @@
+{
+  "checkedAt": "2026-10-27T03:37:33.022229+00:00",
+  "deployment": {
+    "id": "dpl_GunMRPqgwt6W4o5NYRBHyWrs2r2w",
+    "url": "https://afp-eal2tpx0q-minnicas-projects.vercel.app",
+    "state": "READY",
+    "target": "production",
+    "aliases": [
+      "afp-virid.vercel.app",
+      "finanzas.garatachia.com",
+      "afp-minnicas-projects.vercel.app"
+    ],
+    "baseCommit": "98ec7d9528bf11dad67501b26488ea0025c354bb",
+    "sourceFiles": 348,
+    "manifestSha256": "7b13f40b6d4970e803dae7f543abed267bac9fdf9af05c9e1d565cb733ca486f",
+    "previousId": "dpl_8EZ34NdfMyQG9wJYsQ6ToXiYJ3ov"
+  },
+  "configurationStatus": "applied_and_verified",
+  "migration": "20261027000000_variable_budget_payment_mix",
+  "configuration": {
+    "authorization": "El propietario solicitó completar el presupuesto y cerrar la configuración de la proyección.",
+    "categoryBudgets": 8,
+    "atomic": true,
+    "idempotentReceiptRecorded": true,
+    "privateBackupCreated": true,
+    "currentBalancesUnchanged": true,
+    "actualMovementsUnchanged": true,
+    "previousPlansUnchanged": true,
+    "allForecastEventsAssigned": true,
+    "currentConfigurationIssues": 0,
+    "historicalWarnings": 4,
+    "historicalDatesUnchanged": true,
+    "personalAmountsAndRecords": "Los importes, IDs, referencias históricas y respaldos permanecen fuera de Git."
+  },
+  "migrationVerification": {
+    "name": "20261027000000_variable_budget_payment_mix",
+    "applied": true,
+    "existingPlansPreserved": true,
+    "nullableDefaultPreserved": true,
+    "previousMigrationChecksumsPreserved": true,
+    "rlsPreserved": true,
+    "migrationCount": 41,
+    "tablesWithRls": 45
+  },
+  "calendar": {
+    "connected": true,
+    "upToDate": true,
+    "lastError": null,
+    "variableBudgetsCreateDailyReminders": false
+  },
+  "http": {
+    "checkedAt": "2026-10-27T03:35:42.193Z",
+    "origin": "https://finanzas.garatachia.com",
+    "checks": [
+      {
+        "path": "/mi-dinero",
+        "invalidToken": false,
+        "status": 200,
+        "cacheControl": "public, max-age=0, must-revalidate"
+      },
+      {
+        "path": "/mi-dinero",
+        "invalidToken": false,
+        "status": 200,
+        "cacheControl": "public, max-age=0, must-revalidate"
+      },
+      {
+        "path": "/api/money",
+        "invalidToken": false,
+        "status": 401,
+        "cacheControl": "private, no-store"
+      },
+      {
+        "path": "/api/money",
+        "invalidToken": true,
+        "status": 401,
+        "cacheControl": "private, no-store"
+      }
+    ],
+    "updatedBudgetLabels": true,
+    "matchingScripts": [
+      "/_next/static/chunks/app/mi-dinero/page-39a06da85776bf87.js"
+    ],
+    "authenticatedBrowserVerification": false
+  },
+  "domain": {
+    "host": "finanzas.garatachia.com",
+    "deploymentId": "dpl_GunMRPqgwt6W4o5NYRBHyWrs2r2w",
+    "verified": true
+  },
+  "runtime": {
+    "errorOrFatalObserved": false,
+    "scope": "Consulta inmediata del nuevo despliegue; no es monitoreo prolongado."
+  },
+  "limits": [
+    "La comprobación autenticada del navegador usó API real y PostgreSQL local con datos ficticios.",
+    "La comprobación financiera de producción usó lecturas reales y comparación antes/después; no incluyó una sesión visual autenticada.",
+    "Las fechas de períodos históricos superpuestos siguen pendientes de cotejo."
+  ],
+  "git": {
+    "baseCommit": "98ec7d9528bf11dad67501b26488ea0025c354bb",
+    "commitCreated": false,
+    "pushPerformed": false
+  }
+}

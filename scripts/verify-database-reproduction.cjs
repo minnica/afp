@@ -84,6 +84,9 @@ function runRegressions(url) {
 }
 
 function assertCatalog(actual) {
+  const paymentMix = actual.columns.find(row => row.table_name === 'money_plans' && row.column_name === 'paymentMix');
+  assert.equal(paymentMix?.data_type, 'jsonb'); assert.equal(paymentMix?.is_nullable, 'YES');
+  assert.match(actual.constraints.find(row => row.name === 'money_plans_payment_mix_check')?.definition || '', /VARIABLE.*version/s);
   const debit = actual.columns.find(row => row.table_name === 'daily_expenses' && row.column_name === 'debitAccountId');
   assert.equal(debit?.is_nullable, 'YES'); assert.equal(debit?.data_type, 'text');
   assert.match(actual.constraints.find(row => row.name === 'daily_expenses_debit_account_check')?.definition || '', /DEBIT.*debitAccountId/s);

@@ -5,6 +5,7 @@ import { calculateCycleAmount } from '@/lib/calculations/cardCycles';
 import { buildSubscriptionCharges } from '@/lib/subscriptionCharges';
 import { Prisma } from '@prisma/client';
 import { ruleAt, dailyYieldCents, roundedYieldCents, paysOn, isRecordedYield, previousBankingDay } from '@/lib/money/yieldRules';
+import { budgetExpenses, budgetPaymentParts } from '@/lib/money/budgets';
 
 function planPayDate(plan, date) { return plan.kind === 'PAYROLL' && plan.payrollBusinessDays ? previousBankingDay(date) : date; }
 export function planDates(plan, from, to) {
@@ -46,18 +47,18 @@ export function buildForecast(data, today, options = {}) {
   const add = event => { if (event.cents && event.date <= end) future.push({ ...event, date: event.date < today ? today : event.date, originalDate: event.date, status: event.status || 'EXPECTED' }); };
   const resolve = (keys, fallback = {}) => resolveRoute(data, keys, fallback);
   const currentStart = `${today.slice(0, 7)}-01`;
-  const planOccurrences = [];
+  const planOccurrences = [], variableBudgets = [];
   if (!data.plans.some(p => p.isActive && p.kind === 'VARIABLE')) issues.push({ key: 'no-variable-budget', message: 'Sin presupuesto variable: la proyección solo contempla los gastos y compromisos definidos.' });
   for (const plan of data.plans.filter(p => p.isActive)) {
     const isIncome = ['INCOME', 'PAYROLL'].includes(plan.kind);
     if (plan.kind === 'VARIABLE') {
       const recordedByDate = new Map();
-      for (const expense of data.expenses) {
-        if (expense.categoryId !== plan.categoryId || expense.subscriptionId || expense.payableAccountId || data.routes.some(r => r.key === `expense:${expense.id}` && r.planId)) continue;
+      for (const expense of budgetExpenses(data, plan.categoryId)) {
         const date = day(expense.date);
-        recordedByDate.set(date, (recordedByDate.get(date) || 0) + cents(expense.amount));
+        recordedByDate.set(date, (recordedByDate.get(date) || 0) + expense.personalCents);
       }
       const monthlyAmount = Math.max(0, Math.round(cents(plan.amount) * scenario.variablePercent / 100));
+      let pendingConsumption = 0;
       for (const month of months) {
         if (month < day(plan.startDate).slice(0, 7) || (plan.endDate && month > day(plan.endDate).slice(0, 7))) continue;
         const start = [today, day(plan.startDate), `${month}-01`].sort().at(-1), last = [end, day(plan.endDate) || end, monthDay(month, 31)].sort()[0];
@@ -69,10 +70,21 @@ export function buildForecast(data, today, options = {}) {
           const expected = Math.round(monthlyAmount * ordinal / daysInMonth) - Math.round(monthlyAmount * (ordinal - 1) / daysInMonth);
           const value = Math.max(0, expected - (recordedByDate.get(date) || 0));
           if (!value) continue;
+          pendingConsumption += value;
           const event = { key: `budget:${plan.id}:${date}`, date, cents: -value, label: plan.name, kind: 'VARIABLE', accountId: plan.accountId, planId: plan.id, status: 'ESTIMATED' };
-          if (plan.cardId) plannedCardExpenses.push({ id: event.key, cardId: plan.cardId, paymentMethod: 'CARD', date, amount: amount(value), concept: plan.name }); else add(event);
+          const parts = plan.paymentMix ? budgetPaymentParts(value, plan.paymentMix) : [{ cardId: plan.cardId || null, cents: value }];
+          let immediate = 0;
+          for (const part of parts) {
+            if (part.cardId && data.cards.some(card => card.id === part.cardId)) plannedCardExpenses.push({ id: `${event.key}:${part.cardId}`, cardId: part.cardId, paymentMethod: 'CARD', date, amount: amount(part.cents), concept: plan.name });
+            else {
+              if (part.cardId && !issues.some(issue => issue.key === `budget-card:${plan.id}:${part.cardId}`)) issues.push({ key: `budget-card:${plan.id}:${part.cardId}`, message: `Una tarjeta de ${plan.name} ya no existe; su gasto se estima como salida inmediata. Revisa la previsión.` });
+              immediate += part.cents;
+            }
+          }
+          if (immediate) add({ ...event, cents: -immediate });
         }
       }
+      variableBudgets.push({ id: plan.id, categoryId: plan.categoryId, name: plan.name, monthlyAmount: amount(monthlyAmount), recordedAmount: amount([...recordedByDate].filter(([date]) => date.slice(0, 7) === today.slice(0, 7) && date <= today).reduce((sum, [, value]) => sum + value, 0)), pendingConsumption: amount(pendingConsumption), referenceMonths: plan.paymentMix?.referenceMonths || null });
       continue;
     }
     const effectiveStart = planPayDate(plan, day(plan.startDate)), effectiveEnd = plan.endDate ? planPayDate(plan, day(plan.endDate)) : null;
@@ -110,7 +122,9 @@ export function buildForecast(data, today, options = {}) {
   for (const receivable of data.receivables) {
     const state = getDebtAccountState(receivable, receivable.incomes);
     if (state.status !== 'ACTIVE') continue;
-    const route = resolve([`receivable:${receivable.id}`, 'default:income']);
+    // La exclusión de una previsión no debe ocultar abonos reales. Estos
+    // conservan sus reglas de ingreso en buildSources.
+    const route = resolve([`receivable-forecast:${receivable.id}`, `receivable:${receivable.id}`, 'default:income']);
     if (route.excluded) continue;
     let balance = cents(state.pendingBalance);
     if (!receivable.expectedMonthlyPayment || !receivable.expectedChargeDays.length) { issues.push({ key: `receivable:${receivable.id}`, message: `Falta calendario de cobro: ${receivable.concept}.` }); continue; }
@@ -118,7 +132,9 @@ export function buildForecast(data, today, options = {}) {
       let paid = receivable.incomes.filter(i => day(i.date).startsWith(month)).reduce((sum, i) => sum + cents(i.amount), 0);
       const dates = [...new Set(receivable.expectedChargeDays.map(n => monthDay(month, n)))].sort();
       for (let i = 0; i < dates.length && balance > 0; i++) {
-        const nominal = Math.floor(cents(receivable.expectedMonthlyPayment) / dates.length) + (i < cents(receivable.expectedMonthlyPayment) % dates.length ? 1 : 0);
+        // El campo legado representa el importe de cada fecha de cobro,
+        // igual que Calendar y Avisos importantes, no un total a dividir.
+        const nominal = cents(receivable.expectedMonthlyPayment);
         const covered = Math.min(paid, nominal); paid -= covered;
         if (dates[i] < day(receivable.originDate)) continue;
         const value = Math.min(balance, nominal - covered); balance -= value;
@@ -186,7 +202,11 @@ export function buildForecast(data, today, options = {}) {
   if (missingFuture.length) issues.push({ key: 'future-unassigned', message: `${missingFuture.length} previsiones sin cuenta. Asígnalas para incluirlas en los saldos.` });
   for (const card of data.cards) {
     const overlapping = cycles.filter(c => c.cardId === card.id).sort((a, b) => day(a.startDate).localeCompare(day(b.startDate)));
-    if (overlapping.some((c, i) => i && day(c.startDate) <= day(overlapping[i - 1].cutDate))) issues.push({ key: `overlap:${card.id}`, message: `Revisa períodos superpuestos de ${card.name}.` });
+    const pairs = overlapping.flatMap((cycle, index) => index && day(cycle.startDate) <= day(overlapping[index - 1].cutDate) ? [[overlapping[index - 1], cycle]] : []);
+    if (pairs.length) {
+      const historical = pairs.every(pair => pair.every(cycle => day(cycle.cutDate) < today && day(cycle.dueDate) < today && cycle.statementAmount != null && cents(cycle.paidAmount) + cents(cycle.postCutCreditAmount) >= cents(cycle.statementAmount)));
+      issues.push({ key: `overlap:${card.id}`, scope: historical ? 'HISTORICAL' : 'PROJECTION', message: `Revisa períodos superpuestos de ${card.name}.` });
+    }
   }
   const balances = Object.fromEntries(accounts.map(a => [a.id, cents(a.balance)]));
   const reserve = accounts.reduce((sum, a) => sum + cents(a.reservedAmount), 0), daily = [];
@@ -222,7 +242,7 @@ export function buildForecast(data, today, options = {}) {
   const minimum = daily.reduce((min, d) => d.balance < min.balance ? d : min, { date: today, balance: amount(starting), available: amount(starting - reserve) });
   return {
     today, end, accounts, actual: actual.map(e => ({ ...e, amount: amount(e.cents) })), events: future.sort((a, b) => a.date.localeCompare(b.date) || a.key.localeCompare(b.key)).map(e => ({ ...e, amount: amount(e.cents) })),
-    daily, monthly, planOccurrences, issues, summary: { balance: amount(starting), available: amount(starting - reserve), reserved: amount(reserve), minimum: minimum.balance, minimumDate: minimum.date, belowReserveDate: starting < reserve ? today : daily.find(d => d.available < 0)?.date || null, zeroDate: starting <= 0 ? today : daily.find(d => d.balance <= 0)?.date || null },
+    daily, monthly, planOccurrences, variableBudgets, issues, summary: { balance: amount(starting), available: amount(starting - reserve), reserved: amount(reserve), minimum: minimum.balance, minimumDate: minimum.date, belowReserveDate: starting < reserve ? today : daily.find(d => d.available < 0)?.date || null, zeroDate: starting <= 0 ? today : daily.find(d => d.balance <= 0)?.date || null },
     accountShortfalls: accounts.map(a => ({ id: a.id, name: a.name, date: cents(a.balance) < cents(a.reservedAmount) ? today : daily.find(d => cents(d.accounts[a.id]) < cents(a.reservedAmount))?.date || null })).filter(a => a.date),
   };
 }

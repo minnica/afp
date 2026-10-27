@@ -3,8 +3,9 @@ import { prisma } from '@/lib/prisma';
 import { loadMoneyData, mutateMoney, routingOptions } from '@/lib/money/service';
 import { buildForecast } from '@/lib/money/forecast';
 import { todayInMexico, addMonths, day } from '@/lib/money/dates';
-import { cents, amount } from '@/lib/money/sources';
+import { amount } from '@/lib/money/sources';
 import { scenarioSchema } from '@/lib/money/schema';
+import { budgetExpenses } from '@/lib/money/budgets';
 
 function failure(error) {
   const access = apiAccessErrorResponse(error); if (access) return access;
@@ -22,8 +23,8 @@ export async function GET(request) {
       const data = await loadMoneyData(tx, user.id), today = todayInMexico();
       const historyMonths = [3, 2, 1].map(n => addMonths(today, -n));
       const budgetSuggestions = data.categories.map(category => {
-        const expenses = data.expenses.filter(e => e.categoryId === category.id && !e.subscriptionId && !e.payableAccountId && historyMonths.includes(day(e.date).slice(0, 7)));
-        return { categoryId: category.id, name: category.name, amount: amount(Math.round(expenses.reduce((sum, e) => sum + cents(e.amount), 0) / 3)), monthsWithRecords: new Set(expenses.map(e => day(e.date).slice(0, 7))).size };
+        const expenses = budgetExpenses(data, category.id).filter(e => historyMonths.includes(day(e.date).slice(0, 7)));
+        return { categoryId: category.id, name: category.name, amount: amount(Math.round(expenses.reduce((sum, e) => sum + e.personalCents, 0) / 3)), monthsWithRecords: new Set(expenses.map(e => day(e.date).slice(0, 7))).size };
       }).filter(s => s.amount > 0);
       if (scenario.data.extraAccountId && !data.accounts.some(a => a.id === scenario.data.extraAccountId)) return apiResponse.json({ error: 'Cuenta no encontrada.' }, { status: 404 });
       const base = buildForecast(data, today), simulated = Object.keys(params).some(k => k !== 'userId') ? buildForecast(data, today, scenario.data) : null;

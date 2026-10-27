@@ -1,0 +1,94 @@
+{
+  "checkedAt": "2026-10-27T03:05:25.016391+00:00",
+  "deployment": {
+    "id": "dpl_8EZ34NdfMyQG9wJYsQ6ToXiYJ3ov",
+    "url": "https://afp-lcosywvzd-minnicas-projects.vercel.app",
+    "state": "READY",
+    "target": "production",
+    "aliases": [
+      "afp-virid.vercel.app",
+      "finanzas.garatachia.com",
+      "afp-minnicas-projects.vercel.app"
+    ],
+    "baseCommit": "98ec7d9528bf11dad67501b26488ea0025c354bb",
+    "sourceFiles": 346,
+    "manifestSha256": "bd254654af6f82af6ceff5cd574b65c3dc9a44293da16fb85b0120caaaac8b48",
+    "previousId": "dpl_HkyRyJmzJ9iUoXvcb61MH3VT5jxi"
+  },
+  "configurationStatus": "applied_and_verified",
+  "schemaChanges": false,
+  "configuration": {
+    "authorizedBy": "Instrucción explícita del propietario sobre cobros, fechas de pago y conservación de registros.",
+    "atomic": true,
+    "privateBackupCreated": true,
+    "idempotentReceiptRecorded": true,
+    "currentBalancesUnchanged": true,
+    "existingMovementsUnchanged": true,
+    "receivableRecordsPreserved": true,
+    "bankLoansUnchanged": true,
+    "subscriptionsUnchanged": true,
+    "statementCyclesUnchanged": true,
+    "verification": "Cálculo con datos reales antes y después dentro de la transacción y nueva lectura tras confirmar."
+  },
+  "calendar": {
+    "status": "SYNCED",
+    "writes": 38,
+    "events": 196,
+    "connected": true,
+    "upToDate": true,
+    "lastError": null
+  },
+  "http": {
+    "checkedAt": "2026-10-27T03:03:32.469Z",
+    "origin": "https://finanzas.garatachia.com",
+    "checks": [
+      {
+        "path": "/mi-dinero",
+        "invalidToken": false,
+        "status": 200,
+        "cacheControl": "public, max-age=0, must-revalidate"
+      },
+      {
+        "path": "/cuentas-por-cobrar",
+        "invalidToken": false,
+        "status": 200,
+        "cacheControl": "public, max-age=0, must-revalidate"
+      },
+      {
+        "path": "/api/money",
+        "invalidToken": false,
+        "status": 401,
+        "cacheControl": "private, no-store"
+      },
+      {
+        "path": "/api/money",
+        "invalidToken": true,
+        "status": 401,
+        "cacheControl": "private, no-store"
+      }
+    ],
+    "updatedReceivableLabel": true,
+    "matchingScripts": [
+      "/_next/static/chunks/app/cuentas-por-cobrar/page-151dd90cb739b0cc.js"
+    ],
+    "authenticatedBrowserVerification": false
+  },
+  "domain": {
+    "host": "finanzas.garatachia.com",
+    "deploymentId": "dpl_8EZ34NdfMyQG9wJYsQ6ToXiYJ3ov",
+    "verified": true
+  },
+  "runtime": {
+    "errorOrFatalObserved": false,
+    "scope": "Consulta inmediata del nuevo despliegue; no es observación prolongada."
+  },
+  "limits": [
+    "No se realizó una revisión visual autenticada en producción.",
+    "No se corrigieron fechas históricas de estados de cuenta.",
+    "El presupuesto variable aprobado aún está pendiente de incorporarse como planes."
+  ],
+  "git": {
+    "commitCreated": false,
+    "pushPerformed": false
+  }
+}

@@ -18,6 +18,7 @@ export default function MoneyEditor({ editor, onClose, onSave, restoreFocus }) {
   const kind = useWatch({ control: form.control, name: 'kind' });
   const frequency = useWatch({ control: form.control, name: 'frequencyMonths' });
   const yieldMethod = useWatch({ control: form.control, name: 'yieldMethod' });
+  const historicalPayments = useWatch({ control: form.control, name: 'useHistoricalPayments' });
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
   const [advancedOpen, setAdvancedOpen] = useState(false);
@@ -35,6 +36,7 @@ export default function MoneyEditor({ editor, onClose, onSave, restoreFocus }) {
   function renderField(config) {
     if (config.kinds && !config.kinds.includes(kind)) return null;
     if (config.methods && !config.methods.includes(yieldMethod)) return null;
+    if (config.singlePayment && kind === 'VARIABLE' && historicalPayments) return null;
     if (config.recurringDays && (!frequency || kind === 'VARIABLE')) return null;
     const id = `money-${config.name}`, fieldError = form.formState.errors[config.name];
     const message = fieldError?.message || (Array.isArray(fieldError) ? fieldError.find(e => e?.message)?.message : null);
@@ -48,10 +50,11 @@ export default function MoneyEditor({ editor, onClose, onSave, restoreFocus }) {
             if (v === 'VARIABLE') form.setValue('frequencyMonths', 1);
             if (['PAYROLL', 'INCOME'].includes(v)) form.setValue('cardId', ''); else form.setValue('incomeTypeId', '');
             if (v !== 'VARIABLE') form.setValue('categoryId', '');
+            if (v !== 'VARIABLE') form.setValue('useHistoricalPayments', false);
           }
           if (config.name === 'yieldMethod' && v === 'DAILY_AMOUNT') { form.setValue('yieldExcessRate', 0); form.setValue('yieldTaxPercent', 0); }
         }} options={config.options} disabled={saving || config.disabled || (config.name === 'frequencyMonths' && kind === 'VARIABLE')} placeholder="Selecciona una opción" /> : config.type === 'checkbox' ?
-        <div className="flex min-h-11 items-start gap-3"><Checkbox id={id} checked={!!field.value} onCheckedChange={v => field.onChange(v === true)} disabled={saving} aria-invalid={!!message} aria-describedby={message ? `${id}-error` : config.help ? `${id}-help` : undefined} /><FieldLabel htmlFor={id}>{config.label}</FieldLabel></div> :
+        <div className="flex min-h-11 items-start gap-3"><Checkbox id={id} checked={!!field.value} onCheckedChange={v => { field.onChange(v === true); if (config.name === 'useHistoricalPayments' && v === true) form.setValue('cardId', ''); }} disabled={saving} aria-invalid={!!message} aria-describedby={message ? `${id}-error` : config.help ? `${id}-help` : undefined} /><FieldLabel htmlFor={id}>{config.label}</FieldLabel></div> :
         <Input {...field} id={id} value={config.type === 'days' ? daysDraft[config.name] : field.value ?? ''} type={config.type === 'days' ? 'text' : config.type || 'text'} inputMode={config.money ? 'decimal' : undefined} step={config.step ?? (config.money ? '0.01' : undefined)} disabled={saving || config.disabled} aria-invalid={!!message} aria-describedby={message ? `${id}-error` : config.help ? `${id}-help` : undefined} className="min-h-11" onChange={e => { if (config.type === 'days') setDaysDraft(previous => ({ ...previous, [config.name]: e.target.value })); field.onChange(config.type === 'days' ? e.target.value.split(',').map(v => v.trim()).filter(Boolean).map(Number) : e.target.value); }} />
       } />
       {config.help && <FieldDescription id={`${id}-help`}>{config.help}</FieldDescription>}

@@ -25,6 +25,8 @@ export default function MoneyProjection({ data, onScenario, onResetScenario }) {
   const selected = forecast.monthly.find(m => m.month === month);
   const yields = rows.filter(e => e.kind === 'YIELD').reduce((sum, e) => sum + Math.round(e.amount * 100), 0) / 100;
   const summary = forecast.summary;
+  const currentIssues = forecast.issues.filter(issue => issue.scope !== 'HISTORICAL');
+  const historicalIssues = forecast.issues.filter(issue => issue.scope === 'HISTORICAL');
   return <div className="flex flex-col gap-6">
     {data.simulated && <p role="status" className="text-sm font-medium">Estás viendo un escenario simulado. El saldo registrado de hoy se conserva; las fechas y saldos futuros reflejan tus cambios.</p>}
     <div className="grid gap-4 md:grid-cols-3">
@@ -32,7 +34,8 @@ export default function MoneyProjection({ data, onScenario, onResetScenario }) {
       <Card><CardHeader><CardDescription>Menor saldo previsto</CardDescription><CardTitle className="tabular-nums text-2xl">{money(summary.minimum)}</CardTitle></CardHeader><CardContent><p className="text-sm text-muted-foreground">{dateLabel(summary.minimumDate)} · próximos 12 meses</p></CardContent></Card>
       <Card><CardHeader><CardDescription>Por debajo de tu reserva</CardDescription><CardTitle>{summary.belowReserveDate ? dateLabel(summary.belowReserveDate) : 'No en estos 12 meses'}</CardTitle></CardHeader><CardContent><p className="text-sm text-muted-foreground">{summary.zeroDate ? `Saldo cero o negativo: ${dateLabel(summary.zeroDate)}.` : 'No se alcanza saldo cero dentro del período.'}</p></CardContent></Card>
     </div>
-    {!!forecast.issues.length && <Alert><AlertDescription><p>Proyección por completar</p><ul className="list-disc pl-5">{forecast.issues.map(issue => <li key={issue.key}>{issue.message}</li>)}</ul></AlertDescription></Alert>}
+    {!!currentIssues.length && <Alert><AlertDescription><p>Proyección por completar</p><ul className="list-disc pl-5">{currentIssues.map(issue => <li key={issue.key}>{issue.message}</li>)}</ul></AlertDescription></Alert>}
+    {!!historicalIssues.length && <Alert><AlertDescription><p>Revisión histórica pendiente</p><p>Estos períodos están liquidados. Puedes cotejar sus fechas después; este aviso no agrega pagos a la proyección.</p><ul className="list-disc pl-5">{historicalIssues.map(issue => <li key={issue.key}>{issue.message}</li>)}</ul></AlertDescription></Alert>}
     {!!forecast.accountShortfalls.length && <Alert><AlertDescription>{forecast.accountShortfalls.map(a => <p key={a.id}>{a.name}: por debajo de su reserva el {dateLabel(a.date)}. Revisa si necesitas transferir dinero.</p>)}</AlertDescription></Alert>}
     <Card>
       <CardHeader><div className="flex flex-wrap items-center justify-between gap-3"><CardTitle>Tu dinero en el tiempo</CardTitle><div className="flex flex-wrap gap-2">{data.simulated && <Button variant="ghost" onClick={onResetScenario} className="min-h-11">Quitar escenario</Button>}<Button variant="outline" onClick={onScenario} className="min-h-11">Simular cambios</Button></div></div><CardDescription>Desde {dateLabel(forecast.today)}. Las previsiones dependen de tus fechas, importes y tasas. Los rendimientos se calculan por día y se reflejan según el calendario configurado en cada cuenta.</CardDescription></CardHeader>

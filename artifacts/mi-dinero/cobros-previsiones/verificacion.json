@@ -1,0 +1,24 @@
+{
+  "status": "PUBLICADO_Y_CONFIGURADO",
+  "forecastTests": {
+    "passed": 34,
+    "failed": 0,
+    "skipped": 0
+  },
+  "fullSuite": {
+    "passed": 436,
+    "failed": 0,
+    "skipped": 46,
+    "skipReason": "Sin AFP_TEST_DATABASE_URL para las integraciones PostgreSQL."
+  },
+  "build": "pnpm exec next build --webpack: correcto",
+  "lint": "Correcto en los archivos modificados",
+  "migrationRequired": false,
+  "behavior": [
+    "Excluir una previsión de cobro conserva los ingresos reales y el registro de la deuda.",
+    "El importe esperado se aplica completo a cada fecha de cobro, de acuerdo con Calendar.",
+    "La simulación local de las instrucciones conservó saldos, movimientos, estados de cuenta y suscripciones.",
+    "La configuración aplicada conserva los movimientos y saldos reales; sus recordatorios quedaron sincronizados."
+  ],
+  "productionEvidence": "production.json"
+}

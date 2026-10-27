@@ -55,10 +55,66 @@ test('Mi dinero: una suscripción confirmada u omitida no se vuelve a prever', (
   assert.ok(!buildForecast(d, today).events.some(e => e.key === 'subscription:s:2026-10'));
 });
 test('Mi dinero: los cobros se reparten por fecha y terminan al recuperar el saldo', () => {
-  const r = buildForecast(data({ receivables: [{ id: 'r', originalAmount: 250, balanceAdjustment: 0, status: 'ACTIVE', concept: 'Préstamo', originDate: '2026-10-01', expectedMonthlyPayment: 200, expectedChargeDays: [15, 31], incomes: [{ amount: 50, date: '2026-10-15' }] }] }), today);
+  const r = buildForecast(data({ receivables: [{ id: 'r', originalAmount: 250, balanceAdjustment: 0, status: 'ACTIVE', concept: 'Préstamo', originDate: '2026-10-01', expectedMonthlyPayment: 100, expectedChargeDays: [15, 31], incomes: [{ amount: 50, date: '2026-10-15' }] }] }), today);
   const expected = r.events.filter(e => e.kind === 'COLLECTION'); assert.equal(expected.reduce((s, e) => s + e.amount, 0), 200); assert.equal(expected.length, 3);
   const delayed = buildForecast(data({ receivables: [{ id: 'r', originalAmount: 100, status: 'ACTIVE', concept: 'Cobro', originDate: '2026-10-01', expectedMonthlyPayment: 100, expectedChargeDays: [31], incomes: [] }] }), today, { collectionDelay: 10 });
   assert.equal(delayed.events.find(e => e.kind === 'COLLECTION').date, '2026-11-10');
+});
+test('Mi dinero: el importe de un cobro quincenal se aplica completo en cada fecha', () => {
+  const d = data({ receivables: [{ id: 'r', originalAmount: 10000, status: 'ACTIVE', concept: 'Camioneta', originDate: '2026-10-01', expectedMonthlyPayment: 1750, expectedChargeDays: [15, 31], incomes: [{ amount: 1750, date: '2026-10-15' }] }] });
+  const r = buildForecast(d, today), collections = r.events.filter(e => e.kind === 'COLLECTION');
+  assert.deepEqual(Array.from(collections.filter(e => e.date.startsWith('2026-10')), e => [e.date, e.amount]), [['2026-10-31', 1750]]);
+  assert.equal(collections.filter(e => e.date.startsWith('2026-11')).reduce((sum, e) => sum + e.amount, 0), 3500);
+  assert.equal(collections.reduce((sum, e) => sum + e.amount, 0), 8250);
+});
+test('Mi dinero: excluir un cobro incierto conserva su registro y los abonos reales', () => {
+  const payment = income({ amount: 40, receivableAccountId: 'r' });
+  const receivable = { id: 'r', originalAmount: 300, status: 'ACTIVE', concept: 'Incierto', originDate: '2026-10-01', expectedMonthlyPayment: 100, expectedChargeDays: [31], incomes: [payment] };
+  const d = data({ receivables: [receivable], incomes: [payment] });
+  const original = buildForecast(d, today);
+  d.routes.push({ key: 'receivable-forecast:r', excluded: true, accountId: null });
+  const before = JSON.stringify(d), excluded = buildForecast(d, today);
+  assert.equal(excluded.summary.balance, original.summary.balance);
+  assert.equal(excluded.summary.balance, 10040);
+  assert.ok(!excluded.events.some(e => e.key.startsWith('receivable:r:')));
+  assert.ok(!excluded.issues.some(i => i.key === 'receivable:r'));
+  assert.equal(excluded.actual.find(e => e.key === 'income:i').excluded, false);
+  assert.equal(JSON.stringify(d), before);
+  d.routes = d.routes.filter(r => r.key !== 'receivable-forecast:r');
+  assert.ok(buildForecast(d, today).events.some(e => e.key.startsWith('receivable:r:')));
+});
+test('Mi dinero: excluir previsión sin calendario permite recibir nuevos abonos incluso con fecha futura', () => {
+  const d = data({ receivables: [{ id: 'r', originalAmount: 300, status: 'ACTIVE', concept: 'Incierto', originDate: '2026-10-01', expectedMonthlyPayment: null, expectedChargeDays: [], incomes: [] }] });
+  d.routes.push({ key: 'receivable-forecast:r', excluded: true });
+  assert.ok(!buildForecast(d, today).issues.some(i => i.key === 'receivable:r'));
+  const payment = income({ amount: 80, receivableAccountId: 'r', date: '2026-10-25' });
+  d.incomes.push(payment); d.receivables[0].incomes.push(payment);
+  const r = buildForecast(d, today);
+  assert.equal(r.summary.balance, 10000);
+  assert.equal(r.events.find(e => e.key === 'income:i').amount, 80);
+  assert.equal(r.daily.find(d => d.date === '2026-10-25').balance, 10080);
+  assert.equal(buildForecast(d, '2026-10-25').summary.balance, 10080);
+});
+test('Mi dinero: la cuenta prevista para un cobro es independiente de sus ingresos reales', () => {
+  const payment = income({ amount: 40, receivableAccountId: 'r' });
+  const d = data({ accounts: [...data().accounts, { ...data().accounts[0], id: 'b', openingBalance: 0 }], receivables: [{ id: 'r', originalAmount: 100, status: 'ACTIVE', concept: 'Cobro', originDate: '2026-10-01', expectedMonthlyPayment: 100, expectedChargeDays: [31], incomes: [payment] }], incomes: [payment] });
+  d.routes.push({ key: 'receivable-forecast:r', excluded: false, accountId: 'b' });
+  const r = buildForecast(d, today);
+  assert.equal(r.actual.find(e => e.key === 'income:i').accountId, 'a');
+  assert.equal(r.events.find(e => e.key === 'receivable:r:2026-10-31').accountId, 'b');
+  assert.equal(r.events.find(e => e.key === 'receivable:r:2026-10-31').amount, 60);
+});
+test('Mi dinero: fechas de cobro ajustadas a febrero no duplican el importe por ocurrencia', () => {
+  const d = data({ receivables: [{ id: 'r', originalAmount: 5000, status: 'ACTIVE', concept: 'Cobro', originDate: '2027-02-01', expectedMonthlyPayment: 1750, expectedChargeDays: [30, 31], incomes: [] }] });
+  const r = buildForecast(d, '2027-02-01');
+  assert.deepEqual(Array.from(r.events.filter(e => e.kind === 'COLLECTION' && e.date.startsWith('2027-02')), e => [e.date, e.amount]), [['2027-02-28', 1750]]);
+});
+test('Mi dinero: ofrece una regla de previsión independiente solo para cuentas por cobrar activas', () => {
+  const service = sourceLoader({ '@/lib/apiAuth': { ApiAccessError: class extends Error {} } })('src/lib/money/service.js');
+  const options = service.routingOptions(data({ incomeTypes: [], receivables: [{ id: 'r', status: 'ACTIVE', concept: 'Préstamo' }, { id: 'closed', status: 'PAID_OFF', concept: 'Liquidado' }] }));
+  assert.ok(options.some(o => o.key === 'receivable:r'));
+  assert.ok(options.some(o => o.key === 'receivable-forecast:r' && o.forecastOnly));
+  assert.ok(!options.some(o => o.key === 'receivable-forecast:closed'));
 });
 test('Mi dinero: nómina neta no descuenta dos veces los préstamos, y permite pago externo explícito', () => {
   const loan = { id: 'loan', accountType: 'LOAN', originalAmount: 10000, currentBalance: 9000, status: 'ACTIVE', paymentAmount: 100, paymentDays: [15, 31], totalPayments: 12, paymentsMade: 10, originDate: '2026-01-01', dailyExpenses: [] };

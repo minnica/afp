@@ -1,0 +1,66 @@
+{
+  "status": "PUBLICADO_Y_CONFIGURADO",
+  "checkedAt": "2026-10-27T03:27:47.428996+00:00",
+  "fullSuite": {
+    "passed": 778,
+    "failed": 0,
+    "skipped": 0,
+    "database": "PostgreSQL local desechable"
+  },
+  "targetedBudgetTests": {
+    "unitPassed": 10,
+    "integrationPassed": 6
+  },
+  "migration": {
+    "name": "20261027000000_variable_budget_payment_mix",
+    "freshDatabase": "passed",
+    "historicalUpgrade": "passed",
+    "schemaDiff": "empty",
+    "checksumsPreserved": true,
+    "rlsPreserved": true,
+    "migrationCount": 41
+  },
+  "build": "passed",
+  "buildCommand": "pnpm exec next build --webpack",
+  "lint": "passed",
+  "browser": {
+    "realApi": true,
+    "database": "PostgreSQL local desechable",
+    "authentication": "Ficticia y limitada al servidor local de pruebas",
+    "fixtures": "Datos ficticios; las capturas no contienen datos del propietario",
+    "amountEditPersisted": true,
+    "historicalReferencePreservedAfterEdit": true,
+    "monthlyTotalShown": true,
+    "categoryConsumptionShown": true,
+    "viewports": [
+      390,
+      1440
+    ],
+    "horizontalPageOverflow": false,
+    "historicalNoticeSeparateFromMissingConfiguration": true
+  },
+  "behavior": [
+    "Un solo importe mensual por categoría para todas las formas de pago.",
+    "El historial seleccionado estima únicamente el momento de salida; el crédito pasa por su corte y pago.",
+    "Un gasto real cubre la cuota del día sin importar su medio de pago.",
+    "Se excluye del consumo personal el importe recuperable de adelantos, manteniendo su salida real.",
+    "No se crean gastos, cobros, pagos o transferencias a partir del presupuesto."
+  ],
+  "dependencyAudit": {
+    "changedDependencies": false,
+    "production": {
+      "critical": 2,
+      "high": 1,
+      "moderate": 2,
+      "low": 2
+    },
+    "all": {
+      "critical": 2,
+      "high": 2,
+      "moderate": 2,
+      "low": 2
+    },
+    "status": "Hallazgos preexistentes ya documentados; no se modificaron dependencias en esta tarea."
+  },
+  "productionEvidence": "production.json"
+}

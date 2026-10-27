@@ -3,7 +3,9 @@ import { ApiAccessError } from '@/lib/apiAuth';
 import { runDebtAccountOperation } from '@/lib/debtAccountService';
 import { getStoredCycleStatus } from '@/lib/calculations/cardCyclePayments';
 import { accountSchema, reconcileSchema, planSchema, transferSchema, withdrawalSchema, paymentSchema } from '@/lib/money/schema';
-import { todayInMexico, day, validDay } from '@/lib/money/dates';
+import { todayInMexico, day, validDay, addMonths } from '@/lib/money/dates';
+import { buildBudgetPaymentMix } from '@/lib/money/budgets';
+import { Prisma } from '@prisma/client';
 import { buildSources, accountBalances, exposure, cents, amount } from '@/lib/money/sources';
 import { planDates } from '@/lib/money/forecast';
 import { yieldRule, changedYieldHistory } from '@/lib/money/yieldRules';
@@ -49,6 +51,7 @@ export function routingOptions(data) {
     ...data.incomeTypes.map(t => ({ key: `incomeType:${t.id}`, label: `Ingreso · ${t.name}` })),
     ...data.cards.map(c => ({ key: `card:${c.id}`, label: `Pago · ${c.name}` })),
     ...data.receivables.filter(a => a.status === 'ACTIVE').map(a => ({ key: `receivable:${a.id}`, label: `Cobro · ${a.concept}` })),
+    ...data.receivables.filter(a => a.status === 'ACTIVE').map(a => ({ key: `receivable-forecast:${a.id}`, label: `Previsión de cobro · ${a.concept}`, forecastOnly: true })),
     ...data.payables.filter(a => a.status === 'ACTIVE').map(a => ({ key: `payable:${a.id}`, label: `Pago · ${a.concept}`, payrollDefault: a.accountType === 'LOAN' })),
     ...data.subscriptions.filter(s => s.paymentMethod === 'CASH').map(s => ({ key: `subscription:${s.id}`, label: `Suscripción · ${s.name}` })),
   ];
@@ -109,14 +112,24 @@ export async function mutateMoney(db, userId, body, today = todayInMexico()) {
         await tx.moneyRoute.upsert({ where: { userId_key: { userId, key: body.key } }, create: { userId, key: body.key, ...values }, update: values });
       }
     } else if (body.action === 'SAVE_PLAN') {
-      const values = parsed(planSchema, body); requireRecord(data.accounts, values.accountId);
+      const existing = body.id ? requireRecord(data.plans, body.id) : null;
+      if (existing) version(existing, body.version);
+      const values = parsed(planSchema, { ...body, useHistoricalPayments: body.useHistoricalPayments ?? !!existing?.paymentMix, referenceMonths: body.referenceMonths ?? existing?.paymentMix?.referenceMonths }); requireRecord(data.accounts, values.accountId);
       if (values.cardId) requireRecord(data.cards, values.cardId);
       if (values.incomeTypeId) requireRecord(data.incomeTypes, values.incomeTypeId);
       if (values.categoryId) requireRecord(data.categories, values.categoryId);
       if (values.incomeTypeId && data.plans.some(p => p.id !== body.id && p.isActive && p.incomeTypeId === values.incomeTypeId)) throw new ApiAccessError('Ya hay una previsión activa para ese tipo de ingreso. Usa una sola regla para evitar duplicados.', 409);
       if (values.kind === 'VARIABLE' && data.plans.some(p => p.id !== body.id && p.isActive && p.kind === 'VARIABLE' && p.categoryId === values.categoryId)) throw new ApiAccessError('Ya existe un presupuesto activo para esta categoría.', 409);
-      const fields = { ...values, days: [...new Set(values.days)].sort((a, b) => a - b), cardId: values.cardId || null, incomeTypeId: values.incomeTypeId || null, categoryId: values.categoryId || null, startDate: new Date(values.startDate), endDate: values.endDate ? new Date(values.endDate) : null };
-      if (body.id) { const existing = requireRecord(data.plans, body.id); version(existing, body.version); await tx.moneyPlan.update({ where: { id: existing.id, userId }, data: { ...fields, version: { increment: 1 } } }); }
+      const { useHistoricalPayments, referenceMonths, ...stored } = values;
+      let paymentMix = Prisma.DbNull;
+      if (useHistoricalPayments) {
+        const months = [...new Set(referenceMonths || [3, 2, 1].map(offset => addMonths(today, -offset)))].sort();
+        if (months.some(month => month >= today.slice(0, 7))) throw new ApiAccessError('Usa meses completos anteriores para estimar los pagos.', 400);
+        try { paymentMix = buildBudgetPaymentMix(data, values.categoryId, months); }
+        catch (error) { throw new ApiAccessError(error.message, 400); }
+      }
+      const fields = { ...stored, paymentMix, days: [...new Set(values.days)].sort((a, b) => a - b), cardId: values.cardId || null, incomeTypeId: values.incomeTypeId || null, categoryId: values.categoryId || null, startDate: new Date(values.startDate), endDate: values.endDate ? new Date(values.endDate) : null };
+      if (existing) { await tx.moneyPlan.update({ where: { id: existing.id, userId }, data: { ...fields, version: { increment: 1 } } }); }
       else { const plan = await tx.moneyPlan.create({ data: { userId, ...fields } }); result.id = plan.id; }
     } else if (body.action === 'OCCURRENCE') {
       const plan = requireRecord(data.plans, body.planId);
