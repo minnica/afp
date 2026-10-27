@@ -1,0 +1,96 @@
+{
+  "scope": "Componentes y motor reales con datos ficticios aislados; revisión de presentación, sin Auth, API ni base de datos.",
+  "checks": {
+    "currentMonthInitiallyOpen": true,
+    "allSixtyAmountsMatchDesktop": true,
+    "keyboardAndSingleOpenMonth": true,
+    "contentWidthDeterminesLayout": true,
+    "scenarioUpdatesSummary": true,
+    "resetScenario": true,
+    "negativeAndZeroValues": true,
+    "largeAmountsAt320": true,
+    "narrowContainerOnDesktop": {
+      "accordionVisible": true,
+      "documentWidth": 1425,
+      "minimumTargetHeight": 101.5,
+      "sectionScrollWidth": 368,
+      "sectionWidth": 368,
+      "tableVisible": false,
+      "viewport": 1440
+    },
+    "errors": {
+      "errors": []
+    }
+  },
+  "viewports": [
+    {
+      "accordionVisible": true,
+      "documentWidth": 305,
+      "minimumTargetHeight": 157,
+      "sectionScrollWidth": 273,
+      "sectionWidth": 273,
+      "tableVisible": false,
+      "viewport": 320
+    },
+    {
+      "accordionVisible": true,
+      "documentWidth": 375,
+      "minimumTargetHeight": 101.5,
+      "sectionScrollWidth": 343,
+      "sectionWidth": 343,
+      "tableVisible": false,
+      "viewport": 390
+    },
+    {
+      "accordionVisible": true,
+      "documentWidth": 415,
+      "minimumTargetHeight": 101.5,
+      "sectionScrollWidth": 383,
+      "sectionWidth": 383,
+      "tableVisible": false,
+      "viewport": 430
+    },
+    {
+      "accordionVisible": true,
+      "documentWidth": 753,
+      "minimumTargetHeight": 101.5,
+      "sectionScrollWidth": 721,
+      "sectionWidth": 721,
+      "tableVisible": false,
+      "viewport": 768
+    },
+    {
+      "accordionVisible": false,
+      "documentWidth": 829,
+      "minimumTargetHeight": null,
+      "sectionScrollWidth": 797,
+      "sectionWidth": 797,
+      "tableVisible": true,
+      "viewport": 844
+    },
+    {
+      "accordionVisible": false,
+      "documentWidth": 1265,
+      "minimumTargetHeight": null,
+      "sectionScrollWidth": 992,
+      "sectionWidth": 992,
+      "tableVisible": true,
+      "viewport": 1280
+    },
+    {
+      "accordionVisible": false,
+      "documentWidth": 1425,
+      "minimumTargetHeight": null,
+      "sectionScrollWidth": 992,
+      "sectionWidth": 992,
+      "tableVisible": true,
+      "viewport": 1440
+    }
+  ],
+  "limitations": "Chromium con anchos de viewport emulados, teclado y un contenedor de prueba de ancho reducido. Sin prueba en un teléfono físico ni Safari.",
+  "qaHarnessNote": {
+    "route": "/monthly-summary-states?narrow=1",
+    "excludedErrors": 2,
+    "description": "Errores del manifiesto de Next dev en una ruta auxiliar temporal de QA. La adaptación por contenedor se verificó sobre /mi-dinero reduciendo el ancho del host en el navegador. Sesión nueva sobre /mi-dinero: ver checks.errors."
+  }
+}

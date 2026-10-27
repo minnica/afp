@@ -1,0 +1,26 @@
+{
+  "date": "2026-10-27",
+  "scope": "Indicadores de estado del Accordion móvil. No se modifica forecast.monthly, el motor de proyección ni la tabla de escritorio.",
+  "components": [
+    "Badge local con variantes success, warning y destructive",
+    "Iconos Hugeicons",
+    "Accordion local sin subrayado en el trigger"
+  ],
+  "rules": [
+    "Rojo si el mínimo diario es negativo o llega a cero, aunque el cierre se recupere.",
+    "Ámbar si el mínimo diario toca o baja de la reserva personal, si hay avisos no históricos pendientes en la proyección, o si el cierre baja respecto al inicio.",
+    "Verde si el mínimo es positivo y superior a la reserva, el cierre no baja y no hay avisos pendientes. Sin reserva configurada se etiqueta Saldo positivo.",
+    "La diferencia entre cierre e inicio y las comparaciones monetarias se calculan en centavos. No se inventan umbrales porcentuales.",
+    "El estado corresponde al saldo global de las cuentas. El copy mantiene cifras y etiquetas; el detalle muestra entradas, salidas y reserva personal cuando existe."
+  ],
+  "checks": {
+    "tests": "node --test tests/money-monthly-summary-status.test.cjs: 6 correctas, cero fallos y cero omitidas. Incluye dos casos con el motor real y datos ficticios.",
+    "lint": "Correcto en MoneyMonthlySummary.jsx, MoneyProjection.jsx y monthlySummaryStatus.js.",
+    "build": "La versión inicial de indicadores pasó pnpm exec next build --webpack, con 51 páginas generadas. No se repitió el build para el ajuste posterior de copy y subrayado.",
+    "detector": "[]",
+    "diffCheck": "Correcto."
+  },
+  "limitations": "Por instrucción vigente del propietario no se ejecutaron verificaciones visuales ni se tomaron capturas. No se verificó interacción en navegador ni dispositivo físico para esta extensión. Las capturas previas corresponden a versiones anteriores.",
+  "publication": "Cambio local, pendiente de publicación.",
+  "copyRefinement": "Se retiraron las descripciones repetidas, las instrucciones para desplegar y el Separator sin contenido que separar. Datos pendientes sustituye a Proyección por revisar. Se eliminó hover:underline en AccordionTrigger compartido, conservando el foco visible y la apertura por teclado."
+}

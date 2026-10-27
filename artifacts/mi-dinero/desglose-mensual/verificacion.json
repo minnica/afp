@@ -1,0 +1,36 @@
+{
+  "feature": "Sustitución exclusiva de Movimientos previstos por Cómo se moverá tu dinero",
+  "date": "2026-10-27",
+  "implementation": {
+    "components": "Accordion, Item, Badge y Empty locales de shadcn, con la jerarquía y el estilo de Mi dinero",
+    "aggregation": "Entradas, pagos y gastos previstos, gasto variable por categoría y rendimientos por cuenta; transferencias con efecto neto cuando existen",
+    "engineChanged": false,
+    "apiChanged": false,
+    "databaseChanged": false,
+    "productionPublished": false
+  },
+  "validation": {
+    "tests": {
+      "command": "node --test tests/money-projection-breakdown.test.cjs tests/money-forecast.test.cjs tests/money-budgets.test.cjs",
+      "passed": 49,
+      "failed": 0,
+      "skipped": 0
+    },
+    "lint": {
+      "result": "passed",
+      "scope": [
+        "MoneyProjection.jsx",
+        "MoneyForecastBreakdown.jsx",
+        "projectionBreakdown.js",
+        "money-projection-breakdown.test.cjs"
+      ]
+    },
+    "build": {
+      "command": "pnpm exec next build --webpack",
+      "result": "passed"
+    },
+    "designDetector": "detector.json",
+    "browser": "browser-checks.json"
+  },
+  "limitations": "La revisión del navegador usa los componentes reales y el motor real con datos ficticios aislados. No autentica ni consulta la API o la base de datos. El alcance es la presentación de los eventos ya calculados."
+}

@@ -1,0 +1,71 @@
+{
+  "scope": "Componentes reales de Mi dinero con eventos generados por el motor real y datos ficticios en una vista local aislada. No usa Auth, API ni base de datos.",
+  "checks": {
+    "accountFilter": true,
+    "yieldsGroupedByAccount": true,
+    "monthFilter": true,
+    "scenario": true,
+    "resetScenario": true,
+    "keyboard": true,
+    "noPageErrors": {
+      "errors": []
+    },
+    "emptyState": true,
+    "unassignedState": true,
+    "longContentAt320": {
+      "documentWidth": 320,
+      "sectionScrollWidth": 288,
+      "sectionWidth": 288,
+      "viewport": 320
+    },
+    "textContrast": [
+      {
+        "ratio": 18.97,
+        "text": "Cómo se moverá tu dinero · octubre de 2026"
+      },
+      {
+        "ratio": 7.66,
+        "text": "Todas las cuentas · desde 27 oct 2026. Abre un grupo para ver su composición."
+      },
+      {
+        "ratio": 6.87,
+        "text": "El gasto con crédito se incluye en el pago de tarjeta. Aquí se resume lo que sale directamente de tus cuentas."
+      },
+      {
+        "ratio": 17,
+        "text": "Categoría con un nombre extenso para gastos personales y actividades extraordinarias"
+      },
+      {
+        "ratio": 6.87,
+        "text": "Cuenta de prueba con una descripción extensa para revisar el ajuste en pantallas pequeñas"
+      },
+      {
+        "ratio": 15.24,
+        "text": "Estimado"
+      }
+    ]
+  },
+  "viewports": [
+    {
+      "documentWidth": 1425,
+      "minimumTargetHeight": 69.5,
+      "sectionScrollWidth": 992,
+      "sectionWidth": 992,
+      "viewport": 1440
+    },
+    {
+      "documentWidth": 375,
+      "minimumTargetHeight": 93.5,
+      "sectionScrollWidth": 343,
+      "sectionWidth": 343,
+      "viewport": 390
+    },
+    {
+      "documentWidth": 305,
+      "minimumTargetHeight": 93.5,
+      "sectionScrollWidth": 273,
+      "sectionWidth": 273,
+      "viewport": 320
+    }
+  ]
+}

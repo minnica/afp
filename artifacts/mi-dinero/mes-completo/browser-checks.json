@@ -1,0 +1,121 @@
+{
+  "scope": "Componentes y motor reales con datos ficticios en una vista local aislada. No usa Auth, API ni base de datos.",
+  "checks": {
+    "wholeMonthWithoutExtraSelector": true,
+    "historyAndForecast": true,
+    "calculatedYieldSeparate": true,
+    "keyboard": true,
+    "accountFilter": true,
+    "futureMonthOnlyForecast": true,
+    "scenarioPreservesRegistered": true,
+    "resetScenario": true,
+    "emptyState": true,
+    "unassignedHistory": true,
+    "historyOnlyAndLongContent": true,
+    "errors": {
+      "errors": []
+    }
+  },
+  "groups": {
+    "income": {
+      "amounts": [
+        {
+          "amount": "+$9,000.00",
+          "label": "Registrado"
+        },
+        {
+          "amount": "+$9,300.00",
+          "label": "Previsto"
+        }
+      ],
+      "heading": "EntradasNómina, cobros y otros ingresosTotal del mes: +$18,300.00",
+      "rows": [
+        "Nómina de prueba\n\nBanco de nómina · 15 oct 2026\n\n+$9,000.00\nRegistrado",
+        "Nómina de prueba\n\nBanco de nómina · 31 oct 2026\n\n+$9,000.00\nPrevisto",
+        "Ingreso registrado a futuro\n\nBanco de nómina · 28 oct 2026\n\n+$300.00\nRegistrado a futuro"
+      ]
+    },
+    "payments": {
+      "amounts": [
+        {
+          "amount": "-$500.00",
+          "label": "Registrado"
+        },
+        {
+          "amount": "-$6,600.00",
+          "label": "Previsto"
+        }
+      ],
+      "heading": "Pagos y gastosTarjetas, deudas y gastos con fechaTotal del mes: -$7,100.00",
+      "rows": [
+        "Pago acumulado · Tarjeta de prueba\n\nBanco de nómina · 25 oct 2026 · fecha aproximada\n\n-$500.00\nRegistrado",
+        "Renta de prueba\n\nBanco de nómina · 27 oct 2026\n\n-$5,500.00\nPrevisto",
+        "Tarjeta · Tarjeta de prueba\n\nBanco de nómina · 29 oct 2026\n\n-$1,100.00\nComprometido"
+      ]
+    },
+    "variable": {
+      "amounts": [
+        {
+          "amount": "-$780.00",
+          "label": "Registrado"
+        },
+        {
+          "amount": "-$452.79",
+          "label": "Previsto"
+        }
+      ],
+      "heading": "Gasto variableSalidas directas por categoríaTotal del mes: -$1,232.79",
+      "rows": [
+        "Comida\n\nBanco de nómina · 2 fechas · 2 oct 2026 – 27 oct 2026\n\n-$780.00\nRegistrado",
+        "Comida\n\nBanco de nómina\n\n-$235.00\nEstimado",
+        "Transporte\n\nBanco de nómina\n\n-$120.99\nEstimado",
+        "Gastos personales\n\nBanco de nómina\n\n-$96.80\nEstimado"
+      ]
+    },
+    "yield": {
+      "amounts": [
+        {
+          "amount": "+$2.50",
+          "label": "Registrado"
+        },
+        {
+          "amount": "+$13.28",
+          "label": "Previsto"
+        },
+        {
+          "amount": "+$19.75",
+          "label": "Calculado por AFP"
+        }
+      ],
+      "heading": "RendimientosTotal por cuentaTotal del mes: +$35.53",
+      "rows": [
+        "Cajita de prueba\n\nAbonos registrados en el mes\n\n+$2.50\nRegistrado",
+        "Cajita de prueba\n\nRendimiento calculado de días transcurridos\n\n+$19.75\nCalculado por AFP",
+        "Cajita de prueba\n\nAbonos previstos hasta el cierre del mes\n\n+$13.28\nEstimado"
+      ]
+    }
+  },
+  "viewports": [
+    {
+      "documentWidth": 1425,
+      "minimumTargetHeight": 69.5,
+      "sectionScrollWidth": 992,
+      "sectionWidth": 992,
+      "viewport": 1440
+    },
+    {
+      "documentWidth": 375,
+      "minimumTargetHeight": 93.5,
+      "sectionScrollWidth": 343,
+      "sectionWidth": 343,
+      "viewport": 390
+    },
+    {
+      "documentWidth": 305,
+      "minimumTargetHeight": 93.5,
+      "sectionScrollWidth": 273,
+      "sectionWidth": 273,
+      "viewport": 320
+    }
+  ]
+}

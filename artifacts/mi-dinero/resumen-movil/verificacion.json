@@ -1,0 +1,29 @@
+{
+  "date": "2026-10-27",
+  "scope": "Presentación adaptable de Resumen de los próximos 12 meses. Se conservan forecast.monthly y la tabla de escritorio, sin cambios al motor, API o persistencia.",
+  "implementation": {
+    "component": "src/components/mi-dinero/MoneyMonthlySummary.jsx",
+    "mobile": "Accordion local de shadcn: cierre y mínimo diario visibles; inicio, entradas y salidas al abrir el mes. Mes actual abierto inicialmente y marcado Desde hoy. Aviso textual de saldo negativo.",
+    "responsive": "El ancho de la sección determina la vista: tabla desde 768 px disponibles; Accordion por debajo. Los indicadores se apilan cuando la sección tiene menos de 320 px."
+  },
+  "checks": {
+    "eslint": "Correcto en MoneyMonthlySummary.jsx y MoneyProjection.jsx.",
+    "build": "pnpm exec next build --webpack: correcto, 51 páginas generadas.",
+    "browser": "Componentes y motor reales con datos ficticios aislados. Coinciden los 60 importes de los 12 meses entre tabla y Accordion. Teclado, apertura única, simulación y restablecimiento correctos.",
+    "responsive": "Sin desbordamiento horizontal de la sección en viewports de 320, 390, 430, 768, 844, 1280 y 1440 px. Adaptación por contenedor también verificada en viewport de 1440 px con sección de 368 px.",
+    "edgeCases": "Ceros, mínimos negativos con cierre positivo e importes grandes legibles a 320 px.",
+    "runtime": "Sesión nueva de Chromium sobre /mi-dinero sin errores de navegador.",
+    "detector": "[]",
+    "diffCheck": "Correcto."
+  },
+  "evidence": [
+    "browser-checks.json",
+    "detector.json",
+    "mobile-320.png",
+    "mobile-390.png",
+    "desktop.png",
+    "edge-cases-320.png"
+  ],
+  "limitations": "Chromium con viewports emulados; sin prueba en teléfono físico o Safari. La vista aislada no verifica Auth, API ni base de datos. Un error de manifiesto de Next dev en una ruta auxiliar de QA se documenta en browser-checks.json; la comprobación se completó sobre la ruta principal. No se agregaron pruebas unitarias para este cambio de presentación.",
+  "publication": "Cambio local, pendiente de publicación."
+}

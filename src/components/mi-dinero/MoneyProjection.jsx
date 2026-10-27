@@ -3,13 +3,13 @@ import { useState } from 'react';
 import { Line, LineChart, CartesianGrid, XAxis, YAxis, ReferenceLine } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ResponsiveSelect } from '@/components/ui/responsive-select';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Empty, EmptyHeader, EmptyTitle, EmptyDescription } from '@/components/ui/empty';
+import MoneyForecastBreakdown from './MoneyForecastBreakdown';
+import MoneyMonthlySummary from './MoneyMonthlySummary';
 import { money, dateLabel, monthLabel, accountOptions } from './format';
 
 export default function MoneyProjection({ data, onScenario, onResetScenario }) {
@@ -49,9 +49,7 @@ export default function MoneyProjection({ data, onScenario, onResetScenario }) {
         {!account && selected && <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">{[['Al inicio', selected.opening], ['Entradas', selected.incoming], ['Salidas', selected.outgoing], ['Al cierre', selected.closing]].map(([label, value]) => <div key={label}><p className="text-sm text-muted-foreground">{label}</p><p className="font-medium tabular-nums">{money(value)}</p></div>)}</div>}
       </CardContent>
     </Card>
-    <section className="flex flex-col gap-3"><p className="text-xs text-muted-foreground sm:hidden">Desliza la tabla para ver todas las columnas.</p><h2 className="text-lg font-semibold">Movimientos previstos · {monthLabel(month)}</h2>
-      {rows.length ? <div className="overflow-x-auto"><Table tabIndex={0} className="focus-visible:outline-2 focus-visible:outline-ring focus-visible:-outline-offset-2"><TableHeader><TableRow><TableHead>Fecha</TableHead><TableHead>Concepto</TableHead><TableHead>Cuenta</TableHead><TableHead className="text-right">Importe</TableHead><TableHead>Estado</TableHead></TableRow></TableHeader><TableBody>{rows.map(e => <TableRow key={e.key}><TableCell className="whitespace-nowrap">{dateLabel(e.date)}</TableCell><TableCell>{e.label}</TableCell><TableCell>{forecast.accounts.find(a => a.id === e.accountId)?.name || 'Sin asignar'}</TableCell><TableCell className="text-right tabular-nums whitespace-nowrap">{money(e.amount)}</TableCell><TableCell><Badge variant={e.status === 'COMMITTED' ? 'secondary' : 'outline'}>{e.status === 'COMMITTED' ? 'Comprometido' : e.status === 'REGISTERED_FUTURE' ? 'Registrado a futuro' : e.status === 'ESTIMATED' ? 'Estimado' : 'Previsto'}</Badge></TableCell></TableRow>)}</TableBody></Table></div> : <Empty><EmptyHeader><EmptyTitle>Sin movimientos previstos</EmptyTitle><EmptyDescription>Agrega planes o asigna tus compromisos a una cuenta.</EmptyDescription></EmptyHeader></Empty>}
-    </section>
-    <section className="flex flex-col gap-3"><p className="text-xs text-muted-foreground sm:hidden">Desliza la tabla para ver todas las columnas.</p><h2 className="text-lg font-semibold">Resumen de los próximos 12 meses</h2><div className="overflow-x-auto"><Table tabIndex={0} className="focus-visible:outline-2 focus-visible:outline-ring focus-visible:-outline-offset-2"><TableHeader><TableRow><TableHead>Mes</TableHead><TableHead>Inicio</TableHead><TableHead>Entradas</TableHead><TableHead>Salidas</TableHead><TableHead>Cierre</TableHead><TableHead>Mínimo diario</TableHead></TableRow></TableHeader><TableBody>{forecast.monthly.map(m => <TableRow key={m.month}><TableCell className="whitespace-nowrap">{monthLabel(m.month)}</TableCell>{['opening', 'incoming', 'outgoing', 'closing', 'minimum'].map(k => <TableCell key={k} className="whitespace-nowrap tabular-nums">{money(m[k])}</TableCell>)}</TableRow>)}</TableBody></Table></div></section>
+    <MoneyForecastBreakdown forecast={forecast} plans={data.plans} categories={data.categories} month={month} accountId={accountId} />
+    <MoneyMonthlySummary monthly={forecast.monthly} today={forecast.today} reserved={summary.reserved} incomplete={currentIssues.length > 0} />
   </div>;
 }

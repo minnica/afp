@@ -1,0 +1,39 @@
+{
+  "feature": "Mes completo en el desglose de Mi dinero",
+  "date": "2026-10-27",
+  "implementation": {
+    "scope": "Solo la sección de composición mensual",
+    "sources": "Historial hasta hoy y previsiones del mes elegido, usando la respuesta existente de Mi dinero",
+    "totals": "Registrado + Previsto; el rendimiento histórico calculado por AFP se identifica y suma aparte cuando existe",
+    "futureRecords": "Los registros fechados a futuro se incluyen una sola vez en Previsto",
+    "history": "Incluye movimientos anteriores a la referencia sin reaplicarlos a los saldos; no reconstruye importes ausentes",
+    "engineChanged": false,
+    "apiChanged": false,
+    "databaseChanged": false,
+    "productionPublished": false
+  },
+  "validation": {
+    "tests": {
+      "command": "node --test --test-reporter=spec tests/money-projection-breakdown.test.cjs tests/money-forecast.test.cjs tests/money-budgets.test.cjs",
+      "passed": 54,
+      "failed": 0,
+      "skipped": 0
+    },
+    "lint": {
+      "result": "passed",
+      "scope": [
+        "MoneyForecastBreakdown.jsx",
+        "projectionBreakdown.js",
+        "MoneyProjection.jsx",
+        "money-projection-breakdown.test.cjs"
+      ]
+    },
+    "build": {
+      "command": "pnpm exec next build --webpack",
+      "result": "passed"
+    },
+    "detector": "detector.json",
+    "browser": "browser-checks.json"
+  },
+  "limitations": "La revisión del navegador usa los componentes y el motor reales con datos ficticios aislados. No autentica ni consulta la API ni una base de datos. El alcance es la composición de movimientos y previsiones ya existentes."
+}
