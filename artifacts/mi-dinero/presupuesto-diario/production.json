@@ -1,0 +1,53 @@
+{
+  "checkedAt": "2026-10-27T02:07:42.594Z",
+  "status": "PUBLICADO_Y_VERIFICADO",
+  "authorization": "El propietario autorizó publicar esta corrección.",
+  "deployment": {
+    "id": "dpl_7E6bz4bpYKTrnQB5t6EM7NYnqBYv",
+    "url": "https://afp-72afltc7q-minnicas-projects.vercel.app",
+    "productionUrl": "https://finanzas.garatachia.com/mi-dinero",
+    "state": "READY",
+    "target": "production",
+    "teamId": "team_5jQEAASyPb5wB0LxR9KsHf5X",
+    "projectId": "prj_FUBRDkPPFpOgJG9zuLLhTwm3JHKV",
+    "baseCommit": "44d5c8669a88df17b1186eca51af14525342ad3f",
+    "sourceMode": "working-tree",
+    "sourceFiles": 346,
+    "manifestSha256": "2fe41c17a7e4ab501f7752d10668de12296cefd8c7a08d66a812e4606a112c77",
+    "previousDeploymentId": "dpl_6g1E2QoRFcfgwXqeaWJYLta7uPzX",
+    "buildDurationSeconds": 81.324,
+    "sourceComparison": {
+      "returned": 271,
+      "compared": 125,
+      "mismatches": [],
+      "truncated": true
+    },
+    "commitOrPushPerformed": false
+  },
+  "checks": {
+    "productionDomainAssigned": true,
+    "pageStatus": 200,
+    "loginStatus": 200,
+    "moneyApiWithoutSession": 401,
+    "moneyApiInvalidSession": 401,
+    "apiPrivateNoStore": true,
+    "updatedFormHelpVerified": true,
+    "runtimeErrorGroupsObserved": 0,
+    "runtimeWindow": "Ventana inmediata de este despliegue, filtrada por su identificador.",
+    "fullAuthenticatedFinancialFlow": false
+  },
+  "database": {
+    "migrations": 0,
+    "financialWrites": 0,
+    "budgetPlansActivated": 0
+  },
+  "pending": [
+    "Configurar los importes y las cuentas de los presupuestos propuestos.",
+    "Atender los avisos de dependencias documentados en dependency-audit.json."
+  ],
+  "limits": [
+    "No se ejecutaron las integraciones PostgreSQL por falta de AFP_TEST_DATABASE_URL.",
+    "La API financiera se comprobó sin sesión y con una credencial inválida; no se inició una sesión del propietario.",
+    "Vercel devolvió un árbol de archivos parcial; los 125 hashes de fuentes disponibles coinciden con el manifiesto."
+  ]
+}

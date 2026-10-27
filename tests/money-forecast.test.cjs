@@ -82,10 +82,95 @@ test('Mi dinero: vínculo explícito reemplaza una ocurrencia aunque el cobro ll
   d.routes.push({ key: 'income:i', accountId: 'a', planId: 'plan', occurrenceDate: '2026-10-31' });
   const r = buildForecast(d, today); assert.equal(r.events.find(e => e.key === 'plan:plan:2026-10-31').amount, 300);
 });
-test('Mi dinero: presupuesto variable descuenta gasto real y no suma otra vez suscripciones', () => {
-  const d = data({ plans: [plan({ kind: 'VARIABLE', amount: 100, categoryId: 'food', endDate: '2026-10-31' })], expenses: [expense({ amount: 40, categoryId: 'food' }), expense({ id: 's', amount: 20, categoryId: 'food', subscriptionId: 'sub' })] });
-  const r = buildForecast(d, today); assert.equal(r.events.filter(e => e.kind === 'VARIABLE').reduce((s, e) => s + Math.round(e.amount * 100), 0), -6000);
-  const reduced = buildForecast(d, today, { variablePercent: 80 }); assert.equal(reduced.events.filter(e => e.kind === 'VARIABLE').reduce((s, e) => s + Math.round(e.amount * 100), 0), -4000);
+test('Mi dinero: consumo registrado cubre la cuota diaria, separado de suscripciones, deudas y otras previsiones', () => {
+  const d = data({ plans: [plan({ kind: 'VARIABLE', amount: 310, categoryId: 'food', endDate: '2026-10-31' })], expenses: [expense({ amount: 4, categoryId: 'food' }), expense({ id: 's', amount: 20, categoryId: 'food', subscriptionId: 'sub' }), expense({ id: 'debt', amount: 20, categoryId: 'food', payableAccountId: 'debt' }), expense({ id: 'planned', amount: 20, categoryId: 'food' })] });
+  d.routes.push({ key: 'expense:planned', accountId: 'a', planId: 'another-plan' });
+  const r = buildForecast(d, today); assert.equal(r.events.filter(e => e.kind === 'VARIABLE').reduce((s, e) => s + Math.round(e.amount * 100), 0), -7600);
+  const reduced = buildForecast(d, today, { variablePercent: 80 }); assert.equal(reduced.events.filter(e => e.kind === 'VARIABLE').reduce((s, e) => s + Math.round(e.amount * 100), 0), -6000);
+});
+test('Mi dinero: cinco días pendientes no concentran el presupuesto sin gastar ni desaparecen al superarlo', () => {
+  for (const alreadySpent of [0, 1000, 4000]) {
+    const d = data({ plans: [plan({ kind: 'VARIABLE', amount: 3100, categoryId: 'food', startDate: '2026-10-27', endDate: '2026-10-31' })], expenses: [expense({ amount: alreadySpent, categoryId: 'food', date: '2026-10-26' })] });
+    const r = buildForecast(d, '2026-10-27');
+    const projected = r.events.filter(e => e.kind === 'VARIABLE');
+    assert.equal(projected.length, 5);
+    assert.ok(projected.every(e => e.amount === -100 && e.status === 'ESTIMATED'));
+    assert.equal(r.monthly[0].outgoing, 500);
+  }
+});
+test('Mi dinero: registrar hoy reduce solo la estimación de hoy y conserva el saldo real', () => {
+  const d = data({ plans: [plan({ kind: 'VARIABLE', amount: 3100, categoryId: 'food', endDate: '2026-10-31' })], expenses: [expense({ amount: 30, categoryId: 'food', date: '2026-10-26' }), expense({ id: 'second', amount: 20, categoryId: 'food', date: '2026-10-26', paymentMethod: 'DEBIT', debitAccountId: 'a' })] });
+  const before = JSON.stringify(d), r = buildForecast(d, '2026-10-26');
+  assert.equal(r.summary.balance, 9950);
+  assert.equal(r.events.find(e => e.key === 'budget:plan:2026-10-26').amount, -50);
+  assert.equal(r.monthly[0].outgoing, 550);
+  assert.equal(r.monthly[0].closing, 9400);
+  assert.equal(buildForecast(d, '2026-10-27').monthly[0].outgoing, 500);
+  assert.equal(JSON.stringify(d), before);
+  d.expenses[0].amount = 300;
+  const overspent = buildForecast(d, '2026-10-26');
+  assert.ok(!overspent.events.some(e => e.key === 'budget:plan:2026-10-26'));
+  assert.equal(overspent.monthly[0].outgoing, 500);
+  assert.equal(overspent.summary.balance, 9680);
+});
+test('Mi dinero: un gasto futuro registrado sustituye su estimación diaria y conserva su importe completo', () => {
+  const d = data({ plans: [plan({ kind: 'VARIABLE', amount: 3100, categoryId: 'food', endDate: '2026-10-31' })], expenses: [expense({ amount: 30, categoryId: 'food', date: '2026-10-28' })] });
+  const r = buildForecast(d, '2026-10-27');
+  assert.equal(r.summary.balance, 10000);
+  assert.equal(r.events.find(e => e.key === 'expense:e').amount, -30);
+  assert.equal(r.events.find(e => e.key === 'budget:plan:2026-10-28').amount, -70);
+  assert.equal(r.monthly[0].outgoing, 500);
+  d.expenses[0].amount = 300;
+  const larger = buildForecast(d, '2026-10-27');
+  assert.ok(!larger.events.some(e => e.key === 'budget:plan:2026-10-28'));
+  assert.equal(larger.events.find(e => e.key === 'expense:e').amount, -300);
+  assert.equal(larger.monthly[0].outgoing, 700);
+});
+test('Mi dinero: vigencia parcial conserva el ritmo mensual y respeta el cambio de mes', () => {
+  const d = data({ plans: [plan({ kind: 'VARIABLE', amount: 3100, categoryId: 'food', startDate: '2026-10-29', endDate: '2026-11-02' })] });
+  const r = buildForecast(d, today), events = r.events.filter(e => e.kind === 'VARIABLE');
+  assert.deepEqual(Array.from(events, e => [e.date, e.amount]), [['2026-10-29', -100], ['2026-10-30', -100], ['2026-10-31', -100], ['2026-11-01', -103.33], ['2026-11-02', -103.34]]);
+  assert.equal(r.monthly[0].outgoing, 300);
+  assert.equal(r.monthly[1].outgoing, 206.67);
+});
+test('Mi dinero: referencia diaria conserva centavos en meses de 28, 29, 30 y 31 días', () => {
+  for (const [start, end, days] of [['2027-02-01', '2027-02-28', 28], ['2028-02-01', '2028-02-29', 29], ['2026-11-01', '2026-11-30', 30], ['2026-10-01', '2026-10-31', 31]]) {
+    const d = data({ accounts: [{ ...data().accounts[0], asOf: start }], plans: [plan({ kind: 'VARIABLE', amount: '100.01', categoryId: 'food', startDate: start, endDate: end })] });
+    const r = buildForecast(d, start), events = r.events.filter(e => e.kind === 'VARIABLE');
+    assert.equal(events.length, days);
+    assert.equal(events.reduce((sum, e) => sum - Math.round(e.amount * 100), 0), 10001);
+    assert.equal(r.monthly[0].outgoing, 100.01);
+    assert.ok(Math.max(...events.map(e => -Math.round(e.amount * 100))) - Math.min(...events.map(e => -Math.round(e.amount * 100))) <= 1);
+    const lastDay = buildForecast(d, end).events.filter(e => e.kind === 'VARIABLE');
+    assert.equal(lastDay.length, 1);
+    assert.equal(lastDay[0].amount, events.at(-1).amount);
+  }
+});
+test('Mi dinero: releer días después no mueve centavos entre fechas ni acumula días sin gasto', () => {
+  const d = data({ plans: [plan({ kind: 'VARIABLE', amount: '100.01', categoryId: 'food', endDate: '2026-10-31' })] });
+  const first = buildForecast(d, today).events.filter(e => e.kind === 'VARIABLE' && e.date >= '2026-10-27');
+  const later = buildForecast(d, '2026-10-27').events.filter(e => e.kind === 'VARIABLE');
+  assert.deepEqual(Array.from(later, e => [e.date, e.amount]), Array.from(first, e => [e.date, e.amount]));
+});
+test('Mi dinero: escenario de gasto variable ajusta el ritmo sin crear movimientos ni cambiar saldos', () => {
+  const d = data({ plans: [plan({ kind: 'VARIABLE', amount: 3100, categoryId: 'food', endDate: '2026-10-31' })] });
+  const before = JSON.stringify(d);
+  for (const [variablePercent, expected] of [[0, 0], [80, 400], [100, 500], [300, 1500]]) {
+    const r = buildForecast(d, '2026-10-27', { variablePercent });
+    assert.equal(r.summary.balance, 10000);
+    assert.equal(r.monthly[0].outgoing, expected);
+    assert.ok(r.events.every(e => e.amount !== 0));
+  }
+  assert.equal(JSON.stringify(d), before);
+});
+test('Mi dinero: consumo diario a crédito sustituye compras registradas y sale al pagar cada corte', () => {
+  const credit = { ...card, usualCutDay: 28 };
+  const d = data({ cards: [credit], plans: [plan({ kind: 'VARIABLE', amount: 3100, categoryId: 'food', cardId: credit.id, startDate: '2026-10-27', endDate: '2026-10-31' })], expenses: [expense({ categoryId: 'food', amount: 40, date: '2026-10-28', paymentMethod: 'CARD', cardId: credit.id })] });
+  const r = buildForecast(d, '2026-10-27');
+  assert.equal(r.summary.balance, 10000);
+  assert.equal(r.monthly[0].outgoing, 0);
+  assert.ok(!r.events.some(e => e.kind === 'VARIABLE'));
+  assert.deepEqual(Array.from(r.events.filter(e => e.kind === 'CARD_DUE'), e => [e.date, e.amount]), [['2026-11-10', -200], ['2026-12-10', -300]]);
 });
 test('Mi dinero: detecta falta de liquidez antes de una nómina aunque el cierre sea positivo', () => {
   const d = data({ accounts: [{ ...data().accounts[0], openingBalance: 100 }], plans: [plan({ kind: 'EXPENSE', amount: 200, frequencyMonths: 0, startDate: '2026-10-25' }), plan({ id: 'salary', amount: 500, frequencyMonths: 0, startDate: '2026-10-31' })] });

@@ -1,0 +1,51 @@
+{
+  "checkedAt": "2026-10-27T02:06:42.220Z",
+  "deploymentId": "dpl_7E6bz4bpYKTrnQB5t6EM7NYnqBYv",
+  "http": [
+    {
+      "path": "/mi-dinero",
+      "status": 200,
+      "url": "https://finanzas.garatachia.com/mi-dinero",
+      "cacheControl": "public, max-age=0, must-revalidate"
+    },
+    {
+      "path": "/login",
+      "status": 200,
+      "url": "https://finanzas.garatachia.com/login",
+      "cacheControl": "public, max-age=0, must-revalidate"
+    },
+    {
+      "path": "/api/money",
+      "status": 401,
+      "url": "https://finanzas.garatachia.com/api/money",
+      "cacheControl": "private, no-store"
+    },
+    {
+      "path": "/api/money",
+      "status": 401,
+      "url": "https://finanzas.garatachia.com/api/money",
+      "cacheControl": "private, no-store"
+    }
+  ],
+  "scriptCount": 18,
+  "uiChecks": [
+    {
+      "phrase": "se estima el gasto de los días que faltan, sin obligarte a agotarla",
+      "found": true
+    },
+    {
+      "phrase": "los días siguientes conservan su previsión",
+      "found": true
+    },
+    {
+      "phrase": "100 mantiene la estimación diaria",
+      "found": true
+    }
+  ],
+  "financialRequests": "Solo GET; sin sesión del usuario ni escrituras.",
+  "oldHelpAbsent": true,
+  "uiVerification": {
+    "asset": "/_next/static/chunks/app/mi-dinero/page-9e5552337537f417.js",
+    "method": "JavaScript servido por /mi-dinero, normalizando escapes Unicode y hexadecimales."
+  }
+}

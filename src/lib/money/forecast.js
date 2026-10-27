@@ -51,15 +51,25 @@ export function buildForecast(data, today, options = {}) {
   for (const plan of data.plans.filter(p => p.isActive)) {
     const isIncome = ['INCOME', 'PAYROLL'].includes(plan.kind);
     if (plan.kind === 'VARIABLE') {
+      const recordedByDate = new Map();
+      for (const expense of data.expenses) {
+        if (expense.categoryId !== plan.categoryId || expense.subscriptionId || expense.payableAccountId || data.routes.some(r => r.key === `expense:${expense.id}` && r.planId)) continue;
+        const date = day(expense.date);
+        recordedByDate.set(date, (recordedByDate.get(date) || 0) + cents(expense.amount));
+      }
+      const monthlyAmount = Math.max(0, Math.round(cents(plan.amount) * scenario.variablePercent / 100));
       for (const month of months) {
         if (month < day(plan.startDate).slice(0, 7) || (plan.endDate && month > day(plan.endDate).slice(0, 7))) continue;
-        const spent = data.expenses.filter(e => e.categoryId === plan.categoryId && !e.subscriptionId && !e.payableAccountId && !data.routes.some(r => r.key === `expense:${e.id}` && r.planId) && day(e.date).startsWith(month)).reduce((sum, e) => sum + cents(e.amount), 0);
-        const remaining = Math.max(0, Math.round(cents(plan.amount) * scenario.variablePercent / 100) - spent);
         const start = [today, day(plan.startDate), `${month}-01`].sort().at(-1), last = [end, day(plan.endDate) || end, monthDay(month, 31)].sort()[0];
-        const count = Math.round((Date.parse(last) - Date.parse(start)) / 86400000) + 1;
-        for (let i = 0; i < count; i++) {
-          const date = addDays(start, i), value = Math.floor(remaining / count) + (i < remaining % count ? 1 : 0);
-          const event = { key: `budget:${plan.id}:${date}`, date, cents: -value, label: plan.name, kind: 'VARIABLE', accountId: plan.accountId, planId: plan.id };
+        const daysInMonth = Number(monthDay(month, 31).slice(-2));
+        for (let date = start; date <= last; date = addDays(date, 1)) {
+          const ordinal = Number(date.slice(-2));
+          // Ritmo diario, no obligación de agotar el presupuesto. El redondeo
+          // acumulado conserva los centavos y la cuota de cada fecha al releer.
+          const expected = Math.round(monthlyAmount * ordinal / daysInMonth) - Math.round(monthlyAmount * (ordinal - 1) / daysInMonth);
+          const value = Math.max(0, expected - (recordedByDate.get(date) || 0));
+          if (!value) continue;
+          const event = { key: `budget:${plan.id}:${date}`, date, cents: -value, label: plan.name, kind: 'VARIABLE', accountId: plan.accountId, planId: plan.id, status: 'ESTIMATED' };
           if (plan.cardId) plannedCardExpenses.push({ id: event.key, cardId: plan.cardId, paymentMethod: 'CARD', date, amount: amount(value), concept: plan.name }); else add(event);
         }
       }

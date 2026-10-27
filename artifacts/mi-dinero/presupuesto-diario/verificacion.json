@@ -1,0 +1,45 @@
+{
+  "status": "PUBLICADO_Y_VERIFICADO",
+  "date": "2026-10-26",
+  "problem": "El presupuesto mensual sin gastar se concentraba en los días restantes y superar el presupuesto eliminaba toda previsión de consumo posterior.",
+  "behavior": "Referencia mensual repartida por los días naturales del mes. Solo se prevén las fechas vigentes desde hoy. Los gastos registrados cubren la cuota de su fecha, hasta cero, sin trasladar sobrantes ni excesos a otros días. El crédito se incorpora al corte correspondiente.",
+  "example": {
+    "monthlyReference": 3100,
+    "from": "2026-10-27",
+    "through": "2026-10-31",
+    "remainingEstimateWithoutRecordedExpensesOnThoseDays": 500,
+    "currency": "MXN"
+  },
+  "checks": {
+    "forecast": {
+      "command": "node --test tests/money-forecast.test.cjs",
+      "passed": 28,
+      "failed": 0,
+      "skipped": 0
+    },
+    "regressions": {
+      "command": "pnpm test",
+      "passed": 430,
+      "failed": 0,
+      "skipped": 46,
+      "skipReason": "AFP_TEST_DATABASE_URL no está configurada; no se ejecutaron integraciones PostgreSQL."
+    },
+    "lint": {
+      "command": "pnpm exec eslint src/lib/money/forecast.js src/components/mi-dinero/MoneyContent.jsx tests/money-forecast.test.cjs",
+      "exitCode": 0
+    },
+    "build": {
+      "command": "pnpm exec next build --webpack",
+      "exitCode": 0
+    }
+  },
+  "limitations": [
+    "La previsión utiliza un ritmo uniforme, no predice días concretos de compra ni cambios de hábitos.",
+    "Los gastos con fecha conocida o extraordinarios se prevén por separado.",
+    "Sin prueba integrada contra PostgreSQL en esta revisión. La publicación y las comprobaciones HTTP están documentadas por separado en production.json."
+  ],
+  "databaseMigrations": 0,
+  "productionFinancialWrites": 0,
+  "budgetPlansActivated": 0,
+  "productionEvidence": "production.json"
+}

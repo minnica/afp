@@ -1,0 +1,134 @@
+{
+  "status": "PENDIENTES_PREEXISTENTES_SIN_CAMBIOS_DE_DEPENDENCIAS",
+  "checks": [
+    {
+      "scope": "prod",
+      "counts": {
+        "info": 0,
+        "low": 2,
+        "moderate": 2,
+        "high": 1,
+        "critical": 2
+      },
+      "advisories": [
+        {
+          "package": "next",
+          "severity": "critical",
+          "title": "Next.js: Unauthenticated Remote Code Execution in Image Optimization API when SVG files are used",
+          "patchedVersions": ">=16.4.1",
+          "url": "https://github.com/advisories/GHSA-2464-fhr4-w9xw"
+        },
+        {
+          "package": "next",
+          "severity": "high",
+          "title": "Next.js: Denial of Service in App Router using Server Actions",
+          "patchedVersions": ">=16.4.1",
+          "url": "https://github.com/advisories/GHSA-p3m5-59mp-jv5r"
+        },
+        {
+          "package": "next",
+          "severity": "critical",
+          "title": "Next.js: Unauthenticated Remote Code Execution in `use cache` functions returning typed arrays",
+          "patchedVersions": ">=16.4.1",
+          "url": "https://github.com/advisories/GHSA-673q-mjm6-r5xr"
+        },
+        {
+          "package": "fast-uri",
+          "severity": "moderate",
+          "title": "fast-uri vulnerable to URI scheme spoofing via percent-encoded scheme decoding",
+          "patchedVersions": ">=3.1.9",
+          "url": "https://github.com/advisories/GHSA-w74x-v6f9-j3xg"
+        },
+        {
+          "package": "fast-uri",
+          "severity": "low",
+          "title": "fast-uri vulnerable to improper path equivalence in relative reference normalization",
+          "patchedVersions": ">=3.1.9",
+          "url": "https://github.com/advisories/GHSA-xhq7-xmqj-769h"
+        },
+        {
+          "package": "fast-uri",
+          "severity": "moderate",
+          "title": "fast-uri vulnerable to host confusion via unchecked WHATWG host canonicalization",
+          "patchedVersions": ">=3.1.9",
+          "url": "https://github.com/advisories/GHSA-wjr9-j795-jxcr"
+        },
+        {
+          "package": "fast-uri",
+          "severity": "low",
+          "title": "fast-uri vulnerable to scheme injection via an unescaped first-segment colon in suffix references",
+          "patchedVersions": ">=3.1.9",
+          "url": "https://github.com/advisories/GHSA-333x-w4r6-6crp"
+        }
+      ]
+    },
+    {
+      "scope": "all",
+      "counts": {
+        "info": 0,
+        "low": 2,
+        "moderate": 2,
+        "high": 2,
+        "critical": 2
+      },
+      "advisories": [
+        {
+          "package": "next",
+          "severity": "critical",
+          "title": "Next.js: Unauthenticated Remote Code Execution in Image Optimization API when SVG files are used",
+          "patchedVersions": ">=16.4.1",
+          "url": "https://github.com/advisories/GHSA-2464-fhr4-w9xw"
+        },
+        {
+          "package": "next",
+          "severity": "high",
+          "title": "Next.js: Denial of Service in App Router using Server Actions",
+          "patchedVersions": ">=16.4.1",
+          "url": "https://github.com/advisories/GHSA-p3m5-59mp-jv5r"
+        },
+        {
+          "package": "next",
+          "severity": "critical",
+          "title": "Next.js: Unauthenticated Remote Code Execution in `use cache` functions returning typed arrays",
+          "patchedVersions": ">=16.4.1",
+          "url": "https://github.com/advisories/GHSA-673q-mjm6-r5xr"
+        },
+        {
+          "package": "body-parser",
+          "severity": "high",
+          "title": "body-parser vulnerable to Denial of Service via trailing bytes after a compressed request body",
+          "patchedVersions": ">=2.4.0",
+          "url": "https://github.com/advisories/GHSA-27r3-jxmh-p828"
+        },
+        {
+          "package": "fast-uri",
+          "severity": "moderate",
+          "title": "fast-uri vulnerable to URI scheme spoofing via percent-encoded scheme decoding",
+          "patchedVersions": ">=3.1.9",
+          "url": "https://github.com/advisories/GHSA-w74x-v6f9-j3xg"
+        },
+        {
+          "package": "fast-uri",
+          "severity": "low",
+          "title": "fast-uri vulnerable to improper path equivalence in relative reference normalization",
+          "patchedVersions": ">=3.1.9",
+          "url": "https://github.com/advisories/GHSA-xhq7-xmqj-769h"
+        },
+        {
+          "package": "fast-uri",
+          "severity": "moderate",
+          "title": "fast-uri vulnerable to host confusion via unchecked WHATWG host canonicalization",
+          "patchedVersions": ">=3.1.9",
+          "url": "https://github.com/advisories/GHSA-wjr9-j795-jxcr"
+        },
+        {
+          "package": "fast-uri",
+          "severity": "low",
+          "title": "fast-uri vulnerable to scheme injection via an unescaped first-segment colon in suffix references",
+          "patchedVersions": ">=3.1.9",
+          "url": "https://github.com/advisories/GHSA-333x-w4r6-6crp"
+        }
+      ]
+    }
+  ]
+}
