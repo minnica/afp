@@ -12,8 +12,9 @@ import { paymentCaptureKind } from "@/lib/capturePaymentParsers";
 import { resolveCapturePayment } from "@/lib/capturePayments";
 import { bankFallbackInterpretation } from "@/lib/captureBankFallback";
 import { automateCapturePayment } from "@/lib/capturePaymentAutomation";
-import { moneyCaptureKind } from "@/lib/captureMoneyParsers";
+import { moneyCaptureKind, accountDebitNotice } from "@/lib/captureMoneyParsers";
 import { completeMoneyCapture, automateMoneyCapture, resolveMoneyCapture } from "@/lib/captureMoney";
+import { correctDebitCapture } from "@/lib/captureDebitCorrections";
 import { refundCaptureKind } from "@/lib/captureRefundParsers";
 import { completeRefundIdentity, resolveCaptureRefund } from "@/lib/captureRefunds";
 
@@ -128,7 +129,7 @@ export async function processCaptureEvent(tx, event) {
   } });
   if (reason === "PURCHASE") await registerCaptureMovement(tx, movement, false);
   if (paymentCaptureKind(movement)) movement = await automateCapturePayment(tx, event, movement);
-  if (moneyCaptureKind(movement)) movement = await automateMoneyCapture(tx, event, movement);
+  if (moneyCaptureKind(movement) || accountDebitNotice(movement)) movement = await automateMoneyCapture(tx, event, movement);
   await tx.captureEvent.update({ where: { id: event.id }, data: {
     movementId: movement.id, interpretation: { ...interpretation, proposal, reason },
   } });
@@ -256,13 +257,14 @@ export async function registerCaptureMovement(tx, movement, distinct) {
 
 export async function resolveCaptureMovement(db, userId, input) {
   if (!input || typeof input.id !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(input.id)
-    || !["link", "linkInstallment", "distinct", "discard", "convertToInstallments", "correct", "register", "reinterpret", "validateWalletBackup", "registerPayment", "linkPayment", "reversePayment", "applyRefund", "reverseRefund", "registerMoneyTransfer", "registerMoneyWithdrawal", "registerDebitExpense"].includes(input.action)) {
+    || !["link", "linkInstallment", "distinct", "discard", "convertToInstallments", "correct", "register", "reinterpret", "validateWalletBackup", "registerPayment", "linkPayment", "reversePayment", "applyRefund", "reverseRefund", "registerMoneyTransfer", "registerMoneyWithdrawal", "registerDebitExpense", "correctDebitType"].includes(input.action)) {
     throw new ApiAccessError("Resolución no válida.", 400);
   }
   return db.$transaction(async tx => {
     await lockDebtAccounts(tx, userId);
     const movement = await tx.captureMovement.findFirst({ where: { id: input.id, userId } });
     if (!movement) throw new ApiAccessError("Aviso no encontrado.", 404);
+    if (input.action === "correctDebitType") return correctDebitCapture(tx, movement, input);
     if (["registerMoneyTransfer", "registerMoneyWithdrawal", "registerDebitExpense"].includes(input.action)) return resolveMoneyCapture(tx, movement, input);
     if (moneyCaptureKind(movement) && !["discard", "reinterpret"].includes(input.action)) throw new ApiAccessError("Revisa este aviso como movimiento entre cuentas.", 409);
     if (["applyRefund", "reverseRefund"].includes(input.action)) return resolveCaptureRefund(tx, movement, input);

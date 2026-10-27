@@ -4,7 +4,7 @@
 import { interpretPaymentNotice } from "@/lib/capturePaymentParsers";
 import { parsePaymentReceipt, paymentReceiptSource } from "@/lib/paymentReceipts";
 import { reviewOnlyCapturePackages } from "@/lib/captureSourcePolicy";
-import { interpretMoneyNotice } from "@/lib/captureMoneyParsers";
+import { interpretMoneyNotice, interpretBbvaAccountCharge } from "@/lib/captureMoneyParsers";
 import { interpretRefundNotice } from "@/lib/captureRefundParsers";
 
 export const captureParsers = [
@@ -267,18 +267,8 @@ export function interpretCapture(event) {
         paymentEvidence: "SOURCE_DEBIT_ONLY", missingFields: ["destination", "card", "currency", "statementPeriod", "operationDate"],
       } };
     }
-    const account = body.match(/^Tienes un cargo a tu cuenta \*(\d{4}) de \$([\d,.]+)\. /);
-    if (account) {
-      const conflicting = event.fields["android.bigText"] && event.fields["android.text"] && !body.startsWith(event.fields["android.text"]);
-      if (conflicting || !captureAmount(account[2])) return { parserKey: "bbva.account-charge.es.v1", verified: false,
-        reason: conflicting ? "CONFLICTING_FIELDS" : "INVALID_FIELDS", proposal: {} };
-      return { parserKey: "bbva.account-charge.es.v1", verified: false,
-        reason: conflicting ? "CONFLICTING_FIELDS" : "ACCOUNT_DEBIT_REVIEW", proposal: {
-          movementType: "ACCOUNT_DEBIT", merchant: "Cargo a cuenta BBVA", amount: captureAmount(account[2]),
-          ...captureNotificationDate(event), paymentEvidence: "SOURCE_DEBIT_ONLY",
-          missingFields: ["destination", "card", "currency", "statementPeriod", "operationDate"],
-        } };
-    }
+    const accountCharge = interpretBbvaAccountCharge(event, captureAmount, captureNotificationDate);
+    if (accountCharge) return accountCharge;
   }
   // Muestra real confirmada como pago CFE desde Nu. El símbolo $ no fija la
   // moneda; publicación/recepción no sustituyen la fecha de operación y el

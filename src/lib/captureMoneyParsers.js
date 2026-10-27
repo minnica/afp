@@ -25,3 +25,26 @@ export function interpretMoneyNotice(event, parseAmount, notificationDate) {
   if (amounts.length !== 1 || aliases.length !== 1 || !date || /comisi[oó]n|IVA/i.test(text)) return { ...base, reason: 'INCOMPLETE_FORMAT' };
   return { ...base, reason: 'WITHDRAWAL_SAMPLE_REQUIRED', proposal: { ...base.proposal, amount: amounts[0], accountLast4: aliases[0], ...date } };
 }
+
+// La cuenta se conserva tal como aparece (cuatro o cinco cifras), sin inferir
+// destinatario ni recortar la terminación. La regla del usuario decide el gasto.
+export function interpretBbvaAccountCharge(event, parseAmount, notificationDate) {
+  if (event.sourcePackage !== 'com.bancomer.mbanking') return null;
+  const fields = event.fields || {}, body = fields['android.bigText'] || fields['android.text'] || '';
+  const old = body.match(/^Tienes un cargo a tu cuenta \*(\d{4,5}) de \$([\d,.]+)\. /);
+  const short = body.match(/^Cargo a tu cuenta \*(\d{4,5}) de \$([\d,]+\.\d{2})\s*$/);
+  const match = old || short;
+  if (!match) return null;
+  const base = { parserKey: 'bbva.account-charge.es.v1', verified: false, proposal: {} };
+  if (fields['android.bigText'] && fields['android.text'] && !body.startsWith(fields['android.text'])) return { ...base, reason: 'CONFLICTING_FIELDS' };
+  const text = Object.values(fields).join('\n');
+  if (/\b(?:USD|EUR|d[oó]lares)\b/i.test(text)) return { ...base, reason: 'FOREIGN_CURRENCY' };
+  if (/cancel|devol|revers|rechaz|no se (?:aplic[oó]|realiz[oó])/i.test(text)) return { ...base, reason: 'SPECIAL_MOVEMENT' };
+  const amount = parseAmount(match[2]);
+  if (!amount || (body.match(/\$/g) || []).length !== 1) return { ...base, reason: 'INVALID_FIELDS' };
+  return { ...base, reason: 'ACCOUNT_DEBIT_REVIEW', proposal: {
+    movementType: 'ACCOUNT_DEBIT', merchant: 'Cargo BBVA', amount, accountSuffix: match[1],
+    ...notificationDate(event), paymentEvidence: 'SOURCE_DEBIT_ONLY',
+    missingFields: ['destination', 'card', 'currency', 'statementPeriod', 'operationDate'],
+  } };
+}

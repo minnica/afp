@@ -1,0 +1,52 @@
+{
+  "status": "LOCAL_VERIFIED_NOT_DEPLOYED",
+  "tests": {
+    "passed": 50,
+    "failed": 0,
+    "skipped": 0,
+    "files": [
+      "tests/capture-bbva-debit.test.cjs",
+      "tests/capture-money-integration.test.cjs",
+      "tests/capture-parsers.test.cjs",
+      "tests/migration-history.test.cjs",
+      "tests/capture-inbox-integration.test.cjs",
+      "tests/capture-card-payments.test.cjs",
+      "tests/capture-card-payments-integration.test.cjs"
+    ]
+  },
+  "database": {
+    "localMigrationCount": 42,
+    "schemaDiff": "empty",
+    "migration": "20261027010000_bbva_debit_automation",
+    "kind": "additive"
+  },
+  "lint": "passed",
+  "build": "next build --webpack passed",
+  "privateOriginalReplay": {
+    "environment": "local disposable fixture",
+    "passed": true,
+    "deliveries": 2,
+    "expenses": 1,
+    "balanceEffect": "verified"
+  },
+  "visualValidation": "omitted at user request",
+  "productionWrites": false,
+  "apkRequired": false,
+  "sourceSha256": {
+    "prisma/migrations/20261027010000_bbva_debit_automation/migration.sql": "69cd66286a1d3a3de86d52eb70a072a0e268cf3957567222a3a00cacb985b028",
+    "prisma/schema.prisma": "00828cc74e12eb1c555d9e450ab03bcc5f679612531c8ecf26ec1ba810e80a13",
+    "src/components/configuracion/CaptureDebitCorrection.jsx": "bbd2e1f72ba3efc3a9413fc008df722ea2e4fa08415cc5d18540a9a2da2b142b",
+    "src/components/configuracion/CaptureMoneyEditor.jsx": "0b31529465acdd00b404277310de8f11502403cf87fa1abe63d67b2fa2bed157",
+    "src/components/configuracion/CaptureMoneySettings.jsx": "323e6a4921116a89d6e05c7f6bd62991302959c056b50d5123106db74b5822b3",
+    "src/components/configuracion/CaptureReview.jsx": "fcae1fe49c3263e4473f0bd65c41a46e830198705045932dc8b9ce3bef59a617",
+    "src/lib/captureDebitCorrections.js": "c3aa43289d66f8ddfd22b5db315f1dd38fcbb46d09149d6d6bca9680de40d580",
+    "src/lib/captureInbox.js": "aa5a9748b0a9373436276fef87734c86bf4cd39f56024657693434149a7b4dd1",
+    "src/lib/captureMoney.js": "f2a38228a66e94c954dc3537f92b8fe48a8c4f19bc14e50c3218a86177039e75",
+    "src/lib/captureMoneyParsers.js": "11bbdddcafad6cd44182d8a8af00ef31cd5ab4bfc4656258329dc65c40793b89",
+    "src/lib/captureParsers.js": "d5fb965cf9fc37ab6c5db2c67dc39ea2a69fdfa9fb255cd84b172a155b76ff4a",
+    "src/lib/capturePresentation.js": "d1ba5ef1e2f49ff82ad2846b8855be58cde23b9895d162189b40d2125f3ebbdc",
+    "src/lib/captureProcessing.js": "2d8a44712ab77fe26a7897f04202dabe23f67d6460cd6a297d6c646b5472955a",
+    "tests/capture-bbva-debit.test.cjs": "012020f3505ea2afbc0ec09f151300a7c0fe1fbc63252f55bf24c7cdabcf310d",
+    "tests/migration-history.test.cjs": "71d64a1a8a93e35f0ae7fec5f0e0eb81470c9f09cfafff3c9068f543e06ec1e0"
+  }
+}

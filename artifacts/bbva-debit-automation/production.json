@@ -1,0 +1,51 @@
+{
+  "status": "DEPLOYED_AND_ACTIVE",
+  "deploymentId": "dpl_7GyevNM3o1fSZhpQ3SPLrFRnyoJa",
+  "url": "https://finanzas.garatachia.com",
+  "environment": "production",
+  "baseCommit": "d67992c3761fcdace49fe735b2d078c0f469a4d8",
+  "sourceFiles": 349,
+  "verifiedSourceHashes": 124,
+  "verifiedCaptureSourceHashes": 25,
+  "migration": {
+    "name": "20261027010000_bbva_debit_automation",
+    "kind": "additive",
+    "appliedCount": 42,
+    "rlsTables": 45,
+    "schemaDiff": "empty",
+    "backup": "private",
+    "previousFinancialTablesPreservedBeforeActivation": 10
+  },
+  "application": {
+    "policy": "BBVA_DEBIT",
+    "mode": "AUTOMATIC",
+    "exactAccountSuffixVariants": 2,
+    "historicalNotice": "registered once",
+    "addedExpenses": 1,
+    "method": "DEBIT",
+    "category": "Por clasificar",
+    "balanceEffect": "verified against original notice",
+    "otherFinancialRecords": "preserved",
+    "openingBalances": "unchanged",
+    "idempotentRetry": "same expense"
+  },
+  "health": {
+    "pageStatus": 200,
+    "protectedRoutesStatus": 401,
+    "calendarWorkerStatus": 200,
+    "calendarResults": [
+      "SYNCED"
+    ],
+    "calendarCurrent": true
+  },
+  "runtimeErrors": "Only an existing pg deprecation group from the previous deployment appeared in the query; no group from this deployment was reported.",
+  "tests": {
+    "passed": 50,
+    "failed": 0,
+    "skipped": 0
+  },
+  "apkRequired": false,
+  "commitOrPushPerformed": false,
+  "visualValidation": "omitted at user request",
+  "verifiedAt": "2026-10-27T05:34:24.483Z"
+}

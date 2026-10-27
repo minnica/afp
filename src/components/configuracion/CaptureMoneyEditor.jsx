@@ -6,6 +6,7 @@ import { captureReasons } from '@/lib/capturePresentation';
 import { accountDebitNotice } from '@/lib/captureMoneyParsers';
 import CaptureNotificationDetails from './CaptureNotificationDetails';
 import CapturePaymentEditor from './CapturePaymentEditor';
+import CaptureDebitCorrection from './CaptureDebitCorrection';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
@@ -17,12 +18,12 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Spinner } from '@/components/ui/spinner';
 const money = v => Number(v || 0).toLocaleString('es-MX', { style: 'currency', currency: 'MXN' });
 export default function CaptureMoneyEditor({ detail, configuration, userId, onClose, onSaved, restoreFocus }) {
-  const [current, setCurrent] = useState(detail), [busy, setBusy] = useState(false), [error, setError] = useState(''), [confirmation, setConfirmation] = useState(null), [paymentView, setPaymentView] = useState(false);
+  const [current, setCurrent] = useState(detail), [busy, setBusy] = useState(false), [error, setError] = useState(''), [confirmation, setConfirmation] = useState(null), [paymentView, setPaymentView] = useState(false), [correcting, setCorrecting] = useState(false);
   const p = current.movement.proposal, posting = current.moneyDetail?.posting;
   const generic = accountDebitNotice(current.movement), accounts = configuration.moneyAccounts || [];
   const [kind, setKind] = useState(p.movementType === 'MONEY_TRANSFER' ? 'TRANSFER' : generic ? 'DEBIT_EXPENSE' : 'WITHDRAWAL');
   const [from, setFrom] = useState(p.fromAccountId || ''), [to, setTo] = useState(p.toAccountId || ''), [categoryId, setCategoryId] = useState('none');
-  const [concept, setConcept] = useState(generic ? 'Compra con débito BBVA' : p.merchant || 'Retiro de efectivo'), [distinct, setDistinct] = useState(false);
+  const [concept, setConcept] = useState(generic ? 'Cargo BBVA' : p.merchant || 'Retiro de efectivo'), [distinct, setDistinct] = useState(false);
   const title = useRef(null), open = ['REVIEW', 'OBSERVED'].includes(current.movement.status) && !posting;
   const name = id => accounts.find(a => a.id === id)?.name || 'Cuenta por identificar';
   async function save() {
@@ -51,7 +52,8 @@ export default function CaptureMoneyEditor({ detail, configuration, userId, onCl
         <p className="text-xs text-muted-foreground">La fecha procede del aviso, en hora de México. La moneda MXN y las cuentas las confirmas al registrar.</p>
         <Field orientation="horizontal"><Checkbox id="money-distinct" checked={distinct} onCheckedChange={v => setDistinct(v === true)} disabled={busy} /><FieldLabel htmlFor="money-distinct" className="min-h-11">Es otro movimiento aunque coincida con uno registrado</FieldLabel></Field>
         <Alert><AlertDescription>{effect}</AlertDescription></Alert>
-      </FieldGroup></form> : posting ? <div className="flex flex-col gap-2 text-sm"><p>{posting.snapshot.fromName}{posting.snapshot.toName && ` → ${posting.snapshot.toName}`}</p><p>{posting.kind === 'DEBIT_EXPENSE' && !posting.expense ? 'El gasto fue eliminado. Este aviso no volverá a crearlo.' : posting.transfer?.reversedAt || posting.withdrawal?.reversedAt ? 'El movimiento fue revertido. Su historial se conserva.' : 'Se aplicó una sola vez. Puedes revisar el registro y su efecto en Mi dinero.'}</p><Button variant="outline" className="min-h-11 self-start" asChild><Link href={posting.kind === 'DEBIT_EXPENSE' ? '/gastos' : '/mi-dinero'}>{posting.kind === 'DEBIT_EXPENSE' ? 'Ver gastos' : 'Ver Mi dinero'}</Link></Button></div> : <p className="text-sm">Este aviso conserva su resolución.</p>}
+      </FieldGroup></form> : posting ? <div className="flex flex-col gap-2 text-sm"><p>{posting.snapshot.fromName}{posting.snapshot.toName && ` → ${posting.snapshot.toName}`}</p><p>{posting.kind === 'DEBIT_EXPENSE' && !posting.expense ? 'El gasto fue eliminado. Este aviso no volverá a crearlo.' : posting.transfer?.reversedAt || posting.withdrawal?.reversedAt || posting.cardPayment?.reversedAt ? 'El movimiento fue revertido. Su historial se conserva.' : posting.kind === 'CARD_PAYMENT' && !posting.cardPayment ? 'El pago fue eliminado. El aviso conserva su historial.' : 'Se aplicó una sola vez. Puedes revisar el registro y su efecto en Mi dinero.'}</p><Button variant="outline" className="min-h-11 self-start" asChild><Link href={posting.kind === 'DEBIT_EXPENSE' ? '/gastos' : '/mi-dinero'}>{posting.kind === 'DEBIT_EXPENSE' ? 'Ver gastos' : 'Ver Mi dinero'}</Link></Button></div> : <p className="text-sm">Este aviso conserva su resolución.</p>}
+      {generic && posting?.kind === 'DEBIT_EXPENSE' && posting.expense && (correcting ? <CaptureDebitCorrection detail={current} accounts={accounts} userId={userId} busy={busy} setBusy={setBusy} onCancel={() => setCorrecting(false)} onSaved={async () => { await onSaved(); const r = await apiFetch(`/api/captures/movements?id=${current.movement.id}`, { expectedUserId: userId, errorMode: 'inline' }); setCurrent(await r.json()); setCorrecting(false); }} /> : <Button className="min-h-11 self-start" variant="outline" onClick={() => setCorrecting(true)}>Cambiar tipo de movimiento</Button>)}
       {generic && open && <Button className="min-h-11 self-start" variant="outline" onClick={() => setPaymentView(true)}>Fue un pago de tarjeta</Button>}
       <CaptureNotificationDetails movement={current.movement} />
     </div><DialogFooter><Button className="min-h-11" variant="outline" disabled={busy} onClick={onClose}>Cerrar</Button>{open && <Button className="min-h-11" form="capture-money-form" type="submit" disabled={busy || !from || (kind === 'TRANSFER' && (!to || to === from)) || !p.amount || !p.date}>Revisar y registrar</Button>}</DialogFooter>

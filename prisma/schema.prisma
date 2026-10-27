@@ -401,6 +401,7 @@ model MoneyCardPayment {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   cycle CardCycle @relation(fields: [cycleId], references: [id], onDelete: Cascade)
   account MoneyAccount @relation(fields: [accountId], references: [id], onDelete: Restrict)
+  capturePostings CaptureMoneyPosting[]
   @@index([userId, cycleId])
   @@map("money_card_payments")
 }
@@ -1005,6 +1006,7 @@ model CaptureMoneyPolicy {
   toAccountId String?
   destinationLabel String @default("")
   accountLast4 String?
+  accountSuffixes String[] @default([])
   currency String @default("MXN")
   datePolicy String @default("NOTIFICATION_POSTED_AT")
   acceptedAt DateTime
@@ -1028,6 +1030,7 @@ model CaptureMoneyPosting {
   transferId String?
   withdrawalId String?
   expenseId String?
+  cardPaymentId String?
   originalRecordId String
   snapshot Json
   createdAt DateTime @default(now())
@@ -1035,6 +1038,7 @@ model CaptureMoneyPosting {
   movement CaptureMovement @relation(fields: [movementId], references: [id], onDelete: Cascade)
   transfer MoneyTransfer? @relation(fields: [transferId], references: [id], onDelete: Restrict)
   withdrawal MoneyWithdrawal? @relation(fields: [withdrawalId], references: [id], onDelete: Restrict)
+  cardPayment MoneyCardPayment? @relation(fields: [cardPaymentId], references: [id], onDelete: SetNull)
   expense DailyExpense? @relation(fields: [expenseId], references: [id], onDelete: SetNull)
   @@unique([userId, sourceKey])
   @@map("capture_money_postings")
