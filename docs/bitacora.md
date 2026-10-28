@@ -6,6 +6,16 @@ Consolidado el **27 de octubre de 2026** a partir del README del commit `4562aa0
 
 ## 2026-10-28
 
+### Ejecución mixta y comprobación estricta de pruebas
+
+**Fase 1 completada localmente** sobre `700afcc`. Se fijó tsx 4.23.15 en desarrollo, manteniendo `node:test`, esbuild, aislamiento y política de instalación. `pnpm test` y las regresiones de `db:verify` comparten descubrimiento/ejecución de CJS y TS, rechazan duplicados y selecciones inválidas, y registran soporte TS explícitamente en los procesos necesarios.
+
+Se añadió `typecheck:tests` con configuración estricta y ESLint para todas las pruebas migradas; los contratos negativos conservan su programa separado. `latest-request.test.ts` mantiene los tres escenarios del módulo puro. Ocho escenarios de infraestructura verifican selección, exclusiones, módulos mixtos, imports dinámicos, orden, entorno, fallos y señales; tres casos negativos comprueban el contrato del ejecutor. Los helpers CJS continúan pendientes de tipado. El fixture Next deja de copiar configuraciones exclusivas de pruebas.
+
+Pasaron instalación limpia con lockfile, los tres controles de tipos sin `.next` previa, lint, build, suite PostgreSQL y `db:verify`. Los 854 escenarios originales se conservan en orden y jerarquía; los ocho nuevos elevan la suite a 862, sin fallos ni omisiones. Reconstrucción y actualización verificaron 42 migraciones y 45 tablas con RLS. También pasaron copia/regeneración y tipos del fixture Next. Se conservan hashes de producto, esquema, fixtures y evidencia histórica, así como los avisos preexistentes.
+
+El primer intento detectó un contrato estático de entorno incompleto por `NODE_ENV`; se corrigió y se conservó su evidencia antes de repetir. README, producto y plan reflejan la fase 1 completada y las fases 2–6 pendientes. Sin cambios de servicios remotos ni publicación. Resultados, límites y reproducción: [fase 1 de pruebas](../artifacts/typescript-tests-migration/phase-1/README.md).
+
 ### Referencia para migrar pruebas y helpers a TypeScript
 
 **Fase 0 completada localmente** sobre `6c1b626`. Se inventariaron 106 pruebas y 11 helpers CJS, ocho archivos de contratos estáticos, 21 fixtures JSON y sus dependencias, rutas dinámicas y consumidores, incluidos documentación y ejecutores de `artifacts/`. El manifiesto identifica los 854 escenarios reales: 555 de primer nivel y 299 subtests; conserva archivo, posición, nombres y jerarquía para comparar la migración sin depender solo del total.

@@ -4,9 +4,10 @@ const { spawnSync } = require('node:child_process');
 const root = path.resolve(__dirname, '../..');
 
 function copyNextConfiguration(target) {
-  // Lista acotada: nunca copiar .env ni tipos generados de otra compilación.
+  // Solo el programa web: los tsconfig de pruebas referencian archivos ausentes
+  // en el fixture. Nunca copiar .env ni tipos generados de otra compilación.
   for (const name of fs.readdirSync(root)) {
-    if (/^tsconfig(?:\.[\w-]+)?\.json$/.test(name) || (name.endsWith('.d.ts') && name !== 'next-env.d.ts') || ['package.json', 'postcss.config.mjs'].includes(name)) {
+    if (name === 'tsconfig.json' || (name.endsWith('.d.ts') && name !== 'next-env.d.ts') || ['package.json', 'postcss.config.mjs'].includes(name)) {
       fs.copyFileSync(path.join(root, name), path.join(target, name));
     }
   }

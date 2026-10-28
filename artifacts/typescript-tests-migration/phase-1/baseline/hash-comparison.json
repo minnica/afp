@@ -1,0 +1,19 @@
+{
+  "protectedFiles": {
+    "count": 394,
+    "changed": []
+  },
+  "historicalArtifacts": {
+    "count": 672,
+    "changed": []
+  },
+  "mutableConfiguration": {
+    "count": 11,
+    "changed": [
+      "eslint.config.mjs",
+      "package.json",
+      "pnpm-lock.yaml",
+      "scripts/verify-database-reproduction.cjs"
+    ]
+  }
+}

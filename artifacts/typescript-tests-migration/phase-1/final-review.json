@@ -1,0 +1,47 @@
+{
+  "baseCommit": "700afcc842a0d7694972eb28dde04acf8779c8d5",
+  "phase1Complete": true,
+  "allValidationChecksPassed": true,
+  "protectedAndHistoricalHashesUnchanged": true,
+  "runtimeTsModulesInStrictTypeScriptAndEslint": [
+    "tests/latest-request.test.ts",
+    "tests/run-tests.ts",
+    "tests/test-runner.test.ts"
+  ],
+  "baselineScenariosPreservedInOrder": 854,
+  "newInfrastructureScenarios": 8,
+  "passingScenariosWithPostgresql": 862,
+  "documentationLinksExist": true,
+  "preexistingWarnings": [
+    "3 ESLint warnings",
+    "pg concurrency deprecation"
+  ],
+  "pendingPhases": [
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "finalSha256": {
+    "README.md": "6b042d2f8e90554be9a39f7faeaabedefec35664c93edf3f01e28bac46e7d6db",
+    "PRODUCT.md": "77a8c0a883135c40d82f3f1e6dcb847a53c1cbaf4aafbbcc0b956f15902e94d7",
+    "docs/bitacora.md": "92da166658c139e8b2527e353b459291d8275d0245efa7eb87fb60fe16d5632a",
+    "docs/plan-migracion-tests-typescript.md": "97f9bde3e75501a08de26c6f7f8a8dbf32799e9090894c53e4a20ebc762c6d54",
+    "package.json": "27078fcfb2ae431fad8d0644ad5546087036baf8d2bdf884934a132baf09b6e0",
+    "pnpm-lock.yaml": "b35d42a9c0e93bd028790958c31c6e8d5f4e33ef6ca47e8099881300b76f7b7c",
+    "pnpm-workspace.yaml": "dd86c36ba952bd86ed1991db3d982b1bf1b7de7471de1880b7a7493ac7eb4526",
+    "tsconfig.json": "b11c0af51c81a819a9219ba47115a39029a9aed6211a1e64036f2296ddbac39a",
+    "tsconfig.type-tests.json": "082c02b9e2972ad1aaf0aac8ff09c49e1f3d42bdeed9f30d3a22fc929387433b",
+    "tsconfig.tests.json": "0fa3f4af2e31ba9635e634501b962a5387989b4da7dff3dce2cef928159b234f",
+    "eslint.config.mjs": "139ac42566109e1152bfc02dda3e70c27cddba9d5c24b4ec785c968eae06b21e",
+    "scripts/verify-database-reproduction.cjs": "ee4c3b4f85702ca6167d1b0f22d49212c776eb6189d22682fa6d222eba323f75",
+    "tests/helpers/next-fixture.cjs": "11384a3e187cb6580671245b6d117c0e22eaade2c533d35539bec901b8a29351",
+    "tests/latest-request.test.ts": "711ce3356ae5a4ce090cbcee5bcd6eee10408d4256264746962e84fd3646d6a7",
+    "tests/run-tests.ts": "b3661d4a758918d736dba2c4ccb4307e4072061afe9f5d762005e9374da1b78c",
+    "tests/test-runner.test.ts": "055d0f74df44768397e7d3f5ceaa8385c5fd0698aa815190ee255f1c2cc1ee71",
+    "tests/types/test-runner.ts": "f76174d14834c31941a23e4307fc420aecc645add98d392d1842c1bb6d34fb2b",
+    "artifacts/typescript-tests-migration/phase-1/collect.py": "0a2b9607e84dde60c269cbeee5104721dc67d967185797dc038f2152f2eeea1f"
+  },
+  "validationSourceHashesMatchFinalFiles": true
+}

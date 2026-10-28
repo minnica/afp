@@ -7,8 +7,8 @@ const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTypescript.map(config => ({ ...config, files: ["**/*.ts", "**/*.tsx"] })),
   {
-    files: ["src/**/*.ts", "src/**/*.tsx", "prisma.config.ts", "tests/types/**/*.ts", "tests/types/**/*.tsx"],
-    languageOptions: { parserOptions: { project: ["./tsconfig.json", "./tsconfig.type-tests.json"], tsconfigRootDir: import.meta.dirname } },
+    files: ["src/**/*.ts", "src/**/*.tsx", "prisma.config.ts", "tests/**/*.ts", "tests/**/*.tsx"],
+    languageOptions: { parserOptions: { project: ["./tsconfig.json", "./tsconfig.type-tests.json", "./tsconfig.tests.json"], tsconfigRootDir: import.meta.dirname } },
     rules: {
       "@typescript-eslint/no-explicit-any": "error",
       "@typescript-eslint/no-unsafe-assignment": "error",
@@ -21,6 +21,13 @@ const eslintConfig = defineConfig([
         message: "No encadenar conversiones de tipo. Validar o acotar el dato en su frontera.",
       }],
       "@typescript-eslint/ban-ts-comment": ["error", { "ts-expect-error": "allow-with-description", "minimumDescriptionLength": 10 }],
+    },
+  },
+  {
+    files: ["tests/**/*.ts", "tests/**/*.tsx"],
+    ignores: ["tests/types/**"],
+    rules: {
+      "@typescript-eslint/ban-ts-comment": ["error", { "ts-expect-error": true, "ts-ignore": true, "ts-nocheck": true, "ts-check": false }],
     },
   },
   // Override default ignores of eslint-config-next.

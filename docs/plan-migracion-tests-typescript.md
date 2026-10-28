@@ -1,6 +1,6 @@
 # Plan de migración de pruebas y helpers a TypeScript
 
-**Estado:** fase 0 completada localmente; fases 1–6 pendientes. **Base revisada del plan:** `6aad1ab`, 28 de octubre de 2026. La [referencia nueva de fase 0](../artifacts/typescript-tests-migration/phase-0/README.md) parte de `6c1b626`. La [migración de la web](plan-migracion-typescript.md) permanece completada. Este plan amplía el tipado a las herramientas de prueba sin cambiar el comportamiento de AFP.
+**Estado:** fases 0 y 1 completadas localmente; fases 2–6 pendientes. **Base revisada del plan:** `6aad1ab`, 28 de octubre de 2026. La [referencia nueva de fase 0](../artifacts/typescript-tests-migration/phase-0/README.md) parte de `6c1b626`; la [fase 1](../artifacts/typescript-tests-migration/phase-1/README.md) parte de `700afcc`. La [migración de la web](plan-migracion-typescript.md) permanece completada. Este plan amplía el tipado a las herramientas de prueba sin cambiar el comportamiento de AFP.
 
 ## Objetivo y alcance
 
@@ -41,7 +41,7 @@ Los grupos del inventario se solapan. Los 854 resultados de la tabla corresponde
 - [load-source.cjs](../tests/helpers/load-source.cjs) transforma módulos con esbuild y los evalúa en `vm`. Su resultado dinámico necesita una frontera de tipos explícita.
 - [legacy-route-context.cjs](../tests/helpers/legacy-route-context.cjs) combina exports de varios módulos y expone algunas funciones privadas de handlers. Ese objeto necesita contratos por ruta.
 - [debt-fixture.cjs](../tests/helpers/debt-fixture.cjs) simula persistencia, bloqueo y rollback. Sus tipos deben distinguir registros, consultas y transacciones sin presentarlo como un cliente Prisma completo.
-- [package.json](../package.json) y [verify-database-reproduction.cjs](../scripts/verify-database-reproduction.cjs) descubren únicamente `.test.cjs`. El segundo también importa el cargador y crea otro proceso para ejecutar regresiones.
+- [package.json](../package.json) y [verify-database-reproduction.cjs](../scripts/verify-database-reproduction.cjs) descubrían únicamente `.test.cjs` en fase 0. Desde fase 1 comparten el ejecutor mixto; el segundo mantiene su import del cargador CJS y registra tsx en el proceso principal y en las regresiones.
 - [next-fixture.cjs](../tests/helpers/next-fixture.cjs) copia configuraciones por patrón; debe distinguir las necesarias para la web de las exclusivas de pruebas.
 - Los tres servidores de navegador y los tres scripts de preparación de datos se invocan también desde documentación y ejecutores en `artifacts/`. Un renombre debe actualizar sus consumidores vigentes.
 
@@ -51,17 +51,19 @@ Los grupos del inventario se solapan. Los 854 resultados de la tabla corresponde
 
 Conservar `node:test`, el modelo de módulos actual del paquete y la política de aislamiento. Usar `.test.ts` y `.ts` para los módulos migrados, con imports tipados y `import type` para dependencias exclusivamente estáticas. No añadir `"type": "module"` a la aplicación ni sustituir el framework de pruebas.
 
-La opción propuesta es añadir **tsx como dependencia de desarrollo**, fijada en el lockfile, y registrar `node --import tsx` en los procesos que ejecuten pruebas o helpers convertidos. La fase 1 comprobará la compatibilidad con Node 22.23.2, CommonJS, imports dinámicos, rutas relativas y procesos hijos antes de adoptarla en toda la suite. Node documenta este modo de ejecución; su soporte nativo de TypeScript tiene límites de sintaxis, resolución y configuración que deben considerarse si se elige una alternativa. [Documentación de Node 22](https://nodejs.org/docs/latest-v22.x/api/typescript.html).
+La fase 1 adoptó **tsx 4.23.15 como dependencia de desarrollo**, fijada exactamente en manifiesto y lockfile, y registra `node --import tsx` en los procesos que ejecutan pruebas o helpers convertidos. Se comprobó compatibilidad con Node 22.23.2, CommonJS, imports dinámicos, rutas relativas y procesos hijos. La política `allowBuilds` no cambió; tsx reutiliza esbuild 0.28.2. Node documenta este modo de ejecución; su soporte nativo de TypeScript tiene límites de sintaxis, resolución y configuración que deben considerarse si se elige una alternativa. [Documentación de Node 22](https://nodejs.org/docs/latest-v22.x/api/typescript.html).
 
 Mantener esbuild dentro de `sourceLoader` y del generador de módulos de navegador: ahí preserva los mocks y el entorno controlado. El registro de tsx en el proceso de pruebas no debe sustituir esa carga por imports directos de servicios reales. Esbuild transforma TypeScript, pero no comprueba tipos; la ejecución y `tsc` son controles separados. [Documentación de esbuild](https://esbuild.github.io/content-types/#typescript).
 
-Crear un único mecanismo de descubrimiento y ejecución, propuesto como `tests/run-tests.ts`, compartido por `pnpm test` y las regresiones de `db:verify`:
+Desde fase 1, [tests/run-tests.ts](../tests/run-tests.ts) es el único mecanismo de descubrimiento y ejecución compartido por `pnpm test` y las regresiones de `db:verify`:
 
 - Durante la transición admite `.test.cjs` y `.test.ts`, ordenados de forma determinista. Rechaza dos archivos con el mismo nombre base para evitar duplicar o esconder escenarios.
 - No ejecuta `tests/types/`, helpers, seeds, fixtures de datos ni artefactos como pruebas.
 - Permite ejecutar archivos concretos durante el desarrollo, sin que un filtro accidental reduzca la suite obligatoria de cierre.
 - Propaga explícitamente el registro de tsx, opciones de aislamiento, entorno de prueba y códigos de salida a los procesos hijos. Comprueba también fallos de arranque y terminaciones por señal.
 - Al cerrar la transición descubre únicamente `.test.ts`. Se retiran puentes temporales y referencias obsoletas.
+
+Sin argumentos ejecuta la suite completa. `pnpm test archivo.test.ts otro.test.cjs` selecciona rutas exactas, conservando el orden de descubrimiento; rechaza rutas ajenas, ausentes o repetidas y opciones desconocidas. `pnpm test --list` lista sin ejecutar; `node --import tsx tests/run-tests.ts --list` entrega solo el JSON. Los cierres usan los comandos sin selección.
 
 `db:verify` puede conservar su archivo CJS. Su proceso principal debe registrar el soporte TS antes de importar helpers convertidos, y su proceso de regresiones debe usar el mismo ejecutor que `pnpm test`. Evitar depender de un `NODE_OPTIONS` global o de flags que `spawnSync` no hereda automáticamente.
 
@@ -71,7 +73,7 @@ Añadir `tsconfig.tests.json` para las pruebas ejecutables, helpers y ejecutor. 
 
 La configuración principal de la web mantiene `allowJs: false` y sus inclusiones actuales. Solo la configuración de pruebas podrá usar temporalmente `allowJs: true` y `checkJs: false` para consumir helpers CJS aún pendientes; esos archivos no se contarán como tipados. La configuración final de pruebas usará `allowJs: false`.
 
-Crear `pnpm typecheck:tests`, propuesto como `prisma generate && next typegen && tsc --project tsconfig.tests.json --noEmit`. Mantener `pnpm test:types` para los casos de compilación positivos y negativos; estos no se ejecutan con `node:test`. Ambas comprobaciones deben funcionar desde una instalación sin `.next` ni caché de TypeScript.
+`pnpm typecheck:tests` ejecuta `prisma generate && next typegen && tsc --project tsconfig.tests.json --noEmit` desde fase 1. Mantener `pnpm test:types` para los casos de compilación positivos y negativos; estos no se ejecutan con `node:test`. Se verificaron las tres comprobaciones de tipos desde una instalación sin `.next` ni caché de TypeScript. El programa de pruebas habilita imports relativos con extensión `.ts`; conserva la resolución `bundler` comprobada con tsx.
 
 Extender ESLint a todas las pruebas migradas y a su configuración de proyecto. Aplicar las reglas actuales contra `any`, usos inseguros, supresiones y dobles conversiones. `@ts-expect-error` explicado se reserva para casos negativos en `tests/types/`; no se usa para hacer compilar fixtures incompletos o llamadas de una prueba ejecutable.
 
@@ -110,7 +112,7 @@ Conservar datos omitidos, nulos, JSON malformado, respuestas perdidas, UUID repe
 
 ## Fases de implementación
 
-La fase 0 está completada; las fases 1–6 siguen pendientes. Cada lote debe ser revisable y contener el módulo convertido junto con sus consumidores y herramientas afectados.
+Las fases 0 y 1 están completadas; las fases 2–6 siguen pendientes. Cada lote debe ser revisable y contener el módulo convertido junto con sus consumidores y herramientas afectados.
 
 | Fase | Entrega | Dependencia |
 | --- | --- | --- |
@@ -135,13 +137,15 @@ La fase 0 está completada; las fases 1–6 siguen pendientes. Cada lote debe se
 
 ### Fase 1 Preparar ejecución y comprobación de tipos
 
-- [ ] Validar y fijar tsx como dependencia de desarrollo; mantener `node:test`, versiones principales y política de instalación. No habilitar scripts de dependencias indiscriminadamente.
-- [ ] Crear `tsconfig.tests.json`, `typecheck:tests` y las reglas ESLint correspondientes. Mantener separado el programa de casos negativos.
-- [ ] Añadir el descubrimiento común de `.test.cjs`/`.test.ts` y actualizar `pnpm test` y `db:verify`, incluido su import del cargador y sus procesos hijos.
-- [ ] Convertir una prueba pequeña, como `latest-request.test.cjs`, para verificar convivencia, tipos y ejecución sin arrancar servicios reales. En ese caso puede importarse directamente el módulo puro, tras comprobar que no inicializa dependencias externas; los módulos con mocks seguirán pasando por el cargador en fase 2.
-- [ ] Probar selección de archivos, nombres duplicados, ausencia inesperada de pruebas, propagación de fallos y preservación del orden/aislamiento. Verificar que ni seeds ni contratos negativos se ejecutan por descubrimiento.
+- [x] Validar y fijar tsx como dependencia de desarrollo; mantener `node:test`, versiones principales y política de instalación. No habilitar scripts de dependencias indiscriminadamente.
+- [x] Crear `tsconfig.tests.json`, `typecheck:tests` y las reglas ESLint correspondientes. Mantener separado el programa de casos negativos.
+- [x] Añadir el descubrimiento común de `.test.cjs`/`.test.ts` y actualizar `pnpm test` y `db:verify`, incluido su import del cargador y sus procesos hijos.
+- [x] Convertir una prueba pequeña, como `latest-request.test.cjs`, para verificar convivencia, tipos y ejecución sin arrancar servicios reales. En ese caso puede importarse directamente el módulo puro, tras comprobar que no inicializa dependencias externas; los módulos con mocks seguirán pasando por el cargador en fase 2.
+- [x] Probar selección de archivos, nombres duplicados, ausencia inesperada de pruebas, propagación de fallos y preservación del orden/aislamiento. Verificar que ni seeds ni contratos negativos se ejecutan por descubrimiento.
 
 **Aceptación:** todos los escenarios de referencia siguen descubiertos una sola vez; `pnpm test` y `db:verify` coinciden en la suite completa. La herramienta propuesta funciona desde instalación limpia y no expone variables del entorno real al cargador.
+
+**Resultado (28 de octubre de 2026):** [fase 1](../artifacts/typescript-tests-migration/phase-1/README.md). Ejecutor mixto compartido, tsx 4.23.15 y programa estricto de pruebas con ESLint; `latest-request.test.ts` conserva sus tres escenarios mediante import del módulo puro. Se añaden ocho escenarios de infraestructura y tres contratos negativos, separados de la ejecución. Los helpers mantienen CJS sin contarse como tipados; los fixtures Next copian solo el programa web y regeneran sus tipos. La evidencia registra instalación limpia, controles, regresiones PostgreSQL, correspondencia de los 854 escenarios y conservación de hashes protegidos; también conserva el primer intento y la corrección del contrato de entorno.
 
 ### Fase 2 Tipar el cargador y ejecutar un piloto
 
@@ -208,7 +212,7 @@ pnpm test
 pnpm build
 ```
 
-`typecheck:tests` es un comando propuesto, todavía inexistente. Para una comprobación completa, `pnpm test` debe recibir `AFP_TEST_DATABASE_URL` con PostgreSQL desechable migrado conforme al [README](../README.md#integraciones-con-postgresql). Una ejecución sin esa variable conserva su utilidad para desarrollo, pero sus omisiones no acreditan las integraciones.
+`typecheck:tests` existe desde fase 1 y no sustituye `test:types`. Para una comprobación completa, `pnpm test` debe recibir `AFP_TEST_DATABASE_URL` con PostgreSQL desechable migrado conforme al [README](../README.md#integraciones-con-postgresql). Una ejecución sin esa variable conserva su utilidad para desarrollo, pero sus omisiones no acreditan las integraciones.
 
 Ejecutar `pnpm db:verify` en fases 0, 1 y 6, y cuando un lote altere su cargador, descubrimiento o ejecución. Verificar fixtures de navegador al cambiar sus helpers o dependencias. Durante la edición, empezar por las pruebas afectadas; repetir controles completos solo tras nuevos cambios, fallos o dudas pendientes.
 

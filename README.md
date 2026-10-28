@@ -133,17 +133,27 @@ En Chrome del emulador Android, usar `http://10.0.2.2:3000`. [next.config.mjs](n
 | `pnpm build` | Generar Prisma Client y compilar la web para producción |
 | `pnpm start` | Servir una compilación previa |
 | `pnpm typecheck` | Generar Prisma y tipos de Next; comprobar TypeScript sin emitir archivos |
+| `pnpm typecheck:tests` | Comprobar estrictamente pruebas, helpers y ejecutor migrados a TypeScript |
 | `pnpm test:types` | Comprobar contratos de tipos y casos negativos con la configuración estricta |
 | `pnpm lint` | Ejecutar ESLint; reglas de seguridad de tipos en TS/TSX |
-| `pnpm test` | Pruebas Node.js con `--experimental-test-isolation=none` |
+| `pnpm test` | Suite mixta CJS/TS con `node:test`, tsx y `--experimental-test-isolation=none` |
 | `pnpm db:verify` | Verificar reconstrucción, actualización, RLS y regresiones en PostgreSQL desechable |
 | `pnpm db:audit-history` | Comparar nombres y checksums de migraciones contra una BD explícita, en solo lectura |
 | `pnpm audit:prod` / `pnpm audit:all` | Auditar dependencias de producción o del árbol completo |
 | `pnpm icons:generate` | Regenerar iconos PNG/ICO desde `public/icons/app-icon.svg` |
 
-Las verificaciones obligatorias por lote son `pnpm typecheck`, `pnpm test:types`, `pnpm lint`, `pnpm test` y `pnpm build`. El build conserva la comprobación de TypeScript. `typecheck` y `test:types` generan sus prerrequisitos y funcionan sin una carpeta `.next` previa. Los clientes tipados validan las respuestas antes de entregarlas a las pantallas y conservan el JSON original, incluidos orden, campos omitidos y metadatos usados en recuperación y concurrencia. Los casos de tipos viven en `tests/types/`, con [configuración propia](tsconfig.type-tests.json).
+Las verificaciones obligatorias por lote son `pnpm typecheck`, `pnpm typecheck:tests`, `pnpm test:types`, `pnpm lint`, `pnpm test` y `pnpm build`. El build conserva la comprobación de TypeScript. Los tres comandos de tipos generan sus prerrequisitos y funcionan sin una carpeta `.next` previa. Los clientes tipados validan las respuestas antes de entregarlas a las pantallas y conservan el JSON original, incluidos orden, campos omitidos y metadatos usados en recuperación y concurrencia. Los casos de tipos viven en `tests/types/`, con [configuración propia](tsconfig.type-tests.json).
 
-La fase 0 de la [migración de pruebas a TypeScript](docs/plan-migracion-tests-typescript.md) fija la [referencia del 28 de octubre de 2026](artifacts/typescript-tests-migration/phase-0/README.md): 106 archivos de pruebas, 11 helpers y 854 escenarios ejecutados con PostgreSQL, sin omisiones. Incluye inventarios, consumidores, hashes y un recolector reproducible; las fases 1–6 siguen pendientes. Todavía no existe `typecheck:tests` ni se ha cambiado el ejecutor CJS.
+La [migración de pruebas a TypeScript](docs/plan-migracion-tests-typescript.md) tiene completadas las fases 0 y 1. La [referencia](artifacts/typescript-tests-migration/phase-0/README.md) conserva 106 pruebas, 11 helpers y 854 escenarios. La [fase 1](artifacts/typescript-tests-migration/phase-1/README.md) añade ejecución mixta con tsx fijado en desarrollo, comprobación estricta separada y ocho escenarios del ejecutor; convierte `latest-request` conservando sus tres casos. Los helpers CJS continúan pendientes de tipado; `allowJs: true` y `checkJs: false` son un puente exclusivo de [tsconfig.tests.json](tsconfig.tests.json). La web mantiene `allowJs: false`.
+
+[tests/run-tests.ts](tests/run-tests.ts) comparte descubrimiento y ejecución entre `pnpm test` y las regresiones de `db:verify`: solo archivos `.test.cjs`/`.test.ts` del primer nivel, ordenados, sin nombres base duplicados. Los contratos negativos, helpers y seeds no se ejecutan por descubrimiento. Sin argumentos se ejecuta la suite completa; la selección exacta sirve para desarrollo y falla ante archivos inexistentes, repetidos o ajenos a la suite:
+
+```bash
+pnpm test latest-request.test.ts source-loader.test.cjs
+pnpm test --list
+```
+
+`--list` muestra la selección sin ejecutarla. Para obtener únicamente el JSON, usar `node --import tsx tests/run-tests.ts --list`. No se admiten filtros por nombre ni opciones arbitrarias de Node en este comando; los cierres se validan con `pnpm test` sin selección y PostgreSQL migrado.
 
 Si se necesita comprobar la compilación con Webpack, usar `pnpm exec prisma generate` seguido de `pnpm exec next build --webpack`. Esta alternativa no cambia el script de build del proyecto.
 
@@ -363,7 +373,7 @@ Desconectar retira eventos de hoy en adelante, conserva el historial y elimina l
 
 - Leer este README y [PRODUCT.md](PRODUCT.md) antes de cambiar arquitectura o comportamiento. Actualizar la documentación afectada en la misma tarea; registrar los hitos relevantes en [docs/bitacora.md](docs/bitacora.md) y guardar los resultados detallados de ejecución en `artifacts/`.
 - El [plan de migración a TypeScript](docs/plan-migracion-typescript.md) está completado en sus fases 0–7. Todo el código activo de `src/` usa TS/TSX con `allowJs: false`, `strict` y `noUncheckedIndexedAccess`; no quedan adaptadores de JavaScript ni archivos vacíos. Importar directamente los componentes tipados de `src/components/ui/`; `components.json` usa `tsx: true`. Conservar validación de JSON en las entradas externas y los cuerpos originales usados por idempotencia y concurrencia. No usar `any`, supresiones de TypeScript ni dobles conversiones para ocultar errores. Los casos negativos con `@ts-expect-error` explicado viven exclusivamente en `tests/types/`. Evidencias y revisión de conversiones locales: [fase 7](artifacts/typescript-migration/phase-7/README.md). Código en inglés e interfaz en español.
-- Conservar `node:test` y cargar fuentes con `tests/helpers/load-source.cjs`: esbuild transforma JS/TS/JSX/TSX, pero no comprueba tipos. Los tests deben inyectar adaptadores de red/BD; el cargador no hereda `process.env` ni carga `.env`. Las rutas con extensión deben señalar el archivo exacto; las rutas sin extensión se resuelven solo si son inequívocas. No se sustituyen extensiones antiguas. Las pruebas `.cjs`, scripts operativos, configuraciones `.mjs` y `public/sw.js` mantienen JavaScript fuera del programa de tipos de la aplicación; Android conserva Kotlin.
+- Conservar `node:test` y cargar fuentes con mocks mediante `tests/helpers/load-source.cjs`: esbuild transforma JS/TS/JSX/TSX, pero no comprueba tipos. Los módulos puros sin inicialización externa pueden importarse directamente desde una prueba TS; los adaptadores de red/BD se inyectan. El cargador no hereda `process.env` ni carga `.env`. Las rutas con extensión deben señalar el archivo exacto; las rutas sin extensión se resuelven solo si son inequívocas. No se sustituyen extensiones antiguas. Registrar tsx explícitamente en procesos que ejecuten entradas TS; no depender de `NODE_OPTIONS`. Las pruebas migradas se comprueban con `typecheck:tests` y ESLint; los casos negativos explicados quedan en `tests/types/`. Los helpers CJS aún no cuentan como tipados. Los scripts operativos, configuraciones `.mjs` y `public/sw.js` mantienen JavaScript fuera del programa de tipos de la aplicación; Android conserva Kotlin.
 - Reutilizar [src/components/ui/](src/components/ui/) y la configuración `radix-mira` de [components.json](components.json). Formularios con React Hook Form + Zod; fechas con `DatePicker`; importes con `NumberInput`; selectores con `ResponsiveSelect`/`SearchableSelect`.
 - Conservar la interacción móvil de `CreateRecordSurface`, los borradores por usuario y el foco de los diálogos. Los borrados requieren el `AlertDialog` compartido. No ocultar errores ni presentar una recarga fallida como un alta no guardada.
 - Mantener autorización por propietario, validación de relaciones, transacciones y las garantías idempotentes de cada flujo. Agregar verificaciones pertinentes cuando cambie una regla financiera o contrato.
@@ -374,7 +384,7 @@ Desconectar retira eventos de hoy en adelante, conserva el historial y elimina l
 
 La web se despliega en Vercel, proyecto `afp`. El build es `pnpm build`; no aplica migraciones. La APK Android se compila y distribuye por separado. No modificar producción, activar automatizaciones ni cargar datos reales sin autorización explícita del propietario.
 
-1. Revisar cambios y variables del entorno de destino; ejecutar typecheck, test:types, lint, pruebas pertinentes, build y auditorías de dependencias. Para cambios de persistencia, verificar también las integraciones y la reconstrucción de BD.
+1. Revisar cambios y variables del entorno de destino; ejecutar typecheck, typecheck:tests, test:types, lint, pruebas pertinentes, build y auditorías de dependencias. Para cambios de persistencia, verificar también las integraciones y la reconstrucción de BD.
 2. Si hay migraciones pendientes, revisar respaldo, checksums y alcance antes de aplicarlas con `prisma migrate deploy`. Regenerar Prisma y publicar una versión compatible con el esquema.
 3. Configurar por separado las URL de Supabase Auth, OAuth de Google, secretos y tareas programadas que use ese entorno. El callback OAuth y `AFP_APP_ORIGIN` deben corresponder al dominio publicado.
 4. Tras publicar, comprobar acceso, rechazo de peticiones sin sesión, los flujos afectados y los registros de errores. Guardar evidencias con fecha y alcance en `artifacts/`, sin datos privados.
@@ -384,7 +394,7 @@ La web se despliega en Vercel, proyecto `afp`. El build es `pnpm build`; no apli
 ## Documentación relacionada
 
 - [docs/plan-migracion-typescript.md](docs/plan-migracion-typescript.md): plan por fases y criterios de aceptación; fases 0–7 completadas localmente, con evidencias de cierre.
-- [docs/plan-migracion-tests-typescript.md](docs/plan-migracion-tests-typescript.md): plan independiente para migrar pruebas y helpers a TypeScript; fase 0 completada con referencia local, fases 1–6 pendientes.
+- [docs/plan-migracion-tests-typescript.md](docs/plan-migracion-tests-typescript.md): plan independiente para migrar pruebas y helpers a TypeScript; fases 0 y 1 completadas localmente, fases 2–6 pendientes.
 - [docs/bitacora.md](docs/bitacora.md): decisiones, migraciones, incidencias y seguimientos históricos con sus evidencias.
 - [PRODUCT.md](PRODUCT.md): propósito, alcance y principios del producto.
 - [docs/android-captura.md](docs/android-captura.md): operación técnica de Android, firma y pruebas.

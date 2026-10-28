@@ -1,12 +1,13 @@
 const assert = require('node:assert/strict');
 const { randomBytes } = require('node:crypto');
-const { readFileSync, readdirSync, writeFileSync, mkdirSync, cpSync, mkdtempSync, rmSync } = require('node:fs');
+const { readFileSync, writeFileSync, mkdirSync, cpSync, mkdtempSync, rmSync } = require('node:fs');
 const { tmpdir } = require('node:os');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 const { PrismaClient } = require('@prisma/client');
 const { PrismaPg } = require('@prisma/adapter-pg');
 const { root, auditHistory, localMigrations } = require('./audit-migration-history.cjs');
+const { runTests } = require('../tests/run-tests.ts');
 const { sourceLoader } = require('../tests/helpers/load-source.cjs');
 const before = require('../artifacts/auditoria-2026-10-15/a11-metadata-before.json');
 const beforeAutomation = require('../artifacts/auditoria-2026-10-15/a11-automation-before.json');
@@ -75,12 +76,8 @@ async function assertNewTableRls(db, role) {
 }
 
 function runRegressions(url) {
-  const files = readdirSync(path.join(root, 'tests')).filter(name => name.endsWith('.test.cjs')).sort();
-  const result = spawnSync(process.execPath, ['--test', '--experimental-test-isolation=none', ...files.map(name => path.join(root, 'tests', name))], {
-    cwd: root, encoding: 'utf8', env: { ...process.env, AFP_TEST_DATABASE_URL: url },
-  });
-  process.stdout.write(result.stdout || '');
-  if (result.status !== 0) throw new Error(`Fallaron las regresiones: ${result.stderr}`);
+  const status = runTests({ env: { ...process.env, AFP_TEST_DATABASE_URL: url } });
+  if (status !== 0) throw new Error(`Fallaron las regresiones: código ${status}`);
 }
 
 function assertCatalog(actual) {
