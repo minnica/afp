@@ -13,11 +13,11 @@ test('Wallet/Banamex reales anonimizados: observación, fecha aceptada y un gast
   assert.ok(['127.0.0.1', 'localhost'].includes(url.hostname) && /^\/afp_test\w*$/.test(url.pathname) && !url.search);
   const db = new PrismaClient({ adapter: new PrismaPg({ connectionString }) });
   const load = sourceLoader();
-  const protocol = load('src/lib/captureProtocol.js');
-  const service = load('src/lib/captureService.js');
-  const processing = load('src/lib/captureProcessing.js');
-  const configuration = load('src/lib/captureConfiguration.js');
-  const reconciliation = load('src/lib/captureReconciliation.js');
+  const protocol = load('src/lib/captureProtocol.ts');
+  const service = load('src/lib/captureService.ts');
+  const processing = load('src/lib/captureProcessing.ts');
+  const configuration = load('src/lib/captureConfiguration.ts');
+  const reconciliation = load('src/lib/captureReconciliation.ts');
   const user = await db.user.create({ data: { email: `wallet-real-${randomUUID()}@example.test` } });
   const other = await db.user.create({ data: { email: `wallet-other-${randomUUID()}@example.test` } });
   const card = await db.card.create({ data: { userId: user.id, name: 'BANAMEX 1', usualCutDay: 25, usualDueDay: 15 } });
@@ -136,8 +136,8 @@ test('Wallet/Banamex reales anonimizados: observación, fecha aceptada y un gast
       assert.equal(await db.dailyExpense.count({ where: { userId: user.id } }), before);
     });
     await t.test('reintentar un recibo antiguo no reinterpreta; solicitarlo conserva originales, no crea gastos y es idempotente', async () => {
-      const base = load('src/lib/captureParsers.js');
-      const previous = sourceLoader({ '@/lib/captureParsers': { ...base, interpretCapture: () => ({ reason: 'UNKNOWN_FORMAT', proposal: {} }) } })('src/lib/captureService.js');
+      const base = load('src/lib/captureParsers.ts');
+      const previous = sourceLoader({ '@/lib/captureParsers': { ...base, interpretCapture: () => ({ reason: 'UNKNOWN_FORMAT', proposal: {} }) } })('src/lib/captureService.ts');
       const input = makeEvent(walletFixture, '701.25');
       const receipt = await previous.receiveCaptureEvent(db, credential, input), original = await read(input);
       assert.equal(JSON.stringify(await service.receiveCaptureEvent(db, credential, input)), JSON.stringify(receipt));

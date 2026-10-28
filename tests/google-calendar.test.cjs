@@ -5,9 +5,9 @@ const env = { GOOGLE_CALENDAR_CLIENT_ID: 'test-client', GOOGLE_CALENDAR_CLIENT_S
 const globals = { process: { env }, URLSearchParams, AbortSignal };
 const plain = value => JSON.parse(JSON.stringify(value));
 const load = sourceLoader({}, globals);
-const config = load('src/lib/calendar/config.js');
-const { buildCalendarEvents, googleEvent, mexicoDay } = load('src/lib/calendar/events.js');
-const palette = load('src/lib/calendar/palette.js').CALENDAR_EVENT_PALETTE;
+const config = load('src/lib/calendar/config.ts');
+const { buildCalendarEvents, googleEvent, mexicoDay } = load('src/lib/calendar/events.ts');
+const palette = load('src/lib/calendar/palette.ts').CALENDAR_EVENT_PALETTE;
 const empty = () => ({ cards: [], cycles: [], subscriptions: [], receivables: [], payables: [] });
 const now = new Date('2026-10-21T18:00:00Z');
 
@@ -197,9 +197,9 @@ test('calendar: ingresos futuros no liquidan ni retiran los cobros previstos de 
 });
 
 test('calendar: cuotas y denegación no revelan respuestas de Google; reintento respeta Retry-After', async () => {
-  const google = sourceLoader({}, { ...globals, fetch: async () => new Response(JSON.stringify({ error: { errors: [{ reason: 'rateLimitExceeded' }], message: 'private-provider-body' } }), { status: 403, headers: { 'retry-after': '300' } }) })('src/lib/calendar/google.js');
+  const google = sourceLoader({}, { ...globals, fetch: async () => new Response(JSON.stringify({ error: { errors: [{ reason: 'rateLimitExceeded' }], message: 'private-provider-body' } }), { status: 403, headers: { 'retry-after': '300' } }) })('src/lib/calendar/google.ts');
   await assert.rejects(google.googleRequest('https://www.googleapis.com'), e => e.code === 'RATE_LIMIT' && e.retryAfter === 300000 && !e.message.includes('private'));
-  const revoked = sourceLoader({}, { ...globals, fetch: async () => new Response(JSON.stringify({ error: 'invalid_grant' }), { status: 400 }) })('src/lib/calendar/google.js');
+  const revoked = sourceLoader({}, { ...globals, fetch: async () => new Response(JSON.stringify({ error: 'invalid_grant' }), { status: 400 }) })('src/lib/calendar/google.ts');
   await assert.rejects(revoked.googleRequest('https://oauth2.googleapis.com/token'), e => e.code === 'RECONNECT');
 });
 
@@ -207,12 +207,12 @@ test('calendar: cron exige su secreto incluso cuando falta configuración y no e
   let calls = 0;
   const db = { calendarOAuthState: { deleteMany: async () => calls++ }, googleCalendarConnection: { fields: { syncedRevision: 'syncedRevision' }, findMany: async () => [{ userId: 'private-user' }] } };
   const mocks = { '@/lib/prisma': { prisma: db }, '@/lib/apiAuth': { apiResponse: { json: (body, options = {}) => ({ body, status: options.status || 200 }) } }, '@/lib/calendar/worker': { runCalendarSync: async () => ({ status: 'SYNCED' }) } };
-  const route = sourceLoader(mocks, globals)('src/app/api/cron/calendar-sync/route.js');
+  const route = sourceLoader(mocks, globals)('src/app/api/cron/calendar-sync/route.ts');
   for (const authorization of ['', 'Bearer wrong', 'cron-test-secret']) assert.equal((await route.GET({ headers: new Headers({ authorization }) })).status, 401);
   assert.equal(calls, 0);
   const response = await route.GET({ headers: new Headers({ authorization: `Bearer ${env.CRON_SECRET}` }) });
   assert.deepEqual(plain(response.body), { processed: 1, results: ['SYNCED'] });
-  const missing = sourceLoader(mocks, { ...globals, process: { env: {} } })('src/app/api/cron/calendar-sync/route.js');
+  const missing = sourceLoader(mocks, { ...globals, process: { env: {} } })('src/app/api/cron/calendar-sync/route.ts');
   assert.equal((await missing.GET({ headers: new Headers({ authorization: 'Bearer undefined' }) })).status, 401);
 });
 
@@ -220,7 +220,7 @@ test('calendar: callback usa origen fijo, borra cookie y no refleja mensajes del
   const cookies = [];
   const mocks = { 'next/server': { NextResponse: { redirect: (url, status) => ({ url, status, headers: new Headers(), cookies: { set: (...args) => cookies.push(args) } }) } },
     '@/lib/calendar/service': { completeCalendarOAuth: async () => { throw new Error('provider-secret'); } }, '@/lib/calendar/schedule': { scheduleCalendarSync() { throw new Error('must not schedule'); } } };
-  const route = sourceLoader(mocks, globals)('src/app/api/calendar/google/callback/route.js');
+  const route = sourceLoader(mocks, globals)('src/app/api/calendar/google/callback/route.ts');
   const response = await route.GET({ url: 'https://evil.example/callback?state=wrong&code=x', cookies: { get: () => ({ value: 'x' }) } });
   assert.equal(response.status, 303); assert.equal(new URL(response.url).origin, env.AFP_APP_ORIGIN);
   assert.ok(!response.url.includes('provider-secret')); assert.equal(response.headers.get('referrer-policy'), 'no-referrer');
@@ -247,7 +247,7 @@ test('calendar: la API usa el propietario de sesión e impide preferencias y use
     apiResponse: { json: (body, options = {}) => ({ body, status: options.status || 200 }) } },
     '@/lib/calendar/service': { calendarStatus: async id => { calls.push(id); return { status: 'CONNECTED' }; }, updateCalendarPreferences: async id => calls.push(id) },
     '@/lib/calendar/schedule': { scheduleCalendarSync: id => calls.push(id) } };
-  const api = sourceLoader(mocks, globals)('src/app/api/calendar/google/route.js');
+  const api = sourceLoader(mocks, globals)('src/app/api/calendar/google/route.ts');
   const request = body => ({ url: 'https://afp.example.test/api/calendar/google?userId=owner-b', json: async () => body });
   await api.GET(request({}));
   assert.equal((await api.PATCH(request({ types: ['cuts'], showAmounts: false, reminders: true, userId: 'owner-b' }))).status, 400);

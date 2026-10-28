@@ -46,7 +46,7 @@ test("apiFetch no envía nada sin sesión ni con una cuenta distinta de la panta
 
 test("la cola conserva los pendientes si cambia la cuenta y los sincroniza con su propietario", async () => {
   const { load, requests, setSession } = client();
-  const offline = load("src/lib/offlineExpenses.js");
+  const offline = load("src/lib/offlineExpenses.ts");
   await offline.addOfflineExpense("a", { userId: "a", concept: "Pendiente", amount: 10 });
   setSession({ user: { id: "b" }, access_token: "token-b" });
   const blocked = await offline.syncOfflineExpenses("a");

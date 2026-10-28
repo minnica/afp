@@ -20,10 +20,10 @@ test('Santander real anonimizado: API, revisión, activación y un gasto por com
     'next/server': { NextResponse: { json: (body, options = {}) => ({ body: JSON.parse(JSON.stringify(body)), status: options.status || 200, headers: new Headers(options.headers) }) } },
     '@supabase/supabase-js': { createClient: () => ({ auth: { getUser: async token => ({ data: { user: sessions.get(token) }, error: sessions.has(token) ? null : new Error('expired') }) } }) },
   };
-  const load = sourceLoader(mocks), protocol = load('src/lib/captureProtocol.js');
-  const processing = load('src/lib/captureProcessing.js'), configuration = load('src/lib/captureConfiguration.js');
-  const reconciliation = load('src/lib/captureReconciliation.js');
-  const eventRoute = load('src/app/api/captures/events/route.js'), movementRoute = load('src/app/api/captures/movements/route.js');
+  const load = sourceLoader(mocks), protocol = load('src/lib/captureProtocol.ts');
+  const processing = load('src/lib/captureProcessing.ts'), configuration = load('src/lib/captureConfiguration.ts');
+  const reconciliation = load('src/lib/captureReconciliation.ts');
+  const eventRoute = load('src/app/api/captures/events/route.ts'), movementRoute = load('src/app/api/captures/movements/route.ts');
   const card = await db.card.create({ data: { userId: user.id, name: 'Santander ficticia', usualCutDay: 25, usualDueDay: 15 } });
   const sibling = await db.card.create({ data: { userId: user.id, name: 'Otra tarjeta Santander', usualCutDay: 25, usualDueDay: 15 } });
   const otherCard = await db.card.create({ data: { userId: other.id, name: 'Santander ajena', usualCutDay: 25, usualDueDay: 15 } });
@@ -58,8 +58,8 @@ test('Santander real anonimizado: API, revisión, activación y un gasto por com
     ]) await configuration.configureCapture(db, ownerId, { action: 'alias', cardId: ownCard.id, sourcePackage, kind, value, verified: true, evidence: 'Datos exclusivamente ficticios' });
 
     await t.test('recepción anterior y reintentos conservan originales; reinterpretación explícita no crea dinero', async () => {
-      const parsers = load('src/lib/captureParsers.js');
-      const previous = sourceLoader({ ...mocks, '@/lib/captureParsers': { ...parsers, interpretCapture: () => ({ reason: 'UNKNOWN_FORMAT', proposal: {} }) } })('src/lib/captureService.js');
+      const parsers = load('src/lib/captureParsers.ts');
+      const previous = sourceLoader({ ...mocks, '@/lib/captureParsers': { ...parsers, interpretCapture: () => ({ reason: 'UNKNOWN_FORMAT', proposal: {} }) } })('src/lib/captureService.ts');
       bankInput = event(bankFixture); walletInput = event(walletFixture);
       for (const input of [bankInput, walletInput]) {
         const receipt = await previous.receiveCaptureEvent(db, credential, input), before = await read(input);

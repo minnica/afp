@@ -18,10 +18,10 @@ test('Wallet BBVA real: API, observación, política de fecha, activación y gas
     'next/server': { NextResponse: { json: (body, options = {}) => ({ body: JSON.parse(JSON.stringify(body)), status: options.status || 200, headers: new Headers(options.headers) }) } },
     '@supabase/supabase-js': { createClient: () => ({ auth: { getUser: async token => ({ data: { user: sessions.get(token) }, error: sessions.has(token) ? null : new Error('expired') }) } }) },
   };
-  const load = sourceLoader(mocks), protocol = load('src/lib/captureProtocol.js');
-  const processing = load('src/lib/captureProcessing.js'), configuration = load('src/lib/captureConfiguration.js');
-  const reconciliation = load('src/lib/captureReconciliation.js'), service = load('src/lib/captureService.js');
-  const routes = { events: load('src/app/api/captures/events/route.js'), movements: load('src/app/api/captures/movements/route.js'), expenses: load('src/app/api/expenses/route.ts') };
+  const load = sourceLoader(mocks), protocol = load('src/lib/captureProtocol.ts');
+  const processing = load('src/lib/captureProcessing.ts'), configuration = load('src/lib/captureConfiguration.ts');
+  const reconciliation = load('src/lib/captureReconciliation.ts'), service = load('src/lib/captureService.ts');
+  const routes = { events: load('src/app/api/captures/events/route.ts'), movements: load('src/app/api/captures/movements/route.ts'), expenses: load('src/app/api/expenses/route.ts') };
   const card = await db.card.create({ data: { userId: user.id, name: 'Nombre personal de tarjeta', usualCutDay: 25, usualDueDay: 15 } });
   const sibling = await db.card.create({ data: { userId: user.id, name: 'Otra BBVA', usualCutDay: 25, usualDueDay: 15 } });
   const banamex = await db.card.create({ data: { userId: user.id, name: 'Otra marca con cifras distintas', usualCutDay: 25, usualDueDay: 15 } });
@@ -70,8 +70,8 @@ test('Wallet BBVA real: API, observación, política de fecha, activación y gas
     });
 
     await t.test('recibo desconocido anterior se conserva al reenviar; interpretar explícitamente añade un análisis sin crear gasto', async () => {
-      const parsers = load('src/lib/captureParsers.js');
-      const previous = sourceLoader({ ...mocks, '@/lib/captureParsers': { ...parsers, interpretCapture: () => ({ reason: 'UNKNOWN_FORMAT', proposal: {} }) } })('src/lib/captureService.js');
+      const parsers = load('src/lib/captureParsers.ts');
+      const previous = sourceLoader({ ...mocks, '@/lib/captureParsers': { ...parsers, interpretCapture: () => ({ reason: 'UNKNOWN_FORMAT', proposal: {} }) } })('src/lib/captureService.ts');
       original = event(); const receipt = await previous.receiveCaptureEvent(db, credential, original), before = await read(original);
       assert.deepEqual((await post(original)).body, JSON.parse(JSON.stringify(receipt))); assert.deepEqual(await read(original), before);
       const results = await Promise.all(Array.from({ length: 4 }, () => resolve({ id: before.movementId, action: 'reinterpret' })));

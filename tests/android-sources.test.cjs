@@ -19,6 +19,6 @@ test('Android and API accept the same eleven exact sources, including three serv
   assert.deepEqual(allowed, expected);
   assert.deepEqual(visible, expected);
   const load = sourceLoader({ 'next/server': { NextResponse: {} } });
-  assert.deepEqual(Array.from(load('src/lib/captureProtocol.js').capturePackages).sort(), expected);
+  assert.deepEqual(Array.from(load('src/lib/captureProtocol.ts').capturePackages).sort(), expected);
   assert.doesNotMatch(manifest, /QUERY_ALL_PACKAGES/);
 });

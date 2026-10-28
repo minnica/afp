@@ -4,7 +4,7 @@ const { sourceLoader } = require('./helpers/load-source.cjs');
 const banamex = require('./fixtures/captures/banamex-card-payment.es.v1.json').event;
 const mercado = require('./fixtures/captures/mercadopago-card-payment.es.v1.json').event;
 const debit = require('./fixtures/captures/bbva-debit-card-charge.es.v1.json').event;
-const { interpretCapture, captureParsers } = sourceLoader()('src/lib/captureParsers.js');
+const { interpretCapture, captureParsers } = sourceLoader()('src/lib/captureParsers.ts');
 const change = (event, before, after) => ({ ...event, fields: Object.fromEntries(Object.entries(event.fields).map(([k,v]) => [k,v.replaceAll(before,after)])) });
 
 test('Banamex: pago SPEI real, medianoche 00 AM, tres cifras y fecha bancaria; no inventa moneda o corte', () => {

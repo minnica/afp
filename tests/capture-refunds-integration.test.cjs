@@ -17,8 +17,8 @@ test('devoluciones PostgreSQL: confirmación, neto exacto, historial e idempoten
     'next/server': { NextResponse: { json: (body, options = {}) => ({ body: JSON.parse(JSON.stringify(body)), status: options.status || 200 }) } },
     '@supabase/supabase-js': { createClient: () => ({ auth: { getUser: async token => ({ data: { user: token === 'owner' ? user : token === 'other' ? other : null } }) } }) },
   });
-  const protocol = load('src/lib/captureProtocol.js'), service = load('src/lib/captureService.js'), processing = load('src/lib/captureProcessing.js');
-  const refunds = load('src/lib/captureRefunds.js'), movementRoute = load('src/app/api/captures/movements/route.js');
+  const protocol = load('src/lib/captureProtocol.ts'), service = load('src/lib/captureService.ts'), processing = load('src/lib/captureProcessing.ts');
+  const refunds = load('src/lib/captureRefunds.ts'), movementRoute = load('src/app/api/captures/movements/route.ts');
   const expenseRoute = load('src/app/api/expenses/route.ts');
   const card = await db.card.create({ data: { userId: user.id, name: 'MP ficticia', usualCutDay: 25, usualDueDay: 15 } });
   const category = await db.category.create({ data: { userId: user.id, name: 'Transporte ficticio' } });
@@ -162,8 +162,8 @@ test('devoluciones PostgreSQL: confirmación, neto exacto, historial e idempoten
     });
     await t.test('un aviso antiguo se reanaliza expresamente sin reescribir evento ni aplicar el reembolso', async () => {
       const input = notice('HISTORICO FICTICIO'); await sale('HISTORICO FICTICIO');
-      const original = load('src/lib/captureParsers.js');
-      const legacy = sourceLoader({ '@/lib/captureParsers': { ...original, interpretCapture: () => ({ reason: 'UNKNOWN_FORMAT', proposal: {} }) } })('src/lib/captureProcessing.js');
+      const original = load('src/lib/captureParsers.ts');
+      const legacy = sourceLoader({ '@/lib/captureParsers': { ...original, interpretCapture: () => ({ reason: 'UNKNOWN_FORMAT', proposal: {} }) } })('src/lib/captureProcessing.ts');
       const saved = await db.captureEvent.create({ data: { ...input, userId: user.id, deviceId: device.id, requestHash: protocol.captureHash(JSON.stringify(input)) } });
       const old = await db.$transaction(tx => legacy.processCaptureEvent(tx, saved));
       const before = await db.captureEvent.findUnique({ where: { id: saved.id } });

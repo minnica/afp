@@ -6,6 +6,7 @@ import { scheduleCalendarSync } from "@/lib/calendar/schedule";
 
 export class ApiAccessError extends Error {
   status: number;
+  retryAfter?: number;
   constructor(message: string, status: number) {
     super(message);
     this.status = status;

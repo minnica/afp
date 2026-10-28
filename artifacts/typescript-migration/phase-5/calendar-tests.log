@@ -1,0 +1,245 @@
+TAP version 13
+# Subtest: calendar eventos: las mutaciones autenticadas disparan trabajo para el propietario; las lecturas no
+ok 1 - calendar eventos: las mutaciones autenticadas disparan trabajo para el propietario; las lecturas no
+  ---
+  duration_ms: 5.520667
+  type: 'test'
+  ...
+# Subtest: calendar eventos: captura nativa solicita sincronización después del commit y usa al dueño autenticado
+ok 2 - calendar eventos: captura nativa solicita sincronización después del commit y usa al dueño autenticado
+  ---
+  duration_ms: 64.784594
+  type: 'test'
+  ...
+# Subtest: calendar eventos: consume lotes y cambios concurrentes; termina al quedar al día
+ok 3 - calendar eventos: consume lotes y cambios concurrentes; termina al quedar al día
+  ---
+  duration_ms: 21.927755
+  type: 'test'
+  ...
+# Subtest: calendar eventos: no mantiene temporizadores ante errores, bloqueos, cuotas o agotamiento de tiempo
+ok 4 - calendar eventos: no mantiene temporizadores ante errores, bloqueos, cuotas o agotamiento de tiempo
+  ---
+  duration_ms: 19.854616
+  type: 'test'
+  ...
+# Subtest: calendar DB: OAuth vinculado al navegador, expiración, un solo uso y cuenta estable
+ok 5 - calendar DB: OAuth vinculado al navegador, expiración, un solo uso y cuenta estable
+  ---
+  duration_ms: 243.763964
+  type: 'test'
+  ...
+# Subtest: calendar DB: sincronización idempotente, fecha corregida, pago parcial/liquidado y borrado
+ok 6 - calendar DB: sincronización idempotente, fecha corregida, pago parcial/liquidado y borrado
+  ---
+  duration_ms: 256.697865
+  type: 'test'
+  ...
+# Subtest: calendar DB: corrige un cobro futuro marcado como cobrado en Google sin duplicar eventos ni ingresos
+ok 7 - calendar DB: corrige un cobro futuro marcado como cobrado en Google sin duplicar eventos ni ingresos
+  ---
+  duration_ms: 181.16554
+  type: 'test'
+  ...
+(node:559822) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+# Subtest: calendar eventos DB: fechas y pagos de tarjeta, cobros y gastos vinculados actualizan Google al guardar
+ok 8 - calendar eventos DB: fechas y pagos de tarjeta, cobros y gastos vinculados actualizan Google al guardar
+  ---
+  duration_ms: 432.196879
+  type: 'test'
+  ...
+# Subtest: calendar DB: revisar corte exige ambos guardados, conserva ID y no registra pagos
+ok 9 - calendar DB: revisar corte exige ambos guardados, conserva ID y no registra pagos
+  ---
+  duration_ms: 352.546246
+  type: 'test'
+  ...
+Google Calendar: GOOGLE_UNAVAILABLE
+# Subtest: calendar DB: respuesta perdida y evento borrado en Google se recuperan sin duplicados activos
+ok 10 - calendar DB: respuesta perdida y evento borrado en Google se recuperan sin duplicados activos
+  ---
+  duration_ms: 166.36466
+  type: 'test'
+  ...
+Google Calendar: RATE_LIMIT
+# Subtest: calendar DB: solo selecciona pendientes y revisión diaria; respeta esperas y desconexiones
+ok 11 - calendar DB: solo selecciona pendientes y revisión diaria; respeta esperas y desconexiones
+  ---
+  duration_ms: 225.383718
+  type: 'test'
+  ...
+# Subtest: calendar DB: termina lotes interrumpidos y conserva cambios recibidos durante la sincronización
+ok 12 - calendar DB: termina lotes interrumpidos y conserva cambios recibidos durante la sincronización
+  ---
+  duration_ms: 1203.936303
+  type: 'test'
+  ...
+Google Calendar: RATE_LIMIT
+Google Calendar: RECONNECT
+# Subtest: calendar DB: exclusión mutua, expiración del bloqueo, pausa por cuota y revocación
+ok 13 - calendar DB: exclusión mutua, expiración del bloqueo, pausa por cuota y revocación
+  ---
+  duration_ms: 106.774503
+  type: 'test'
+  ...
+# Subtest: calendar DB: triggers atómicos por propietario y desconexión limpia sin borrar historial
+ok 14 - calendar DB: triggers atómicos por propietario y desconexión limpia sin borrar historial
+  ---
+  duration_ms: 194.56968
+  type: 'test'
+  ...
+Google Calendar OAuth: FAILED
+# Subtest: calendar DB: recupera la creación del calendario y conserva cambios concurrentes pendientes
+ok 15 - calendar DB: recupera la creación del calendario y conserva cambios concurrentes pendientes
+  ---
+  duration_ms: 192.013322
+  type: 'test'
+  ...
+# Subtest: calendar palette: fechas de México separan vencidos, cobros de hoy y suscripciones futuras sin cambiar sus textos
+ok 16 - calendar palette: fechas de México separan vencidos, cobros de hoy y suscripciones futuras sin cambiar sus textos
+  ---
+  duration_ms: 10.820522
+  type: 'test'
+  ...
+# Subtest: calendar palette: seis roles con prioridad explícita, sin convertir cortes o parciales en vencidos
+ok 17 - calendar palette: seis roles con prioridad explícita, sin convertir cortes o parciales en vencidos
+  ---
+  duration_ms: 0.25997
+  type: 'test'
+  ...
+# Subtest: calendar palette: conserva etiquetas personales y propiedades, actualiza solo sus seis colores y es idempotente
+ok 18 - calendar palette: conserva etiquetas personales y propiedades, actualiza solo sus seis colores y es idempotente
+  ---
+  duration_ms: 0.25167
+  type: 'test'
+  ...
+# Subtest: calendar palette: respeta el máximo de 200 etiquetas sin borrar otras para hacer espacio
+ok 19 - calendar palette: respeta el máximo de 200 etiquetas sin borrar otras para hacer espacio
+  ---
+  duration_ms: 0.25329
+  type: 'test'
+  ...
+# Subtest: calendar palette: una edición concurrente en Google se recupera leyendo de nuevo y usando If-Match
+ok 20 - calendar palette: una edición concurrente en Google se recupera leyendo de nuevo y usando If-Match
+  ---
+  duration_ms: 0.393079
+  type: 'test'
+  ...
+# Subtest: calendar palette: no reescribe una paleta correcta ni escribe sin ETag; respeta cuotas
+ok 21 - calendar palette: no reescribe una paleta correcta ni escribe sin ETag; respeta cuotas
+  ---
+  duration_ms: 0.34503
+  type: 'test'
+  ...
+# Subtest: calendar palette: limita reintentos ante conflictos continuos
+ok 22 - calendar palette: limita reintentos ante conflictos continuos
+  ---
+  duration_ms: 0.20984
+  type: 'test'
+  ...
+# Subtest: calendar client: envía If-Match conservando autorización y codificación JSON
+ok 23 - calendar client: envía If-Match conservando autorización y codificación JSON
+  ---
+  duration_ms: 8.835984
+  type: 'test'
+  ...
+# Subtest: calendar: credenciales cifradas ligadas al propietario, autenticadas y no deterministas
+ok 24 - calendar: credenciales cifradas ligadas al propietario, autenticadas y no deterministas
+  ---
+  duration_ms: 0.47337
+  type: 'test'
+  ...
+# Subtest: calendar: conserva el día bancario, ajusta febrero bisiesto y usa fin exclusivo
+ok 25 - calendar: conserva el día bancario, ajusta febrero bisiesto y usa fin exclusivo
+  ---
+  duration_ms: 1.151609
+  type: 'test'
+  ...
+# Subtest: calendar: corrección de fechas mantiene clave, saldo parcial y liquidación sin recordatorio
+ok 26 - calendar: corrección de fechas mantiene clave, saldo parcial y liquidación sin recordatorio
+  ---
+  duration_ms: 3.453788
+  type: 'test'
+  ...
+# Subtest: calendar: corte verde requiere fechas confirmadas y monto, conserva pago independiente y acepta cero
+ok 27 - calendar: corte verde requiere fechas confirmadas y monto, conserva pago independiente y acepta cero
+  ---
+  duration_ms: 2.931098
+  type: 'test'
+  ...
+# Subtest: calendar: cuentas cobradas, canceladas y con pago parcial respetan el saldo real
+ok 28 - calendar: cuentas cobradas, canceladas y con pago parcial respetan el saldo real
+  ---
+  duration_ms: 1.070359
+  type: 'test'
+  ...
+# Subtest: calendar: el color representa el estado en todos los tipos y los parciales conservan su aviso
+ok 29 - calendar: el color representa el estado en todos los tipos y los parciales conservan su aviso
+  ---
+  duration_ms: 0.19944
+  type: 'test'
+  ...
+# Subtest: calendar: abonos de cuentas usan naranja y texto parcial; al liquidar pasan a verde
+ok 30 - calendar: abonos de cuentas usan naranja y texto parcial; al liquidar pasan a verde
+  ---
+  duration_ms: 1.348799
+  type: 'test'
+  ...
+# Subtest: calendar: un cobro quincenal no marca la siguiente fecha como cobrada, ni al llegar ese día
+ok 31 - calendar: un cobro quincenal no marca la siguiente fecha como cobrada, ni al llegar ese día
+  ---
+  duration_ms: 5.222376
+  type: 'test'
+  ...
+# Subtest: calendar: abonos se suman a centavos y los días ajustados a fin de mes no duplican cobros
+ok 32 - calendar: abonos se suman a centavos y los días ajustados a fin de mes no duplican cobros
+  ---
+  duration_ms: 0.689479
+  type: 'test'
+  ...
+# Subtest: calendar: ingresos futuros no liquidan ni retiran los cobros previstos de una cuenta activa
+ok 33 - calendar: ingresos futuros no liquidan ni retiran los cobros previstos de una cuenta activa
+  ---
+  duration_ms: 0.69096
+  type: 'test'
+  ...
+# Subtest: calendar: cuotas y denegación no revelan respuestas de Google; reintento respeta Retry-After
+ok 34 - calendar: cuotas y denegación no revelan respuestas de Google; reintento respeta Retry-After
+  ---
+  duration_ms: 17.956057
+  type: 'test'
+  ...
+# Subtest: calendar: cron exige su secreto incluso cuando falta configuración y no expone usuarios
+ok 35 - calendar: cron exige su secreto incluso cuando falta configuración y no expone usuarios
+  ---
+  duration_ms: 10.580433
+  type: 'test'
+  ...
+# Subtest: calendar: callback usa origen fijo, borra cookie y no refleja mensajes del proveedor
+ok 36 - calendar: callback usa origen fijo, borra cookie y no refleja mensajes del proveedor
+  ---
+  duration_ms: 4.676607
+  type: 'test'
+  ...
+# Subtest: calendar: suscripciones omiten saltos, respetan frecuencia y desactivación, y retiran avisos al confirmar
+ok 37 - calendar: suscripciones omiten saltos, respetan frecuencia y desactivación, y retiran avisos al confirmar
+  ---
+  duration_ms: 0.909809
+  type: 'test'
+  ...
+# Subtest: calendar: la API usa el propietario de sesión e impide preferencias y userId arbitrarios
+ok 38 - calendar: la API usa el propietario de sesión e impide preferencias y userId arbitrarios
+  ---
+  duration_ms: 4.292517
+  type: 'test'
+  ...
+1..38
+# tests 38
+# suites 0
+# pass 38
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3873.538122

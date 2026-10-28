@@ -1,5 +1,5 @@
-import { z } from 'zod';
 import type { PrismaClient } from '@prisma/client';
+import { z } from 'zod';
 import type { MoneyData } from './data';
 import { readPaymentMix } from './persisted';
 import { mutationResponseSchema, type MoneyMutationResponse } from './commands';
@@ -49,7 +49,7 @@ export function routingOptions(data: MoneyData) {
     ...data.subscriptions.filter(s => s.paymentMethod === 'CASH').map(s => ({ key: `subscription:${s.id}`, label: `Suscripción · ${s.name}` })),
   ];
 }
-export async function mutateMoney(db: PrismaClient, userId: string, body: unknown, today = todayInMexico()) {
+export async function mutateMoney(db: MoneyTransactionRunner, userId: string, body: unknown, today = todayInMexico()) {
   if (!body || Array.isArray(body) || typeof body !== 'object' || !('operationId' in body) || typeof body.operationId !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(body.operationId || '')) throw new ApiAccessError('La operación necesita un identificador válido.', 400);
   const command: Record<string, unknown> = { ...body };
   const operationId = body.operationId;
@@ -168,4 +168,9 @@ export async function mutateMoney(db: PrismaClient, userId: string, body: unknow
   // The shared JS coordinator retains the owner lock and transaction options.
   const result: unknown = await runDebtAccountOperation(db, userId, operation);
   return mutationResponseSchema.parse(result);
+}
+
+export type MoneyTransactionRunner = PrismaClient | {
+  transactionScope: 'existing';
+  $transaction<T>(run: (tx: Prisma.TransactionClient) => Promise<T>, options?: { isolationLevel?: Prisma.TransactionIsolationLevel; timeout?: number; maxWait?: number }): Promise<T>;
 }

@@ -2,7 +2,7 @@ const assert = require('node:assert/strict');
 const { test } = require('node:test');
 const { sourceLoader } = require('./helpers/load-source.cjs');
 const fixture = require('./fixtures/captures/nu-cfe-service-payment.es.v1.json');
-const { interpretCapture, captureParsers } = sourceLoader()('src/lib/captureParsers.js');
+const { interpretCapture, captureParsers } = sourceLoader()('src/lib/captureParsers.ts');
 
 test('Nu real anonimizado: pago CFE conserva solo importe/comercio y exige completar tarjeta, moneda y fecha', () => {
   const result = interpretCapture(fixture.event);

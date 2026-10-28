@@ -17,9 +17,9 @@ test('Wallet principal y respaldo bancario persistente: API y PostgreSQL', { ski
     'next/server': { NextResponse: { json: (body, options = {}) => ({ body: JSON.parse(JSON.stringify(body)), status: options.status || 200, headers: new Headers(options.headers) }) } },
     '@supabase/supabase-js': { createClient: () => ({ auth: { getUser: async token => ({ data: { user: token === 'owner' ? user : token === 'other' ? other : null }, error: null }) } }) },
   };
-  const load = sourceLoader(mocks), protocol = load('src/lib/captureProtocol.js'), config = load('src/lib/captureConfiguration.js');
-  const processing = load('src/lib/captureProcessing.js'), worker = load('src/lib/captureBankFallbackWorker.js');
-  const route = load('src/app/api/captures/events/route.js'), configRoute = load('src/app/api/captures/configuration/route.js');
+  const load = sourceLoader(mocks), protocol = load('src/lib/captureProtocol.ts'), config = load('src/lib/captureConfiguration.ts');
+  const processing = load('src/lib/captureProcessing.ts'), worker = load('src/lib/captureBankFallbackWorker.ts');
+  const route = load('src/app/api/captures/events/route.ts'), configRoute = load('src/app/api/captures/configuration/route.ts');
   const secret = randomBytes(32).toString('base64url');
   const device = await db.captureDevice.create({ data: { userId: user.id, name: 'Teléfono ficticio', approvedAt: new Date(), secretHash: protocol.captureHash(secret) } });
   const category = await db.category.create({ data: { userId: user.id, name: 'Categoría ficticia' } });
@@ -202,11 +202,11 @@ test('Wallet principal y respaldo bancario persistente: API y PostgreSQL', { ski
       assert.equal(await db.capturePaymentPolicy.count({ where: { userId: user.id } }), 0);
     });
     await t.test('endpoint del programador exige secreto, no filtra usuarios y devuelve fallo recuperable', async () => {
-      const env = { CRON_SECRET: 's'.repeat(40) }, r = sourceLoader(mocks, { process: { env } })('src/app/api/cron/capture-bank-fallback/route.js');
+      const env = { CRON_SECRET: 's'.repeat(40) }, r = sourceLoader(mocks, { process: { env } })('src/app/api/cron/capture-bank-fallback/route.ts');
       const request = token => new Request('http://localhost/api/cron/capture-bank-fallback', { method: 'POST', headers: token ? { authorization: `Bearer ${token}` } : {} });
       assert.equal((await r.POST(request())).status, 401); assert.equal((await r.POST(request('wrong'))).status, 401);
       const response = await r.POST(request(env.CRON_SECRET)); assert.equal(response.status, 200); assert.equal(response.body.users, undefined);
-      const brokenRoute = sourceLoader({ ...mocks, '@/lib/captureBankFallbackWorker': { runBankFallbacks: async () => ({ registered: 0, failed: 1, users: [] }) } }, { process: { env } })('src/app/api/cron/capture-bank-fallback/route.js');
+      const brokenRoute = sourceLoader({ ...mocks, '@/lib/captureBankFallbackWorker': { runBankFallbacks: async () => ({ registered: 0, failed: 1, users: [] }) } }, { process: { env } })('src/app/api/cron/capture-bank-fallback/route.ts');
       assert.equal((await brokenRoute.POST(request(env.CRON_SECRET))).status, 503);
     });
   } finally {

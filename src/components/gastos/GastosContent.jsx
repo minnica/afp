@@ -1,4 +1,5 @@
 "use client";
+import { observeOfflineExpenses } from "@/lib/offlineExpenseObserver";
 import AutomaticRecordingLink from "@/components/configuracion/AutomaticRecordingLink";
 import CaptureStatus from "@/components/gastos/CaptureStatus";
 import OfflineCaptureConflicts from "@/components/gastos/OfflineCaptureConflicts";
@@ -39,7 +40,6 @@ import {
   addOfflineExpense,
   readOfflineExpenses,
   syncOfflineExpenses,
-  subscribeOfflineExpenses,
 } from "@/lib/offlineExpenses";
 
 import { Button } from "@/components/ui/button";
@@ -540,27 +540,16 @@ export default function GastosContent() {
 
   useEffect(() => {
     if (!user) return;
-    let active = true;
-    let generation = 0;
-    const refresh = async ({ confirmed = false } = {}) => {
-      const current = ++generation;
-      try {
-        const pending = await readOfflineExpenses(user.id);
-        if (active && current === generation) setPendingOfflineExpenses(pending);
-        if (active && confirmed && navigator.onLine) {
-          await Promise.all([
-            loadExpenses(user.id, { force: true, mutationCompleted: true, errorMode: "inline" }),
-            loadReceivables(user.id, { mutationCompleted: true, errorMode: "inline" }),
-            loadPayables(user.id, { mutationCompleted: true, errorMode: "inline" }),
-          ]);
-        }
-      } catch (err) {
-        if (active) setError(err.message || "No se pudieron leer los pendientes.");
-      }
-    };
-    const unsubscribe = subscribeOfflineExpenses(user.id, refresh);
-    const timeoutId = window.setTimeout(refresh, 0);
-    return () => { active = false; unsubscribe(); window.clearTimeout(timeoutId); };
+    return observeOfflineExpenses({
+      userId: user.id,
+      onPending: setPendingOfflineExpenses,
+      onConfirmed: () => Promise.all([
+        loadExpenses(user.id, { force: true, mutationCompleted: true, errorMode: "inline" }),
+        loadReceivables(user.id, { mutationCompleted: true, errorMode: "inline" }),
+        loadPayables(user.id, { mutationCompleted: true, errorMode: "inline" }),
+      ]),
+      onError: setError,
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, filterDate, filterMonth, filterCategoryId, filterConcept, filterCardId, filterAmount, mobileNavigation]);
 

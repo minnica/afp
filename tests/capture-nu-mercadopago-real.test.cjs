@@ -4,7 +4,7 @@ const { sourceLoader } = require('./helpers/load-source.cjs');
 const wallet = require('./fixtures/captures/wallet-nu-purchase.es.v1.json');
 const bank = require('./fixtures/captures/nu-card-purchase.es.v1.json');
 const mp = require('./fixtures/captures/mercadopago-card-purchase.es.v1.json');
-const load = sourceLoader(), { interpretCapture, captureParsers } = load('src/lib/captureParsers.js');
+const load = sourceLoader(), { interpretCapture, captureParsers } = load('src/lib/captureParsers.ts');
 const change = (fixture, fields) => ({ ...fixture.event, fields: { ...fixture.event.fields, ...fields } });
 const mpAmount = value => change(mp, { 'android.title': `Compra por $ ${value} fue aprobada`, 'android.title.big': `Compra por $ ${value} fue aprobada` });
 
@@ -57,7 +57,7 @@ test('Mercado Pago rechaza moneda contradictoria, revisiones, pagos y estructura
 });
 
 test('las reglas Nu/CFE y Mercado Pago requieren aceptaciones independientes; solo CFE exige suscripción', () => {
-  const { matchesCapturePolicy } = load('src/lib/captureFormatPolicy.js');
+  const { matchesCapturePolicy } = load('src/lib/captureFormatPolicy.ts');
   const parser = captureParsers.find(p => p.key === 'mercadopago.card-purchase.es.v1');
   const policy = { parserKey: parser.key, completionPolicy: parser.completionPolicy, cardId: 'own-card', datePolicy: 'NOTIFICATION_POSTED_AT', policyAcceptedAt: new Date('2026-10-20T12:00:00Z'), policySubscriptionId: null };
   assert.equal(matchesCapturePolicy(policy, parser), true);

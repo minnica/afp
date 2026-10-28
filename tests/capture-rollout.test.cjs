@@ -1,7 +1,7 @@
 const assert = require('node:assert/strict');
 const { test } = require('node:test');
 const { sourceLoader } = require('./helpers/load-source.cjs');
-const { isReviewedCapture, captureFormatReadiness, buildCaptureRollout } = sourceLoader()('src/lib/captureRollout.js');
+const { isReviewedCapture, captureFormatReadiness, buildCaptureRollout } = sourceLoader()('src/lib/captureRollout.ts');
 const sourcePackage = 'mx.hsbc.hsbcmexico';
 const parser = { key: 'synthetic.hsbc.v1', sourcePackage, verified: true };
 const alias = { cardId: 'card1', sourcePackage, kind: 'PHYSICAL', value: '0123', verifiedAt: new Date() };

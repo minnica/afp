@@ -18,10 +18,10 @@ test('Nu y Mercado Pago: muestras reales anonimizadas, regla expresa y registro 
     'next/server': { NextResponse: { json: (body, options = {}) => ({ body: JSON.parse(JSON.stringify(body)), status: options.status || 200, headers: new Headers(options.headers) }) } },
     '@supabase/supabase-js': { createClient: () => ({ auth: { getUser: async token => ({ data: { user: token === 'owner' ? user : token === 'other' ? other : null }, error: null }) } }) },
   };
-  const load = sourceLoader(mocks), protocol = load('src/lib/captureProtocol.js');
-  const service = load('src/lib/captureService.js'), processing = load('src/lib/captureProcessing.js');
-  const configuration = load('src/lib/captureConfiguration.js'), reconciliation = load('src/lib/captureReconciliation.js');
-  const eventsRoute = load('src/app/api/captures/events/route.js'), configRoute = load('src/app/api/captures/configuration/route.js');
+  const load = sourceLoader(mocks), protocol = load('src/lib/captureProtocol.ts');
+  const service = load('src/lib/captureService.ts'), processing = load('src/lib/captureProcessing.ts');
+  const configuration = load('src/lib/captureConfiguration.ts'), reconciliation = load('src/lib/captureReconciliation.ts');
+  const eventsRoute = load('src/app/api/captures/events/route.ts'), configRoute = load('src/app/api/captures/configuration/route.ts');
   const [nu, mercado, second, sibling] = await Promise.all(['NU', 'MERCADOPAGO', 'Otra Mercado Pago', 'Otra Nu'].map(name => db.card.create({ data: { userId: user.id, name, usualCutDay: 25, usualDueDay: 15 } })));
   const category = await db.category.create({ data: { userId: user.id, name: 'Compras ficticias' } });
   const secret = randomBytes(32).toString('base64url');
@@ -57,8 +57,8 @@ test('Nu y Mercado Pago: muestras reales anonimizadas, regla expresa y registro 
     nuCfeBefore = await configuration.configureCapture(db, user.id, { action: 'formatPolicy', cardId: nu.id, parserKey: 'nu.cfe-service-payment.es.v2', completionPolicy: 'NU_CFE_MXN', datePolicy: 'NOTIFICATION_POSTED_AT', subscriptionId: subscription.id });
 
     await t.test('los avisos desconocidos conservan recibos y los formatos nuevos no generan gastos al publicarse', async () => {
-      const parsers = load('src/lib/captureParsers.js');
-      const prior = sourceLoader({ ...mocks, '@/lib/captureParsers': { ...parsers, interpretCapture: () => ({ reason: 'UNKNOWN_FORMAT', proposal: {} }) } })('src/lib/captureService.js');
+      const parsers = load('src/lib/captureParsers.ts');
+      const prior = sourceLoader({ ...mocks, '@/lib/captureParsers': { ...parsers, interpretCapture: () => ({ reason: 'UNKNOWN_FORMAT', proposal: {} }) } })('src/lib/captureService.ts');
       for (const [key, fixture] of Object.entries({ wallet, bank, mp })) {
         const e = oldInputs[key] = input(fixture);
         const receipt = await prior.receiveCaptureEvent(db, credential, e); originals[key] = await read(e);

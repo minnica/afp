@@ -3,8 +3,8 @@ const { test } = require('node:test');
 const { sourceLoader } = require('./helpers/load-source.cjs');
 const refund = require('./fixtures/captures/mercadopago-refund.es.v1.json');
 const cancellation = require('./fixtures/captures/banamex-purchase-cancellation.es.v1.json');
-const { interpretCapture } = sourceLoader()('src/lib/captureParsers.js');
-const { refundCaptureKind } = sourceLoader()('src/lib/captureRefundParsers.js');
+const { interpretCapture } = sourceLoader()('src/lib/captureParsers.ts');
+const { refundCaptureKind } = sourceLoader()('src/lib/captureRefundParsers.ts');
 
 test('devoluciones reales: conserva datos impresos sin inventar tarjeta, MXN ni referencia', () => {
   for (const fixture of [refund, cancellation]) {

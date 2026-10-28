@@ -3,7 +3,7 @@ const { test } = require("node:test");
 const { randomBytes, randomUUID } = require("node:crypto");
 const { sourceLoader } = require("./helpers/load-source.cjs");
 const load = sourceLoader({ "next/server": { NextResponse: { json: (body, options) => ({ body, ...options }) } } });
-const protocol = load("src/lib/captureProtocol.js");
+const protocol = load("src/lib/captureProtocol.ts");
 const sample = () => ({ contractVersion: 1, eventId: randomUUID(), sourcePackage: "com.bancomer.mbanking",
   notificationKeyHash: "a".repeat(64), postedAt: "2026-10-21T01:02:03Z", receivedAt: "2026-10-21T01:02:04Z",
   fields: { "android.title": "Prueba sintética", "android.text": "Compra ficticia" } });

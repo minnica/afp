@@ -1,7 +1,7 @@
 const assert = require('node:assert/strict');
 const { test } = require('node:test');
 const { sourceLoader } = require('./helpers/load-source.cjs');
-const { captureAmount, captureOperationTime, interpretCapture, captureParsers } = sourceLoader()('src/lib/captureParsers.js');
+const { captureAmount, captureOperationTime, interpretCapture, captureParsers } = sourceLoader()('src/lib/captureParsers.ts');
 const fixture = (sourcePackage='com.bancomer.mbanking', fields={}) => ({sourcePackage, receivedAt:'2026-10-21T23:59:00Z',fields:{
  'android.title':sourcePackage==='com.bancomer.mbanking'?'Compra aprobada':'Pago realizado',
  'android.text':`Importe: MXN 1,234.50\nComercio: COMERCIO FICTICIO\nTarjeta ${sourcePackage==='com.bancomer.mbanking'?'física':'Wallet'}: *0123\nFecha: 21/10/2026 13:14:15\nReferencia bancaria: FICTICIA-00001`,...fields}});

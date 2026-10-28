@@ -1,0 +1,614 @@
+{
+  "baseCommit": "4731c766291a77936843c0c1c5f56db77abc3d77",
+  "startedAt": "2026-10-28T05:55:48.447518+00:00",
+  "baselineHashes": {
+    "prisma/schema.prisma": "00828cc74e12eb1c555d9e450ab03bcc5f679612531c8ecf26ec1ba810e80a13",
+    "pnpm-lock.yaml": "c565d057974dc2bc1aa7df7bba47f61742834051f6ec084ee74b29373ff7299c",
+    "prisma/migrations/20260509070227_init/migration.sql": "1ff8bca46c1f428981d455d8f4078194aa7dd47e6c58319c54fc584ae70c2b41",
+    "prisma/migrations/20260517045000_add_payable_accounts/migration.sql": "50c239f9c08407ed7107a926a660b785583849dbe729c290b1691ecfb0556e30",
+    "prisma/migrations/20260517222440_add_subscription_frequency/migration.sql": "ab2fce6df5b4b14baac3c10e4d83df85ddda1167140c2d0aa321605b885c3f56",
+    "prisma/migrations/20260517235633_replace_receivable_expected_date_with_charge_day/migration.sql": "1e1f4decb4b19bc185906545755cbd43b6510c3919408e3d077f88446c77c502",
+    "prisma/migrations/20260518002802_replace_receivable_charge_day_with_charge_days/migration.sql": "9a4e80ec04bd471c5f8616da3a38feed07e0d156e128afdcf4c34a0579d9369a",
+    "prisma/migrations/20260518041110_add_expense_subscription_relation/migration.sql": "12c4fe245e66a08076d473b58fa48e07431b93e39e440ade52ba10c07c8fa86b",
+    "prisma/migrations/20260518234708_add_payable_loan_support/migration.sql": "8ef7dcd79b9e4439e96092a131bbb569cb04b405721054e6916e71479a8c40b1",
+    "prisma/migrations/20260604000000_add_subscription_active_fields/migration.sql": "a7a8905cf9facf6135d2b095dff53a0d63392adef65519cfc919f060cd5affb8",
+    "prisma/migrations/20261009000000_add_installment_statement_reconciliations/migration.sql": "c5b70602e66ac44fff6f46d7d432e06277d4d5927227c7935383506099216b5b",
+    "prisma/migrations/20261010000000_add_card_cycle_credits/migration.sql": "bce78dbd21bdae948e03b1a314ab18586da68d7c7ea63088c39ef34bca349497",
+    "prisma/migrations/20261011000000_add_card_usage_verification/migration.sql": "ab7b6a61669a4910c4c6af563e02912944daf58416198f1dbcdb8fddd5032fb3",
+    "prisma/migrations/20261015000000_add_notice_dismissals/migration.sql": "8b082a23fdd3e10c8712590b6c0c1529640c9328f386fc7a5902689ac2cded87",
+    "prisma/migrations/20261016000000_add_subscription_charges/migration.sql": "fe3d2bdd2e3fe3b495e51c5a8a29e398e47e6ee26595ec7a1b91f156ed5add21",
+    "prisma/migrations/20261017000000_add_expense_operations/migration.sql": "ae45ef363c01fd0fbe514c0f29f6ecdcacb57e3f21039d4aebf8036931e01dcf",
+    "prisma/migrations/20261017020000_enable_application_rls/migration.sql": "69325502c6b19dacccf07e518c9f520638b5a3a5f59b8022c71547219952489e",
+    "prisma/migrations/20261017030000_add_post_cut_credits/migration.sql": "d878d5420a86740d69643722d6150bb10e6db784bd6058618beaf15c660231a3",
+    "prisma/migrations/20261020000000_add_cash_expense_contributions/migration.sql": "86f61ad5d5b818a17199a22343516e14961e2f837c849be8fcdfd6752cf336fd",
+    "prisma/migrations/20261021000000_add_android_capture_linking/migration.sql": "c80f3d004d6b34fede13ca5afa2d6f3107eb192fbcf09042cf5df4bc6338d8aa",
+    "prisma/migrations/20261021010000_add_capture_processing/migration.sql": "64882d0b153c5a10f94251b5544f5bc2d77b081f34ec5eec9f67a5afa1843dc5",
+    "prisma/migrations/20261021020000_capture_installment_reconciliation/migration.sql": "4a42bc36c68e092ad788481f0757bcc6c1d472bb6ed12a67b77d768486bdca2e",
+    "prisma/migrations/20261021030000_capture_review_and_reconciliation/migration.sql": "34f04b1ce08cc388006205fbfcbb8e0e8b91de2389ad11c05011767a49cc1c4f",
+    "prisma/migrations/20261021040000_add_card_credit_balances/migration.sql": "5f042600ecc8c93230b8b7ea0814498b22717b892bbadd8a568d577310dafb22",
+    "prisma/migrations/20261022000000_add_card_balance_tracking/migration.sql": "013fcbd00be5ef700fd210e561153523343d5bd64d4788e742fa3b852262492c",
+    "prisma/migrations/20261023000000_add_google_calendar_sync/migration.sql": "7482699faa47bb271aa7a0f51429b9a881464f8c6306a7e794070855b32e8790",
+    "prisma/migrations/20261023010000_capture_wallet_date_policy/migration.sql": "8a91d0ca16506aeb08adb6783569bcf414b051b85c8d294d80ee7f136c3eaec2",
+    "prisma/migrations/20261023020000_capture_nu_cfe_policy/migration.sql": "cf111147b0ee4786093ae2c3b7e65e5585a3da9773f341726a40b00d020b4353",
+    "prisma/migrations/20261023030000_capture_card_payments/migration.sql": "18956971f1b4f4b0f6a2be404fb9e50240521f81b6349b1eb99921d7e75aac3f",
+    "prisma/migrations/20261023040000_automatic_payment_receipts/migration.sql": "30377945f2a3e9f7af3acef63dcf3df6ce3237aa80acf66dae5de19c64bf6111",
+    "prisma/migrations/20261023050000_receivable_balance_adjustment/migration.sql": "7576dd3b6d7bef160ec348e8c890563dae89797014678b1326638c887e90f902",
+    "prisma/migrations/20261023060000_receiver_payment_notices/migration.sql": "6b0aac052e2ad455aef0a230e02cb9036b728bfed7df12c44a5c3cfd1c6bbdbd",
+    "prisma/migrations/20261024010000_capture_mercadopago_purchase_policy/migration.sql": "166646abdaa37e67228d0133740cb0eb451f9134306faef8e4672e8ce8552978",
+    "prisma/migrations/20261024020000_capture_bank_fallback/migration.sql": "fe792871e3417ac18e0ddf5a9fa264769e49c63c3c298cfe8097b4d4750a0f16",
+    "prisma/migrations/20261025000000_add_money_accounts/migration.sql": "9c6c16b3095279e819a0028ab7ea139aa36cd1c420b1ef00fec66f89aded8eb5",
+    "prisma/migrations/20261025010000_money_account_yields/migration.sql": "187f6827879e60af3a4dac5589b3bd302b1bc9cddb237adaa94a53f9c2304518",
+    "prisma/migrations/20261025020000_automatic_money_yields/migration.sql": "a4d21aab627389c21e9a639dde5348d5222766416166830ea5fd1562bb6bfdc7",
+    "prisma/migrations/20261025030000_payroll_business_days/migration.sql": "244c3f541242990d5137bd45c23f2313d282fb8b40e550670cee37aea3829285",
+    "prisma/migrations/20261026000000_expense_refunds/migration.sql": "ebd2a9695a6a7d3d2aa2e4558b4d466769ad5ec538ed347c659b2e976760bea2",
+    "prisma/migrations/20261026010000_debit_payment_method/migration.sql": "6d6cf09901b68930b6eacc11d6e687869a769f0acdf18b4188a7cedce855721a",
+    "prisma/migrations/20261026020000_capture_account_movements/migration.sql": "dc74a0bf84fa66803575d91b18550765f46c110aabff7d375636d6c6566ed536",
+    "prisma/migrations/20261026030000_card_cycle_dates_confirmation/migration.sql": "dca61abfb6631ba981ccd41707da601baef16d70c0165fc4d6e2a4d01b61ed2c",
+    "prisma/migrations/20261027000000_variable_budget_payment_mix/migration.sql": "8d26f706c6f0ace8ad267dde6c3e5be4fd29c8ec342bc6be04873c66eb97708c",
+    "prisma/migrations/20261027010000_bbva_debit_automation/migration.sql": "69cd66286a1d3a3de86d52eb70a072a0e268cf3957567222a3a00cacb985b028"
+  },
+  "batches": [
+    {
+      "name": "capture",
+      "startedAt": "2026-10-28T06:00:22.154795+00:00",
+      "commands": [
+        {
+          "command": "pnpm typecheck",
+          "exitCode": 0,
+          "seconds": 7.721,
+          "log": "capture-typecheck.log"
+        },
+        {
+          "command": "pnpm test:types",
+          "exitCode": 2,
+          "seconds": 6.673,
+          "log": "capture-test-types.log"
+        }
+      ],
+      "developmentFailureLogReused": true
+    },
+    {
+      "name": "capture",
+      "startedAt": "2026-10-28T06:01:00.447585+00:00",
+      "commands": [
+        {
+          "command": "pnpm typecheck",
+          "exitCode": 0,
+          "seconds": 7.451,
+          "log": "capture-typecheck.log"
+        },
+        {
+          "command": "pnpm test:types",
+          "exitCode": 0,
+          "seconds": 6.791,
+          "log": "capture-test-types.log"
+        },
+        {
+          "command": "pnpm lint",
+          "exitCode": 0,
+          "seconds": 24.932,
+          "log": "capture-lint.log"
+        },
+        {
+          "command": "pnpm test",
+          "exitCode": 0,
+          "seconds": 48.911,
+          "log": "capture-test.log"
+        },
+        {
+          "command": "pnpm build",
+          "exitCode": 0,
+          "seconds": 25.498,
+          "log": "capture-build.log"
+        }
+      ]
+    },
+    {
+      "name": "calendar",
+      "startedAt": "2026-10-28T06:04:07.122554+00:00",
+      "commands": [
+        {
+          "command": "pnpm typecheck",
+          "exitCode": 0,
+          "seconds": 7.727,
+          "log": "calendar-typecheck.log"
+        },
+        {
+          "command": "pnpm test:types",
+          "exitCode": 0,
+          "seconds": 6.376,
+          "log": "calendar-test-types.log"
+        },
+        {
+          "command": "pnpm lint",
+          "exitCode": 0,
+          "seconds": 23.843,
+          "log": "calendar-lint.log"
+        },
+        {
+          "command": "pnpm test",
+          "exitCode": 1,
+          "seconds": 48.617,
+          "log": "calendar-test.log"
+        }
+      ],
+      "developmentFailureLogReused": true
+    },
+    {
+      "name": "calendar",
+      "startedAt": "2026-10-28T06:06:31.472946+00:00",
+      "commands": [
+        {
+          "command": "pnpm typecheck",
+          "exitCode": 0,
+          "seconds": 6.98,
+          "log": "calendar-typecheck.log"
+        },
+        {
+          "command": "pnpm test:types",
+          "exitCode": 0,
+          "seconds": 6.406,
+          "log": "calendar-test-types.log"
+        },
+        {
+          "command": "pnpm lint",
+          "exitCode": 0,
+          "seconds": 23.87,
+          "log": "calendar-lint.log"
+        },
+        {
+          "command": "pnpm test",
+          "exitCode": 0,
+          "seconds": 45.805,
+          "log": "calendar-test.log"
+        },
+        {
+          "command": "pnpm build",
+          "exitCode": 0,
+          "seconds": 12.426,
+          "log": "calendar-build.log"
+        }
+      ]
+    },
+    {
+      "name": "offline",
+      "startedAt": "2026-10-28T06:09:27.083221+00:00",
+      "commands": [
+        {
+          "command": "pnpm typecheck",
+          "exitCode": 0,
+          "seconds": 4.151,
+          "log": "offline-typecheck.log"
+        },
+        {
+          "command": "pnpm test:types",
+          "exitCode": 0,
+          "seconds": 6.473,
+          "log": "offline-test-types.log"
+        },
+        {
+          "command": "pnpm lint",
+          "exitCode": 0,
+          "seconds": 24.057,
+          "log": "offline-lint.log"
+        },
+        {
+          "command": "pnpm test",
+          "exitCode": 0,
+          "seconds": 45.593,
+          "log": "offline-test.log"
+        },
+        {
+          "command": "pnpm build",
+          "exitCode": 0,
+          "seconds": 8.503,
+          "log": "offline-build.log"
+        }
+      ]
+    },
+    {
+      "name": "offline-final",
+      "startedAt": "2026-10-28T06:13:05.331303+00:00",
+      "commands": [
+        {
+          "command": "pnpm typecheck",
+          "exitCode": 0,
+          "seconds": 4.142,
+          "log": "offline-final-1-typecheck.log"
+        },
+        {
+          "command": "pnpm test:types",
+          "exitCode": 0,
+          "seconds": 6.546,
+          "log": "offline-final-1-test-types.log"
+        },
+        {
+          "command": "pnpm lint",
+          "exitCode": 0,
+          "seconds": 25.808,
+          "log": "offline-final-1-lint.log"
+        },
+        {
+          "command": "pnpm test",
+          "exitCode": 0,
+          "seconds": 49.05,
+          "log": "offline-final-1-test.log"
+        },
+        {
+          "command": "pnpm build",
+          "exitCode": 0,
+          "seconds": 15.128,
+          "log": "offline-final-1-build.log"
+        }
+      ],
+      "attempt": 1
+    }
+  ],
+  "finalHashes": {
+    "prisma/schema.prisma": "00828cc74e12eb1c555d9e450ab03bcc5f679612531c8ecf26ec1ba810e80a13",
+    "pnpm-lock.yaml": "c565d057974dc2bc1aa7df7bba47f61742834051f6ec084ee74b29373ff7299c",
+    "prisma/migrations/20260509070227_init/migration.sql": "1ff8bca46c1f428981d455d8f4078194aa7dd47e6c58319c54fc584ae70c2b41",
+    "prisma/migrations/20260517045000_add_payable_accounts/migration.sql": "50c239f9c08407ed7107a926a660b785583849dbe729c290b1691ecfb0556e30",
+    "prisma/migrations/20260517222440_add_subscription_frequency/migration.sql": "ab2fce6df5b4b14baac3c10e4d83df85ddda1167140c2d0aa321605b885c3f56",
+    "prisma/migrations/20260517235633_replace_receivable_expected_date_with_charge_day/migration.sql": "1e1f4decb4b19bc185906545755cbd43b6510c3919408e3d077f88446c77c502",
+    "prisma/migrations/20260518002802_replace_receivable_charge_day_with_charge_days/migration.sql": "9a4e80ec04bd471c5f8616da3a38feed07e0d156e128afdcf4c34a0579d9369a",
+    "prisma/migrations/20260518041110_add_expense_subscription_relation/migration.sql": "12c4fe245e66a08076d473b58fa48e07431b93e39e440ade52ba10c07c8fa86b",
+    "prisma/migrations/20260518234708_add_payable_loan_support/migration.sql": "8ef7dcd79b9e4439e96092a131bbb569cb04b405721054e6916e71479a8c40b1",
+    "prisma/migrations/20260604000000_add_subscription_active_fields/migration.sql": "a7a8905cf9facf6135d2b095dff53a0d63392adef65519cfc919f060cd5affb8",
+    "prisma/migrations/20261009000000_add_installment_statement_reconciliations/migration.sql": "c5b70602e66ac44fff6f46d7d432e06277d4d5927227c7935383506099216b5b",
+    "prisma/migrations/20261010000000_add_card_cycle_credits/migration.sql": "bce78dbd21bdae948e03b1a314ab18586da68d7c7ea63088c39ef34bca349497",
+    "prisma/migrations/20261011000000_add_card_usage_verification/migration.sql": "ab7b6a61669a4910c4c6af563e02912944daf58416198f1dbcdb8fddd5032fb3",
+    "prisma/migrations/20261015000000_add_notice_dismissals/migration.sql": "8b082a23fdd3e10c8712590b6c0c1529640c9328f386fc7a5902689ac2cded87",
+    "prisma/migrations/20261016000000_add_subscription_charges/migration.sql": "fe3d2bdd2e3fe3b495e51c5a8a29e398e47e6ee26595ec7a1b91f156ed5add21",
+    "prisma/migrations/20261017000000_add_expense_operations/migration.sql": "ae45ef363c01fd0fbe514c0f29f6ecdcacb57e3f21039d4aebf8036931e01dcf",
+    "prisma/migrations/20261017020000_enable_application_rls/migration.sql": "69325502c6b19dacccf07e518c9f520638b5a3a5f59b8022c71547219952489e",
+    "prisma/migrations/20261017030000_add_post_cut_credits/migration.sql": "d878d5420a86740d69643722d6150bb10e6db784bd6058618beaf15c660231a3",
+    "prisma/migrations/20261020000000_add_cash_expense_contributions/migration.sql": "86f61ad5d5b818a17199a22343516e14961e2f837c849be8fcdfd6752cf336fd",
+    "prisma/migrations/20261021000000_add_android_capture_linking/migration.sql": "c80f3d004d6b34fede13ca5afa2d6f3107eb192fbcf09042cf5df4bc6338d8aa",
+    "prisma/migrations/20261021010000_add_capture_processing/migration.sql": "64882d0b153c5a10f94251b5544f5bc2d77b081f34ec5eec9f67a5afa1843dc5",
+    "prisma/migrations/20261021020000_capture_installment_reconciliation/migration.sql": "4a42bc36c68e092ad788481f0757bcc6c1d472bb6ed12a67b77d768486bdca2e",
+    "prisma/migrations/20261021030000_capture_review_and_reconciliation/migration.sql": "34f04b1ce08cc388006205fbfcbb8e0e8b91de2389ad11c05011767a49cc1c4f",
+    "prisma/migrations/20261021040000_add_card_credit_balances/migration.sql": "5f042600ecc8c93230b8b7ea0814498b22717b892bbadd8a568d577310dafb22",
+    "prisma/migrations/20261022000000_add_card_balance_tracking/migration.sql": "013fcbd00be5ef700fd210e561153523343d5bd64d4788e742fa3b852262492c",
+    "prisma/migrations/20261023000000_add_google_calendar_sync/migration.sql": "7482699faa47bb271aa7a0f51429b9a881464f8c6306a7e794070855b32e8790",
+    "prisma/migrations/20261023010000_capture_wallet_date_policy/migration.sql": "8a91d0ca16506aeb08adb6783569bcf414b051b85c8d294d80ee7f136c3eaec2",
+    "prisma/migrations/20261023020000_capture_nu_cfe_policy/migration.sql": "cf111147b0ee4786093ae2c3b7e65e5585a3da9773f341726a40b00d020b4353",
+    "prisma/migrations/20261023030000_capture_card_payments/migration.sql": "18956971f1b4f4b0f6a2be404fb9e50240521f81b6349b1eb99921d7e75aac3f",
+    "prisma/migrations/20261023040000_automatic_payment_receipts/migration.sql": "30377945f2a3e9f7af3acef63dcf3df6ce3237aa80acf66dae5de19c64bf6111",
+    "prisma/migrations/20261023050000_receivable_balance_adjustment/migration.sql": "7576dd3b6d7bef160ec348e8c890563dae89797014678b1326638c887e90f902",
+    "prisma/migrations/20261023060000_receiver_payment_notices/migration.sql": "6b0aac052e2ad455aef0a230e02cb9036b728bfed7df12c44a5c3cfd1c6bbdbd",
+    "prisma/migrations/20261024010000_capture_mercadopago_purchase_policy/migration.sql": "166646abdaa37e67228d0133740cb0eb451f9134306faef8e4672e8ce8552978",
+    "prisma/migrations/20261024020000_capture_bank_fallback/migration.sql": "fe792871e3417ac18e0ddf5a9fa264769e49c63c3c298cfe8097b4d4750a0f16",
+    "prisma/migrations/20261025000000_add_money_accounts/migration.sql": "9c6c16b3095279e819a0028ab7ea139aa36cd1c420b1ef00fec66f89aded8eb5",
+    "prisma/migrations/20261025010000_money_account_yields/migration.sql": "187f6827879e60af3a4dac5589b3bd302b1bc9cddb237adaa94a53f9c2304518",
+    "prisma/migrations/20261025020000_automatic_money_yields/migration.sql": "a4d21aab627389c21e9a639dde5348d5222766416166830ea5fd1562bb6bfdc7",
+    "prisma/migrations/20261025030000_payroll_business_days/migration.sql": "244c3f541242990d5137bd45c23f2313d282fb8b40e550670cee37aea3829285",
+    "prisma/migrations/20261026000000_expense_refunds/migration.sql": "ebd2a9695a6a7d3d2aa2e4558b4d466769ad5ec538ed347c659b2e976760bea2",
+    "prisma/migrations/20261026010000_debit_payment_method/migration.sql": "6d6cf09901b68930b6eacc11d6e687869a769f0acdf18b4188a7cedce855721a",
+    "prisma/migrations/20261026020000_capture_account_movements/migration.sql": "dc74a0bf84fa66803575d91b18550765f46c110aabff7d375636d6c6566ed536",
+    "prisma/migrations/20261026030000_card_cycle_dates_confirmation/migration.sql": "dca61abfb6631ba981ccd41707da601baef16d70c0165fc4d6e2a4d01b61ed2c",
+    "prisma/migrations/20261027000000_variable_budget_payment_mix/migration.sql": "8d26f706c6f0ace8ad267dde6c3e5be4fd29c8ec342bc6be04873c66eb97708c",
+    "prisma/migrations/20261027010000_bbva_debit_automation/migration.sql": "69cd66286a1d3a3de86d52eb70a072a0e268cf3957567222a3a00cacb985b028"
+  },
+  "baselineHashesUnchanged": true,
+  "finishedAt": "2026-10-28T06:15:42.506057+00:00",
+  "node": "v22.23.2",
+  "pnpm": "10.33.0",
+  "renamedModules": [
+    {
+      "before": "src/app/api/calendar/google/callback/route.js",
+      "after": "src/app/api/calendar/google/callback/route.ts"
+    },
+    {
+      "before": "src/app/api/calendar/google/connect/route.js",
+      "after": "src/app/api/calendar/google/connect/route.ts"
+    },
+    {
+      "before": "src/app/api/calendar/google/disconnect/route.js",
+      "after": "src/app/api/calendar/google/disconnect/route.ts"
+    },
+    {
+      "before": "src/app/api/calendar/google/route.js",
+      "after": "src/app/api/calendar/google/route.ts"
+    },
+    {
+      "before": "src/app/api/calendar/google/sync/route.js",
+      "after": "src/app/api/calendar/google/sync/route.ts"
+    },
+    {
+      "before": "src/app/api/captures/configuration/route.js",
+      "after": "src/app/api/captures/configuration/route.ts"
+    },
+    {
+      "before": "src/app/api/captures/device/route.js",
+      "after": "src/app/api/captures/device/route.ts"
+    },
+    {
+      "before": "src/app/api/captures/devices/route.js",
+      "after": "src/app/api/captures/devices/route.ts"
+    },
+    {
+      "before": "src/app/api/captures/events/route.js",
+      "after": "src/app/api/captures/events/route.ts"
+    },
+    {
+      "before": "src/app/api/captures/movements/route.js",
+      "after": "src/app/api/captures/movements/route.ts"
+    },
+    {
+      "before": "src/app/api/captures/notices/route.js",
+      "after": "src/app/api/captures/notices/route.ts"
+    },
+    {
+      "before": "src/app/api/captures/pairings/route.js",
+      "after": "src/app/api/captures/pairings/route.ts"
+    },
+    {
+      "before": "src/app/api/captures/payment-receipts/route.js",
+      "after": "src/app/api/captures/payment-receipts/route.ts"
+    },
+    {
+      "before": "src/app/api/captures/reconciliation/route.js",
+      "after": "src/app/api/captures/reconciliation/route.ts"
+    },
+    {
+      "before": "src/app/api/cron/calendar-sync/route.js",
+      "after": "src/app/api/cron/calendar-sync/route.ts"
+    },
+    {
+      "before": "src/app/api/cron/capture-bank-fallback/route.js",
+      "after": "src/app/api/cron/capture-bank-fallback/route.ts"
+    },
+    {
+      "before": "src/lib/androidNotices.js",
+      "after": "src/lib/androidNotices.ts"
+    },
+    {
+      "before": "src/lib/calendar/config.js",
+      "after": "src/lib/calendar/config.ts"
+    },
+    {
+      "before": "src/lib/calendar/events.js",
+      "after": "src/lib/calendar/events.ts"
+    },
+    {
+      "before": "src/lib/calendar/google.js",
+      "after": "src/lib/calendar/google.ts"
+    },
+    {
+      "before": "src/lib/calendar/palette.js",
+      "after": "src/lib/calendar/palette.ts"
+    },
+    {
+      "before": "src/lib/calendar/pending.js",
+      "after": "src/lib/calendar/pending.ts"
+    },
+    {
+      "before": "src/lib/calendar/schedule.js",
+      "after": "src/lib/calendar/schedule.ts"
+    },
+    {
+      "before": "src/lib/calendar/service.js",
+      "after": "src/lib/calendar/service.ts"
+    },
+    {
+      "before": "src/lib/calendar/sync.js",
+      "after": "src/lib/calendar/sync.ts"
+    },
+    {
+      "before": "src/lib/calendar/worker.js",
+      "after": "src/lib/calendar/worker.ts"
+    },
+    {
+      "before": "src/lib/captureApi.js",
+      "after": "src/lib/captureApi.ts"
+    },
+    {
+      "before": "src/lib/captureBankFallback.js",
+      "after": "src/lib/captureBankFallback.ts"
+    },
+    {
+      "before": "src/lib/captureBankFallbackWorker.js",
+      "after": "src/lib/captureBankFallbackWorker.ts"
+    },
+    {
+      "before": "src/lib/captureConfiguration.js",
+      "after": "src/lib/captureConfiguration.ts"
+    },
+    {
+      "before": "src/lib/captureDebitCorrections.js",
+      "after": "src/lib/captureDebitCorrections.ts"
+    },
+    {
+      "before": "src/lib/captureFormatPolicy.js",
+      "after": "src/lib/captureFormatPolicy.ts"
+    },
+    {
+      "before": "src/lib/captureIdentity.js",
+      "after": "src/lib/captureIdentity.ts"
+    },
+    {
+      "before": "src/lib/captureInbox.js",
+      "after": "src/lib/captureInbox.ts"
+    },
+    {
+      "before": "src/lib/captureMoney.js",
+      "after": "src/lib/captureMoney.ts"
+    },
+    {
+      "before": "src/lib/captureMoneyParsers.js",
+      "after": "src/lib/captureMoneyParsers.ts"
+    },
+    {
+      "before": "src/lib/captureParsers.js",
+      "after": "src/lib/captureParsers.ts"
+    },
+    {
+      "before": "src/lib/capturePaymentAutomation.js",
+      "after": "src/lib/capturePaymentAutomation.ts"
+    },
+    {
+      "before": "src/lib/capturePaymentParsers.js",
+      "after": "src/lib/capturePaymentParsers.ts"
+    },
+    {
+      "before": "src/lib/capturePayments.js",
+      "after": "src/lib/capturePayments.ts"
+    },
+    {
+      "before": "src/lib/capturePilot.js",
+      "after": "src/lib/capturePilot.ts"
+    },
+    {
+      "before": "src/lib/capturePresentation.js",
+      "after": "src/lib/capturePresentation.ts"
+    },
+    {
+      "before": "src/lib/captureProcessing.js",
+      "after": "src/lib/captureProcessing.ts"
+    },
+    {
+      "before": "src/lib/captureProtocol.js",
+      "after": "src/lib/captureProtocol.ts"
+    },
+    {
+      "before": "src/lib/captureReconciliation.js",
+      "after": "src/lib/captureReconciliation.ts"
+    },
+    {
+      "before": "src/lib/captureRefundParsers.js",
+      "after": "src/lib/captureRefundParsers.ts"
+    },
+    {
+      "before": "src/lib/captureRefunds.js",
+      "after": "src/lib/captureRefunds.ts"
+    },
+    {
+      "before": "src/lib/captureReview.js",
+      "after": "src/lib/captureReview.ts"
+    },
+    {
+      "before": "src/lib/captureRollout.js",
+      "after": "src/lib/captureRollout.ts"
+    },
+    {
+      "before": "src/lib/captureService.js",
+      "after": "src/lib/captureService.ts"
+    },
+    {
+      "before": "src/lib/captureSourcePolicy.js",
+      "after": "src/lib/captureSourcePolicy.ts"
+    },
+    {
+      "before": "src/lib/offlineExpenses.js",
+      "after": "src/lib/offlineExpenses.ts"
+    },
+    {
+      "before": "src/lib/paymentReceipts.js",
+      "after": "src/lib/paymentReceipts.ts"
+    }
+  ],
+  "addedContractModules": [
+    "src/lib/captureTypes.ts",
+    "src/lib/captureJson.ts",
+    "src/lib/calendar/types.ts",
+    "src/lib/calendar/responses.ts",
+    "src/lib/offlineExpenseContracts.ts",
+    "src/lib/offlineExpenseObserver.ts"
+  ],
+  "finalTests": {
+    "passed": 849,
+    "failed": 0,
+    "skipped": 0,
+    "newNegativeTypeCases": 19
+  },
+  "supplementary": [
+    {
+      "command": "pnpm db:verify",
+      "exitCode": 0,
+      "log": "db-verify.log",
+      "migrations": 42,
+      "rlsTables": 45
+    },
+    {
+      "command": "node artifacts/typescript-migration/phase-0/transfers.cjs",
+      "exitCode": 0,
+      "log": "transfer-reference.log",
+      "identicalResponses": 12
+    },
+    {
+      "command": "node artifacts/typescript-migration/phase-5/compare-contracts.cjs",
+      "exitCode": 0,
+      "log": "compatibility.log",
+      "identicalCaptureFixtures": 19,
+      "identicalCalendarEvents": 9
+    }
+  ],
+  "publicServiceWorkerUnchanged": true,
+  "nativeApplicationUnchanged": true,
+  "sourceSha256": {
+    "src/app/api/calendar/google/callback/route.ts": "91656e4ced4b1d726287115a6169c30acca7e750f718ee52eecaa9c37a4ad8ae",
+    "src/app/api/calendar/google/connect/route.ts": "81b9da63003606274d28e90c32c896e0170dbfb8cb0e21c185e387fa0bbcf03b",
+    "src/app/api/calendar/google/disconnect/route.ts": "05e635143b93f10272cc7b3c2a9b78f8598497a0145c26071dec463958faa66f",
+    "src/app/api/calendar/google/route.ts": "dca1703d112fa6d30423e60243991a396fb69c1f425af303bcdb23e058261627",
+    "src/app/api/calendar/google/sync/route.ts": "2bfa00eaa4dea8bdcdf644ea18eb9ffef23fd92343aefba5eb7c04e0350c3ff4",
+    "src/app/api/captures/configuration/route.ts": "c98f03c9d2f282ff895a367f0aed2d0a7d5781e82c882055038fe96536bc25dc",
+    "src/app/api/captures/device/route.ts": "884bf953192ec3130466a044a2186e6ce449e4dd6157d7e23ee1fc3ab928e059",
+    "src/app/api/captures/devices/route.ts": "487ad2985dcb0ba6f3f531acd00b00c2089b232fb38d3fd9a4d4c0dd9bc59092",
+    "src/app/api/captures/events/route.ts": "f5222d2cd37d5a58e822fb64230b91ff7a0b1d4620c8318a0cf919e150ef1d19",
+    "src/app/api/captures/movements/route.ts": "c3845369c7e6be7ea98e91030ed3894c1294d8a84a3053314f1d0ee911297c4e",
+    "src/app/api/captures/notices/route.ts": "02dd1358040d03095856acec26d439002999249cc958cd6398e7d4e99c01a73e",
+    "src/app/api/captures/pairings/route.ts": "6da510d15af1f3465d61c538bb12e623e15d2aba2070e81ecc8104ec8cc0afde",
+    "src/app/api/captures/payment-receipts/route.ts": "d61db087a3493c5ae6c64e447bac71e269dd996930217cfb1a734873124d8f88",
+    "src/app/api/captures/reconciliation/route.ts": "37b6261cd74bdbea1d43cee0b2645b0c74b3204ed2fae247ef0281a4fc1ea556",
+    "src/app/api/cron/calendar-sync/route.ts": "6d14c4ca6f5e07bf3f9500e8e44d674f346ef94e2d20e3fb6cab0cb4d2ad4482",
+    "src/app/api/cron/capture-bank-fallback/route.ts": "c3d2ac1e2a546bd020ad0203684cc0687bf38f64f9603c34579c5b9bb324e51f",
+    "src/components/gastos/GastosContent.jsx": "d65e991bd940b2e9bc0790596f94c9e768d7e829dde674b10ddab0947a22100b",
+    "src/lib/androidNotices.ts": "58dcd9e787e6df7caf1850f153d4801cdcd1778e01e9a6b6ad5bedb1beb8f3dd",
+    "src/lib/apiAuth.ts": "cc401696d24704e00835b3edd9a9da397d5d62fc2c9e7ead26dd5be7e02c2882",
+    "src/lib/calendar/config.ts": "ba182d4c4ac1160af27bb92ba651e446c68f2bd861d65defaa49bb3a04e8d8c1",
+    "src/lib/calendar/events.ts": "7884701b038a2e2b23a4cadc3a21495b5fd837cd7d2763c1d1ef9536e724ce3d",
+    "src/lib/calendar/google.ts": "35474f61cabaf42c349a9931b2410ce15c6c12e6ca2972656fe4150a6b6a0108",
+    "src/lib/calendar/palette.ts": "2a4f92c0c8296dbdbd21be702eea79a9f570af9202472f0f81ca185ef2239e6e",
+    "src/lib/calendar/pending.ts": "7de10455f97539ef7ba1b14807c85faf051108def5e7ae89938531e979566fb0",
+    "src/lib/calendar/responses.ts": "968f8bdc762007334ca078991a8995a6469d4e3a1e721b84e06eaa2b907f670e",
+    "src/lib/calendar/schedule.ts": "3a91882ff77d9439d47f7e7a10092f3f50252e32c9d7bdc67d181ffa0314d5a9",
+    "src/lib/calendar/service.ts": "58106512d3ab11383642b2c9bc84cfae79e8bca01d42e105896f4cf0a998ca1c",
+    "src/lib/calendar/sync.ts": "2403c6be20869d92b46612aaea6973c47ee8d35b3ba5e7965c86cfc88c44c985",
+    "src/lib/calendar/types.ts": "6b2ed1feb51c2b59801e4152c95d5f89ecc7f78cfed723951e54101589ff2cab",
+    "src/lib/calendar/worker.ts": "85dc78a57c8614dc7e08be68fa3c5e13f800584a1dab29b4267f8d49e59c580f",
+    "src/lib/captureApi.ts": "670df82f218fc52ef8eeb033529581f0ae3970700d5ee18f3e88d26ea67a32f9",
+    "src/lib/captureBankFallback.ts": "529818b5e77ab5feaae4f10666697a7a4a38cc06346fb1709bd1641830139939",
+    "src/lib/captureBankFallbackWorker.ts": "1f008b4241d3a5c7f14fbbe65291d57b9449a1984cb5e088098536cbf7069a8b",
+    "src/lib/captureConfiguration.ts": "235e5dcc2ee5701712450dd5cc3c8067639c4e4c63b953e4edbd102a976943d6",
+    "src/lib/captureDebitCorrections.ts": "ea183adc24658447bb84384aa12b3ee918ef042f6d094486590d0f15ec98d078",
+    "src/lib/captureFormatPolicy.ts": "83e50ae0dfabe87d57d6a8343fd3883c305e573975365bf5d1c7bfa4fb5e138a",
+    "src/lib/captureIdentity.ts": "3e5c01ad34a9b6af84e602fd2d31b08b952300732467af23da992d37a96f21a7",
+    "src/lib/captureInbox.ts": "d674d4e20c4e12fb35b617674e7cfb7e033958e64bf89eaf83a8b0128f088e72",
+    "src/lib/captureJson.ts": "58571e0e409982cb4fe50722aac47dffb3d27f59cf4d47312455aa3b80c972e9",
+    "src/lib/captureMoney.ts": "e1903bf0dc5d957bab7e829f811122df927d35a78138a74fc8f9503a46be1376",
+    "src/lib/captureMoneyParsers.ts": "c695093726de5f954e10f7f380aa0ce530c8cf85b8c99e94b7fe39e000fc2fe0",
+    "src/lib/captureParsers.ts": "6054c99e618a23826ecba6ab42e95a7d56673275aa56c327c617269ccea8d166",
+    "src/lib/capturePaymentAutomation.ts": "af55bf022241e9b5941696dca9db5b43e3fbf48c4d3400825583fc8d737959df",
+    "src/lib/capturePaymentParsers.ts": "1bad9aab0d8a46ede7b0962bdde546321b7929e4185c7fde0e52ba084e67b8f7",
+    "src/lib/capturePayments.ts": "bbaaeebcb8d3a58198706d734fccb49d44a86f447ed3e373f5b37741d6f88b51",
+    "src/lib/capturePilot.ts": "e2281984ee7d6def7cce3ca75ac4e29951d1878d88e7af33e2ffa63831890a91",
+    "src/lib/capturePresentation.ts": "be33709f9dfe844b4e6d04c06e317c23bfc39831d121d2c7ffff14ddf54a5fc5",
+    "src/lib/captureProcessing.ts": "c14c084b6b549cee75408f0578af3419f5c5b61bb18f1e5501a8f177506769b1",
+    "src/lib/captureProtocol.ts": "2193c62c969e4f943c8eb638f8739b6f78230fc20b7967ae58ede0ec6de31e35",
+    "src/lib/captureReconciliation.ts": "7833c0b14fe30c2d0182c2b6b25b953e995043ae1e88f58d7d1a8b2654334a2d",
+    "src/lib/captureRefundParsers.ts": "f1f88dd45a41f378fedb1a4666b5ad51b28e261a3ed6a1a64cf1651b1febe230",
+    "src/lib/captureRefunds.ts": "1d66dfd1182e7a862f1f703a6fcda5e200d93115e3540102bafb7b4e0f7cc2d4",
+    "src/lib/captureReview.ts": "6aeee6d5ffc3503a874548bc930462d902c9f3acce6276b08af5690861fd911a",
+    "src/lib/captureRollout.ts": "fb99005adec33751add6e04ea27179e3f6bcc2f56b57cb4f684456b85349ebb8",
+    "src/lib/captureService.ts": "849a9d8ff8ce7cb0ecc2d7cc9971b6bf83188538c62805fba3bf8d8a41c4b329",
+    "src/lib/captureSourcePolicy.ts": "680aa66c9de68d6c597a75285d6197037606cf7c8dde6665965e8eb45c24c3e6",
+    "src/lib/captureTypes.ts": "13798a857367535cf6a08b475d09acaef7b9bf7a77f8531bdf36d731c3461b13",
+    "src/lib/debtAccountService.ts": "84bf30095bc928892e074b6db876eec597eaf1efe549b69a419b6d2f075510b3",
+    "src/lib/money/service.ts": "307554038679cd5fb38174b95c63cf150fceb01a1eb3bb4ab95526da930b3133",
+    "src/lib/offlineExpenseContracts.ts": "29aa5620bd06878bc94a1fd7f3c3eebea8ea292c0bfa5b2f8db8706111eeb34f",
+    "src/lib/offlineExpenseObserver.ts": "e33929cb4167022d702121c7ae76deb0245581ae488ddd2aaa7c9dc0bc7089c8",
+    "src/lib/offlineExpenses.ts": "0beff3114461b8980a49667963df88b32d2fd85b54e8aec71f1a81d20515a740",
+    "src/lib/paymentReceipts.ts": "113dac6777f596ff7e4c07c0ce112a0491b5a1d18df8105ef273ac1019157d5d"
+  }
+}

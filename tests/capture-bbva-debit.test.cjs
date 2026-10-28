@@ -5,7 +5,7 @@ const { randomUUID, randomBytes } = require('node:crypto');
 const { PrismaClient } = require('@prisma/client');
 const { PrismaPg } = require('@prisma/adapter-pg');
 const { sourceLoader } = require('./helpers/load-source.cjs');
-const { interpretCapture } = sourceLoader()('src/lib/captureParsers.js');
+const { interpretCapture } = sourceLoader()('src/lib/captureParsers.ts');
 const notice = (body, extra = {}) => ({ sourcePackage: 'com.bancomer.mbanking', postedAt: '2026-10-26T04:06:00Z', receivedAt: '2026-10-26T04:07:00Z', fields: { 'android.title': 'BBVA', 'android.text': body, ...extra } });
 test('BBVA: admite las variantes exactas de cuatro y cinco cifras, sin inferir receptor ni moneda', () => {
   for (const suffix of ['0123', '90123']) {
@@ -28,9 +28,9 @@ test('BBVA: regla, efecto financiero, corrección e idempotencia con PostgreSQL'
   const db = new PrismaClient({ adapter: new PrismaPg({ connectionString }) });
   const users = await Promise.all(['owner', 'other'].map(x => db.user.create({ data: { email: `bbva-${x}-${randomUUID()}@example.test` } }))), [user, other] = users;
   const load = sourceLoader({ '@/lib/prisma': { prisma: db }, '@/lib/calendar/schedule': { scheduleCalendarSync() {} }, 'next/server': { NextResponse: { json: (body, opts = {}) => ({ body: JSON.parse(JSON.stringify(body)), status: opts.status || 200 }) } }, '@supabase/supabase-js': { createClient: () => ({ auth: { getUser: async token => ({ data: { user: token === 'owner' ? user : other } }) } }) } });
-  const protocol = load('src/lib/captureProtocol.js'), service = load('src/lib/captureService.js'), processing = load('src/lib/captureProcessing.js');
-  const config = load('src/lib/captureConfiguration.js'), money = load('src/lib/money/service.ts'), sources = load('src/lib/money/sources.ts');
-  const route = load('src/app/api/captures/movements/route.js');
+  const protocol = load('src/lib/captureProtocol.ts'), service = load('src/lib/captureService.ts'), processing = load('src/lib/captureProcessing.ts');
+  const config = load('src/lib/captureConfiguration.ts'), money = load('src/lib/money/service.ts'), sources = load('src/lib/money/sources.ts');
+  const route = load('src/app/api/captures/movements/route.ts');
   const account = (u, name) => db.moneyAccount.create({ data: { userId: u.id, name, kind: 'BANK', openingBalance: 10000, asOf: new Date('2026-10-24'), baseline: {} } });
   const bbva = await account(user, 'Cuenta QA'), destination = await account(user, 'Destino QA'), foreign = await account(other, 'Ajena QA');
   const device = await db.captureDevice.create({ data: { userId: user.id, name: 'QA', approvedAt: new Date(), secretHash: protocol.captureHash(randomBytes(32).toString('hex')) } });

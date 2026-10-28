@@ -5,7 +5,7 @@ const bank = require('./fixtures/captures/banamex-joy-card-charge.es.v1.json');
 const wallet = require('./fixtures/captures/wallet-banamex2-purchase.es.v1.json');
 const additional = require('./fixtures/captures/banamex-card-charge.es.v1.json');
 const firstWallet = require('./fixtures/captures/wallet-banamex-purchase.es.v1.json');
-const { interpretCapture, captureParsers } = sourceLoader()('src/lib/captureParsers.js');
+const { interpretCapture, captureParsers } = sourceLoader()('src/lib/captureParsers.ts');
 const change = (from, to) => {
   const text = bank.event.fields['android.text'].replace(from, to);
   return { ...bank.event, fields: { ...bank.event.fields, 'android.text': text, 'android.bigText': text } };

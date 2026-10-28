@@ -4,7 +4,7 @@ const { sourceLoader } = require('./helpers/load-source.cjs');
 const fixture = require('./fixtures/captures/wallet-didi-purchase.es.v1.json');
 const banamex = require('./fixtures/captures/wallet-banamex-purchase.es.v1.json');
 const santander = require('./fixtures/captures/wallet-santander-purchase.es.v1.json');
-const { interpretCapture, captureParsers } = sourceLoader()('src/lib/captureParsers.js');
+const { interpretCapture, captureParsers } = sourceLoader()('src/lib/captureParsers.ts');
 const body = text => ({ ...fixture.event, fields: { ...fixture.event.fields, 'android.text': text } });
 
 test('Wallet DiDi real: importe y MXN explícitos, comercio, alias bancario y fecha del aviso México separados de operación', () => {

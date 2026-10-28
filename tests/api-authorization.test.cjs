@@ -9,7 +9,7 @@ const routes = fs.readdirSync(path.join(__dirname, "../src/app/api"), { recursiv
   // Captura usa un protocolo propio: inicio público y credencial Capture limitada al teléfono.
   // Todos sus métodos se verifican por separado en capture-api-integration.test.cjs.
   // OAuth valida estado+cookie de un solo uso y cron su secreto; tienen pruebas propias.
-  .filter(file => /route\.[jt]s$/.test(file) && !file.startsWith("captures/") && !["calendar/google/callback/route.js", "cron/calendar-sync/route.js"].includes(file))
+  .filter(file => /route\.[jt]s$/.test(file) && !file.startsWith("captures/") && !["calendar/google/callback/route", "cron/calendar-sync/route"].includes(file.replace(/\.[jt]s$/, "")))
   .map(file => file.replace(/\/route\.[jt]s$/, ""));
 const models = ["moneyAccount", "card", "cardCycle", "dailyExpense", "category", "person", "incomeType", "income",
   "subscription", "subscriptionCharge", "installmentPurchase", "receivableAccount", "payableAccount", "cardCycleCredit", "noticeDismissal", "user", "expenseTombstone"];

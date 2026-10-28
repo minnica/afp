@@ -17,10 +17,49 @@ function fixture() {
     const payload = JSON.parse(options.body);
     requests.push(payload);
     return send(payload);
-  } } }, globals)("src/lib/offlineExpenses.js");
+  } } }, globals)("src/lib/offlineExpenses.ts");
   return { tab, storage, receipts, requests, globals, setSend: fn => { send = fn; } };
 }
 const payload = { concept: "Comida", amount: 10, date: "2026-10-17", categoryId: "category-a", paymentMethod: "CASH" };
+test('IndexedDB v1 anterior: respuesta perdida, cambio de cuenta y dos pestañas conservan recibo y metadatos', async () => {
+  const persisted = require('./fixtures/offline/expenses-v1.json');
+  const f = fixture();
+  await new Promise((resolve, reject) => {
+    const request = f.globals.indexedDB.open(persisted.database, persisted.version);
+    request.onupgradeneeded = () => {
+      const queue = request.result.createObjectStore('expenses', { keyPath: ['userId', 'clientId'] });
+      queue.createIndex('userId', 'userId');
+      request.result.createObjectStore('legacyImports', { keyPath: ['userId', 'clientId'] });
+    };
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => {
+      const db = request.result, tx = db.transaction(['expenses'], 'readwrite');
+      for (const row of persisted.expenses) tx.objectStore('expenses').add(row);
+      tx.oncomplete = () => { db.close(); resolve(); };
+      tx.onabort = () => reject(tx.error);
+    };
+  });
+  const a = f.tab(), b = f.tab();
+  assert.deepEqual((await a.readOfflineExpenses('a'))[0], persisted.expenses[0]);
+  assert.deepEqual((await b.readOfflineExpenses('b'))[0], persisted.expenses[1]);
+  let lose = true;
+  f.setSend(async input => {
+    f.receipts.set(input.operationId, { id: input.operationId });
+    if (lose) { lose = false; throw new TypeError('Respuesta perdida'); }
+    return { ok: true, json: async () => ({ expense: f.receipts.get(input.operationId) }) };
+  });
+  await a.syncOfflineExpenses('a');
+  assert.deepEqual((await b.readOfflineExpenses('a'))[0].payload, persisted.expenses[0].payload);
+  await Promise.all([a.syncOfflineExpenses('a'), b.syncOfflineExpenses('a')]);
+  assert.equal(f.receipts.size, 1);
+  assert.ok(f.requests.every(row => JSON.stringify(row) === JSON.stringify(persisted.expenses[0].payload)));
+  assert.equal((await a.readOfflineExpenses('a')).length, 0);
+  assert.deepEqual((await b.readOfflineExpenses('b'))[0], persisted.expenses[1]);
+  const db = await new Promise(resolve => { const r = f.globals.indexedDB.open(persisted.database); r.onsuccess = () => resolve(r.result); });
+  assert.equal(db.version, 1);
+  assert.deepEqual([...db.objectStoreNames], ['expenses', 'legacyImports']);
+  db.close();
+});
 test("conflicto con captura: decisión explícita conserva UUID, notas y aportación al registrar otra compra", async () => {
   const f = fixture(), queue = f.tab();
   const entry = await queue.addOfflineExpense('a', { ...payload, cashContributionAmount: '2', notes: 'Personal' });
@@ -141,6 +180,8 @@ test("migración concurrente conserva la copia local y no reimporta confirmados"
 test("JSON corrupto, validación y confirmación incompleta nunca eliminan pendientes", async () => {
   const f = fixture(), tab = f.tab();
   const entry = await tab.addOfflineExpense("a", payload);
+  f.setSend(async () => { throw new Error(''); });
+  assert.equal((await tab.syncOfflineExpenses('a')).failedExpenses[0].clientId, entry.clientId);
   for (const response of [
     { ok: true, json: async () => { throw new SyntaxError("Respuesta truncada"); } },
     { ok: false, json: async () => ({ error: "Categoría no válida" }) },

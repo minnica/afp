@@ -35,7 +35,7 @@ test('calendar eventos: captura nativa solicita sincronización después del com
     },
     '@/lib/calendar/schedule': { scheduleCalendarSync: id => { assert.equal(committed, true); scheduled.push(id); } },
   });
-  const { captureRequest } = load('src/lib/captureApi.js');
+  const { captureRequest } = load('src/lib/captureApi.ts');
   const event = { contractVersion: 1, eventId: randomUUID(), sourcePackage: 'com.bancomer.mbanking', notificationKeyHash: 'b'.repeat(64),
     postedAt: '2026-10-21T01:00:00Z', receivedAt: '2026-10-21T01:00:01Z', fields: { 'android.title': 'Prueba', 'android.text': 'Aviso ficticio $12.34' } };
   const request = () => new Request('https://afp.example.test/api/captures/events?userId=other', { method: 'POST',
@@ -51,7 +51,7 @@ test('calendar eventos: consume lotes y cambios concurrentes; termina al quedar 
   let ticks = 0, calls = 0;
   const current = { status: 'CONNECTED', revision: 2, syncedRevision: 1, nextAttemptAt: new Date(0), lastSyncedAt: new Date(100000) };
   const db = { googleCalendarConnection: { findUnique: async () => current } };
-  const { runCalendarSync } = sourceLoader({ '@/lib/prisma': { prisma: db } })('src/lib/calendar/worker.js');
+  const { runCalendarSync } = sourceLoader({ '@/lib/prisma': { prisma: db } })('src/lib/calendar/worker.ts');
   const result = await runCalendarSync('owner', { db, clock: () => ticks, wait: async ms => { ticks += ms; }, sync: async (_id, options) => {
     assert.ok(options.budgetMs <= 210000); calls++;
     if (calls === 1) { current.nextAttemptAt = new Date(10000); return { status: 'PENDING' }; }
@@ -63,7 +63,7 @@ test('calendar eventos: consume lotes y cambios concurrentes; termina al quedar 
 
 test('calendar eventos: no mantiene temporizadores ante errores, bloqueos, cuotas o agotamiento de tiempo', async () => {
   const db = { googleCalendarConnection: { findUnique: async () => ({ nextAttemptAt: new Date(600000) }) } };
-  const { runCalendarSync } = sourceLoader({ '@/lib/prisma': { prisma: db } })('src/lib/calendar/worker.js');
+  const { runCalendarSync } = sourceLoader({ '@/lib/prisma': { prisma: db } })('src/lib/calendar/worker.ts');
   const noWait = async () => { throw new Error('No debe esperar'); };
   for (const status of ['ERROR', 'BUSY', 'SKIPPED', 'UNCONFIGURED', 'DISCONNECTED']) {
     let calls = 0;

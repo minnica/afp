@@ -3,8 +3,8 @@ const { test } = require('node:test');
 const { sourceLoader } = require('./helpers/load-source.cjs');
 const fixture = require('./fixtures/captures/nu-card-payment.es.v1.json');
 const load = sourceLoader();
-const { interpretCapture } = load('src/lib/captureParsers.js');
-const { paymentStatementPeriod } = load('src/lib/capturePaymentParsers.js');
+const { interpretCapture } = load('src/lib/captureParsers.ts');
+const { paymentStatementPeriod } = load('src/lib/capturePaymentParsers.ts');
 
 test('pago Nu real anonimizado: identifica recepción, conserva ausencias y usa fecha propuesta explícita', () => {
   const p = interpretCapture(fixture.event);

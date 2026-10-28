@@ -1,0 +1,29 @@
+{
+  "database": "afp-offline-expenses",
+  "version": 1,
+  "expenses": [
+    {
+      "userId": "a",
+      "clientId": "9a97f474-9dd6-4d4b-a4ee-79054a54d235",
+      "createdAt": "2026-10-27T12:00:00.000Z",
+      "lastError": "Respuesta perdida",
+      "lastStatus": null,
+      "historicalMetadata": { "keep": true },
+      "payload": {
+        "date": "2026-10-27", "concept": "Compra ficticia anterior", "amount": "42.25",
+        "paymentMethod": "CASH", "categoryId": "category-a", "notes": "Nota anterior",
+        "cashContributionAmount": "2.25", "operationId": "9a97f474-9dd6-4d4b-a4ee-79054a54d235"
+      }
+    },
+    {
+      "userId": "b",
+      "clientId": "a9d19df0-65b7-472d-af9a-ec5965f1c936",
+      "createdAt": "2026-10-27T11:00:00.000Z",
+      "payload": {
+        "date": "2026-10-27", "concept": "Otra cuenta ficticia", "amount": 8.9,
+        "paymentMethod": "CASH", "categoryId": "category-b",
+        "operationId": "a9d19df0-65b7-472d-af9a-ec5965f1c936"
+      }
+    }
+  ]
+}

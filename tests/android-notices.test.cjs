@@ -49,7 +49,7 @@ function fixture() {
 test("avisos Android: mismo pago y saldo del Dashboard, sin exponer registros financieros", async () => {
   const { load, request, rows, card } = fixture();
   rows.card.push({ ...card, id: "other", userId: "b", name: "Tarjeta ajena" });
-  const native = await load("src/app/api/captures/notices/route.js").GET(request());
+  const native = await load("src/app/api/captures/notices/route.ts").GET(request());
   const dashboard = await load("src/app/api/dashboard/route.ts").GET({
     url: "http://localhost/api/dashboard?clientDate=2026-10-26", headers: new Headers({ authorization: "Bearer test" }),
   });
@@ -68,7 +68,7 @@ test("avisos Android: mismo pago y saldo del Dashboard, sin exponer registros fi
 
 test("avisos Android: oculta por mes, retira liquidaciones y vuelve a avisar si cambia el saldo", async () => {
   const { load, db, rows, cycle } = fixture();
-  const { loadAndroidNotices } = load("src/lib/androidNotices.js");
+  const { loadAndroidNotices } = load("src/lib/androidNotices.ts");
   const initial = await loadAndroidNotices(db, "a", today);
   const noticeKey = load("src/lib/noticeDismissals.ts").getNoticeKey({ type: "CARD_PAYMENT", id: "card-october", date: cycle.dueDate, amount: 900 });
   rows.noticeDismissal.push({ userId: "a", month: "2026-10", noticeKey });
@@ -83,7 +83,7 @@ test("avisos Android: oculta por mes, retira liquidaciones y vuelve a avisar si 
 
 test("avisos Android: identidad estable entre consultas, cambia al vencer y al mes siguiente", async () => {
   const { load, db, cycle } = fixture();
-  const { loadAndroidNotices } = load("src/lib/androidNotices.js");
+  const { loadAndroidNotices } = load("src/lib/androidNotices.ts");
   cycle.dueDate = "2026-10-28T12:00:00Z";
   const key = async date => (await loadAndroidNotices(db, "a", new Date(`${date}T12:00:00Z`)))[0].key;
   assert.equal(await key("2026-10-26"), await key("2026-10-26"));
@@ -104,7 +104,7 @@ test("avisos Android: cálculo sin estado conserva las bonificaciones documentad
   db.cardCycle.findMany = async ({ include }) => [{ ...cycle, credits: [{ ...credit,
     ...(include.credits?.select?.income ? { income } : {}),
   }] }];
-  const notices = await load("src/lib/androidNotices.js").loadAndroidNotices(db, "a", today);
+  const notices = await load("src/lib/androidNotices.ts").loadAndroidNotices(db, "a", today);
   assert.match(notices.find(notice => notice.title.startsWith("Pago de tarjeta")).body, /800\.00/);
 });
 
@@ -117,7 +117,7 @@ test("avisos Android: suscripciones, cobros y cortes conservan destino y reglas 
     expectedChargeDays: [26], originDate: "2026-10-01", incomes: [], status: "ACTIVE", person: { name: "Persona" } });
   rows.cardCycle.push({ ...cycle, id: "next", month: 11, startDate: "2026-10-11", cutDate: "2026-10-28", dueDate: "2026-11-15",
     statementAmount: null, paidAmount: 0, cardId: card.id });
-  const service = load("src/lib/androidNotices.js");
+  const service = load("src/lib/androidNotices.ts");
   const notices = await service.loadAndroidNotices(db, "a", today);
   assert.deepEqual(Array.from(notices.map(notice => notice.path)).sort(), ["/gastos", "/ingresos", "/tarjetas"]);
   rows.subscription[0].charges.push({ month: "2026-10", status: "SKIPPED" });
@@ -126,7 +126,7 @@ test("avisos Android: suscripciones, cobros y cortes conservan destino y reglas 
 
 test("avisos Android: fecha local de México, cambio de mes y zonas inválidas", () => {
   const { load } = fixture();
-  const { noticeLocalDate } = load("src/lib/androidNotices.js");
+  const { noticeLocalDate } = load("src/lib/androidNotices.ts");
   assert.equal(noticeLocalDate("America/Mexico_City", new Date("2026-11-01T05:59:00Z")).getMonth(), 9);
   assert.equal(noticeLocalDate("America/Mexico_City", new Date("2026-11-01T06:00:00Z")).getMonth(), 10);
   assert.throws(() => noticeLocalDate("not-a-zone"), error => error.status === 400);
@@ -143,7 +143,7 @@ test("cuentas por pagar: Dashboard y Android comparten saldo, fecha, aislamiento
     url: "http://localhost/api/dashboard?clientDate=2026-10-26&userId=b", headers: new Headers({ authorization: "Bearer test" }),
   });
   const web = await dashboard();
-  const native = await load("src/app/api/captures/notices/route.js").GET(request());
+  const native = await load("src/app/api/captures/notices/route.ts").GET(request());
   assert.equal(web.status, 200);
   assert.equal(native.status, 200);
   assert.equal(web.body.importantNotices.length, 1);
@@ -161,16 +161,16 @@ test("cuentas por pagar: Dashboard y Android comparten saldo, fecha, aislamiento
 
   const { getNoticeKey } = load("src/lib/noticeDismissals.ts");
   rows.noticeDismissal.push({ userId: "a", month: "2026-10", noticeKey: getNoticeKey(notice) });
-  assert.equal((await load("src/lib/androidNotices.js").loadAndroidNotices(db, "a", today)).length, 0);
+  assert.equal((await load("src/lib/androidNotices.ts").loadAndroidNotices(db, "a", today)).length, 0);
   assert.equal((await dashboard()).body.importantNotices.length, 1, "Dashboard conserva los avisos para particionar en el cliente");
   rows.noticeDismissal.length = 0;
   payable.dailyExpenses.push({ amount: 700 });
   assert.equal((await dashboard()).body.importantNotices.length, 0);
-  assert.equal((await load("src/lib/androidNotices.js").loadAndroidNotices(db, "a", today)).length, 0);
+  assert.equal((await load("src/lib/androidNotices.ts").loadAndroidNotices(db, "a", today)).length, 0);
   payable.dailyExpenses.pop();
   payable.status = "CANCELLED";
   assert.equal((await dashboard()).body.importantNotices.length, 0);
-  assert.equal((await load("src/lib/androidNotices.js").loadAndroidNotices(db, "a", today)).length, 0);
+  assert.equal((await load("src/lib/androidNotices.ts").loadAndroidNotices(db, "a", today)).length, 0);
 });
 
 test("avisos Android: credencial, pausa y revocación se comprueban antes de leer finanzas", async () => {
@@ -180,7 +180,7 @@ test("avisos Android: credencial, pausa y revocación se comprueban antes de lee
     if (state === "paused") device.pausedAt = today;
     if (state === "revoked") device.revokedAt = today;
     if (state === "pending") device.userId = null;
-    const response = await load("src/app/api/captures/notices/route.js").GET(request());
+    const response = await load("src/app/api/captures/notices/route.ts").GET(request());
     assert.equal(response.status, ["invalid", "revoked"].includes(state) ? 401 : 403);
     assert.equal(calls.length, 0);
   }
@@ -189,7 +189,7 @@ test("avisos Android: credencial, pausa y revocación se comprueban antes de lee
 test("avisos Android: un fallo de lectura nunca se presenta como una lista vacía válida", async () => {
   const { load, request, db } = fixture();
   db.noticeDismissal.findMany = async () => { throw new Error("storage unavailable"); };
-  const response = await load("src/app/api/captures/notices/route.js").GET(request());
+  const response = await load("src/app/api/captures/notices/route.ts").GET(request());
   assert.equal(response.status, 500);
   assert.equal(response.body.notices, undefined);
 });
@@ -200,12 +200,12 @@ test("avisos Android: zona inválida y límite de consultas no consultan registr
   const url = new URL(request.url);
   url.searchParams.set("timeZone", "invalid-zone");
   request.url = url.href;
-  assert.equal((await invalidZone.load("src/app/api/captures/notices/route.js").GET(request)).status, 400);
+  assert.equal((await invalidZone.load("src/app/api/captures/notices/route.ts").GET(request)).status, 400);
   assert.equal(invalidZone.calls.length, 0);
   const limited = fixture();
   limited.db.$queryRaw = async sql => sql.join("").includes("INSERT INTO capture_rate_limits")
     ? [{ count: 31, expiresAt: new Date(today.getTime() + 60_000) }] : [{ id: limited.device.id }];
-  const response = await limited.load("src/app/api/captures/notices/route.js").GET(limited.request());
+  const response = await limited.load("src/app/api/captures/notices/route.ts").GET(limited.request());
   assert.equal(response.status, 429);
   assert.equal(response.headers.get("retry-after"), "60");
   assert.equal(limited.calls.length, 0);

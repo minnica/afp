@@ -26,7 +26,7 @@ test('pagos Banamex/Mercado Pago: API real, reglas, saldos, aislamiento, concurr
      'next/server':{NextResponse:{json:(body,options={})=>({body:JSON.parse(JSON.stringify(body)),status:options.status||200,headers:new Headers(options.headers)})}},
      '@supabase/supabase-js':{createClient:()=>({auth:{getUser:async token=>({data:{user:token==='owner'?user:token==='other'?other:null}})}})},
     });
-    const protocol=load('src/lib/captureProtocol.js');
+    const protocol=load('src/lib/captureProtocol.ts');
     const card = await db.card.create({data:{userId:user.id,name:'Banamex ficticia',usualCutDay:10,usualDueDay:30}});
     const mercado = await db.card.create({data:{userId:user.id,name:'Mercado ficticia',usualCutDay:10,usualDueDay:30}});
     const sibling = await db.card.create({data:{userId:user.id,name:'Segunda tarjeta',usualCutDay:10,usualDueDay:30}});
@@ -41,7 +41,7 @@ test('pagos Banamex/Mercado Pago: API real, reglas, saldos, aislamiento, concurr
     const secret=randomBytes(32).toString('base64url');
     const device=await db.captureDevice.create({data:{userId:user.id,approvedAt:new Date(),secretHash:protocol.captureHash(secret),name:'Teléfono ficticio'}});
     const auth=`Capture ${device.id}.${secret}`;
-    const routes={events:load('src/app/api/captures/events/route.js'),cycles:load('src/app/api/card-cycles/route.ts'),cards:load('src/app/api/cards/route.ts'),movements:load('src/app/api/captures/movements/route.js')};
+    const routes={events:load('src/app/api/captures/events/route.ts'),cycles:load('src/app/api/card-cycles/route.ts'),cards:load('src/app/api/cards/route.ts'),movements:load('src/app/api/captures/movements/route.ts')};
     const event=(kind='bank',replacements=[])=>({...fixtures[kind],contractVersion:1,eventId:randomUUID(),notificationKeyHash:protocol.captureHash(randomUUID()),fields:Object.fromEntries(Object.entries(fixtures[kind].fields).map(([k,v])=>[k,replacements.reduce((text,[a,b])=>text.replaceAll(a,b),v)]))});
     const post=(input,authorization=auth)=>routes.events.POST(new Request('http://localhost/api/captures/events',{method:'POST',headers:{authorization,'Content-Type':'application/json'},body:JSON.stringify(input)}));
     const movement=async(input,deviceId=device.id)=>(await db.captureEvent.findUnique({where:{deviceId_eventId:{deviceId,eventId:input.eventId}},include:{movement:true}})).movement;
@@ -77,7 +77,7 @@ test('pagos Banamex/Mercado Pago: API real, reglas, saldos, aislamiento, concurr
    assert.equal(balances.find(r=>r.id===card.id).usedBalance,'876.55');assert.equal(balances.find(r=>r.id===mercado.id).usedBalance,'932.11');
    assert.equal(await db.dailyExpense.count({where:{userId:user.id}}),0);assert.equal(await db.income.count({where:{userId:user.id}}),0);
    assert.ok(syncs.length>=2&&syncs.every(id=>id===user.id));
-   const config=await load('src/lib/captureConfiguration.js').captureConfiguration(db,user.id);
+   const config=await load('src/lib/captureConfiguration.ts').captureConfiguration(db,user.id);
    assert.ok(config.paymentPolicies.some(p=>p.source==='BANAMEX_NOTICE'));assert.ok(!config.parsers.some(p=>p.key==='banamex.card-payment.es.v1'));
   });
   await scenario('sin regla, en observación o sin aceptación: conserva el aviso sin sumar dinero',async c=>{
@@ -85,8 +85,8 @@ test('pagos Banamex/Mercado Pago: API real, reglas, saldos, aislamiento, concurr
    assert.equal((await c.send(c.event())).reason,'PAYMENT_POLICY_REQUIRED');
    await c.db.capturePaymentPolicy.update({where:{id:c.policies[1].id},data:{mode:'OBSERVATION',acceptedAt:null}});
    assert.equal((await c.send(c.event('mercado'))).reason,'PAYMENT_POLICY_REQUIRED');assert.equal(await c.count(),0);
-   await assert.rejects(c.load('src/lib/captureConfiguration.js').configureCapture(c.db,c.user.id,{action:'paymentAutomation',id:c.policies[1].id,mode:'AUTOMATIC'}),e=>e.status===409);
-   await assert.rejects(c.load('src/lib/captureConfiguration.js').configureCapture(c.db,c.user.id,{action:'automation',cardId:c.card.id,parserKey:'banamex.card-payment.es.v1',mode:'AUTOMATIC'}),e=>e.status===409);
+   await assert.rejects(c.load('src/lib/captureConfiguration.ts').configureCapture(c.db,c.user.id,{action:'paymentAutomation',id:c.policies[1].id,mode:'AUTOMATIC'}),e=>e.status===409);
+   await assert.rejects(c.load('src/lib/captureConfiguration.ts').configureCapture(c.db,c.user.id,{action:'automation',cardId:c.card.id,parserKey:'banamex.card-payment.es.v1',mode:'AUTOMATIC'}),e=>e.status===409);
   });
   await scenario('Banamex: alias ausente, sin verificar o compartido entre tarjetas impide elegir por importe',async c=>{
    await c.db.captureCardAlias.update({where:{id:c.alias.id},data:{verifiedAt:null}});
@@ -140,13 +140,13 @@ test('pagos Banamex/Mercado Pago: API real, reglas, saldos, aislamiento, concurr
    await c.db.capturePaymentPolicy.create({data:{userId:c.user.id,cardId:c.card.id,source:'BBVA_RECEIPT',destinationLast4:'0009',mode:'AUTOMATIC',acceptedAt:new Date()}});
    const text=require('./fixtures/captures/bbva-payment-receipt.es.v1.json').text;
    const input={...c.event(),sourcePackage:'com.garatachia.afp.paymentreceipts',fields:{'receipt.text':text,'receipt.contentHash':c.protocol.captureHash(text),'receipt.mimeType':'image/png'}};
-   const result=await c.load('src/lib/captureService.js').receiveCaptureEvent(c.db,{id:c.device.id,secretHash:c.device.secretHash},input);
+   const result=await c.load('src/lib/captureService.ts').receiveCaptureEvent(c.db,{id:c.device.id,secretHash:c.device.secretHash},input);
    const row=await c.db.captureEvent.findUnique({where:{id:result.event.id},include:{movement:true}});
    assert.equal(row.movement.reason,'PAYMENT_POSSIBLE_DUPLICATE');assert.equal(await c.count(),1);
   });
   await scenario('revertir conserva recibo; reenvío y aviso equivalente no vuelven a aplicar el abono',async c=>{
    const input=c.event(),m=await c.send(input);
-   await c.load('src/lib/captureProcessing.js').resolveCaptureMovement(c.db,c.user.id,{id:m.id,action:'reversePayment'});
+   await c.load('src/lib/captureProcessing.ts').resolveCaptureMovement(c.db,c.user.id,{id:m.id,action:'reversePayment'});
    assert.equal(Number((await c.readCycle()).paidAmount),0);
    await c.post(input);assert.equal(Number((await c.readCycle()).paidAmount),0);
    assert.equal((await c.send(c.event())).reason,'PAYMENT_POSSIBLE_DUPLICATE');assert.equal(Number((await c.readCycle()).paidAmount),0);
@@ -160,19 +160,19 @@ test('pagos Banamex/Mercado Pago: API real, reglas, saldos, aislamiento, concurr
    const m=await c.send(c.event());
    const wrong=await c.routes.movements.PATCH(new Request('http://localhost/api/captures/movements',{method:'PATCH',headers:{authorization:'Bearer other','Content-Type':'application/json'},body:JSON.stringify({id:m.id,action:'reversePayment'})}));
    assert.equal(wrong.status,404);assert.equal((await c.readCycle()).status,'PAID');
-   await assert.rejects(c.load('src/lib/captureConfiguration.js').configureCapture(c.db,c.other.id,{action:'paymentAutomation',id:c.policies[0].id,mode:'OBSERVATION'}),e=>e.status===404);
+   await assert.rejects(c.load('src/lib/captureConfiguration.ts').configureCapture(c.db,c.other.id,{action:'paymentAutomation',id:c.policies[0].id,mode:'OBSERVATION'}),e=>e.status===404);
   });
   await scenario('fallo después de crear el abono revierte evento, recibo y total en PostgreSQL',async c=>{
    const broken={$transaction:op=>c.db.$transaction(tx=>op(new Proxy(tx,{get(target,key){if(key==='cardCycle')return new Proxy(target.cardCycle,{get(model,method){if(method==='update')return async()=>{throw Error('Fallo de persistencia simulado')};return model[method]}});return target[key]}})))};
-   await assert.rejects(c.load('src/lib/captureService.js').receiveCaptureEvent(broken,{id:c.device.id,secretHash:c.device.secretHash},c.event()),/Fallo de persistencia simulado/);
+   await assert.rejects(c.load('src/lib/captureService.ts').receiveCaptureEvent(broken,{id:c.device.id,secretHash:c.device.secretHash},c.event()),/Fallo de persistencia simulado/);
    assert.equal(await c.count(),0);assert.equal(await c.db.captureEvent.count({where:{userId:c.user.id}}),0);assert.equal((await c.readCycle()).paidAmount,null);
   });
   await scenario('activar no reprocesa antiguos; reinterpretar conserva historia y tampoco registra dinero',async c=>{
    await c.db.capturePaymentPolicy.update({where:{id:c.policies[0].id},data:{mode:'OBSERVATION'}});
    const input=c.event(),m=await c.send(input);
-   await c.load('src/lib/captureConfiguration.js').configureCapture(c.db,c.user.id,{action:'paymentAutomation',id:c.policies[0].id,mode:'AUTOMATIC'});
+   await c.load('src/lib/captureConfiguration.ts').configureCapture(c.db,c.user.id,{action:'paymentAutomation',id:c.policies[0].id,mode:'AUTOMATIC'});
    await c.post(input);assert.equal(await c.count(),0);
-   const interpreted=await c.load('src/lib/captureProcessing.js').resolveCaptureMovement(c.db,c.user.id,{id:m.id,action:'reinterpret'});
+   const interpreted=await c.load('src/lib/captureProcessing.ts').resolveCaptureMovement(c.db,c.user.id,{id:m.id,action:'reinterpret'});
    assert.equal(interpreted.reason,'PAYMENT_REVIEW');assert.equal(interpreted.analysisHistory.length,1);assert.equal(await c.count(),0);
    assert.equal((await c.send(c.event())).reason,'PAYMENT_AUTOMATIC');assert.equal(await c.count(),1);
   });

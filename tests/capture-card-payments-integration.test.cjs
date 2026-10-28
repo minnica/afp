@@ -11,9 +11,9 @@ test('pagos capturados: recepción, revisión y acumulados transaccionales con P
   const url = new URL(connectionString);
   assert.ok(['127.0.0.1', 'localhost'].includes(url.hostname) && /^\/afp_test\w*$/.test(url.pathname) && !url.search);
   const db = new PrismaClient({ adapter: new PrismaPg({ connectionString }) });
-  const load = sourceLoader(), protocol = load('src/lib/captureProtocol.js');
-  const service = load('src/lib/captureService.js'), processing = load('src/lib/captureProcessing.js');
-  const payments = load('src/lib/capturePayments.js'), balances = load('src/lib/cardBalanceTracking.ts');
+  const load = sourceLoader(), protocol = load('src/lib/captureProtocol.ts');
+  const service = load('src/lib/captureService.ts'), processing = load('src/lib/captureProcessing.ts');
+  const payments = load('src/lib/capturePayments.ts'), balances = load('src/lib/cardBalanceTracking.ts');
   const user = await db.user.create({ data: { email: `payment-${randomUUID()}@example.test` } });
   const other = await db.user.create({ data: { email: `payment-other-${randomUUID()}@example.test` } });
   const card = await db.card.create({ data: { userId: user.id, name: 'Nu ficticia', usualCutDay: 10, usualDueDay: 25,

@@ -2,12 +2,12 @@ const assert = require('node:assert/strict');
 const { test } = require('node:test');
 const { sourceLoader } = require('./helpers/load-source.cjs');
 const load = sourceLoader();
-const { CALENDAR_EVENT_PALETTE: palette, calendarEventLabel, calendarLabelProperties, ensureCalendarPalette } = load('src/lib/calendar/palette.js');
+const { CALENDAR_EVENT_PALETTE: palette, calendarEventLabel, calendarLabelProperties, ensureCalendarPalette } = load('src/lib/calendar/palette.ts');
 const plain = value => JSON.parse(JSON.stringify(value));
 const custom = { id: '11111111-2222-4333-8444-555555555555', name: 'Personal', backgroundColor: '#663399' };
 
 test('calendar palette: fechas de México separan vencidos, cobros de hoy y suscripciones futuras sin cambiar sus textos', () => {
-  const { buildCalendarEvents } = load('src/lib/calendar/events.js');
+  const { buildCalendarEvents } = load('src/lib/calendar/events.ts');
   const data = { cards:[], cycles:[], payables:[], receivables:[{ id:'r', originalAmount:1000, originDate:'2026-10-01',
     expectedMonthlyPayment:100, expectedChargeDays:[25,26,27], concept:'Reembolso', incomes:[], status:'ACTIVE' }],
     subscriptions:[25,28].map(chargeDay => ({ id:`s-${chargeDay}`, name:'Servicio', amount:99, chargeDay,
@@ -105,7 +105,7 @@ test('calendar client: envía If-Match conservando autorización y codificación
   const google = sourceLoader({}, { process: { env }, URLSearchParams, AbortSignal, fetch: async (url, options) => {
     requests.push({ url, options });
     return new Response(JSON.stringify(url.includes('oauth2') ? { access_token: 'test-access' } : {}), { status: 200 });
-  } })('src/lib/calendar/google.js');
+  } })('src/lib/calendar/google.ts');
   const client = await google.calendarClient('test-refresh');
   await client.request('calendars/afp', 'PATCH', { labelProperties: {} }, { 'If-Match': '"revision"' });
   assert.equal(requests[1].options.headers['If-Match'], '"revision"');

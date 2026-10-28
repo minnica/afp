@@ -3,7 +3,7 @@ const { test } = require('node:test');
 const { sourceLoader } = require('./helpers/load-source.cjs');
 const bank = require('./fixtures/captures/santander-card-purchase.es.v1.json');
 const wallet = require('./fixtures/captures/wallet-santander-purchase.es.v1.json');
-const { interpretCapture, captureParsers } = sourceLoader()('src/lib/captureParsers.js');
+const { interpretCapture, captureParsers } = sourceLoader()('src/lib/captureParsers.ts');
 const changeBank = (from, to) => ({ ...bank.event, fields: Object.fromEntries(Object.entries(bank.event.fields).map(([key, value]) => [key, value.replaceAll(from, to)])) });
 
 test('Santander real: compra MXN con fecha bancaria México, comercio y terminación física/digital', () => {

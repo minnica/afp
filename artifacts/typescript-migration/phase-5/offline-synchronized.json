@@ -1,0 +1,71 @@
+{
+  "database": {
+    "stores": [
+      "expenses",
+      "legacyImports"
+    ],
+    "version": 1
+  },
+  "legacy": {
+    "confirmations": [
+      {
+        "alreadyConfirmed": false,
+        "clientId": "86de16b1-6d43-411c-9460-f2f31b96fd43"
+      }
+    ],
+    "failedExpenses": [],
+    "syncedExpenses": [
+      {
+        "concept": "legado",
+        "id": "86de16b1-6d43-411c-9460-f2f31b96fd43"
+      }
+    ]
+  },
+  "legacySourceRetained": true,
+  "other": [
+    {
+      "clientId": "e1939873-a795-4f3a-88cc-c57712be53f4",
+      "createdAt": "2026-10-28T06:04:42.797Z",
+      "payload": {
+        "amount": "8.90",
+        "concept": "otra cuenta",
+        "operationId": "e1939873-a795-4f3a-88cc-c57712be53f4"
+      },
+      "userId": "phase5-other"
+    }
+  ],
+  "queue": [],
+  "result": {
+    "confirmations": [
+      {
+        "alreadyConfirmed": false,
+        "clientId": "af45dbf9-1282-489e-b640-2d41a6a878fd"
+      }
+    ],
+    "failedExpenses": [],
+    "syncedExpenses": [
+      {
+        "concept": "perdida",
+        "id": "af45dbf9-1282-489e-b640-2d41a6a878fd"
+      }
+    ]
+  },
+  "state": {
+    "held": 0,
+    "receipts": [
+      {
+        "concept": "perdida",
+        "id": "af45dbf9-1282-489e-b640-2d41a6a878fd"
+      },
+      {
+        "concept": "legado",
+        "id": "86de16b1-6d43-411c-9460-f2f31b96fd43"
+      }
+    ],
+    "requests": [
+      "af45dbf9-1282-489e-b640-2d41a6a878fd",
+      "af45dbf9-1282-489e-b640-2d41a6a878fd",
+      "86de16b1-6d43-411c-9460-f2f31b96fd43"
+    ]
+  }
+}

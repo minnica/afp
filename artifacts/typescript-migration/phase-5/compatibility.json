@@ -1,0 +1,843 @@
+{
+  "baseCommit": "4731c766291a77936843c0c1c5f56db77abc3d77",
+  "captures": [
+    {
+      "fixture": "banamex-card-charge.es.v1.json",
+      "interpretation": {
+        "parserKey": "banamex.card-charge.es.v1",
+        "verified": false,
+        "reason": "INCOMPLETE_FORMAT",
+        "proposal": {
+          "operationAt": "2026-10-21T02:28:47.000Z",
+          "date": "2026-10-20",
+          "timeZone": "America/Mexico_City",
+          "dateSource": "BANK_OPERATION",
+          "amount": "123.45",
+          "merchant": "COMERCIO FICTICIO CIUDAD",
+          "movementType": "CARD_CHARGE",
+          "printedAlias": {
+            "value": "123",
+            "digits": 3
+          },
+          "aliasSourcePackage": "com.citibanamex.banamexmobile",
+          "bankAuthorization": "999111",
+          "missingFields": [
+            "currency",
+            "purchaseType"
+          ],
+          "evidenceOnly": true
+        }
+      }
+    },
+    {
+      "fixture": "banamex-card-payment.es.v1.json",
+      "interpretation": {
+        "parserKey": "banamex.card-payment.es.v1",
+        "verified": true,
+        "proposal": {
+          "movementType": "CARD_PAYMENT",
+          "merchant": "Pago de tarjeta Banamex",
+          "operationAt": "2026-10-23T06:10:00.000Z",
+          "date": "2026-10-23",
+          "timeZone": "America/Mexico_City",
+          "amount": "123.45",
+          "dateSource": "BANK_OPERATION",
+          "printedAlias": {
+            "value": "123",
+            "digits": 3
+          },
+          "aliasSourcePackage": "com.citibanamex.banamexmobile",
+          "bankReference": "001234",
+          "bankAuthorization": "654321",
+          "paymentEvidence": "RECEIVER_ACKNOWLEDGEMENT",
+          "missingFields": [
+            "currency",
+            "statementPeriod"
+          ]
+        },
+        "reason": "PAYMENT_REVIEW"
+      }
+    },
+    {
+      "fixture": "banamex-joy-card-charge.es.v1.json",
+      "interpretation": {
+        "parserKey": "banamex.joy-card-charge.es.v1",
+        "verified": false,
+        "reason": "INCOMPLETE_FORMAT",
+        "proposal": {
+          "operationAt": "2026-10-20T22:21:22.000Z",
+          "date": "2026-10-20",
+          "timeZone": "America/Mexico_City",
+          "dateSource": "BANK_OPERATION",
+          "amount": "123.45",
+          "merchant": "COMERCIO FICTICIO     CIUDAD",
+          "movementType": "CARD_CHARGE",
+          "printedAlias": {
+            "value": "456",
+            "digits": 3
+          },
+          "aliasSourcePackage": "com.citibanamex.banamexmobile",
+          "bankAuthorization": "999222",
+          "missingFields": [
+            "currency",
+            "purchaseType"
+          ],
+          "evidenceOnly": true
+        }
+      }
+    },
+    {
+      "fixture": "banamex-purchase-cancellation.es.v1.json",
+      "interpretation": {
+        "parserKey": "banamex.purchase-cancellation.es.v1",
+        "verified": true,
+        "proposal": {
+          "movementType": "REFUND",
+          "refundKind": "CANCELLATION",
+          "operationAt": "2026-10-24T18:00:00.000Z",
+          "date": "2026-10-24",
+          "timeZone": "America/Mexico_City",
+          "dateSource": "BANK_OPERATION",
+          "amount": "123.45",
+          "merchant": "COMERCIO FICTICIO",
+          "printedAlias": {
+            "value": "123",
+            "digits": 3
+          },
+          "aliasSourcePackage": "com.citibanamex.banamexmobile",
+          "missingFields": [
+            "currency"
+          ]
+        },
+        "reason": "REFUND_REVIEW"
+      }
+    },
+    {
+      "fixture": "bbva-debit-card-charge.es.v1.json",
+      "interpretation": {
+        "parserKey": "bbva.debit-card-charge.es.v1",
+        "verified": false,
+        "proposal": {
+          "movementType": "ACCOUNT_DEBIT",
+          "merchant": "Cargo con débito BBVA",
+          "amount": "67.89",
+          "date": "2026-10-23",
+          "notificationAt": "2026-10-23T06:11:00.000Z",
+          "dateSource": "NOTIFICATION_POSTED_AT",
+          "timeZone": "America/Mexico_City",
+          "sourceMerchant": "MERPAGO*TARJETADE",
+          "paymentEvidence": "SOURCE_DEBIT_ONLY",
+          "missingFields": [
+            "destination",
+            "card",
+            "currency",
+            "statementPeriod",
+            "operationDate"
+          ]
+        },
+        "reason": "ACCOUNT_DEBIT_REVIEW"
+      }
+    },
+    {
+      "fixture": "mercadopago-card-payment.es.v1.json",
+      "interpretation": {
+        "parserKey": "mercadopago.card-payment.es.v1",
+        "verified": true,
+        "proposal": {
+          "movementType": "CARD_PAYMENT",
+          "merchant": "Pago de tarjeta Mercado Pago",
+          "amount": "67.89",
+          "date": "2026-10-23",
+          "notificationAt": "2026-10-23T06:12:00.000Z",
+          "dateSource": "NOTIFICATION_POSTED_AT",
+          "timeZone": "America/Mexico_City",
+          "paymentEvidence": "RECEIVER_ACKNOWLEDGEMENT",
+          "paymentCoverage": "FULL",
+          "missingFields": [
+            "card",
+            "currency",
+            "statementPeriod",
+            "operationDate"
+          ]
+        },
+        "reason": "PAYMENT_REVIEW"
+      }
+    },
+    {
+      "fixture": "mercadopago-card-purchase.es.v1.json",
+      "interpretation": {
+        "parserKey": "mercadopago.card-purchase.es.v1",
+        "verified": false,
+        "proposal": {
+          "amount": "123.00",
+          "merchant": "COMERCIO FICTICIO",
+          "missingFields": [
+            "currency",
+            "card",
+            "operationDate"
+          ]
+        },
+        "reason": "FORMAT_POLICY_REQUIRED"
+      }
+    },
+    {
+      "fixture": "mercadopago-refund.es.v1.json",
+      "interpretation": {
+        "parserKey": "mercadopago.refund.es.v1",
+        "verified": true,
+        "proposal": {
+          "movementType": "REFUND",
+          "refundKind": "REFUND",
+          "date": "2026-10-24",
+          "notificationAt": "2026-10-24T18:00:00.000Z",
+          "dateSource": "NOTIFICATION_POSTED_AT",
+          "timeZone": "America/Mexico_City",
+          "amount": "123.45",
+          "merchant": "COMERCIO FICTICIO",
+          "missingFields": [
+            "currency",
+            "card"
+          ]
+        },
+        "reason": "REFUND_REVIEW"
+      }
+    },
+    {
+      "fixture": "nu-card-payment.es.v1.json",
+      "interpretation": {
+        "parserKey": "nu.card-payment.es.v1",
+        "verified": false,
+        "proposal": {
+          "movementType": "CARD_PAYMENT",
+          "merchant": "Pago de tarjeta Nu",
+          "amount": "123.45",
+          "date": "2026-10-21",
+          "notificationAt": "2026-10-22T04:00:00.000Z",
+          "dateSource": "NOTIFICATION_POSTED_AT",
+          "timeZone": "America/Mexico_City",
+          "paymentEvidence": "RECEIVER_ACKNOWLEDGEMENT",
+          "missingFields": [
+            "card",
+            "currency",
+            "statementPeriod",
+            "operationDate"
+          ]
+        },
+        "reason": "PAYMENT_REVIEW"
+      }
+    },
+    {
+      "fixture": "nu-card-purchase.es.v1.json",
+      "interpretation": {
+        "parserKey": "nu.card-purchase.es.v1",
+        "verified": false,
+        "proposal": {
+          "amount": "123.45",
+          "merchant": "COMERCIO FICTICIO",
+          "printedAlias": {
+            "value": "0123",
+            "digits": 4
+          },
+          "aliasSourcePackage": "com.nu.production",
+          "notificationAt": "2026-10-21T00:14:26.000Z",
+          "timeZone": "America/Mexico_City",
+          "evidenceOnly": true,
+          "missingFields": [
+            "currency",
+            "operationDate"
+          ]
+        },
+        "reason": "INCOMPLETE_FORMAT"
+      }
+    },
+    {
+      "fixture": "nu-cfe-service-payment.es.v1.json",
+      "interpretation": {
+        "parserKey": "nu.cfe-service-payment.es.v2",
+        "verified": false,
+        "reason": "FORMAT_POLICY_REQUIRED",
+        "proposal": {
+          "amount": "123.45",
+          "merchant": "CFE",
+          "movementType": "SERVICE_PAYMENT",
+          "missingFields": [
+            "currency",
+            "card",
+            "operationDate"
+          ]
+        }
+      }
+    },
+    {
+      "fixture": "santander-card-purchase.es.v1.json",
+      "interpretation": {
+        "parserKey": "santander.card-purchase.es.v1",
+        "verified": true,
+        "reason": "PURCHASE",
+        "proposal": {
+          "operationAt": "2026-10-20T20:49:02.000Z",
+          "date": "2026-10-20",
+          "timeZone": "America/Mexico_City",
+          "dateSource": "BANK_OPERATION",
+          "amount": "123.45",
+          "currency": "MXN",
+          "merchant": "COMERCIO FICTICIO",
+          "printedAlias": {
+            "value": "0123",
+            "digits": 4
+          },
+          "aliasSourcePackage": "mx.bancosantander.supermovil",
+          "reference": null
+        }
+      }
+    },
+    {
+      "fixture": "wallet-banamex-purchase.es.v1.json",
+      "interpretation": {
+        "parserKey": "wallet.banamex-purchase.es.v1",
+        "verified": true,
+        "reason": "PURCHASE",
+        "proposal": {
+          "date": "2026-10-20",
+          "notificationAt": "2026-10-21T02:28:52.977Z",
+          "dateSource": "NOTIFICATION_POSTED_AT",
+          "timeZone": "America/Mexico_City",
+          "amount": "123.45",
+          "currency": "MXN",
+          "merchant": "COMERCIO FICTICIO",
+          "printedAlias": {
+            "value": "0123",
+            "digits": 4
+          },
+          "aliasSourcePackage": "com.citibanamex.banamexmobile",
+          "reference": null
+        }
+      }
+    },
+    {
+      "fixture": "wallet-banamex2-purchase.es.v1.json",
+      "interpretation": {
+        "parserKey": "wallet.banamex-purchase.es.v1",
+        "verified": true,
+        "reason": "PURCHASE",
+        "proposal": {
+          "date": "2026-10-20",
+          "notificationAt": "2026-10-20T22:21:27.134Z",
+          "dateSource": "NOTIFICATION_POSTED_AT",
+          "timeZone": "America/Mexico_City",
+          "amount": "123.45",
+          "currency": "MXN",
+          "merchant": "COMERCIO FICTICIO",
+          "printedAlias": {
+            "value": "0456",
+            "digits": 4
+          },
+          "aliasSourcePackage": "com.citibanamex.banamexmobile",
+          "reference": null
+        }
+      }
+    },
+    {
+      "fixture": "wallet-bbva-purchase.es.v1.json",
+      "interpretation": {
+        "parserKey": "wallet.bbva-purchase.es.v1",
+        "verified": true,
+        "reason": "PURCHASE",
+        "proposal": {
+          "date": "2026-10-20",
+          "notificationAt": "2026-10-21T02:49:07.000Z",
+          "dateSource": "NOTIFICATION_POSTED_AT",
+          "timeZone": "America/Mexico_City",
+          "amount": "123.45",
+          "currency": "MXN",
+          "merchant": "COMERCIO FICTICIO   SUCURSAL",
+          "printedAlias": {
+            "value": "0123",
+            "digits": 4
+          },
+          "aliasSourcePackage": "com.bancomer.mbanking",
+          "reference": null
+        }
+      }
+    },
+    {
+      "fixture": "wallet-didi-purchase.es.v1.json",
+      "interpretation": {
+        "parserKey": "wallet.didi-purchase.es.v1",
+        "verified": true,
+        "reason": "PURCHASE",
+        "proposal": {
+          "date": "2026-10-20",
+          "notificationAt": "2026-10-21T03:49:09.934Z",
+          "dateSource": "NOTIFICATION_POSTED_AT",
+          "timeZone": "America/Mexico_City",
+          "amount": "123.45",
+          "currency": "MXN",
+          "merchant": "COMERCIO FICTICIO",
+          "printedAlias": {
+            "value": "0123",
+            "digits": 4
+          },
+          "aliasSourcePackage": "com.didiglobal.cashloan",
+          "reference": null
+        }
+      }
+    },
+    {
+      "fixture": "wallet-nu-purchase.es.v1.json",
+      "interpretation": {
+        "parserKey": "wallet.nu-purchase.es.v1",
+        "verified": true,
+        "reason": "PURCHASE",
+        "proposal": {
+          "date": "2026-10-20",
+          "notificationAt": "2026-10-21T00:14:26.000Z",
+          "dateSource": "NOTIFICATION_POSTED_AT",
+          "timeZone": "America/Mexico_City",
+          "amount": "123.45",
+          "currency": "MXN",
+          "merchant": "COMERCIO FICTICIO",
+          "printedAlias": {
+            "value": "0123",
+            "digits": 4
+          },
+          "aliasSourcePackage": "com.nu.production",
+          "reference": null
+        }
+      }
+    },
+    {
+      "fixture": "wallet-santander-purchase.es.v1.json",
+      "interpretation": {
+        "parserKey": "wallet.santander-purchase.es.v2",
+        "verified": true,
+        "reason": "PURCHASE",
+        "proposal": {
+          "date": "2026-10-20",
+          "notificationAt": "2026-10-20T20:49:07.663Z",
+          "dateSource": "NOTIFICATION_POSTED_AT",
+          "timeZone": "America/Mexico_City",
+          "amount": "123.45",
+          "currency": "MXN",
+          "merchant": "COMERCIO FICTICIO",
+          "printedAlias": {
+            "value": "0123",
+            "digits": 4
+          },
+          "aliasSourcePackage": "mx.bancosantander.supermovil",
+          "reference": null
+        }
+      }
+    },
+    {
+      "fixture": "wallet-santander-purchase.es.v2.json",
+      "interpretation": {
+        "parserKey": "wallet.santander-purchase.es.v2",
+        "verified": true,
+        "reason": "PURCHASE",
+        "proposal": {
+          "date": "2026-10-20",
+          "notificationAt": "2026-10-20T20:49:07.663Z",
+          "dateSource": "NOTIFICATION_POSTED_AT",
+          "timeZone": "America/Mexico_City",
+          "amount": "123.45",
+          "currency": "MXN",
+          "merchant": "COMERCIO FICTICIO",
+          "printedAlias": {
+            "value": "0123",
+            "digits": 4
+          },
+          "aliasSourcePackage": "mx.bancosantander.supermovil",
+          "reference": null
+        }
+      }
+    }
+  ],
+  "agenda": {
+    "from": "2026-07-30",
+    "to": "2027-02-25",
+    "today": "2026-10-28",
+    "events": [
+      {
+        "key": "card:synthetic-card:2026-10:cut",
+        "type": "cuts",
+        "date": "2026-10-10",
+        "title": "Corte revisado · Tarjeta ficticia",
+        "detail": "Fechas reales y monto del estado de cuenta registrados en AFP. Consulta el evento de pago para ver el saldo pendiente.",
+        "route": "/tarjetas",
+        "settled": false,
+        "informational": true,
+        "reviewed": true,
+        "overdue": false
+      },
+      {
+        "key": "card:synthetic-card:2026-10:payment",
+        "type": "cardPayments",
+        "date": "2026-10-28",
+        "title": "Pago parcial · Tarjeta ficticia",
+        "detail": "Fecha del ciclo registrada en AFP. Actualízala en AFP si el banco la modifica.\nSaldo pendiente del estado de cuenta, después de pagos y devoluciones aplicadas.",
+        "amount": 70.15,
+        "route": "/tarjetas",
+        "settled": false,
+        "partial": true,
+        "overdue": false
+      },
+      {
+        "key": "card:synthetic-card:2026-11:cut",
+        "type": "cuts",
+        "date": "2026-11-10",
+        "title": "Corte · Tarjeta ficticia",
+        "detail": "Fecha prevista según los días habituales de la tarjeta. Confírmala con el banco.\nPara marcar el corte como revisado, guarda las fechas reales y el monto del estado de cuenta en AFP.",
+        "route": "/tarjetas",
+        "settled": false,
+        "informational": true,
+        "reviewed": false,
+        "overdue": false
+      },
+      {
+        "key": "card:synthetic-card:2026-11:payment",
+        "type": "cardPayments",
+        "date": "2026-11-28",
+        "title": "Pago · Tarjeta ficticia",
+        "detail": "Fecha prevista según los días habituales de la tarjeta. Confírmala con el banco.\nImporte del estado de cuenta por confirmar.",
+        "amount": null,
+        "route": "/tarjetas",
+        "settled": false,
+        "partial": false,
+        "overdue": false
+      },
+      {
+        "key": "card:synthetic-card:2026-12:cut",
+        "type": "cuts",
+        "date": "2026-12-10",
+        "title": "Corte · Tarjeta ficticia",
+        "detail": "Fecha prevista según los días habituales de la tarjeta. Confírmala con el banco.\nPara marcar el corte como revisado, guarda las fechas reales y el monto del estado de cuenta en AFP.",
+        "route": "/tarjetas",
+        "settled": false,
+        "informational": true,
+        "reviewed": false,
+        "overdue": false
+      },
+      {
+        "key": "card:synthetic-card:2026-12:payment",
+        "type": "cardPayments",
+        "date": "2026-12-28",
+        "title": "Pago · Tarjeta ficticia",
+        "detail": "Fecha prevista según los días habituales de la tarjeta. Confírmala con el banco.\nImporte del estado de cuenta por confirmar.",
+        "amount": null,
+        "route": "/tarjetas",
+        "settled": false,
+        "partial": false,
+        "overdue": false
+      },
+      {
+        "key": "card:synthetic-card:2027-01:cut",
+        "type": "cuts",
+        "date": "2027-01-10",
+        "title": "Corte · Tarjeta ficticia",
+        "detail": "Fecha prevista según los días habituales de la tarjeta. Confírmala con el banco.\nPara marcar el corte como revisado, guarda las fechas reales y el monto del estado de cuenta en AFP.",
+        "route": "/tarjetas",
+        "settled": false,
+        "informational": true,
+        "reviewed": false,
+        "overdue": false
+      },
+      {
+        "key": "card:synthetic-card:2027-01:payment",
+        "type": "cardPayments",
+        "date": "2027-01-28",
+        "title": "Pago · Tarjeta ficticia",
+        "detail": "Fecha prevista según los días habituales de la tarjeta. Confírmala con el banco.\nImporte del estado de cuenta por confirmar.",
+        "amount": null,
+        "route": "/tarjetas",
+        "settled": false,
+        "partial": false,
+        "overdue": false
+      },
+      {
+        "key": "card:synthetic-card:2027-02:cut",
+        "type": "cuts",
+        "date": "2027-02-10",
+        "title": "Corte · Tarjeta ficticia",
+        "detail": "Fecha prevista según los días habituales de la tarjeta. Confírmala con el banco.\nPara marcar el corte como revisado, guarda las fechas reales y el monto del estado de cuenta en AFP.",
+        "route": "/tarjetas",
+        "settled": false,
+        "informational": true,
+        "reviewed": false,
+        "overdue": false
+      }
+    ]
+  },
+  "payloads": [
+    {
+      "summary": "Corte revisado · Tarjeta ficticia",
+      "description": "Fechas reales y monto del estado de cuenta registrados en AFP. Consulta el evento de pago para ver el saldo pendiente.\n\nGestiona este registro en AFP: https://example.test/tarjetas",
+      "start": {
+        "date": "2026-10-10"
+      },
+      "end": {
+        "date": "2026-10-11"
+      },
+      "transparency": "transparent",
+      "visibility": "private",
+      "eventLabelId": "d8bc0c82-1db1-4f76-9caa-34696472709f",
+      "reminders": {
+        "useDefault": false,
+        "overrides": []
+      },
+      "source": {
+        "title": "AFP",
+        "url": "https://example.test/tarjetas"
+      },
+      "extendedProperties": {
+        "private": {
+          "afpConnection": "synthetic-connection",
+          "afpSource": "card:synthetic-card:2026-10:cut"
+        }
+      }
+    },
+    {
+      "summary": "Pago parcial · Tarjeta ficticia",
+      "description": "Fecha del ciclo registrada en AFP. Actualízala en AFP si el banco la modifica.\nSaldo pendiente del estado de cuenta, después de pagos y devoluciones aplicadas.\nImporte: $70.15\n\nGestiona este registro en AFP: https://example.test/tarjetas",
+      "start": {
+        "date": "2026-10-28"
+      },
+      "end": {
+        "date": "2026-10-29"
+      },
+      "transparency": "transparent",
+      "visibility": "private",
+      "eventLabelId": "aef6e19a-31b3-428d-b9c0-5795a080a18e",
+      "reminders": {
+        "useDefault": false,
+        "overrides": [
+          {
+            "method": "popup",
+            "minutes": 1440
+          }
+        ]
+      },
+      "source": {
+        "title": "AFP",
+        "url": "https://example.test/tarjetas"
+      },
+      "extendedProperties": {
+        "private": {
+          "afpConnection": "synthetic-connection",
+          "afpSource": "card:synthetic-card:2026-10:payment"
+        }
+      }
+    },
+    {
+      "summary": "Corte · Tarjeta ficticia",
+      "description": "Fecha prevista según los días habituales de la tarjeta. Confírmala con el banco.\nPara marcar el corte como revisado, guarda las fechas reales y el monto del estado de cuenta en AFP.\n\nGestiona este registro en AFP: https://example.test/tarjetas",
+      "start": {
+        "date": "2026-11-10"
+      },
+      "end": {
+        "date": "2026-11-11"
+      },
+      "transparency": "transparent",
+      "visibility": "private",
+      "eventLabelId": "57c0de45-bd92-4bf2-a9df-8dc3bc55e5b3",
+      "reminders": {
+        "useDefault": false,
+        "overrides": []
+      },
+      "source": {
+        "title": "AFP",
+        "url": "https://example.test/tarjetas"
+      },
+      "extendedProperties": {
+        "private": {
+          "afpConnection": "synthetic-connection",
+          "afpSource": "card:synthetic-card:2026-11:cut"
+        }
+      }
+    },
+    {
+      "summary": "Pago · Tarjeta ficticia",
+      "description": "Fecha prevista según los días habituales de la tarjeta. Confírmala con el banco.\nImporte del estado de cuenta por confirmar.\n\nGestiona este registro en AFP: https://example.test/tarjetas",
+      "start": {
+        "date": "2026-11-28"
+      },
+      "end": {
+        "date": "2026-11-29"
+      },
+      "transparency": "transparent",
+      "visibility": "private",
+      "eventLabelId": "72fe658a-4532-4db4-a613-b969507e102b",
+      "reminders": {
+        "useDefault": false,
+        "overrides": [
+          {
+            "method": "popup",
+            "minutes": 1440
+          }
+        ]
+      },
+      "source": {
+        "title": "AFP",
+        "url": "https://example.test/tarjetas"
+      },
+      "extendedProperties": {
+        "private": {
+          "afpConnection": "synthetic-connection",
+          "afpSource": "card:synthetic-card:2026-11:payment"
+        }
+      }
+    },
+    {
+      "summary": "Corte · Tarjeta ficticia",
+      "description": "Fecha prevista según los días habituales de la tarjeta. Confírmala con el banco.\nPara marcar el corte como revisado, guarda las fechas reales y el monto del estado de cuenta en AFP.\n\nGestiona este registro en AFP: https://example.test/tarjetas",
+      "start": {
+        "date": "2026-12-10"
+      },
+      "end": {
+        "date": "2026-12-11"
+      },
+      "transparency": "transparent",
+      "visibility": "private",
+      "eventLabelId": "57c0de45-bd92-4bf2-a9df-8dc3bc55e5b3",
+      "reminders": {
+        "useDefault": false,
+        "overrides": []
+      },
+      "source": {
+        "title": "AFP",
+        "url": "https://example.test/tarjetas"
+      },
+      "extendedProperties": {
+        "private": {
+          "afpConnection": "synthetic-connection",
+          "afpSource": "card:synthetic-card:2026-12:cut"
+        }
+      }
+    },
+    {
+      "summary": "Pago · Tarjeta ficticia",
+      "description": "Fecha prevista según los días habituales de la tarjeta. Confírmala con el banco.\nImporte del estado de cuenta por confirmar.\n\nGestiona este registro en AFP: https://example.test/tarjetas",
+      "start": {
+        "date": "2026-12-28"
+      },
+      "end": {
+        "date": "2026-12-29"
+      },
+      "transparency": "transparent",
+      "visibility": "private",
+      "eventLabelId": "72fe658a-4532-4db4-a613-b969507e102b",
+      "reminders": {
+        "useDefault": false,
+        "overrides": [
+          {
+            "method": "popup",
+            "minutes": 1440
+          }
+        ]
+      },
+      "source": {
+        "title": "AFP",
+        "url": "https://example.test/tarjetas"
+      },
+      "extendedProperties": {
+        "private": {
+          "afpConnection": "synthetic-connection",
+          "afpSource": "card:synthetic-card:2026-12:payment"
+        }
+      }
+    },
+    {
+      "summary": "Corte · Tarjeta ficticia",
+      "description": "Fecha prevista según los días habituales de la tarjeta. Confírmala con el banco.\nPara marcar el corte como revisado, guarda las fechas reales y el monto del estado de cuenta en AFP.\n\nGestiona este registro en AFP: https://example.test/tarjetas",
+      "start": {
+        "date": "2027-01-10"
+      },
+      "end": {
+        "date": "2027-01-11"
+      },
+      "transparency": "transparent",
+      "visibility": "private",
+      "eventLabelId": "57c0de45-bd92-4bf2-a9df-8dc3bc55e5b3",
+      "reminders": {
+        "useDefault": false,
+        "overrides": []
+      },
+      "source": {
+        "title": "AFP",
+        "url": "https://example.test/tarjetas"
+      },
+      "extendedProperties": {
+        "private": {
+          "afpConnection": "synthetic-connection",
+          "afpSource": "card:synthetic-card:2027-01:cut"
+        }
+      }
+    },
+    {
+      "summary": "Pago · Tarjeta ficticia",
+      "description": "Fecha prevista según los días habituales de la tarjeta. Confírmala con el banco.\nImporte del estado de cuenta por confirmar.\n\nGestiona este registro en AFP: https://example.test/tarjetas",
+      "start": {
+        "date": "2027-01-28"
+      },
+      "end": {
+        "date": "2027-01-29"
+      },
+      "transparency": "transparent",
+      "visibility": "private",
+      "eventLabelId": "72fe658a-4532-4db4-a613-b969507e102b",
+      "reminders": {
+        "useDefault": false,
+        "overrides": [
+          {
+            "method": "popup",
+            "minutes": 1440
+          }
+        ]
+      },
+      "source": {
+        "title": "AFP",
+        "url": "https://example.test/tarjetas"
+      },
+      "extendedProperties": {
+        "private": {
+          "afpConnection": "synthetic-connection",
+          "afpSource": "card:synthetic-card:2027-01:payment"
+        }
+      }
+    },
+    {
+      "summary": "Corte · Tarjeta ficticia",
+      "description": "Fecha prevista según los días habituales de la tarjeta. Confírmala con el banco.\nPara marcar el corte como revisado, guarda las fechas reales y el monto del estado de cuenta en AFP.\n\nGestiona este registro en AFP: https://example.test/tarjetas",
+      "start": {
+        "date": "2027-02-10"
+      },
+      "end": {
+        "date": "2027-02-11"
+      },
+      "transparency": "transparent",
+      "visibility": "private",
+      "eventLabelId": "57c0de45-bd92-4bf2-a9df-8dc3bc55e5b3",
+      "reminders": {
+        "useDefault": false,
+        "overrides": []
+      },
+      "source": {
+        "title": "AFP",
+        "url": "https://example.test/tarjetas"
+      },
+      "extendedProperties": {
+        "private": {
+          "afpConnection": "synthetic-connection",
+          "afpSource": "card:synthetic-card:2027-02:cut"
+        }
+      }
+    }
+  ],
+  "encryption": {
+    "format": "v1.AES-256-GCM",
+    "historicalCiphertext": "v1.FEy9kcoI2dYVT5I4.cb4A5JCwAkrH28hFNBvJMA.ORHVTe4eYnshT70iPbk5TzDbHWufTJv5ppR2",
+    "previousToCurrent": true,
+    "currentToPrevious": true,
+    "ownerBinding": true
+  }
+}

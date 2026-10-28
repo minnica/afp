@@ -3,10 +3,10 @@ const { test } = require('node:test');
 const { randomUUID } = require('node:crypto');
 const { sourceLoader } = require('./helpers/load-source.cjs');
 const load = sourceLoader({ 'next/server': { NextResponse: {} } });
-const { reviewOnlyCapturePackages } = load('src/lib/captureSourcePolicy.js');
-const { validateCaptureEvent } = load('src/lib/captureProtocol.js');
-const { interpretCapture, captureParsers } = load('src/lib/captureParsers.js');
-const { captureInventorySchema, configureCapture } = load('src/lib/captureConfiguration.js');
+const { reviewOnlyCapturePackages } = load('src/lib/captureSourcePolicy.ts');
+const { validateCaptureEvent } = load('src/lib/captureProtocol.ts');
+const { interpretCapture, captureParsers } = load('src/lib/captureParsers.ts');
+const { captureInventorySchema, configureCapture } = load('src/lib/captureConfiguration.ts');
 
 test('Viajes y pedidos: cada paquete exacto conserva texto original sin interpretar cobros ni tarjetas', () => {
   // Casos hipotéticos deliberados: no son muestras ni gramáticas verificadas.

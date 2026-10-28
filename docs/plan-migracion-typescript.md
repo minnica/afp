@@ -1,6 +1,6 @@
 # Plan de migración gradual a TypeScript
 
-**Estado:** fases 0–4 completadas; fases 5–7 pendientes. **Núcleo financiero:** [resultados de la fase 4](../artifacts/typescript-migration/phase-4/README.md), 27 de octubre de 2026. **Mi dinero:** [resultados de la fase 3](../artifacts/typescript-migration/phase-3/README.md), sobre `0c11537`, 27 de octubre de 2026. **Piloto implementado:** [resultados de la fase 2](../artifacts/typescript-migration/phase-2/README.md), sobre `2ff43a9`, 27 de octubre de 2026. **Base revisada del plan:** `4d7b6e6`, 27 de octubre de 2026. **Referencia ejecutada:** `83a3924`; [resultados y reproducción de la fase 0](../artifacts/typescript-migration/phase-0/README.md).
+**Estado:** fases 0–5 completadas; fases 6–7 pendientes. **Captura, Calendar y offline:** [resultados de la fase 5](../artifacts/typescript-migration/phase-5/README.md), 28 de octubre de 2026. **Núcleo financiero:** [resultados de la fase 4](../artifacts/typescript-migration/phase-4/README.md), 27 de octubre de 2026. **Mi dinero:** [resultados de la fase 3](../artifacts/typescript-migration/phase-3/README.md), sobre `0c11537`, 27 de octubre de 2026. **Piloto implementado:** [resultados de la fase 2](../artifacts/typescript-migration/phase-2/README.md), sobre `2ff43a9`, 27 de octubre de 2026. **Base revisada del plan:** `4d7b6e6`, 27 de octubre de 2026. **Referencia ejecutada:** `83a3924`; [resultados y reproducción de la fase 0](../artifacts/typescript-migration/phase-0/README.md).
 
 ## Objetivo y alcance
 
@@ -67,7 +67,7 @@ Las validaciones nuevas deberán aceptar las formas que ya admite el contrato p�
 | 2 | Transferencias tipadas de formulario a persistencia | 1 | Completada |
 | 3 | Mi dinero completo | 2 | Completada |
 | 4 | Núcleo financiero, API y contratos compartidos | 3 | Completada |
-| 5 | Captura, Calendar y cola offline | 4 | Pendiente |
+| 5 | Captura, Calendar y cola offline | 4 | Completada |
 | 6 | Resto de la interfaz, hooks y páginas | 5 | Pendiente |
 | 7 | Retirada de puentes temporales y cierre | 6 | Pendiente |
 
@@ -173,12 +173,14 @@ Orden de lotes: cálculos de tarjetas/MSI → suscripciones → cuentas e ingres
 
 Dividir esta fase en tres lotes independientes y verificados secuencialmente.
 
-- [ ] **Captura:** migrar protocolo, parsers, políticas, revisión, conciliación y endpoints `captures`. Modelar estados y resoluciones con variantes explícitas. Conservar contrato Android v1, formato de credenciales, fechas de recepción/operación, reglas de activación y prioridad Wallet/respaldo.
-- [ ] **Calendar:** migrar OAuth, configuración, eventos y sincronización de [src/lib/calendar/](../src/lib/calendar/). Mantener identificadores deterministas, contenido cifrado, locks, cuotas, revisiones y desconexión. El cifrado existente y las credenciales guardadas deben seguir siendo legibles.
-- [ ] **Offline:** convertir [offlineExpenses.js](../src/lib/offlineExpenses.js), operaciones y consumidores con fixtures de datos ya guardados. Conservar nombre y estructura de IndexedDB, UUID, propietarios, recibos y recuperación entre pestañas. Renombrar a TypeScript no debe cambiar la versión de la BD local.
-- [ ] Actualizar pruebas, referencias y transformaciones del servidor offline. Mantener `public/sw.js` como recurso JavaScript servido directamente; comprobar su exclusión de `/api/`.
+- [x] **Captura:** migrar protocolo, parsers, políticas, revisión, conciliación y endpoints `captures`. Modelar estados y resoluciones con variantes explícitas. Conservar contrato Android v1, formato de credenciales, fechas de recepción/operación, reglas de activación y prioridad Wallet/respaldo.
+- [x] **Calendar:** migrar OAuth, configuración, eventos y sincronización de [src/lib/calendar/](../src/lib/calendar/). Mantener identificadores deterministas, contenido cifrado, locks, cuotas, revisiones y desconexión. El cifrado existente y las credenciales guardadas deben seguir siendo legibles.
+- [x] **Offline:** convertir [offlineExpenses.ts](../src/lib/offlineExpenses.ts), operaciones y consumidores con fixtures de datos ya guardados. Conservar nombre y estructura de IndexedDB, UUID, propietarios, recibos y recuperación entre pestañas. Renombrar a TypeScript no debe cambiar la versión de la BD local.
+- [x] Actualizar pruebas, referencias y transformaciones del servidor offline. Mantener `public/sw.js` como recurso JavaScript servido directamente; comprobar su exclusión de `/api/`.
 
 **Aceptación:** contrato de captura compatible con la APK existente, sin necesidad de una actualización nativa por este cambio; pruebas de eventos repetidos, pausa/revocación y conciliación correctas. Calendar con Google simulado conserva OAuth, identificadores y comportamiento de reintento. Una cola creada con el formato anterior se recupera y sincroniza una sola vez, incluyendo respuesta perdida y cambio de cuenta.
+
+**Entrega:** [implementación, compatibilidad y evidencias de fase 5](../artifacts/typescript-migration/phase-5/README.md). Migrados 53 módulos, incluidos los 16 handlers restantes. Se conservan Android v1, credenciales, prioridad Wallet/respaldo, cifrado Calendar v1 y estructura/versión 1 de IndexedDB. El observador de pendientes de Gastos está tipado; el interior de la pantalla JSX sigue en fase 6. Verificación secuencial de los tres lotes, con PostgreSQL local y pruebas de recuperación en dos pestañas. Sin cambios de esquema, SQL, dependencias ni publicación.
 
 ### Fase 6 — Interfaz, hooks y páginas restantes
 

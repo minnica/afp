@@ -2,7 +2,7 @@ const assert = require('node:assert/strict');
 const { test } = require('node:test');
 const { sourceLoader } = require('./helpers/load-source.cjs');
 const fixture = require('./fixtures/captures/bbva-payment-receipt.es.v1.json');
-const { parsePaymentReceipt, paymentReceiptSource, validClabe } = sourceLoader()('src/lib/paymentReceipts.js');
+const { parsePaymentReceipt, paymentReceiptSource, validClabe } = sourceLoader()('src/lib/paymentReceipts.ts');
 const event = text => ({ sourcePackage: paymentReceiptSource, fields: { 'receipt.text': text } });
 test('comprobante BBVA: destino, importe, día bancario, concepto y rastreo; no infiere moneda o tarjeta', () => {
   const result = parsePaymentReceipt(event(fixture.text));

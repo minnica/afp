@@ -125,8 +125,8 @@ test("Captura PostgreSQL: vinculación, recepción y autorización completa", { 
       assert.equal((await call("devices", "PATCH", "Bearer a", { deviceId: phone.deviceId, action: "resume" })).status, 200);
     });
     await t.test("viajes y pedidos: once fuentes, recepción idempotente, pausa por fuente y evidencia sin gastos", async () => {
-      const { capturePackages } = load("src/lib/captureProtocol.js");
-      const { reviewOnlyCapturePackages } = load("src/lib/captureSourcePolicy.js");
+      const { capturePackages } = load("src/lib/captureProtocol.ts");
+      const { reviewOnlyCapturePackages } = load("src/lib/captureSourcePolicy.ts");
       const state = { action: "report", version: 1, active: true, listenerConnected: true, notificationAccess: true,
         batteryExempt: true, deliveryPaused: false, selectedPackages: [...capturePackages], pausedPackages: [] };
       for (const selectedPackages of [[], capturePackages.slice(0, 8), capturePackages]) {
@@ -158,7 +158,7 @@ test("Captura PostgreSQL: vinculación, recepción y autorización completa", { 
       assert.equal(await db.dailyExpense.count({ where: { userId: users[0].id } }), 0);
     });
     await t.test("fallo después de persistir revierte la transacción y no devuelve recibo", async () => {
-      const service = load("src/lib/captureService.js"), protocol = load("src/lib/captureProtocol.js");
+      const service = load("src/lib/captureService.ts"), protocol = load("src/lib/captureProtocol.ts");
       const input = protocol.validateCaptureEvent(event());
       const failing = { $transaction: fn => db.$transaction(tx => fn(new Proxy(tx, { get(target, key) {
         if (key === "captureEvent") return new Proxy(target.captureEvent, { get(model, method) {
@@ -189,7 +189,7 @@ test("Captura PostgreSQL: vinculación, recepción y autorización completa", { 
       let response;
       for (let i = 0; i < 11; i++) response = await call("pairings", "PATCH", "Bearer b", { code: "0000-0000-0000" });
       assert.equal(response.status, 429); assert.ok(Number(response.headers.get("Retry-After")) > 0);
-      const service = load("src/lib/captureService.js"), protocol = load("src/lib/captureProtocol.js");
+      const service = load("src/lib/captureService.ts"), protocol = load("src/lib/captureProtocol.ts");
       const identity = randomUUID(), time = new Date("2026-01-01T00:00:00Z");
       try {
         const results = await Promise.allSettled(Array.from({ length: 8 }, () => service.limitCaptureAttempts(db, "test", identity, 3, time)));
@@ -200,7 +200,7 @@ test("Captura PostgreSQL: vinculación, recepción y autorización completa", { 
   } finally {
     await db.captureDevice.deleteMany({ where: { id: { in: ids } } });
     await db.user.deleteMany({ where: { id: { in: users.map(row => row.id) } } });
-    const { captureHash } = load("src/lib/captureProtocol.js");
+    const { captureHash } = load("src/lib/captureProtocol.ts");
     await db.captureRateLimit.deleteMany({ where: { key: { in: [captureHash("start-global:all"), captureHash("start-address:capture-integration"),
       ...users.map(user => captureHash(`approve-user:${user.id}`)), ...ids.map(id => captureHash(`device:${id}`))] } } });
     await db.$disconnect();

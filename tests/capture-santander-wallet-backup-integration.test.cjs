@@ -17,15 +17,15 @@ test('Santander Wallet de respaldo: legado vinculado, fecha aceptada y un gasto 
     'next/server': { NextResponse: { json: (body, options = {}) => ({ body: JSON.parse(JSON.stringify(body)), status: options.status || 200, headers: new Headers(options.headers) }) } },
     '@supabase/supabase-js': { createClient: () => ({ auth: { getUser: async token => ({ data: { user: token === 'owner' ? user : token === 'other' ? other : null }, error: null }) } }) },
   };
-  const load = sourceLoader(mocks), protocol = load('src/lib/captureProtocol.js'), parsers = load('src/lib/captureParsers.js');
-  const config = load('src/lib/captureConfiguration.js'), reconciliation = load('src/lib/captureReconciliation.js');
-  const eventsRoute = load('src/app/api/captures/events/route.js'), route = load('src/app/api/captures/movements/route.js');
+  const load = sourceLoader(mocks), protocol = load('src/lib/captureProtocol.ts'), parsers = load('src/lib/captureParsers.ts');
+  const config = load('src/lib/captureConfiguration.ts'), reconciliation = load('src/lib/captureReconciliation.ts');
+  const eventsRoute = load('src/app/api/captures/events/route.ts'), route = load('src/app/api/captures/movements/route.ts');
   const oldReceive = sourceLoader({ ...mocks, '@/lib/captureParsers': { ...parsers, interpretCapture: event => {
     const parsed = parsers.interpretCapture(event), { date, dateSource, reference, ...proposal } = parsed.proposal;
     void date; void dateSource; void reference;
     return { parserKey: 'wallet.santander-purchase.es.v1', verified: false, reason: 'INCOMPLETE_FORMAT',
       proposal: { ...proposal, evidenceOnly: true, missingFields: ['operationDate'] } };
-  } } })('src/lib/captureService.js');
+  } } })('src/lib/captureService.ts');
   const [card, sibling] = await Promise.all(['Santander ficticia', 'Otra Santander ficticia'].map(name => db.card.create({ data: { userId: user.id, name, usualCutDay: 25, usualDueDay: 15 } })));
   const category = await db.category.create({ data: { userId: user.id, name: 'Compras ficticias' } });
   const secret = randomBytes(32).toString('base64url'), device = await db.captureDevice.create({ data: { userId: user.id, name: 'Teléfono ficticio', approvedAt: new Date(), secretHash: protocol.captureHash(secret) } });
@@ -111,7 +111,7 @@ test('Santander Wallet de respaldo: legado vinculado, fecha aceptada y un gasto 
       const manual=await db.dailyExpense.create({data:{userId:user.id,cardId:card.id,categoryId:category.id,date:new Date('2026-10-20T12:00:00Z'),amount:'403.03',paymentMethod:'CARD',concept:'Concepto personal ficticio',notes:'Nota personal ficticia',cashContributionAmount:2}});
       const pending=await send(input(wallet,'403.03'));assert.equal(pending.reason,'POSSIBLE_DUPLICATE');await resolve({id:pending.id,action:'link',expenseId:manual.id});
       assert.deepEqual(await db.dailyExpense.findUnique({where:{id:manual.id}}),manual);
-      await load('src/lib/captureProcessing.js').archiveCapturedExpense(db,await db.dailyExpense.findUnique({where:{id:m.expenseId}}));await db.dailyExpense.delete({where:{id:m.expenseId}});
+      await load('src/lib/captureProcessing.ts').archiveCapturedExpense(db,await db.dailyExpense.findUnique({where:{id:m.expenseId}}));await db.dailyExpense.delete({where:{id:m.expenseId}});
       const afterDelete=await count();await post(event);assert.equal((await send(input(wallet,'401.01'))).reason,'POSSIBLE_DUPLICATE');assert.equal(await count(),afterDelete);
     });
     await t.test('validación rechaza otra fecha, corrección personal, gasto sin banco y fuentes distintas sin alterar el gasto', async () => {

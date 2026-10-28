@@ -17,7 +17,7 @@ test('bandeja por tipo: filtros antes de paginar, contadores e independencia de 
     'next/server': { NextResponse: { json: (body, options = {}) => ({ body: JSON.parse(JSON.stringify(body)), status: options.status || 200 }) } },
     '@supabase/supabase-js': { createClient: () => ({ auth: { getUser: async token => ({ data: { user: token === 'owner' ? owner : token === 'other' ? other : null } }) } }) },
   });
-  const route = load('src/app/api/captures/movements/route.js');
+  const route = load('src/app/api/captures/movements/route.ts');
   const request = (query, token = 'owner') => new Request(`http://localhost/api/captures/movements?${query}`, { headers: { authorization: `Bearer ${token}` } });
   const create = data => db.captureMovement.create({ data: { userId: owner.id, reason: 'UNKNOWN_FORMAT', proposal: {}, ...data } });
   try {

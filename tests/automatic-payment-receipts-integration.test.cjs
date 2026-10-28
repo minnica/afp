@@ -10,8 +10,8 @@ const connectionString = process.env.AFP_TEST_DATABASE_URL;
 test('pagos automáticos: comprobantes y Nu con reglas explícitas, recibos y aislamiento reales', { skip: !connectionString }, async t => {
   const url = new URL(connectionString); assert.ok(['localhost','127.0.0.1'].includes(url.hostname) && /^\/afp_test\w*$/.test(url.pathname) && !url.search);
   const db = new PrismaClient({ adapter: new PrismaPg({ connectionString }) });
-  const load = sourceLoader(), service = load('src/lib/captureService.js'), protocol = load('src/lib/captureProtocol.js');
-  const { paymentReceiptSource } = load('src/lib/paymentReceipts.js');
+  const load = sourceLoader(), service = load('src/lib/captureService.ts'), protocol = load('src/lib/captureProtocol.ts');
+  const { paymentReceiptSource } = load('src/lib/paymentReceipts.ts');
   const user = await db.user.create({ data: { email: `receipt-${randomUUID()}@example.test` } });
   const card = await db.card.create({ data: { userId: user.id, name: 'DiDi ficticia', usualCutDay: 10, usualDueDay: 25 } });
   const nuCard = await db.card.create({ data: { userId: user.id, name: 'Nu ficticia', usualCutDay: 10, usualDueDay: 25 } });
@@ -72,7 +72,7 @@ test('pagos automáticos: comprobantes y Nu con reglas explícitas, recibos y ai
       assert.equal(await db.dailyExpense.count({ where: { userId: user.id } }), 0); assert.equal(await db.income.count({ where: { userId: user.id } }), 0);
     });
     await t.test('endpoint nativo recibe, consulta solo sus propios comprobantes y conserva los rechazos de autenticación', async () => {
-      const route = sourceLoader({ '@/lib/prisma': { prisma: db } })('src/app/api/captures/payment-receipts/route.js');
+      const route = sourceLoader({ '@/lib/prisma': { prisma: db } })('src/app/api/captures/payment-receipts/route.ts');
       const raw = { receiptVersion: 1, eventId: randomUUID(), contentHash: protocol.captureHash(randomUUID()), extractedText: fixture.text, receivedAt: '2026-10-22T04:40:00.000Z', mimeType: 'image/png' };
       const secret = Buffer.alloc(32, 7).toString('base64url'); await db.captureDevice.update({ where: { id: device.id }, data: { secretHash: protocol.captureHash(secret) } });
       const request = (method, body = raw, query = '') => new Request('http://localhost/api/captures/payment-receipts'+query, { method,

@@ -1,0 +1,112 @@
+TAP version 13
+# Subtest: apiFetch usa el token vigente, preserva headers y signal, y bloquea otros orígenes
+ok 1 - apiFetch usa el token vigente, preserva headers y signal, y bloquea otros orígenes
+  ---
+  duration_ms: 62.419625
+  type: 'test'
+  ...
+# Subtest: apiFetch no envía nada sin sesión ni con una cuenta distinta de la pantalla
+ok 2 - apiFetch no envía nada sin sesión ni con una cuenta distinta de la pantalla
+  ---
+  duration_ms: 7.696575
+  type: 'test'
+  ...
+# Subtest: la cola conserva los pendientes si cambia la cuenta y los sincroniza con su propietario
+ok 3 - la cola conserva los pendientes si cambia la cuenta y los sincroniza con su propietario
+  ---
+  duration_ms: 21.739864
+  type: 'test'
+  ...
+# Subtest: el service worker no intercepta API ni siquiera como navegación; elimina caché anterior
+ok 4 - el service worker no intercepta API ni siquiera como navegación; elimina caché anterior
+  ---
+  duration_ms: 1.114369
+  type: 'test'
+  ...
+# Subtest: observador offline: ignora lecturas antiguas y deja de publicar al cambiar de cuenta
+ok 5 - observador offline: ignora lecturas antiguas y deja de publicar al cambiar de cuenta
+  ---
+  duration_ms: 3.661878
+  type: 'test'
+  ...
+# Subtest: IndexedDB v1 anterior: respuesta perdida, cambio de cuenta y dos pestañas conservan recibo y metadatos
+ok 6 - IndexedDB v1 anterior: respuesta perdida, cambio de cuenta y dos pestañas conservan recibo y metadatos
+  ---
+  duration_ms: 14.821009
+  type: 'test'
+  ...
+# Subtest: conflicto con captura: decisión explícita conserva UUID, notas y aportación al registrar otra compra
+ok 7 - conflicto con captura: decisión explícita conserva UUID, notas y aportación al registrar otra compra
+  ---
+  duration_ms: 10.627012
+  type: 'test'
+  ...
+# Subtest: conservar gasto existente solo retira un conflicto confirmado, sin borrar otros pendientes
+ok 8 - conservar gasto existente solo retira un conflicto confirmado, sin borrar otros pendientes
+  ---
+  duration_ms: 12.288611
+  type: 'test'
+  ...
+# Subtest: aportación offline: recarga, error y reintento conservan el importe y UUID
+ok 9 - aportación offline: recarga, error y reintento conservan el importe y UUID
+  ---
+  duration_ms: 11.102432
+  type: 'test'
+  ...
+# Subtest: respuesta perdida después de guardar: recargar y reintentar conserva el UUID
+ok 10 - respuesta perdida después de guardar: recargar y reintentar conserva el UUID
+  ---
+  duration_ms: 11.837432
+  type: 'test'
+  ...
+# Subtest: dos pestañas sin Web Locks: conservan un mismo UUID y no resucitan un error tardío
+ok 11 - dos pestañas sin Web Locks: conservan un mismo UUID y no resucitan un error tardío
+  ---
+  duration_ms: 12.056581
+  type: 'test'
+  ...
+# Subtest: capturar en otra pestaña durante sync no pierde la nueva entrada ni la de otro usuario
+ok 12 - capturar en otra pestaña durante sync no pierde la nueva entrada ni la de otro usuario
+  ---
+  duration_ms: 16.546798
+  type: 'test'
+  ...
+# Subtest: cerrar tras persistir y antes del POST permite recuperar y sincronizar
+ok 13 - cerrar tras persistir y antes del POST permite recuperar y sincronizar
+  ---
+  duration_ms: 11.207302
+  type: 'test'
+  ...
+# Subtest: migración concurrente conserva la copia local y no reimporta confirmados
+ok 14 - migración concurrente conserva la copia local y no reimporta confirmados
+  ---
+  duration_ms: 10.511432
+  type: 'test'
+  ...
+# Subtest: JSON corrupto, validación y confirmación incompleta nunca eliminan pendientes
+ok 15 - JSON corrupto, validación y confirmación incompleta nunca eliminan pendientes
+  ---
+  duration_ms: 7.358305
+  type: 'test'
+  ...
+# Subtest: fallo de almacenamiento no confirma una captura ni envía un POST
+ok 16 - fallo de almacenamiento no confirma una captura ni envía un POST
+  ---
+  duration_ms: 4.612537
+  type: 'test'
+  ...
+# Subtest: Web Locks serializa dos pestañas y la segunda relee la cola al obtener el bloqueo
+ok 17 - Web Locks serializa dos pestañas y la segunda relee la cola al obtener el bloqueo
+  ---
+  duration_ms: 11.378161
+  type: 'test'
+  ...
+1..17
+# tests 17
+# suites 0
+# pass 17
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 265.592549

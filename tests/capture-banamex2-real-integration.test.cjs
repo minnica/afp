@@ -18,10 +18,10 @@ test('BANAMEX 1/2: mismo Wallet, activación independiente y dos evidencias para
     'next/server': { NextResponse: { json: (body, options = {}) => ({ body: JSON.parse(JSON.stringify(body)), status: options.status || 200, headers: new Headers(options.headers) }) } },
     '@supabase/supabase-js': { createClient: () => ({ auth: { getUser: async token => ({ data: { user: token === 'owner' ? user : token === 'other' ? other : null }, error: null }) } }) },
   };
-  const load = sourceLoader(mocks), protocol = load('src/lib/captureProtocol.js');
-  const processing = load('src/lib/captureProcessing.js'), service = load('src/lib/captureService.js');
-  const configuration = load('src/lib/captureConfiguration.js'), reconciliation = load('src/lib/captureReconciliation.js');
-  const eventsRoute = load('src/app/api/captures/events/route.js'), movementsRoute = load('src/app/api/captures/movements/route.js');
+  const load = sourceLoader(mocks), protocol = load('src/lib/captureProtocol.ts');
+  const processing = load('src/lib/captureProcessing.ts'), service = load('src/lib/captureService.ts');
+  const configuration = load('src/lib/captureConfiguration.ts'), reconciliation = load('src/lib/captureReconciliation.ts');
+  const eventsRoute = load('src/app/api/captures/events/route.ts'), movementsRoute = load('src/app/api/captures/movements/route.ts');
   const [first, second] = await Promise.all(['BANAMEX 1', 'BANAMEX 2'].map(name => db.card.create({ data: { userId: user.id, name, usualCutDay: 25, usualDueDay: 15 } })));
   const category = await db.category.create({ data: { userId: user.id, name: 'Compras ficticias' } });
   const secret = randomBytes(32).toString('base64url');
@@ -68,8 +68,8 @@ test('BANAMEX 1/2: mismo Wallet, activación independiente y dos evidencias para
     });
 
     await t.test('aviso bancario antes desconocido conserva recibo y original; análisis explícito idempotente sin gasto', async () => {
-      const parsers = load('src/lib/captureParsers.js');
-      const old = sourceLoader({ ...mocks, '@/lib/captureParsers': { ...parsers, interpretCapture: () => ({ reason: 'UNKNOWN_FORMAT', proposal: {} }) } })('src/lib/captureService.js');
+      const parsers = load('src/lib/captureParsers.ts');
+      const old = sourceLoader({ ...mocks, '@/lib/captureParsers': { ...parsers, interpretCapture: () => ({ reason: 'UNKNOWN_FORMAT', proposal: {} }) } })('src/lib/captureService.ts');
       bankInput = input(bank); const receipt = await old.receiveCaptureEvent(db, credential, bankInput), before = await read(bankInput);
       assert.deepEqual((await post(bankInput)).body, JSON.parse(JSON.stringify(receipt))); assert.deepEqual(await read(bankInput), before);
       for (const result of await Promise.all(Array.from({ length: 4 }, () => resolve({ id: before.movementId, action: 'reinterpret' })))) assert.equal(result.status, 200);

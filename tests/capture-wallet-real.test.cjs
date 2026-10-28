@@ -3,7 +3,7 @@ const { test } = require('node:test');
 const { sourceLoader } = require('./helpers/load-source.cjs');
 const wallet = require('./fixtures/captures/wallet-banamex-purchase.es.v1.json');
 const bank = require('./fixtures/captures/banamex-card-charge.es.v1.json');
-const { interpretCapture } = sourceLoader()('src/lib/captureParsers.js');
+const { interpretCapture } = sourceLoader()('src/lib/captureParsers.ts');
 
 test('Wallet real: MXN, comercio y título de Banamex; fecha de aviso México separada de operación bancaria', () => {
   const parsed = interpretCapture(wallet.event);

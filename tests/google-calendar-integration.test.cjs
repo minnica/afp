@@ -12,9 +12,9 @@ async function fixture(run) {
   assert.ok(['localhost', '127.0.0.1'].includes(parsed.hostname) && parsed.pathname.startsWith('/afp_test'), 'Solo se permite PostgreSQL local de pruebas');
   const db = new PrismaClient({ adapter: new PrismaPg({ connectionString: url }) });
   const load = sourceLoader({ '@/lib/prisma': { prisma: db } }, { process: { env }, URLSearchParams, AbortSignal });
-  const config = load('src/lib/calendar/config.js');
-  const service = load('src/lib/calendar/service.js');
-  const sync = load('src/lib/calendar/sync.js');
+  const config = load('src/lib/calendar/config.ts');
+  const service = load('src/lib/calendar/service.ts');
+  const sync = load('src/lib/calendar/sync.ts');
   const userId = `calendar-${randomUUID()}`;
   await db.user.create({ data: { id: userId, email: `${userId}@example.test` } });
   const connection = await db.googleCalendarConnection.create({ data: { userId, status: 'CONNECTED', refreshToken: config.encryptSecret('private-refresh', userId), googleSubject: 'subject-test' } });
@@ -120,7 +120,7 @@ integration('calendar DB: corrige un cobro futuro marcado como cobrado en Google
   assert.ok(changed[0].path.includes(mapping.eventId));
   const fixed = remote.get(mapping.eventId);
   assert.equal(fixed.summary, 'Cobrar · Persona de prueba');
-  assert.equal(fixed.eventLabelId, load('src/lib/calendar/palette.js').CALENDAR_EVENT_PALETTE.pending.id);
+  assert.equal(fixed.eventLabelId, load('src/lib/calendar/palette.ts').CALENDAR_EVENT_PALETTE.pending.id);
   assert.equal(fixed.start.date, '2026-10-30'); assert.equal(fixed.reminders.overrides.length, 1);
   assert.equal(await db.googleCalendarEvent.count({ where: { connectionId: connection.id } }), mappings.length);
   assert.equal(await db.income.count({ where: { userId } }), 1);
@@ -145,10 +145,10 @@ integration('calendar eventos DB: fechas y pagos de tarjeta, cobros y gastos vin
     'next/server': { NextResponse: { json: (body, options = {}) => ({ body, status: options.status || 200 }) } },
     '@supabase/supabase-js': { createClient: () => ({ auth: { getUser: async () => ({ data: { user: { id: userId } } }) } }) },
   }, { process: { env }, URLSearchParams, AbortSignal });
-  const worker = load('src/lib/calendar/worker.js');
+  const worker = load('src/lib/calendar/worker.ts');
   const request = (path, method, body) => ({ method, url: `https://afp.example.test/api/${path}`, headers: new Headers({ authorization: 'Bearer valid' }), json: async () => body });
   const save = async (path, method, body) => {
-    const response = await api(`src/app/api/${path}/route.js`)[method](request(path, method, body));
+    const response = await api(`src/app/api/${path}/route`)[method](request(path, method, body));
     assert.equal(response.status, 200, JSON.stringify(response.body));
     assert.equal(pending.length, 1); assert.equal(pending[0], userId);
     const connection = await db.googleCalendarConnection.findUnique({ where: { userId } });
@@ -169,7 +169,7 @@ integration('calendar eventos DB: fechas y pagos de tarjeta, cobros y gastos vin
 });
 
 integration('calendar DB: revisar corte exige ambos guardados, conserva ID y no registra pagos', async ({ db, load, userId, perform, remote, connection }) => {
-  const palette = load('src/lib/calendar/palette.js').CALENDAR_EVENT_PALETTE;
+  const palette = load('src/lib/calendar/palette.ts').CALENDAR_EVENT_PALETTE;
   const api = sourceLoader({ '@/lib/prisma': { prisma: db },
     '@/lib/calendar/schedule': { scheduleCalendarSync: () => {} },
     'next/server': { NextResponse: { json: (body, options = {}) => ({ body, status: options.status || 200 }) } },
@@ -234,7 +234,7 @@ integration('calendar DB: respuesta perdida y evento borrado en Google se recupe
 });
 
 integration('calendar DB: solo selecciona pendientes y revisión diaria; respeta esperas y desconexiones', async ({ db, load, userId, perform, connection, config }) => {
-  const { calendarPendingWhere, calendarNeedsSync } = load('src/lib/calendar/pending.js');
+  const { calendarPendingWhere, calendarNeedsSync } = load('src/lib/calendar/pending.ts');
   const selected = async () => {
     const count = await db.googleCalendarConnection.count({ where: { AND: [{ userId }, calendarPendingWhere(db)] } });
     return count;

@@ -16,9 +16,9 @@ test('Fase 5 PostgreSQL: revisión, fuentes y cotejo manual sin alterar decision
     'next/server': { NextResponse: { json: (body, opts = {}) => ({ body: JSON.parse(JSON.stringify(body)), status: opts.status || 200, headers: new Headers(opts.headers) }) } },
     '@supabase/supabase-js': { createClient: () => ({ auth: { getUser: async token => ({ data: { user: token === 'a' ? user : token === 'b' ? other : null } }) } }) },
   });
-  const processing = load('src/lib/captureProcessing.js'), reconciliation = load('src/lib/captureReconciliation.js');
-  const configuration = load('src/lib/captureConfiguration.js'), service = load('src/lib/captureService.js');
-  const protocol = load('src/lib/captureProtocol.js');
+  const processing = load('src/lib/captureProcessing.ts'), reconciliation = load('src/lib/captureReconciliation.ts');
+  const configuration = load('src/lib/captureConfiguration.ts'), service = load('src/lib/captureService.ts');
+  const protocol = load('src/lib/captureProtocol.ts');
   const card = await db.card.create({ data: { userId: user.id, name: 'Tarjeta ficticia', usualCutDay: 25, usualDueDay: 15 } });
   const category = await db.category.create({ data: { userId: user.id, name: 'Categoría ficticia' } });
   const foreign = await db.card.create({ data: { userId: other.id, name: 'Ajena', usualCutDay: 25, usualDueDay: 15 } });
@@ -47,6 +47,10 @@ test('Fase 5 PostgreSQL: revisión, fuentes y cotejo manual sin alterar decision
       const fixed = await processing.resolveCaptureMovement(db, user.id, { id: first.id, action: 'correct', correction, expectedCorrection: 'null' });
       assert.deepEqual(fixed.proposal, first.proposal); assert.deepEqual(fixed.correction, correction);
       await assert.rejects(processing.resolveCaptureMovement(db, user.id, { id: first.id, action: 'correct', correction, expectedCorrection: 'null' }), e => e.status === 409);
+      // PostgreSQL JSONB orders keys independently of the validation schema.
+      // A second edit uses the exact snapshot returned to the browser.
+      const repeated = await processing.resolveCaptureMovement(db, user.id, { id: first.id, action: 'correct', correction, expectedCorrection: JSON.stringify(fixed.correction) });
+      assert.deepEqual(repeated.correction, fixed.correction);
     });
     await t.test('registro explícito concurrente crea un gasto pendiente y no habilita formatos sintéticos', async () => {
       const rows = await Promise.all(Array.from({ length: 5 }, () => processing.resolveCaptureMovement(db, user.id, { id: first.id, action: 'register' })));
@@ -82,7 +86,7 @@ test('Fase 5 PostgreSQL: revisión, fuentes y cotejo manual sin alterar decision
       assert.equal(saved.notes, 'Nota personal'); assert.equal(saved.cashContributionAmount.toFixed(2), '50.50'); assert.equal(saved.reconciliationStatus, 'CONFIRMED');
     });
     await t.test('bandeja deriva Conciliado y separa los cuatro estados, con paginación propia', async () => {
-      const route = load('src/app/api/captures/movements/route.js');
+      const route = load('src/app/api/captures/movements/route.ts');
       const result = await route.GET(request(null, 'status=RECONCILED', 'a', 'GET'));
       assert.ok(result.body.movements.length >= 2); assert.ok(result.body.movements.every(row => row.inboxState === 'RECONCILED'));
       const foreignResult = await route.GET(request(null, `id=${first.id}`, 'b', 'GET')); assert.equal(foreignResult.status, 404);
@@ -196,7 +200,7 @@ test('Fase 5 PostgreSQL: revisión, fuentes y cotejo manual sin alterar decision
       await assert.rejects(service.changeCaptureDevice(db, user.id, { deviceId: device.id, action: 'source', sourcePackage: 'unknown', paused: true }), e => e.status === 400);
     });
     await t.test('reporte nativo guarda datos acotados, nunca secretos; usuario web no suplanta el reporte', async () => {
-      const route = load('src/app/api/captures/device/route.js');
+      const route = load('src/app/api/captures/device/route.ts');
       const input = { action: 'report', version: 1, active: true, listenerConnected: true, notificationAccess: true, batteryExempt: false, deliveryPaused: false, selectedPackages: ['com.bancomer.mbanking'], pausedPackages: ['com.bancomer.mbanking'] };
       const nativeRequest = body => new Request('http://localhost/api/captures/device', { method: 'POST', headers: { authorization: `Capture ${device.id}.${secret}`, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
       assert.equal((await route.POST(nativeRequest(input))).status, 200);

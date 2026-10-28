@@ -4,6 +4,16 @@ Historial resumido de decisiones, cambios, migraciones e incidencias que ayudan 
 
 Consolidado el **27 de octubre de 2026** a partir del README del commit `4562aa0cec0a46d8b482fdfef96116d1d3040282` y sus evidencias. «Publicado», «aplicado» y «pendiente» describen lo documentado en cada fecha; esta consolidación no incluye una comprobación remota nueva. Se conservan las fechas de los registros originales, que pueden usar hora local o UTC. El nombre de una migración identifica su versión, no demuestra cuándo se aplicó.
 
+## 2026-10-28
+
+### Captura Android, Calendar y offline en TypeScript
+
+**Fase 5 completada localmente.** Se migraron protocolo, parsers, reglas, revisión, conciliación, avisos Android, comprobantes y todos los endpoints de Captura; OAuth, agenda, sincronización y tareas de Calendar; y la cola offline con su observador de cambios. Los comandos distinguen resoluciones y las lecturas de JSON preservan las propuestas parciales, notas históricas y el orden usado por los controles de concurrencia.
+
+Las verificaciones se ejecutaron por lote con PostgreSQL desechable. Las interpretaciones de 19 fixtures coinciden con el JavaScript anterior; el cifrado Calendar v1 sigue siendo legible en ambas direcciones. En navegador, una cola creada antes de convertirla conserva UUID, se recupera tras una respuesta perdida y confirma entre pestañas con un solo envío bajo Web Locks. IndexedDB mantiene nombre, almacenes y versión 1, y el service worker conserva su exclusión de API privadas.
+
+El interior de las pantallas/hooks JSX queda para fase 6. No se cambió esquema, SQL, lockfile ni APK, ni se publicó o activaron reglas. Los resultados, tiempos, incidencias de preparación y límites están en la [fase 5](../artifacts/typescript-migration/phase-5/README.md).
+
 ## 2026-10-27
 
 ### Núcleo financiero y API compartida en TypeScript

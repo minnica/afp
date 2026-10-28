@@ -51,7 +51,7 @@ Este README describe el funcionamiento y los procedimientos del código versiona
 | Área | Implementación |
 | --- | --- |
 | Web | Next.js 16.3.8, App Router y React 19.2.4 |
-| Lenguaje | Transición gradual JS/JSX → TypeScript; Mi dinero, núcleo financiero y API compartida en TS; interfaz restante y captura/Calendar/offline aún en JS/JSX. Alias `@/*` para `src/*` |
+| Lenguaje | Transición gradual JS/JSX → TypeScript; Mi dinero, núcleo financiero, API, Captura, Calendar y cola offline en TS; interfaz y hooks restantes aún en JS/JSX. Alias `@/*` para `src/*` |
 | UI | Componentes shadcn locales, Radix UI y Tailwind CSS 4; Base UI para el Combobox múltiple |
 | Formularios | React Hook Form y Zod |
 | Tablas y gráficas | TanStack Table 8 y Recharts 3 |
@@ -69,8 +69,8 @@ src/hooks/               Sesión/carga de vistas, borradores y comportamiento de
 src/lib/calculations/    Cálculos de ciclos, MSI, suscripciones, deudas y dashboard
 src/lib/money/           Cuentas, previsiones, presupuestos y rendimientos
 src/lib/calendar/        OAuth, generación de eventos y sincronización con Google
-src/lib/capture*.js      Recepción, interpretación, revisión y automatización de avisos
-src/lib/offlineExpenses.js  Cola de gastos por usuario en IndexedDB
+src/lib/capture*.ts      Recepción, interpretación, revisión y automatización de avisos
+src/lib/offlineExpenses.ts  Cola de gastos por usuario en IndexedDB
 prisma/                  Esquema e historial de migraciones SQL
 public/                  Manifest, service worker, iconos y Digital Asset Links
 android/                 Aplicación nativa, pruebas y herramientas de diagnóstico
@@ -337,7 +337,7 @@ La tarea revisa cada minuto y solo solicita `POST /api/cron/capture-bank-fallbac
 
 ## Google Calendar
 
-Desde Configuración se puede conectar un calendario AFP para cortes, pagos de tarjetas, suscripciones y cuentas por cobrar/pagar. Los eventos usan `America/Mexico_City`; mostrar importes es opcional. Los colores y estados se definen en [src/lib/calendar/palette.js](src/lib/calendar/palette.js).
+Desde Configuración se puede conectar un calendario AFP para cortes, pagos de tarjetas, suscripciones y cuentas por cobrar/pagar. Los eventos usan `America/Mexico_City`; mostrar importes es opcional. Los colores y estados se definen en [src/lib/calendar/palette.ts](src/lib/calendar/palette.ts).
 
 Variables adicionales, solo de servidor:
 
@@ -360,7 +360,7 @@ Desconectar retira eventos de hoy en adelante, conserva el historial y elimina l
 ## Convenciones de desarrollo
 
 - Leer este README y [PRODUCT.md](PRODUCT.md) antes de cambiar arquitectura o comportamiento. Actualizar la documentación afectada en la misma tarea; registrar los hitos relevantes en [docs/bitacora.md](docs/bitacora.md) y guardar los resultados detallados de ejecución en `artifacts/`.
-- Seguir el [plan de migración gradual a TypeScript](docs/plan-migracion-typescript.md): fases 0–3 completas. Mi dinero usa una instantánea tipada de Prisma, comandos por acción, validación de JSON históricos y respuestas, y formularios/proyección en TSX. La [evidencia de la fase 3](artifacts/typescript-migration/phase-3/README.md) incluye PostgreSQL y navegador móvil/escritorio. Los componentes compartidos de UI y el núcleo financiero externo conservan fronteras locales explícitas hasta sus respectivas fases. `tsconfig.json` permite JS sin comprobarlo (`allowJs: true`, `checkJs: false`); TS/TSX usa `strict` y `noUncheckedIndexedAccess`. No considerar tipado el código JS restante. Código en inglés e interfaz en español.
+- Seguir el [plan de migración gradual a TypeScript](docs/plan-migracion-typescript.md): fases 0–5 completas. Mi dinero, núcleo financiero/API, Captura, Calendar y la cola offline usan TypeScript estricto, consultas Prisma inferidas y validación de JSON externos/históricos. La [evidencia de fase 5](artifacts/typescript-migration/phase-5/README.md) incluye compatibilidad Android v1, cifrado anterior, PostgreSQL y recuperación entre pestañas. La interfaz y hooks restantes siguen en fase 6; sus interiores JSX no cuentan como tipados. `tsconfig.json` mantiene `allowJs: true`, `checkJs: false`, `strict` y `noUncheckedIndexedAccess`, con fronteras locales explícitas. Código en inglés e interfaz en español.
 - Conservar `node:test` y cargar fuentes con `tests/helpers/load-source.cjs`: esbuild transforma JS/TS/JSX/TSX, pero no comprueba tipos. Los tests deben inyectar adaptadores de red/BD; el cargador no hereda `process.env` ni carga `.env`. Actualizar rutas literales al convertir archivos; el fallback de extensión inequívoco es temporal hasta la fase 7.
 - Reutilizar [src/components/ui/](src/components/ui/) y la configuración `radix-mira` de [components.json](components.json). Formularios con React Hook Form + Zod; fechas con `DatePicker`; importes con `NumberInput`; selectores con `ResponsiveSelect`/`SearchableSelect`.
 - Conservar la interacción móvil de `CreateRecordSurface`, los borradores por usuario y el foco de los diálogos. Los borrados requieren el `AlertDialog` compartido. No ocultar errores ni presentar una recarga fallida como un alta no guardada.
@@ -381,7 +381,7 @@ La web se despliega en Vercel, proyecto `afp`. El build es `pnpm build`; no apli
 
 ## Documentación relacionada
 
-- [docs/plan-migracion-typescript.md](docs/plan-migracion-typescript.md): plan por fases y criterios de aceptación; fases 0–4 completadas; siguiente fase: captura Android, Calendar y offline.
+- [docs/plan-migracion-typescript.md](docs/plan-migracion-typescript.md): plan por fases y criterios de aceptación; fases 0–5 completadas; siguiente fase: interfaz, hooks y páginas restantes.
 - [docs/bitacora.md](docs/bitacora.md): decisiones, migraciones, incidencias y seguimientos históricos con sus evidencias.
 - [PRODUCT.md](PRODUCT.md): propósito, alcance y principios del producto.
 - [docs/android-captura.md](docs/android-captura.md): operación técnica de Android, firma y pruebas.

@@ -13,10 +13,10 @@ test('Nu CFE PostgreSQL: aviso real anonimizado conserva recepción y exige revi
   const db = new PrismaClient({ adapter: new PrismaPg({ connectionString }) });
   const user = await db.user.create({ data: { email: `real-notice-${randomUUID()}@example.test` } });
   const load = sourceLoader();
-  const protocol = load('src/lib/captureProtocol.js');
-  const service = load('src/lib/captureService.js');
-  const processing = load('src/lib/captureProcessing.js');
-  const configuration = load('src/lib/captureConfiguration.js');
+  const protocol = load('src/lib/captureProtocol.ts');
+  const service = load('src/lib/captureService.ts');
+  const processing = load('src/lib/captureProcessing.ts');
+  const configuration = load('src/lib/captureConfiguration.ts');
   const device = await db.captureDevice.create({ data: { userId: user.id, name: 'Prueba local Nu/CFE', approvedAt: new Date(), secretHash: protocol.captureHash(randomBytes(32).toString('base64url')) } });
   const credential = { id: device.id, secretHash: device.secretHash };
   const card = await db.card.create({ data: { userId: user.id, name: 'NU', usualCutDay: 25, usualDueDay: 15 } });
@@ -55,8 +55,8 @@ test('Nu CFE PostgreSQL: aviso real anonimizado conserva recepción y exige revi
       assert.equal((await db.dailyExpense.findUnique({ where: { id: registered.expenseId } })).reconciliationStatus, 'PENDING');
     });
     await t.test('un recibo previo de formato desconocido nunca se reinterpreta al incorporar el nuevo analizador', async () => {
-      const parsers = load('src/lib/captureParsers.js');
-      const prior = sourceLoader({ '@/lib/captureParsers': { ...parsers, interpretCapture: () => ({ reason: 'UNKNOWN_FORMAT', proposal: {} }) } })('src/lib/captureService.js');
+      const parsers = load('src/lib/captureParsers.ts');
+      const prior = sourceLoader({ '@/lib/captureParsers': { ...parsers, interpretCapture: () => ({ reason: 'UNKNOWN_FORMAT', proposal: {} }) } })('src/lib/captureService.ts');
       const previous = event(); await prior.receiveCaptureEvent(db, credential, previous);
       const before = await read(previous);
       assert.equal(before.movement.reason, 'UNKNOWN_FORMAT');

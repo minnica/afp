@@ -1,4 +1,5 @@
-import type { Prisma, PrismaClient } from '@prisma/client';
+import type { MoneyTransactionRunner } from './money/service';
+import type { Prisma } from '@prisma/client';
 import { getDebtAccountState } from "@/lib/calculations/debtAccounts";
 
 // Todas las mutaciones de abonos/principal toman este bloqueo ANTES de leer.
@@ -10,7 +11,7 @@ export async function lockDebtAccounts(tx: Prisma.TransactionClient, userId: str
   await tx.$queryRaw`SELECT 1 AS locked FROM pg_advisory_xact_lock(hashtextextended(${key}, 0))`;
 }
 
-export async function runDebtAccountOperation<T>(db: PrismaClient, userId: string, operation: (tx: Prisma.TransactionClient) => Promise<T>): Promise<T> {
+export async function runDebtAccountOperation<T>(db: MoneyTransactionRunner, userId: string, operation: (tx: Prisma.TransactionClient) => Promise<T>): Promise<T> {
   return db.$transaction(async tx => {
     await lockDebtAccounts(tx, userId);
     return operation(tx);

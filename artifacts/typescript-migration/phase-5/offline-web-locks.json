@@ -1,0 +1,32 @@
+{
+  "postsForConcurrentEntry": 1,
+  "realWebLocks": true,
+  "result": {
+    "confirmations": [],
+    "failedExpenses": [],
+    "syncedExpenses": []
+  },
+  "state": {
+    "held": 0,
+    "receipts": [
+      {
+        "concept": "perdida",
+        "id": "af45dbf9-1282-489e-b640-2d41a6a878fd"
+      },
+      {
+        "concept": "legado",
+        "id": "86de16b1-6d43-411c-9460-f2f31b96fd43"
+      },
+      {
+        "concept": "cierre",
+        "id": "cd95c11b-0067-406b-b839-f895177fa0f3"
+      }
+    ],
+    "requests": [
+      "af45dbf9-1282-489e-b640-2d41a6a878fd",
+      "af45dbf9-1282-489e-b640-2d41a6a878fd",
+      "86de16b1-6d43-411c-9460-f2f31b96fd43",
+      "cd95c11b-0067-406b-b839-f895177fa0f3"
+    ]
+  }
+}

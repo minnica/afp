@@ -16,9 +16,9 @@ test('Nu/CFE: regla expresa, suscripción bimestral y avisos resueltos con un so
   const url = new URL(connectionString);
   assert.ok(['127.0.0.1', 'localhost'].includes(url.hostname) && /^\/afp_test\w*$/.test(url.pathname) && !url.search);
   const db = new PrismaClient({ adapter: new PrismaPg({ connectionString }) });
-  const load = sourceLoader({}, { Date: FixtureClock }), protocol = load('src/lib/captureProtocol.js'), service = load('src/lib/captureService.js');
-  const processing = load('src/lib/captureProcessing.js'), configuration = load('src/lib/captureConfiguration.js');
-  const reconciliation = load('src/lib/captureReconciliation.js'), charges = load('src/lib/subscriptionChargeService.ts');
+  const load = sourceLoader({}, { Date: FixtureClock }), protocol = load('src/lib/captureProtocol.ts'), service = load('src/lib/captureService.ts');
+  const processing = load('src/lib/captureProcessing.ts'), configuration = load('src/lib/captureConfiguration.ts');
+  const reconciliation = load('src/lib/captureReconciliation.ts'), charges = load('src/lib/subscriptionChargeService.ts');
   const parserKey = 'nu.cfe-service-payment.es.v2';
   const user = await db.user.create({ data: { email: `nu-cfe-${randomUUID()}@example.test` } });
   const other = await db.user.create({ data: { email: `nu-other-${randomUUID()}@example.test` } });
@@ -68,8 +68,8 @@ test('Nu/CFE: regla expresa, suscripción bimestral y avisos resueltos con un so
       assert.equal(await db.dailyExpense.count({ where: { userId: user.id } }), 0);
     });
     await t.test('aviso antiguo: reintentar conserva recibo; reinterpretar pide análisis explícito y completa solo por la regla', async () => {
-      const parsers = load('src/lib/captureParsers.js');
-      const prior = sourceLoader({ '@/lib/captureParsers': { ...parsers, interpretCapture: () => ({ reason: 'UNKNOWN_FORMAT', proposal: {} }) } })('src/lib/captureService.js');
+      const parsers = load('src/lib/captureParsers.ts');
+      const prior = sourceLoader({ '@/lib/captureParsers': { ...parsers, interpretCapture: () => ({ reason: 'UNKNOWN_FORMAT', proposal: {} }) } })('src/lib/captureService.ts');
       oldInput = event('2026-08', '111.11'); oldReceipt = await prior.receiveCaptureEvent(db, credential, oldInput);
       const before = await read(oldInput);
       assert.equal(JSON.stringify(await service.receiveCaptureEvent(db, credential, oldInput)), JSON.stringify(oldReceipt));

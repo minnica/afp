@@ -12,8 +12,8 @@ test('Fase 7 PostgreSQL: activación gradual, evidencia propia y recuperación d
   const db = new PrismaClient({ adapter: new PrismaPg({ connectionString }) });
   const user = await db.user.create({ data: { email: `rollout-${randomUUID()}@example.test` } });
   const other = await db.user.create({ data: { email: `rollout-other-${randomUUID()}@example.test` } });
-  const base = sourceLoader()('src/lib/captureParsers.js');
-  const protocol = sourceLoader()('src/lib/captureProtocol.js');
+  const base = sourceLoader()('src/lib/captureParsers.ts');
+  const protocol = sourceLoader()('src/lib/captureProtocol.ts');
   const wallet = 'com.google.android.apps.walletnfcrel';
   // Contratos ficticios SOLO en este cargador. Ningún analizador nuevo ni un
   // interruptor de verificación se incorpora al producto sin muestras reales.
@@ -22,11 +22,11 @@ test('Fase 7 PostgreSQL: activación gradual, evidencia propia y recuperación d
     ...base.interpretCapture({ ...event, sourcePackage: event.sourcePackage === wallet ? wallet : 'com.bancomer.mbanking' }),
     parserKey: parsers.find(parser => parser.sourcePackage === event.sourcePackage).key, verified: true,
   }) } });
-  const configuration = load('src/lib/captureConfiguration.js');
-  const service = load('src/lib/captureService.js');
-  const processing = load('src/lib/captureProcessing.js');
-  const reconciliation = load('src/lib/captureReconciliation.js');
-  const real = sourceLoader()('src/lib/captureConfiguration.js');
+  const configuration = load('src/lib/captureConfiguration.ts');
+  const service = load('src/lib/captureService.ts');
+  const processing = load('src/lib/captureProcessing.ts');
+  const reconciliation = load('src/lib/captureReconciliation.ts');
+  const real = sourceLoader()('src/lib/captureConfiguration.ts');
   const category = await db.category.create({ data: { userId: user.id, name: 'Pruebas ficticias' } });
   const device = await db.captureDevice.create({ data: { userId: user.id, name: 'Ficticio Fase 7', approvedAt: new Date(), secretHash: protocol.captureHash(randomBytes(32).toString('base64url')) } });
   const credential = { id: device.id, secretHash: device.secretHash };
@@ -183,7 +183,7 @@ test('Fase 7 PostgreSQL: activación gradual, evidencia propia y recuperación d
       const before = await db.captureMovement.findMany({ where: { userId: user.id }, orderBy: { id: 'asc' } });
       await configuration.captureConfiguration(db, user.id);
       assert.deepEqual(await db.captureMovement.findMany({ where: { userId: user.id }, orderBy: { id: 'asc' } }), before);
-      const rollout = load('src/lib/captureRollout.js');
+      const rollout = load('src/lib/captureRollout.ts');
       const aliases = await db.captureCardAlias.findMany({ where: { userId: user.id } });
       const movements = await rollout.captureRolloutMovements(db, user.id);
       assert.equal(rollout.captureFormatReadiness({ ...parser(cards[0].sourcePackage), key: 'synthetic.new.v2' }, cards[0].id, aliases, movements).canEnable, false);

@@ -11,7 +11,7 @@ test('Fase 4 PostgreSQL: interpretación, resoluciones y escritura financiera at
  const db=new PrismaClient({adapter:new PrismaPg({connectionString})});
  const user=await db.user.create({data:{email:`phase4-${randomUUID()}@example.test`}});
  const other=await db.user.create({data:{email:`phase4-other-${randomUUID()}@example.test`}});
- const base=sourceLoader()('src/lib/captureParsers.js');
+ const base=sourceLoader()('src/lib/captureParsers.ts');
  const session={a:user,b:other};
  const mocks={
   '@/lib/prisma':{prisma:db},
@@ -22,8 +22,8 @@ test('Fase 4 PostgreSQL: interpretación, resoluciones y escritura financiera at
  // interruptor de entorno o de cliente que permita saltar el bloqueo real.
  const load=sourceLoader({...mocks,'@/lib/captureParsers':{...base,captureParsers:base.captureParsers.map(parser=>({...parser,verified:true})),interpretCapture:event=>({...base.interpretCapture(event),verified:true})}});
  const realLoad=sourceLoader(mocks);
- const protocol=load('src/lib/captureProtocol.js'), service=load('src/lib/captureService.js');
- const configuration=load('src/lib/captureConfiguration.js'), processing=load('src/lib/captureProcessing.js');
+ const protocol=load('src/lib/captureProtocol.ts'), service=load('src/lib/captureService.ts');
+ const configuration=load('src/lib/captureConfiguration.ts'), processing=load('src/lib/captureProcessing.ts');
  const expenses=load('src/app/api/expenses/route.ts');
  const request=(body={},query='',token='a',method='POST')=>new Request(`http://localhost/api/test?userId=${other.id}&${query}`,{method,headers:{authorization:`Bearer ${token}`,'Content-Type':'application/json'},...(!['GET','HEAD'].includes(method)?{body:JSON.stringify(body)}:{})});
  let sequence=0;
@@ -39,14 +39,14 @@ test('Fase 4 PostgreSQL: interpretación, resoluciones y escritura financiera at
  const card=await db.card.create({data:{userId:user.id,name:'BBVA',usualCutDay:25,usualDueDay:15}});
  const card2=await db.card.create({data:{userId:user.id,name:'HSBC 1',usualCutDay:25,usualDueDay:15}});
  const send=async (input, loader=load)=>{
-  const route=loader('src/app/api/captures/events/route.js');
+  const route=loader('src/app/api/captures/events/route.ts');
   const response=await route.POST(new Request('http://localhost/api/captures/events',{method:'POST',headers:{authorization:`Capture ${device.id}.${secret}`,'Content-Type':'application/json'},body:JSON.stringify(input)}));
   assert.equal(response.status,200,JSON.stringify(response.body));
   const stored=await db.captureEvent.findUnique({where:{deviceId_eventId:{deviceId:device.id,eventId:input.eventId}},include:{movement:true}});
   return {response,movement:stored.movement,stored};
  };
  const enable=async(cardId=card.id,parserKey='bbva.purchase.es.v1')=>{
-  const rollout=load('src/lib/captureRollout.js');
+  const rollout=load('src/lib/captureRollout.ts');
   const aliases=await db.captureCardAlias.findMany({where:{userId:user.id}});
   const reviewed=await rollout.captureRolloutMovements(db,user.id,{cardId,parserKey});
   if(!rollout.captureFormatReadiness({key:parserKey,sourcePackage:parserKey.startsWith('wallet.')?'com.google.android.apps.walletnfcrel':'com.bancomer.mbanking',verified:true},cardId,aliases,reviewed).canEnable){
@@ -55,7 +55,7 @@ test('Fase 4 PostgreSQL: interpretación, resoluciones y escritura financiera at
    const p=movement.proposal;
    await processing.resolveCaptureMovement(db,user.id,{id:movement.id,action:'correct',expectedCorrection:'null',correction:{cardId,date:p.date,amount:p.amount,currency:p.currency,merchant:p.merchant,categoryId:category.id}});
    const registered=await processing.resolveCaptureMovement(db,user.id,{id:movement.id,action:'register'});
-   const reconciliation=load('src/lib/captureReconciliation.js');
+   const reconciliation=load('src/lib/captureReconciliation.ts');
    const period={cardId,startDate:'2026-10-01',endDate:'2026-10-25'};
    const row=(await reconciliation.captureStatement(db,user.id,period)).records.find(row=>row.id===registered.expenseId);
    await reconciliation.reconcileCaptureStatement(db,user.id,{...period,action:'confirm',type:row.type,recordId:row.id,fingerprint:row.fingerprint});
@@ -79,7 +79,7 @@ test('Fase 4 PostgreSQL: interpretación, resoluciones y escritura financiera at
   await assert.rejects(configuration.configureCapture(db,user.id,{action:'importAliases',inventory:partial}));assert.equal(await db.captureCardAlias.count(),before);
  });
  await t.test('registro real bloquea activación sin muestras verificadas y queda en observación aun con alias conocidos',async()=>{
-  await assert.rejects(realLoad('src/lib/captureConfiguration.js').configureCapture(db,user.id,{action:'automation',cardId:card.id,parserKey:'bbva.purchase.es.v1',mode:'AUTOMATIC'}),e=>e.status===409);
+  await assert.rejects(realLoad('src/lib/captureConfiguration.ts').configureCapture(db,user.id,{action:'automation',cardId:card.id,parserKey:'bbva.purchase.es.v1',mode:'AUTOMATIC'}),e=>e.status===409);
   const row=await send(event(),realLoad);assert.equal(row.movement.status,'OBSERVED');assert.equal(row.movement.reason,'UNVERIFIED_FORMAT');assert.equal(await db.dailyExpense.count({where:{userId:user.id}}),0);
  });
  await t.test('formato habilitado solo para tarjeta concreta crea gasto MXN Por conciliar y Por clasificar',async()=>{
@@ -230,12 +230,12 @@ test('Fase 4 PostgreSQL: interpretación, resoluciones y escritura financiera at
 
  });
  await t.test('dos cuentas no comparten alias, reglas, resoluciones, páginas ni datos financieros',async()=>{
-  const list=await load('src/app/api/captures/movements/route.js').GET(request({},'','b','GET'));assert.equal(list.status,200);assert.equal(list.body.movements.length,0);
+  const list=await load('src/app/api/captures/movements/route.ts').GET(request({},'','b','GET'));assert.equal(list.status,200);assert.equal(list.body.movements.length,0);
   const owned=await db.captureMovement.findFirst({where:{userId:user.id}});await assert.rejects(processing.resolveCaptureMovement(db,other.id,{id:owned.id,action:'discard'}),e=>e.status===404);
   await assert.rejects(configuration.configureCapture(db,other.id,{action:'rule',cardId:card.id,merchant:'X',categoryId:category.id}),e=>e.status===404);
   const config=await configuration.captureConfiguration(db,other.id);assert.equal(config.aliases.length,0);
-  const page=await load('src/app/api/captures/movements/route.js').GET(request({},`cursor=${owned.id}`,'b','GET'));assert.equal(page.status,404);
-  assert.equal((await load('src/app/api/captures/configuration/route.js').PATCH(request({action:'automation',cardId:card.id,parserKey:'bbva.purchase.es.v1',mode:'AUTOMATIC',userId:user.id},'','b','PATCH'))).status,400);
+  const page=await load('src/app/api/captures/movements/route.ts').GET(request({},`cursor=${owned.id}`,'b','GET'));assert.equal(page.status,404);
+  assert.equal((await load('src/app/api/captures/configuration/route.ts').PATCH(request({action:'automation',cardId:card.id,parserKey:'bbva.purchase.es.v1',mode:'AUTOMATIC',userId:user.id},'','b','PATCH'))).status,400);
  });
  }finally{
   await db.captureEvent.deleteMany({where:{userId:user.id}});await db.captureMovement.deleteMany({where:{userId:user.id}});

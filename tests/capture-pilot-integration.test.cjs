@@ -13,10 +13,10 @@ test('Fase 6 PostgreSQL: seguimiento del piloto sin atribuir cobertura ni crear 
   const user = await db.user.create({ data: { email: `${randomUUID()}@example.test` } });
   const other = await db.user.create({ data: { email: `${randomUUID()}@example.test` } });
   const load = sourceLoader();
-  const { captureStatement, reconcileCaptureStatement } = load('src/lib/captureReconciliation.js');
-  const { configureCapture } = load('src/lib/captureConfiguration.js');
-  const { receiveCaptureEvent } = load('src/lib/captureService.js');
-  const { validateCaptureEvent, captureHash } = load('src/lib/captureProtocol.js');
+  const { captureStatement, reconcileCaptureStatement } = load('src/lib/captureReconciliation.ts');
+  const { configureCapture } = load('src/lib/captureConfiguration.ts');
+  const { receiveCaptureEvent } = load('src/lib/captureService.ts');
+  const { validateCaptureEvent, captureHash } = load('src/lib/captureProtocol.ts');
   const card = await db.card.create({ data: { userId: user.id, name: 'BBVA ficticia', usualCutDay: 25, usualDueDay: 15 } });
   const category = await db.category.create({ data: { userId: user.id, name: 'Ficticia' } });
   const device = await db.captureDevice.create({ data: { userId: user.id, name: 'Ficticio', approvedAt: new Date(), secretHash: captureHash(randomBytes(32).toString('base64url')) } });
@@ -78,7 +78,7 @@ test('Fase 6 PostgreSQL: seguimiento del piloto sin atribuir cobertura ni crear 
       assert.equal((await captureStatement(db, user.id, historical)).pilot.unassignedSourceEvents, 2);
     });
     await t.test('avisos de débito quedan por revisar: reintentos y activación forzada no crean una compra de crédito', async () => {
-      const config = await load('src/lib/captureConfiguration.js').captureConfiguration(db, user.id);
+      const config = await load('src/lib/captureConfiguration.ts').captureConfiguration(db, user.id);
       assert.ok(!config.parsers.some(parser => parser.key === 'bbva.account-charge.es.v1'));
       await assert.rejects(configureCapture(db, user.id, { action: 'automation', cardId: card.id, parserKey: 'bbva.account-charge.es.v1', mode: 'AUTOMATIC' }), error => error.status === 409);
       // Incluso una fila administrativa alterada no vuelve completo un aviso.
