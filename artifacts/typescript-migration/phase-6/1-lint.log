@@ -1,0 +1,40 @@
+
+> afp@0.1.0 lint /home/garatachia/projects/afp
+> eslint
+
+
+/home/garatachia/projects/afp/src/components/configuracion/SettingsContent.tsx
+  6:6  warning  'RowModel' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/garatachia/projects/afp/src/components/credito-y-deuda/CreditBalancesContent.tsx
+  4:6  warning  'RowModel' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/garatachia/projects/afp/src/components/gastos/GastosContent.tsx
+  415:18  warning  'loadSubscriptions' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/garatachia/projects/afp/src/components/ingresos/IngresosContent.tsx
+  163:11  warning  'activeReceivables' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/home/garatachia/projects/afp/src/components/tarjetas/TarjetasContent.tsx
+  6:6  warning  'RowModel' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/garatachia/projects/afp/src/components/ui/data-table.tsx
+  65:17  warning  Compilation Skipped: Use of incompatible library
+
+This API returns functions which cannot be memoized without leading to stale UI. To prevent this, by default React Compiler will skip memoizing this component/hook. However, you may see issues if values from this API are passed to other components/hooks that are memoized.
+
+/home/garatachia/projects/afp/src/components/ui/data-table.tsx:65:17
+  63 |   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize });
+  64 |
+> 65 |   const table = useReactTable({
+     |                 ^^^^^^^^^^^^^ TanStack Table's `useReactTable()` API returns functions that cannot be memoized safely
+  66 |     data,
+  67 |     columns,
+  68 |     state: { sorting, columnFilters, globalFilter, pagination },  react-hooks/incompatible-library
+
+/home/garatachia/projects/afp/tests/types/interface.tsx
+  12:11  error  Unsafe assignment of an error typed value  @typescript-eslint/no-unsafe-assignment
+
+✖ 7 problems (1 error, 6 warnings)
+
+ ELIFECYCLE  Command failed with exit code 1.

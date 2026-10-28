@@ -18,6 +18,7 @@ test('PostgreSQL: contratos JSON de todos los flujos financieros, variantes y pa
     '@supabase/supabase-js': { createClient: () => ({ auth: { getUser: async () => ({ data: { user } }) } }) },
   });
   const { validateFinancialResponse, financialReadSchemas } = load('src/lib/financialResponses.ts');
+  const { uiResponseSchemas } = load('src/lib/uiResponseSchemas.ts');
   async function call(resource, method = 'GET', body, params = '') {
     const response = await load(`src/app/api/${resource}/route`)[method]({
       method, headers: new Headers({ authorization: 'Bearer fictitious' }),
@@ -25,6 +26,10 @@ test('PostgreSQL: contratos JSON de todos los flujos financieros, variantes y pa
     });
     assert.equal(response.status, 200, `${method} ${resource}: ${JSON.stringify(response.body)}`);
     validateFinancialResponse(`/api/${resource}`, method, response.body);
+    if (method === 'GET' && resource in uiResponseSchemas) {
+      const parsed = uiResponseSchemas[resource].parse(response.body);
+      assert.deepEqual(JSON.parse(JSON.stringify(parsed)), response.body, `El contrato UI conserva ${resource}`);
+    }
     return response.body;
   }
   try {

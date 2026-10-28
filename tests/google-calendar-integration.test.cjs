@@ -49,7 +49,10 @@ async function fixture(run) {
     await db.googleCalendarConnection.update({ where: { userId }, data: { nextAttemptAt: new Date(0) } });
     return sync.syncGoogleCalendar(userId, { db, clientFactory: async () => client, now, ...options });
   };
-  try { await run({ db, load, config, service, sync, userId, connection, client, remote, calendars, calls, perform, losePost: () => { failNextPost = true; } }); }
+  try {
+    const { uiResponseSchemas } = load('src/lib/uiResponseSchemas.ts');
+    uiResponseSchemas['calendar/google'].parse(JSON.parse(JSON.stringify(await service.calendarStatus(userId, db))));
+    await run({ db, load, config, service, sync, userId, connection, client, remote, calendars, calls, perform, losePost: () => { failNextPost = true; } }); }
   finally { await db.user.delete({ where: { id: userId } }); await db.$disconnect(); }
 }
 const integration = (name, run) => test(name, { skip: !url }, () => fixture(run));

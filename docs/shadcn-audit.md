@@ -81,7 +81,7 @@ Estas comprobaciones validan el control web y su estado en emulación; el diálo
 
 Se incorporaron `Command` e `InputGroup` desde el registro `radix-mira`, manteniendo JSX, Hugeicons y el helper local `cn`. `cmdk` es la única dependencia nueva. No se sobrescribieron los componentes existentes. `CommandDialog` mantiene su título y descripción dentro del contenido del diálogo y los textos predeterminados se localizaron al español. `CommandInput` admite clases para el grupo de entrada, utilizadas por la composición para darle una altura táctil de 48 px.
 
-`src/components/ui/searchable-select.jsx` compone `Command` con `Sheet` en pantallas menores de 768 px o con puntero principal táctil, y con `Popover` en escritorio. Se aplica a 21 campos de categorías, personas, suscripciones y cuentas en Gastos, Compras a meses, Suscripciones, Cuentas por cobrar, Cuentas por pagar, Ingresos y Dashboard. Los selectores de opciones cortas y tarjetas conservan `Select`.
+`src/components/ui/searchable-select.tsx` compone `Command` con `Sheet` en pantallas menores de 768 px o con puntero principal táctil, y con `Popover` en escritorio. Se aplica a 21 campos de categorías, personas, suscripciones y cuentas en Gastos, Compras a meses, Suscripciones, Cuentas por cobrar, Cuentas por pagar, Ingresos y Dashboard. Los selectores de opciones cortas y tarjetas conservan `Select`.
 
 - La búsqueda opera sobre etiquetas, ignora acentos y mayúsculas y conserva los IDs originales. Ordena alfabéticamente; opciones como «Sin persona» y «Todas las categorías» quedan al principio.
 - En móvil, el panel ocupa como máximo el 70 % de la altura. El encabezado y buscador permanecen visibles; la lista tiene desplazamiento independiente. Las filas, buscador y botón de cerrar tienen una altura de 48 px. La tipografía del buscador permanece en 16 px, también en orientación horizontal.
@@ -105,7 +105,7 @@ Con este ajuste hay 29 componentes base y tres composiciones compartidas: `DateP
 
 Una recarga completa de `/gastos` en Chrome del emulador mostró un error de hidratación en `SidebarInset`. La causa estaba en `useIsMobile`: el inicializador de estado devolvía escritorio en el servidor, pero móvil en el primer render del cliente. Esto cambiaba la estructura de `AppSidebar` antes de completar la hidratación.
 
-`src/hooks/use-mobile.js` ahora usa `useSyncExternalStore` con una instantánea de servidor estable (`false`). El render inicial coincide con el servidor y después se aplica el tamaño real de pantalla. La consulta `(width < 768px)` coincide con el breakpoint de CSS, incluidos los anchos fraccionarios que puede producir el emulador.
+`src/hooks/use-mobile.ts` ahora usa `useSyncExternalStore` con una instantánea de servidor estable (`false`). El render inicial coincide con el servidor y después se aplica el tamaño real de pantalla. La consulta `(width < 768px)` coincide con el breakpoint de CSS, incluidos los anchos fraccionarios que puede producir el emulador.
 
 - Recarga completa en el emulador a 412 px: formulario de Gastos cargado, sin skeleton, error de hidratación ni indicador de issues. Esta comprobación usó la sesión y datos de la app, sin respuestas simuladas.
 - Menú móvil: apertura y cierre comprobados. Cambios de viewport a 767, 768 y 1280 px: modo móvil o escritorio correcto. Al finalizar se restauró el tamaño original del emulador.
@@ -240,7 +240,7 @@ Comprobado en web a 390 px con API simulada: Tarjetas inicia en Ciclos, su formu
 
 ## Navegación entre secciones desde la captura móvil
 
-`MobileNavigationSheet` compone los componentes oficiales Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetClose y SheetFooter con `side="bottom"`. Se consultaron el registro y el ejemplo `sheet-side` mediante el MCP de shadcn. El componente base no se modifica y no se añaden dependencias. La lista de destinos se extrajo a `src/lib/navigation.js` y se comparte con AppSidebar, conservando sus etiquetas, rutas, iconos y orden.
+`MobileNavigationSheet` compone los componentes oficiales Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetClose y SheetFooter con `side="bottom"`. Se consultaron el registro y el ejemplo `sheet-side` mediante el MCP de shadcn. El componente base no se modifica y no se añaden dependencias. La lista de destinos se extrajo a `src/lib/navigation.tsx` y se comparte con AppSidebar, conservando sus etiquetas, rutas, iconos y orden.
 
 Solo aparece con ancho menor de 768 px. En AppShell sustituye el acceso al menú lateral por «Cambiar sección»; también se monta dentro del encabezado de los diálogos de alta, con lo que se navega en dos toques sin cerrar primero el formulario. Escritorio conserva su SidebarTrigger y presentación. Las nueve secciones son enlaces reales; la actual usa `aria-current="page"`, fondo y marca. Enlaces y cierre tienen áreas de 48 px. No hay buscador ni foco en inputs: abre con foco en el título. Cancelar o elegir la sección actual cierra únicamente el Sheet y devuelve el foco al acceso. Elegir otro destino cierra el diálogo de captura y navega; se evita restaurar foco a una capa que va a desaparecer. El acceso de la captura está deshabilitado mientras se guarda.
 

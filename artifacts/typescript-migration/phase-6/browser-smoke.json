@@ -1,0 +1,344 @@
+[
+  {
+    "alerts": [],
+    "headings": [
+      "Dashboard"
+    ],
+    "scrollWidth": 1440,
+    "url": "/dashboard",
+    "width": 1440,
+    "device": "desktop",
+    "marker": "PAGOS DE TARJETAS",
+    "errors": []
+  },
+  {
+    "alerts": [],
+    "headings": [
+      "Mi dinero",
+      "Mi dinero"
+    ],
+    "scrollWidth": 1440,
+    "url": "/mi-dinero",
+    "width": 1440,
+    "device": "desktop",
+    "marker": "Banco ficticio",
+    "errors": []
+  },
+  {
+    "alerts": [],
+    "headings": [
+      "Gastos",
+      "Gastos filtrados"
+    ],
+    "scrollWidth": 1440,
+    "url": "/gastos",
+    "width": 1440,
+    "device": "desktop",
+    "marker": "Compra ficticia CASH",
+    "errors": []
+  },
+  {
+    "alerts": [],
+    "headings": [
+      "Registro automático",
+      "Registro automático",
+      "Otros avisos"
+    ],
+    "scrollWidth": 1440,
+    "url": "/registro-automatico?tipo=otros",
+    "width": 1440,
+    "device": "desktop",
+    "marker": "Aviso ficticio",
+    "errors": []
+  },
+  {
+    "alerts": [],
+    "headings": [
+      "Análisis",
+      "Gastos por semana"
+    ],
+    "scrollWidth": 1440,
+    "url": "/analisis",
+    "width": 1440,
+    "device": "desktop",
+    "marker": "Gastos por semana",
+    "errors": []
+  },
+  {
+    "alerts": [],
+    "headings": [
+      "Compras a meses"
+    ],
+    "scrollWidth": 1440,
+    "url": "/compras-a-meses",
+    "width": 1440,
+    "device": "desktop",
+    "marker": "Compra ficticia a meses",
+    "errors": []
+  },
+  {
+    "alerts": [],
+    "headings": [
+      "Suscripciones"
+    ],
+    "scrollWidth": 1440,
+    "url": "/suscripciones",
+    "width": 1440,
+    "device": "desktop",
+    "marker": "Servicio ficticio",
+    "errors": []
+  },
+  {
+    "alerts": [],
+    "headings": [
+      "Ingresos"
+    ],
+    "scrollWidth": 1440,
+    "url": "/ingresos",
+    "width": 1440,
+    "device": "desktop",
+    "marker": "Ingreso de prueba",
+    "errors": []
+  },
+  {
+    "alerts": [],
+    "headings": [
+      "Cuentas por cobrar"
+    ],
+    "scrollWidth": 1440,
+    "url": "/cuentas-por-cobrar",
+    "width": 1440,
+    "device": "desktop",
+    "marker": "Cobro ficticio",
+    "errors": []
+  },
+  {
+    "alerts": [],
+    "headings": [
+      "Cuentas por pagar",
+      "Tu deuda actual",
+      "Cuentas por pagar"
+    ],
+    "scrollWidth": 1440,
+    "url": "/cuentas-por-pagar",
+    "width": 1440,
+    "device": "desktop",
+    "marker": "Deuda ficticia",
+    "errors": []
+  },
+  {
+    "alerts": [],
+    "headings": [
+      "Tarjetas"
+    ],
+    "scrollWidth": 1440,
+    "url": "/tarjetas",
+    "width": 1440,
+    "device": "desktop",
+    "marker": "Tarjeta ficticia",
+    "errors": []
+  },
+  {
+    "alerts": [],
+    "headings": [
+      "Crédito y deuda",
+      "Resumen de crédito",
+      "Saldos por tarjeta"
+    ],
+    "scrollWidth": 1440,
+    "url": "/credito-y-deuda",
+    "width": 1440,
+    "device": "desktop",
+    "marker": "Tarjeta ficticia",
+    "errors": []
+  },
+  {
+    "alerts": [],
+    "headings": [
+      "Configuración"
+    ],
+    "scrollWidth": 1440,
+    "url": "/configuracion",
+    "width": 1440,
+    "device": "desktop",
+    "marker": "Categoría ficticia",
+    "errors": []
+  },
+  {
+    "alerts": [],
+    "headings": [
+      "Dashboard"
+    ],
+    "scrollWidth": 390,
+    "url": "/dashboard",
+    "width": 390,
+    "device": "mobile",
+    "marker": "PAGOS DE TARJETAS",
+    "errors": []
+  },
+  {
+    "alerts": [],
+    "headings": [
+      "Mi dinero",
+      "Mi dinero"
+    ],
+    "scrollWidth": 390,
+    "url": "/mi-dinero",
+    "width": 390,
+    "device": "mobile",
+    "marker": "Banco ficticio",
+    "errors": []
+  },
+  {
+    "alerts": [],
+    "headings": [
+      "Gastos",
+      "Gastos filtrados",
+      "Gastos",
+      "Nuevo gasto"
+    ],
+    "scrollWidth": 390,
+    "url": "/gastos",
+    "width": 390,
+    "device": "mobile",
+    "marker": "Compra ficticia CASH",
+    "errors": []
+  },
+  {
+    "alerts": [],
+    "headings": [
+      "Registro automático",
+      "Registro automático",
+      "Otros avisos"
+    ],
+    "scrollWidth": 390,
+    "url": "/registro-automatico?tipo=otros",
+    "width": 390,
+    "device": "mobile",
+    "marker": "Aviso ficticio",
+    "errors": []
+  },
+  {
+    "alerts": [],
+    "headings": [
+      "Análisis",
+      "Gastos por semana"
+    ],
+    "scrollWidth": 390,
+    "url": "/analisis",
+    "width": 390,
+    "device": "mobile",
+    "marker": "Gastos por semana",
+    "errors": []
+  },
+  {
+    "alerts": [],
+    "headings": [
+      "Compras a meses",
+      "Compras a meses",
+      "Nueva compra"
+    ],
+    "scrollWidth": 390,
+    "url": "/compras-a-meses",
+    "width": 390,
+    "device": "mobile",
+    "marker": "Compra ficticia a meses",
+    "errors": []
+  },
+  {
+    "alerts": [],
+    "headings": [
+      "Suscripciones",
+      "Suscripciones",
+      "Nueva suscripción"
+    ],
+    "scrollWidth": 390,
+    "url": "/suscripciones",
+    "width": 390,
+    "device": "mobile",
+    "marker": "Servicio ficticio",
+    "errors": []
+  },
+  {
+    "alerts": [],
+    "headings": [
+      "Ingresos",
+      "Ingresos",
+      "Nuevo ingreso"
+    ],
+    "scrollWidth": 390,
+    "url": "/ingresos",
+    "width": 390,
+    "device": "mobile",
+    "marker": "Ingreso de prueba",
+    "errors": []
+  },
+  {
+    "alerts": [],
+    "headings": [
+      "Cuentas por cobrar",
+      "Cuentas por cobrar",
+      "Nueva cuenta por cobrar"
+    ],
+    "scrollWidth": 390,
+    "url": "/cuentas-por-cobrar",
+    "width": 390,
+    "device": "mobile",
+    "marker": "Cobro ficticio",
+    "errors": []
+  },
+  {
+    "alerts": [],
+    "headings": [
+      "Cuentas por pagar",
+      "Tu deuda actual",
+      "Cuentas por pagar",
+      "Cuentas por pagar",
+      "Nueva cuenta por pagar"
+    ],
+    "scrollWidth": 390,
+    "url": "/cuentas-por-pagar",
+    "width": 390,
+    "device": "mobile",
+    "marker": "Deuda ficticia",
+    "errors": []
+  },
+  {
+    "alerts": [],
+    "headings": [
+      "Tarjetas"
+    ],
+    "scrollWidth": 390,
+    "url": "/tarjetas",
+    "width": 390,
+    "device": "mobile",
+    "marker": "Tarjeta ficticia",
+    "errors": []
+  },
+  {
+    "alerts": [],
+    "headings": [
+      "Crédito y deuda",
+      "Resumen de crédito",
+      "Saldos por tarjeta"
+    ],
+    "scrollWidth": 390,
+    "url": "/credito-y-deuda",
+    "width": 390,
+    "device": "mobile",
+    "marker": "Tarjeta ficticia",
+    "errors": []
+  },
+  {
+    "alerts": [],
+    "headings": [
+      "Configuración"
+    ],
+    "scrollWidth": 390,
+    "url": "/configuracion",
+    "width": 390,
+    "device": "mobile",
+    "marker": "Categoría ficticia",
+    "errors": []
+  }
+]

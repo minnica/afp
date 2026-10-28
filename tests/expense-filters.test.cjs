@@ -1,7 +1,7 @@
 const assert = require("node:assert/strict");
 const { test } = require("node:test");
 const { sourceLoader } = require("./helpers/load-source.cjs");
-const ctx = sourceLoader()("src/lib/expenseFilters.js");
+const ctx = sourceLoader()("src/lib/expenseFilters.ts");
 
 const expenses = [
   { id: "coffee", categoryId: "food", paymentMethod: "CASH", concept: "CAFÉ con leche", amount: "45.50" },

@@ -36,3 +36,11 @@ export function readLegacyEntries(value: unknown): (Record<string, unknown> & { 
 export function isOfflineChange(value: unknown): value is OfflineChange {
   return isRecord(value) && typeof value.userId === 'string' && (value.confirmed === undefined || typeof value.confirmed === 'boolean');
 }
+
+// The existing form retains ignored card IDs (including an empty string) when
+// switching payment method. Queue the original body; the API validates it later.
+export type OfflineExpenseDraft = { date: string; concept: string; amount: string | number; categoryId: string } & (
+  | { paymentMethod: 'CASH'; cardId?: string | null; debitAccountId?: null }
+  | { paymentMethod: 'CARD'; cardId: string; debitAccountId?: null }
+  | { paymentMethod: 'DEBIT'; debitAccountId: string; cardId?: string | null }
+);

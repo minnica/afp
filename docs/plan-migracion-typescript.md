@@ -1,6 +1,6 @@
 # Plan de migración gradual a TypeScript
 
-**Estado:** fases 0–5 completadas; fases 6–7 pendientes. **Captura, Calendar y offline:** [resultados de la fase 5](../artifacts/typescript-migration/phase-5/README.md), 28 de octubre de 2026. **Núcleo financiero:** [resultados de la fase 4](../artifacts/typescript-migration/phase-4/README.md), 27 de octubre de 2026. **Mi dinero:** [resultados de la fase 3](../artifacts/typescript-migration/phase-3/README.md), sobre `0c11537`, 27 de octubre de 2026. **Piloto implementado:** [resultados de la fase 2](../artifacts/typescript-migration/phase-2/README.md), sobre `2ff43a9`, 27 de octubre de 2026. **Base revisada del plan:** `4d7b6e6`, 27 de octubre de 2026. **Referencia ejecutada:** `83a3924`; [resultados y reproducción de la fase 0](../artifacts/typescript-migration/phase-0/README.md).
+**Estado:** fases 0–6 completadas; fase 7 pendiente. **Interfaz:** [resultados de fase 6](../artifacts/typescript-migration/phase-6/README.md), 28 de octubre de 2026. **Captura, Calendar y offline:** [resultados de la fase 5](../artifacts/typescript-migration/phase-5/README.md), 28 de octubre de 2026. **Núcleo financiero:** [resultados de la fase 4](../artifacts/typescript-migration/phase-4/README.md), 27 de octubre de 2026. **Mi dinero:** [resultados de la fase 3](../artifacts/typescript-migration/phase-3/README.md), sobre `0c11537`, 27 de octubre de 2026. **Piloto implementado:** [resultados de la fase 2](../artifacts/typescript-migration/phase-2/README.md), sobre `2ff43a9`, 27 de octubre de 2026. **Base revisada del plan:** `4d7b6e6`, 27 de octubre de 2026. **Referencia ejecutada:** `83a3924`; [resultados y reproducción de la fase 0](../artifacts/typescript-migration/phase-0/README.md).
 
 ## Objetivo y alcance
 
@@ -68,7 +68,7 @@ Las validaciones nuevas deberán aceptar las formas que ya admite el contrato p�
 | 3 | Mi dinero completo | 2 | Completada |
 | 4 | Núcleo financiero, API y contratos compartidos | 3 | Completada |
 | 5 | Captura, Calendar y cola offline | 4 | Completada |
-| 6 | Resto de la interfaz, hooks y páginas | 5 | Pendiente |
+| 6 | Resto de la interfaz, hooks y páginas | 5 | Completada |
 | 7 | Retirada de puentes temporales y cierre | 6 | Pendiente |
 
 Cada fase se divide en lotes revisables. Una dependencia compartida puede convertirse antes de su fase si el flujo actual la necesita; debe llevar sus consumidores y pruebas afectados en el mismo lote. La conversión de extensión, el tipado y cualquier extracción necesaria deben poder revisarse sin un reformateo masivo.
@@ -184,14 +184,16 @@ Dividir esta fase en tres lotes independientes y verificados secuencialmente.
 
 ### Fase 6 — Interfaz, hooks y páginas restantes
 
-- [ ] Migrar los hooks y componentes de cada pantalla junto con sus contratos de API. Separar tipos de carga, error, vacío y contenido cuando represente estados reales distintos.
-- [ ] Convertir componentes compartidos de UI conforme los necesiten esos flujos; tipar props, refs y eventos con las APIs reales de React, Radix/Base UI, TanStack y Recharts.
-- [ ] Descomponer componentes grandes solo cuando sea necesario para aislar un contrato o responsabilidad. Mantener la extracción y la conversión revisables; evitar mezclar rediseño, cambios de filtros o nuevas reglas financieras.
-- [ ] Convertir páginas/layout y revisar límites cliente/servidor. Los tipos compartidos no deben arrastrar Prisma, credenciales ni módulos de Node al bundle del cliente.
-- [ ] Ajustar `components.json` a `tsx: true` al iniciar nuevas incorporaciones de UI en TSX. Conservar el estilo, componentes y alias locales; no reinstalar masivamente shadcn.
-- [ ] Actualizar fixtures y cualquier herramienta que identifique componentes por extensión o archivo.
+- [x] Migrar los hooks y componentes de cada pantalla junto con sus contratos de API. Separar tipos de carga, error, vacío y contenido cuando represente estados reales distintos.
+- [x] Convertir componentes compartidos de UI conforme los necesiten esos flujos; tipar props, refs y eventos con las APIs reales de React, Radix/Base UI, TanStack y Recharts.
+- [x] Descomponer componentes grandes solo cuando sea necesario para aislar un contrato o responsabilidad. Mantener la extracción y la conversión revisables; evitar mezclar rediseño, cambios de filtros o nuevas reglas financieras.
+- [x] Convertir páginas/layout y revisar límites cliente/servidor. Los tipos compartidos no deben arrastrar Prisma, credenciales ni módulos de Node al bundle del cliente.
+- [x] Ajustar `components.json` a `tsx: true` al iniciar nuevas incorporaciones de UI en TSX. Conservar el estilo, componentes y alias locales; no reinstalar masivamente shadcn.
+- [x] Actualizar fixtures y cualquier herramienta que identifique componentes por extensión o archivo.
 
 **Aceptación:** recorridos principales de cada módulo correctos con datos ficticios; mismas rutas, formularios, tablas, filtros, borradores y recuperación. Revisión móvil/escritorio, teclado y foco en los componentes afectados. Sin imports de servidor en cliente ni errores de hidratación introducidos.
+
+**Entrega:** [implementación, contratos y evidencias de fase 6](../artifacts/typescript-migration/phase-6/README.md). Convertidos 135 módulos con contenido (20 881 líneas de origen): todas las páginas/layout restantes, hooks, pantallas y componentes compartidos. Props, refs, eventos, formularios, tablas y gráficas usan sus APIs reales. El cliente valida los contratos JSON dentro de la recuperación HTTP y devuelve el cuerpo original; conserva propuestas parciales, historial nulo y campos omitidos. `components.json` habilita TSX sin reinstalar UI. Los 14 archivos vacíos, `allowJs`, los adaptadores de Mi dinero y los fallbacks de pruebas se reservan para fase 7. Sin cambios de esquema, SQL, dependencias ni publicación.
 
 ### Fase 7 — Cerrar la transición
 

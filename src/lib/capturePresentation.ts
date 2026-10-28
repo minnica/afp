@@ -1,4 +1,4 @@
-export const captureReasons = {
+export const captureReasons: Record<string, string> = {
   MONEY_POLICY_REQUIRED: "Configura qué cuentas corresponden a esta transferencia.",
   MONEY_ACCOUNT_REQUIRED: "La cuenta de la regla ya no está disponible. Revisa el movimiento.",
   MONEY_BEFORE_REFERENCE: "El aviso es anterior al saldo de referencia. Comprueba si ya está incluido.",
@@ -54,8 +54,8 @@ export const captureReasons = {
   USER_DISCARDED: "Aviso descartado.", USER_INSTALLMENTS: "El gasto se sustituyó por una compra a meses.",
   USER_LINKED_INSTALLMENT: "Aviso vinculado a una compra a meses.",
 };
-export const captureStatuses = { REVIEW: "Por revisar", OBSERVED: "Observación", REGISTERED: "Registrado", LINKED: "Vinculado", DISCARDED: "Descartado", CONVERTED: "A meses" };
-export const captureInboxStatuses = { REVIEW: "Por revisar", REGISTERED: "Registrado", RECONCILED: "Conciliado", DISCARDED: "Descartado" };
+export const captureStatuses: Record<string, string> = { REVIEW: "Por revisar", OBSERVED: "Observación", REGISTERED: "Registrado", LINKED: "Vinculado", DISCARDED: "Descartado", CONVERTED: "A meses" };
+export const captureInboxStatuses: Record<string, string> = { REVIEW: "Por revisar", REGISTERED: "Registrado", RECONCILED: "Conciliado", DISCARDED: "Descartado" };
 export const captureSources: Record<string, string> = {
   "com.garatachia.afp.paymentreceipts": "Comprobante compartido",
   "com.bancomer.mbanking": "BBVA", "com.google.android.apps.walletnfcrel": "Google Wallet", "mx.hsbc.hsbcmexico": "HSBC",
@@ -65,7 +65,7 @@ export const captureSources: Record<string, string> = {
   "com.didiglobal.passenger": "DiDi viajes",
   "com.ubercab.eats": "Uber Eats",
 };
-export const capturePaymentSources = {
+export const capturePaymentSources: Record<string, string> = {
   BBVA_RECEIPT: "Comprobante compartido de BBVA",
   NU_NOTICE: "Aviso de pago recibido de Nu",
   BANAMEX_NOTICE: "Depósito SPEI de Banamex",

@@ -7,8 +7,9 @@ function getBankDay(value: DateValue) {
   return Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
 }
 
-// El estado guardado y la fecha de pago no demuestran la liquidación.
-export function getCyclePaymentState(cycle: PaymentCycle, today = new Date()): CyclePaymentState {
+// Capture's payment detail has amounts but no dates. Keep that calculation
+// separate from the calendar status, without inventing dates in the UI.
+export function getCyclePaymentAmounts(cycle: Pick<PaymentCycle, 'statementAmount' | 'paidAmount' | 'postCutCreditAmount'>): Omit<CyclePaymentState, 'displayStatus'> {
   const hasStatement = cycle.statementAmount !== null && cycle.statementAmount !== undefined;
   const statementCents = hasStatement ? Math.round(Number(cycle.statementAmount) * 100) : null;
   const paidCents = Math.max(0, Math.round(Number(cycle.paidAmount ?? 0) * 100));
@@ -24,17 +25,25 @@ export function getCyclePaymentState(cycle: PaymentCycle, today = new Date()): C
     : pendingAmount === 0 ? "PAID"
     : paidCents > 0 ? "PARTIALLY_PAID" : "PENDING";
   const isSettled = paymentStatus === "PAID" || paymentStatus === "NO_PAYMENT_DUE";
+  return { paymentStatus, paymentDueAmount, pendingAmount, excessAmount, isSettled };
+}
+
+// El estado guardado y la fecha de pago no demuestran la liquidación.
+export function getCyclePaymentState(cycle: PaymentCycle, today = new Date()): CyclePaymentState {
+  const amounts = getCyclePaymentAmounts(cycle);
+  const { paymentStatus } = amounts;
+  const hasStatement = cycle.statementAmount !== null && cycle.statementAmount !== undefined;
   // Las fechas bancarias guardan su día UTC; hoy corresponde al día local.
   // El pago vence al terminar ese día, independientemente de la hora guardada.
   const localDay = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
   let displayStatus: CycleDisplayStatus;
-  if (isSettled) displayStatus = paymentStatus;
+  if (paymentStatus === "PAID" || paymentStatus === "NO_PAYMENT_DUE") displayStatus = paymentStatus;
   else if (localDay > getBankDay(cycle.dueDate)) displayStatus = "OVERDUE";
   else if (paymentStatus === "PARTIALLY_PAID") displayStatus = "PARTIALLY_PAID";
   else if (localDay >= getBankDay(cycle.cutDate)) displayStatus = hasStatement ? "PAYMENT_PENDING" : "CUT";
   else displayStatus = "OPEN";
 
-  return { paymentStatus, paymentDueAmount, pendingAmount, excessAmount, isSettled, displayStatus };
+  return { ...amounts, displayStatus };
 }
 
 // Conserva el enum existente. La distinción financiera se deriva en cada lectura.

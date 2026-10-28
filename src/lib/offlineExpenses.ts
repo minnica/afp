@@ -1,7 +1,7 @@
 import { isRecord } from './financialJson';
 import { readOfflineEntry, readLegacyEntries, isOfflineChange } from './offlineExpenseContracts';
 import type { OfflineExpense, OfflineSyncResult, OfflineChange, SyncedOfflineExpense } from './offlineExpenseContracts';
-import type { ExpenseCommand } from './financialContracts';
+import type { OfflineExpenseDraft } from './offlineExpenseContracts';
 import type { ApiFetchOptions } from './apiFetch';
 import { apiFetch } from "@/lib/apiFetch";
 
@@ -112,7 +112,7 @@ export async function readOfflineExpenses(userId: string | null | undefined): Pr
   });
 }
 
-export async function addOfflineExpense<P extends ExpenseCommand>(userId: string, payload: P) {
+export async function addOfflineExpense<P extends OfflineExpenseDraft>(userId: string, payload: P) {
   if (!userId) throw new Error("Inicia sesión para guardar el pendiente.");
   const operationId = crypto.randomUUID();
   const expense = { userId, clientId: operationId, createdAt: new Date().toISOString(),

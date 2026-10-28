@@ -1,7 +1,7 @@
 const assert = require("node:assert/strict");
 const { test } = require("node:test");
 const { sourceLoader } = require("./helpers/load-source.cjs");
-const { getCyclePaymentState, parseCycleMoney } = sourceLoader()("src/lib/calculations/cardCyclePayments.ts");
+const { getCyclePaymentState, getCyclePaymentAmounts, parseCycleMoney } = sourceLoader()("src/lib/calculations/cardCyclePayments.ts");
 const { getDashboardPayment } = sourceLoader()("src/lib/cardPaymentPresentation.ts");
 const now = new Date("2026-10-25T18:00:00Z");
 const base = {
@@ -11,6 +11,15 @@ const base = {
   card: { id: "card", name: "Tarjeta de prueba", usualCutDay: 10 },
 };
 const plain = value => JSON.parse(JSON.stringify(value));
+
+test("el detalle de captura calcula el saldo con importes sin necesitar fechas del corte", () => {
+  assert.deepEqual(plain(getCyclePaymentAmounts({ statementAmount: "1000.50", paidAmount: "250.25", postCutCreditAmount: "50.25" })), {
+    paymentStatus: "PARTIALLY_PAID", paymentDueAmount: 950.25, pendingAmount: 700,
+    excessAmount: 0, isSettled: false,
+  });
+  assert.equal(getCyclePaymentAmounts({ statementAmount: null, paidAmount: "1000" }).pendingAmount, null);
+});
+
 function fixture(initial = {}) {
   let cycle = { ...base, ...initial }, writes = 0, fail = false;
   const reads = [], locks = [];

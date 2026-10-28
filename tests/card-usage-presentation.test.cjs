@@ -1,7 +1,7 @@
 const assert = require("node:assert/strict");
 const { test } = require("node:test");
 const { sourceLoader } = require("./helpers/load-source.cjs");
-const helpers = sourceLoader()("src/lib/cardUsagePresentation.js");
+const helpers = sourceLoader()("src/lib/cardUsagePresentation.ts");
 const row = (name, cutDate, year = 2026, month = 10) => ({ card: { name }, selectedCycle: { cutDate, year, month } });
 
 test("cortes próximos primero, fechas ausentes al final y empates por nombre", () => {

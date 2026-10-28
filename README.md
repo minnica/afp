@@ -26,7 +26,7 @@ Este README describe el funcionamiento y los procedimientos del código versiona
 
 ## Módulos
 
-`/` redirige a `/dashboard`; el inicio de sesión y el manifest de la PWA también usan esa ruta como entrada. La navegación compartida se define en [src/lib/navigation.js](src/lib/navigation.js).
+`/` redirige a `/dashboard`; el inicio de sesión y el manifest de la PWA también usan esa ruta como entrada. La navegación compartida se define en [src/lib/navigation.tsx](src/lib/navigation.tsx).
 
 | Ruta | Función |
 | --- | --- |
@@ -51,7 +51,7 @@ Este README describe el funcionamiento y los procedimientos del código versiona
 | Área | Implementación |
 | --- | --- |
 | Web | Next.js 16.3.8, App Router y React 19.2.4 |
-| Lenguaje | Transición gradual JS/JSX → TypeScript; Mi dinero, núcleo financiero, API, Captura, Calendar y cola offline en TS; interfaz y hooks restantes aún en JS/JSX. Alias `@/*` para `src/*` |
+| Lenguaje | Código web activo en TypeScript/TSX; cierre de la transición pendiente en fase 7. Alias `@/*` para `src/*` |
 | UI | Componentes shadcn locales, Radix UI y Tailwind CSS 4; Base UI para el Combobox múltiple |
 | Formularios | React Hook Form y Zod |
 | Tablas y gráficas | TanStack Table 8 y Recharts 3 |
@@ -141,7 +141,7 @@ En Chrome del emulador Android, usar `http://10.0.2.2:3000`. [next.config.mjs](n
 | `pnpm audit:prod` / `pnpm audit:all` | Auditar dependencias de producción o del árbol completo |
 | `pnpm icons:generate` | Regenerar iconos PNG/ICO desde `public/icons/app-icon.svg` |
 
-Las verificaciones obligatorias por lote son `pnpm typecheck`, `pnpm test:types`, `pnpm lint`, `pnpm test` y `pnpm build`. El build conserva la comprobación de TypeScript. `typecheck` y `test:types` generan sus prerrequisitos y funcionan sin una carpeta `.next` previa. Los contratos financieros validan las respuestas antes de entregarlas a las pantallas JSX; sus interiores siguen pendientes de migración. Los casos de tipos viven en `tests/types/`, con [configuración propia](tsconfig.type-tests.json).
+Las verificaciones obligatorias por lote son `pnpm typecheck`, `pnpm test:types`, `pnpm lint`, `pnpm test` y `pnpm build`. El build conserva la comprobación de TypeScript. `typecheck` y `test:types` generan sus prerrequisitos y funcionan sin una carpeta `.next` previa. Los clientes tipados validan las respuestas antes de entregarlas a las pantallas y conservan el JSON original, incluidos orden, campos omitidos y metadatos usados en recuperación y concurrencia. Los casos de tipos viven en `tests/types/`, con [configuración propia](tsconfig.type-tests.json).
 
 Si se necesita comprobar la compilación con Webpack, usar `pnpm exec prisma generate` seguido de `pnpm exec next build --webpack`. Esta alternativa no cambia el script de build del proyecto.
 
@@ -360,7 +360,7 @@ Desconectar retira eventos de hoy en adelante, conserva el historial y elimina l
 ## Convenciones de desarrollo
 
 - Leer este README y [PRODUCT.md](PRODUCT.md) antes de cambiar arquitectura o comportamiento. Actualizar la documentación afectada en la misma tarea; registrar los hitos relevantes en [docs/bitacora.md](docs/bitacora.md) y guardar los resultados detallados de ejecución en `artifacts/`.
-- Seguir el [plan de migración gradual a TypeScript](docs/plan-migracion-typescript.md): fases 0–5 completas. Mi dinero, núcleo financiero/API, Captura, Calendar y la cola offline usan TypeScript estricto, consultas Prisma inferidas y validación de JSON externos/históricos. La [evidencia de fase 5](artifacts/typescript-migration/phase-5/README.md) incluye compatibilidad Android v1, cifrado anterior, PostgreSQL y recuperación entre pestañas. La interfaz y hooks restantes siguen en fase 6; sus interiores JSX no cuentan como tipados. `tsconfig.json` mantiene `allowJs: true`, `checkJs: false`, `strict` y `noUncheckedIndexedAccess`, con fronteras locales explícitas. Código en inglés e interfaz en español.
+- Seguir el [plan de migración gradual a TypeScript](docs/plan-migracion-typescript.md): fases 0–6 implementadas. Páginas, hooks, formularios y componentes compartidos están en TS/TSX con tipos de React, Radix/Base UI, TanStack y Recharts. Los [resultados de fase 6](artifacts/typescript-migration/phase-6/README.md) incluyen contratos de interfaz, PostgreSQL y revisión en navegador. `components.json` usa `tsx: true`. La fase 7 retirará adaptadores y fallbacks temporales, resolverá los 14 archivos vacíos inventariados y desactivará `allowJs`; mientras tanto se conservan `strict`, `noUncheckedIndexedAccess` y las comprobaciones obligatorias. Código en inglés e interfaz en español.
 - Conservar `node:test` y cargar fuentes con `tests/helpers/load-source.cjs`: esbuild transforma JS/TS/JSX/TSX, pero no comprueba tipos. Los tests deben inyectar adaptadores de red/BD; el cargador no hereda `process.env` ni carga `.env`. Actualizar rutas literales al convertir archivos; el fallback de extensión inequívoco es temporal hasta la fase 7.
 - Reutilizar [src/components/ui/](src/components/ui/) y la configuración `radix-mira` de [components.json](components.json). Formularios con React Hook Form + Zod; fechas con `DatePicker`; importes con `NumberInput`; selectores con `ResponsiveSelect`/`SearchableSelect`.
 - Conservar la interacción móvil de `CreateRecordSurface`, los borradores por usuario y el foco de los diálogos. Los borrados requieren el `AlertDialog` compartido. No ocultar errores ni presentar una recarga fallida como un alta no guardada.
@@ -381,7 +381,7 @@ La web se despliega en Vercel, proyecto `afp`. El build es `pnpm build`; no apli
 
 ## Documentación relacionada
 
-- [docs/plan-migracion-typescript.md](docs/plan-migracion-typescript.md): plan por fases y criterios de aceptación; fases 0–5 completadas; siguiente fase: interfaz, hooks y páginas restantes.
+- [docs/plan-migracion-typescript.md](docs/plan-migracion-typescript.md): plan por fases y criterios de aceptación; fases 0–6 implementadas; siguiente fase: retirar puentes temporales y cerrar la transición.
 - [docs/bitacora.md](docs/bitacora.md): decisiones, migraciones, incidencias y seguimientos históricos con sus evidencias.
 - [PRODUCT.md](PRODUCT.md): propósito, alcance y principios del producto.
 - [docs/android-captura.md](docs/android-captura.md): operación técnica de Android, firma y pruebas.

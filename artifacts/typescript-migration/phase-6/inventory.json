@@ -1,0 +1,697 @@
+{
+  "baseCommit": "39da231760e4ac6a00c8ae32764f65f7eec4230d",
+  "migrated": [
+    {
+      "before": "src/app/acerca/page.jsx",
+      "after": "src/app/acerca/page.tsx",
+      "originalLines": 13
+    },
+    {
+      "before": "src/app/analisis/page.js",
+      "after": "src/app/analisis/page.tsx",
+      "originalLines": 6
+    },
+    {
+      "before": "src/app/compras-a-meses/page.js",
+      "after": "src/app/compras-a-meses/page.tsx",
+      "originalLines": 10
+    },
+    {
+      "before": "src/app/configuracion/page.js",
+      "after": "src/app/configuracion/page.tsx",
+      "originalLines": 10
+    },
+    {
+      "before": "src/app/credito-y-deuda/page.js",
+      "after": "src/app/credito-y-deuda/page.tsx",
+      "originalLines": 6
+    },
+    {
+      "before": "src/app/cuentas-por-cobrar/page.js",
+      "after": "src/app/cuentas-por-cobrar/page.tsx",
+      "originalLines": 10
+    },
+    {
+      "before": "src/app/cuentas-por-pagar/page.jsx",
+      "after": "src/app/cuentas-por-pagar/page.tsx",
+      "originalLines": 10
+    },
+    {
+      "before": "src/app/dashboard/page.js",
+      "after": "src/app/dashboard/page.tsx",
+      "originalLines": 10
+    },
+    {
+      "before": "src/app/gastos/page.js",
+      "after": "src/app/gastos/page.tsx",
+      "originalLines": 10
+    },
+    {
+      "before": "src/app/ingresos/page.js",
+      "after": "src/app/ingresos/page.tsx",
+      "originalLines": 10
+    },
+    {
+      "before": "src/app/layout.js",
+      "after": "src/app/layout.tsx",
+      "originalLines": 53
+    },
+    {
+      "before": "src/app/login/page.js",
+      "after": "src/app/login/page.tsx",
+      "originalLines": 188
+    },
+    {
+      "before": "src/app/mi-dinero/page.js",
+      "after": "src/app/mi-dinero/page.tsx",
+      "originalLines": 3
+    },
+    {
+      "before": "src/app/page.js",
+      "after": "src/app/page.tsx",
+      "originalLines": 5
+    },
+    {
+      "before": "src/app/privacidad/page.jsx",
+      "after": "src/app/privacidad/page.tsx",
+      "originalLines": 15
+    },
+    {
+      "before": "src/app/registro-automatico/page.js",
+      "after": "src/app/registro-automatico/page.tsx",
+      "originalLines": 8
+    },
+    {
+      "before": "src/app/suscripciones/page.js",
+      "after": "src/app/suscripciones/page.tsx",
+      "originalLines": 10
+    },
+    {
+      "before": "src/app/tarjetas/page.js",
+      "after": "src/app/tarjetas/page.tsx",
+      "originalLines": 10
+    },
+    {
+      "before": "src/components/PublicInfoPage.jsx",
+      "after": "src/components/PublicInfoPage.tsx",
+      "originalLines": 16
+    },
+    {
+      "before": "src/components/analisis/AnalysisCharts.jsx",
+      "after": "src/components/analisis/AnalysisCharts.tsx",
+      "originalLines": 133
+    },
+    {
+      "before": "src/components/analisis/AnalysisContent.jsx",
+      "after": "src/components/analisis/AnalysisContent.tsx",
+      "originalLines": 57
+    },
+    {
+      "before": "src/components/analisis/AnalysisError.jsx",
+      "after": "src/components/analisis/AnalysisError.tsx",
+      "originalLines": 14
+    },
+    {
+      "before": "src/components/analisis/AnalysisSkeleton.jsx",
+      "after": "src/components/analisis/AnalysisSkeleton.tsx",
+      "originalLines": 13
+    },
+    {
+      "before": "src/components/analisis/MonthSelector.jsx",
+      "after": "src/components/analisis/MonthSelector.tsx",
+      "originalLines": 18
+    },
+    {
+      "before": "src/components/compras-a-meses/ComprasAMesesContent.jsx",
+      "after": "src/components/compras-a-meses/ComprasAMesesContent.tsx",
+      "originalLines": 1079
+    },
+    {
+      "before": "src/components/configuracion/AutomaticRecordingContent.jsx",
+      "after": "src/components/configuracion/AutomaticRecordingContent.tsx",
+      "originalLines": 27
+    },
+    {
+      "before": "src/components/configuracion/AutomaticRecordingLink.jsx",
+      "after": "src/components/configuracion/AutomaticRecordingLink.tsx",
+      "originalLines": 11
+    },
+    {
+      "before": "src/components/configuracion/CaptureConfigurationPanel.jsx",
+      "after": "src/components/configuracion/CaptureConfigurationPanel.tsx",
+      "originalLines": 138
+    },
+    {
+      "before": "src/components/configuracion/CaptureDebitCorrection.jsx",
+      "after": "src/components/configuracion/CaptureDebitCorrection.tsx",
+      "originalLines": 35
+    },
+    {
+      "before": "src/components/configuracion/CaptureDevices.jsx",
+      "after": "src/components/configuracion/CaptureDevices.tsx",
+      "originalLines": 157
+    },
+    {
+      "before": "src/components/configuracion/CaptureFields.jsx",
+      "after": "src/components/configuracion/CaptureFields.tsx",
+      "originalLines": 24
+    },
+    {
+      "before": "src/components/configuracion/CaptureMoneyEditor.jsx",
+      "after": "src/components/configuracion/CaptureMoneyEditor.tsx",
+      "originalLines": 61
+    },
+    {
+      "before": "src/components/configuracion/CaptureMoneySettings.jsx",
+      "after": "src/components/configuracion/CaptureMoneySettings.tsx",
+      "originalLines": 40
+    },
+    {
+      "before": "src/components/configuracion/CaptureMovementEditor.jsx",
+      "after": "src/components/configuracion/CaptureMovementEditor.tsx",
+      "originalLines": 135
+    },
+    {
+      "before": "src/components/configuracion/CaptureNotificationDetails.jsx",
+      "after": "src/components/configuracion/CaptureNotificationDetails.tsx",
+      "originalLines": 21
+    },
+    {
+      "before": "src/components/configuracion/CapturePaymentEditor.jsx",
+      "after": "src/components/configuracion/CapturePaymentEditor.tsx",
+      "originalLines": 104
+    },
+    {
+      "before": "src/components/configuracion/CapturePilotSummary.jsx",
+      "after": "src/components/configuracion/CapturePilotSummary.tsx",
+      "originalLines": 35
+    },
+    {
+      "before": "src/components/configuracion/CaptureReconciliation.jsx",
+      "after": "src/components/configuracion/CaptureReconciliation.tsx",
+      "originalLines": 109
+    },
+    {
+      "before": "src/components/configuracion/CaptureRefundEditor.jsx",
+      "after": "src/components/configuracion/CaptureRefundEditor.tsx",
+      "originalLines": 74
+    },
+    {
+      "before": "src/components/configuracion/CaptureReview.jsx",
+      "after": "src/components/configuracion/CaptureReview.tsx",
+      "originalLines": 111
+    },
+    {
+      "before": "src/components/configuracion/CaptureRolloutStatus.jsx",
+      "after": "src/components/configuracion/CaptureRolloutStatus.tsx",
+      "originalLines": 80
+    },
+    {
+      "before": "src/components/configuracion/GoogleCalendarSettings.jsx",
+      "after": "src/components/configuracion/GoogleCalendarSettings.tsx",
+      "originalLines": 144
+    },
+    {
+      "before": "src/components/configuracion/SettingsContent.jsx",
+      "after": "src/components/configuracion/SettingsContent.tsx",
+      "originalLines": 464
+    },
+    {
+      "before": "src/components/credito-y-deuda/CardBalances.jsx",
+      "after": "src/components/credito-y-deuda/CardBalances.tsx",
+      "originalLines": 278
+    },
+    {
+      "before": "src/components/credito-y-deuda/CreditBalancesContent.jsx",
+      "after": "src/components/credito-y-deuda/CreditBalancesContent.tsx",
+      "originalLines": 131
+    },
+    {
+      "before": "src/components/credito-y-deuda/MobileCreditCard.jsx",
+      "after": "src/components/credito-y-deuda/MobileCreditCard.tsx",
+      "originalLines": 54
+    },
+    {
+      "before": "src/components/cuentas-por-cobrar/CuentasPorCobrarContent.jsx",
+      "after": "src/components/cuentas-por-cobrar/CuentasPorCobrarContent.tsx",
+      "originalLines": 1044
+    },
+    {
+      "before": "src/components/cuentas-por-cobrar/ReceivableBalanceAdjustment.jsx",
+      "after": "src/components/cuentas-por-cobrar/ReceivableBalanceAdjustment.tsx",
+      "originalLines": 18
+    },
+    {
+      "before": "src/components/cuentas-por-pagar/CuentasPorPagarContent.jsx",
+      "after": "src/components/cuentas-por-pagar/CuentasPorPagarContent.tsx",
+      "originalLines": 808
+    },
+    {
+      "before": "src/components/cuentas-por-pagar/PayableDetails.jsx",
+      "after": "src/components/cuentas-por-pagar/PayableDetails.tsx",
+      "originalLines": 171
+    },
+    {
+      "before": "src/components/cuentas-por-pagar/PayablesSummary.jsx",
+      "after": "src/components/cuentas-por-pagar/PayablesSummary.tsx",
+      "originalLines": 127
+    },
+    {
+      "before": "src/components/dashboard/CardUsageWaiverBreakdown.jsx",
+      "after": "src/components/dashboard/CardUsageWaiverBreakdown.tsx",
+      "originalLines": 111
+    },
+    {
+      "before": "src/components/dashboard/CardUsageWaiverProgress.jsx",
+      "after": "src/components/dashboard/CardUsageWaiverProgress.tsx",
+      "originalLines": 283
+    },
+    {
+      "before": "src/components/dashboard/CyclePeriodHelp.jsx",
+      "after": "src/components/dashboard/CyclePeriodHelp.tsx",
+      "originalLines": 80
+    },
+    {
+      "before": "src/components/dashboard/DashboardContent.jsx",
+      "after": "src/components/dashboard/DashboardContent.tsx",
+      "originalLines": 389
+    },
+    {
+      "before": "src/components/dashboard/DashboardPanels.jsx",
+      "after": "src/components/dashboard/DashboardPanels.tsx",
+      "originalLines": 112
+    },
+    {
+      "before": "src/components/dashboard/DashboardProvider.jsx",
+      "after": "src/components/dashboard/DashboardProvider.tsx",
+      "originalLines": 158
+    },
+    {
+      "before": "src/components/dashboard/ImportantNotices.jsx",
+      "after": "src/components/dashboard/ImportantNotices.tsx",
+      "originalLines": 238
+    },
+    {
+      "before": "src/components/dashboard/NuTurboUsage.jsx",
+      "after": "src/components/dashboard/NuTurboUsage.tsx",
+      "originalLines": 99
+    },
+    {
+      "before": "src/components/gastos/CaptureStatus.jsx",
+      "after": "src/components/gastos/CaptureStatus.tsx",
+      "originalLines": 12
+    },
+    {
+      "before": "src/components/gastos/DailyExpenseCards.jsx",
+      "after": "src/components/gastos/DailyExpenseCards.tsx",
+      "originalLines": 163
+    },
+    {
+      "before": "src/components/gastos/ExpenseCreateSurface.jsx",
+      "after": "src/components/gastos/ExpenseCreateSurface.tsx",
+      "originalLines": 20
+    },
+    {
+      "before": "src/components/gastos/GastosContent.jsx",
+      "after": "src/components/gastos/GastosContent.tsx",
+      "originalLines": 1941
+    },
+    {
+      "before": "src/components/gastos/OfflineCaptureConflicts.jsx",
+      "after": "src/components/gastos/OfflineCaptureConflicts.tsx",
+      "originalLines": 27
+    },
+    {
+      "before": "src/components/gastos/SharedExpenseFields.jsx",
+      "after": "src/components/gastos/SharedExpenseFields.tsx",
+      "originalLines": 39
+    },
+    {
+      "before": "src/components/gastos/SubscriptionCharges.jsx",
+      "after": "src/components/gastos/SubscriptionCharges.tsx",
+      "originalLines": 414
+    },
+    {
+      "before": "src/components/ingresos/IngresosContent.jsx",
+      "after": "src/components/ingresos/IngresosContent.tsx",
+      "originalLines": 805
+    },
+    {
+      "before": "src/components/layout/AppHeader.jsx",
+      "after": "src/components/layout/AppHeader.tsx",
+      "originalLines": 29
+    },
+    {
+      "before": "src/components/layout/AppHeaderActions.jsx",
+      "after": "src/components/layout/AppHeaderActions.tsx",
+      "originalLines": 108
+    },
+    {
+      "before": "src/components/layout/AppShell.jsx",
+      "after": "src/components/layout/AppShell.tsx",
+      "originalLines": 24
+    },
+    {
+      "before": "src/components/layout/AppSidebar.jsx",
+      "after": "src/components/layout/AppSidebar.tsx",
+      "originalLines": 80
+    },
+    {
+      "before": "src/components/layout/MobileNavigationSheet.jsx",
+      "after": "src/components/layout/MobileNavigationSheet.tsx",
+      "originalLines": 168
+    },
+    {
+      "before": "src/components/layout/PageSkeleton.jsx",
+      "after": "src/components/layout/PageSkeleton.tsx",
+      "originalLines": 226
+    },
+    {
+      "before": "src/components/pwa/ServiceWorkerRegistration.jsx",
+      "after": "src/components/pwa/ServiceWorkerRegistration.tsx",
+      "originalLines": 45
+    },
+    {
+      "before": "src/components/suscripciones/SuscripcionesContent.jsx",
+      "after": "src/components/suscripciones/SuscripcionesContent.tsx",
+      "originalLines": 1178
+    },
+    {
+      "before": "src/components/tarjetas/CycleBreakdown.jsx",
+      "after": "src/components/tarjetas/CycleBreakdown.tsx",
+      "originalLines": 171
+    },
+    {
+      "before": "src/components/tarjetas/CyclesDataTable.jsx",
+      "after": "src/components/tarjetas/CyclesDataTable.tsx",
+      "originalLines": 657
+    },
+    {
+      "before": "src/components/tarjetas/TarjetasContent.jsx",
+      "after": "src/components/tarjetas/TarjetasContent.tsx",
+      "originalLines": 618
+    },
+    {
+      "before": "src/components/ui/accordion.jsx",
+      "after": "src/components/ui/accordion.tsx",
+      "originalLines": 64
+    },
+    {
+      "before": "src/components/ui/alert-dialog.jsx",
+      "after": "src/components/ui/alert-dialog.tsx",
+      "originalLines": 190
+    },
+    {
+      "before": "src/components/ui/alert.jsx",
+      "after": "src/components/ui/alert.tsx",
+      "originalLines": 79
+    },
+    {
+      "before": "src/components/ui/badge.jsx",
+      "after": "src/components/ui/badge.tsx",
+      "originalLines": 51
+    },
+    {
+      "before": "src/components/ui/button.jsx",
+      "after": "src/components/ui/button.tsx",
+      "originalLines": 63
+    },
+    {
+      "before": "src/components/ui/calendar.jsx",
+      "after": "src/components/ui/calendar.tsx",
+      "originalLines": 194
+    },
+    {
+      "before": "src/components/ui/card.jsx",
+      "after": "src/components/ui/card.tsx",
+      "originalLines": 111
+    },
+    {
+      "before": "src/components/ui/chart.jsx",
+      "after": "src/components/ui/chart.tsx",
+      "originalLines": 331
+    },
+    {
+      "before": "src/components/ui/checkbox.jsx",
+      "after": "src/components/ui/checkbox.tsx",
+      "originalLines": 32
+    },
+    {
+      "before": "src/components/ui/collapsible.jsx",
+      "after": "src/components/ui/collapsible.tsx",
+      "originalLines": 33
+    },
+    {
+      "before": "src/components/ui/combobox.jsx",
+      "after": "src/components/ui/combobox.tsx",
+      "originalLines": 309
+    },
+    {
+      "before": "src/components/ui/command.jsx",
+      "after": "src/components/ui/command.tsx",
+      "originalLines": 186
+    },
+    {
+      "before": "src/components/ui/create-record-surface.jsx",
+      "after": "src/components/ui/create-record-surface.tsx",
+      "originalLines": 234
+    },
+    {
+      "before": "src/components/ui/data-table.jsx",
+      "after": "src/components/ui/data-table.tsx",
+      "originalLines": 272
+    },
+    {
+      "before": "src/components/ui/date-picker.jsx",
+      "after": "src/components/ui/date-picker.tsx",
+      "originalLines": 136
+    },
+    {
+      "before": "src/components/ui/dialog.jsx",
+      "after": "src/components/ui/dialog.tsx",
+      "originalLines": 151
+    },
+    {
+      "before": "src/components/ui/dropdown-menu.jsx",
+      "after": "src/components/ui/dropdown-menu.tsx",
+      "originalLines": 235
+    },
+    {
+      "before": "src/components/ui/empty.jsx",
+      "after": "src/components/ui/empty.tsx",
+      "originalLines": 103
+    },
+    {
+      "before": "src/components/ui/expense-filter-combobox.jsx",
+      "after": "src/components/ui/expense-filter-combobox.tsx",
+      "originalLines": 116
+    },
+    {
+      "before": "src/components/ui/field.jsx",
+      "after": "src/components/ui/field.tsx",
+      "originalLines": 250
+    },
+    {
+      "before": "src/components/ui/header-dialog.jsx",
+      "after": "src/components/ui/header-dialog.tsx",
+      "originalLines": 73
+    },
+    {
+      "before": "src/components/ui/input-group.jsx",
+      "after": "src/components/ui/input-group.tsx",
+      "originalLines": 151
+    },
+    {
+      "before": "src/components/ui/input.jsx",
+      "after": "src/components/ui/input.tsx",
+      "originalLines": 34
+    },
+    {
+      "before": "src/components/ui/item.jsx",
+      "after": "src/components/ui/item.tsx",
+      "originalLines": 195
+    },
+    {
+      "before": "src/components/ui/label.jsx",
+      "after": "src/components/ui/label.tsx",
+      "originalLines": 23
+    },
+    {
+      "before": "src/components/ui/number-input.jsx",
+      "after": "src/components/ui/number-input.tsx",
+      "originalLines": 120
+    },
+    {
+      "before": "src/components/ui/payment-method-selector.jsx",
+      "after": "src/components/ui/payment-method-selector.tsx",
+      "originalLines": 46
+    },
+    {
+      "before": "src/components/ui/popover.jsx",
+      "after": "src/components/ui/popover.tsx",
+      "originalLines": 90
+    },
+    {
+      "before": "src/components/ui/progress.jsx",
+      "after": "src/components/ui/progress.tsx",
+      "originalLines": 32
+    },
+    {
+      "before": "src/components/ui/radio-group.jsx",
+      "after": "src/components/ui/radio-group.tsx",
+      "originalLines": 28
+    },
+    {
+      "before": "src/components/ui/record-card.jsx",
+      "after": "src/components/ui/record-card.tsx",
+      "originalLines": 113
+    },
+    {
+      "before": "src/components/ui/request-error-dialog.jsx",
+      "after": "src/components/ui/request-error-dialog.tsx",
+      "originalLines": 111
+    },
+    {
+      "before": "src/components/ui/responsive-breakdown.jsx",
+      "after": "src/components/ui/responsive-breakdown.tsx",
+      "originalLines": 190
+    },
+    {
+      "before": "src/components/ui/responsive-select.jsx",
+      "after": "src/components/ui/responsive-select.tsx",
+      "originalLines": 402
+    },
+    {
+      "before": "src/components/ui/searchable-select.jsx",
+      "after": "src/components/ui/searchable-select.tsx",
+      "originalLines": 10
+    },
+    {
+      "before": "src/components/ui/select.jsx",
+      "after": "src/components/ui/select.tsx",
+      "originalLines": 188
+    },
+    {
+      "before": "src/components/ui/separator.jsx",
+      "after": "src/components/ui/separator.tsx",
+      "originalLines": 27
+    },
+    {
+      "before": "src/components/ui/sheet.jsx",
+      "after": "src/components/ui/sheet.tsx",
+      "originalLines": 139
+    },
+    {
+      "before": "src/components/ui/sidebar.jsx",
+      "after": "src/components/ui/sidebar.tsx",
+      "originalLines": 659
+    },
+    {
+      "before": "src/components/ui/skeleton.jsx",
+      "after": "src/components/ui/skeleton.tsx",
+      "originalLines": 15
+    },
+    {
+      "before": "src/components/ui/sonner.jsx",
+      "after": "src/components/ui/sonner.tsx",
+      "originalLines": 52
+    },
+    {
+      "before": "src/components/ui/spinner.jsx",
+      "after": "src/components/ui/spinner.tsx",
+      "originalLines": 21
+    },
+    {
+      "before": "src/components/ui/table.jsx",
+      "after": "src/components/ui/table.tsx",
+      "originalLines": 123
+    },
+    {
+      "before": "src/components/ui/tabs.jsx",
+      "after": "src/components/ui/tabs.tsx",
+      "originalLines": 82
+    },
+    {
+      "before": "src/components/ui/textarea.jsx",
+      "after": "src/components/ui/textarea.tsx",
+      "originalLines": 20
+    },
+    {
+      "before": "src/components/ui/tooltip.jsx",
+      "after": "src/components/ui/tooltip.tsx",
+      "originalLines": 51
+    },
+    {
+      "before": "src/hooks/use-analysis.js",
+      "after": "src/hooks/use-analysis.ts",
+      "originalLines": 8
+    },
+    {
+      "before": "src/hooks/use-capture-resource.js",
+      "after": "src/hooks/use-capture-resource.ts",
+      "originalLines": 37
+    },
+    {
+      "before": "src/hooks/use-creation-draft.js",
+      "after": "src/hooks/use-creation-draft.ts",
+      "originalLines": 57
+    },
+    {
+      "before": "src/hooks/use-dialog-focus.js",
+      "after": "src/hooks/use-dialog-focus.ts",
+      "originalLines": 24
+    },
+    {
+      "before": "src/hooks/use-mobile.js",
+      "after": "src/hooks/use-mobile.ts",
+      "originalLines": 28
+    },
+    {
+      "before": "src/hooks/use-notice-dismissals.js",
+      "after": "src/hooks/use-notice-dismissals.ts",
+      "originalLines": 96
+    },
+    {
+      "before": "src/lib/cardAppearance.js",
+      "after": "src/lib/cardAppearance.ts",
+      "originalLines": 25
+    },
+    {
+      "before": "src/lib/cardUsagePresentation.js",
+      "after": "src/lib/cardUsagePresentation.ts",
+      "originalLines": 44
+    },
+    {
+      "before": "src/lib/expenseFilters.js",
+      "after": "src/lib/expenseFilters.ts",
+      "originalLines": 30
+    },
+    {
+      "before": "src/lib/navigation.js",
+      "after": "src/lib/navigation.tsx",
+      "originalLines": 78
+    },
+    {
+      "before": "src/lib/utils.js",
+      "after": "src/lib/utils.ts",
+      "originalLines": 6
+    }
+  ],
+  "emptyFilesReservedForPhase7": [
+    "src/actions/cardCycles.js",
+    "src/actions/cards.js",
+    "src/actions/expenses.js",
+    "src/actions/incomes.js",
+    "src/actions/installmentPurchases.js",
+    "src/actions/receivables.js",
+    "src/actions/settings.js",
+    "src/actions/subscriptions.js",
+    "src/lib/calculations/dashboard.js",
+    "src/lib/calculations/installments.js",
+    "src/lib/calculations/receivables.js",
+    "src/lib/dates.js",
+    "src/lib/money.js",
+    "src/lib/validations.js"
+  ],
+  "activeJavaScriptRemaining": []
+}

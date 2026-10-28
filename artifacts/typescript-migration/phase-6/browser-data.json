@@ -1,0 +1,75 @@
+{
+  "online": [
+    {
+      "id": "f7563ed8-664b-4bea-bde8-87ab20fa4111",
+      "concept": "Prueba TSX 6",
+      "amount": "1250.5",
+      "date": "2026-10-28T12:00:00.000Z"
+    }
+  ],
+  "offline": [
+    {
+      "id": "faa36d96-9746-483c-9b4d-50bd221f84bf",
+      "concept": "Borrador TSX móvil",
+      "amount": "38.75",
+      "date": "2026-10-28T12:00:00.000Z"
+    }
+  ],
+  "receipts": [
+    {
+      "userId": "00000000-0000-4000-8000-000000000094",
+      "operationId": "ab8853f5-f6d8-492a-b111-1d1393bcd0c2",
+      "requestHash": "e1e0a0d540aa78ef19696ff4b6baca677c4df14da923c26663fa24a9592a15cb",
+      "response": {
+        "expense": {
+          "id": "faa36d96-9746-483c-9b4d-50bd221f84bf",
+          "card": null,
+          "date": "2026-10-28T12:00:00.000Z",
+          "notes": null,
+          "amount": "38.75",
+          "cardId": null,
+          "person": null,
+          "userId": "00000000-0000-4000-8000-000000000094",
+          "concept": "Borrador TSX móvil",
+          "category": {
+            "id": "06996b1a-0283-4763-8a35-2ec079ecbb73",
+            "name": "Categoría ficticia"
+          },
+          "personId": null,
+          "createdAt": "2026-10-28T06:52:02.126Z",
+          "updatedAt": "2026-10-28T06:52:02.126Z",
+          "categoryId": "06996b1a-0283-4763-8a35-2ec079ecbb73",
+          "debitAccount": null,
+          "reconciledAt": null,
+          "subscription": null,
+          "paymentMethod": "CASH",
+          "debitAccountId": null,
+          "payableAccount": null,
+          "subscriptionId": null,
+          "captureMovements": [],
+          "payableAccountId": null,
+          "receivableAccount": null,
+          "receivableAccountId": null,
+          "reconciliationStatus": "CONFIRMED",
+          "refundOriginalAmount": null,
+          "cashContributionAmount": "0"
+        }
+      },
+      "createdAt": "2026-10-28T06:52:02.116Z"
+    }
+  ],
+  "captures": [
+    {
+      "id": "a63d006f-48ad-4be1-a32d-a65e60f7a49f",
+      "status": "REVIEW",
+      "correction": {
+        "date": "2026-10-28",
+        "amount": "45.50",
+        "cardId": "f5ee8af4-92a9-4059-b0f0-9bf6e424edc0",
+        "currency": "MXN",
+        "merchant": "Aviso ficticio corrección 2",
+        "categoryId": "06996b1a-0283-4763-8a35-2ec079ecbb73"
+      }
+    }
+  ]
+}

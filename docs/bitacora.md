@@ -6,6 +6,14 @@ Consolidado el **27 de octubre de 2026** a partir del README del commit `4562aa0
 
 ## 2026-10-28
 
+### Interfaz, hooks y páginas en TypeScript
+
+**Fase 6 completada localmente.** Se convirtieron 135 módulos con contenido: páginas/layout restantes, seis hooks, pantallas y componentes compartidos. Props, refs, eventos, tablas y gráficas usan los tipos de sus bibliotecas. Los clientes validan las respuestas dentro de la recuperación HTTP y conservan el JSON original, incluidos metadatos, claves omitidas y orden usado por Captura. El cálculo de importes de pago se separó del estado de calendario para consumir detalles sin fechas.
+
+Pasaron tipos, contratos negativos, lint, build y 854 pruebas con PostgreSQL local, sin fallos ni omisiones. Se verificaron reconstrucción y actualización de BD, límites cliente/servidor y 26 recorridos de navegador entre móvil y escritorio. Las comprobaciones incluyen centavos, teclado/foco, borrador restaurado, gasto offline sincronizado una vez con el mismo UUID, correcciones sucesivas y recuperación de una respuesta incompleta.
+
+`components.json` habilita TSX. Se actualizaron README, producto, plan y referencias de UI. La fase 7 conserva la retirada de adaptadores/fallbacks, `allowJs` y los 14 archivos vacíos inventariados. Sin cambios de esquema, SQL, dependencias, APK ni publicación. Resultados, advertencias y reproducción: [fase 6](../artifacts/typescript-migration/phase-6/README.md).
+
 ### Captura Android, Calendar y offline en TypeScript
 
 **Fase 5 completada localmente.** Se migraron protocolo, parsers, reglas, revisión, conciliación, avisos Android, comprobantes y todos los endpoints de Captura; OAuth, agenda, sincronización y tareas de Calendar; y la cola offline con su observador de cambios. Los comandos distinguen resoluciones y las lecturas de JSON preservan las propuestas parciales, notas históricas y el orden usado por los controles de concurrencia.

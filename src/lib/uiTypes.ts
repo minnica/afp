@@ -1,0 +1,22 @@
+import type { UiResponse } from './uiResponseSchemas';
+export type NamedRecord = { id: string; name: string; notes?: string | null };
+export type Expense = UiResponse<'expenses'>['expenses'][number];
+export type Income = UiResponse<'incomes'>['incomes'][number];
+export type Card = NamedRecord & { usualCutDay: number; usualDueDay: number; notes?: string | null; creditLimit?: string | number | null; usedBalance?: string | number | null; bankUsedBalance?: string | number | null; balanceAsOf?: string | null; balanceCalculatedAt?: string; balanceAdjustment?: string | number | null; balanceTracking?: unknown; balanceTrackingStatus?: string };
+export type Cycle = Extract<UiResponse<'card-cycles'>, { cycles: unknown }>['cycles'][number];
+export type Purchase = UiResponse<'installment-purchases'>['purchases'][number];
+export type Subscription = UiResponse<'subscriptions'>['subscriptions'][number];
+export type Receivable = UiResponse<'receivables'>['receivables'][number];
+export type Payable = UiResponse<'payables'>['payables'][number];
+export type Dashboard = UiResponse<'dashboard'>;
+export type RegularUsage = Dashboard['cardUsageWaiverHistory'][number] | Dashboard['cardUsageWaivers'][number];
+export type Usage = Dashboard['cardUsageWaiversCurrent'][number] | RegularUsage;
+export type TurboUsage = Extract<Usage, { recentPurchases: unknown }>;
+export type Notice = Dashboard['importantNotices'][number];
+export type Charge = Extract<UiResponse<'subscription-charges'>, { charges: unknown }>['charges'][number];
+export type CaptureConfiguration = UiResponse<'captures/configuration'>;
+export type CaptureInbox = Extract<UiResponse<'captures/movements'>, { movements: unknown }>;
+export type CaptureDetail = Extract<UiResponse<'captures/movements'>, { movement: unknown }>;
+export type CreateError = { field?: string; message: string };
+export function errorMessage(error: unknown, fallback = ''): string { return error instanceof Error ? error.message || fallback : fallback; }
+export type ExpenseRow = { id: string; userId?: string; date: string; paymentMethod: string; cardId?: string | null; debitAccountId?: string | null; concept: string; amount: string | number; cashContributionAmount?: string | number; categoryId: string; notes?: string | null; personId?: string | null; receivableAccountId?: string | null; payableAccountId?: string | null; subscriptionId?: string | null; card?: NamedRecord | null; debitAccount?: NamedRecord | null; category?: NamedRecord | null; person?: NamedRecord | null; receivableAccount?: { id: string; concept: string } | null; payableAccount?: { id: string; concept: string } | null; subscription?: NamedRecord | null; createdAt?: string; updatedAt?: string; refundOriginalAmount?: string | number | null; reconciliationStatus?: string; reconciledAt?: string | null; captureMovements?: { events?: { sourcePackage: string }[] }[]; _offlineStatus?: 'pending'; _offlineError?: string };

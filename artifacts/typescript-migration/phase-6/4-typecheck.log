@@ -1,0 +1,109 @@
+
+> afp@0.1.0 typecheck /home/garatachia/projects/afp
+> prisma generate && next typegen && tsc --noEmit
+
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma/schema.prisma.
+
+✔ Generated Prisma Client (v7.10.1) to ./node_modules/.pnpm/@prisma+client@7.10.1_prisma@7.10.1_@types+node@22.20.5_@types+react-dom@19.3.0_@types+_67e1dd834939b123c798939e408e968c/node_modules/@prisma/client in 402ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+
+Generating route types...
+✓ Types generated successfully
+src/components/tarjetas/CycleBreakdown.tsx(32,82): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string | null | undefined'.
+src/components/tarjetas/CycleBreakdown.tsx(32,120): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string | null | undefined'.
+src/components/tarjetas/CycleBreakdown.tsx(33,19): error TS2339: Property 'length' does not exist on type '{}'.
+src/components/tarjetas/CycleBreakdown.tsx(35,52): error TS2339: Property 'length' does not exist on type '{}'.
+src/components/tarjetas/CycleBreakdown.tsx(36,56): error TS2339: Property 'length' does not exist on type '{}'.
+src/components/tarjetas/CycleBreakdown.tsx(40,25): error TS2339: Property 'map' does not exist on type '{}'.
+src/components/tarjetas/CycleBreakdown.tsx(40,30): error TS7006: Parameter 'warning' implicitly has an 'any' type.
+src/components/tarjetas/CycleBreakdown.tsx(60,233): error TS18046: 'cycle.creditsAmount' is of type 'unknown'.
+src/components/tarjetas/CycleBreakdown.tsx(88,74): error TS18046: 'cycle.creditsAmount' is of type 'unknown'.
+src/components/tarjetas/CycleBreakdown.tsx(110,82): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string | null | undefined'.
+src/components/tarjetas/CycleBreakdown.tsx(110,140): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
+src/components/tarjetas/CycleBreakdown.tsx(117,11): error TS2740: Type '{}' is missing the following properties from type '{ id: string; }[]': length, pop, push, concat, and 35 more.
+src/components/tarjetas/CycleBreakdown.tsx(119,38): error TS2339: Property 'concept' does not exist on type '{ id: string; }'.
+src/components/tarjetas/CycleBreakdown.tsx(121,40): error TS2339: Property 'date' does not exist on type '{ id: string; }'.
+src/components/tarjetas/CycleBreakdown.tsx(121,53): error TS2339: Property 'categoryName' does not exist on type '{ id: string; }'.
+src/components/tarjetas/CycleBreakdown.tsx(121,79): error TS2339: Property 'categoryName' does not exist on type '{ id: string; }'.
+src/components/tarjetas/CycleBreakdown.tsx(121,168): error TS2559: Type '{ id: string; }' has no properties in common with type '{ amount?: unknown; refundOriginalAmount?: unknown; reconciliationStatus?: string | undefined; reconciledAt?: string | null | undefined; captureMovements?: { events?: { sourcePackage: string; }[] | undefined; }[] | undefined; }'.
+src/components/tarjetas/CycleBreakdown.tsx(123,37): error TS2339: Property 'amount' does not exist on type '{ id: string; }'.
+src/components/tarjetas/CycleBreakdown.tsx(130,11): error TS2740: Type '{}' is missing the following properties from type '{ id: string; }[]': length, pop, push, concat, and 35 more.
+src/components/tarjetas/CycleBreakdown.tsx(132,38): error TS2339: Property 'name' does not exist on type '{ id: string; }'.
+src/components/tarjetas/CycleBreakdown.tsx(134,37): error TS2339: Property 'chargeDate' does not exist on type '{ id: string; }'.
+src/components/tarjetas/CycleBreakdown.tsx(135,20): error TS2339: Property 'categoryName' does not exist on type '{ id: string; }'.
+src/components/tarjetas/CycleBreakdown.tsx(135,46): error TS2339: Property 'categoryName' does not exist on type '{ id: string; }'.
+src/components/tarjetas/CycleBreakdown.tsx(138,37): error TS2339: Property 'amount' does not exist on type '{ id: string; }'.
+src/components/tarjetas/CycleBreakdown.tsx(145,11): error TS2740: Type '{}' is missing the following properties from type '{ id: string; }[]': length, pop, push, concat, and 35 more.
+src/components/tarjetas/CycleBreakdown.tsx(147,38): error TS2339: Property 'concept' does not exist on type '{ id: string; }'.
+src/components/tarjetas/CycleBreakdown.tsx(149,40): error TS2339: Property 'purchaseDate' does not exist on type '{ id: string; }'.
+src/components/tarjetas/CycleBreakdown.tsx(149,68): error TS2339: Property 'currentMonth' does not exist on type '{ id: string; }'.
+src/components/tarjetas/CycleBreakdown.tsx(150,20): error TS2339: Property 'months' does not exist on type '{ id: string; }'.
+src/components/tarjetas/CycleBreakdown.tsx(151,21): error TS2339: Property 'categoryName' does not exist on type '{ id: string; }'.
+src/components/tarjetas/CycleBreakdown.tsx(151,47): error TS2339: Property 'categoryName' does not exist on type '{ id: string; }'.
+src/components/tarjetas/CycleBreakdown.tsx(151,136): error TS2559: Type '{ id: string; }' has no properties in common with type '{ amount?: unknown; refundOriginalAmount?: unknown; reconciliationStatus?: string | undefined; reconciledAt?: string | null | undefined; captureMovements?: { events?: { sourcePackage: string; }[] | undefined; }[] | undefined; }'.
+src/components/tarjetas/CycleBreakdown.tsx(153,37): error TS2339: Property 'amount' does not exist on type '{ id: string; }'.
+src/components/tarjetas/CycleBreakdown.tsx(158,22): error TS18046: 'cycle.creditsAmount' is of type 'unknown'.
+src/components/tarjetas/CycleBreakdown.tsx(160,13): error TS2740: Type '{}' is missing the following properties from type '{ id: string; }[]': length, pop, push, concat, and 35 more.
+src/components/tarjetas/CycleBreakdown.tsx(162,40): error TS2339: Property 'concept' does not exist on type '{ id: string; }'.
+src/components/tarjetas/CycleBreakdown.tsx(164,39): error TS2339: Property 'date' does not exist on type '{ id: string; }'.
+src/components/tarjetas/CycleBreakdown.tsx(164,85): error TS2339: Property 'incomeAmount' does not exist on type '{ id: string; }'.
+src/components/tarjetas/CycleBreakdown.tsx(166,40): error TS2339: Property 'amount' does not exist on type '{ id: string; }'.
+src/components/tarjetas/CycleBreakdown.tsx(167,37): error TS2339: Property 'notes' does not exist on type '{ id: string; }'.
+src/components/tarjetas/CyclesDataTable.tsx(128,118): error TS18046: 'cycle.card' is of type 'unknown'.
+src/components/tarjetas/CyclesDataTable.tsx(130,70): error TS18046: 'cycle.card' is of type 'unknown'.
+src/components/tarjetas/CyclesDataTable.tsx(131,80): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/components/tarjetas/CyclesDataTable.tsx(132,27): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/components/tarjetas/CyclesDataTable.tsx(151,66): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string | null | undefined'.
+src/components/tarjetas/CyclesDataTable.tsx(155,66): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string | null | undefined'.
+src/components/tarjetas/CyclesDataTable.tsx(159,10): error TS18046: 'cycle.excessAmount' is of type 'unknown'.
+src/components/tarjetas/CyclesDataTable.tsx(163,146): error TS18046: 'cycle.card' is of type 'unknown'.
+src/components/tarjetas/CyclesDataTable.tsx(166,144): error TS18046: 'cycle.card' is of type 'unknown'.
+src/components/tarjetas/CyclesDataTable.tsx(177,63): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/components/tarjetas/CyclesDataTable.tsx(177,101): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/components/tarjetas/CyclesDataTable.tsx(183,129): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string | null | undefined'.
+src/components/tarjetas/CyclesDataTable.tsx(184,124): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string | null | undefined'.
+src/components/tarjetas/CyclesDataTable.tsx(185,133): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string | null | undefined'.
+src/components/tarjetas/CyclesDataTable.tsx(186,9): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
+src/components/tarjetas/CyclesDataTable.tsx(186,153): error TS2345: Argument of type '{}' is not assignable to parameter of type 'string'.
+src/components/tarjetas/CyclesDataTable.tsx(189,295): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string | null | undefined'.
+src/components/tarjetas/CyclesDataTable.tsx(189,323): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
+src/components/tarjetas/CyclesDataTable.tsx(193,10): error TS18046: 'cycle.excessAmount' is of type 'unknown'.
+src/components/tarjetas/CyclesDataTable.tsx(238,28): error TS2345: Argument of type '{ paidAmount: number; statementAmount: string | number | null; }' is not assignable to parameter of type 'PaymentCycle'.
+  Type '{ paidAmount: number; statementAmount: string | number | null; }' is missing the following properties from type '{ cutDate: DateValue; dueDate: DateValue; }': cutDate, dueDate
+src/components/tarjetas/CyclesDataTable.tsx(242,88): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string | null | undefined'.
+src/components/tarjetas/CyclesDataTable.tsx(245,28): error TS2345: Argument of type '{ postCutCreditAmount: number | null; statementAmount: string | number | null; }' is not assignable to parameter of type 'PaymentCycle'.
+  Type '{ postCutCreditAmount: number | null; statementAmount: string | number | null; }' is missing the following properties from type '{ cutDate: DateValue; dueDate: DateValue; }': cutDate, dueDate
+src/components/tarjetas/CyclesDataTable.tsx(251,46): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string | null | undefined'.
+src/components/tarjetas/CyclesDataTable.tsx(252,44): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string | null | undefined'.
+src/components/tarjetas/CyclesDataTable.tsx(253,44): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string | null | undefined'.
+src/components/tarjetas/CyclesDataTable.tsx(257,49): error TS2345: Argument of type '{}' is not assignable to parameter of type 'string'.
+src/components/tarjetas/CyclesDataTable.tsx(261,45): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string | null | undefined'.
+src/components/tarjetas/CyclesDataTable.tsx(262,29): error TS2345: Argument of type '{}' is not assignable to parameter of type 'SetStateAction<string>'.
+src/components/tarjetas/CyclesDataTable.tsx(274,36): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/components/tarjetas/CyclesDataTable.tsx(320,66): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/components/tarjetas/CyclesDataTable.tsx(323,75): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/components/tarjetas/CyclesDataTable.tsx(324,71): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/components/tarjetas/CyclesDataTable.tsx(325,30): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/components/tarjetas/CyclesDataTable.tsx(334,30): error TS18046: 'row.card' is of type 'unknown'.
+src/components/tarjetas/CyclesDataTable.tsx(390,51): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/components/tarjetas/CyclesDataTable.tsx(390,109): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/components/tarjetas/CyclesDataTable.tsx(465,52): error TS2322: Type 'unknown' is not assignable to type 'Key | null | undefined'.
+src/components/tarjetas/CyclesDataTable.tsx(496,269): error TS18046: 'currentCycle.card' is of type 'unknown'.
+src/components/tarjetas/CyclesDataTable.tsx(635,148): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/components/tarjetas/CyclesDataTable.tsx(645,116): error TS18046: 'activeDialog.cycle.card' is of type 'unknown'.
+src/components/tarjetas/TarjetasContent.tsx(309,26): error TS18046: 'cycle.month' is of type 'unknown'.
+src/components/tarjetas/TarjetasContent.tsx(314,52): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(value: string | number | Date): Date', gave the following error.
+    Argument of type 'unknown' is not assignable to parameter of type 'string | number | Date'.
+  Overload 2 of 4, '(value: string | number): Date', gave the following error.
+    Argument of type 'unknown' is not assignable to parameter of type 'string | number'.
+src/components/tarjetas/TarjetasContent.tsx(314,84): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(value: string | number | Date): Date', gave the following error.
+    Argument of type 'unknown' is not assignable to parameter of type 'string | number | Date'.
+  Overload 2 of 4, '(value: string | number): Date', gave the following error.
+    Argument of type 'unknown' is not assignable to parameter of type 'string | number'.
+ ELIFECYCLE  Command failed with exit code 2.

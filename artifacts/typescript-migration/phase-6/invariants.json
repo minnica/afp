@@ -1,0 +1,556 @@
+{
+  "baseCommit": "39da231760e4ac6a00c8ae32764f65f7eec4230d",
+  "unchanged": true,
+  "files": [
+    {
+      "path": "android/app/build.gradle.kts",
+      "before": "40e8cddfd0d31b7b3571cb0e88d9b5d2fc43f89a8acf0d1cee9e4cbbee72f587",
+      "after": "40e8cddfd0d31b7b3571cb0e88d9b5d2fc43f89a8acf0d1cee9e4cbbee72f587"
+    },
+    {
+      "path": "android/app/proguard-rules.pro",
+      "before": "f596afa84a06a351addc1a51fe5c5130c35bee8007b89d6271b707a0334d5cb0",
+      "after": "f596afa84a06a351addc1a51fe5c5130c35bee8007b89d6271b707a0334d5cb0"
+    },
+    {
+      "path": "android/app/schemas/com.garatachia.afp.CaptureQueueDatabase/1.json",
+      "before": "87947b0fb2b4fdccf28130c9e72be92d18e19dedc623a5656dc1ab9bdc1ba90d",
+      "after": "87947b0fb2b4fdccf28130c9e72be92d18e19dedc623a5656dc1ab9bdc1ba90d"
+    },
+    {
+      "path": "android/app/src/androidTest/java/com/garatachia/afp/BindingStoreTest.kt",
+      "before": "40b2a53ad8cd36a63225a17c0426d3bc223caefae4fdb3085aaaa2857323c361",
+      "after": "40b2a53ad8cd36a63225a17c0426d3bc223caefae4fdb3085aaaa2857323c361"
+    },
+    {
+      "path": "android/app/src/androidTest/java/com/garatachia/afp/CaptureDeliveryTest.kt",
+      "before": "dfdc8f22f572bef4c65e5fe5fc8b807985aaed5aaa5294f009d3e133dcbb2a5c",
+      "after": "dfdc8f22f572bef4c65e5fe5fc8b807985aaed5aaa5294f009d3e133dcbb2a5c"
+    },
+    {
+      "path": "android/app/src/androidTest/java/com/garatachia/afp/CaptureQueueDeliveryTest.kt",
+      "before": "58e4abc603917829791fb7e2997ebac3ba08ec6ad9fe2c87ab3bda80547a4552",
+      "after": "58e4abc603917829791fb7e2997ebac3ba08ec6ad9fe2c87ab3bda80547a4552"
+    },
+    {
+      "path": "android/app/src/androidTest/java/com/garatachia/afp/CaptureQueueTest.kt",
+      "before": "bc87acc7af5e7c646106a6cb05ef9e2c41740413753d5c205e5f4f6f603abaaa",
+      "after": "bc87acc7af5e7c646106a6cb05ef9e2c41740413753d5c205e5f4f6f603abaaa"
+    },
+    {
+      "path": "android/app/src/androidTest/java/com/garatachia/afp/CaptureRemoteScreenTest.kt",
+      "before": "a94ced80f5408172a3e04759f8bc96a91dfc43c7c0e48b3f586dada8d08f73ad",
+      "after": "a94ced80f5408172a3e04759f8bc96a91dfc43c7c0e48b3f586dada8d08f73ad"
+    },
+    {
+      "path": "android/app/src/androidTest/java/com/garatachia/afp/CaptureRemoteSettingsTest.kt",
+      "before": "1815633575444ab4386a0a3cf91d40c807d685ff3b535fb262041a755db60878",
+      "after": "1815633575444ab4386a0a3cf91d40c807d685ff3b535fb262041a755db60878"
+    },
+    {
+      "path": "android/app/src/androidTest/java/com/garatachia/afp/DiagnosticStoreTest.kt",
+      "before": "acc04d63db563426213de0ad62d31c76c3be178f151d2df53cc08f1dc43c715e",
+      "after": "acc04d63db563426213de0ad62d31c76c3be178f151d2df53cc08f1dc43c715e"
+    },
+    {
+      "path": "android/app/src/androidTest/java/com/garatachia/afp/PaymentReceiptTest.kt",
+      "before": "a5dc6d4dcf1adde83f5d579464a1b75a850c275de7d5d1f4f50baa39eae1ea05",
+      "after": "a5dc6d4dcf1adde83f5d579464a1b75a850c275de7d5d1f4f50baa39eae1ea05"
+    },
+    {
+      "path": "android/app/src/androidTest/java/com/garatachia/afp/QueueRecoveryProbeTest.kt",
+      "before": "b9ab720f69c297ffdad59b7177767be6704cff40c59e55563410fa1a5b212b90",
+      "after": "b9ab720f69c297ffdad59b7177767be6704cff40c59e55563410fa1a5b212b90"
+    },
+    {
+      "path": "android/app/src/androidTest/java/com/garatachia/afp/QueueUpgradeProbeTest.kt",
+      "before": "0b9ca20d194abb4b14670cbe989f63f932748ee232d1fe07e6e8ffe9492efaa8",
+      "after": "0b9ca20d194abb4b14670cbe989f63f932748ee232d1fe07e6e8ffe9492efaa8"
+    },
+    {
+      "path": "android/app/src/androidTest/java/com/garatachia/afp/ServiceSourcesScreenTest.kt",
+      "before": "5c952ed2f64b129b046274b75a9d7b64f59850ed15ccdf2edfe87fcbbf7b9d34",
+      "after": "5c952ed2f64b129b046274b75a9d7b64f59850ed15ccdf2edfe87fcbbf7b9d34"
+    },
+    {
+      "path": "android/app/src/androidTest/java/com/garatachia/afp/TwaNavigationTest.kt",
+      "before": "41633621067a9d819718360e875c3a200b556901fe4e44db06c44f2a633d8fb7",
+      "after": "41633621067a9d819718360e875c3a200b556901fe4e44db06c44f2a633d8fb7"
+    },
+    {
+      "path": "android/app/src/main/AndroidManifest.xml",
+      "before": "fb6faef2265848d02d9f48dc3edd23fa0b8e7641195cf3de73d06aaa64ccd355",
+      "after": "fb6faef2265848d02d9f48dc3edd23fa0b8e7641195cf3de73d06aaa64ccd355"
+    },
+    {
+      "path": "android/app/src/main/java/com/garatachia/afp/BindingController.kt",
+      "before": "dec312258d079d66385c37c6074904ec896db5ddd72d491091cbe9b264031826",
+      "after": "dec312258d079d66385c37c6074904ec896db5ddd72d491091cbe9b264031826"
+    },
+    {
+      "path": "android/app/src/main/java/com/garatachia/afp/BindingSection.kt",
+      "before": "75ec2b8bd1a283736cdd96516ee55ae0690a799d28d3779b5e9d5e3d927948f5",
+      "after": "75ec2b8bd1a283736cdd96516ee55ae0690a799d28d3779b5e9d5e3d927948f5"
+    },
+    {
+      "path": "android/app/src/main/java/com/garatachia/afp/BindingStore.kt",
+      "before": "79027a7842cb32b4d2d86a4d430ed10280115d1fb6fbb0727ad9ca4c6eb317a8",
+      "after": "79027a7842cb32b4d2d86a4d430ed10280115d1fb6fbb0727ad9ca4c6eb317a8"
+    },
+    {
+      "path": "android/app/src/main/java/com/garatachia/afp/CaptureApiClient.kt",
+      "before": "bcf9ef70a7bfa499aace7c916af40e55876556a44c0164e50643c4eb74db6d55",
+      "after": "bcf9ef70a7bfa499aace7c916af40e55876556a44c0164e50643c4eb74db6d55"
+    },
+    {
+      "path": "android/app/src/main/java/com/garatachia/afp/CaptureApplication.kt",
+      "before": "db636b5f6591aeb9e47d1fe99a210a296c339f80f49a21ff4fb0b8044a027f47",
+      "after": "db636b5f6591aeb9e47d1fe99a210a296c339f80f49a21ff4fb0b8044a027f47"
+    },
+    {
+      "path": "android/app/src/main/java/com/garatachia/afp/CaptureBinding.kt",
+      "before": "693d53cde8621bd9f000d61fa84751197ba009a272087b12cc6103d3139f19af",
+      "after": "693d53cde8621bd9f000d61fa84751197ba009a272087b12cc6103d3139f19af"
+    },
+    {
+      "path": "android/app/src/main/java/com/garatachia/afp/CaptureContentFilter.kt",
+      "before": "5e6bb1a0aeaebfc7fe90622134409b7d1acb0ee1ac7e65e8ee8181c8d276cb40",
+      "after": "5e6bb1a0aeaebfc7fe90622134409b7d1acb0ee1ac7e65e8ee8181c8d276cb40"
+    },
+    {
+      "path": "android/app/src/main/java/com/garatachia/afp/CaptureNotificationListener.kt",
+      "before": "02db8d27ebcea86b3323a7a64a29619a147e3bf74a3a472afed0c06eaa4a21d3",
+      "after": "02db8d27ebcea86b3323a7a64a29619a147e3bf74a3a472afed0c06eaa4a21d3"
+    },
+    {
+      "path": "android/app/src/main/java/com/garatachia/afp/CapturePolicy.kt",
+      "before": "1dceb9a7b1fe589f422fd09753d7208327c22530ea17e76b63bdead8ba7eaf6b",
+      "after": "1dceb9a7b1fe589f422fd09753d7208327c22530ea17e76b63bdead8ba7eaf6b"
+    },
+    {
+      "path": "android/app/src/main/java/com/garatachia/afp/CaptureQueue.kt",
+      "before": "0d121bca273d5c8151cfcc41260ef9ed69762a65cc8d2c52233a2e3c6c5bc74d",
+      "after": "0d121bca273d5c8151cfcc41260ef9ed69762a65cc8d2c52233a2e3c6c5bc74d"
+    },
+    {
+      "path": "android/app/src/main/java/com/garatachia/afp/CaptureQueueDatabase.kt",
+      "before": "f9c55212d88812a5d4e504daa37c5fb203487d146181757e687c957ad2ae1de3",
+      "after": "f9c55212d88812a5d4e504daa37c5fb203487d146181757e687c957ad2ae1de3"
+    },
+    {
+      "path": "android/app/src/main/java/com/garatachia/afp/CaptureRemoteSettings.kt",
+      "before": "8b522dddaca8d6b3bd19cb9638730ad1703d812c418be98aa9056382abbae319",
+      "after": "8b522dddaca8d6b3bd19cb9638730ad1703d812c418be98aa9056382abbae319"
+    },
+    {
+      "path": "android/app/src/main/java/com/garatachia/afp/CaptureSyncEngine.kt",
+      "before": "c8375ff665df37f7abd589462ae16f5de8f73b2905edf119c3e984f2692dd95f",
+      "after": "c8375ff665df37f7abd589462ae16f5de8f73b2905edf119c3e984f2692dd95f"
+    },
+    {
+      "path": "android/app/src/main/java/com/garatachia/afp/CaptureSyncWorker.kt",
+      "before": "3806e4d711773fd80b9abd5eecf903af607b12f4ad686f52d4d1c4182d1da92d",
+      "after": "3806e4d711773fd80b9abd5eecf903af607b12f4ad686f52d4d1c4182d1da92d"
+    },
+    {
+      "path": "android/app/src/main/java/com/garatachia/afp/DiagnosticSample.kt",
+      "before": "7a0a5bb8e0f434c22941071398a6aa07f0c28ca84c53a2da89f7af040eb80c17",
+      "after": "7a0a5bb8e0f434c22941071398a6aa07f0c28ca84c53a2da89f7af040eb80c17"
+    },
+    {
+      "path": "android/app/src/main/java/com/garatachia/afp/DiagnosticStore.kt",
+      "before": "3ea831af24f4142940b353dc4c906b9e83e13dc858e0c173b40ee52aeda15303",
+      "after": "3ea831af24f4142940b353dc4c906b9e83e13dc858e0c173b40ee52aeda15303"
+    },
+    {
+      "path": "android/app/src/main/java/com/garatachia/afp/ImportantNoticeCenter.kt",
+      "before": "160a5e5d8526c6d132c52eb8d831dd7b4e5f7249ea8c9de1816e8fb752826b0d",
+      "after": "160a5e5d8526c6d132c52eb8d831dd7b4e5f7249ea8c9de1816e8fb752826b0d"
+    },
+    {
+      "path": "android/app/src/main/java/com/garatachia/afp/ImportantNoticePolicy.kt",
+      "before": "bbedb284c3f3dce6a7bdc753d04d8495f8f79f35d4090bdffe8d064683451e30",
+      "after": "bbedb284c3f3dce6a7bdc753d04d8495f8f79f35d4090bdffe8d064683451e30"
+    },
+    {
+      "path": "android/app/src/main/java/com/garatachia/afp/ImportantNoticeWorker.kt",
+      "before": "6b1ed679ee5d351a379505f99afd56e0cdf80692fffbfb9a68b8693e3306acf6",
+      "after": "6b1ed679ee5d351a379505f99afd56e0cdf80692fffbfb9a68b8693e3306acf6"
+    },
+    {
+      "path": "android/app/src/main/java/com/garatachia/afp/MainActivity.kt",
+      "before": "aee2b71deb44c12d23804a4cbbfe5726ef884c4e0e15352d9594884fa4f58bbb",
+      "after": "aee2b71deb44c12d23804a4cbbfe5726ef884c4e0e15352d9594884fa4f58bbb"
+    },
+    {
+      "path": "android/app/src/main/java/com/garatachia/afp/QueueCipher.kt",
+      "before": "01d09e377fffa4ba963739f4bf74e7583e2ae03f2e8c314fbc4cdc86a3127063",
+      "after": "01d09e377fffa4ba963739f4bf74e7583e2ae03f2e8c314fbc4cdc86a3127063"
+    },
+    {
+      "path": "android/app/src/main/java/com/garatachia/afp/QueueSection.kt",
+      "before": "aff56e02ac16fd47c5d2cf3bcc298aa85c64567f5be3d2af429838e6ead2c8b2",
+      "after": "aff56e02ac16fd47c5d2cf3bcc298aa85c64567f5be3d2af429838e6ead2c8b2"
+    },
+    {
+      "path": "android/app/src/main/java/com/garatachia/afp/ReceiptTextReader.kt",
+      "before": "14e9431a2bc77bcb0d393f8b250debc3c3ba4cdf8f1e6bff18c56fb77a55f1d6",
+      "after": "14e9431a2bc77bcb0d393f8b250debc3c3ba4cdf8f1e6bff18c56fb77a55f1d6"
+    },
+    {
+      "path": "android/app/src/main/java/com/garatachia/afp/SharePaymentActivity.kt",
+      "before": "006a9ec35fa2a011e132a2ad9eb8bba115599b0e5af158cb78d755b2caf8b23a",
+      "after": "006a9ec35fa2a011e132a2ad9eb8bba115599b0e5af158cb78d755b2caf8b23a"
+    },
+    {
+      "path": "android/app/src/main/res/drawable/ic_launcher.xml",
+      "before": "ab6330a4cf2e71311d49ec3f30dbc7d92113212b578123adab366cf3085ce77d",
+      "after": "ab6330a4cf2e71311d49ec3f30dbc7d92113212b578123adab366cf3085ce77d"
+    },
+    {
+      "path": "android/app/src/main/res/drawable/ic_notification.xml",
+      "before": "b78917680727ee71f259e11b600820124c71784d76c06d44972403e9b8e0a113",
+      "after": "b78917680727ee71f259e11b600820124c71784d76c06d44972403e9b8e0a113"
+    },
+    {
+      "path": "android/app/src/main/res/values/colors.xml",
+      "before": "b31e7117c945fb5eb06db6225a5bfb758a32f8ac68be60a8b2cb63f52725d38a",
+      "after": "b31e7117c945fb5eb06db6225a5bfb758a32f8ac68be60a8b2cb63f52725d38a"
+    },
+    {
+      "path": "android/app/src/main/res/values/strings.xml",
+      "before": "8ac5d9272da596b890901f65addc910bb8929a843869184b30bf6db401356919",
+      "after": "8ac5d9272da596b890901f65addc910bb8929a843869184b30bf6db401356919"
+    },
+    {
+      "path": "android/app/src/main/res/values/styles.xml",
+      "before": "6948380d99365d75b1b46bafa0d1c1aaf82607517aa67b3ab9499b8b86b20abe",
+      "after": "6948380d99365d75b1b46bafa0d1c1aaf82607517aa67b3ab9499b8b86b20abe"
+    },
+    {
+      "path": "android/app/src/main/res/xml/data_extraction_rules.xml",
+      "before": "8b55ff5489071bb19a4e89967b604a16c0e4d1e87a2df3c73c64417314a59f22",
+      "after": "8b55ff5489071bb19a4e89967b604a16c0e4d1e87a2df3c73c64417314a59f22"
+    },
+    {
+      "path": "android/app/src/test/java/com/garatachia/afp/CaptureBindingTest.kt",
+      "before": "b5c8a1361dbda2ee01e5d3bdef39bec9bb139dd2b42c61e7abf3812314bd1ddf",
+      "after": "b5c8a1361dbda2ee01e5d3bdef39bec9bb139dd2b42c61e7abf3812314bd1ddf"
+    },
+    {
+      "path": "android/app/src/test/java/com/garatachia/afp/CaptureContentFilterTest.kt",
+      "before": "02565bdb791a04af71cb1b36831ece2376f9d96426dedfa7116e938ee9699818",
+      "after": "02565bdb791a04af71cb1b36831ece2376f9d96426dedfa7116e938ee9699818"
+    },
+    {
+      "path": "android/app/src/test/java/com/garatachia/afp/CaptureDeliveryJvmTest.kt",
+      "before": "aea391ae62e896c834786119098104f7c2040f5d698f95170438a0271d42b427",
+      "after": "aea391ae62e896c834786119098104f7c2040f5d698f95170438a0271d42b427"
+    },
+    {
+      "path": "android/app/src/test/java/com/garatachia/afp/CapturePolicyTest.kt",
+      "before": "0af2cc0fc5146791683a2ab9402a36eb4aec97e7a94ce7d0b433e1e66754d3b3",
+      "after": "0af2cc0fc5146791683a2ab9402a36eb4aec97e7a94ce7d0b433e1e66754d3b3"
+    },
+    {
+      "path": "android/app/src/test/java/com/garatachia/afp/ImportantNoticePolicyTest.kt",
+      "before": "96f25a8645a7ede0c0555dbf10eae9c27957d5666848ed19e73556e4d71a1f9f",
+      "after": "96f25a8645a7ede0c0555dbf10eae9c27957d5666848ed19e73556e4d71a1f9f"
+    },
+    {
+      "path": "android/build.gradle.kts",
+      "before": "b08018cf92079aee7355eee7fe960e162521df486e384ea059fbe92035a3ef10",
+      "after": "b08018cf92079aee7355eee7fe960e162521df486e384ea059fbe92035a3ef10"
+    },
+    {
+      "path": "android/diagnostics/format-matrix.md",
+      "before": "de702dd0062392732dd9fa78f4620090e110365a094cc8e818b9602438843caf",
+      "after": "de702dd0062392732dd9fa78f4620090e110365a094cc8e818b9602438843caf"
+    },
+    {
+      "path": "android/gradle.properties",
+      "before": "e43a00491832254a35cf5a979ef6de17f78c4e159d446be39319d2e3d3e46325",
+      "after": "e43a00491832254a35cf5a979ef6de17f78c4e159d446be39319d2e3d3e46325"
+    },
+    {
+      "path": "android/gradle/wrapper/gradle-wrapper.jar",
+      "before": "b3a875ddc1f044746e1b1a55f645584505f4a10438c1afea9f15e92a7c42ec13",
+      "after": "b3a875ddc1f044746e1b1a55f645584505f4a10438c1afea9f15e92a7c42ec13"
+    },
+    {
+      "path": "android/gradle/wrapper/gradle-wrapper.properties",
+      "before": "1e3d87ddfd70069f68afa0c9ddcaab26913c3baf3d809447b0362d2d49f57325",
+      "after": "1e3d87ddfd70069f68afa0c9ddcaab26913c3baf3d809447b0362d2d49f57325"
+    },
+    {
+      "path": "android/gradlew",
+      "before": "b2fe376b143a459ba5d0bd290dc89beed5399fc6d159cd1214bd642ea94bcf07",
+      "after": "b2fe376b143a459ba5d0bd290dc89beed5399fc6d159cd1214bd642ea94bcf07"
+    },
+    {
+      "path": "android/gradlew.bat",
+      "before": "9386e790d58b9368ca8e034536a5baa688643d51cb37bfa462503d36fd0291a6",
+      "after": "9386e790d58b9368ca8e034536a5baa688643d51cb37bfa462503d36fd0291a6"
+    },
+    {
+      "path": "android/scripts/check-device.py",
+      "before": "998ca1960e6bc0b6001807962e3a220cb360f57c1956735159e2831e31547cc3",
+      "after": "998ca1960e6bc0b6001807962e3a220cb360f57c1956735159e2831e31547cc3"
+    },
+    {
+      "path": "android/scripts/init-signing.py",
+      "before": "d8cef1a426d9295e10cf4b05ff1f0e11424c8a0a9c6a8503c47bfd2c539c32c8",
+      "after": "d8cef1a426d9295e10cf4b05ff1f0e11424c8a0a9c6a8503c47bfd2c539c32c8"
+    },
+    {
+      "path": "android/settings.gradle.kts",
+      "before": "4ca7450362703a5a9bcfb5a75a302c83c00ce208a5bd1951b520dd949c0772cf",
+      "after": "4ca7450362703a5a9bcfb5a75a302c83c00ce208a5bd1951b520dd949c0772cf"
+    },
+    {
+      "path": "eslint.config.mjs",
+      "before": "775f631e733d6f0b455448d11e1859c62ca4ed9ec218ad3eebc45583c62e3411",
+      "after": "775f631e733d6f0b455448d11e1859c62ca4ed9ec218ad3eebc45583c62e3411"
+    },
+    {
+      "path": "package.json",
+      "before": "977c36e6c3f77d68a15a26fae97da29a4e4030476c9e3a8a6b0e7ed454f531ad",
+      "after": "977c36e6c3f77d68a15a26fae97da29a4e4030476c9e3a8a6b0e7ed454f531ad"
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "before": "c565d057974dc2bc1aa7df7bba47f61742834051f6ec084ee74b29373ff7299c",
+      "after": "c565d057974dc2bc1aa7df7bba47f61742834051f6ec084ee74b29373ff7299c"
+    },
+    {
+      "path": "prisma/migrations/20260509070227_init/migration.sql",
+      "before": "1ff8bca46c1f428981d455d8f4078194aa7dd47e6c58319c54fc584ae70c2b41",
+      "after": "1ff8bca46c1f428981d455d8f4078194aa7dd47e6c58319c54fc584ae70c2b41"
+    },
+    {
+      "path": "prisma/migrations/20260517045000_add_payable_accounts/migration.sql",
+      "before": "50c239f9c08407ed7107a926a660b785583849dbe729c290b1691ecfb0556e30",
+      "after": "50c239f9c08407ed7107a926a660b785583849dbe729c290b1691ecfb0556e30"
+    },
+    {
+      "path": "prisma/migrations/20260517222440_add_subscription_frequency/migration.sql",
+      "before": "ab2fce6df5b4b14baac3c10e4d83df85ddda1167140c2d0aa321605b885c3f56",
+      "after": "ab2fce6df5b4b14baac3c10e4d83df85ddda1167140c2d0aa321605b885c3f56"
+    },
+    {
+      "path": "prisma/migrations/20260517235633_replace_receivable_expected_date_with_charge_day/migration.sql",
+      "before": "1e1f4decb4b19bc185906545755cbd43b6510c3919408e3d077f88446c77c502",
+      "after": "1e1f4decb4b19bc185906545755cbd43b6510c3919408e3d077f88446c77c502"
+    },
+    {
+      "path": "prisma/migrations/20260518002802_replace_receivable_charge_day_with_charge_days/migration.sql",
+      "before": "9a4e80ec04bd471c5f8616da3a38feed07e0d156e128afdcf4c34a0579d9369a",
+      "after": "9a4e80ec04bd471c5f8616da3a38feed07e0d156e128afdcf4c34a0579d9369a"
+    },
+    {
+      "path": "prisma/migrations/20260518041110_add_expense_subscription_relation/migration.sql",
+      "before": "12c4fe245e66a08076d473b58fa48e07431b93e39e440ade52ba10c07c8fa86b",
+      "after": "12c4fe245e66a08076d473b58fa48e07431b93e39e440ade52ba10c07c8fa86b"
+    },
+    {
+      "path": "prisma/migrations/20260518234708_add_payable_loan_support/migration.sql",
+      "before": "8ef7dcd79b9e4439e96092a131bbb569cb04b405721054e6916e71479a8c40b1",
+      "after": "8ef7dcd79b9e4439e96092a131bbb569cb04b405721054e6916e71479a8c40b1"
+    },
+    {
+      "path": "prisma/migrations/20260604000000_add_subscription_active_fields/migration.sql",
+      "before": "a7a8905cf9facf6135d2b095dff53a0d63392adef65519cfc919f060cd5affb8",
+      "after": "a7a8905cf9facf6135d2b095dff53a0d63392adef65519cfc919f060cd5affb8"
+    },
+    {
+      "path": "prisma/migrations/20261009000000_add_installment_statement_reconciliations/migration.sql",
+      "before": "c5b70602e66ac44fff6f46d7d432e06277d4d5927227c7935383506099216b5b",
+      "after": "c5b70602e66ac44fff6f46d7d432e06277d4d5927227c7935383506099216b5b"
+    },
+    {
+      "path": "prisma/migrations/20261010000000_add_card_cycle_credits/migration.sql",
+      "before": "bce78dbd21bdae948e03b1a314ab18586da68d7c7ea63088c39ef34bca349497",
+      "after": "bce78dbd21bdae948e03b1a314ab18586da68d7c7ea63088c39ef34bca349497"
+    },
+    {
+      "path": "prisma/migrations/20261011000000_add_card_usage_verification/migration.sql",
+      "before": "ab7b6a61669a4910c4c6af563e02912944daf58416198f1dbcdb8fddd5032fb3",
+      "after": "ab7b6a61669a4910c4c6af563e02912944daf58416198f1dbcdb8fddd5032fb3"
+    },
+    {
+      "path": "prisma/migrations/20261015000000_add_notice_dismissals/migration.sql",
+      "before": "8b082a23fdd3e10c8712590b6c0c1529640c9328f386fc7a5902689ac2cded87",
+      "after": "8b082a23fdd3e10c8712590b6c0c1529640c9328f386fc7a5902689ac2cded87"
+    },
+    {
+      "path": "prisma/migrations/20261016000000_add_subscription_charges/migration.sql",
+      "before": "fe3d2bdd2e3fe3b495e51c5a8a29e398e47e6ee26595ec7a1b91f156ed5add21",
+      "after": "fe3d2bdd2e3fe3b495e51c5a8a29e398e47e6ee26595ec7a1b91f156ed5add21"
+    },
+    {
+      "path": "prisma/migrations/20261017000000_add_expense_operations/migration.sql",
+      "before": "ae45ef363c01fd0fbe514c0f29f6ecdcacb57e3f21039d4aebf8036931e01dcf",
+      "after": "ae45ef363c01fd0fbe514c0f29f6ecdcacb57e3f21039d4aebf8036931e01dcf"
+    },
+    {
+      "path": "prisma/migrations/20261017020000_enable_application_rls/migration.sql",
+      "before": "69325502c6b19dacccf07e518c9f520638b5a3a5f59b8022c71547219952489e",
+      "after": "69325502c6b19dacccf07e518c9f520638b5a3a5f59b8022c71547219952489e"
+    },
+    {
+      "path": "prisma/migrations/20261017030000_add_post_cut_credits/migration.sql",
+      "before": "d878d5420a86740d69643722d6150bb10e6db784bd6058618beaf15c660231a3",
+      "after": "d878d5420a86740d69643722d6150bb10e6db784bd6058618beaf15c660231a3"
+    },
+    {
+      "path": "prisma/migrations/20261020000000_add_cash_expense_contributions/migration.sql",
+      "before": "86f61ad5d5b818a17199a22343516e14961e2f837c849be8fcdfd6752cf336fd",
+      "after": "86f61ad5d5b818a17199a22343516e14961e2f837c849be8fcdfd6752cf336fd"
+    },
+    {
+      "path": "prisma/migrations/20261021000000_add_android_capture_linking/migration.sql",
+      "before": "c80f3d004d6b34fede13ca5afa2d6f3107eb192fbcf09042cf5df4bc6338d8aa",
+      "after": "c80f3d004d6b34fede13ca5afa2d6f3107eb192fbcf09042cf5df4bc6338d8aa"
+    },
+    {
+      "path": "prisma/migrations/20261021010000_add_capture_processing/migration.sql",
+      "before": "64882d0b153c5a10f94251b5544f5bc2d77b081f34ec5eec9f67a5afa1843dc5",
+      "after": "64882d0b153c5a10f94251b5544f5bc2d77b081f34ec5eec9f67a5afa1843dc5"
+    },
+    {
+      "path": "prisma/migrations/20261021020000_capture_installment_reconciliation/migration.sql",
+      "before": "4a42bc36c68e092ad788481f0757bcc6c1d472bb6ed12a67b77d768486bdca2e",
+      "after": "4a42bc36c68e092ad788481f0757bcc6c1d472bb6ed12a67b77d768486bdca2e"
+    },
+    {
+      "path": "prisma/migrations/20261021030000_capture_review_and_reconciliation/migration.sql",
+      "before": "34f04b1ce08cc388006205fbfcbb8e0e8b91de2389ad11c05011767a49cc1c4f",
+      "after": "34f04b1ce08cc388006205fbfcbb8e0e8b91de2389ad11c05011767a49cc1c4f"
+    },
+    {
+      "path": "prisma/migrations/20261021040000_add_card_credit_balances/migration.sql",
+      "before": "5f042600ecc8c93230b8b7ea0814498b22717b892bbadd8a568d577310dafb22",
+      "after": "5f042600ecc8c93230b8b7ea0814498b22717b892bbadd8a568d577310dafb22"
+    },
+    {
+      "path": "prisma/migrations/20261022000000_add_card_balance_tracking/migration.sql",
+      "before": "013fcbd00be5ef700fd210e561153523343d5bd64d4788e742fa3b852262492c",
+      "after": "013fcbd00be5ef700fd210e561153523343d5bd64d4788e742fa3b852262492c"
+    },
+    {
+      "path": "prisma/migrations/20261023000000_add_google_calendar_sync/migration.sql",
+      "before": "7482699faa47bb271aa7a0f51429b9a881464f8c6306a7e794070855b32e8790",
+      "after": "7482699faa47bb271aa7a0f51429b9a881464f8c6306a7e794070855b32e8790"
+    },
+    {
+      "path": "prisma/migrations/20261023010000_capture_wallet_date_policy/migration.sql",
+      "before": "8a91d0ca16506aeb08adb6783569bcf414b051b85c8d294d80ee7f136c3eaec2",
+      "after": "8a91d0ca16506aeb08adb6783569bcf414b051b85c8d294d80ee7f136c3eaec2"
+    },
+    {
+      "path": "prisma/migrations/20261023020000_capture_nu_cfe_policy/migration.sql",
+      "before": "cf111147b0ee4786093ae2c3b7e65e5585a3da9773f341726a40b00d020b4353",
+      "after": "cf111147b0ee4786093ae2c3b7e65e5585a3da9773f341726a40b00d020b4353"
+    },
+    {
+      "path": "prisma/migrations/20261023030000_capture_card_payments/migration.sql",
+      "before": "18956971f1b4f4b0f6a2be404fb9e50240521f81b6349b1eb99921d7e75aac3f",
+      "after": "18956971f1b4f4b0f6a2be404fb9e50240521f81b6349b1eb99921d7e75aac3f"
+    },
+    {
+      "path": "prisma/migrations/20261023040000_automatic_payment_receipts/migration.sql",
+      "before": "30377945f2a3e9f7af3acef63dcf3df6ce3237aa80acf66dae5de19c64bf6111",
+      "after": "30377945f2a3e9f7af3acef63dcf3df6ce3237aa80acf66dae5de19c64bf6111"
+    },
+    {
+      "path": "prisma/migrations/20261023050000_receivable_balance_adjustment/migration.sql",
+      "before": "7576dd3b6d7bef160ec348e8c890563dae89797014678b1326638c887e90f902",
+      "after": "7576dd3b6d7bef160ec348e8c890563dae89797014678b1326638c887e90f902"
+    },
+    {
+      "path": "prisma/migrations/20261023060000_receiver_payment_notices/migration.sql",
+      "before": "6b0aac052e2ad455aef0a230e02cb9036b728bfed7df12c44a5c3cfd1c6bbdbd",
+      "after": "6b0aac052e2ad455aef0a230e02cb9036b728bfed7df12c44a5c3cfd1c6bbdbd"
+    },
+    {
+      "path": "prisma/migrations/20261024010000_capture_mercadopago_purchase_policy/migration.sql",
+      "before": "166646abdaa37e67228d0133740cb0eb451f9134306faef8e4672e8ce8552978",
+      "after": "166646abdaa37e67228d0133740cb0eb451f9134306faef8e4672e8ce8552978"
+    },
+    {
+      "path": "prisma/migrations/20261024020000_capture_bank_fallback/migration.sql",
+      "before": "fe792871e3417ac18e0ddf5a9fa264769e49c63c3c298cfe8097b4d4750a0f16",
+      "after": "fe792871e3417ac18e0ddf5a9fa264769e49c63c3c298cfe8097b4d4750a0f16"
+    },
+    {
+      "path": "prisma/migrations/20261025000000_add_money_accounts/migration.sql",
+      "before": "9c6c16b3095279e819a0028ab7ea139aa36cd1c420b1ef00fec66f89aded8eb5",
+      "after": "9c6c16b3095279e819a0028ab7ea139aa36cd1c420b1ef00fec66f89aded8eb5"
+    },
+    {
+      "path": "prisma/migrations/20261025010000_money_account_yields/migration.sql",
+      "before": "187f6827879e60af3a4dac5589b3bd302b1bc9cddb237adaa94a53f9c2304518",
+      "after": "187f6827879e60af3a4dac5589b3bd302b1bc9cddb237adaa94a53f9c2304518"
+    },
+    {
+      "path": "prisma/migrations/20261025020000_automatic_money_yields/migration.sql",
+      "before": "a4d21aab627389c21e9a639dde5348d5222766416166830ea5fd1562bb6bfdc7",
+      "after": "a4d21aab627389c21e9a639dde5348d5222766416166830ea5fd1562bb6bfdc7"
+    },
+    {
+      "path": "prisma/migrations/20261025030000_payroll_business_days/migration.sql",
+      "before": "244c3f541242990d5137bd45c23f2313d282fb8b40e550670cee37aea3829285",
+      "after": "244c3f541242990d5137bd45c23f2313d282fb8b40e550670cee37aea3829285"
+    },
+    {
+      "path": "prisma/migrations/20261026000000_expense_refunds/migration.sql",
+      "before": "ebd2a9695a6a7d3d2aa2e4558b4d466769ad5ec538ed347c659b2e976760bea2",
+      "after": "ebd2a9695a6a7d3d2aa2e4558b4d466769ad5ec538ed347c659b2e976760bea2"
+    },
+    {
+      "path": "prisma/migrations/20261026010000_debit_payment_method/migration.sql",
+      "before": "6d6cf09901b68930b6eacc11d6e687869a769f0acdf18b4188a7cedce855721a",
+      "after": "6d6cf09901b68930b6eacc11d6e687869a769f0acdf18b4188a7cedce855721a"
+    },
+    {
+      "path": "prisma/migrations/20261026020000_capture_account_movements/migration.sql",
+      "before": "dc74a0bf84fa66803575d91b18550765f46c110aabff7d375636d6c6566ed536",
+      "after": "dc74a0bf84fa66803575d91b18550765f46c110aabff7d375636d6c6566ed536"
+    },
+    {
+      "path": "prisma/migrations/20261026030000_card_cycle_dates_confirmation/migration.sql",
+      "before": "dca61abfb6631ba981ccd41707da601baef16d70c0165fc4d6e2a4d01b61ed2c",
+      "after": "dca61abfb6631ba981ccd41707da601baef16d70c0165fc4d6e2a4d01b61ed2c"
+    },
+    {
+      "path": "prisma/migrations/20261027000000_variable_budget_payment_mix/migration.sql",
+      "before": "8d26f706c6f0ace8ad267dde6c3e5be4fd29c8ec342bc6be04873c66eb97708c",
+      "after": "8d26f706c6f0ace8ad267dde6c3e5be4fd29c8ec342bc6be04873c66eb97708c"
+    },
+    {
+      "path": "prisma/migrations/20261027010000_bbva_debit_automation/migration.sql",
+      "before": "69cd66286a1d3a3de86d52eb70a072a0e268cf3957567222a3a00cacb985b028",
+      "after": "69cd66286a1d3a3de86d52eb70a072a0e268cf3957567222a3a00cacb985b028"
+    },
+    {
+      "path": "prisma/migrations/migration_lock.toml",
+      "before": "99836963713b4f5b269ad49af0ed3d7b0b2e336115c2f92dc9ac683d139d0900",
+      "after": "99836963713b4f5b269ad49af0ed3d7b0b2e336115c2f92dc9ac683d139d0900"
+    },
+    {
+      "path": "prisma/schema.prisma",
+      "before": "00828cc74e12eb1c555d9e450ab03bcc5f679612531c8ecf26ec1ba810e80a13",
+      "after": "00828cc74e12eb1c555d9e450ab03bcc5f679612531c8ecf26ec1ba810e80a13"
+    },
+    {
+      "path": "public/sw.js",
+      "before": "03f2a85166e175193f80d8c4db478c4c0a71a5290532f8b2da612cebf8ecf15d",
+      "after": "03f2a85166e175193f80d8c4db478c4c0a71a5290532f8b2da612cebf8ecf15d"
+    },
+    {
+      "path": "tsconfig.json",
+      "before": "220d11fbc5f5e70bbeb826ff23b5e40d6b4c2e12b3d0aa2894951cb52240041c",
+      "after": "220d11fbc5f5e70bbeb826ff23b5e40d6b4c2e12b3d0aa2894951cb52240041c"
+    }
+  ]
+}

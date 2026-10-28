@@ -1,0 +1,190 @@
+{
+  "baseCommit": "39da231760e4ac6a00c8ae32764f65f7eec4230d",
+  "attempts": [
+    {
+      "startedAt": "2026-10-28T06:38:02.764448+00:00",
+      "commands": [
+        {
+          "command": "pnpm typecheck",
+          "exitCode": 0,
+          "seconds": 14.148,
+          "log": "1-typecheck.log"
+        },
+        {
+          "command": "pnpm test:types",
+          "exitCode": 0,
+          "seconds": 8.047,
+          "log": "1-test-types.log"
+        },
+        {
+          "command": "pnpm lint",
+          "exitCode": 1,
+          "seconds": 30.861,
+          "log": "1-lint.log"
+        }
+      ]
+    },
+    {
+      "startedAt": "2026-10-28T06:39:24.201499+00:00",
+      "commands": [
+        {
+          "command": "pnpm typecheck",
+          "exitCode": 0,
+          "seconds": 6.099,
+          "log": "2-typecheck.log"
+        },
+        {
+          "command": "pnpm test:types",
+          "exitCode": 0,
+          "seconds": 9.059,
+          "log": "2-test-types.log"
+        },
+        {
+          "command": "pnpm lint",
+          "exitCode": 0,
+          "seconds": 34.157,
+          "log": "2-lint.log"
+        },
+        {
+          "command": "pnpm test",
+          "exitCode": 0,
+          "seconds": 58.332,
+          "log": "2-test.log"
+        },
+        {
+          "command": "pnpm build",
+          "exitCode": 0,
+          "seconds": 30.779,
+          "log": "2-build.log"
+        }
+      ]
+    },
+    {
+      "startedAt": "2026-10-28T06:48:35.236347+00:00",
+      "commands": [
+        {
+          "command": "pnpm typecheck",
+          "exitCode": 0,
+          "seconds": 11.339,
+          "log": "3-typecheck.log"
+        },
+        {
+          "command": "pnpm test:types",
+          "exitCode": 0,
+          "seconds": 8.065,
+          "log": "3-test-types.log"
+        },
+        {
+          "command": "pnpm lint",
+          "exitCode": 0,
+          "seconds": 31.442,
+          "log": "3-lint.log"
+        },
+        {
+          "command": "pnpm test",
+          "exitCode": 0,
+          "seconds": 54.112,
+          "log": "3-test.log"
+        },
+        {
+          "command": "pnpm build",
+          "exitCode": 0,
+          "seconds": 27.908,
+          "log": "3-build.log"
+        }
+      ]
+    },
+    {
+      "startedAt": "2026-10-28T06:57:45.172655+00:00",
+      "commands": [
+        {
+          "command": "pnpm typecheck",
+          "exitCode": 2,
+          "seconds": 11.673,
+          "log": "4-typecheck.log"
+        }
+      ]
+    },
+    {
+      "startedAt": "2026-10-28T06:59:01.278409+00:00",
+      "commands": [
+        {
+          "command": "pnpm typecheck",
+          "exitCode": 0,
+          "seconds": 10.361,
+          "log": "5-typecheck.log"
+        },
+        {
+          "command": "pnpm test:types",
+          "exitCode": 0,
+          "seconds": 7.779,
+          "log": "5-test-types.log"
+        },
+        {
+          "command": "pnpm lint",
+          "exitCode": 0,
+          "seconds": 31.821,
+          "log": "5-lint.log"
+        },
+        {
+          "command": "pnpm test",
+          "exitCode": 1,
+          "seconds": 50.876,
+          "log": "5-test.log"
+        }
+      ]
+    },
+    {
+      "startedAt": "2026-10-28T07:00:58.705381+00:00",
+      "commands": [
+        {
+          "command": "pnpm typecheck",
+          "exitCode": 0,
+          "seconds": 4.331,
+          "log": "6-typecheck.log"
+        },
+        {
+          "command": "pnpm test:types",
+          "exitCode": 0,
+          "seconds": 8.413,
+          "log": "6-test-types.log"
+        },
+        {
+          "command": "pnpm lint",
+          "exitCode": 0,
+          "seconds": 28.999,
+          "log": "6-lint.log"
+        },
+        {
+          "command": "pnpm test",
+          "exitCode": 0,
+          "seconds": 48.163,
+          "log": "6-test.log"
+        },
+        {
+          "command": "pnpm build",
+          "exitCode": 0,
+          "seconds": 25.38,
+          "log": "6-build.log"
+        }
+      ]
+    }
+  ],
+  "finalVerification": {
+    "completedAt": "2026-10-28T07:03:47.732671+00:00",
+    "sourceFiles": 294,
+    "sourceSha256": "c6d514c51df09c655b9a5e8c60433e46e60b7d6dd20e82569a62ec2e108f0a9f",
+    "browserFixtureSourceSha256": "c6d514c51df09c655b9a5e8c60433e46e60b7d6dd20e82569a62ec2e108f0a9f",
+    "browserSourceMatchesWorkspace": true,
+    "browserCases": 26,
+    "testCount": 854,
+    "skipped": 0,
+    "clientBoundaryViolations": 0,
+    "extraChecks": [
+      "git diff --check",
+      "pnpm exec eslint tests/helpers/seed-ui.cjs"
+    ],
+    "unchangedFilesEvidence": "invariants.json",
+    "temporaryResourcesStopped": true
+  }
+}

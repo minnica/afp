@@ -1,0 +1,13 @@
+{
+  "rows": [
+    {
+      "amount": "38.75",
+      "clientId": "ab8853f5-f6d8-492a-b111-1d1393bcd0c2",
+      "concept": "Borrador TSX móvil",
+      "operationId": "ab8853f5-f6d8-492a-b111-1d1393bcd0c2",
+      "paymentMethod": "CASH",
+      "userId": "00000000-0000-4000-8000-000000000094"
+    }
+  ],
+  "version": 1
+}

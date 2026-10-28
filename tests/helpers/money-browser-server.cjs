@@ -17,7 +17,9 @@ for (const name of ['node_modules', 'public']) {
 fs.cpSync(path.join(root, 'src'), path.join(qaDir, 'src'), { recursive: true });
 const { copyNextConfiguration, generateNextTypes } = require('./next-fixture.cjs');
 copyNextConfiguration(qaDir);
-const origin = 'http://127.0.0.1:4216';
+const port = Number(process.env.AFP_UI_TEST_PORT || 4216);
+if (!Number.isInteger(port) || port < 1024 || port > 65534) throw new Error('Puerto de fixture no válido.');
+const origin = `http://127.0.0.1:${port}`;
 process.env.NEXT_PUBLIC_SUPABASE_URL = origin;
 process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'qa-public-key';
 process.env.DATABASE_URL = connectionString;
@@ -37,7 +39,7 @@ if (productionFixture) {
   });
   if (built.status !== 0) throw new Error(`Falló la compilación del fixture local: ${built.stderr}\n${built.stdout}`);
 }
-const app = next({ dev: !productionFixture, webpack: true, dir: qaDir, hostname: '127.0.0.1', port: 4216,
+const app = next({ dev: !productionFixture, webpack: true, dir: qaDir, hostname: '127.0.0.1', port,
   conf: { devIndicators: false, allowedDevOrigins: ['127.0.0.1'], experimental: { externalDir: true } } });
 async function main() {
   await db.user.upsert({ where: { id: user.id }, create: { id: user.id, email: user.email }, update: {} });
@@ -51,21 +53,21 @@ async function main() {
     if (url.pathname.startsWith('/auth/')) return send({});
     if (url.pathname === '/qa-login') return send({ access_token: token, refresh_token: 'fake-refresh', expires_in: 3600, token_type: 'bearer', user });
     if (url.pathname === '/api/setup-user') return send({ ok: true });
-    if (url.pathname === '/api/settings') return send({ categories: [], people: [], incomeTypes: [] });
+    if (url.pathname === '/api/settings' && process.env.AFP_UI_TEST_REAL_SETTINGS !== '1') return send({ categories: [], people: [], incomeTypes: [] });
     if (url.pathname === '/api/dashboard' && process.env.AFP_CAPTURE_TEST_REAL_DASHBOARD !== '1') return send({ importantNotices: [], cardUsageWaiversCurrent: [], cardUsageWaiverHistory: [] });
     if (url.pathname === '/api/notice-dismissals') return send({ dismissals: [] });
     return handle(req, res);
   };
-  http.createServer(handler).listen(4216, '127.0.0.1', async () => {
+  http.createServer(handler).listen(port, '127.0.0.1', async () => {
     // Compilar secuencialmente antes de la prueba evita carreras del servidor de desarrollo.
     for (const [route, method] of [['money', 'GET']]) {
       const response = await fetch(`${origin}/api/${route}`, { method });
       if (response.status !== 401) throw new Error(`Fallo preparando ${route}: HTTP ${response.status}`);
     }
     console.log('Fixture directory:', qaDir);
-    console.log('Money QA ready on 4216; real API and local PostgreSQL.');
+    console.log(`Money/UI QA ready on ${port}; real API and local PostgreSQL.`);
   });
   if (process.env.AFP_CAPTURE_TEST_KEY && process.env.AFP_CAPTURE_TEST_CERTIFICATE) https.createServer({ key: fs.readFileSync(process.env.AFP_CAPTURE_TEST_KEY), cert: fs.readFileSync(process.env.AFP_CAPTURE_TEST_CERTIFICATE) }, handler)
-    .listen(4217, '127.0.0.1', () => console.log('Capture QA HTTPS ready on 4217'));
+    .listen(port + 1, '127.0.0.1', () => console.log(`Capture QA HTTPS ready on ${port + 1}`));
 }
 main().catch(error => { console.error(error.message); process.exitCode = 1; });
