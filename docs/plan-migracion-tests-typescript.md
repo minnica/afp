@@ -1,6 +1,6 @@
 # Plan de migración de pruebas y helpers a TypeScript
 
-**Estado:** fases 0–3 completadas localmente; fases 4–6 pendientes. **Base revisada del plan:** `6aad1ab`, 28 de octubre de 2026. La [referencia nueva de fase 0](../artifacts/typescript-tests-migration/phase-0/README.md) parte de `6c1b626`; la [fase 1](../artifacts/typescript-tests-migration/phase-1/README.md) parte de `700afcc` y la [fase 2](../artifacts/typescript-tests-migration/phase-2/README.md) de `c0a0a37`; la [fase 3](../artifacts/typescript-tests-migration/phase-3/README.md) parte de `dd81d4f`. La [migración de la web](plan-migracion-typescript.md) permanece completada. Este plan amplía el tipado a las herramientas de prueba sin cambiar el comportamiento de AFP.
+**Estado:** fases 0–4 completadas localmente; fases 5–6 pendientes. **Base revisada del plan:** `6aad1ab`, 28 de octubre de 2026. La [referencia nueva de fase 0](../artifacts/typescript-tests-migration/phase-0/README.md) parte de `6c1b626`; la [fase 1](../artifacts/typescript-tests-migration/phase-1/README.md) parte de `700afcc` y la [fase 2](../artifacts/typescript-tests-migration/phase-2/README.md) de `c0a0a37`; la [fase 3](../artifacts/typescript-tests-migration/phase-3/README.md) parte de `dd81d4f`; la [fase 4](../artifacts/typescript-tests-migration/phase-4/README.md) parte de `429d747`. La [migración de la web](plan-migracion-typescript.md) permanece completada. Este plan amplía el tipado a las herramientas de prueba sin cambiar el comportamiento de AFP.
 
 ## Objetivo y alcance
 
@@ -38,7 +38,7 @@ Los grupos del inventario se solapan. Los 854 resultados de la tabla corresponde
 
 ### Dependencias que requieren atención
 
-- [load-source.ts](../tests/helpers/load-source.ts) transforma módulos con esbuild y los evalúa en `vm`. Desde fase 2 vincula rutas a sus exports reales; la fase 3 amplía los contratos del núcleo financiero y comprueba también esquemas, constantes y constructores. Las rutas dinámicas siguen devolviendo `unknown`; los helpers privados financieros tienen contratos mínimos por ruta.
+- [load-source.ts](../tests/helpers/load-source.ts) transforma módulos con esbuild y los evalúa en `vm`. Desde fase 2 vincula rutas a sus exports reales; la fase 3 amplía los contratos del núcleo financiero y la fase 4 los de Captura, Calendar, HTTP y offline, con 97 módulos vinculados y comprobación de esquemas, constantes y constructores. Las rutas dinámicas siguen devolviendo `unknown`; los helpers privados financieros tienen contratos mínimos por ruta.
 - [legacy-route-context.ts](../tests/helpers/legacy-route-context.ts) combina exports de varios módulos y expone algunas funciones privadas de handlers. La fase 3 conserva una lista cerrada y contratos mínimos por ruta, sin exportar funciones desde producción.
 - [debt-fixture.ts](../tests/helpers/debt-fixture.ts) simula persistencia, bloqueo y rollback. Desde fase 3 distingue registros, consultas y transacciones sin presentarse como un cliente Prisma completo; conserva tombstones sin ID y los fallos simulados.
 - [package.json](../package.json) y [verify-database-reproduction.cjs](../scripts/verify-database-reproduction.cjs) descubrían únicamente `.test.cjs` en fase 0. Desde fase 1 comparten el ejecutor mixto; el segundo importa el cargador TS y registra tsx en el proceso principal y en las regresiones.
@@ -112,7 +112,7 @@ Conservar datos omitidos, nulos, JSON malformado, respuestas perdidas, UUID repe
 
 ## Fases de implementación
 
-Las fases 0–3 están completadas; las fases 4–6 siguen pendientes. Cada lote debe ser revisable y contener el módulo convertido junto con sus consumidores y herramientas afectados.
+Las fases 0–4 están completadas; las fases 5–6 siguen pendientes. Cada lote debe ser revisable y contener el módulo convertido junto con sus consumidores y herramientas afectados.
 
 | Fase | Entrega | Dependencia |
 | --- | --- | --- |
@@ -176,12 +176,14 @@ Orden de lotes: cálculos de tarjetas/MSI y presentación → suscripciones y ga
 
 Ejecutar tres lotes: captura → Calendar → cliente HTTP, recuperación y offline.
 
-- [ ] Convertir las pruebas unitarias y PostgreSQL de parsers, protocolo, políticas, revisión, conciliación, automatización y recibos de captura. Conservar el contrato Android v1 y los fixtures ficticios existentes.
-- [ ] Tipar dobles de OAuth/Google, eventos, cifrado, locks, revisiones y reintentos de Calendar. Mantener el proveedor simulado y la limpieza de temporizadores.
-- [ ] Migrar las pruebas de Auth/API, recuperación, clientes de UI y sus contratos de respuesta. Conservar las respuestas incompletas, fallos temporales y JSON original usados por idempotencia/concurrencia.
-- [ ] Migrar las pruebas de cola/observador offline y los dos contextos `vm` del service worker. Tipar IndexedDB, Web Locks, eventos y callbacks simulados sin cambiar `public/sw.js` ni la versión de la BD local.
+- [x] Convertir las pruebas unitarias y PostgreSQL de parsers, protocolo, políticas, revisión, conciliación, automatización y recibos de captura. Conservar el contrato Android v1 y los fixtures ficticios existentes.
+- [x] Tipar dobles de OAuth/Google, eventos, cifrado, locks, revisiones y reintentos de Calendar. Mantener el proveedor simulado y la limpieza de temporizadores.
+- [x] Migrar las pruebas de Auth/API, recuperación, clientes de UI y sus contratos de respuesta. Conservar las respuestas incompletas, fallos temporales y JSON original usados por idempotencia/concurrencia.
+- [x] Migrar las pruebas de cola/observador offline y los dos contextos `vm` del service worker. Tipar IndexedDB, Web Locks, eventos y callbacks simulados sin cambiar `public/sw.js` ni la versión de la BD local.
 
 **Aceptación:** misma matriz de escenarios; se mantienen duplicados, cambio de cuenta, recuperación entre pestañas y respuesta perdida. Los formatos inválidos siguen llegando a la validación que se prueba. No se requiere actualizar APK ni conectar proveedores reales por esta conversión.
+
+**Resultado (28 de octubre de 2026):** [fase 4](../artifacts/typescript-tests-migration/phase-4/README.md). Convertidas las 50 pruebas restantes, con contratos públicos derivados de las fuentes, mocks mínimos de Auth/Google/HTTP, persistencia interceptada sobre PostgreSQL real y callbacks de IndexedDB, Web Locks y ambos contextos `vm`. Se conservan los 866 escenarios de fase 3 y todos los de fases 0 y 2, sin omisiones; una regresión nueva comprueba los metadatos de rutas: 867 escenarios en total. Hay 108 pruebas TS, 120 módulos TS activos de pruebas/helpers/ejecutor incluidos y once casos negativos nuevos en su programa separado. Pasaron instalación aislada, los seis controles, reconstrucción/actualización y comparación de escenarios/hashes. Los siete helpers CJS de navegador/seeds/Next y la retirada de puentes permanecen en fases 5–6. Sin cambios de producto, esquema, SQL, fixtures JSON, service worker, APK ni dependencias.
 
 ### Fase 5 Migrar los fixtures de navegador y seeds
 

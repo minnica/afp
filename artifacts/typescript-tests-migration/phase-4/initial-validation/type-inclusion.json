@@ -1,0 +1,203 @@
+{
+  "included": [
+    "tests/analysis-presentation.test.ts",
+    "tests/android-assetlinks.test.ts",
+    "tests/android-notices.test.ts",
+    "tests/android-sources.test.ts",
+    "tests/api-auth-availability.test.ts",
+    "tests/api-authorization.test.ts",
+    "tests/api-fetch.test.ts",
+    "tests/automatic-payment-receipts-integration.test.ts",
+    "tests/automatic-payment-receipts.test.ts",
+    "tests/capture-api-integration.test.ts",
+    "tests/capture-api.test.ts",
+    "tests/capture-banamex2-real-integration.test.ts",
+    "tests/capture-banamex2-real.test.ts",
+    "tests/capture-bank-fallback-cron.test.ts",
+    "tests/capture-bank-fallback-integration.test.ts",
+    "tests/capture-bbva-debit.test.ts",
+    "tests/capture-bbva-wallet-real-integration.test.ts",
+    "tests/capture-bbva-wallet-real.test.ts",
+    "tests/capture-card-payments-integration.test.ts",
+    "tests/capture-card-payments.test.ts",
+    "tests/capture-didi-wallet-real-integration.test.ts",
+    "tests/capture-didi-wallet-real.test.ts",
+    "tests/capture-inbox-integration.test.ts",
+    "tests/capture-money-integration.test.ts",
+    "tests/capture-nu-mercadopago-real-integration.test.ts",
+    "tests/capture-nu-mercadopago-real.test.ts",
+    "tests/capture-nu-subscription-integration.test.ts",
+    "tests/capture-parsers.test.ts",
+    "tests/capture-pilot-integration.test.ts",
+    "tests/capture-processing-integration.test.ts",
+    "tests/capture-protocol.test.ts",
+    "tests/capture-real-notices-integration.test.ts",
+    "tests/capture-real-notices.test.ts",
+    "tests/capture-refunds-integration.test.ts",
+    "tests/capture-refunds.test.ts",
+    "tests/capture-review-integration.test.ts",
+    "tests/capture-rollout-integration.test.ts",
+    "tests/capture-rollout.test.ts",
+    "tests/capture-santander-real-integration.test.ts",
+    "tests/capture-santander-real.test.ts",
+    "tests/capture-santander-wallet-backup-integration.test.ts",
+    "tests/capture-service-notices.test.ts",
+    "tests/capture-wallet-real-integration.test.ts",
+    "tests/capture-wallet-real.test.ts",
+    "tests/card-balance-tracking-integration.test.ts",
+    "tests/card-balance-tracking.test.ts",
+    "tests/card-balances-integration.test.ts",
+    "tests/card-balances.test.ts",
+    "tests/card-credits.test.ts",
+    "tests/card-cycle-calculation.test.ts",
+    "tests/card-cycle-credits-integration.test.ts",
+    "tests/card-cycle-payments.test.ts",
+    "tests/card-payment-presentation.test.ts",
+    "tests/card-usage-presentation.test.ts",
+    "tests/card-usage-waivers.test.ts",
+    "tests/dashboard-breakdowns.test.ts",
+    "tests/debt-accounts-integration.test.ts",
+    "tests/debt-accounts.test.ts",
+    "tests/expense-filters.test.ts",
+    "tests/expense-operations-integration.test.ts",
+    "tests/expense-operations.test.ts",
+    "tests/financial-contracts-integration.test.ts",
+    "tests/financial-fixtures.test.ts",
+    "tests/google-calendar-events.test.ts",
+    "tests/google-calendar-integration.test.ts",
+    "tests/google-calendar-palette.test.ts",
+    "tests/google-calendar.test.ts",
+    "tests/helpers/browser-module.ts",
+    "tests/helpers/debt-fixture.ts",
+    "tests/helpers/dynamic-values.ts",
+    "tests/helpers/financial-fixtures.ts",
+    "tests/helpers/financial-persistence.ts",
+    "tests/helpers/integration-fixtures.ts",
+    "tests/helpers/legacy-route-context.ts",
+    "tests/helpers/load-source.ts",
+    "tests/helpers/notice-fixture.ts",
+    "tests/helpers/source-contracts.ts",
+    "tests/helpers/source-exports.ts",
+    "tests/installment-statements.test.ts",
+    "tests/installment-transactions.test.ts",
+    "tests/interface-contracts.test.ts",
+    "tests/latest-request.test.ts",
+    "tests/migration-history.test.ts",
+    "tests/money-automatic-yields-integration.test.ts",
+    "tests/money-automatic-yields.test.ts",
+    "tests/money-budgets-integration.test.ts",
+    "tests/money-budgets.test.ts",
+    "tests/money-forecast.test.ts",
+    "tests/money-integration.test.ts",
+    "tests/money-loading.test.ts",
+    "tests/money-monthly-minimum-period.test.ts",
+    "tests/money-monthly-summary-status.test.ts",
+    "tests/money-payroll-calendar-integration.test.ts",
+    "tests/money-payroll-calendar.test.ts",
+    "tests/money-projection-breakdown.test.ts",
+    "tests/money-transfer-client.test.ts",
+    "tests/money-transfer-integration.test.ts",
+    "tests/money-typescript-contracts.test.ts",
+    "tests/notice-dismissals.test.ts",
+    "tests/nu-turbo-usage.test.ts",
+    "tests/offline-expense-observer.test.ts",
+    "tests/offline-expenses.test.ts",
+    "tests/offline-service-worker.test.ts",
+    "tests/payable-notices.test.ts",
+    "tests/payables-summary.test.ts",
+    "tests/receivable-adjustments.test.ts",
+    "tests/receiver-payment-notices-integration.test.ts",
+    "tests/receiver-payment-notices.test.ts",
+    "tests/related-operations-integration.test.ts",
+    "tests/request-recovery.test.ts",
+    "tests/run-tests.ts",
+    "tests/shared-expenses-integration.test.ts",
+    "tests/shared-expenses.test.ts",
+    "tests/source-loader.test.ts",
+    "tests/subscription-charges-api.test.ts",
+    "tests/subscription-charges-integration.test.ts",
+    "tests/subscription-charges.test.ts",
+    "tests/subscription-payment-adjustments.test.ts",
+    "tests/subscription-statements.test.ts",
+    "tests/test-runner.test.ts"
+  ],
+  "scriptDeclarations": [
+    "scripts/android-assetlinks.d.cts",
+    "scripts/audit-migration-history.d.cts",
+    "scripts/configure-capture-bank-fallback-cron.d.cts"
+  ],
+  "remainingCjsHelpers": [
+    "tests/helpers/capture-browser-server.cjs",
+    "tests/helpers/money-browser-server.cjs",
+    "tests/helpers/next-fixture.cjs",
+    "tests/helpers/offline-browser-server.cjs",
+    "tests/helpers/seed-capture-review.cjs",
+    "tests/helpers/seed-receiver-payments.cjs",
+    "tests/helpers/seed-ui.cjs"
+  ],
+  "negativeContractFiles": [
+    "tests/types/calendar.ts",
+    "tests/types/capture.ts",
+    "tests/types/financial-core.ts",
+    "tests/types/financial-fixtures.ts",
+    "tests/types/integration-fixtures.ts",
+    "tests/types/interface.tsx",
+    "tests/types/money.ts",
+    "tests/types/offline.ts",
+    "tests/types/source-loader.ts",
+    "tests/types/test-runner.ts",
+    "tests/types/toolchain.tsx",
+    "tests/types/transfers.ts"
+  ],
+  "eslintRules": {
+    "react/no-unsafe": [
+      0
+    ],
+    "no-unsafe-negation": [
+      0,
+      {
+        "enforceForOrderingRelations": false
+      }
+    ],
+    "@typescript-eslint/ban-ts-comment": [
+      2,
+      {
+        "ts-expect-error": true,
+        "ts-ignore": true,
+        "ts-nocheck": true,
+        "ts-check": false
+      }
+    ],
+    "@typescript-eslint/no-explicit-any": [
+      2
+    ],
+    "@typescript-eslint/no-unsafe-declaration-merging": [
+      2
+    ],
+    "@typescript-eslint/no-unsafe-function-type": [
+      2
+    ],
+    "@typescript-eslint/no-unsafe-assignment": [
+      2
+    ],
+    "@typescript-eslint/no-unsafe-argument": [
+      2
+    ],
+    "@typescript-eslint/no-unsafe-call": [
+      2
+    ],
+    "@typescript-eslint/no-unsafe-member-access": [
+      2
+    ],
+    "@typescript-eslint/no-unsafe-return": [
+      2
+    ],
+    "no-restricted-syntax": [
+      2,
+      {
+        "selector": "TSAsExpression > TSAsExpression, TSAsExpression > TSTypeAssertion, TSTypeAssertion > TSAsExpression, TSTypeAssertion > TSTypeAssertion",
+        "message": "No encadenar conversiones de tipo. Validar o acotar el dato en su frontera."
+      }
+    ]
+  }
+}

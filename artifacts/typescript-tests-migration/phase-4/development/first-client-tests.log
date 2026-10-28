@@ -1,0 +1,333 @@
+
+> afp@0.1.0 test /home/garatachia/projects/afp
+> node --import tsx tests/run-tests.ts capture-parsers.test.ts capture-protocol.test.ts api-fetch.test.ts request-recovery.test.ts offline-expenses.test.ts offline-expense-observer.test.ts offline-service-worker.test.ts interface-contracts.test.ts
+
+TAP version 13
+# Subtest: apiFetch usa el token vigente, preserva headers y signal, y bloquea otros orígenes
+ok 1 - apiFetch usa el token vigente, preserva headers y signal, y bloquea otros orígenes
+  ---
+  duration_ms: 9.059251
+  type: 'test'
+  ...
+# Subtest: apiFetch no envía nada sin sesión ni con una cuenta distinta de la pantalla
+ok 2 - apiFetch no envía nada sin sesión ni con una cuenta distinta de la pantalla
+  ---
+  duration_ms: 7.107453
+  type: 'test'
+  ...
+# Subtest: la cola conserva los pendientes si cambia la cuenta y los sincroniza con su propietario
+ok 3 - la cola conserva los pendientes si cambia la cuenta y los sincroniza con su propietario
+  ---
+  duration_ms: 25.588665
+  type: 'test'
+  ...
+# Subtest: el service worker no intercepta API ni siquiera como navegación; elimina caché anterior
+ok 4 - el service worker no intercepta API ni siquiera como navegación; elimina caché anterior
+  ---
+  duration_ms: 1.210928
+  type: 'test'
+  ...
+# Subtest: analizadores: importes exactos sin sumar ni convertir mediante punto flotante
+ok 5 - analizadores: importes exactos sin sumar ni convertir mediante punto flotante
+  ---
+  duration_ms: 0.24524
+  type: 'test'
+  ...
+# Subtest: analizadores: fecha de operación México, día bancario independiente de recepción, calendario y DST
+ok 6 - analizadores: fecha de operación México, día bancario independiente de recepción, calendario y DST
+  ---
+  duration_ms: 0.37357
+  type: 'test'
+  ...
+# Subtest: analizadores: BBVA y Wallet sintéticos conservan tipo, referencia, ceros iniciales y versión sin afirmar cobertura real
+ok 7 - analizadores: BBVA y Wallet sintéticos conservan tipo, referencia, ceros iniciales y versión sin afirmar cobertura real
+  ---
+  duration_ms: 2.747658
+  type: 'test'
+  ...
+# Subtest: BBVA débito: cargo a cuenta confirmado fuera del piloto no propone una compra de crédito
+ok 8 - BBVA débito: cargo a cuenta confirmado fuera del piloto no propone una compra de crédito
+  ---
+  duration_ms: 0.885249
+  type: 'test'
+  ...
+# Subtest: BBVA incompleto: texto contradictorio, importe inválido y movimiento especial no proponen una compra
+ok 9 - BBVA incompleto: texto contradictorio, importe inválido y movimiento especial no proponen una compra
+  ---
+  duration_ms: 0.624229
+  type: 'test'
+  ...
+# Subtest: analizadores: desconocidos, importes incompletos y campos contradictorios nunca admiten una compra
+ok 10 - analizadores: desconocidos, importes incompletos y campos contradictorios nunca admiten una compra
+  ---
+  duration_ms: 1.655139
+  type: 'test'
+  ...
+# Subtest: analizadores: MSI, retenciones, devoluciones, cancelaciones, abonos, rechazos, pedidos, promociones y OTP van a revisión
+ok 11 - analizadores: MSI, retenciones, devoluciones, cancelaciones, abonos, rechazos, pedidos, promociones y OTP van a revisión
+  ---
+  duration_ms: 0.796269
+  type: 'test'
+  ...
+# Subtest: analizadores: publicación y recepción no completan fecha ausente y una operación futura queda bloqueada
+ok 12 - analizadores: publicación y recepción no completan fecha ausente y una operación futura queda bloqueada
+  ---
+  duration_ms: 0.424119
+  type: 'test'
+  ...
+# Subtest: Captura: secreto de 256 bits, código separado y vigencia de cinco minutos
+ok 13 - Captura: secreto de 256 bits, código separado y vigencia de cinco minutos
+  ---
+  duration_ms: 0.40302
+  type: 'test'
+  ...
+# Subtest: Captura: credencial Capture separada de Bearer y hash en tiempo constante
+ok 14 - Captura: credencial Capture separada de Bearer y hash en tiempo constante
+  ---
+  duration_ms: 1.850248
+  type: 'test'
+  ...
+# Subtest: Captura: contrato limitado, fechas normalizadas y hash independiente del orden JSON
+ok 15 - Captura: contrato limitado, fechas normalizadas y hash independiente del orden JSON
+  ---
+  duration_ms: 3.605116
+  type: 'test'
+  ...
+# Subtest: Captura: lectura JSON acotada también sin Content-Length
+ok 16 - Captura: lectura JSON acotada también sin Content-Length
+  ---
+  duration_ms: 3.577257
+  type: 'test'
+  ...
+# Subtest: Captura: propietario y revocación tienen prioridad sobre expiración y pausa
+ok 17 - Captura: propietario y revocación tienen prioridad sobre expiración y pausa
+  ---
+  duration_ms: 0.14253
+  type: 'test'
+  ...
+# Subtest: cliente UI valida el recurso y conserva los metadatos y los valores serializados
+ok 18 - cliente UI valida el recurso y conserva los metadatos y los valores serializados
+  ---
+  duration_ms: 40.3963
+  type: 'test'
+  ...
+# Subtest: una respuesta incompleta entra en recuperación antes de entregarse a la pantalla
+ok 19 - una respuesta incompleta entra en recuperación antes de entregarse a la pantalla
+  ---
+  duration_ms: 32.858287
+  type: 'test'
+  ...
+# Subtest: el contrato de interfaz acepta propuestas históricas parciales y rechaza importes estructurados
+ok 20 - el contrato de interfaz acepta propuestas históricas parciales y rechaza importes estructurados
+  ---
+  duration_ms: 35.790705
+  type: 'test'
+  ...
+# Subtest: el cliente conserva el orden de la corrección usado por el control optimista
+ok 21 - el cliente conserva el orden de la corrección usado por el control optimista
+  ---
+  duration_ms: 37.384263
+  type: 'test'
+  ...
+# Subtest: observador offline: ignora lecturas antiguas y deja de publicar al cambiar de cuenta
+ok 22 - observador offline: ignora lecturas antiguas y deja de publicar al cambiar de cuenta
+  ---
+  duration_ms: 3.936496
+  type: 'test'
+  ...
+# Subtest: IndexedDB v1 anterior: respuesta perdida, cambio de cuenta y dos pestañas conservan recibo y metadatos
+not ok 23 - IndexedDB v1 anterior: respuesta perdida, cambio de cuenta y dos pestañas conservan recibo y metadatos
+  ---
+  duration_ms: 24.101536
+  type: 'test'
+  location: '/home/garatachia/projects/afp/tests/offline-expenses.test.ts:2:2395'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert.ok(isRecord(value))
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    record (/home/garatachia/projects/afp/tests/helpers/dynamic-values.ts:7:10)
+    TestContext.<anonymous> (/home/garatachia/projects/afp/tests/offline-expenses.test.ts:69:3)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: conflicto con captura: decisión explícita conserva UUID, notas y aportación al registrar otra compra
+ok 24 - conflicto con captura: decisión explícita conserva UUID, notas y aportación al registrar otra compra
+  ---
+  duration_ms: 18.129212
+  type: 'test'
+  ...
+# Subtest: conservar gasto existente solo retira un conflicto confirmado, sin borrar otros pendientes
+ok 25 - conservar gasto existente solo retira un conflicto confirmado, sin borrar otros pendientes
+  ---
+  duration_ms: 9.725531
+  type: 'test'
+  ...
+# Subtest: aportación offline: recarga, error y reintento conservan el importe y UUID
+ok 26 - aportación offline: recarga, error y reintento conservan el importe y UUID
+  ---
+  duration_ms: 11.333688
+  type: 'test'
+  ...
+# Subtest: respuesta perdida después de guardar: recargar y reintentar conserva el UUID
+ok 27 - respuesta perdida después de guardar: recargar y reintentar conserva el UUID
+  ---
+  duration_ms: 10.75954
+  type: 'test'
+  ...
+# Subtest: dos pestañas sin Web Locks: conservan un mismo UUID y no resucitan un error tardío
+ok 28 - dos pestañas sin Web Locks: conservan un mismo UUID y no resucitan un error tardío
+  ---
+  duration_ms: 10.00408
+  type: 'test'
+  ...
+# Subtest: capturar en otra pestaña durante sync no pierde la nueva entrada ni la de otro usuario
+ok 29 - capturar en otra pestaña durante sync no pierde la nueva entrada ni la de otro usuario
+  ---
+  duration_ms: 9.35874
+  type: 'test'
+  ...
+# Subtest: cerrar tras persistir y antes del POST permite recuperar y sincronizar
+ok 30 - cerrar tras persistir y antes del POST permite recuperar y sincronizar
+  ---
+  duration_ms: 10.049931
+  type: 'test'
+  ...
+# Subtest: migración concurrente conserva la copia local y no reimporta confirmados
+ok 31 - migración concurrente conserva la copia local y no reimporta confirmados
+  ---
+  duration_ms: 10.440269
+  type: 'test'
+  ...
+# Subtest: JSON corrupto, validación y confirmación incompleta nunca eliminan pendientes
+ok 32 - JSON corrupto, validación y confirmación incompleta nunca eliminan pendientes
+  ---
+  duration_ms: 6.145914
+  type: 'test'
+  ...
+# Subtest: fallo de almacenamiento no confirma una captura ni envía un POST
+ok 33 - fallo de almacenamiento no confirma una captura ni envía un POST
+  ---
+  duration_ms: 4.632806
+  type: 'test'
+  ...
+# Subtest: Web Locks serializa dos pestañas y la segunda relee la cola al obtener el bloqueo
+ok 34 - Web Locks serializa dos pestañas y la segunda relee la cola al obtener el bloqueo
+  ---
+  duration_ms: 10.63176
+  type: 'test'
+  ...
+# Subtest: service worker servido como JavaScript: todas las API privadas pasan directo a la red
+not ok 35 - service worker servido como JavaScript: todas las API privadas pasan directo a la red
+  ---
+  duration_ms: 0.952209
+  type: 'test'
+  location: '/home/garatachia/projects/afp/tests/offline-service-worker.test.ts:2:1170'
+  failureType: 'testCodeFailure'
+  error: 'present is not defined'
+  code: 'ERR_TEST_FAILURE'
+  name: 'ReferenceError'
+  stack: |-
+    TestContext.<anonymous> (/home/garatachia/projects/afp/tests/offline-service-worker.test.ts:25:16)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: agrupa cargas fallidas y recupera cada interacción; no duplica clics ni consume el JSON
+ok 36 - agrupa cargas fallidas y recupera cada interacción; no duplica clics ni consume el JSON
+  ---
+  duration_ms: 9.084671
+  type: 'test'
+  ...
+# Subtest: reintentar conserva cuerpo/propietario y renueva token; un nuevo fallo mantiene el diálogo
+ok 37 - reintentar conserva cuerpo/propietario y renueva token; un nuevo fallo mantiene el diálogo
+  ---
+  duration_ms: 7.659382
+  type: 'test'
+  ...
+# Subtest: no reenvía altas no idempotentes cuando se pierde la respuesta o llega un 5xx
+ok 38 - no reenvía altas no idempotentes cuando se pierde la respuesta o llega un 5xx
+  ---
+  duration_ms: 12.387788
+  type: 'test'
+  ...
+# Subtest: un alta bloqueada antes del envío por falta de conexión sí admite reintento
+ok 39 - un alta bloqueada antes del envío por falta de conexión sí admite reintento
+  ---
+  duration_ms: 8.035512
+  type: 'test'
+  ...
+# Subtest: sesión vencida y cambio de cuenta nunca repiten la mutación con otro propietario
+ok 40 - sesión vencida y cambio de cuenta nunca repiten la mutación con otro propietario
+  ---
+  duration_ms: 6.530254
+  type: 'test'
+  ...
+# Subtest: cancelar libera la interacción; abortar y cambiar de sección retiran los pendientes
+ok 41 - cancelar libera la interacción; abortar y cambiar de sección retiran los pendientes
+  ---
+  duration_ms: 18.245172
+  type: 'test'
+  ...
+# Subtest: las respuestas tardías y peticiones abortadas no abren diálogos en otra sección
+ok 42 - las respuestas tardías y peticiones abortadas no abren diálogos en otra sección
+  ---
+  duration_ms: 5.924334
+  type: 'test'
+  ...
+# Subtest: un timeout cancela la red y se puede recuperar; JSON incompleto también informa el fallo
+ok 43 - un timeout cancela la red y se puede recuperar; JSON incompleto también informa el fallo
+  ---
+  duration_ms: 28.662231
+  type: 'test'
+  ...
+# Subtest: validación y consultas de fondo no interrumpen; permisos/conflictos explican el bloqueo
+ok 44 - validación y consultas de fondo no interrumpen; permisos/conflictos explican el bloqueo
+  ---
+  duration_ms: 44.687396
+  type: 'test'
+  ...
+# Subtest: un bloqueo al eliminar muestra el motivo en un diálogo sin volver a enviar
+ok 45 - un bloqueo al eliminar muestra el motivo en un diálogo sin volver a enviar
+  ---
+  duration_ms: 6.690544
+  type: 'test'
+  ...
+# Subtest: respeta Retry-After y nunca reenvía un POST exitoso al recuperar su lectura posterior
+ok 46 - respeta Retry-After y nunca reenvía un POST exitoso al recuperar su lectura posterior
+  ---
+  duration_ms: 14.927425
+  type: 'test'
+  ...
+# Subtest: abortar una petición en curso cancela fetch sin mostrar recuperación
+ok 47 - abortar una petición en curso cancela fetch sin mostrar recuperación
+  ---
+  duration_ms: 6.813443
+  type: 'test'
+  ...
+# Subtest: salir durante un reintento impide que el resultado tardío reabra el diálogo
+ok 48 - salir durante un reintento impide que el resultado tardío reabra el diálogo
+  ---
+  duration_ms: 6.815473
+  type: 'test'
+  ...
+1..48
+# tests 48
+# suites 0
+# pass 46
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 976.365366
+ ELIFECYCLE  Test failed. See above for more details.

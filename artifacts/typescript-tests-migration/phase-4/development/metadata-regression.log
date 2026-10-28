@@ -1,0 +1,74 @@
+
+> afp@0.1.0 test /home/garatachia/projects/afp
+> node --import tsx tests/run-tests.ts source-loader.test.ts
+
+TAP version 13
+# Subtest: cargador: JS → TS → JS, tipos, alias, exports/default y reexports
+ok 1 - cargador: JS → TS → JS, tipos, alias, exports/default y reexports
+  ---
+  duration_ms: 25.525467
+  type: 'test'
+  ...
+# Subtest: cargador: mocks tienen prioridad, incluso módulos inexistentes y valores falsy
+ok 2 - cargador: mocks tienen prioridad, incluso módulos inexistentes y valores falsy
+  ---
+  duration_ms: 2.554664
+  type: 'test'
+  ...
+# Subtest: cargador: caché por instancia, imports circulares y reexports vivos
+ok 3 - cargador: caché por instancia, imports circulares y reexports vivos
+  ---
+  duration_ms: 8.08058
+  type: 'test'
+  ...
+# Subtest: cargador: resolución inequívoca, índices y extensiones explícitas sin sustitución
+ok 4 - cargador: resolución inequívoca, índices y extensiones explícitas sin sustitución
+  ---
+  duration_ms: 9.935786
+  type: 'test'
+  ...
+# Subtest: cargador: JSX y TSX se ejecutan con runtime React
+ok 5 - cargador: JSX y TSX se ejecutan con runtime React
+  ---
+  duration_ms: 6.308904
+  type: 'test'
+  ...
+# Subtest: cargador: no hereda credenciales, no carga dotenv ni abre red o BD
+ok 6 - cargador: no hereda credenciales, no carga dotenv ni abre red o BD
+  ---
+  duration_ms: 60.352782
+  type: 'test'
+  ...
+# Subtest: cargador: elimina de la caché evaluaciones fallidas
+ok 7 - cargador: elimina de la caché evaluaciones fallidas
+  ---
+  duration_ms: 3.106872
+  type: 'test'
+  ...
+# Subtest: fixture offline: transforma TS e imports relativos en ESM con API simulada
+ok 8 - fixture offline: transforma TS e imports relativos en ESM con API simulada
+  ---
+  duration_ms: 22.997253
+  type: 'test'
+  ...
+# Subtest: cargador tipado: rutas conocidas, exports públicos y lenguajes admitidos
+ok 9 - cargador tipado: rutas conocidas, exports públicos y lenguajes admitidos
+  ---
+  duration_ms: 3.242762
+  type: 'test'
+  ...
+# Subtest: cargador de integraciones: conserva metadatos de rutas y adapta únicamente métodos HTTP
+ok 10 - cargador de integraciones: conserva metadatos de rutas y adapta únicamente métodos HTTP
+  ---
+  duration_ms: 9.194437
+  type: 'test'
+  ...
+1..10
+# tests 10
+# suites 0
+# pass 10
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 288.885318

@@ -1,0 +1,275 @@
+{
+  "baseCommit": "429d747d75bd1a7fa7c99bbda5b096800f8f6c93",
+  "files": [
+    {
+      "from": "tests/android-notices.test.cjs",
+      "to": "tests/android-notices.test.ts",
+      "lines": 212
+    },
+    {
+      "from": "tests/api-auth-availability.test.cjs",
+      "to": "tests/api-auth-availability.test.ts",
+      "lines": 42
+    },
+    {
+      "from": "tests/api-fetch.test.cjs",
+      "to": "tests/api-fetch.test.ts",
+      "lines": 76
+    },
+    {
+      "from": "tests/automatic-payment-receipts-integration.test.cjs",
+      "to": "tests/automatic-payment-receipts-integration.test.ts",
+      "lines": 86
+    },
+    {
+      "from": "tests/automatic-payment-receipts.test.cjs",
+      "to": "tests/automatic-payment-receipts.test.ts",
+      "lines": 24
+    },
+    {
+      "from": "tests/capture-api-integration.test.cjs",
+      "to": "tests/capture-api-integration.test.ts",
+      "lines": 208
+    },
+    {
+      "from": "tests/capture-api.test.cjs",
+      "to": "tests/capture-api.test.ts",
+      "lines": 26
+    },
+    {
+      "from": "tests/capture-banamex2-real-integration.test.cjs",
+      "to": "tests/capture-banamex2-real-integration.test.ts",
+      "lines": 166
+    },
+    {
+      "from": "tests/capture-banamex2-real.test.cjs",
+      "to": "tests/capture-banamex2-real.test.ts",
+      "lines": 55
+    },
+    {
+      "from": "tests/capture-bank-fallback-integration.test.cjs",
+      "to": "tests/capture-bank-fallback-integration.test.ts",
+      "lines": 216
+    },
+    {
+      "from": "tests/capture-bbva-debit.test.cjs",
+      "to": "tests/capture-bbva-debit.test.ts",
+      "lines": 128
+    },
+    {
+      "from": "tests/capture-bbva-wallet-real-integration.test.cjs",
+      "to": "tests/capture-bbva-wallet-real-integration.test.ts",
+      "lines": 241
+    },
+    {
+      "from": "tests/capture-bbva-wallet-real.test.cjs",
+      "to": "tests/capture-bbva-wallet-real.test.ts",
+      "lines": 48
+    },
+    {
+      "from": "tests/capture-card-payments-integration.test.cjs",
+      "to": "tests/capture-card-payments-integration.test.ts",
+      "lines": 112
+    },
+    {
+      "from": "tests/capture-card-payments.test.cjs",
+      "to": "tests/capture-card-payments.test.ts",
+      "lines": 33
+    },
+    {
+      "from": "tests/capture-didi-wallet-real-integration.test.cjs",
+      "to": "tests/capture-didi-wallet-real-integration.test.ts",
+      "lines": 215
+    },
+    {
+      "from": "tests/capture-didi-wallet-real.test.cjs",
+      "to": "tests/capture-didi-wallet-real.test.ts",
+      "lines": 79
+    },
+    {
+      "from": "tests/capture-inbox-integration.test.cjs",
+      "to": "tests/capture-inbox-integration.test.ts",
+      "lines": 82
+    },
+    {
+      "from": "tests/capture-money-integration.test.cjs",
+      "to": "tests/capture-money-integration.test.ts",
+      "lines": 126
+    },
+    {
+      "from": "tests/capture-nu-mercadopago-real-integration.test.cjs",
+      "to": "tests/capture-nu-mercadopago-real-integration.test.ts",
+      "lines": 180
+    },
+    {
+      "from": "tests/capture-nu-mercadopago-real.test.cjs",
+      "to": "tests/capture-nu-mercadopago-real.test.ts",
+      "lines": 72
+    },
+    {
+      "from": "tests/capture-nu-subscription-integration.test.cjs",
+      "to": "tests/capture-nu-subscription-integration.test.ts",
+      "lines": 151
+    },
+    {
+      "from": "tests/capture-parsers.test.cjs",
+      "to": "tests/capture-parsers.test.ts",
+      "lines": 48
+    },
+    {
+      "from": "tests/capture-pilot-integration.test.cjs",
+      "to": "tests/capture-pilot-integration.test.ts",
+      "lines": 108
+    },
+    {
+      "from": "tests/capture-processing-integration.test.cjs",
+      "to": "tests/capture-processing-integration.test.ts",
+      "lines": 246
+    },
+    {
+      "from": "tests/capture-protocol.test.cjs",
+      "to": "tests/capture-protocol.test.ts",
+      "lines": 52
+    },
+    {
+      "from": "tests/capture-real-notices-integration.test.cjs",
+      "to": "tests/capture-real-notices-integration.test.ts",
+      "lines": 67
+    },
+    {
+      "from": "tests/capture-real-notices.test.cjs",
+      "to": "tests/capture-real-notices.test.ts",
+      "lines": 47
+    },
+    {
+      "from": "tests/capture-refunds-integration.test.cjs",
+      "to": "tests/capture-refunds-integration.test.ts",
+      "lines": 208
+    },
+    {
+      "from": "tests/capture-refunds.test.cjs",
+      "to": "tests/capture-refunds.test.ts",
+      "lines": 36
+    },
+    {
+      "from": "tests/capture-review-integration.test.cjs",
+      "to": "tests/capture-review-integration.test.ts",
+      "lines": 213
+    },
+    {
+      "from": "tests/capture-rollout-integration.test.cjs",
+      "to": "tests/capture-rollout-integration.test.ts",
+      "lines": 203
+    },
+    {
+      "from": "tests/capture-rollout.test.cjs",
+      "to": "tests/capture-rollout.test.ts",
+      "lines": 66
+    },
+    {
+      "from": "tests/capture-santander-real-integration.test.cjs",
+      "to": "tests/capture-santander-real-integration.test.ts",
+      "lines": 208
+    },
+    {
+      "from": "tests/capture-santander-real.test.cjs",
+      "to": "tests/capture-santander-real.test.ts",
+      "lines": 101
+    },
+    {
+      "from": "tests/capture-santander-wallet-backup-integration.test.cjs",
+      "to": "tests/capture-santander-wallet-backup-integration.test.ts",
+      "lines": 142
+    },
+    {
+      "from": "tests/capture-service-notices.test.cjs",
+      "to": "tests/capture-service-notices.test.ts",
+      "lines": 40
+    },
+    {
+      "from": "tests/capture-wallet-real-integration.test.cjs",
+      "to": "tests/capture-wallet-real-integration.test.ts",
+      "lines": 168
+    },
+    {
+      "from": "tests/capture-wallet-real.test.cjs",
+      "to": "tests/capture-wallet-real.test.ts",
+      "lines": 56
+    },
+    {
+      "from": "tests/google-calendar-events.test.cjs",
+      "to": "tests/google-calendar-events.test.ts",
+      "lines": 75
+    },
+    {
+      "from": "tests/google-calendar-integration.test.cjs",
+      "to": "tests/google-calendar-integration.test.ts",
+      "lines": 343
+    },
+    {
+      "from": "tests/google-calendar-palette.test.cjs",
+      "to": "tests/google-calendar-palette.test.ts",
+      "lines": 115
+    },
+    {
+      "from": "tests/google-calendar.test.cjs",
+      "to": "tests/google-calendar.test.ts",
+      "lines": 256
+    },
+    {
+      "from": "tests/interface-contracts.test.cjs",
+      "to": "tests/interface-contracts.test.ts",
+      "lines": 38
+    },
+    {
+      "from": "tests/offline-expense-observer.test.cjs",
+      "to": "tests/offline-expense-observer.test.ts",
+      "lines": 30
+    },
+    {
+      "from": "tests/offline-expenses.test.cjs",
+      "to": "tests/offline-expenses.test.ts",
+      "lines": 217
+    },
+    {
+      "from": "tests/offline-service-worker.test.cjs",
+      "to": "tests/offline-service-worker.test.ts",
+      "lines": 26
+    },
+    {
+      "from": "tests/receiver-payment-notices-integration.test.cjs",
+      "to": "tests/receiver-payment-notices-integration.test.ts",
+      "lines": 180
+    },
+    {
+      "from": "tests/receiver-payment-notices.test.cjs",
+      "to": "tests/receiver-payment-notices.test.ts",
+      "lines": 67
+    },
+    {
+      "from": "tests/request-recovery.test.cjs",
+      "to": "tests/request-recovery.test.ts",
+      "lines": 244
+    }
+  ],
+  "summary": {
+    "renamedTests": 50,
+    "originalLines": 6178,
+    "newTypedHelpers": [
+      "tests/helpers/integration-fixtures.ts",
+      "tests/helpers/notice-fixture.ts"
+    ],
+    "extendedHelpers": [
+      "tests/helpers/load-source.ts",
+      "tests/helpers/source-contracts.ts",
+      "tests/helpers/source-exports.ts",
+      "tests/helpers/financial-fixtures.ts"
+    ],
+    "negativeContracts": "tests/types/integration-fixtures.ts",
+    "unchangedRunnerAndCompilerConfiguration": true,
+    "extendedTests": [
+      "tests/source-loader.test.ts"
+    ],
+    "newRuntimeScenarios": 1
+  }
+}

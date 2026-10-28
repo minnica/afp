@@ -6,6 +6,7 @@ import { test, type TestContext } from 'node:test';
 import { sourceLoader, resolveSource, transformSource, checkSourceExports } from './helpers/load-source';
 import { buildBrowserModule } from './helpers/browser-module';
 import { record, array, call } from './helpers/dynamic-values';
+import { integrationLoader, routeHandlers } from './helpers/integration-fixtures';
 
 function fixture(t: TestContext, files: Record<string, string>) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'afp-source-test-'));
@@ -124,4 +125,20 @@ test('cargador tipado: rutas conocidas, exports públicos y lenguajes admitidos'
   assert.throws(() => checkSourceExports('src/lib/money/transferClient.ts', {}), /Export público inválido/);
   assert.throws(() => checkSourceExports('src/lib/money/transferClient.ts', { sendTransfer: 1 }), /Export público inválido/);
   assert.throws(() => transformSource('', 'fixture.txt'), /no admitido/);
+});
+
+test('cargador de integraciones: conserva metadatos de rutas y adapta únicamente métodos HTTP', async () => {
+  const load = integrationLoader({
+    '@/lib/prisma': { prisma: {} },
+    '@/lib/captureBankFallbackWorker': { runBankFallbacks: async () => assert.fail('No debe acceder al trabajador sin autorización') },
+    '@/lib/calendar/schedule': { scheduleCalendarSync: () => assert.fail('No debe programar una petición rechazada') },
+    '@/lib/apiAuth': { apiResponse: { json: (body, options = {}) => ({ body, status: options.status || 200 }) } },
+  });
+  const route = load('src/app/api/cron/capture-bank-fallback/route.ts');
+  const duration: typeof import('../src/app/api/cron/capture-bank-fallback/route').maxDuration = route.maxDuration;
+  assert.equal(duration, 60);
+  assert.deepEqual(Object.keys(routeHandlers(route)), ['POST']);
+  const reply = await route.POST(new Request('http://localhost/api/cron/capture-bank-fallback', { method: 'POST' }));
+  assert.equal(reply.status, 401);
+  assert.equal(reply.body.error, 'No autorizado.');
 });

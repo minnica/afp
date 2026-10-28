@@ -6,6 +6,14 @@ Consolidado el **27 de octubre de 2026** a partir del README del commit `4562aa0
 
 ## 2026-10-28
 
+### Integraciones, recuperación y persistencia offline con pruebas TypeScript
+
+**Fase 4 de pruebas completada localmente** sobre `429d747`. Se convirtieron las 50 pruebas CJS restantes: parsers, protocolo Android v1, políticas, revisión, conciliación, automatización y recibos de Captura; OAuth, eventos, locks y reintentos de Calendar; Auth/HTTP, contratos de UI, recuperación y cola/observador offline. Los dos contextos `vm` del service worker usan eventos y callbacks tipados. Se preservan fixtures parciales, formatos inválidos, JSON original, duplicados, cambio de cuenta y respuestas perdidas.
+
+Las 108 pruebas ejecutables son TS. Los 866 escenarios de fase 3 se conservan en identidad, orden y jerarquía, sin omisiones; una regresión nueva conserva los metadatos de rutas, con 867 escenarios en total. Hay 97 módulos vinculados a exports reales y once contratos negativos nuevos. Pasaron instalación limpia, tipos, contratos, lint, suite PostgreSQL, build, reconstrucción/actualización y comparación de hashes. Los 394 archivos protegidos, 672 artefactos históricos y 160 archivos de evidencias de fases anteriores permanecen intactos.
+
+README, plan y comandos Android se actualizaron. Los siete helpers CJS de navegador/seeds/Next y los puentes de configuración continúan en fases 5–6. Sin cambios de producto, esquema, SQL, fixtures JSON, dependencias, APK, proveedores reales ni publicación. Resultados, límites de adaptadores, incidencias y reproducción: [fase 4 de pruebas](../artifacts/typescript-tests-migration/phase-4/README.md).
+
 ### Pruebas financieras y persistencia en TypeScript
 
 **Fase 3 de pruebas completada localmente** sobre `dd81d4f`. Se convirtieron 52 pruebas de tarjetas/MSI, presentación, suscripciones, gastos, deudas, ingresos y Mi dinero, junto con los helpers de contexto de rutas y persistencia de deudas. Los mocks distinguen consultas, escrituras, bloqueo y rollback; las integraciones conservan PostgreSQL real. Las proyecciones parciales y entradas inválidas pasan por fronteras de prueba explícitas sin completar los datos históricos ni modificar firmas de producción. Tres scripts operativos CJS tienen declaraciones específicas adyacentes.

@@ -531,7 +531,7 @@ Al cerrar el período, documentar compras cotejadas, compras capturadas, cargos 
 
 ### Pruebas y actualización
 
-`tests/capture-pilot-integration.test.cjs` usa exclusivamente localhost y una base `afp_test…`. Verifica multiplicidad, dos canales/un cargo, correcciones frente a campos completados, recepción local e histórica, aislamiento, falta de propuesta antigua, recibos repetidos y exclusión de débito incluso ante configuración administrativa forzada. Las regresiones de parser usan un prefijo derivado del aviso de débito y un resto ficticio; no son un fixture validado de crédito.
+`tests/capture-pilot-integration.test.ts` usa exclusivamente localhost y una base `afp_test…`. Verifica multiplicidad, dos canales/un cargo, correcciones frente a campos completados, recepción local e histórica, aislamiento, falta de propuesta antigua, recibos repetidos y exclusión de débito incluso ante configuración administrativa forzada. Las regresiones de parser usan un prefijo derivado del aviso de débito y un resto ficticio; no son un fixture validado de crédito.
 
 Resultado: 298 pruebas web, 18 JVM y 29 instrumentadas correctas sin omisiones, más dos comprobaciones de actualización de APK. Para repetir las regresiones, usar los comandos de Fase 5 con una base local Fase 6, por ejemplo `127.0.0.1:55446/afp_test_phase6`. Reconstrucción desde cero e historial: 21 migraciones, diff vacío, checksums, filas conservadas y 27 tablas con RLS. Las APK debug/release y web compilan; lint mantiene los avisos previos.
 
@@ -703,7 +703,7 @@ La comprobación se hace al **habilitar o reactivar**. Editar o eliminar despué
 
 `captureRollout.ts` deriva la preparación desde las tablas existentes; no guarda textos nuevos ni publica terminaciones en el resumen. `GET /api/captures/configuration` incluye `rollout` y mantiene los campos anteriores; `PATCH` aplica los requisitos adicionales y admite `datePolicy`. La implementación inicial de cobertura no añadió migraciones; Wallet/Banamex añade la política de fecha y el historial; Nu/CFE añade la regla expresa y su suscripción, sin modificar RLS ni el contrato Android.
 
-Pruebas nuevas: `tests/capture-rollout.test.cjs` y `tests/capture-rollout-integration.test.cjs`. Ejecutar con `AFP_TEST_DATABASE_URL` apuntando exclusivamente a localhost y una base `afp_test…` que tenga las 26 migraciones, por ejemplo el puerto 55450 usado en la aceptación Nu/CFE:
+Pruebas: `tests/capture-rollout.test.ts` y `tests/capture-rollout-integration.test.ts`. Ejecutar con `AFP_TEST_DATABASE_URL` apuntando exclusivamente a localhost y una base `afp_test…` con el historial vigente de migraciones, conforme a la [preparación de PostgreSQL](../README.md#integraciones-con-postgresql). El puerto 55450 del ejemplo corresponde a la aceptación inicial Nu/CFE:
 
 ```bash
 AFP_TEST_DATABASE_URL=postgresql://postgres:afp_test_only@127.0.0.1:55450/afp_test_nu_cfe \
@@ -736,7 +736,7 @@ Las claves por ocurrencia, fase y mes se guardan en el teléfono para que no sue
 Comprobaciones funcionales sin capturas ni revisión visual:
 
 ```bash
-pnpm test android-notices.test.cjs capture-api.test.cjs dashboard-breakdowns.test.ts notice-dismissals.test.ts
+pnpm test android-notices.test.ts capture-api.test.ts dashboard-breakdowns.test.ts notice-dismissals.test.ts
 pnpm exec next build --webpack
 pnpm lint
 # Dentro de android/, con un JDK completo configurado:

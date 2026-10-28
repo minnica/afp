@@ -62,6 +62,11 @@ function checkPublicExports(full: string, value: unknown) {
 }
 
 export function sourceLoader(mocks: SourceMocks = {}, globals: SourceGlobals = {}) {
+  return fixtureSourceLoader(mocks, globals);
+}
+// Infraestructura con contratos mínimos propios (transporte/BD parciales).
+// Comparte la misma evaluación, comprobación de exports y rutas dinámicas.
+export function fixtureSourceLoader(mocks: Readonly<Record<string, unknown>>, globals: Readonly<Record<string, unknown>> = {}) {
   const cache = new Map<string, { exports: unknown }>();
   // Única frontera estática de vm: la sobrecarga promete los exports de la ruta
   // real, cuya presencia se comprueba abajo. No demuestra su semántica. Las rutas

@@ -1,0 +1,265 @@
+{
+  "knownModules": 97,
+  "remainingCjsHelpers": [
+    "capture-browser-server.cjs",
+    "money-browser-server.cjs",
+    "next-fixture.cjs",
+    "offline-browser-server.cjs",
+    "seed-capture-review.cjs",
+    "seed-receiver-payments.cjs",
+    "seed-ui.cjs"
+  ],
+  "localAssertions": [
+    {
+      "file": "tests/helpers/integration-fixtures.ts",
+      "line": 86,
+      "type": "ReturnType<F>"
+    },
+    {
+      "file": "tests/helpers/integration-fixtures.ts",
+      "line": 119,
+      "type": "ReturnType<Worker>"
+    },
+    {
+      "file": "tests/helpers/notice-fixture.ts",
+      "line": 21,
+      "type": "(keyof NoticeRows)[]"
+    },
+    {
+      "file": "tests/helpers/notice-fixture.ts",
+      "line": 22,
+      "type": "NoticeDelegates"
+    }
+  ],
+  "injections": [
+    {
+      "file": "tests/android-notices.test.ts",
+      "line": 71,
+      "helper": "withFixtureDb",
+      "target": "loadAndroidNotices"
+    },
+    {
+      "file": "tests/android-notices.test.ts",
+      "line": 74,
+      "helper": "withFixtureDb",
+      "target": "loadAndroidNotices"
+    },
+    {
+      "file": "tests/android-notices.test.ts",
+      "line": 76,
+      "helper": "withFixtureDb",
+      "target": "loadAndroidNotices"
+    },
+    {
+      "file": "tests/android-notices.test.ts",
+      "line": 80,
+      "helper": "withFixtureDb",
+      "target": "loadAndroidNotices"
+    },
+    {
+      "file": "tests/android-notices.test.ts",
+      "line": 87,
+      "helper": "withFixtureDb",
+      "target": "loadAndroidNotices"
+    },
+    {
+      "file": "tests/android-notices.test.ts",
+      "line": 106,
+      "helper": "withFixtureDb",
+      "target": "load(\"src/lib/androidNotices.ts\").loadAndroidNotices"
+    },
+    {
+      "file": "tests/android-notices.test.ts",
+      "line": 120,
+      "helper": "withFixtureDb",
+      "target": "service.loadAndroidNotices"
+    },
+    {
+      "file": "tests/android-notices.test.ts",
+      "line": 123,
+      "helper": "withFixtureDb",
+      "target": "service.loadAndroidNotices"
+    },
+    {
+      "file": "tests/android-notices.test.ts",
+      "line": 162,
+      "helper": "uncheckedFixture",
+      "target": "getNoticeKey"
+    },
+    {
+      "file": "tests/android-notices.test.ts",
+      "line": 163,
+      "helper": "withFixtureDb",
+      "target": "load(\"src/lib/androidNotices.ts\").loadAndroidNotices"
+    },
+    {
+      "file": "tests/android-notices.test.ts",
+      "line": 168,
+      "helper": "withFixtureDb",
+      "target": "load(\"src/lib/androidNotices.ts\").loadAndroidNotices"
+    },
+    {
+      "file": "tests/android-notices.test.ts",
+      "line": 172,
+      "helper": "withFixtureDb",
+      "target": "load(\"src/lib/androidNotices.ts\").loadAndroidNotices"
+    },
+    {
+      "file": "tests/api-fetch.test.ts",
+      "line": 53,
+      "helper": "uncheckedFixture",
+      "target": "offline.addOfflineExpense"
+    },
+    {
+      "file": "tests/capture-api-integration.test.ts",
+      "line": 171,
+      "helper": "withFixtureDb",
+      "target": "service.receiveCaptureEvent"
+    },
+    {
+      "file": "tests/capture-bank-fallback-integration.test.ts",
+      "line": 193,
+      "helper": "withFixtureDb",
+      "target": "worker.runBankFallbacks"
+    },
+    {
+      "file": "tests/capture-bank-fallback-integration.test.ts",
+      "line": 199,
+      "helper": "withFixtureDb",
+      "target": "worker.runBankFallbacks"
+    },
+    {
+      "file": "tests/capture-bbva-debit.test.ts",
+      "line": 128,
+      "helper": "withFixtureDb",
+      "target": "processing.resolveCaptureMovement"
+    },
+    {
+      "file": "tests/capture-bbva-wallet-real.test.ts",
+      "line": 38,
+      "helper": "uncheckedFixture",
+      "target": "interpretCapture"
+    },
+    {
+      "file": "tests/capture-card-payments-integration.test.ts",
+      "line": 104,
+      "helper": "withFixtureDb",
+      "target": "processing.resolveCaptureMovement"
+    },
+    {
+      "file": "tests/capture-didi-wallet-real.test.ts",
+      "line": 49,
+      "helper": "uncheckedFixture",
+      "target": "interpretCapture"
+    },
+    {
+      "file": "tests/capture-didi-wallet-real.test.ts",
+      "line": 52,
+      "helper": "uncheckedFixture",
+      "target": "interpretCapture"
+    },
+    {
+      "file": "tests/capture-money-integration.test.ts",
+      "line": 117,
+      "helper": "withFixtureDb",
+      "target": "configuration.configureCapture"
+    },
+    {
+      "file": "tests/capture-money-integration.test.ts",
+      "line": 118,
+      "helper": "withFixtureDb",
+      "target": "processing.resolveCaptureMovement"
+    },
+    {
+      "file": "tests/capture-money-integration.test.ts",
+      "line": 119,
+      "helper": "withFixtureDb",
+      "target": "money.mutateMoney"
+    },
+    {
+      "file": "tests/capture-nu-subscription-integration.test.ts",
+      "line": 49,
+      "helper": "rawHandlers",
+      "target": "fixtureSourceLoader({ '@/lib/prisma': { prisma: db }, '@/lib/apiAuth': { ...load('src/lib/apiAuth.ts'),\n    apiResponse: { json: (body: unkn"
+    },
+    {
+      "file": "tests/capture-processing-integration.test.ts",
+      "line": 185,
+      "helper": "withFixtureDb",
+      "target": "service.receiveCaptureEvent"
+    },
+    {
+      "file": "tests/capture-processing-integration.test.ts",
+      "line": 200,
+      "helper": "withFixtureDb",
+      "target": "processing.resolveCaptureMovement"
+    },
+    {
+      "file": "tests/capture-review-integration.test.ts",
+      "line": 155,
+      "helper": "withFixtureDb",
+      "target": "reconciliation.reconcileCaptureStatement"
+    },
+    {
+      "file": "tests/capture-santander-real.test.ts",
+      "line": 43,
+      "helper": "uncheckedFixture",
+      "target": "interpretCapture"
+    },
+    {
+      "file": "tests/capture-santander-real.test.ts",
+      "line": 95,
+      "helper": "uncheckedFixture",
+      "target": "interpretCapture"
+    },
+    {
+      "file": "tests/capture-service-notices.test.ts",
+      "line": 38,
+      "helper": "withFixtureDb",
+      "target": "configureCapture"
+    },
+    {
+      "file": "tests/capture-wallet-real.test.ts",
+      "line": 28,
+      "helper": "uncheckedFixture",
+      "target": "interpretCapture"
+    },
+    {
+      "file": "tests/google-calendar-events.test.ts",
+      "line": 57,
+      "helper": "fixtureWorker",
+      "target": "realWorker"
+    },
+    {
+      "file": "tests/google-calendar-events.test.ts",
+      "line": 70,
+      "helper": "fixtureWorker",
+      "target": "realWorker"
+    },
+    {
+      "file": "tests/google-calendar-integration.test.ts",
+      "line": 82,
+      "helper": "uncheckedFixture",
+      "target": "service.completeCalendarOAuth"
+    },
+    {
+      "file": "tests/receiver-payment-notices-integration.test.ts",
+      "line": 180,
+      "helper": "withFixtureDb",
+      "target": "c.load('src/lib/captureService.ts').receiveCaptureEvent"
+    }
+  ],
+  "anyKeywords": [],
+  "suppressionComments": [],
+  "negativeCases": 11,
+  "notes": [
+    "sourceLoader preserves its strict mocks; fixtureSourceLoader shares the same vm/cache/export checks with the typed minimum mocks of integrationLoader.",
+    "Dynamic paths and native JSON reads return unknown. The body/status transport adapter is a test reply, not NextResponse.",
+    "withFixtureDb substitutes only the persistence argument; the remaining parameters and result derive from the real function. Fault injection still uses real PostgreSQL transactions.",
+    "fixtureWorker supports the historical minimum worker state and sync result; Reflect.apply is its single return boundary.",
+    "noticeDelegates maps typed collections to minimum delegates and preserves omitted fields. Neither its keys cast nor its mapped return asserts PrismaClient.",
+    "uncheckedFixture preserves deliberately invalid internal inputs without parsing or adding defaults. Sparse preserves function callbacks.",
+    "Browser servers, seeds and Next fixtures remain in CJS for phase 5. allowJs/discovery bridges remain for phase 6.",
+    "HTTP adapters preserve non-method exports and filter route metadata out of handler maps; source-loader.test.ts checks maxDuration and POST together."
+  ]
+}

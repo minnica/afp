@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 // Esta frontera conserva exactamente las claves omitidas: no completa fixtures
 // ni afirma que sean modelos Prisma íntegros. Los tipos escalares y resultados
 // se derivan de la función real; el cast del retorno solo salva Reflect.apply.
-export type Sparse<T> = T extends Prisma.Decimal ? Prisma.Decimal | string | number : T extends Date ? Date | string
+export type Sparse<T> = T extends (...args: never[]) => unknown ? T : T extends Prisma.Decimal ? Prisma.Decimal | string | number : T extends Date ? Date | string
   : T extends readonly (infer Item)[] ? Sparse<Item>[]
   : T extends object ? { [K in keyof T]?: Sparse<T[K]> } : T;
 type SparseArgs<A extends unknown[]> = { [K in keyof A]: Sparse<A[K]> };
@@ -116,3 +116,8 @@ export function uncheckedFixture<F extends (...args: never[]) => unknown>(fn: F,
 const jsonSchema = z.json();
 function isJsonValue(value: unknown): value is Prisma.JsonValue { return jsonSchema.safeParse(value).success; }
 export function jsonValue(value: unknown): Prisma.JsonValue { assert.ok(isJsonValue(value)); return value; }
+
+export function dateValue(value: unknown): Date {
+  assert.ok(value instanceof Date);
+  return value;
+}

@@ -1,0 +1,166 @@
+
+> afp@0.1.0 test /home/garatachia/projects/afp
+> node --import tsx tests/run-tests.ts capture-nu-mercadopago-real-integration.test.ts google-calendar.test.ts
+
+TAP version 13
+# Subtest: Nu y Mercado Pago: muestras reales anonimizadas, regla expresa y registro único mediante API/PostgreSQL
+    # Subtest: los avisos desconocidos conservan recibos y los formatos nuevos no generan gastos al publicarse
+    ok 1 - los avisos desconocidos conservan recibos y los formatos nuevos no generan gastos al publicarse
+      ---
+      duration_ms: 229.461581
+      type: 'test'
+      ...
+    # Subtest: regla Mercado Pago exige propietario, fuente y fecha expresos; no hereda Nu/CFE ni acepta suscripción
+    ok 2 - regla Mercado Pago exige propietario, fuente y fecha expresos; no hereda Nu/CFE ni acepta suscripción
+      ---
+      duration_ms: 34.981113
+      type: 'test'
+      ...
+    # Subtest: reinterpretar añade historial explícito idempotente y deja intactos originales; Mercado Pago usa regla, Nu su alias
+    ok 3 - reinterpretar añade historial explícito idempotente y deja intactos originales; Mercado Pago usa regla, Nu su alias
+      ---
+      duration_ms: 56.925903
+      type: 'test'
+      ...
+    # Subtest: cada piloto exige revisión, cotejo y fecha aceptada antes de habilitar; Nu enlaza ambas fuentes a un gasto
+    ok 4 - cada piloto exige revisión, cotejo y fecha aceptada antes de habilitar; Nu enlaza ambas fuentes a un gasto
+      ---
+      duration_ms: 185.479691
+      type: 'test'
+      ...
+    # Subtest: Nu: banco antes/después de Wallet, ocho entregas y reintento conservan un solo gasto por compra
+    ok 5 - Nu: banco antes/después de Wallet, ocho entregas y reintento conservan un solo gasto por compra
+      ---
+      duration_ms: 352.170237
+      type: 'test'
+      ...
+    # Subtest: Mercado Pago: concurrencia y respuesta perdida crean un gasto pendiente, sin cobro de suscripción ni abono
+    ok 6 - Mercado Pago: concurrencia y respuesta perdida crean un gasto pendiente, sin cobro de suscripción ni abono
+      ---
+      duration_ms: 117.123302
+      type: 'test'
+      ...
+    # Subtest: compras repetidas, revisiones y monedas contradictorias quedan por revisar; iguales importes en tarjetas distintas se separan
+    ok 7 - compras repetidas, revisiones y monedas contradictorias quedan por revisar; iguales importes en tarjetas distintas se separan
+      ---
+      duration_ms: 116.163644
+      type: 'test'
+      ...
+    # Subtest: alias Nu ambiguo y número NFC no sustituyen el alias bancario; correcciones personales conservadas
+    ok 8 - alias Nu ambiguo y número NFC no sustituyen el alias bancario; correcciones personales conservadas
+      ---
+      duration_ms: 77.529766
+      type: 'test'
+      ...
+    # Subtest: cambiar destinatario Mercado Pago detiene el formato, invalida propuestas previas y conserva Nu/CFE
+    ok 9 - cambiar destinatario Mercado Pago detiene el formato, invalida propuestas previas y conserva Nu/CFE
+      ---
+      duration_ms: 76.951737
+      type: 'test'
+      ...
+Google Calendar OAuth: FAILED
+    1..9
+ok 1 - Nu y Mercado Pago: muestras reales anonimizadas, regla expresa y registro único mediante API/PostgreSQL
+  ---
+  duration_ms: 1732.950669
+  type: 'test'
+  ...
+# Subtest: calendar: credenciales cifradas ligadas al propietario, autenticadas y no deterministas
+ok 2 - calendar: credenciales cifradas ligadas al propietario, autenticadas y no deterministas
+  ---
+  duration_ms: 1.752478
+  type: 'test'
+  ...
+# Subtest: calendar: conserva el día bancario, ajusta febrero bisiesto y usa fin exclusivo
+ok 3 - calendar: conserva el día bancario, ajusta febrero bisiesto y usa fin exclusivo
+  ---
+  duration_ms: 2.650707
+  type: 'test'
+  ...
+# Subtest: calendar: corrección de fechas mantiene clave, saldo parcial y liquidación sin recordatorio
+ok 4 - calendar: corrección de fechas mantiene clave, saldo parcial y liquidación sin recordatorio
+  ---
+  duration_ms: 3.951894
+  type: 'test'
+  ...
+# Subtest: calendar: corte verde requiere fechas confirmadas y monto, conserva pago independiente y acepta cero
+ok 5 - calendar: corte verde requiere fechas confirmadas y monto, conserva pago independiente y acepta cero
+  ---
+  duration_ms: 3.280026
+  type: 'test'
+  ...
+# Subtest: calendar: cuentas cobradas, canceladas y con pago parcial respetan el saldo real
+ok 6 - calendar: cuentas cobradas, canceladas y con pago parcial respetan el saldo real
+  ---
+  duration_ms: 2.064187
+  type: 'test'
+  ...
+# Subtest: calendar: el color representa el estado en todos los tipos y los parciales conservan su aviso
+ok 7 - calendar: el color representa el estado en todos los tipos y los parciales conservan su aviso
+  ---
+  duration_ms: 0.21263
+  type: 'test'
+  ...
+# Subtest: calendar: abonos de cuentas usan naranja y texto parcial; al liquidar pasan a verde
+ok 8 - calendar: abonos de cuentas usan naranja y texto parcial; al liquidar pasan a verde
+  ---
+  duration_ms: 1.057288
+  type: 'test'
+  ...
+# Subtest: calendar: un cobro quincenal no marca la siguiente fecha como cobrada, ni al llegar ese día
+ok 9 - calendar: un cobro quincenal no marca la siguiente fecha como cobrada, ni al llegar ese día
+  ---
+  duration_ms: 5.453083
+  type: 'test'
+  ...
+# Subtest: calendar: abonos se suman a centavos y los días ajustados a fin de mes no duplican cobros
+ok 10 - calendar: abonos se suman a centavos y los días ajustados a fin de mes no duplican cobros
+  ---
+  duration_ms: 1.043998
+  type: 'test'
+  ...
+# Subtest: calendar: ingresos futuros no liquidan ni retiran los cobros previstos de una cuenta activa
+ok 11 - calendar: ingresos futuros no liquidan ni retiran los cobros previstos de una cuenta activa
+  ---
+  duration_ms: 1.159069
+  type: 'test'
+  ...
+# Subtest: calendar: cuotas y denegación no revelan respuestas de Google; reintento respeta Retry-After
+ok 12 - calendar: cuotas y denegación no revelan respuestas de Google; reintento respeta Retry-After
+  ---
+  duration_ms: 21.093211
+  type: 'test'
+  ...
+# Subtest: calendar: cron exige su secreto incluso cuando falta configuración y no expone usuarios
+ok 13 - calendar: cron exige su secreto incluso cuando falta configuración y no expone usuarios
+  ---
+  duration_ms: 17.209297
+  type: 'test'
+  ...
+# Subtest: calendar: callback usa origen fijo, borra cookie y no refleja mensajes del proveedor
+ok 14 - calendar: callback usa origen fijo, borra cookie y no refleja mensajes del proveedor
+  ---
+  duration_ms: 5.660763
+  type: 'test'
+  ...
+# Subtest: calendar: suscripciones omiten saltos, respetan frecuencia y desactivación, y retiran avisos al confirmar
+ok 15 - calendar: suscripciones omiten saltos, respetan frecuencia y desactivación, y retiran avisos al confirmar
+  ---
+  duration_ms: 1.132228
+  type: 'test'
+  ...
+# Subtest: calendar: la API usa el propietario de sesión e impide preferencias y userId arbitrarios
+ok 16 - calendar: la API usa el propietario de sesión e impide preferencias y userId arbitrarios
+  ---
+  duration_ms: 7.70669
+  type: 'test'
+  ...
+1..16
+# tests 25
+# suites 0
+# pass 25
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2157.975188
