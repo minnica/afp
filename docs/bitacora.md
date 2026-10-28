@@ -6,6 +6,16 @@ Consolidado el **27 de octubre de 2026** a partir del README del commit `4562aa0
 
 ## 2026-10-28
 
+### Cierre de la migración web a TypeScript
+
+**Fase 7 completada localmente.** Los 275 módulos TS/TSX de `src/` están incluidos en el programa estricto con `allowJs: false`. Se retiraron los adaptadores de UI de Mi dinero, el wrapper del piloto de transferencias y el cliente financiero temporal sin consumidores. Los 14 archivos vacíos se eliminaron sin contarlos como módulos migrados. El cargador de pruebas exige el archivo exacto cuando la ruta declara una extensión; se actualizaron las referencias históricas que aún lo necesitaban.
+
+Se revisaron las interfaces y entradas externas, las 58 conversiones locales y los límites cliente/servidor, sin `any`, supresiones TypeScript, dobles conversiones ni declaraciones que oculten módulos pendientes. ESLint impide encadenar conversiones. Mi dinero usa los contratos reales de los componentes compartidos, incluido el tooltip de proyección; el formulario común conserva el UUID en reintentos y lo renueva cuando cambia el contenido.
+
+La instalación limpia, tipos, contratos negativos, lint, 854 pruebas con PostgreSQL sin omisiones, build y `db:verify` pasaron. Se verificaron las 42 migraciones, 45 tablas con RLS y las 12 respuestas del piloto contra fase 0. En navegador se guardaron transferencias de $125.50 en escritorio y $38.75 en móvil, con un recibo por operación, centavos y total conservados; selector por teclado, foco del diálogo, retorno al botón y tooltip correctos, sin errores de página ni desbordamiento.
+
+README, producto y plan reflejan el cierre y las excepciones previstas: pruebas/scripts JS/CJS, configuraciones `.mjs`, `public/sw.js` y Android Kotlin fuera del programa web. Sin cambios de esquema, SQL, dependencias, APK ni publicación. Resultados, revisión de conversiones y reproducción: [fase 7](../artifacts/typescript-migration/phase-7/README.md).
+
 ### Interfaz, hooks y páginas en TypeScript
 
 **Fase 6 completada localmente.** Se convirtieron 135 módulos con contenido: páginas/layout restantes, seis hooks, pantallas y componentes compartidos. Props, refs, eventos, tablas y gráficas usan los tipos de sus bibliotecas. Los clientes validan las respuestas dentro de la recuperación HTTP y conservan el JSON original, incluidos metadatos, claves omitidas y orden usado por Captura. El cálculo de importes de pago se separó del estado de calendario para consumir detalles sin fechas.

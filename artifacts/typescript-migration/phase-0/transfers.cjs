@@ -35,7 +35,7 @@ async function main() {
       headers: Object.fromEntries(new Headers(options.headers)),
     }) } },
   }, { Date: FixedDate });
-  const route = load('src/app/api/money/route.js');
+  const route = load('src/app/api/money/route.ts');
   const request = (body, method = 'POST') => ({ method,
     url: 'http://localhost/api/money', headers: new Headers({ authorization: 'Bearer fictitious' }),
     json: async () => body,

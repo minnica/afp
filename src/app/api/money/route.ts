@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import type { Prisma, PrismaClient } from '@prisma/client';
 import { apiResponse, requireApiUser, apiAccessErrorResponse } from '@/lib/apiAuth';
 import { prisma } from '@/lib/prisma';
 import { loadMoneyData, mutateMoney, routingOptions } from '@/lib/money/service';
@@ -27,7 +26,7 @@ export async function GET(request: Request) {
     if (!scenario.success) return apiResponse.json({ error: 'Revisa las fechas e importes del escenario.' }, { status: 400 });
     // La transacción solo obtiene una instantánea coherente. El cálculo y la
     // serialización ocurren después de liberar la conexión con PostgreSQL.
-    const data = await (prisma as PrismaClient).$transaction((tx: Prisma.TransactionClient) => loadMoneyData(tx, user.id), { isolationLevel: 'RepeatableRead', timeout: 20000 });
+    const data = await prisma.$transaction((tx) => loadMoneyData(tx, user.id), { isolationLevel: 'RepeatableRead', timeout: 20000 });
     const today = todayInMexico();
     const historyMonths = [3, 2, 1].map(n => addMonths(today, -n));
     const budgetSuggestions = data.categories.map(category => {
@@ -40,6 +39,6 @@ export async function GET(request: Request) {
   } catch (error) { return failure(error); }
 }
 export async function POST(request: Request) {
-  try { const user = z.object({ id: z.string() }).parse(await requireApiUser(request)); return apiResponse.json(await mutateMoney(prisma as PrismaClient, user.id, await request.json())); }
+  try { const user = z.object({ id: z.string() }).parse(await requireApiUser(request)); return apiResponse.json(await mutateMoney(prisma, user.id, await request.json())); }
   catch (error) { return failure(error); }
 }

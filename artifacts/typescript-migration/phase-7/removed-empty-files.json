@@ -1,0 +1,19 @@
+{
+  "files": [
+    "src/actions/cardCycles.js",
+    "src/actions/cards.js",
+    "src/actions/expenses.js",
+    "src/actions/incomes.js",
+    "src/actions/installmentPurchases.js",
+    "src/actions/receivables.js",
+    "src/actions/settings.js",
+    "src/actions/subscriptions.js",
+    "src/lib/calculations/dashboard.js",
+    "src/lib/calculations/installments.js",
+    "src/lib/calculations/receivables.js",
+    "src/lib/dates.js",
+    "src/lib/money.js",
+    "src/lib/validations.js"
+  ],
+  "reason": "Archivos vac\u00edos sin imports ni implementaci\u00f3n; se retiran, no se cuentan como m\u00f3dulos migrados."
+}

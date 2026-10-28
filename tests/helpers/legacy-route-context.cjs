@@ -18,7 +18,7 @@ function routeContext(route, globals = {}) {
     'calculations/subscriptionStatements', 'calculations/cardCycles',
     'calculations/cardCyclePayments', 'calculations/cycleDataQuality',
     'calculations/cardUsageWaivers',
-  ].map(name => load(`src/lib/${name}.js`)));
+  ].map(name => load(`src/lib/${name}.ts`)));
   const exposed = route === 'dashboard' ? [
     'buildWeeklyComparison', 'buildCategoryBreakdown', 'buildCardMonthlyComparison',
     'shouldIncludePurchaseInMonth', 'isSubscriptionChargeableInMonth', 'getMonthlySubscriptions',

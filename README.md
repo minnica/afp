@@ -51,7 +51,7 @@ Este README describe el funcionamiento y los procedimientos del código versiona
 | Área | Implementación |
 | --- | --- |
 | Web | Next.js 16.3.8, App Router y React 19.2.4 |
-| Lenguaje | Código web activo en TypeScript/TSX; cierre de la transición pendiente en fase 7. Alias `@/*` para `src/*` |
+| Lenguaje | Código web activo en TypeScript/TSX, con comprobación estricta y `allowJs: false`. Alias `@/*` para `src/*` |
 | UI | Componentes shadcn locales, Radix UI y Tailwind CSS 4; Base UI para el Combobox múltiple |
 | Formularios | React Hook Form y Zod |
 | Tablas y gráficas | TanStack Table 8 y Recharts 3 |
@@ -360,8 +360,8 @@ Desconectar retira eventos de hoy en adelante, conserva el historial y elimina l
 ## Convenciones de desarrollo
 
 - Leer este README y [PRODUCT.md](PRODUCT.md) antes de cambiar arquitectura o comportamiento. Actualizar la documentación afectada en la misma tarea; registrar los hitos relevantes en [docs/bitacora.md](docs/bitacora.md) y guardar los resultados detallados de ejecución en `artifacts/`.
-- Seguir el [plan de migración gradual a TypeScript](docs/plan-migracion-typescript.md): fases 0–6 implementadas. Páginas, hooks, formularios y componentes compartidos están en TS/TSX con tipos de React, Radix/Base UI, TanStack y Recharts. Los [resultados de fase 6](artifacts/typescript-migration/phase-6/README.md) incluyen contratos de interfaz, PostgreSQL y revisión en navegador. `components.json` usa `tsx: true`. La fase 7 retirará adaptadores y fallbacks temporales, resolverá los 14 archivos vacíos inventariados y desactivará `allowJs`; mientras tanto se conservan `strict`, `noUncheckedIndexedAccess` y las comprobaciones obligatorias. Código en inglés e interfaz en español.
-- Conservar `node:test` y cargar fuentes con `tests/helpers/load-source.cjs`: esbuild transforma JS/TS/JSX/TSX, pero no comprueba tipos. Los tests deben inyectar adaptadores de red/BD; el cargador no hereda `process.env` ni carga `.env`. Actualizar rutas literales al convertir archivos; el fallback de extensión inequívoco es temporal hasta la fase 7.
+- El [plan de migración a TypeScript](docs/plan-migracion-typescript.md) está completado en sus fases 0–7. Todo el código activo de `src/` usa TS/TSX con `allowJs: false`, `strict` y `noUncheckedIndexedAccess`; no quedan adaptadores de JavaScript ni archivos vacíos. Importar directamente los componentes tipados de `src/components/ui/`; `components.json` usa `tsx: true`. Conservar validación de JSON en las entradas externas y los cuerpos originales usados por idempotencia y concurrencia. No usar `any`, supresiones de TypeScript ni dobles conversiones para ocultar errores. Los casos negativos con `@ts-expect-error` explicado viven exclusivamente en `tests/types/`. Evidencias y revisión de conversiones locales: [fase 7](artifacts/typescript-migration/phase-7/README.md). Código en inglés e interfaz en español.
+- Conservar `node:test` y cargar fuentes con `tests/helpers/load-source.cjs`: esbuild transforma JS/TS/JSX/TSX, pero no comprueba tipos. Los tests deben inyectar adaptadores de red/BD; el cargador no hereda `process.env` ni carga `.env`. Las rutas con extensión deben señalar el archivo exacto; las rutas sin extensión se resuelven solo si son inequívocas. No se sustituyen extensiones antiguas. Las pruebas `.cjs`, scripts operativos, configuraciones `.mjs` y `public/sw.js` mantienen JavaScript fuera del programa de tipos de la aplicación; Android conserva Kotlin.
 - Reutilizar [src/components/ui/](src/components/ui/) y la configuración `radix-mira` de [components.json](components.json). Formularios con React Hook Form + Zod; fechas con `DatePicker`; importes con `NumberInput`; selectores con `ResponsiveSelect`/`SearchableSelect`.
 - Conservar la interacción móvil de `CreateRecordSurface`, los borradores por usuario y el foco de los diálogos. Los borrados requieren el `AlertDialog` compartido. No ocultar errores ni presentar una recarga fallida como un alta no guardada.
 - Mantener autorización por propietario, validación de relaciones, transacciones y las garantías idempotentes de cada flujo. Agregar verificaciones pertinentes cuando cambie una regla financiera o contrato.
@@ -381,7 +381,7 @@ La web se despliega en Vercel, proyecto `afp`. El build es `pnpm build`; no apli
 
 ## Documentación relacionada
 
-- [docs/plan-migracion-typescript.md](docs/plan-migracion-typescript.md): plan por fases y criterios de aceptación; fases 0–6 implementadas; siguiente fase: retirar puentes temporales y cerrar la transición.
+- [docs/plan-migracion-typescript.md](docs/plan-migracion-typescript.md): plan por fases y criterios de aceptación; fases 0–7 completadas localmente, con evidencias de cierre.
 - [docs/bitacora.md](docs/bitacora.md): decisiones, migraciones, incidencias y seguimientos históricos con sus evidencias.
 - [PRODUCT.md](PRODUCT.md): propósito, alcance y principios del producto.
 - [docs/android-captura.md](docs/android-captura.md): operación técnica de Android, firma y pruebas.

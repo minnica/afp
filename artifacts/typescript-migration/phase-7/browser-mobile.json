@@ -1,0 +1,43 @@
+{
+  "activeElement": "Transferir",
+  "horizontalOverflow": false,
+  "pageAlerts": [],
+  "requests": [
+    {
+      "body": {
+        "action": "TRANSFER",
+        "amount": 125.5,
+        "concept": "Transferencia fase 7 escritorio",
+        "date": "2026-10-28",
+        "fromAccountId": "2b3d91ba-031d-4e0b-9dff-21211f123473",
+        "operationId": "adaa87d8-42ad-4a6b-aa91-6dd3ca53b86b",
+        "toAccountId": "cacc7b1c-6591-47df-803a-b2d30a618b08"
+      },
+      "response": {
+        "id": "4428302d-e252-427a-b17a-c7ede7b90b50",
+        "ok": true
+      },
+      "status": 200
+    },
+    {
+      "body": {
+        "action": "TRANSFER",
+        "amount": 38.75,
+        "concept": "Transferencia fase 7 móvil",
+        "date": "2026-10-28",
+        "fromAccountId": "cacc7b1c-6591-47df-803a-b2d30a618b08",
+        "operationId": "5ead0fae-0454-4424-8860-218f0692bc5f",
+        "toAccountId": "2b3d91ba-031d-4e0b-9dff-21211f123473"
+      },
+      "response": {
+        "id": "36f5b050-3e4f-46ef-b66f-a986a16c6f14",
+        "ok": true
+      },
+      "status": 200
+    }
+  ],
+  "viewport": {
+    "height": 844,
+    "width": 390
+  }
+}

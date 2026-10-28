@@ -53,23 +53,52 @@ test('transferencias: cancelación, validación HTTP y error de red conservan el
   assert.equal(c.requests[0].init.body, c.requests[1].init.body);
 });
 
-test('transferencias: frontera JSX valida el callback y conserva configuración y UUID del editor', async () => {
-  const load = sourceLoader({ './MoneyEditor': { default: () => null } });
+test('transferencias: editor compartido valida el formulario y conserva configuración y UUID al reintentar', async () => {
+  let values;
+  const controls = new Proxy({}, { get: (_, name) => name });
+  const mocks = Object.fromEntries(['dialog', 'field', 'input', 'checkbox', 'alert', 'responsive-select', 'collapsible', 'button'].map(name => [`@/components/ui/${name}`, controls]));
+  const load = sourceLoader({ ...mocks,
+    '@/lib/money/client': { errorMessage: error => error.message },
+    react: { useRef: current => ({ current }), useState: initial => [typeof initial === 'function' ? initial() : initial, () => {}] },
+    'react-hook-form': {
+      useForm: () => ({ control: {}, formState: { errors: {} }, handleSubmit: submit => () => submit(editor.schema.parse(values)) }),
+      useWatch: () => undefined,
+    },
+    '@hookform/resolvers/zod': { zodResolver: () => undefined },
+  }, { crypto: { randomUUID } });
   const { createTransferEditor } = load('src/components/mi-dinero/transferEditor.ts');
-  const Editor = load('src/components/mi-dinero/MoneyTransferEditor.tsx').default;
+  const Editor = load('src/components/mi-dinero/MoneyEditor.tsx').default;
   const editor = createTransferEditor([{ id: 'a', name: 'Origen', balance: 100 }, { id: 'b', name: 'Destino' }], '2026-10-27');
-  const saved = [], onClose = () => {}, restoreFocus = () => {};
-  const element = Editor({ editor, onClose, restoreFocus, onSave: async value => { saved.push(value); } });
-  assert.equal(element.props.editor, editor); assert.equal(element.props.onClose, onClose); assert.equal(element.props.restoreFocus, restoreFocus);
+  const saved = [], restoreFocus = () => {};
+  let closed = 0, fail = true;
+  const element = Editor({ editor, onClose: () => { closed++; }, restoreFocus, onSave: async value => {
+    saved.push(value);
+    if (fail) throw new TypeError('Respuesta perdida');
+  } });
+  const content = element.props.children;
+  assert.equal(content.props.onCloseAutoFocus, restoreFocus);
+  const form = content.props.children.find(child => child.type === 'form');
   assert.equal(editor.values.amount, '');
   assert.deepEqual(Array.from(editor.fields, f => f.name), ['fromAccountId', 'toAccountId', 'amount', 'date', 'concept']);
-  const body = command();
-  await element.props.onSave(body); await element.props.onSave(body);
-  assert.equal(saved[0].amount, 12.5); assert.equal(saved[0].operationId, body.operationId);
+  values = command();
+  // El editor crea el recibo, sin aceptar uno del formulario.
+  const submit = async () => { form.props.onSubmit({}); await new Promise(resolve => setImmediate(resolve)); };
+  await submit();
+  assert.equal(closed, 0);
+  fail = false;
+  await submit();
+  assert.equal(closed, 1);
+  assert.equal(saved[0].amount, 12.5); assert.match(saved[0].operationId, /^[\da-f-]{36}$/);
   assert.deepEqual(saved[0], saved[1]);
-  assert.throws(() => element.props.onSave({ ...body, toAccountId: 'a' }), /Selecciona otra cuenta/);
-  assert.throws(() => element.props.onSave({ action: 'REVERSE_TRANSFER', id: 'saved', operationId: body.operationId }));
-  assert.equal(saved.length, 2);
+  values = { ...values, amount: '13.75' };
+  await submit();
+  assert.notEqual(saved[2].operationId, saved[0].operationId);
+  assert.equal(saved[2].amount, 13.75);
+  values = { ...values, toAccountId: 'a' };
+  assert.throws(() => form.props.onSubmit({}), /Selecciona otra cuenta/);
+  values = { action: 'REVERSE_TRANSFER', id: 'saved' };
+  assert.throws(() => form.props.onSubmit({}));
+  assert.equal(saved.length, 3);
 });
 
 

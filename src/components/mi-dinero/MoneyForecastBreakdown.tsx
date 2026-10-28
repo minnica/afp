@@ -1,5 +1,8 @@
 'use client';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Badge, Empty, EmptyDescription, EmptyHeader, EmptyTitle, Item, ItemActions, ItemContent, ItemDescription, ItemGroup, ItemTitle } from './ui';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Badge } from '@/components/ui/badge';
+import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from '@/components/ui/empty';
+import { Item, ItemActions, ItemContent, ItemDescription, ItemGroup, ItemTitle } from '@/components/ui/item';
 import type { MoneyResponse, ForecastResponse } from '@/lib/money/responses';
 
 

@@ -1,0 +1,59 @@
+{
+  "transfers": [
+    {
+      "id": "4428302d-e252-427a-b17a-c7ede7b90b50",
+      "userId": "00000000-0000-4000-8000-000000000094",
+      "fromAccountId": "2b3d91ba-031d-4e0b-9dff-21211f123473",
+      "toAccountId": "cacc7b1c-6591-47df-803a-b2d30a618b08",
+      "amount": "125.5",
+      "date": "2026-10-28T00:00:00.000Z",
+      "concept": "Transferencia fase 7 escritorio",
+      "reversedAt": null,
+      "createdAt": "2026-10-28T07:15:51.474Z"
+    },
+    {
+      "id": "36f5b050-3e4f-46ef-b66f-a986a16c6f14",
+      "userId": "00000000-0000-4000-8000-000000000094",
+      "fromAccountId": "cacc7b1c-6591-47df-803a-b2d30a618b08",
+      "toAccountId": "2b3d91ba-031d-4e0b-9dff-21211f123473",
+      "amount": "38.75",
+      "date": "2026-10-28T00:00:00.000Z",
+      "concept": "Transferencia fase 7 móvil",
+      "reversedAt": null,
+      "createdAt": "2026-10-28T07:16:27.865Z"
+    }
+  ],
+  "operations": [
+    {
+      "userId": "00000000-0000-4000-8000-000000000094",
+      "operationId": "adaa87d8-42ad-4a6b-aa91-6dd3ca53b86b",
+      "fingerprint": "826778d0b7ac13077b8da5f1f659ee2d508019691a6f4f8a4d9a702b8411f0a2",
+      "result": {
+        "id": "4428302d-e252-427a-b17a-c7ede7b90b50",
+        "ok": true
+      },
+      "createdAt": "2026-10-28T07:15:51.476Z"
+    },
+    {
+      "userId": "00000000-0000-4000-8000-000000000094",
+      "operationId": "5ead0fae-0454-4424-8860-218f0692bc5f",
+      "fingerprint": "375b31dd3a3658eaa5dbd08dc2307dd7d385729aa2bbcf39d44ba9d94f81e9ef",
+      "result": {
+        "id": "36f5b050-3e4f-46ef-b66f-a986a16c6f14",
+        "ok": true
+      },
+      "createdAt": "2026-10-28T07:16:27.867Z"
+    }
+  ],
+  "balances": [
+    {
+      "name": "Banco ficticio",
+      "transferAdjustedCents": 491325
+    },
+    {
+      "name": "Efectivo ficticio",
+      "transferAdjustedCents": 508675
+    }
+  ],
+  "totalCents": 1000000
+}

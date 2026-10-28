@@ -1,5 +1,11 @@
 'use client';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, Field, FieldLabel, FieldDescription, FieldGroup, Input, Checkbox, Alert, AlertDescription, ResponsiveSelect, Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { Field, FieldLabel, FieldDescription, FieldGroup } from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { ResponsiveSelect } from '@/components/ui/responsive-select';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { z } from 'zod';
 import { editorSubmissionSchema, type EditorConfiguration, type EditorInput, type EditorOutput, type EditorField, type EditorSubmission } from './editorContracts';
 import { errorMessage } from '@/lib/money/client';
@@ -17,7 +23,14 @@ import { Button } from '@/components/ui/button';
 
 import { ChevronDown, Loader2 } from 'lucide-react';
 
-export default function MoneyEditor({ editor, onClose, onSave, restoreFocus }: { editor: EditorConfiguration; onClose: () => void; onSave: (payload: EditorSubmission) => Promise<void>; restoreFocus: (event: Event) => void }) {
+export interface MoneyEditorProps {
+  editor: EditorConfiguration;
+  onClose: () => void;
+  onSave: (payload: EditorSubmission) => Promise<void>;
+  restoreFocus: (event: Event) => void;
+}
+
+export default function MoneyEditor({ editor, onClose, onSave, restoreFocus }: MoneyEditorProps) {
   const schema: z.ZodType<EditorOutput, EditorInput> = editor.schema;
   const form = useForm<EditorInput, unknown, EditorOutput>({ resolver: zodResolver(schema), defaultValues: editor.values });
   const kind = useWatch({ control: form.control, name: 'kind' });

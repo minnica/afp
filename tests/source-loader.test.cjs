@@ -53,14 +53,20 @@ test('cargador: caché por instancia, imports circulares y reexports vivos', t =
   assert.equal(load(file('a.ts')).result(), 3);
 });
 
-test('cargador: resolución inequívoca, índices y puente histórico sin ocultar archivo exacto', t => {
+test('cargador: resolución inequívoca, índices y extensiones explícitas sin sustitución', t => {
   const file = fixture(t, { 'only.ts': 'export default 1;', 'folder/index.ts': 'export default 2;', 'duplicate.js': 'export default 3;', 'duplicate.ts': 'export default 4;' });
-  assert.equal(sourceLoader()(file('only.js')).default, 1);
+  assert.equal(sourceLoader()(file('only.ts')).default, 1);
+  assert.equal(sourceLoader()(file('only')).default, 1);
+  assert.throws(() => resolveSource(file('only.js')), /no encontrado/);
+  assert.throws(() => sourceLoader()(file('only.jsx')), /no encontrado/);
   assert.equal(sourceLoader()(file('folder')).default, 2);
   assert.throws(() => resolveSource(file('duplicate')), /ambiguo/);
   assert.equal(sourceLoader()(file('duplicate.js')).default, 3);
   fs.writeFileSync(file('only.tsx'), 'export default 5;');
-  assert.throws(() => resolveSource(file('only.js')), /ambiguo/);
+  assert.throws(() => resolveSource(file('only')), /ambiguo/);
+  assert.equal(sourceLoader()(file('only.ts')).default, 1);
+  assert.equal(sourceLoader()(file('only.tsx')).default, 5);
+  assert.throws(() => resolveSource(file('only.js')), /no encontrado/);
   assert.throws(() => resolveSource(file('absent')), /no encontrado/);
 });
 

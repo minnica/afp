@@ -10,10 +10,12 @@ const allowedPackages = new Set(["zod", "date-fns", "date-fns/locale", "clsx", "
 function resolveSource(file) {
   const full = path.resolve(root, file);
   const extension = path.extname(full);
-  if (extensions.includes(extension) && fs.existsSync(full)) return full;
-  // Puente temporal para referencias .js históricas; retirar en la fase 7.
-  const base = extensions.includes(extension) ? full.slice(0, -extension.length) : full;
-  const candidates = [...extensions.map(ext => base + ext), ...(!extension ? extensions.map(ext => path.join(base, `index${ext}`)) : [])]
+  // Una extensión explícita identifica ese archivo; nunca sustituir JS por TS.
+  if (extension) {
+    if (extensions.includes(extension) && fs.existsSync(full) && fs.statSync(full).isFile()) return full;
+    throw new Error(`Módulo no encontrado: ${file}`);
+  }
+  const candidates = [...extensions.map(ext => full + ext), ...extensions.map(ext => path.join(full, `index${ext}`))]
     .filter(candidate => fs.existsSync(candidate) && fs.statSync(candidate).isFile());
   if (candidates.length !== 1) throw new Error(`${candidates.length ? "Módulo ambiguo" : "Módulo no encontrado"}: ${file}${candidates.length ? ` (${candidates.join(", ")})` : ""}`);
   return candidates[0];

@@ -16,6 +16,10 @@ const eslintConfig = defineConfig([
       "@typescript-eslint/no-unsafe-call": "error",
       "@typescript-eslint/no-unsafe-member-access": "error",
       "@typescript-eslint/no-unsafe-return": "error",
+      "no-restricted-syntax": ["error", {
+        selector: "TSAsExpression > TSAsExpression, TSAsExpression > TSTypeAssertion, TSTypeAssertion > TSAsExpression, TSTypeAssertion > TSTypeAssertion",
+        message: "No encadenar conversiones de tipo. Validar o acotar el dato en su frontera.",
+      }],
       "@typescript-eslint/ban-ts-comment": ["error", { "ts-expect-error": "allow-with-description", "minimumDescriptionLength": 10 }],
     },
   },

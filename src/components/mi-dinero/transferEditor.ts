@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { transferSchema, transferCommandSchema, type TransferCommand } from '@/lib/money/transferContracts';
+import { transferSchema } from '@/lib/money/transferContracts';
 
 import type { EditorConfiguration } from './editorContracts';
 export type TransferEditorConfiguration = Extract<EditorConfiguration, { action: 'TRANSFER' }>;
@@ -19,8 +19,4 @@ export function createTransferEditor(accounts: unknown, today: string): Transfer
       { name: 'date', label: 'Fecha', type: 'date' }, { name: 'concept', label: 'Concepto' },
     ],
   };
-}
-
-export function transferEditorCommand(payload: unknown): TransferCommand {
-  return transferCommandSchema.parse(payload);
 }

@@ -1,5 +1,14 @@
 'use client';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, Tabs, TabsList, TabsTrigger, TabsContent, Input, Label, Badge, Alert, AlertDescription, Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyContent, EmptyMedia, Item, ItemContent, ItemTitle, ItemDescription, ItemActions, ItemGroup, ItemSeparator, ResponsiveSelect, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from './ui';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyContent, EmptyMedia } from '@/components/ui/empty';
+import { Item, ItemContent, ItemTitle, ItemDescription, ItemActions, ItemGroup, ItemSeparator } from '@/components/ui/item';
+import { ResponsiveSelect } from '@/components/ui/responsive-select';
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -29,7 +38,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 import { toast } from '@/components/ui/sonner';
 import MoneyEditor from './MoneyEditor';
-import MoneyTransferEditor from './MoneyTransferEditor';
 import { createTransferEditor } from './transferEditor';
 import { sendTransfer } from '@/lib/money/transferClient';
 import { transferMutationSchema } from '@/lib/money/transferContracts';
@@ -197,7 +205,7 @@ export default function MoneyContent() {
         <TabsContent value="routes" className="flex flex-col gap-4"><h2 className="text-lg font-semibold">Cuentas por defecto</h2><p className="text-sm text-muted-foreground">Una regla específica tiene prioridad sobre la general. Los gastos con débito usan la cuenta elegida en Gastos. Estas reglas asignan los demás movimientos.</p><ItemGroup>{data.routingOptions.map((option, index) => { const rule = data.routes.find(r => r.key === option.key); return <div key={option.key}>{index > 0 && <ItemSeparator />}<Item className="flex-wrap px-0"><ItemContent><ItemTitle>{option.label}</ItemTitle><ItemDescription>{rule ? rule.excluded ? 'Sin efecto en cuentas / descontado en nómina' : accounts.find(a => a.id === rule.accountId)?.name : option.payrollDefault ? 'Ya descontado de la nómina neta (por defecto)' : 'Usar regla general; sin asignación propia'}</ItemDescription></ItemContent><ItemActions><Button variant="outline" className="min-h-11" onClick={() => openRoute(option.key, option.label)}>Configurar</Button></ItemActions></Item></div>; })}</ItemGroup></TabsContent>
       </Tabs>}
     </>}
-    {editor?.action === 'TRANSFER' ? <MoneyTransferEditor editor={editor} onClose={() => setEditor(null)} onSave={save} restoreFocus={restoreFocus} /> : editor && <MoneyEditor key={`${editor.action}:${editor.extra?.id || editor.extra?.key || editor.title}`} editor={editor} onClose={() => setEditor(null)} onSave={save} restoreFocus={restoreFocus} />}
+    {editor && <MoneyEditor key={`${editor.action}:${editor.extra?.id || editor.extra?.key || editor.title}`} editor={editor} onClose={() => setEditor(null)} onSave={save} restoreFocus={restoreFocus} />}
     <AlertDialog open={!!confirmation} onOpenChange={open => { if (!open && !confirming) setConfirmation(null); }}><AlertDialogContent onCloseAutoFocus={restoreFocus}><AlertDialogHeader><AlertDialogTitle>{confirmation?.title}</AlertDialogTitle><AlertDialogDescription>{confirmation?.description}</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel disabled={confirming}>Cancelar</AlertDialogCancel><AlertDialogAction disabled={confirming} onClick={(e: React.MouseEvent<HTMLButtonElement>) => { e.preventDefault(); void performConfirmed(); }}>{confirming ? 'Guardando…' : 'Confirmar'}</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
   </div>;
 }

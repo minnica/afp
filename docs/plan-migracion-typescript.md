@@ -1,12 +1,12 @@
 # Plan de migración gradual a TypeScript
 
-**Estado:** fases 0–6 completadas; fase 7 pendiente. **Interfaz:** [resultados de fase 6](../artifacts/typescript-migration/phase-6/README.md), 28 de octubre de 2026. **Captura, Calendar y offline:** [resultados de la fase 5](../artifacts/typescript-migration/phase-5/README.md), 28 de octubre de 2026. **Núcleo financiero:** [resultados de la fase 4](../artifacts/typescript-migration/phase-4/README.md), 27 de octubre de 2026. **Mi dinero:** [resultados de la fase 3](../artifacts/typescript-migration/phase-3/README.md), sobre `0c11537`, 27 de octubre de 2026. **Piloto implementado:** [resultados de la fase 2](../artifacts/typescript-migration/phase-2/README.md), sobre `2ff43a9`, 27 de octubre de 2026. **Base revisada del plan:** `4d7b6e6`, 27 de octubre de 2026. **Referencia ejecutada:** `83a3924`; [resultados y reproducción de la fase 0](../artifacts/typescript-migration/phase-0/README.md).
+**Estado:** fases 0–7 completadas localmente. **Cierre:** [resultados de fase 7](../artifacts/typescript-migration/phase-7/README.md), 28 de octubre de 2026. **Interfaz:** [resultados de fase 6](../artifacts/typescript-migration/phase-6/README.md), 28 de octubre de 2026. **Captura, Calendar y offline:** [resultados de la fase 5](../artifacts/typescript-migration/phase-5/README.md), 28 de octubre de 2026. **Núcleo financiero:** [resultados de la fase 4](../artifacts/typescript-migration/phase-4/README.md), 27 de octubre de 2026. **Mi dinero:** [resultados de la fase 3](../artifacts/typescript-migration/phase-3/README.md), sobre `0c11537`, 27 de octubre de 2026. **Piloto implementado:** [resultados de la fase 2](../artifacts/typescript-migration/phase-2/README.md), sobre `2ff43a9`, 27 de octubre de 2026. **Base revisada del plan:** `4d7b6e6`, 27 de octubre de 2026. **Referencia ejecutada:** `83a3924`; [resultados y reproducción de la fase 0](../artifacts/typescript-migration/phase-0/README.md).
 
 ## Objetivo y alcance
 
 Migrar el código activo de la web de AFP a TypeScript para comprobar los contratos entre formularios, API, servicios y persistencia antes de ejecutar la aplicación. Conservar el comportamiento financiero, las respuestas HTTP, la captura offline, las integraciones y la interfaz.
 
-La migración será por flujos completos y módulos, con JavaScript y TypeScript coexistiendo durante la transición. El primer flujo será **transferencias entre cuentas propias en Mi dinero**. Su resultado servirá para ajustar el esfuerzo y la secuencia del resto.
+La migración se realizó por flujos completos y módulos, con JavaScript y TypeScript coexistiendo durante la transición. El primer flujo fue **transferencias entre cuentas propias en Mi dinero**. Su resultado permitió ajustar el esfuerzo y la secuencia del resto. Las decisiones y entregas siguientes conservan el recorrido de implementación; el estado final usa `allowJs: false` y no mantiene puentes temporales en `src/`.
 
 Alcance final: código activo de `src/app`, `src/components`, `src/hooks` y `src/lib`. Las pruebas `.cjs`, scripts operativos, configuraciones `.mjs`, `public/sw.js` y la aplicación Android Kotlin pueden conservar su lenguaje; sus consumidores y herramientas deben seguir funcionando. Los archivos vacíos se inventariarán como tales y no contarán como módulos migrados.
 
@@ -69,7 +69,7 @@ Las validaciones nuevas deberán aceptar las formas que ya admite el contrato p�
 | 4 | Núcleo financiero, API y contratos compartidos | 3 | Completada |
 | 5 | Captura, Calendar y cola offline | 4 | Completada |
 | 6 | Resto de la interfaz, hooks y páginas | 5 | Completada |
-| 7 | Retirada de puentes temporales y cierre | 6 | Pendiente |
+| 7 | Retirada de puentes temporales y cierre | 6 | Completada |
 
 Cada fase se divide en lotes revisables. Una dependencia compartida puede convertirse antes de su fase si el flujo actual la necesita; debe llevar sus consumidores y pruebas afectados en el mismo lote. La conversión de extensión, el tipado y cualquier extracción necesaria deben poder revisarse sin un reformateo masivo.
 
@@ -111,7 +111,7 @@ esbuild [transforma TypeScript pero no comprueba tipos](https://esbuild.github.i
 
 ### Fase 2 — Piloto: transferir entre cuentas propias
 
-**Referencias:** [contratos tipados](../src/lib/money/transferContracts.ts), [persistencia del piloto](../src/lib/money/transfers.ts), [cliente](../src/lib/money/transferClient.ts), [adaptador del editor](../src/components/mi-dinero/MoneyTransferEditor.tsx), [esquemas](../src/lib/money/schema.ts), [servicio](../src/lib/money/service.ts), [API](../src/app/api/money/route.ts), [pantalla](../src/components/mi-dinero/MoneyContent.tsx), [editor compartido](../src/components/mi-dinero/MoneyEditor.tsx) y [pruebas de integración](../tests/money-integration.test.cjs).
+**Referencias:** [contratos tipados](../src/lib/money/transferContracts.ts), [persistencia del piloto](../src/lib/money/transfers.ts), [cliente](../src/lib/money/transferClient.ts), [editor compartido actual](../src/components/mi-dinero/MoneyEditor.tsx) (el adaptador del piloto se retiró en fase 7), [esquemas](../src/lib/money/schema.ts), [servicio](../src/lib/money/service.ts), [API](../src/app/api/money/route.ts), [pantalla](../src/components/mi-dinero/MoneyContent.tsx), [editor compartido](../src/components/mi-dinero/MoneyEditor.tsx) y [pruebas de integración](../tests/money-integration.test.cjs).
 
 - [x] Definir los contratos de `TRANSFER` y `REVERSE_TRANSFER`, sus entradas validadas y respuestas. Mantener `POST /api/money`, acciones, códigos HTTP, UUID y formas JSON existentes.
 - [x] Extraer la lógica de transferencia a un módulo `.ts` pequeño si hace falta. Recibir la transacción y los datos necesarios: conservar el bloqueo por propietario y el recibo de operación en la transacción actual, sin crear una segunda transacción interna.
@@ -197,14 +197,16 @@ Dividir esta fase en tres lotes independientes y verificados secuencialmente.
 
 ### Fase 7 — Cerrar la transición
 
-- [ ] Confirmar que el código activo de `src/` está migrado y retirar los adaptadores y fallbacks de extensión temporales. Resolver los archivos vacíos explícitamente, sin usarlos para inflar el avance.
-- [ ] Desactivar `allowJs` para la aplicación cuando ya no importe código propio JS. Si una excepción es necesaria, mantenerla acotada, documentada y fuera del criterio de «migración completa» hasta resolverla.
-- [ ] Revisar interfaces públicas y entradas externas: sin `any` implícito, `@ts-ignore`, `@ts-nocheck`, dobles conversiones de tipo ni declaraciones globales que oculten módulos pendientes. Las conversiones justificadas deben ser locales y comprobables.
-- [ ] Confirmar que ninguna configuración de build usa `ignoreBuildErrors` ni reglas menos estrictas que la comprobación obligatoria.
-- [ ] Ejecutar la validación completa desde instalación limpia, incluyendo integraciones y `db:verify`. Verificar que `schema.prisma`, SQL y checksums de migraciones permanecen iguales.
-- [ ] Actualizar README, convenciones y [bitácora](bitacora.md) con lo efectivamente implementado, los comandos finales y las excepciones de herramientas que permanezcan en JS/CJS.
+- [x] Confirmar que el código activo de `src/` está migrado y retirar los adaptadores y fallbacks de extensión temporales. Resolver los archivos vacíos explícitamente, sin usarlos para inflar el avance.
+- [x] Desactivar `allowJs` para la aplicación cuando ya no importe código propio JS. Si una excepción es necesaria, mantenerla acotada, documentada y fuera del criterio de «migración completa» hasta resolverla.
+- [x] Revisar interfaces públicas y entradas externas: sin `any` implícito, `@ts-ignore`, `@ts-nocheck`, dobles conversiones de tipo ni declaraciones globales que oculten módulos pendientes. Las conversiones justificadas deben ser locales y comprobables.
+- [x] Confirmar que ninguna configuración de build usa `ignoreBuildErrors` ni reglas menos estrictas que la comprobación obligatoria.
+- [x] Ejecutar la validación completa desde instalación limpia, incluyendo integraciones y `db:verify`. Verificar que `schema.prisma`, SQL y checksums de migraciones permanecen iguales.
+- [x] Actualizar README, convenciones y [bitácora](bitacora.md) con lo efectivamente implementado, los comandos finales y las excepciones de herramientas que permanezcan en JS/CJS.
 
 **Aceptación final:** código activo web verificado, contratos y pruebas conservados, build reproducible y sin cambios funcionales no previstos. El porcentaje de archivos renombrados por sí solo no acredita el cierre.
+
+**Entrega:** [cierre, auditoría y reproducción de fase 7](../artifacts/typescript-migration/phase-7/README.md). Los 275 módulos TS/TSX de `src/` están incluidos en la comprobación estricta, con `allowJs: false`. Retirados los adaptadores de UI, el wrapper de transferencia y el cliente financiero temporal sin consumidores; los 14 archivos vacíos se eliminaron sin contarlos como migraciones. El cargador exige la extensión exacta cuando se declara. Instalación limpia, contratos, lint, 854 pruebas con PostgreSQL sin omisiones, build, reconstrucción/actualización de BD y las 12 respuestas de referencia correctos. Las herramientas JS/CJS, configuraciones, `public/sw.js` y Android quedan fuera del alcance web, como estaba previsto. Sin cambios de esquema, SQL, dependencias ni publicación.
 
 ## Validación y seguimiento por lote
 

@@ -1,5 +1,8 @@
 'use client';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Badge, Separator, Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from './ui';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import type { ForecastResponse } from '@/lib/money/responses';
 
 import { HugeiconsIcon } from '@hugeicons/react';

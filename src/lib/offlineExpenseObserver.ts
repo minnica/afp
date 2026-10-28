@@ -9,7 +9,7 @@ export interface OfflineExpenseObserverOptions {
   onError(message: string): void;
 }
 
-// The JSX screen retains its filter dependencies. This consumer owns the queue
+// The screen retains its filter dependencies. This consumer owns the queue
 // subscription, stale reads and cleanup when that screen or account changes.
 export function observeOfflineExpenses({ userId, onPending, onConfirmed, onError }: OfflineExpenseObserverOptions) {
   let active = true;

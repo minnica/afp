@@ -1,6 +1,6 @@
 import type { TransferCommand, TransferValues, ReverseTransferCommand, TransferResponse } from '@/lib/money/transferContracts';
 import { sendTransfer } from '@/lib/money/transferClient';
-import type { MoneyTransferEditorProps } from '@/components/mi-dinero/MoneyTransferEditor';
+import type { MoneyEditorProps } from '@/components/mi-dinero/MoneyEditor';
 import type { TransferEditorConfiguration } from '@/components/mi-dinero/transferEditor';
 
 export const transfer: TransferCommand = { action: 'TRANSFER', operationId: 'uuid', fromAccountId: 'a', toAccountId: 'b', amount: '12.50', date: '2026-10-27', concept: 'Prueba' };
@@ -13,10 +13,10 @@ export const incompatibleAction: ReverseTransferCommand = { ...transfer, action:
 export const unparsedValues: TransferValues = { ...transfer, amount: '12.50' };
 // @ts-expect-error El recibo del alta exige el ID persistido.
 export const incompleteReceipt: TransferResponse = { ok: true };
-// @ts-expect-error Los nombres de campos del adaptador deben existir en el formulario.
+// @ts-expect-error Los nombres de campos del editor deben existir en el formulario.
 export const unknownField: TransferEditorConfiguration['fields'][number] = { name: 'bankAccount', label: 'Cuenta' };
-// @ts-expect-error El editor entrega una transferencia, nunca una reversión.
-export const wrongCallback: MoneyTransferEditorProps['onSave'] = async (command: ReverseTransferCommand) => { void command; };
+// @ts-expect-error El editor compartido exige un callback para todas sus acciones.
+export const wrongCallback: MoneyEditorProps['onSave'] = async (command: ReverseTransferCommand) => { void command; };
 
 export async function clientContracts() {
   const created = await sendTransfer(transfer, { expectedUserId: 'owner' });

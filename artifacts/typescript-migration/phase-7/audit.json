@@ -1,0 +1,304 @@
+{
+  "sourceTsFiles": 275,
+  "ownJsFiles": [],
+  "emptyFiles": [],
+  "filesOutsideTypeProgram": [],
+  "options": {
+    "allowJs": false,
+    "strict": true,
+    "noUncheckedIndexedAccess": true
+  },
+  "violations": [],
+  "localAssertions": [
+    {
+      "file": "src/lib/calculations/cardCyclePayments.ts",
+      "line": 53,
+      "type": "Exclude<CycleDisplayStatus, \"NO_PAYMENT_DUE\" | \"PARTIALLY_PAID\">"
+    },
+    {
+      "file": "src/lib/subscriptionCharges.ts",
+      "line": 15,
+      "type": "[number, number]"
+    },
+    {
+      "file": "src/lib/calendar/config.ts",
+      "line": 81,
+      "type": "CalendarEventType"
+    },
+    {
+      "file": "src/lib/prisma.ts",
+      "line": 4,
+      "type": "typeof globalThis & { prisma?: PrismaClient }"
+    },
+    {
+      "file": "src/lib/captureJson.ts",
+      "line": 10,
+      "type": "z.output<S>"
+    },
+    {
+      "file": "src/lib/subscriptionChargeService.ts",
+      "line": 95,
+      "type": "\"CASH\" | \"CARD\""
+    },
+    {
+      "file": "src/lib/capturePaymentParsers.ts",
+      "line": 31,
+      "type": "[string, string, string, string, string, string, string, string, string, string]"
+    },
+    {
+      "file": "src/lib/captureParsers.ts",
+      "line": 73,
+      "type": "[string, string, string, string, string, string, string]"
+    },
+    {
+      "file": "src/lib/captureParsers.ts",
+      "line": 106,
+      "type": "\"DIDI Credit Card\" | \"Joy Banamex\" | \"Nu Mastercard Gold\" | \"TDC Platinum\""
+    },
+    {
+      "file": "src/lib/captureParsers.ts",
+      "line": 127,
+      "type": "[string, string, string, string, string, string, string, string, string, string]"
+    },
+    {
+      "file": "src/lib/captureParsers.ts",
+      "line": 153,
+      "type": "[string, string, string, string, string, string, string]"
+    },
+    {
+      "file": "src/lib/captureParsers.ts",
+      "line": 304,
+      "type": "[string, string, string, string, string, string, string, string]"
+    },
+    {
+      "file": "src/lib/captureParsers.ts",
+      "line": 307,
+      "type": "\"física\" | \"digital\" | \"Wallet\""
+    },
+    {
+      "file": "src/lib/captureReconciliation.ts",
+      "line": 82,
+      "type": "string | null"
+    },
+    {
+      "file": "src/lib/captureReconciliation.ts",
+      "line": 90,
+      "type": "string"
+    },
+    {
+      "file": "src/lib/captureReconciliation.ts",
+      "line": 100,
+      "type": "string"
+    },
+    {
+      "file": "src/lib/captureBankFallbackWorker.ts",
+      "line": 12,
+      "type": "string[]"
+    },
+    {
+      "file": "src/lib/calculations/cardUsageWaivers.ts",
+      "line": 144,
+      "type": "keyof typeof CARD_USAGE_PRODUCTS"
+    },
+    {
+      "file": "src/lib/calculations/cardUsageWaivers.ts",
+      "line": 172,
+      "type": "keyof typeof CARD_USAGE_PRODUCTS"
+    },
+    {
+      "file": "src/lib/calculations/cardUsageWaivers.ts",
+      "line": 202,
+      "type": "keyof typeof CARD_USAGE_PRODUCTS"
+    },
+    {
+      "file": "src/app/api/expenses/route.ts",
+      "line": 141,
+      "type": "Prisma.EnumPaymentMethodFilter[\"equals\"]"
+    },
+    {
+      "file": "src/app/api/expenses/route.ts",
+      "line": 370,
+      "type": "\"CASH\" | \"CARD\" | \"DEBIT\""
+    },
+    {
+      "file": "src/app/api/subscriptions/route.ts",
+      "line": 170,
+      "type": "\"CASH\" | \"CARD\""
+    },
+    {
+      "file": "src/app/api/subscriptions/route.ts",
+      "line": 351,
+      "type": "\"CASH\" | \"CARD\""
+    },
+    {
+      "file": "src/lib/financialResponses.ts",
+      "line": 63,
+      "type": "FinancialResource"
+    },
+    {
+      "file": "src/lib/financialResponses.ts",
+      "line": 66,
+      "type": "keyof typeof financialWriteSchemas"
+    },
+    {
+      "file": "src/lib/requestRecovery.ts",
+      "line": 61,
+      "type": "T"
+    },
+    {
+      "file": "src/lib/uiClient.ts",
+      "line": 26,
+      "type": "UiResource"
+    },
+    {
+      "file": "src/lib/uiClient.ts",
+      "line": 28,
+      "type": "keyof typeof financialWriteSchemas"
+    },
+    {
+      "file": "src/lib/uiClient.ts",
+      "line": 42,
+      "type": "UiHttpResponse<Result<U, O>>"
+    },
+    {
+      "file": "src/hooks/use-notice-dismissals.ts",
+      "line": 11,
+      "type": "{ month: string; noticeKey: string }[]"
+    },
+    {
+      "file": "src/hooks/use-notice-dismissals.ts",
+      "line": 40,
+      "type": "{ month: string; noticeKey: string }[]"
+    },
+    {
+      "file": "src/hooks/use-creation-draft.ts",
+      "line": 45,
+      "type": "(keyof T & string)[]"
+    },
+    {
+      "file": "src/hooks/use-creation-draft.ts",
+      "line": 47,
+      "type": "Record<string, unknown>"
+    },
+    {
+      "file": "src/hooks/use-creation-draft.ts",
+      "line": 49,
+      "type": "T"
+    },
+    {
+      "file": "src/lib/offlineExpenseContracts.ts",
+      "line": 26,
+      "type": "OfflineExpense"
+    },
+    {
+      "file": "src/lib/offlineExpenseContracts.ts",
+      "line": 30,
+      "type": "unknown[]"
+    },
+    {
+      "file": "src/lib/offlineExpenses.ts",
+      "line": 110,
+      "type": "unknown[]"
+    },
+    {
+      "file": "src/components/ui/sonner.tsx",
+      "line": 16,
+      "type": "React.ComponentProps<typeof Sonner>[\"theme\"]"
+    },
+    {
+      "file": "src/components/ui/sonner.tsx",
+      "line": 36,
+      "type": "React.CSSProperties"
+    },
+    {
+      "file": "src/components/ui/number-input.tsx",
+      "line": 9,
+      "type": "HTMLInputElement"
+    },
+    {
+      "file": "src/components/ui/number-input.tsx",
+      "line": 14,
+      "type": "unknown"
+    },
+    {
+      "file": "src/components/ui/number-input.tsx",
+      "line": 17,
+      "type": "React.ChangeEvent<HTMLInputElement>"
+    },
+    {
+      "file": "src/components/ui/number-input.tsx",
+      "line": 22,
+      "type": "unknown"
+    },
+    {
+      "file": "src/components/ui/input.tsx",
+      "line": 29,
+      "type": "string | number | undefined"
+    },
+    {
+      "file": "src/components/ui/input.tsx",
+      "line": 29,
+      "type": "string | number | undefined"
+    },
+    {
+      "file": "src/components/ui/sidebar.tsx",
+      "line": 114,
+      "type": "React.CSSProperties"
+    },
+    {
+      "file": "src/components/ui/sidebar.tsx",
+      "line": 166,
+      "type": "React.CSSProperties"
+    },
+    {
+      "file": "src/components/ui/sidebar.tsx",
+      "line": 575,
+      "type": "React.CSSProperties"
+    },
+    {
+      "file": "src/components/ui/chart.tsx",
+      "line": 82,
+      "type": "keyof typeof THEMES"
+    },
+    {
+      "file": "src/components/ui/chart.tsx",
+      "line": 201,
+      "type": "React.CSSProperties"
+    },
+    {
+      "file": "src/components/ui/create-record-surface.tsx",
+      "line": 190,
+      "type": "React.CSSProperties"
+    },
+    {
+      "file": "src/components/cuentas-por-pagar/CuentasPorPagarContent.tsx",
+      "line": 793,
+      "type": "keyof typeof acc"
+    },
+    {
+      "file": "src/components/dashboard/DashboardContent.tsx",
+      "line": 279,
+      "type": "\"Q15\" | \"Q30\""
+    },
+    {
+      "file": "src/components/gastos/GastosContent.tsx",
+      "line": 632,
+      "type": "import(\"@/lib/offlineExpenseContracts\").OfflineExpenseDraft"
+    },
+    {
+      "file": "src/components/mi-dinero/MoneyEditor.tsx",
+      "line": 59,
+      "type": "Partial<Record<EditorField['name'], { message?: string } | { message?: string }[]>>"
+    },
+    {
+      "file": "src/components/mi-dinero/MoneyContent.tsx",
+      "line": 110,
+      "type": "MoneyCommand"
+    },
+    {
+      "file": "src/components/configuracion/CaptureReconciliation.tsx",
+      "line": 105,
+      "type": "(keyof typeof next)[]"
+    }
+  ]
+}
