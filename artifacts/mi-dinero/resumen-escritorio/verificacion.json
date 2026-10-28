@@ -1,0 +1,124 @@
+{
+  "date": "2026-10-27",
+  "scope": "Tabla de escritorio de MoneyMonthlySummary; color de cierre cero compartido con móvil.",
+  "columns": [
+    "Mes",
+    "Inicio",
+    "Cierre",
+    "Entradas",
+    "Salidas",
+    "Saldo más bajo del mes"
+  ],
+  "components": [
+    "Table local",
+    "Badge local con variantes success, warning y destructive",
+    "Iconos Hugeicons"
+  ],
+  "rules": [
+    "El estado mensual reutiliza las reglas globales existentes; no evalúa cuentas individuales.",
+    "Un mínimo diario cero o negativo mantiene el estado rojo aunque el cierre mejore.",
+    "Ámbar identifica descenso, reserva alcanzada/rebasada o datos pendientes.",
+    "El cierre muestra variación monetaria respecto al inicio con dirección visible; entradas y salidas conservan importes neutrales.",
+    "El cierre cero usa rojo en escritorio y móvil.",
+    "El mes actual se identifica como Desde hoy."
+  ],
+  "checks": {
+    "statusTests": {
+      "command": "node --test --test-reporter=spec tests/money-monthly-summary-status.test.cjs",
+      "passed": 6,
+      "failed": 0,
+      "skipped": 0
+    },
+    "staticRender": {
+      "method": "React renderToStaticMarkup con MoneyMonthlySummary, Table, Badge, Accordion e iconos reales, sin sustituciones y con datos ficticios.",
+      "months": 12,
+      "amountsVerifiedInCorrectColumn": 60,
+      "states": [
+        "crecimiento",
+        "descenso",
+        "déficit intrames con cierre positivo",
+        "cierre cero",
+        "reserva",
+        "datos pendientes",
+        "sin cambio",
+        "importe largo"
+      ]
+    },
+    "lint": "Correcto en MoneyMonthlySummary.jsx, monthlySummaryStatus.js y money-monthly-summary-status.test.cjs.",
+    "build": "pnpm exec next build --webpack: correcto, 51 páginas generadas.",
+    "detector": [],
+    "diffCheck": "Correcto."
+  },
+  "limitations": "Sin verificaciones visuales, capturas ni navegador por la indicación vigente del propietario. El render estático no verifica interacción, contraste renderizado, ancho de pantalla, Auth, API ni persistencia.",
+  "publication": "Cambio local, pendiente de publicación.",
+  "copyRefinement": "Etiqueta actualizada en escritorio y móvil, con encabezado web adaptable a varias líneas y descripción accesible. Los tests y el build anteriores corresponden a la versión previa de la etiqueta; este ajuste solo cambia copy y ajuste de línea.",
+  "minimumPeriods": {
+    "source": "forecast.daily del escenario activo, usando balance global y solo fechas desde hoy.",
+    "marginPercent": 5,
+    "rules": [
+      "Mínimo a mínimo + 5 % de su magnitud, con margen redondeado hacia abajo a centavos.",
+      "Cero incluye únicamente días en cero.",
+      "Se agrupan solo días consecutivos; los intervalos separados se conservan.",
+      "Sin serie o sin el mínimo esperado no se inventan fechas.",
+      "El margen es de proximidad al mínimo; no modifica el estado de riesgo."
+    ],
+    "tests": {
+      "command": "node --test --test-reporter=spec tests/money-monthly-minimum-period.test.cjs tests/money-monthly-summary-status.test.cjs",
+      "passed": 13,
+      "failed": 0,
+      "skipped": 0
+    },
+    "render": "Componentes reales con datos ficticios: rangos en escritorio y móvil, intervalos separados, margen visible y accesible, datos originales intactos y ausencia de fechas inventadas.",
+    "lint": "Correcto en los componentes modificados, el helper y sus pruebas.",
+    "build": "pnpm exec next build --webpack: correcto, 51 páginas generadas.",
+    "detector": [],
+    "limitations": "Sin navegador, validación visual ni capturas, conforme a la indicación vigente del propietario.",
+    "publication": "Pendiente de publicación."
+  },
+  "mobileSpacingRefinement": {
+    "layout": "Inicio y Cierre en dos columnas. Mínimo en grupo a todo el ancho con Separator local y rangos en su propia línea. Mayor separación vertical, conservando estado y variación visibles.",
+    "staticRender": {
+      "months": 12,
+      "checks": [
+        "Dos columnas para Inicio/Cierre",
+        "Mínimo y rangos a todo el ancho",
+        "Separator como span dentro del botón",
+        "Períodos separados completos",
+        "Orden de escritorio conservado"
+      ],
+      "components": "Componentes reales, sin sustituciones; datos ficticios."
+    },
+    "lint": "Correcto.",
+    "build": "pnpm exec next build --webpack: correcto, 51 páginas generadas.",
+    "detector": [],
+    "limitations": "Sin navegador, capturas, validación visual de anchos ni prueba de interacción, conforme a la indicación vigente del propietario.",
+    "publication": "Pendiente de publicación.",
+    "version": "Composición anterior, sustituida por mobileCollapsedOverview."
+  },
+  "mobileCollapsedOverview": {
+    "layout": "Inicio, Cierre y Saldo más bajo del mes visibles en el trigger, en tres columnas desde 320 px de sección y con alternativa más estrecha. Fechas y margen solo dentro del contenido desplegable.",
+    "staticRender": {
+      "months": 12,
+      "principalAmountsInHeaders": 36,
+      "desktopAmountsPreserved": 60,
+      "checks": [
+        "Encabezados sin fechas ni explicación de margen",
+        "Rangos en el contenido desplegable con ayuda accesible",
+        "Tabla web conserva importes y fechas"
+      ],
+      "components": "Componentes reales, sin sustituciones; datos ficticios."
+    },
+    "lint": "Correcto.",
+    "detector": [],
+    "diffCheck": "Correcto.",
+    "limitations": "Sin repetir build ni pruebas del motor para este cambio de composición. Sin navegador, interacción, capturas ni verificación visual conforme a la indicación vigente del propietario.",
+    "publication": "Pendiente de publicación."
+  },
+  "mobileInitialState": "Todos los meses colapsados; sin defaultValue. El usuario abre cada mes al activar su encabezado.",
+  "mobileStateDisclosure": {
+    "behavior": "Estado y variación solo en AccordionContent; encabezados con mes en mayúsculas y seminegrita y los tres saldos visibles. Todos comienzan colapsados.",
+    "verification": "Render estático de componentes reales cerrado y con apertura forzada solo en una copia de prueba en memoria; lint y diff check correctos, detector vacío.",
+    "limitations": "Sin navegador, interacción, capturas ni nueva compilación.",
+    "publication": "Pendiente de publicación."
+  }
+}

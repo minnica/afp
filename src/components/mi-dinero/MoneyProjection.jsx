@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ResponsiveSelect } from '@/components/ui/responsive-select';
 import { Label } from '@/components/ui/label';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import MoneyForecastBreakdown from './MoneyForecastBreakdown';
 import MoneyMonthlySummary from './MoneyMonthlySummary';
 import { money, dateLabel, monthLabel, accountOptions } from './format';
@@ -25,18 +25,24 @@ export default function MoneyProjection({ data, onScenario, onResetScenario }) {
   const selected = forecast.monthly.find(m => m.month === month);
   const yields = rows.filter(e => e.kind === 'YIELD').reduce((sum, e) => sum + Math.round(e.amount * 100), 0) / 100;
   const summary = forecast.summary;
+  const hasReserve = summary.reserved > 0;
+  const riskDate = hasReserve ? summary.belowReserveDate : summary.zeroDate;
   const currentIssues = forecast.issues.filter(issue => issue.scope !== 'HISTORICAL');
-  const historicalIssues = forecast.issues.filter(issue => issue.scope === 'HISTORICAL');
   return <div className="flex flex-col gap-6">
     {data.simulated && <p role="status" className="text-sm font-medium">Estás viendo un escenario simulado. El saldo registrado de hoy se conserva; las fechas y saldos futuros reflejan tus cambios.</p>}
     <div className="grid gap-4 md:grid-cols-3">
       <Card><CardHeader><CardDescription>{forecast.issues.some(i => i.key === 'unassigned') ? 'Disponible registrado · parcial' : forecast.accounts.some(a => a.calculatedYield) ? 'Disponible calculado hoy' : 'Disponible registrado hoy'}</CardDescription><CardTitle className="tabular-nums text-2xl">{money(summary.available)}</CardTitle></CardHeader><CardContent><p className="text-sm text-muted-foreground">Saldo {money(summary.balance)} · reserva personal {money(summary.reserved)}. Todo permanece a la vista.</p></CardContent></Card>
-      <Card><CardHeader><CardDescription>Menor saldo previsto</CardDescription><CardTitle className="tabular-nums text-2xl">{money(summary.minimum)}</CardTitle></CardHeader><CardContent><p className="text-sm text-muted-foreground">{dateLabel(summary.minimumDate)} · próximos 12 meses</p></CardContent></Card>
-      <Card><CardHeader><CardDescription>Por debajo de tu reserva</CardDescription><CardTitle>{summary.belowReserveDate ? dateLabel(summary.belowReserveDate) : 'No en estos 12 meses'}</CardTitle></CardHeader><CardContent><p className="text-sm text-muted-foreground">{summary.zeroDate ? `Saldo cero o negativo: ${dateLabel(summary.zeroDate)}.` : 'No se alcanza saldo cero dentro del período.'}</p></CardContent></Card>
+      <Card><CardHeader><CardDescription>Menor capital total previsto</CardDescription><CardTitle className="tabular-nums text-2xl">{money(summary.minimum)}</CardTitle></CardHeader><CardContent><p className="text-sm text-muted-foreground">{dateLabel(summary.minimumDate)} · próximos 12 meses</p></CardContent></Card>
+      <Card><CardHeader><CardDescription>{hasReserve ? 'Capital total bajo tu reserva' : 'Capital total cero o negativo'}</CardDescription><CardTitle>{riskDate ? dateLabel(riskDate) : 'No en estos 12 meses'}</CardTitle></CardHeader><CardContent><p className="text-sm text-muted-foreground">{hasReserve && summary.zeroDate ? `Capital total cero o negativo: ${dateLabel(summary.zeroDate)}.` : 'Suma de todas tus cuentas.'}</p></CardContent></Card>
     </div>
     {!!currentIssues.length && <Alert><AlertDescription><p>Proyección por completar</p><ul className="list-disc pl-5">{currentIssues.map(issue => <li key={issue.key}>{issue.message}</li>)}</ul></AlertDescription></Alert>}
-    {!!historicalIssues.length && <Alert><AlertDescription><p>Revisión histórica pendiente</p><p>Estos períodos están liquidados. Puedes cotejar sus fechas después; este aviso no agrega pagos a la proyección.</p><ul className="list-disc pl-5">{historicalIssues.map(issue => <li key={issue.key}>{issue.message}</li>)}</ul></AlertDescription></Alert>}
-    {!!forecast.accountShortfalls.length && <Alert><AlertDescription>{forecast.accountShortfalls.map(a => <p key={a.id}>{a.name}: por debajo de su reserva el {dateLabel(a.date)}. Revisa si necesitas transferir dinero.</p>)}</AlertDescription></Alert>}
+    {(summary.zeroDate || (hasReserve && summary.belowReserveDate)) && <Alert variant={summary.zeroDate ? 'destructive' : 'default'}>
+      <AlertTitle>{summary.zeroDate ? 'Capital total insuficiente' : 'Capital total bajo tu reserva'}</AlertTitle>
+      <AlertDescription>
+        {hasReserve && summary.belowReserveDate && <p>La suma de todas tus cuentas baja de tu reserva personal de {money(summary.reserved)} el {dateLabel(summary.belowReserveDate)}.</p>}
+        {summary.zeroDate && <p>Tu capital total llega a cero o queda negativo el {dateLabel(summary.zeroDate)}.</p>}
+      </AlertDescription>
+    </Alert>}
     <Card>
       <CardHeader><div className="flex flex-wrap items-center justify-between gap-3"><CardTitle>Tu dinero en el tiempo</CardTitle><div className="flex flex-wrap gap-2">{data.simulated && <Button variant="ghost" onClick={onResetScenario} className="min-h-11">Quitar escenario</Button>}<Button variant="outline" onClick={onScenario} className="min-h-11">Simular cambios</Button></div></div><CardDescription>Desde {dateLabel(forecast.today)}. Las previsiones dependen de tus fechas, importes y tasas. Los rendimientos se calculan por día y se reflejan según el calendario configurado en cada cuenta.</CardDescription></CardHeader>
       <CardContent className="flex flex-col gap-5">
@@ -50,6 +56,6 @@ export default function MoneyProjection({ data, onScenario, onResetScenario }) {
       </CardContent>
     </Card>
     <MoneyForecastBreakdown forecast={forecast} plans={data.plans} categories={data.categories} month={month} accountId={accountId} />
-    <MoneyMonthlySummary monthly={forecast.monthly} today={forecast.today} reserved={summary.reserved} incomplete={currentIssues.length > 0} />
+    <MoneyMonthlySummary monthly={forecast.monthly} daily={forecast.daily} today={forecast.today} reserved={summary.reserved} incomplete={currentIssues.length > 0} />
   </div>;
 }

@@ -24,7 +24,16 @@ export async function requireApiUser(request) {
   const auth = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY, {
     auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
   });
-  const { data, error } = await auth.auth.getUser(token);
+  let verification;
+  try {
+    verification = await auth.auth.getUser(token);
+  } catch {
+    throw new ApiAccessError("No se pudo verificar la sesión en este momento. Inténtalo de nuevo.", 503);
+  }
+  const { data, error } = verification;
+  if (error && (error.name === "AuthRetryableFetchError" || error.status === 0 || error.status === 408 || error.status === 429 || error.status >= 500)) {
+    throw new ApiAccessError("No se pudo verificar la sesión en este momento. Inténtalo de nuevo.", 503);
+  }
   if (error || !data?.user?.id) throw new ApiAccessError("La sesión venció. Vuelve a iniciar sesión.", 401);
   // Se ejecuta tras la respuesta/commit; los triggers deciden si cambió la agenda.
   // La revisión diaria recupera interrupciones y escrituras directas fuera de las API.

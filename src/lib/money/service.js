@@ -13,17 +13,19 @@ import { yieldRule, changedYieldHistory } from '@/lib/money/yieldRules';
 export async function loadMoneyData(db, userId) {
   const names = ['accounts', 'routes', 'plans', 'transfers', 'withdrawals', 'cards', 'cycles', 'incomes', 'expenses', 'subscriptions', 'purchases', 'receivables', 'payables', 'incomeTypes', 'categories'];
   const where = { userId };
-  const values = await Promise.all([
-    db.moneyAccount.findMany({ where, orderBy: { createdAt: 'asc' }, include: { reconciliations: { orderBy: { createdAt: 'desc' } } } }),
-    db.moneyRoute.findMany({ where }), db.moneyPlan.findMany({ where, include: { occurrences: true } }), db.moneyTransfer.findMany({ where }), db.moneyWithdrawal.findMany({ where }),
-    db.card.findMany({ where }), db.cardCycle.findMany({ where, include: { card: true, credits: { include: { income: true } }, payments: true, moneyPayments: true } }),
-    db.income.findMany({ where, orderBy: { date: 'desc' } }),
-    db.dailyExpense.findMany({ where, include: { subscriptionCharge: true } }),
-    db.subscription.findMany({ where, include: { charges: true, dailyExpenses: { include: { subscriptionCharge: true } } } }),
-    db.installmentPurchase.findMany({ where }), db.receivableAccount.findMany({ where, include: { incomes: true, person: true } }),
-    db.payableAccount.findMany({ where, include: { dailyExpenses: true, person: true } }),
-    db.incomeType.findMany({ where }), db.category.findMany({ where }),
-  ]);
+  // Una transacción comparte una sola conexión pg; sus consultas se esperan
+  // en orden para no acumular llamadas concurrentes sobre ese mismo cliente.
+  const values = [
+    await db.moneyAccount.findMany({ where, orderBy: { createdAt: 'asc' }, include: { reconciliations: { orderBy: { createdAt: 'desc' } } } }),
+    await db.moneyRoute.findMany({ where }), await db.moneyPlan.findMany({ where, include: { occurrences: true } }), await db.moneyTransfer.findMany({ where }), await db.moneyWithdrawal.findMany({ where }),
+    await db.card.findMany({ where }), await db.cardCycle.findMany({ where, include: { card: true, credits: { include: { income: true } }, payments: true, moneyPayments: true } }),
+    await db.income.findMany({ where, orderBy: { date: 'desc' } }),
+    await db.dailyExpense.findMany({ where, include: { subscriptionCharge: true } }),
+    await db.subscription.findMany({ where, include: { charges: true, dailyExpenses: { include: { subscriptionCharge: true } } } }),
+    await db.installmentPurchase.findMany({ where }), await db.receivableAccount.findMany({ where, include: { incomes: true, person: true } }),
+    await db.payableAccount.findMany({ where, include: { dailyExpenses: true, person: true } }),
+    await db.incomeType.findMany({ where }), await db.category.findMany({ where }),
+  ];
   return Object.fromEntries(names.map((name, i) => [name, values[i]]));
 }
 function parsed(schema, value) {

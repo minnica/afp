@@ -1,0 +1,47 @@
+{
+  "date": "2026-10-27",
+  "scope": "Avisos de liquidez e indicadores de capital total en MoneyProjection.jsx.",
+  "behavior": [
+    "Una cuenta individual negativa no genera un aviso de liquidez cuando el capital global sigue positivo y sobre la reserva global.",
+    "La reserva global es la suma de las reservas personales existentes.",
+    "Sin reserva configurada se identifica el capital total cero o negativo, incluido el cero exacto.",
+    "Los escenarios usan su propio resumen global.",
+    "Los avisos históricos permanecen en el diagnóstico del motor; su bloque se oculta temporalmente en Mi dinero por petición del propietario."
+  ],
+  "checks": {
+    "existingTests": {
+      "command": "node --test --test-reporter=spec tests/money-forecast.test.cjs tests/money-budgets.test.cjs tests/money-monthly-summary-status.test.cjs tests/money-projection-breakdown.test.cjs",
+      "passed": 60,
+      "failed": 0,
+      "skipped": 0
+    },
+    "staticRender": {
+      "method": "Comprobación puntual con React renderToStaticMarkup, el componente y el motor reales, y datos ficticios; primitivas, gráfica y secciones secundarias sustituidas.",
+      "passed": 5,
+      "failed": 0,
+      "cases": [
+        "Cuenta negativa y capital total positivo: sin alerta de capital.",
+        "Reservas de todas las cuentas sumadas: aviso global.",
+        "Capital total exactamente cero: alerta de insuficiencia.",
+        "Escenario simulado negativo: alerta sobre el total simulado.",
+        "Revisión histórica independiente de los avisos de capital."
+      ],
+      "scope": "Comprobación inicial anterior al retiro del bloque histórico; el quinto caso describe esa versión anterior."
+    },
+    "lint": "pnpm exec eslint src/components/mi-dinero/MoneyProjection.jsx: correcto.",
+    "build": "pnpm exec next build --webpack: correcto, 51 páginas generadas, antes del retiro posterior del bloque histórico. No se repitió para eliminar ese bloque.",
+    "detector": [],
+    "diffCheck": "Correcto."
+  },
+  "limitations": "Sin verificaciones visuales, capturas, navegador ni dispositivo físico, conforme a la indicación vigente del propietario. El render estático no verifica interacción, Auth, API ni persistencia. No cambia el motor ni sus hipótesis de rendimientos por cuenta.",
+  "production": "Pendiente de publicación. Sin cambios de datos o esquema.",
+  "historicalNoticeRefinement": {
+    "change": "Se elimina el bloque de revisión histórica y su variable de presentación; se conserva el filtro de avisos actuales y el motor.",
+    "lint": "Correcto.",
+    "diffCheck": "Correcto.",
+    "detector": [],
+    "readOnlyCheck": "Los períodos superpuestos liquidados no generan pagos pendientes en la proyección; los abonos históricos corresponden a los acumulados guardados. La normalización de fechas solo en memoria conserva los eventos y saldos.",
+    "scope": "Comprobación de los cruces señalados y su efecto en Mi dinero; no es una conciliación general de todos los cargos bancarios.",
+    "production": "Pendiente de publicación."
+  }
+}

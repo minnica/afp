@@ -41,6 +41,8 @@ test('estado mensual: advierte si se usa la reserva aunque el cierre se recupere
 test('estado mensual: distingue cero, límite y margen de un centavo sobre la reserva', () => {
   const month = { opening: 100, closing: 100, minimum: 0 };
   assert.equal(monthlySummaryStatus(month).reason, 'zero');
+  assert.equal(monthlySummaryStatus({ opening: -100, closing: 0, minimum: -100 }).closingTone, 'destructive');
+  assert.equal(monthlySummaryStatus({ opening: 100, closing: 0, minimum: 0 }).closingTone, 'destructive');
   assert.equal(monthlySummaryStatus({ ...month, minimum: -0.01 }).reason, 'negative');
   assert.equal(monthlySummaryStatus({ ...month, minimum: 50 }, { reserved: 50 }).reason, 'reserve-limit');
   const above = monthlySummaryStatus({ ...month, minimum: 50.01 }, { reserved: 50 });

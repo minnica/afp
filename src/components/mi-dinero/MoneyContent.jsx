@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { z } from 'zod';
 import { Plus, ArrowLeftRight, Pencil, RefreshCw, CreditCard, Wallet, TrendingUp } from 'lucide-react';
 import { apiFetch } from '@/lib/apiFetch';
+import { createLatestRequest } from '@/lib/latestRequest';
 import { supabase } from '@/lib/supabase';
 import { ensureUserSetup } from '@/lib/userSetup';
 import { useDialogFocus } from '@/hooks/use-dialog-focus';
@@ -37,16 +38,18 @@ export default function MoneyContent() {
   const [error, setError] = useState(''), [loading, setLoading] = useState(true), [editor, setEditor] = useState(null), [confirmation, setConfirmation] = useState(null), [confirming, setConfirming] = useState(false);
   const [scenario, setScenario] = useState(null), [movementFilter, setMovementFilter] = useState('PENDING'), [query, setQuery] = useState(''), [limit, setLimit] = useState(30), [planMonth, setPlanMonth] = useState('');
   const requestRef = useRef(null), savingRef = useRef(false), actorRef = useRef(null), scenarioRef = useRef(null);
+  if (requestRef.current === null) requestRef.current = createLatestRequest();
   const { captureFocus, restoreFocus } = useDialogFocus();
-  const load = useCallback(async (id, options = {}) => {
-    requestRef.current?.abort(); const controller = new AbortController(); requestRef.current = controller;
+  const load = useCallback((id, options = {}) => {
     const params = new URLSearchParams(scenarioRef.current || {});
-    try {
-      const response = await apiFetch(`/api/money?${params}`, { expectedUserId: id, signal: controller.signal, ...options });
-      const body = await response.json(); if (controller.signal.aborted || actorRef.current !== id) return;
-      if (!response.ok) throw new Error(body.error || 'No se pudo cargar Mi dinero.');
-      setData(body); setError('');
-    } catch (failure) { if (!controller.signal.aborted) { setError(failure.message || 'No se pudo cargar Mi dinero.'); throw failure; } }
+    return requestRef.current.run(`${id}:${params}`, async signal => {
+      try {
+        const response = await apiFetch(`/api/money?${params}`, { expectedUserId: id, signal, ...options });
+        const body = await response.json(); if (signal.aborted || actorRef.current !== id) return;
+        if (!response.ok) throw new Error(body.error || 'No se pudo cargar Mi dinero.');
+        setData(body); setError('');
+      } catch (failure) { if (!signal.aborted) { setError(failure.message || 'No se pudo cargar Mi dinero.'); throw failure; } }
+    });
   }, []);
   useEffect(() => {
     let cancelled = false;
@@ -63,10 +66,10 @@ export default function MoneyContent() {
     void initialize();
     const { data: subscription } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_OUT' || (actorRef.current && session?.user.id && session.user.id !== actorRef.current)) {
-        actorRef.current = null; requestRef.current?.abort(); setData(null); setEditor(null); router.replace('/login');
+        actorRef.current = null; requestRef.current.cancel(); setData(null); setEditor(null); router.replace('/login');
       }
     });
-    return () => { cancelled = true; requestRef.current?.abort(); subscription.subscription.unsubscribe(); };
+    return () => { cancelled = true; requestRef.current.cancel(); subscription.subscription.unsubscribe(); };
   }, [load, router]);
   useEffect(() => {
     if (!userId) return;
@@ -84,7 +87,7 @@ export default function MoneyContent() {
       const [planId, occurrenceDate] = (payload.planChoice || '').split('|');
       payload = { ...payload, excluded: payload.accountId === 'EXCLUDED', accountId: ['EXCLUDED', 'DEFAULT'].includes(payload.accountId) ? null : payload.accountId, clear: payload.accountId === 'DEFAULT', planId: planId || null, occurrenceDate: occurrenceDate || null };
     }
-    savingRef.current = true; requestRef.current?.abort();
+    savingRef.current = true; requestRef.current.cancel();
     try {
       const response = await apiFetch('/api/money', { method: 'POST', expectedUserId: userId, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
       const result = await response.json(); if (!response.ok) throw new Error(result.error || 'No se pudo guardar.');
@@ -146,7 +149,8 @@ export default function MoneyContent() {
   const accounts = data?.forecast.accounts || [];
   const movements = (data?.forecast.actual || []).filter(e => (movementFilter === 'ALL' || (movementFilter === 'PENDING' && e.needsAccount) || (movementFilter === 'EXCLUDED' && e.excluded)) && e.label.toLocaleLowerCase('es').includes(query.toLocaleLowerCase('es'))).sort((a, b) => (b.date || '').localeCompare(a.date || ''));
   return <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-5 md:py-8" onClickCapture={captureFocus}>
-    {loading ? <div className="flex flex-col gap-5" role="status" aria-label="Cargando Mi dinero"><Skeleton className="h-8 w-40" /><Skeleton className="h-32 w-full" /><Skeleton className="h-64 w-full" /></div> : error ? <Alert variant="destructive"><AlertDescription><p>{error}</p><Button variant="outline" onClick={() => void load(userId).catch(() => {})} className="mt-3 min-h-11">Reintentar</Button></AlertDescription></Alert> : data && <>
+    {loading ? <div className="flex flex-col gap-5" role="status" aria-label="Cargando Mi dinero"><Skeleton className="h-8 w-40" /><Skeleton className="h-32 w-full" /><Skeleton className="h-64 w-full" /></div> : error && !data ? <Alert variant="destructive"><AlertDescription><p>{error}</p><Button variant="outline" onClick={() => void load(userId).catch(() => {})} className="mt-3 min-h-11">Reintentar</Button></AlertDescription></Alert> : data && <>
+      {error && <Alert><AlertDescription><p>No se pudo actualizar Mi dinero. Se muestran los últimos datos cargados.</p><Button variant="outline" onClick={() => void load(userId).catch(() => {})} className="mt-3 min-h-11">Reintentar actualización</Button></AlertDescription></Alert>}
       <div className="flex flex-wrap items-center justify-between gap-3"><div><h2 className="text-2xl font-semibold">Mi dinero</h2><p className="text-sm text-muted-foreground">Tus cuentas hoy y lo que viene después.</p></div><Button onClick={() => openAccount()} className="min-h-11"><Plus data-icon="inline-start" />Agregar cuenta</Button></div>
       {!accounts.length ? <Empty><EmptyHeader><EmptyMedia variant="icon"><Wallet /></EmptyMedia><EmptyTitle>Empieza con lo que tienes hoy</EmptyTitle><EmptyDescription>Agrega tus cuentas, cajitas y efectivo con un saldo de referencia. Después podrás asignar los movimientos de AFP y proyectar tus próximos meses.</EmptyDescription></EmptyHeader><EmptyContent><Button onClick={() => openAccount()} className="min-h-11">Capturar mi primera cuenta</Button></EmptyContent></Empty> : <Tabs defaultValue="projection" className="flex flex-col gap-5">
         <div className="overflow-x-auto"><TabsList className="w-max" variant="line">{[['projection', 'Proyección'], ['accounts', 'Cuentas'], ['movements', 'Movimientos'], ['plans', 'Planes'], ['routes', 'Asignación automática']].map(([value, label]) => <TabsTrigger key={value} value={value} className="min-h-11">{label}</TabsTrigger>)}</TabsList></div>
