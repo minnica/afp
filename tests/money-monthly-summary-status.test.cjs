@@ -2,8 +2,8 @@ const assert = require('node:assert/strict');
 const { test } = require('node:test');
 const { sourceLoader } = require('./helpers/load-source.cjs');
 const load = sourceLoader();
-const { monthlySummaryStatus } = load('src/components/mi-dinero/monthlySummaryStatus.js');
-const { buildForecast } = load('src/lib/money/forecast.js');
+const { monthlySummaryStatus } = load('src/components/mi-dinero/monthlySummaryStatus.ts');
+const { buildForecast } = load('src/lib/money/forecast.ts');
 
 function forecastWithEarlyExpense(amount) {
   return buildForecast({

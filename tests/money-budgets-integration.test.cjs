@@ -14,7 +14,7 @@ test('presupuesto mixto: API real, persistencia, propietario, reintentos y conse
   const other = await db.user.create({ data: { email: `budget-${randomUUID()}@example.test` } });
   let actor = owner.id;
   const load = sourceLoader({ '@/lib/prisma': { prisma: db }, '@/lib/calendar/schedule': { scheduleCalendarSync: () => {} }, '@supabase/supabase-js': { createClient: () => ({ auth: { getUser: async token => ({ data: { user: token === 'test' ? { id: actor } : null } }) } }) }, 'next/server': { NextResponse: { json: (body, options = {}) => ({ body: JSON.parse(JSON.stringify(body)), status: options.status || 200, headers: new Headers(options.headers) }) } } });
-  const route = load('src/app/api/money/route.js');
+  const route = load('src/app/api/money/route.ts');
   const request = body => ({ url: 'http://localhost/api/money', headers: new Headers({ authorization: 'Bearer test' }), json: async () => body });
   const write = body => route.POST(request({ operationId: randomUUID(), ...body }));
   const ok = response => { assert.equal(response.status, 200, JSON.stringify(response.body)); return response.body; };

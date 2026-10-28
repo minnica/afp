@@ -1,9 +1,11 @@
 'use client';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Badge, Empty, EmptyDescription, EmptyHeader, EmptyTitle, Item, ItemActions, ItemContent, ItemDescription, ItemGroup, ItemTitle } from './ui';
+import type { MoneyResponse, ForecastResponse } from '@/lib/money/responses';
 
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Badge } from '@/components/ui/badge';
-import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from '@/components/ui/empty';
-import { Item, ItemActions, ItemContent, ItemDescription, ItemGroup, ItemTitle } from '@/components/ui/item';
+
+
+
+
 import { buildProjectionBreakdown, monthlyBreakdownEvents } from './projectionBreakdown';
 import { dateLabel, money, monthLabel } from './format';
 
@@ -12,13 +14,13 @@ const statusLabels = {
   ESTIMATED: 'Estimado', EXPECTED: 'Previsto', CALCULATED: 'Calculado por AFP', ACTUAL: 'Registrado',
 };
 
-function signedMoney(value) { return value > 0 ? `+${money(value)}` : money(value); }
-function datesLabel(dates) {
+function signedMoney(value: number) { return value > 0 ? `+${money(value)}` : money(value); }
+function datesLabel(dates: (string | null)[]) {
   return dates.length === 1 ? dateLabel(dates[0])
     : `${dates.length} fechas · ${dateLabel(dates[0])} – ${dateLabel(dates.at(-1))}`;
 }
 
-export default function MoneyForecastBreakdown({ forecast, plans, categories, month, accountId }) {
+export default function MoneyForecastBreakdown({ forecast, plans, categories, month, accountId }: { forecast: ForecastResponse; plans: MoneyResponse['plans']; categories: MoneyResponse['categories']; month: string; accountId: string }) {
   const events = monthlyBreakdownEvents(forecast, month, accountId);
   const breakdown = buildProjectionBreakdown(events, forecast.accounts, plans, categories);
   const account = forecast.accounts.find(item => item.id === accountId);

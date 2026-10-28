@@ -6,6 +6,14 @@ Consolidado el **27 de octubre de 2026** a partir del README del commit `4562aa0
 
 ## 2026-10-27
 
+### Mi dinero completo en TypeScript
+
+**Fase 3 completada localmente.** Se migraron cuentas/conciliaciones, rutas/planes, presupuestos, rendimientos, fuentes y proyección, junto con `/api/money`, los formularios y la presentación mensual. La instantánea de Prisma tiene propiedades explícitas y conserva sus 15 consultas secuenciales; las transferencias reutilizan sus cuentas y movimientos sin lecturas duplicadas. Se validan JSON históricos y respuestas sin cambiar formatos persistidos, fórmulas ni huellas de operación.
+
+La comprobación estricta incluye entrada/salida de Zod, comandos por acción y 13 casos negativos nuevos. Se conservó el descubrimiento de pruebas de autorización al convertir `route.js` a `route.ts`. La instalación limpia pasó tipos, lint, pruebas con PostgreSQL y build; las 12 respuestas de referencia permanecen idénticas. El navegador verificó cuentas con rendimientos, conciliación, nómina, asignación, escenarios sin escrituras, foco, borradores y reenvío del mismo UUID tras perder una respuesta.
+
+Persisten fronteras locales con componentes JSX compartidos y cálculos financieros de fases posteriores. Sin cambios de esquema, SQL, lockfile ni despliegue. Resultados, tiempos, advertencias y límites: [fase 3](../artifacts/typescript-migration/phase-3/README.md).
+
 ### Piloto de transferencias en TypeScript
 
 **Fase 2 completada localmente.** Se tiparon los contratos de `TRANSFER`/`REVERSE_TRANSFER`, su persistencia con `Prisma.TransactionClient`, el cliente con validación de respuesta y el adaptador del formulario compartido. La huella sigue usando el cuerpo original; bloqueo, escritura y recibo permanecen en una sola transacción. Las otras acciones, el handler y el interior del editor continúan en JavaScript.

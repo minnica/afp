@@ -2,9 +2,9 @@ const assert = require('node:assert/strict');
 const { test } = require('node:test');
 const { sourceLoader } = require('./helpers/load-source.cjs');
 const load = sourceLoader();
-const { buildForecast, planDates } = load('src/lib/money/forecast.js');
-const { buildSources, accountBalances, exposure } = load('src/lib/money/sources.js');
-const { accountSchema, planSchema } = load('src/lib/money/schema.js');
+const { buildForecast, planDates } = load('src/lib/money/forecast.ts');
+const { buildSources, accountBalances, exposure } = load('src/lib/money/sources.ts');
+const { accountSchema, planSchema } = load('src/lib/money/schema.ts');
 const today = '2026-10-24';
 function data(extra = {}) { return { accounts: [{ id: 'a', name: 'Cuenta', openingBalance: '10000', reservedAmount: 0, asOf: today, baseline: {}, annualYield: 0 }], routes: [{ key: 'default:income', accountId: 'a' }, { key: 'default:expense', accountId: 'a' }, { key: 'default:card', accountId: 'a' }, { key: 'default:contribution', accountId: 'a' }], plans: [], transfers: [], cards: [], cycles: [], incomes: [], expenses: [], subscriptions: [], purchases: [], receivables: [], payables: [], ...extra }; }
 const plan = extra => ({ id: 'plan', name: 'Nómina', kind: 'PAYROLL', amount: 1000, accountId: 'a', startDate: '2026-10-01', endDate: '2026-11-30', frequencyMonths: 1, days: [15, 31], isActive: true, occurrences: [], ...extra });
@@ -110,7 +110,7 @@ test('Mi dinero: fechas de cobro ajustadas a febrero no duplican el importe por 
   assert.deepEqual(Array.from(r.events.filter(e => e.kind === 'COLLECTION' && e.date.startsWith('2027-02')), e => [e.date, e.amount]), [['2027-02-28', 1750]]);
 });
 test('Mi dinero: ofrece una regla de previsión independiente solo para cuentas por cobrar activas', () => {
-  const service = sourceLoader({ '@/lib/apiAuth': { ApiAccessError: class extends Error {} } })('src/lib/money/service.js');
+  const service = sourceLoader({ '@/lib/apiAuth': { ApiAccessError: class extends Error {} } })('src/lib/money/service.ts');
   const options = service.routingOptions(data({ incomeTypes: [], receivables: [{ id: 'r', status: 'ACTIVE', concept: 'Préstamo' }, { id: 'closed', status: 'PAID_OFF', concept: 'Liquidado' }] }));
   assert.ok(options.some(o => o.key === 'receivable:r'));
   assert.ok(options.some(o => o.key === 'receivable-forecast:r' && o.forecastOnly));

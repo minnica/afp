@@ -1,0 +1,742 @@
+TAP version 13
+(node:458070) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+# Subtest: rendimientos automáticos: reglas históricas, abono real, conciliación y referencia en PostgreSQL
+ok 1 - rendimientos automáticos: reglas históricas, abono real, conciliación y referencia en PostgreSQL
+  ---
+  duration_ms: 848.213562
+  type: 'test'
+  ...
+# Subtest: automático: recupera días con capitalización y no modifica ni duplica registros
+ok 2 - automático: recupera días con capitalización y no modifica ni duplica registros
+  ---
+  duration_ms: 31.804401
+  type: 'test'
+  ...
+# Subtest: automático: respeta la reserva y permite retiros hasta saldo negativo
+ok 3 - automático: respeta la reserva y permite retiros hasta saldo negativo
+  ---
+  duration_ms: 14.412532
+  type: 'test'
+  ...
+# Subtest: automático: tramos, base 360 y centavos completos con abono agrupado el lunes
+ok 4 - automático: tramos, base 360 y centavos completos con abono agrupado el lunes
+  ---
+  duration_ms: 29.704404
+  type: 'test'
+  ...
+# Subtest: automático: referencia inicial en fin de semana admite un día previo pendiente
+ok 5 - automático: referencia inicial en fin de semana admite un día previo pendiente
+  ---
+  duration_ms: 13.184334
+  type: 'test'
+  ...
+# Subtest: automático: pendientes explícitos en un día hábil no se descartan ni se incluyen en la referencia
+ok 6 - automático: pendientes explícitos en un día hábil no se descartan ni se incluyen en la referencia
+  ---
+  duration_ms: 23.629632
+  type: 'test'
+  ...
+# Subtest: automático: importe observado se prorratea, respeta el tope y agrupa varios días
+ok 7 - automático: importe observado se prorratea, respeta el tope y agrupa varios días
+  ---
+  duration_ms: 26.963106
+  type: 'test'
+  ...
+# Subtest: automático: dos componentes de abono real sustituyen un cálculo agrupado
+ok 8 - automático: dos componentes de abono real sustituyen un cálculo agrupado
+  ---
+  duration_ms: 12.963365
+  type: 'test'
+  ...
+# Subtest: automático: un abono en otra cuenta no sustituye el rendimiento propio
+ok 9 - automático: un abono en otra cuenta no sustituye el rendimiento propio
+  ---
+  duration_ms: 24.395201
+  type: 'test'
+  ...
+# Subtest: automático: conciliar absorbe lo calculado sin volver a sumarlo
+ok 10 - automático: conciliar absorbe lo calculado sin volver a sumarlo
+  ---
+  duration_ms: 48.412811
+  type: 'test'
+  ...
+# Subtest: automático: conciliación durante fin de semana conserva el rendimiento pendiente
+ok 11 - automático: conciliación durante fin de semana conserva el rendimiento pendiente
+  ---
+  duration_ms: 21.408284
+  type: 'test'
+  ...
+# Subtest: automático: cambio de tasa conserva las reglas de los días anteriores
+ok 12 - automático: cambio de tasa conserva las reglas de los días anteriores
+  ---
+  duration_ms: 16.556779
+  type: 'test'
+  ...
+# Subtest: automático: detener nuevos días conserva los rendimientos ya generados
+ok 13 - automático: detener nuevos días conserva los rendimientos ya generados
+  ---
+  duration_ms: 16.46416
+  type: 'test'
+  ...
+# Subtest: automático: días inhábiles bancarios difieren los abonos sin detener el cálculo diario
+ok 14 - automático: días inhábiles bancarios difieren los abonos sin detener el cálculo diario
+  ---
+  duration_ms: 12.524845
+  type: 'test'
+  ...
+# Subtest: automático: no inventa abonos antes de activar el cálculo
+ok 15 - automático: no inventa abonos antes de activar el cálculo
+  ---
+  duration_ms: 14.133082
+  type: 'test'
+  ...
+# Subtest: presupuesto mixto: API real, persistencia, propietario, reintentos y conservación de movimientos
+    # Subtest: crea una previsión y un recibo aunque lleguen reintentos concurrentes
+    ok 1 - crea una previsión y un recibo aunque lleguen reintentos concurrentes
+      ---
+      duration_ms: 25.741889
+      type: 'test'
+      ...
+    # Subtest: preserva el historial al editar el importe, valida versiones y permite volver a cuenta fija
+    ok 2 - preserva el historial al editar el importe, valida versiones y permite volver a cuenta fija
+      ---
+      duration_ms: 62.119764
+      type: 'test'
+      ...
+    # Subtest: valida meses completos, categoría, tarjeta fija y referencias de otro propietario
+    ok 3 - valida meses completos, categoría, tarjeta fija y referencias de otro propietario
+      ---
+      duration_ms: 65.779829
+      type: 'test'
+      ...
+    # Subtest: consulta y cálculo conservan gastos, saldos y filas financieras reales
+    ok 4 - consulta y cálculo conservan gastos, saldos y filas financieras reales
+      ---
+      duration_ms: 51.865567
+      type: 'test'
+      ...
+    # Subtest: la restricción de PostgreSQL rechaza configuraciones de otro tipo de previsión
+    ok 5 - la restricción de PostgreSQL rechaza configuraciones de otro tipo de previsión
+      ---
+      duration_ms: 11.951606
+      type: 'test'
+      ...
+    1..5
+ok 16 - presupuesto mixto: API real, persistencia, propietario, reintentos y conservación de movimientos
+  ---
+  duration_ms: 419.221847
+  type: 'test'
+  ...
+# Subtest: presupuesto mixto: un importe por categoría conserva el total y difiere el crédito hasta su pago
+ok 17 - presupuesto mixto: un importe por categoría conserva el total y difiere el crédito hasta su pago
+  ---
+  duration_ms: 16.16793
+  type: 'test'
+  ...
+# Subtest: presupuesto mixto: un gasto real de crédito cubre la cuota diaria completa, sin exigir coincidencia de medio
+ok 18 - presupuesto mixto: un gasto real de crédito cubre la cuota diaria completa, sin exigir coincidencia de medio
+  ---
+  duration_ms: 14.211093
+  type: 'test'
+  ...
+# Subtest: presupuesto mixto: adelantos recuperables completos no consumen el presupuesto personal ni desaparecen del saldo real
+ok 19 - presupuesto mixto: adelantos recuperables completos no consumen el presupuesto personal ni desaparecen del saldo real
+  ---
+  duration_ms: 15.107951
+  type: 'test'
+  ...
+# Subtest: presupuesto mixto: un adelanto parcial cuenta solo su parte personal y no depende de haber cobrado
+ok 20 - presupuesto mixto: un adelanto parcial cuenta solo su parte personal y no depende de haber cobrado
+  ---
+  duration_ms: 23.839411
+  type: 'test'
+  ...
+# Subtest: presupuesto mixto: varios gastos de un mismo adelanto reparten el principal sin perder centavos ni duplicar aportaciones
+ok 21 - presupuesto mixto: varios gastos de un mismo adelanto reparten el principal sin perder centavos ni duplicar aportaciones
+  ---
+  duration_ms: 0.21528
+  type: 'test'
+  ...
+# Subtest: presupuesto mixto: la muestra combina efectivo, débito y tarjetas y excluye deuda, suscripciones, adelantos y gastos vinculados
+ok 22 - presupuesto mixto: la muestra combina efectivo, débito y tarjetas y excluye deuda, suscripciones, adelantos y gastos vinculados
+  ---
+  duration_ms: 0.359029
+  type: 'test'
+  ...
+# Subtest: presupuesto mixto: centavos, importes grandes y orden de prioridades conservan exactamente el importe
+ok 23 - presupuesto mixto: centavos, importes grandes y orden de prioridades conservan exactamente el importe
+  ---
+  duration_ms: 15.547541
+  type: 'test'
+  ...
+# Subtest: presupuesto mixto: el escenario modifica el consumo total una sola vez
+ok 24 - presupuesto mixto: el escenario modifica el consumo total una sola vez
+  ---
+  duration_ms: 13.492094
+  type: 'test'
+  ...
+# Subtest: presupuesto mixto: una tarjeta eliminada conserva la salida estimada y produce un solo movimiento diario
+ok 25 - presupuesto mixto: una tarjeta eliminada conserva la salida estimada y produce un solo movimiento diario
+  ---
+  duration_ms: 10.442337
+  type: 'test'
+  ...
+# Subtest: proyección completa: los períodos antiguos liquidados quedan como revisión histórica; una deuda pendiente mantiene el aviso actual
+ok 26 - proyección completa: los períodos antiguos liquidados quedan como revisión histórica; una deuda pendiente mantiene el aviso actual
+  ---
+  duration_ms: 27.610796
+  type: 'test'
+  ...
+# Subtest: Mi dinero: saldo inicial, efectivo, aportaciones y transferencias conservan centavos y no cuentan crédito como salida
+ok 27 - Mi dinero: saldo inicial, efectivo, aportaciones y transferencias conservan centavos y no cuentan crédito como salida
+  ---
+  duration_ms: 20.136595
+  type: 'test'
+  ...
+# Subtest: Mi dinero: las capturas iniciales no reaplican movimientos; cambios posteriores, borrados y asignación tardía
+ok 28 - Mi dinero: las capturas iniciales no reaplican movimientos; cambios posteriores, borrados y asignación tardía
+  ---
+  duration_ms: 40.77304
+  type: 'test'
+  ...
+# Subtest: Mi dinero: cargo de tarjeta, abonos capturados, acumulado y devolución se cuentan una sola vez
+ok 29 - Mi dinero: cargo de tarjeta, abonos capturados, acumulado y devolución se cuentan una sola vez
+  ---
+  duration_ms: 22.950022
+  type: 'test'
+  ...
+# Subtest: Mi dinero: una bonificación aplicada al crédito no es dinero depositado
+ok 30 - Mi dinero: una bonificación aplicada al crédito no es dinero depositado
+  ---
+  duration_ms: 10.044858
+  type: 'test'
+  ...
+# Subtest: Mi dinero: fuentes futuras no modifican el saldo actual
+ok 31 - Mi dinero: fuentes futuras no modifican el saldo actual
+  ---
+  duration_ms: 11.052786
+  type: 'test'
+  ...
+# Subtest: Mi dinero: cuotas y suscripciones pasan por el pago de tarjeta, con cuotas que terminan
+ok 32 - Mi dinero: cuotas y suscripciones pasan por el pago de tarjeta, con cuotas que terminan
+  ---
+  duration_ms: 14.025463
+  type: 'test'
+  ...
+# Subtest: Mi dinero: una suscripción confirmada u omitida no se vuelve a prever
+ok 33 - Mi dinero: una suscripción confirmada u omitida no se vuelve a prever
+  ---
+  duration_ms: 10.655327
+  type: 'test'
+  ...
+# Subtest: Mi dinero: los cobros se reparten por fecha y terminan al recuperar el saldo
+ok 34 - Mi dinero: los cobros se reparten por fecha y terminan al recuperar el saldo
+  ---
+  duration_ms: 19.481566
+  type: 'test'
+  ...
+# Subtest: Mi dinero: el importe de un cobro quincenal se aplica completo en cada fecha
+ok 35 - Mi dinero: el importe de un cobro quincenal se aplica completo en cada fecha
+  ---
+  duration_ms: 9.562248
+  type: 'test'
+  ...
+# Subtest: Mi dinero: excluir un cobro incierto conserva su registro y los abonos reales
+ok 36 - Mi dinero: excluir un cobro incierto conserva su registro y los abonos reales
+  ---
+  duration_ms: 29.180825
+  type: 'test'
+  ...
+# Subtest: Mi dinero: excluir previsión sin calendario permite recibir nuevos abonos incluso con fecha futura
+ok 37 - Mi dinero: excluir previsión sin calendario permite recibir nuevos abonos incluso con fecha futura
+  ---
+  duration_ms: 27.848085
+  type: 'test'
+  ...
+# Subtest: Mi dinero: la cuenta prevista para un cobro es independiente de sus ingresos reales
+ok 38 - Mi dinero: la cuenta prevista para un cobro es independiente de sus ingresos reales
+  ---
+  duration_ms: 16.4865
+  type: 'test'
+  ...
+# Subtest: Mi dinero: fechas de cobro ajustadas a febrero no duplican el importe por ocurrencia
+ok 39 - Mi dinero: fechas de cobro ajustadas a febrero no duplican el importe por ocurrencia
+  ---
+  duration_ms: 10.013428
+  type: 'test'
+  ...
+# Subtest: Mi dinero: ofrece una regla de previsión independiente solo para cuentas por cobrar activas
+ok 40 - Mi dinero: ofrece una regla de previsión independiente solo para cuentas por cobrar activas
+  ---
+  duration_ms: 34.977537
+  type: 'test'
+  ...
+# Subtest: Mi dinero: nómina neta no descuenta dos veces los préstamos, y permite pago externo explícito
+ok 41 - Mi dinero: nómina neta no descuenta dos veces los préstamos, y permite pago externo explícito
+  ---
+  duration_ms: 38.958722
+  type: 'test'
+  ...
+# Subtest: Mi dinero: nómina registrada reemplaza la previsión mensual con abonos parciales
+ok 42 - Mi dinero: nómina registrada reemplaza la previsión mensual con abonos parciales
+  ---
+  duration_ms: 19.767466
+  type: 'test'
+  ...
+# Subtest: Mi dinero: omitir una nómina no consume el ingreso que cubre la siguiente
+ok 43 - Mi dinero: omitir una nómina no consume el ingreso que cubre la siguiente
+  ---
+  duration_ms: 9.379419
+  type: 'test'
+  ...
+# Subtest: Mi dinero: vínculo explícito reemplaza una ocurrencia aunque el cobro llegue en otro mes
+ok 44 - Mi dinero: vínculo explícito reemplaza una ocurrencia aunque el cobro llegue en otro mes
+  ---
+  duration_ms: 9.614828
+  type: 'test'
+  ...
+# Subtest: Mi dinero: consumo registrado cubre la cuota diaria, separado de suscripciones, deudas y otras previsiones
+ok 45 - Mi dinero: consumo registrado cubre la cuota diaria, separado de suscripciones, deudas y otras previsiones
+  ---
+  duration_ms: 19.641196
+  type: 'test'
+  ...
+# Subtest: Mi dinero: cinco días pendientes no concentran el presupuesto sin gastar ni desaparecen al superarlo
+ok 46 - Mi dinero: cinco días pendientes no concentran el presupuesto sin gastar ni desaparecen al superarlo
+  ---
+  duration_ms: 28.450545
+  type: 'test'
+  ...
+# Subtest: Mi dinero: registrar hoy reduce solo la estimación de hoy y conserva el saldo real
+ok 47 - Mi dinero: registrar hoy reduce solo la estimación de hoy y conserva el saldo real
+  ---
+  duration_ms: 28.030775
+  type: 'test'
+  ...
+# Subtest: Mi dinero: un gasto futuro registrado sustituye su estimación diaria y conserva su importe completo
+ok 48 - Mi dinero: un gasto futuro registrado sustituye su estimación diaria y conserva su importe completo
+  ---
+  duration_ms: 19.264407
+  type: 'test'
+  ...
+# Subtest: Mi dinero: vigencia parcial conserva el ritmo mensual y respeta el cambio de mes
+ok 49 - Mi dinero: vigencia parcial conserva el ritmo mensual y respeta el cambio de mes
+  ---
+  duration_ms: 10.121797
+  type: 'test'
+  ...
+# Subtest: Mi dinero: referencia diaria conserva centavos en meses de 28, 29, 30 y 31 días
+ok 50 - Mi dinero: referencia diaria conserva centavos en meses de 28, 29, 30 y 31 días
+  ---
+  duration_ms: 82.711599
+  type: 'test'
+  ...
+# Subtest: Mi dinero: releer días después no mueve centavos entre fechas ni acumula días sin gasto
+ok 51 - Mi dinero: releer días después no mueve centavos entre fechas ni acumula días sin gasto
+  ---
+  duration_ms: 19.630696
+  type: 'test'
+  ...
+# Subtest: Mi dinero: escenario de gasto variable ajusta el ritmo sin crear movimientos ni cambiar saldos
+ok 52 - Mi dinero: escenario de gasto variable ajusta el ritmo sin crear movimientos ni cambiar saldos
+  ---
+  duration_ms: 39.058582
+  type: 'test'
+  ...
+# Subtest: Mi dinero: consumo diario a crédito sustituye compras registradas y sale al pagar cada corte
+ok 53 - Mi dinero: consumo diario a crédito sustituye compras registradas y sale al pagar cada corte
+  ---
+  duration_ms: 10.618337
+  type: 'test'
+  ...
+# Subtest: Mi dinero: detecta falta de liquidez antes de una nómina aunque el cierre sea positivo
+ok 54 - Mi dinero: detecta falta de liquidez antes de una nómina aunque el cierre sea positivo
+  ---
+  duration_ms: 8.940459
+  type: 'test'
+  ...
+# Subtest: Mi dinero: rendimiento diario compuesto, redondeo, topes y reservas a la vista
+ok 55 - Mi dinero: rendimiento diario compuesto, redondeo, topes y reservas a la vista
+  ---
+  duration_ms: 26.876937
+  type: 'test'
+  ...
+# Subtest: Mi dinero: abono real del rendimiento sustituye estimación de ese día; vigencia termina
+ok 56 - Mi dinero: abono real del rendimiento sustituye estimación de ese día; vigencia termina
+  ---
+  duration_ms: 9.682458
+  type: 'test'
+  ...
+# Subtest: Mi dinero: retirar todo no bloquea dinero ni genera rendimiento sobre saldo negativo
+ok 57 - Mi dinero: retirar todo no bloquea dinero ni genera rendimiento sobre saldo negativo
+  ---
+  duration_ms: 9.107499
+  type: 'test'
+  ...
+# Subtest: Mi dinero: ausencia de cuentas y datos faltantes no simulan un saldo verificado
+ok 58 - Mi dinero: ausencia de cuentas y datos faltantes no simulan un saldo verificado
+  ---
+  duration_ms: 10.683177
+  type: 'test'
+  ...
+# Subtest: Mi dinero: fin de mes y año bisiesto sin duplicar días ajustados
+ok 59 - Mi dinero: fin de mes y año bisiesto sin duplicar días ajustados
+  ---
+  duration_ms: 0.14055
+  type: 'test'
+  ...
+# Subtest: Mi dinero: validación de saldos, tasas y planes
+ok 60 - Mi dinero: validación de saldos, tasas y planes
+  ---
+  duration_ms: 2.296727
+  type: 'test'
+  ...
+# Subtest: Mi dinero: API, PostgreSQL, aislamiento, cuentas, abonos, conciliación y proyección
+    # Subtest: rechaza anónimos y tokens inválidos sin consultar datos
+    ok 1 - rechaza anónimos y tokens inválidos sin consultar datos
+      ---
+      duration_ms: 0.605749
+      type: 'test'
+      ...
+    # Subtest: captura inicial y reintentos conservan una sola cuenta
+    ok 2 - captura inicial y reintentos conservan una sola cuenta
+      ---
+      duration_ms: 104.859782
+      type: 'test'
+      ...
+    # Subtest: reglas, ingresos y gastos reales actualizan saldo sin duplicar
+    ok 3 - reglas, ingresos y gastos reales actualizan saldo sin duplicar
+      ---
+      duration_ms: 138.191901
+      type: 'test'
+      ...
+    # Subtest: transferencias atómicas e idempotentes conservan el total; se pueden revertir
+    ok 4 - transferencias atómicas e idempotentes conservan el total; se pueden revertir
+      ---
+      duration_ms: 89.73575
+      type: 'test'
+      ...
+    # Subtest: más de 100 ingresos se agregan completos
+    ok 5 - más de 100 ingresos se agregan completos
+      ---
+      duration_ms: 55.568092
+      type: 'test'
+      ...
+    # Subtest: conciliar no crea ingreso; conserva historial y detecta ediciones concurrentes
+    ok 6 - conciliar no crea ingreso; conserva historial y detecta ediciones concurrentes
+      ---
+      duration_ms: 148.970228
+      type: 'test'
+      ...
+    # Subtest: un abono nuevo modifica corte y cuenta una vez; reversión conserva historial
+    ok 7 - un abono nuevo modifica corte y cuenta una vez; reversión conserva historial
+      ---
+      duration_ms: 159.517164
+      type: 'test'
+      ...
+    # Subtest: previsiones, ocurrencias y escenarios no generan movimientos reales
+    ok 8 - previsiones, ocurrencias y escenarios no generan movimientos reales
+      ---
+      duration_ms: 178.293252
+      type: 'test'
+      ...
+    # Subtest: aislamiento entre usuarios, referencias ajenas y sin filtración por userId
+    ok 9 - aislamiento entre usuarios, referencias ajenas y sin filtración por userId
+      ---
+      duration_ms: 102.930324
+      type: 'test'
+      ...
+    # Subtest: RLS y lecturas sin escritura
+    ok 10 - RLS y lecturas sin escritura
+      ---
+      duration_ms: 121.372291
+      type: 'test'
+      ...
+    # Subtest: editar el saldo de referencia conserva movimientos, historial, versiones y reintentos
+    ok 11 - editar el saldo de referencia conserva movimientos, historial, versiones y reintentos
+      ---
+      duration_ms: 221.870268
+      type: 'test'
+      ...
+    # Subtest: corregir una referencia anterior no repite ingresos ni transferencias posteriores
+    ok 12 - corregir una referencia anterior no repite ingresos ni transferencias posteriores
+      ---
+      duration_ms: 159.142756
+      type: 'test'
+      ...
+    1..12
+ok 61 - Mi dinero: API, PostgreSQL, aislamiento, cuentas, abonos, conciliación y proyección
+  ---
+  duration_ms: 1584.57682
+  type: 'test'
+  ...
+# Subtest: Mi dinero: las lecturas esperan la conexión única y conservan propietario y relaciones
+ok 62 - Mi dinero: las lecturas esperan la conexión única y conservan propietario y relaciones
+  ---
+  duration_ms: 36.105846
+  type: 'test'
+  ...
+# Subtest: Mi dinero: libera la transacción antes de calcular y serializar ambos escenarios
+ok 63 - Mi dinero: libera la transacción antes de calcular y serializar ambos escenarios
+  ---
+  duration_ms: 16.20975
+  type: 'test'
+  ...
+# Subtest: Mi dinero: saturación de conexión o transacción vencida devuelve un fallo recuperable
+ok 64 - Mi dinero: saturación de conexión o transacción vencida devuelve un fallo recuperable
+  ---
+  duration_ms: 28.156186
+  type: 'test'
+  ...
+# Subtest: mínimo mensual: incluye el margen en centavos y agrupa solo días consecutivos
+ok 65 - mínimo mensual: incluye el margen en centavos y agrupa solo días consecutivos
+  ---
+  duration_ms: 2.719297
+  type: 'test'
+  ...
+# Subtest: mínimo mensual: conserva períodos separados y días aislados
+ok 66 - mínimo mensual: conserva períodos separados y días aislados
+  ---
+  duration_ms: 0.1847
+  type: 'test'
+  ...
+# Subtest: mínimo mensual: respeta el mes, hoy y los huecos sin inventar fechas
+ok 67 - mínimo mensual: respeta el mes, hoy y los huecos sin inventar fechas
+  ---
+  duration_ms: 0.13386
+  type: 'test'
+  ...
+# Subtest: mínimo mensual: negativos y cero usan un margen coherente sin cambiar el importe
+ok 68 - mínimo mensual: negativos y cero usan un margen coherente sin cambiar el importe
+  ---
+  duration_ms: 0.228059
+  type: 'test'
+  ...
+# Subtest: mínimo mensual: un mes constante y febrero bisiesto agrupan hasta su último día
+ok 69 - mínimo mensual: un mes constante y febrero bisiesto agrupan hasta su último día
+  ---
+  duration_ms: 0.24594
+  type: 'test'
+  ...
+# Subtest: mínimo mensual: ordena y deduplica fechas sin modificar la proyección original
+ok 70 - mínimo mensual: ordena y deduplica fechas sin modificar la proyección original
+  ---
+  duration_ms: 0.17378
+  type: 'test'
+  ...
+# Subtest: mínimo mensual: sigue el total global y el escenario con el motor real
+ok 71 - mínimo mensual: sigue el total global y el escenario con el motor real
+  ---
+  duration_ms: 43.280327
+  type: 'test'
+  ...
+# Subtest: estado mensual: un cierre en aumento no oculta un déficit previo al ingreso
+ok 72 - estado mensual: un cierre en aumento no oculta un déficit previo al ingreso
+  ---
+  duration_ms: 12.207785
+  type: 'test'
+  ...
+# Subtest: estado mensual: advierte si se usa la reserva aunque el cierre se recupere
+ok 73 - estado mensual: advierte si se usa la reserva aunque el cierre se recupere
+  ---
+  duration_ms: 10.515657
+  type: 'test'
+  ...
+# Subtest: estado mensual: distingue cero, límite y margen de un centavo sobre la reserva
+ok 74 - estado mensual: distingue cero, límite y margen de un centavo sobre la reserva
+  ---
+  duration_ms: 0.14535
+  type: 'test'
+  ...
+# Subtest: estado mensual: un saldo positivo que baja requiere cautela
+ok 75 - estado mensual: un saldo positivo que baja requiere cautela
+  ---
+  duration_ms: 0.091449
+  type: 'test'
+  ...
+# Subtest: estado mensual: los datos pendientes impiden un indicador global verde
+ok 76 - estado mensual: los datos pendientes impiden un indicador global verde
+  ---
+  duration_ms: 0.07551
+  type: 'test'
+  ...
+# Subtest: estado mensual: sin reserva usa saldo positivo sin inventar umbrales de seguridad
+ok 77 - estado mensual: sin reserva usa saldo positivo sin inventar umbrales de seguridad
+  ---
+  duration_ms: 0.07799
+  type: 'test'
+  ...
+# Subtest: nómina hábil: guarda el plan sin duplicados, aplica abonos reales y evita ingresos simulados
+ok 78 - nómina hábil: guarda el plan sin duplicados, aplica abonos reales y evita ingresos simulados
+  ---
+  duration_ms: 233.067265
+  type: 'test'
+  ...
+# Subtest: nómina: adelanta fines de semana y festivos bancarios conservando el calendario nominal
+ok 79 - nómina: adelanta fines de semana y festivos bancarios conservando el calendario nominal
+  ---
+  duration_ms: 0.476459
+  type: 'test'
+  ...
+# Subtest: nómina: respeta inicio y fin nominales, fase bimestral y pago único adelantado
+ok 80 - nómina: respeta inicio y fin nominales, fase bimestral y pago único adelantado
+  ---
+  duration_ms: 11.265076
+  type: 'test'
+  ...
+# Subtest: nómina: un depósito adelantado al mes anterior se incluye y concilia en el mes del depósito
+ok 81 - nómina: un depósito adelantado al mes anterior se incluye y concilia en el mes del depósito
+  ---
+  duration_ms: 12.172896
+  type: 'test'
+  ...
+# Subtest: nómina: omisiones, vínculos y escenario usan la fecha adelantada
+ok 82 - nómina: omisiones, vínculos y escenario usan la fecha adelantada
+  ---
+  duration_ms: 31.465992
+  type: 'test'
+  ...
+# Subtest: desglose: agrupa los días por categoría y los rendimientos por cuenta conservando centavos
+ok 83 - desglose: agrupa los días por categoría y los rendimientos por cuenta conservando centavos
+  ---
+  duration_ms: 0.769089
+  type: 'test'
+  ...
+# Subtest: desglose: conserva cuenta, fechas y certeza cuando un concepto tiene distintos estados
+ok 84 - desglose: conserva cuenta, fechas y certeza cuando un concepto tiene distintos estados
+  ---
+  duration_ms: 0.24588
+  type: 'test'
+  ...
+# Subtest: desglose: las transferencias tienen efecto neto cero y conservan su efecto al filtrar una cuenta
+ok 85 - desglose: las transferencias tienen efecto neto cero y conservan su efecto al filtrar una cuenta
+  ---
+  duration_ms: 0.129079
+  type: 'test'
+  ...
+# Subtest: desglose: los importes sin cuenta o excluidos no se presentan como parte del saldo proyectado
+ok 86 - desglose: los importes sin cuenta o excluidos no se presentan como parte del saldo proyectado
+  ---
+  duration_ms: 0.10539
+  type: 'test'
+  ...
+# Subtest: desglose: coincide con el flujo mensual del motor y el crédito variable pasa una sola vez por la tarjeta
+ok 87 - desglose: coincide con el flujo mensual del motor y el crédito variable pasa una sola vez por la tarjeta
+  ---
+  duration_ms: 29.579114
+  type: 'test'
+  ...
+# Subtest: mes completo: suma historial anterior a la referencia, hoy y previsiones sin duplicar registros futuros ni crédito
+ok 88 - mes completo: suma historial anterior a la referencia, hoy y previsiones sin duplicar registros futuros ni crédito
+  ---
+  duration_ms: 17.012449
+  type: 'test'
+  ...
+# Subtest: mes completo: el mes futuro solo tiene previsiones y el escenario conserva los importes ya registrados
+ok 89 - mes completo: el mes futuro solo tiene previsiones y el escenario conserva los importes ya registrados
+  ---
+  duration_ms: 30.838732
+  type: 'test'
+  ...
+# Subtest: mes completo: identifica abonos de rendimiento y conserva los cálculos históricos fuera de Registrado
+ok 90 - mes completo: identifica abonos de rendimiento y conserva los cálculos históricos fuera de Registrado
+  ---
+  duration_ms: 0.17335
+  type: 'test'
+  ...
+# Subtest: mes completo: agrupa gasto histórico por categoría sin mezclar suscripciones, deuda ni previsiones vinculadas
+ok 91 - mes completo: agrupa gasto histórico por categoría sin mezclar suscripciones, deuda ni previsiones vinculadas
+  ---
+  duration_ms: 0.20289
+  type: 'test'
+  ...
+# Subtest: mes completo: filtra el historial por cuenta y mes, evita claves repetidas y no inventa días sin registros
+ok 92 - mes completo: filtra el historial por cuenta y mes, evita claves repetidas y no inventa días sin registros
+  ---
+  duration_ms: 0.1466
+  type: 'test'
+  ...
+# Subtest: transferencias: cliente conserva el cuerpo, UUID, cuenta esperada y respuesta por acción
+ok 93 - transferencias: cliente conserva el cuerpo, UUID, cuenta esperada y respuesta por acción
+  ---
+  duration_ms: 13.513853
+  type: 'test'
+  ...
+# Subtest: transferencias: respuesta inválida pasa por recuperación y conserva el resultado incierto
+ok 94 - transferencias: respuesta inválida pasa por recuperación y conserva el resultado incierto
+  ---
+  duration_ms: 10.733817
+  type: 'test'
+  ...
+# Subtest: transferencias: cancelación, validación HTTP y error de red conservan el error compartido
+ok 95 - transferencias: cancelación, validación HTTP y error de red conservan el error compartido
+  ---
+  duration_ms: 8.970679
+  type: 'test'
+  ...
+# Subtest: transferencias: frontera JSX valida el callback y conserva configuración y UUID del editor
+ok 96 - transferencias: frontera JSX valida el callback y conserva configuración y UUID del editor
+  ---
+  duration_ms: 7.293521
+  type: 'test'
+  ...
+# Subtest: piloto TS: transferencias, recibos, concurrencia, rollback y límites con PostgreSQL
+    # Subtest: solicitudes concurrentes y repetición producen un movimiento y un recibo; total a centavos
+    ok 1 - solicitudes concurrentes y repetición producen un movimiento y un recibo; total a centavos
+      ---
+      duration_ms: 62.530213
+      type: 'test'
+      ...
+    # Subtest: huella conserva texto/número y propiedades adicionales antes de validar
+    ok 2 - huella conserva texto/número y propiedades adicionales antes de validar
+      ---
+      duration_ms: 6.416492
+      type: 'test'
+      ...
+Money operation failed Error
+    # Subtest: fallo después de la escritura revierte movimiento y recibo; UUID reutilizable
+    ok 3 - fallo después de la escritura revierte movimiento y recibo; UUID reutilizable
+      ---
+      duration_ms: 45.445654
+      type: 'test'
+      ...
+    # Subtest: cuentas ajenas e inexistentes no filtran datos; mismo origen/destino y fechas conservan errores
+    ok 4 - cuentas ajenas e inexistentes no filtran datos; mismo origen/destino y fechas conservan errores
+      ---
+      duration_ms: 78.536234
+      type: 'test'
+      ...
+    # Subtest: reversión ajena no filtra; reversión válida conserva historial, saldo y recibo
+    ok 5 - reversión ajena no filtra; reversión válida conserva historial, saldo y recibo
+      ---
+      duration_ms: 52.050716
+      type: 'test'
+      ...
+    # Subtest: fecha programada admitida y mismo día de referencia admitido
+    ok 6 - fecha programada admitida y mismo día de referencia admitido
+      ---
+      duration_ms: 53.623884
+      type: 'test'
+      ...
+    # Subtest: conciliación posterior bloquea reversión, conserva historial y no guarda recibo fallido
+    ok 7 - conciliación posterior bloquea reversión, conserva historial y no guarda recibo fallido
+      ---
+      duration_ms: 65.050091
+      type: 'test'
+      ...
+    1..7
+ok 97 - piloto TS: transferencias, recibos, concurrencia, rollback y límites con PostgreSQL
+  ---
+  duration_ms: 502.897874
+  type: 'test'
+  ...
+1..97
+# tests 121
+# suites 0
+# pass 121
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 5374.364411

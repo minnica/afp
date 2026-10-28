@@ -1,8 +1,9 @@
+import type { ForecastResponse } from '@/lib/money/responses';
 import { addDays } from '@/lib/money/dates';
 
 export const MINIMUM_PROXIMITY_PERCENT = 5;
 
-export function monthlyMinimumPeriod(month, daily, today) {
+export function monthlyMinimumPeriod(month: ForecastResponse['monthly'][number], daily: Pick<ForecastResponse['daily'][number], 'date' | 'balance'>[], today: string) {
   const minimum = Math.round(Number(month.minimum) * 100);
   // El margen usa la magnitud del mínimo también cuando el saldo es negativo.
   // En cero, solo se incluyen los días cuyo saldo también es cero.
@@ -12,7 +13,7 @@ export function monthlyMinimumPeriod(month, daily, today) {
   if (!days.some(day => day.balance === minimum)) return { ranges: [], label: null };
 
   const dates = [...new Set(days.filter(day => day.balance >= minimum && day.balance <= ceiling).map(day => day.date))].sort();
-  const ranges = [];
+  const ranges: { from: string; to: string }[] = [];
   for (const date of dates) {
     const previous = ranges.at(-1);
     if (previous && date === addDays(previous.to, 1)) previous.to = date;

@@ -1,0 +1,510 @@
+{
+  "checks": [
+    {
+      "focused": "Agregar cuenta",
+      "name": "account-open-focus"
+    },
+    {
+      "focused": "Conciliar saldo",
+      "name": "reconciliation-focus-return"
+    },
+    {
+      "amount": "0",
+      "days": "15, 31,",
+      "name": "invalid-plan-keeps-draft",
+      "posts": 2
+    },
+    {
+      "lastRequest": "GET",
+      "name": "scenario-only-get",
+      "posts": 3,
+      "query": "/api/money?stopPayrollDate=&collectionDelay=10&variablePercent=100&extraAmount=0&extraDate=&extraAccountId="
+    },
+    {
+      "name": "mobile-overflow",
+      "viewport": 390,
+      "width": 375
+    },
+    {
+      "amount": "550.25",
+      "name": "lost-response-keeps-plan",
+      "title": "Editar previsión"
+    },
+    {
+      "name": "retry-same-command",
+      "sameBody": true,
+      "sameResult": true,
+      "status": 200
+    }
+  ],
+  "requests": [
+    {
+      "body": {
+        "action": "CREATE_ACCOUNT",
+        "annualYield": 36.5,
+        "asOf": "2026-10-27",
+        "autoYield": true,
+        "kind": "BANK",
+        "name": "Cuenta fase 3",
+        "openingBalance": 1000.25,
+        "operationId": "fe4080fb-0840-40c8-b1c8-db7dfd02cd82",
+        "reservedAmount": 100,
+        "yieldBasis": 365,
+        "yieldCap": "",
+        "yieldDailyAmount": "",
+        "yieldEndDate": "",
+        "yieldExcessRate": 0,
+        "yieldFrequency": "DAILY",
+        "yieldIncomeTypeId": "",
+        "yieldInitialPendingDays": null,
+        "yieldMethod": "NOMINAL",
+        "yieldPayDay": 1,
+        "yieldPayout": "DAILY",
+        "yieldRounding": "ROUND",
+        "yieldStartDate": "",
+        "yieldTaxPercent": 0
+      },
+      "method": "POST",
+      "response": {
+        "id": "d924f9c5-bc1d-402e-8682-b69a953b5669",
+        "ok": true
+      },
+      "status": 200,
+      "url": "/api/money"
+    },
+    {
+      "method": "GET",
+      "response": {
+        "accounts": [
+          {
+            "balance": 1000.25,
+            "id": "d924f9c5-bc1d-402e-8682-b69a953b5669",
+            "version": 1
+          }
+        ],
+        "plans": [],
+        "simulated": false,
+        "summary": {
+          "available": 900.25,
+          "balance": 1000.25,
+          "belowReserveDate": null,
+          "minimum": 1000.25,
+          "minimumDate": "2026-10-27",
+          "reserved": 100,
+          "zeroDate": null
+        }
+      },
+      "status": 200,
+      "url": "/api/money?"
+    },
+    {
+      "body": {
+        "accountId": "d924f9c5-bc1d-402e-8682-b69a953b5669",
+        "action": "RECONCILE",
+        "bankBalance": 1100.25,
+        "operationId": "79c94f9e-2293-4e3e-9c6f-2d7a6f6ab3a9",
+        "reason": "Saldo ficticio fase 3",
+        "version": 1
+      },
+      "method": "POST",
+      "response": {
+        "ok": true
+      },
+      "status": 200,
+      "url": "/api/money"
+    },
+    {
+      "method": "GET",
+      "response": {
+        "accounts": [
+          {
+            "balance": 1100.25,
+            "id": "d924f9c5-bc1d-402e-8682-b69a953b5669",
+            "version": 2
+          }
+        ],
+        "plans": [],
+        "simulated": false,
+        "summary": {
+          "available": 1000.25,
+          "balance": 1100.25,
+          "belowReserveDate": null,
+          "minimum": 1100.25,
+          "minimumDate": "2026-10-27",
+          "reserved": 100,
+          "zeroDate": null
+        }
+      },
+      "status": 200,
+      "url": "/api/money?"
+    },
+    {
+      "method": "GET",
+      "response": {
+        "accounts": [
+          {
+            "balance": 1100.25,
+            "id": "d924f9c5-bc1d-402e-8682-b69a953b5669",
+            "version": 2
+          }
+        ],
+        "plans": [],
+        "simulated": false,
+        "summary": {
+          "available": 1000.25,
+          "balance": 1100.25,
+          "belowReserveDate": null,
+          "minimum": 1100.25,
+          "minimumDate": "2026-10-27",
+          "reserved": 100,
+          "zeroDate": null
+        }
+      },
+      "status": 200,
+      "url": "/api/money?"
+    },
+    {
+      "body": {
+        "accountId": "d924f9c5-bc1d-402e-8682-b69a953b5669",
+        "action": "SAVE_PLAN",
+        "amount": 500,
+        "cardId": "",
+        "categoryId": "",
+        "days": [
+          15,
+          31
+        ],
+        "endDate": "",
+        "frequencyMonths": 1,
+        "incomeTypeId": "",
+        "isActive": true,
+        "kind": "PAYROLL",
+        "name": "Nómina ficticia",
+        "operationId": "3727dcbd-93d0-4e9a-b68a-960078bcdf92",
+        "payrollBusinessDays": true,
+        "referenceMonths": [
+          "2026-07",
+          "2026-08",
+          "2026-09"
+        ],
+        "startDate": "2026-10-27",
+        "useHistoricalPayments": false
+      },
+      "method": "POST",
+      "response": {
+        "id": "19771115-2cc3-4139-8a87-fad63cc8610d",
+        "ok": true
+      },
+      "status": 200,
+      "url": "/api/money"
+    },
+    {
+      "method": "GET",
+      "response": {
+        "accounts": [
+          {
+            "balance": 1100.25,
+            "id": "d924f9c5-bc1d-402e-8682-b69a953b5669",
+            "version": 2
+          }
+        ],
+        "plans": [
+          {
+            "amount": "500",
+            "id": "19771115-2cc3-4139-8a87-fad63cc8610d",
+            "version": 1
+          }
+        ],
+        "simulated": false,
+        "summary": {
+          "available": 1000.25,
+          "balance": 1100.25,
+          "belowReserveDate": null,
+          "minimum": 1100.25,
+          "minimumDate": "2026-10-27",
+          "reserved": 100,
+          "zeroDate": null
+        }
+      },
+      "status": 200,
+      "url": "/api/money?"
+    },
+    {
+      "method": "GET",
+      "response": {
+        "accounts": [
+          {
+            "balance": 1100.25,
+            "id": "d924f9c5-bc1d-402e-8682-b69a953b5669",
+            "version": 2
+          }
+        ],
+        "plans": [
+          {
+            "amount": "500",
+            "id": "19771115-2cc3-4139-8a87-fad63cc8610d",
+            "version": 1
+          }
+        ],
+        "simulated": true,
+        "summary": {
+          "available": 1000.25,
+          "balance": 1100.25,
+          "belowReserveDate": null,
+          "minimum": 1100.25,
+          "minimumDate": "2026-10-27",
+          "reserved": 100,
+          "zeroDate": null
+        }
+      },
+      "status": 200,
+      "url": "/api/money?stopPayrollDate=&collectionDelay=10&variablePercent=100&extraAmount=0&extraDate=&extraAccountId="
+    },
+    {
+      "method": "GET",
+      "response": {
+        "accounts": [
+          {
+            "balance": 1100.25,
+            "id": "d924f9c5-bc1d-402e-8682-b69a953b5669",
+            "version": 2
+          }
+        ],
+        "plans": [
+          {
+            "amount": "500",
+            "id": "19771115-2cc3-4139-8a87-fad63cc8610d",
+            "version": 1
+          }
+        ],
+        "simulated": true,
+        "summary": {
+          "available": 1000.25,
+          "balance": 1100.25,
+          "belowReserveDate": null,
+          "minimum": 1100.25,
+          "minimumDate": "2026-10-27",
+          "reserved": 100,
+          "zeroDate": null
+        }
+      },
+      "status": 200,
+      "url": "/api/money?stopPayrollDate=&collectionDelay=10&variablePercent=100&extraAmount=0&extraDate=&extraAccountId="
+    },
+    {
+      "body": {
+        "accountId": "d924f9c5-bc1d-402e-8682-b69a953b5669",
+        "action": "SAVE_PLAN",
+        "amount": 550.25,
+        "cardId": "",
+        "categoryId": "",
+        "days": [
+          15,
+          31
+        ],
+        "endDate": "",
+        "frequencyMonths": 1,
+        "id": "19771115-2cc3-4139-8a87-fad63cc8610d",
+        "incomeTypeId": "",
+        "isActive": true,
+        "kind": "PAYROLL",
+        "name": "Nómina ficticia",
+        "operationId": "da2252f4-e308-4679-a3d5-1c78657ee245",
+        "payrollBusinessDays": true,
+        "referenceMonths": [
+          "2026-07",
+          "2026-08",
+          "2026-09"
+        ],
+        "startDate": "2026-10-27",
+        "useHistoricalPayments": false,
+        "version": 1
+      },
+      "method": "POST",
+      "response": {
+        "ok": true
+      },
+      "status": 200,
+      "url": "/api/money"
+    },
+    {
+      "body": {
+        "accountId": "d924f9c5-bc1d-402e-8682-b69a953b5669",
+        "action": "SAVE_PLAN",
+        "amount": 550.25,
+        "cardId": "",
+        "categoryId": "",
+        "days": [
+          15,
+          31
+        ],
+        "endDate": "",
+        "frequencyMonths": 1,
+        "id": "19771115-2cc3-4139-8a87-fad63cc8610d",
+        "incomeTypeId": "",
+        "isActive": true,
+        "kind": "PAYROLL",
+        "name": "Nómina ficticia",
+        "operationId": "da2252f4-e308-4679-a3d5-1c78657ee245",
+        "payrollBusinessDays": true,
+        "referenceMonths": [
+          "2026-07",
+          "2026-08",
+          "2026-09"
+        ],
+        "startDate": "2026-10-27",
+        "useHistoricalPayments": false,
+        "version": 1
+      },
+      "method": "POST",
+      "response": {
+        "ok": true
+      },
+      "status": 200,
+      "url": "/api/money"
+    },
+    {
+      "method": "GET",
+      "response": {
+        "accounts": [
+          {
+            "balance": 1100.25,
+            "id": "d924f9c5-bc1d-402e-8682-b69a953b5669",
+            "version": 2
+          }
+        ],
+        "plans": [
+          {
+            "amount": "550.25",
+            "id": "19771115-2cc3-4139-8a87-fad63cc8610d",
+            "version": 2
+          }
+        ],
+        "simulated": true,
+        "summary": {
+          "available": 1000.25,
+          "balance": 1100.25,
+          "belowReserveDate": null,
+          "minimum": 1100.25,
+          "minimumDate": "2026-10-27",
+          "reserved": 100,
+          "zeroDate": null
+        }
+      },
+      "status": 200,
+      "url": "/api/money?stopPayrollDate=&collectionDelay=10&variablePercent=100&extraAmount=0&extraDate=&extraAccountId="
+    },
+    {
+      "method": "GET",
+      "response": {
+        "accounts": [
+          {
+            "balance": 1100.25,
+            "id": "d924f9c5-bc1d-402e-8682-b69a953b5669",
+            "version": 2
+          }
+        ],
+        "plans": [
+          {
+            "amount": "550.25",
+            "id": "19771115-2cc3-4139-8a87-fad63cc8610d",
+            "version": 2
+          }
+        ],
+        "simulated": true,
+        "summary": {
+          "available": 1000.25,
+          "balance": 1100.25,
+          "belowReserveDate": null,
+          "minimum": 1100.25,
+          "minimumDate": "2026-10-27",
+          "reserved": 100,
+          "zeroDate": null
+        }
+      },
+      "status": 200,
+      "url": "/api/money?stopPayrollDate=&collectionDelay=10&variablePercent=100&extraAmount=0&extraDate=&extraAccountId="
+    },
+    {
+      "body": {
+        "accountId": "d924f9c5-bc1d-402e-8682-b69a953b5669",
+        "action": "ROUTE",
+        "clear": false,
+        "excluded": false,
+        "key": "default:income",
+        "occurrenceDate": null,
+        "operationId": "6ae9021b-c9dc-4a1b-bc9e-7365bd3089a2",
+        "planChoice": "",
+        "planId": null
+      },
+      "method": "POST",
+      "response": {
+        "ok": true
+      },
+      "status": 200,
+      "url": "/api/money"
+    },
+    {
+      "method": "GET",
+      "response": {
+        "accounts": [
+          {
+            "balance": 1100.25,
+            "id": "d924f9c5-bc1d-402e-8682-b69a953b5669",
+            "version": 2
+          }
+        ],
+        "plans": [
+          {
+            "amount": "550.25",
+            "id": "19771115-2cc3-4139-8a87-fad63cc8610d",
+            "version": 2
+          }
+        ],
+        "simulated": true,
+        "summary": {
+          "available": 1000.25,
+          "balance": 1100.25,
+          "belowReserveDate": null,
+          "minimum": 1100.25,
+          "minimumDate": "2026-10-27",
+          "reserved": 100,
+          "zeroDate": null
+        }
+      },
+      "status": 200,
+      "url": "/api/money?stopPayrollDate=&collectionDelay=10&variablePercent=100&extraAmount=0&extraDate=&extraAccountId="
+    },
+    {
+      "method": "GET",
+      "response": {
+        "accounts": [
+          {
+            "balance": 1100.25,
+            "id": "d924f9c5-bc1d-402e-8682-b69a953b5669",
+            "version": 2
+          }
+        ],
+        "plans": [
+          {
+            "amount": "550.25",
+            "id": "19771115-2cc3-4139-8a87-fad63cc8610d",
+            "version": 2
+          }
+        ],
+        "simulated": true,
+        "summary": {
+          "available": 1000.25,
+          "balance": 1100.25,
+          "belowReserveDate": null,
+          "minimum": 1100.25,
+          "minimumDate": "2026-10-27",
+          "reserved": 100,
+          "zeroDate": null
+        }
+      },
+      "status": 200,
+      "url": "/api/money?stopPayrollDate=&collectionDelay=10&variablePercent=100&extraAmount=0&extraDate=&extraAccountId="
+    }
+  ]
+}

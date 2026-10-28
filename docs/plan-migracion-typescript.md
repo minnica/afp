@@ -1,6 +1,6 @@
 # Plan de migración gradual a TypeScript
 
-**Estado:** fases 0–2 completadas; fases 3–7 pendientes. **Piloto implementado:** [resultados de la fase 2](../artifacts/typescript-migration/phase-2/README.md), sobre `2ff43a9`, 27 de octubre de 2026. **Base revisada del plan:** `4d7b6e6`, 27 de octubre de 2026. **Referencia ejecutada:** `83a3924`; [resultados y reproducción de la fase 0](../artifacts/typescript-migration/phase-0/README.md).
+**Estado:** fases 0–3 completadas; fases 4–7 pendientes. **Mi dinero:** [resultados de la fase 3](../artifacts/typescript-migration/phase-3/README.md), sobre `0c11537`, 27 de octubre de 2026. **Piloto implementado:** [resultados de la fase 2](../artifacts/typescript-migration/phase-2/README.md), sobre `2ff43a9`, 27 de octubre de 2026. **Base revisada del plan:** `4d7b6e6`, 27 de octubre de 2026. **Referencia ejecutada:** `83a3924`; [resultados y reproducción de la fase 0](../artifacts/typescript-migration/phase-0/README.md).
 
 ## Objetivo y alcance
 
@@ -56,7 +56,7 @@ Zod permite derivar tipos de [entrada y salida](https://zod.dev/basics); Prisma 
 
 Las validaciones nuevas deberán aceptar las formas que ya admite el contrato público, incluidos campos omitidos, nulos y formatos monetarios compatibles. Corregir o restringir esos contratos será otro cambio. Los tipos de identificadores o unidades podrán distinguirse internamente cuando eviten una confusión concreta, sin modificar su representación en JSON o BD.
 
-**Protección de idempotencia:** conservar el cuerpo original utilizado para calcular las huellas, el orden de validación relevante y las respuestas guardadas. Coercionar números, eliminar propiedades o normalizar fechas antes de calcular el hash podría cambiar la identidad de un reintento. El código actual de [Mi dinero](../src/lib/money/service.js) y [Gastos](../src/lib/expenseOperations.js) es la referencia de compatibilidad.
+**Protección de idempotencia:** conservar el cuerpo original utilizado para calcular las huellas, el orden de validación relevante y las respuestas guardadas. Coercionar números, eliminar propiedades o normalizar fechas antes de calcular el hash podría cambiar la identidad de un reintento. El código actual de [Mi dinero](../src/lib/money/service.ts) y [Gastos](../src/lib/expenseOperations.js) es la referencia de compatibilidad.
 
 ## Secuencia de implementación
 
@@ -65,7 +65,7 @@ Las validaciones nuevas deberán aceptar las formas que ya admite el contrato p�
 | 0 | Referencia funcional e inventario de dependencias | — | Completada |
 | 1 | Herramientas y pruebas compatibles con JS/TS | 0 | Completada |
 | 2 | Transferencias tipadas de formulario a persistencia | 1 | Completada |
-| 3 | Mi dinero completo | 2 | Pendiente |
+| 3 | Mi dinero completo | 2 | Completada |
 | 4 | Núcleo financiero, API y contratos compartidos | 3 | Pendiente |
 | 5 | Captura, Calendar y cola offline | 4 | Pendiente |
 | 6 | Resto de la interfaz, hooks y páginas | 5 | Pendiente |
@@ -111,7 +111,7 @@ esbuild [transforma TypeScript pero no comprueba tipos](https://esbuild.github.i
 
 ### Fase 2 — Piloto: transferir entre cuentas propias
 
-**Referencias:** [contratos tipados](../src/lib/money/transferContracts.ts), [persistencia del piloto](../src/lib/money/transfers.ts), [cliente](../src/lib/money/transferClient.ts), [adaptador del editor](../src/components/mi-dinero/MoneyTransferEditor.tsx), [esquemas](../src/lib/money/schema.js), [servicio](../src/lib/money/service.js), [API](../src/app/api/money/route.js), [pantalla](../src/components/mi-dinero/MoneyContent.jsx), [editor compartido](../src/components/mi-dinero/MoneyEditor.jsx) y [pruebas de integración](../tests/money-integration.test.cjs).
+**Referencias:** [contratos tipados](../src/lib/money/transferContracts.ts), [persistencia del piloto](../src/lib/money/transfers.ts), [cliente](../src/lib/money/transferClient.ts), [adaptador del editor](../src/components/mi-dinero/MoneyTransferEditor.tsx), [esquemas](../src/lib/money/schema.ts), [servicio](../src/lib/money/service.ts), [API](../src/app/api/money/route.ts), [pantalla](../src/components/mi-dinero/MoneyContent.tsx), [editor compartido](../src/components/mi-dinero/MoneyEditor.tsx) y [pruebas de integración](../tests/money-integration.test.cjs).
 
 - [x] Definir los contratos de `TRANSFER` y `REVERSE_TRANSFER`, sus entradas validadas y respuestas. Mantener `POST /api/money`, acciones, códigos HTTP, UUID y formas JSON existentes.
 - [x] Extraer la lógica de transferencia a un módulo `.ts` pequeño si hace falta. Recibir la transacción y los datos necesarios: conservar el bloqueo por propietario y el recibo de operación en la transacción actual, sin crear una segunda transacción interna.
@@ -139,19 +139,21 @@ Las pruebas de integración deben ejecutarse con PostgreSQL local y recorrer for
 
 **Cierre del piloto:** contratos estrictos, sin escapes de tipos injustificados; casos anteriores correctos; ningún cambio en esquema, reglas ni protocolo. Medir esfuerzo real, impacto en tiempos de comprobación y tamaño de los adaptadores. Ajustar los lotes siguientes con esa evidencia.
 
-**Entrega:** [implementación y evidencias de la fase 2](../artifacts/typescript-migration/phase-2/README.md). Cinco módulos TS/TSX (158 líneas), ocho casos negativos de tipos y 840 pruebas con PostgreSQL local correctas, sin omisiones. Las 12 respuestas de fase 0 coinciden; el fixture verifica formulario → API → PostgreSQL, recuperación, foco y móvil/escritorio. `MoneyContent`, `MoneyEditor`, el handler, la coordinación transaccional y las demás acciones siguen en JS con fronteras explícitas; sus interiores no cuentan como migrados. Sin cambios de esquema, SQL, lockfile ni publicación.
+**Entrega:** [implementación y evidencias de la fase 2](../artifacts/typescript-migration/phase-2/README.md). Cinco módulos TS/TSX (158 líneas), ocho casos negativos de tipos y 840 pruebas con PostgreSQL local correctas, sin omisiones. Las 12 respuestas de fase 0 coinciden; el fixture verifica formulario → API → PostgreSQL, recuperación, foco y móvil/escritorio. Al cierre de la fase 2, `MoneyContent`, `MoneyEditor`, el handler, la coordinación transaccional y las demás acciones seguían en JS con fronteras explícitas; sus interiores no cuentan como migrados. Sin cambios de esquema, SQL, lockfile ni publicación.
 
 ### Fase 3 — Completar Mi dinero
 
 **Ajuste tras el piloto:** revisar en tres lotes: (1) cuentas/conciliaciones y resultado tipado de `loadMoneyData`; (2) rutas/planes y composición de `MoneyEditor`; (3) fuentes, rendimientos, presupuestos y proyección. El piloto necesitó 80 líneas de adaptadores de formulario/cliente y consultas Prisma focalizadas adicionales (una al transferir, dos al revertir); al tipar la instantánea compartida, reutilizar sus datos y retirar esas lecturas duplicadas sin alterar la transacción. Los [tiempos observados](../artifacts/typescript-migration/phase-2/execution.json) y el [intervalo de implementación/verificación](../artifacts/typescript-migration/phase-2/implementation-measurements.json) orientan el tamaño revisable, sin extrapolar un calendario a módulos de mayor complejidad.
 
-- [ ] Migrar cuentas y conciliaciones; después rutas y planes; finalmente fuentes, presupuestos, rendimientos y proyecciones de [src/lib/money/](../src/lib/money/).
-- [ ] Convertir `loadMoneyData` a un resultado con propiedades explícitas y tipos derivados de consultas Prisma. Evitar depender de dos arrays paralelos de nombres y resultados; conservar el orden de consultas y la instantánea transaccional.
-- [ ] Definir todas las variantes de comandos y las respuestas de consulta. Validar JSON históricos como `baseline`, `yieldHistory`, `paymentMix` y snapshots con sus valores heredados compatibles.
-- [ ] Tipar `MoneyEditor` y la composición del resto de formularios diferenciando entrada/salida de Zod. Conservar valores durante la edición, reinicios, errores y recibos de operación.
-- [ ] Migrar los consumidores de previsión y presentación mensual sin cambiar sus fórmulas ni estado de carga.
+- [x] Migrar cuentas y conciliaciones; después rutas y planes; finalmente fuentes, presupuestos, rendimientos y proyecciones de [src/lib/money/](../src/lib/money/).
+- [x] Convertir `loadMoneyData` a un resultado con propiedades explícitas y tipos derivados de consultas Prisma. Evitar depender de dos arrays paralelos de nombres y resultados; conservar el orden de consultas y la instantánea transaccional.
+- [x] Definir todas las variantes de comandos y las respuestas de consulta. Validar JSON históricos como `baseline`, `yieldHistory`, `paymentMix` y snapshots con sus valores heredados compatibles.
+- [x] Tipar `MoneyEditor` y la composición del resto de formularios diferenciando entrada/salida de Zod. Conservar valores durante la edición, reinicios, errores y recibos de operación.
+- [x] Migrar los consumidores de previsión y presentación mensual sin cambiar sus fórmulas ni estado de carga.
 
 **Aceptación:** regresiones de presupuestos, rendimientos, nómina, conciliaciones, pagos y proyección correctas. El calendario bancario, el consumo diario, la deduplicación de abonos reales y los saldos coinciden con la referencia. Las lecturas y escenarios siguen sin crear movimientos.
+
+**Entrega:** [implementación, contratos y evidencias de la fase 3](../artifacts/typescript-migration/phase-3/README.md). Todo `src/lib/money/`, los consumidores de `src/components/mi-dinero/` y `/api/money` están en TS/TSX. `loadMoneyData` conserva las 15 consultas secuenciales con propiedades inferidas; transferencias reutiliza esa instantánea. Se mantienen fronteras locales con UI JSX, cálculos financieros y servicios compartidos pendientes. Verificación con instalación limpia, PostgreSQL desechable, comparación de las 12 respuestas de fase 0 y formularios en navegador. Sin cambios de esquema, migraciones, lockfile ni publicación.
 
 ### Fase 4 — Núcleo financiero y API compartida
 

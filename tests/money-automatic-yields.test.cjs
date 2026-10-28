@@ -2,9 +2,9 @@ const assert = require('node:assert/strict');
 const { test } = require('node:test');
 const { sourceLoader } = require('./helpers/load-source.cjs');
 const load = sourceLoader();
-const { buildForecast } = load('src/lib/money/forecast.js');
-const { buildSources } = load('src/lib/money/sources.js');
-const { yieldRule, changedYieldHistory, bankHolidays } = load('src/lib/money/yieldRules.js');
+const { buildForecast } = load('src/lib/money/forecast.ts');
+const { buildSources } = load('src/lib/money/sources.ts');
+const { yieldRule, changedYieldHistory, bankHolidays } = load('src/lib/money/yieldRules.ts');
 function data(extra = {}) {
   return { accounts: [{ id: 'a', name: 'Cuenta ficticia', openingBalance: 10000, reservedAmount: 0, asOf: '2026-10-23', baseline: {}, annualYield: 36.5, yieldBasis: 365, autoYield: true }], routes: [{ key: 'default:income', accountId: 'a' }, { key: 'default:expense', accountId: 'a' }], plans: [], transfers: [], cards: [], cycles: [], incomes: [], expenses: [], subscriptions: [], purchases: [], receivables: [], payables: [], ...extra };
 }

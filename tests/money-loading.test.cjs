@@ -12,7 +12,7 @@ test('Mi dinero: las lecturas esperan la conexión única y conservan propietari
     return [{ model: name }];
   } }]));
   const load = sourceLoader({ '@/lib/apiAuth': { ApiAccessError: class extends Error {} } });
-  const data = await load('src/lib/money/service.js').loadMoneyData(db, 'owner');
+  const data = await load('src/lib/money/service.ts').loadMoneyData(db, 'owner');
   assert.equal(peak, 1); assert.equal(calls.length, 15);
   assert.ok(calls.every(call => call.options.where.userId === 'owner'));
   assert.equal(data.expenses[0].model, 'dailyExpense');
@@ -41,7 +41,7 @@ function routeFixture(code) {
     },
     '@/lib/money/forecast': { buildForecast: input => { assert.equal(active, false, 'el cálculo no retiene la conexión'); assert.equal(input, data); builds++; return { daily: [], monthly: [] }; } },
   }, { console: { error: () => {} } });
-  return { route: load('src/app/api/money/route.js'), counts: () => ({ reads, builds }) };
+  return { route: load('src/app/api/money/route.ts'), counts: () => ({ reads, builds }) };
 }
 
 test('Mi dinero: libera la transacción antes de calcular y serializar ambos escenarios', async () => {

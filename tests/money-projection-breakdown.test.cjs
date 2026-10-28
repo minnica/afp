@@ -2,8 +2,8 @@ const assert = require('node:assert/strict');
 const { test } = require('node:test');
 const { sourceLoader } = require('./helpers/load-source.cjs');
 const load = sourceLoader();
-const { buildProjectionBreakdown, monthlyBreakdownEvents } = load('src/components/mi-dinero/projectionBreakdown.js');
-const { buildForecast } = load('src/lib/money/forecast.js');
+const { buildProjectionBreakdown, monthlyBreakdownEvents } = load('src/components/mi-dinero/projectionBreakdown.ts');
+const { buildForecast } = load('src/lib/money/forecast.ts');
 const accounts = [{ id: 'a', name: 'Banco' }, { id: 'b', name: 'Cajita' }];
 const event = extra => ({ date: '2026-11-01', amount: -100, label: 'Concepto', kind: 'EXPENSE', accountId: 'a', status: 'EXPECTED', ...extra });
 

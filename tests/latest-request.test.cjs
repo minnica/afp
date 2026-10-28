@@ -1,7 +1,7 @@
 const assert = require('node:assert/strict');
 const { test } = require('node:test');
 const { sourceLoader } = require('./helpers/load-source.cjs');
-const { createLatestRequest } = sourceLoader()('src/lib/latestRequest.js');
+const { createLatestRequest } = sourceLoader()('src/lib/latestRequest.ts');
 const deferred = () => { let resolve, reject; const promise = new Promise((yes, no) => { resolve = yes; reject = no; }); return { promise, resolve, reject }; };
 
 test('lecturas: foco y visibilidad comparten la petición pendiente sin cancelarla', async () => {

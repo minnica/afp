@@ -9,7 +9,7 @@ test('nómina hábil: guarda el plan sin duplicados, aplica abonos reales y evit
   const db = new PrismaClient({ adapter: new PrismaPg({ connectionString }) });
   const user = await db.user.create({ data: { email: `payroll-${randomUUID()}@example.test` } });
   const load = sourceLoader({ '@/lib/prisma': { prisma: db }, '@/lib/calendar/schedule': { scheduleCalendarSync: () => {} } });
-  const { mutateMoney, loadMoneyData } = load('src/lib/money/service.js'), { buildForecast } = load('src/lib/money/forecast.js');
+  const { mutateMoney, loadMoneyData } = load('src/lib/money/service.ts'), { buildForecast } = load('src/lib/money/forecast.ts');
   const write = body => mutateMoney(db, user.id, { operationId: randomUUID(), ...body }, '2026-10-24');
   const read = () => db.$transaction(async tx => { await tx.$executeRawUnsafe('SET TRANSACTION READ ONLY'); return buildForecast(await loadMoneyData(tx,user.id),'2026-10-24'); }, { isolationLevel: 'RepeatableRead' });
   try {

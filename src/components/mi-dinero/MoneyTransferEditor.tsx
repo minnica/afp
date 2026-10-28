@@ -11,8 +11,8 @@ export interface MoneyTransferEditorProps {
   restoreFocus: (event: Event) => void;
 }
 
-// MoneyEditor conserva RHF, borrador, UUID y foco. Su interior JSX no se
-// considera comprobado: validar el callback antes de entrar al flujo tipado.
+// El editor compartido está tipado; este wrapper conserva el callback específico
+// de transferencias para sus consumidores y contratos existentes.
 export default function MoneyTransferEditor({ onSave, ...props }: MoneyTransferEditorProps) {
   return <MoneyEditor {...props} onSave={(payload: unknown) => onSave(transferEditorCommand(payload))} />;
 }

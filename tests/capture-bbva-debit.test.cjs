@@ -29,7 +29,7 @@ test('BBVA: regla, efecto financiero, corrección e idempotencia con PostgreSQL'
   const users = await Promise.all(['owner', 'other'].map(x => db.user.create({ data: { email: `bbva-${x}-${randomUUID()}@example.test` } }))), [user, other] = users;
   const load = sourceLoader({ '@/lib/prisma': { prisma: db }, '@/lib/calendar/schedule': { scheduleCalendarSync() {} }, 'next/server': { NextResponse: { json: (body, opts = {}) => ({ body: JSON.parse(JSON.stringify(body)), status: opts.status || 200 }) } }, '@supabase/supabase-js': { createClient: () => ({ auth: { getUser: async token => ({ data: { user: token === 'owner' ? user : other } }) } }) } });
   const protocol = load('src/lib/captureProtocol.js'), service = load('src/lib/captureService.js'), processing = load('src/lib/captureProcessing.js');
-  const config = load('src/lib/captureConfiguration.js'), money = load('src/lib/money/service.js'), sources = load('src/lib/money/sources.js');
+  const config = load('src/lib/captureConfiguration.js'), money = load('src/lib/money/service.ts'), sources = load('src/lib/money/sources.ts');
   const route = load('src/app/api/captures/movements/route.js');
   const account = (u, name) => db.moneyAccount.create({ data: { userId: u.id, name, kind: 'BANK', openingBalance: 10000, asOf: new Date('2026-10-24'), baseline: {} } });
   const bbva = await account(user, 'Cuenta QA'), destination = await account(user, 'Destino QA'), foreign = await account(other, 'Ajena QA');

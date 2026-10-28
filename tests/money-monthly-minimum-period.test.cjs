@@ -2,8 +2,8 @@ const assert = require('node:assert/strict');
 const { test } = require('node:test');
 const { sourceLoader } = require('./helpers/load-source.cjs');
 const load = sourceLoader();
-const { monthlyMinimumPeriod } = load('src/components/mi-dinero/monthlyMinimumPeriod.js');
-const { buildForecast } = load('src/lib/money/forecast.js');
+const { monthlyMinimumPeriod } = load('src/components/mi-dinero/monthlyMinimumPeriod.ts');
+const { buildForecast } = load('src/lib/money/forecast.ts');
 
 const month = { month: '2026-11', minimum: 1000 };
 const day = (date, balance) => ({ date, balance });

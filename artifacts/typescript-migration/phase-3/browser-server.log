@@ -1,0 +1,5 @@
+✓ Running next.config took 8ms
+Fixture directory: /tmp/afp-money-qa-yjt6rD
+Money QA ready on 4216; real API and local PostgreSQL.
+(node:462408) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)

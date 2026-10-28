@@ -51,7 +51,7 @@ Este README describe el funcionamiento y los procedimientos del código versiona
 | Área | Implementación |
 | --- | --- |
 | Web | Next.js 16.3.8, App Router y React 19.2.4 |
-| Lenguaje | Transición gradual JS/JSX → TypeScript; piloto de transferencias tipado, resto de la aplicación en JS/JSX. Alias `@/*` para `src/*` |
+| Lenguaje | Transición gradual JS/JSX → TypeScript; Mi dinero tipado (API, servicios, cálculos y formularios), otros módulos en JS/JSX. Alias `@/*` para `src/*` |
 | UI | Componentes shadcn locales, Radix UI y Tailwind CSS 4; Base UI para el Combobox múltiple |
 | Formularios | React Hook Form y Zod |
 | Tablas y gráficas | TanStack Table 8 y Recharts 3 |
@@ -360,7 +360,7 @@ Desconectar retira eventos de hoy en adelante, conserva el historial y elimina l
 ## Convenciones de desarrollo
 
 - Leer este README y [PRODUCT.md](PRODUCT.md) antes de cambiar arquitectura o comportamiento. Actualizar la documentación afectada en la misma tarea; registrar los hitos relevantes en [docs/bitacora.md](docs/bitacora.md) y guardar los resultados detallados de ejecución en `artifacts/`.
-- Seguir el [plan de migración gradual a TypeScript](docs/plan-migracion-typescript.md): fases 0–2 completas, transferencias y reversiones tipadas mediante contratos y adaptadores explícitos. La [evidencia del piloto](artifacts/typescript-migration/phase-2/README.md) incluye PostgreSQL y navegador móvil/escritorio. `tsconfig.json` permite JS sin comprobarlo (`allowJs: true`, `checkJs: false`); TS/TSX usa `strict` y `noUncheckedIndexedAccess`. No considerar tipado el código JS restante. Código en inglés e interfaz en español.
+- Seguir el [plan de migración gradual a TypeScript](docs/plan-migracion-typescript.md): fases 0–3 completas. Mi dinero usa una instantánea tipada de Prisma, comandos por acción, validación de JSON históricos y respuestas, y formularios/proyección en TSX. La [evidencia de la fase 3](artifacts/typescript-migration/phase-3/README.md) incluye PostgreSQL y navegador móvil/escritorio. Los componentes compartidos de UI y el núcleo financiero externo conservan fronteras locales explícitas hasta sus respectivas fases. `tsconfig.json` permite JS sin comprobarlo (`allowJs: true`, `checkJs: false`); TS/TSX usa `strict` y `noUncheckedIndexedAccess`. No considerar tipado el código JS restante. Código en inglés e interfaz en español.
 - Conservar `node:test` y cargar fuentes con `tests/helpers/load-source.cjs`: esbuild transforma JS/TS/JSX/TSX, pero no comprueba tipos. Los tests deben inyectar adaptadores de red/BD; el cargador no hereda `process.env` ni carga `.env`. Actualizar rutas literales al convertir archivos; el fallback de extensión inequívoco es temporal hasta la fase 7.
 - Reutilizar [src/components/ui/](src/components/ui/) y la configuración `radix-mira` de [components.json](components.json). Formularios con React Hook Form + Zod; fechas con `DatePicker`; importes con `NumberInput`; selectores con `ResponsiveSelect`/`SearchableSelect`.
 - Conservar la interacción móvil de `CreateRecordSurface`, los borradores por usuario y el foco de los diálogos. Los borrados requieren el `AlertDialog` compartido. No ocultar errores ni presentar una recarga fallida como un alta no guardada.
@@ -381,7 +381,7 @@ La web se despliega en Vercel, proyecto `afp`. El build es `pnpm build`; no apli
 
 ## Documentación relacionada
 
-- [docs/plan-migracion-typescript.md](docs/plan-migracion-typescript.md): plan por fases y criterios de aceptación; referencia, herramientas y piloto de transferencias completados; siguiente fase: completar Mi dinero.
+- [docs/plan-migracion-typescript.md](docs/plan-migracion-typescript.md): plan por fases y criterios de aceptación; referencia, herramientas, piloto y Mi dinero completados; siguiente fase: núcleo financiero y API compartida.
 - [docs/bitacora.md](docs/bitacora.md): decisiones, migraciones, incidencias y seguimientos históricos con sus evidencias.
 - [PRODUCT.md](PRODUCT.md): propósito, alcance y principios del producto.
 - [docs/android-captura.md](docs/android-captura.md): operación técnica de Android, firma y pruebas.

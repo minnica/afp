@@ -1,0 +1,56 @@
+{
+  "verified": true,
+  "account": {
+    "id": "d924f9c5-bc1d-402e-8682-b69a953b5669",
+    "openingBalance": "1100.25",
+    "annualYield": "36.5",
+    "version": 2
+  },
+  "reconciliations": [
+    {
+      "id": "54f2ac82-72e2-4c39-b876-6926ea637f30",
+      "previousBalance": "1000.25",
+      "bankBalance": "1100.25"
+    }
+  ],
+  "plans": [
+    {
+      "id": "19771115-2cc3-4139-8a87-fad63cc8610d",
+      "userId": "00000000-0000-4000-8000-000000000094",
+      "name": "Nómina ficticia",
+      "kind": "PAYROLL",
+      "amount": "550.25",
+      "accountId": "d924f9c5-bc1d-402e-8682-b69a953b5669",
+      "cardId": null,
+      "incomeTypeId": null,
+      "categoryId": null,
+      "startDate": "2026-10-27T00:00:00.000Z",
+      "endDate": null,
+      "frequencyMonths": 1,
+      "days": [
+        15,
+        31
+      ],
+      "payrollBusinessDays": true,
+      "paymentMix": null,
+      "isActive": true,
+      "version": 2
+    }
+  ],
+  "routes": [
+    {
+      "id": "2ee5b6b0-f673-4920-bfea-eb0f09fbe844",
+      "userId": "00000000-0000-4000-8000-000000000094",
+      "key": "default:income",
+      "accountId": "d924f9c5-bc1d-402e-8682-b69a953b5669",
+      "excluded": false,
+      "planId": null,
+      "occurrenceDate": null
+    }
+  ],
+  "receiptCount": 5,
+  "postCount": 6,
+  "incomes": 0,
+  "expenses": 0,
+  "allReceiptsMatch": true
+}

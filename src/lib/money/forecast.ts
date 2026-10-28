@@ -1,28 +1,32 @@
+import type { CalculationData, MoneyPlan, MoneyRoute, DatedEvent } from './types';
+import { readPaymentMix, readBaseline } from './persisted';
+import type { z } from 'zod';
+import type { scenarioSchema } from './schema';
+
+type ForecastCycle = Pick<CalculationData['cycles'][number], 'id' | 'cardId' | 'card' | 'year' | 'month' | 'startDate' | 'cutDate' | 'dueDate'> & Partial<CalculationData['cycles'][number]>;
 import { amount, cents, buildSources, accountBalances, resolveRoute } from '@/lib/money/sources';
 import { day, addDays, addMonths, monthDay, monthRange } from '@/lib/money/dates';
-import { getDebtAccountState } from '@/lib/calculations/debtAccounts';
-import { calculateCycleAmount } from '@/lib/calculations/cardCycles';
-import { buildSubscriptionCharges } from '@/lib/subscriptionCharges';
+import { getDebtAccountState, calculateCycleAmount, buildSubscriptionCharges } from './legacyCalculations';
 import { Prisma } from '@prisma/client';
 import { ruleAt, dailyYieldCents, roundedYieldCents, paysOn, isRecordedYield, previousBankingDay } from '@/lib/money/yieldRules';
 import { budgetExpenses, budgetPaymentParts } from '@/lib/money/budgets';
 
-function planPayDate(plan, date) { return plan.kind === 'PAYROLL' && plan.payrollBusinessDays ? previousBankingDay(date) : date; }
-export function planDates(plan, from, to) {
+function planPayDate(plan: MoneyPlan, date: string) { return plan.kind === 'PAYROLL' && plan.payrollBusinessDays ? previousBankingDay(date) : date; }
+export function planDates(plan: MoneyPlan, from: string, to: string) {
   if (!plan.isActive) return [];
   const start = day(plan.startDate), end = day(plan.endDate);
   if (!plan.frequencyMonths) { const date = planPayDate(plan, start); return date >= from && date <= to && (!end || start <= end) ? [date] : []; }
-  const [sy, sm] = start.split('-').map(Number);
+  const [sy = 0, sm = 0] = start.split('-').map(Number);
   // Un pago del primer día del mes siguiente puede adelantarse a este mes.
   const lookahead = plan.kind === 'PAYROLL' && plan.payrollBusinessDays ? `${addMonths(to, 1)}-01` : to;
   return [...new Set(monthRange(from, lookahead).flatMap(month => {
-    const [y, m] = month.split('-').map(Number);
+    const [y = 0, m = 0] = month.split('-').map(Number);
     if ((y * 12 + m - sy * 12 - sm) % plan.frequencyMonths !== 0) return [];
     return [...new Set(plan.days.map(n => monthDay(month, n)))].filter(d => d >= start && (!end || d <= end)).map(d => planPayDate(plan, d)).filter(d => d >= from && d <= to);
   }))].sort();
 }
-function syntheticCycles(data, today, end) {
-  const cycles = [...data.cycles];
+function syntheticCycles(data: CalculationData, today: string, end: string) {
+  const cycles: (ForecastCycle & { projected?: boolean })[] = [...data.cycles];
   for (const card of data.cards) {
     for (const month of monthRange(`${addMonths(today, -1)}-01`, end)) {
       if (cycles.some(c => c.cardId === card.id && `${c.year}-${String(c.month).padStart(2, '0')}` === month)) continue;
@@ -37,22 +41,22 @@ function syntheticCycles(data, today, end) {
   }
   return cycles;
 }
-export function buildForecast(data, today, options = {}) {
+export function buildForecast(data: CalculationData, today: string, options: Partial<z.output<typeof scenarioSchema>> = {}) {
   const end = monthDay(addMonths(today, 11), 31), months = monthRange(today, end);
   const scenario = { collectionDelay: 0, variablePercent: 100, stopPayrollDate: '', extraAmount: 0, extraDate: '', extraAccountId: '', ...options };
   const { events: actual, issues, pendingYields } = buildSources(data, today);
   const accounts = accountBalances(data.accounts, actual, today).map(a => ({ ...a, pendingYield: amount(roundedYieldCents(pendingYields[a.id] || new Prisma.Decimal(0), ruleAt(a, today))) }));
-  const future = actual.filter(e => !e.excluded && e.date > today && e.date <= end).map(e => ({ ...e, status: 'REGISTERED_FUTURE' }));
-  const plannedCardExpenses = [];
-  const add = event => { if (event.cents && event.date <= end) future.push({ ...event, date: event.date < today ? today : event.date, originalDate: event.date, status: event.status || 'EXPECTED' }); };
-  const resolve = (keys, fallback = {}) => resolveRoute(data, keys, fallback);
+  const future: DatedEvent[] = actual.filter((e): e is DatedEvent => !e.excluded && e.date !== null && e.date > today && e.date <= end).map(e => ({ ...e, status: 'REGISTERED_FUTURE' }));
+  const plannedCardExpenses: { id: string; cardId: string; paymentMethod: 'CARD'; date: string; amount: number; concept: string }[] = [];
+  const add = (event: DatedEvent) => { if (event.cents && event.date <= end) future.push({ ...event, date: event.date < today ? today : event.date, originalDate: event.date, status: event.status || 'EXPECTED' }); };
+  const resolve = (keys: string[], fallback: MoneyRoute = {}) => resolveRoute(data, keys, fallback);
   const currentStart = `${today.slice(0, 7)}-01`;
-  const planOccurrences = [], variableBudgets = [];
+  const planOccurrences: { planId: string; date: string; label: string; pending: number; status: string; kind: string }[] = [], variableBudgets: { id: string; categoryId: string | null; name: string; monthlyAmount: number; recordedAmount: number; pendingConsumption: number; referenceMonths: string[] | null }[] = [];
   if (!data.plans.some(p => p.isActive && p.kind === 'VARIABLE')) issues.push({ key: 'no-variable-budget', message: 'Sin presupuesto variable: la proyección solo contempla los gastos y compromisos definidos.' });
   for (const plan of data.plans.filter(p => p.isActive)) {
     const isIncome = ['INCOME', 'PAYROLL'].includes(plan.kind);
     if (plan.kind === 'VARIABLE') {
-      const recordedByDate = new Map();
+      const recordedByDate = new Map<string, number>();
       for (const expense of budgetExpenses(data, plan.categoryId)) {
         const date = day(expense.date);
         recordedByDate.set(date, (recordedByDate.get(date) || 0) + expense.personalCents);
@@ -61,7 +65,7 @@ export function buildForecast(data, today, options = {}) {
       let pendingConsumption = 0;
       for (const month of months) {
         if (month < day(plan.startDate).slice(0, 7) || (plan.endDate && month > day(plan.endDate).slice(0, 7))) continue;
-        const start = [today, day(plan.startDate), `${month}-01`].sort().at(-1), last = [end, day(plan.endDate) || end, monthDay(month, 31)].sort()[0];
+        const start = [today, day(plan.startDate), `${month}-01`].sort().at(-1)!, last = [end, day(plan.endDate) || end, monthDay(month, 31)].sort()[0]!;
         const daysInMonth = Number(monthDay(month, 31).slice(-2));
         for (let date = start; date <= last; date = addDays(date, 1)) {
           const ordinal = Number(date.slice(-2));
@@ -71,8 +75,8 @@ export function buildForecast(data, today, options = {}) {
           const value = Math.max(0, expected - (recordedByDate.get(date) || 0));
           if (!value) continue;
           pendingConsumption += value;
-          const event = { key: `budget:${plan.id}:${date}`, date, cents: -value, label: plan.name, kind: 'VARIABLE', accountId: plan.accountId, planId: plan.id, status: 'ESTIMATED' };
-          const parts = plan.paymentMix ? budgetPaymentParts(value, plan.paymentMix) : [{ cardId: plan.cardId || null, cents: value }];
+          const event: DatedEvent = { key: `budget:${plan.id}:${date}`, date, cents: -value, label: plan.name, kind: 'VARIABLE', accountId: plan.accountId, planId: plan.id, status: 'ESTIMATED' };
+          const parts = plan.paymentMix ? budgetPaymentParts(value, readPaymentMix(plan.paymentMix)!) : [{ cardId: plan.cardId || null, cents: value }];
           let immediate = 0;
           for (const part of parts) {
             if (part.cardId && data.cards.some(card => card.id === part.cardId)) plannedCardExpenses.push({ id: `${event.key}:${part.cardId}`, cardId: part.cardId, paymentMethod: 'CARD', date, amount: amount(part.cents), concept: plan.name });
@@ -84,15 +88,15 @@ export function buildForecast(data, today, options = {}) {
           if (immediate) add({ ...event, cents: -immediate });
         }
       }
-      variableBudgets.push({ id: plan.id, categoryId: plan.categoryId, name: plan.name, monthlyAmount: amount(monthlyAmount), recordedAmount: amount([...recordedByDate].filter(([date]) => date.slice(0, 7) === today.slice(0, 7) && date <= today).reduce((sum, [, value]) => sum + value, 0)), pendingConsumption: amount(pendingConsumption), referenceMonths: plan.paymentMix?.referenceMonths || null });
+      variableBudgets.push({ id: plan.id, categoryId: plan.categoryId, name: plan.name, monthlyAmount: amount(monthlyAmount), recordedAmount: amount([...recordedByDate].filter(([date]) => date.slice(0, 7) === today.slice(0, 7) && date <= today).reduce((sum, [, value]) => sum + value, 0)), pendingConsumption: amount(pendingConsumption), referenceMonths: readPaymentMix(plan.paymentMix)?.referenceMonths || null });
       continue;
     }
     const effectiveStart = planPayDate(plan, day(plan.startDate)), effectiveEnd = plan.endDate ? planPayDate(plan, day(plan.endDate)) : null;
     const dates = planDates(plan, plan.frequencyMonths ? currentStart : effectiveStart, end);
-    const autoPaid = new Map();
+    const autoPaid = new Map<string, number>();
     if (isIncome && plan.incomeTypeId) {
-      for (const e of actual.filter(e => e.incomeTypeId === plan.incomeTypeId && !e.planId && !e.excluded && e.date >= effectiveStart && (!effectiveEnd || e.date <= effectiveEnd))) {
-        const month = e.date.slice(0, 7); autoPaid.set(month, (autoPaid.get(month) || 0) + Math.abs(e.cents));
+      for (const e of actual.filter(e => e.incomeTypeId === plan.incomeTypeId && !e.planId && !e.excluded && e.date !== null && e.date >= effectiveStart && (!effectiveEnd || e.date <= effectiveEnd))) {
+        const month = e.date!.slice(0, 7); autoPaid.set(month, (autoPaid.get(month) || 0) + Math.abs(e.cents));
       }
     }
     for (const date of dates) {
@@ -136,9 +140,9 @@ export function buildForecast(data, today, options = {}) {
         // igual que Calendar y Avisos importantes, no un total a dividir.
         const nominal = cents(receivable.expectedMonthlyPayment);
         const covered = Math.min(paid, nominal); paid -= covered;
-        if (dates[i] < day(receivable.originDate)) continue;
+        if (dates[i]! < day(receivable.originDate)) continue;
         const value = Math.min(balance, nominal - covered); balance -= value;
-        add({ key: `receivable:${receivable.id}:${dates[i]}`, date: addDays(dates[i] < today ? today : dates[i], scenario.collectionDelay), cents: value, label: `Cobrar · ${receivable.person?.name || receivable.concept}`, kind: 'COLLECTION', accountId: route.accountId || null });
+        add({ key: `receivable:${receivable.id}:${dates[i]}`, date: addDays(dates[i]! < today ? today : dates[i]!, scenario.collectionDelay), cents: value, label: `Cobrar · ${receivable.person?.name || receivable.concept}`, kind: 'COLLECTION', accountId: route.accountId || null });
       }
     }
   }
@@ -193,51 +197,51 @@ export function buildForecast(data, today, options = {}) {
   const oldest = accounts.map(a => day(a.asOf)).sort()[0] || today;
   for (const e of actual) {
     const key = e.paymentGroup ? `card-flow:${e.paymentGroup}` : e.key;
-    e.includedInReference = !!e.date && accounts.length > 0 && accounts.every(a => e.date < day(a.asOf) || (e.date === day(a.asOf) && Object.values(a.baseline?.[key] || {}).reduce((sum, value) => sum + Math.abs(value), 0) >= Math.abs(e.cents)));
-    e.needsAccount = !e.excluded && (!accountIds.has(e.accountId) || !e.date) && (!e.date || e.date >= oldest) && !e.includedInReference;
+    e.includedInReference = !!e.date && accounts.length > 0 && accounts.every(a => e.date! < day(a.asOf) || (e.date === day(a.asOf) && Object.values(readBaseline(a.baseline)[key] || {}).reduce((sum, value) => sum + Math.abs(value), 0) >= Math.abs(e.cents)));
+    e.needsAccount = !e.excluded && (!accountIds.has(e.accountId || '') || !e.date) && (!e.date || e.date >= oldest) && !e.includedInReference;
   }
   const unassigned = actual.filter(e => e.needsAccount);
-  const missingFuture = future.filter(e => !accountIds.has(e.accountId));
+  const missingFuture = future.filter(e => !accountIds.has(e.accountId || ''));
   if (unassigned.length) issues.push({ key: 'unassigned', message: `${unassigned.length} movimientos sin cuenta o fecha. Los saldos están incompletos.` });
   if (missingFuture.length) issues.push({ key: 'future-unassigned', message: `${missingFuture.length} previsiones sin cuenta. Asígnalas para incluirlas en los saldos.` });
   for (const card of data.cards) {
     const overlapping = cycles.filter(c => c.cardId === card.id).sort((a, b) => day(a.startDate).localeCompare(day(b.startDate)));
-    const pairs = overlapping.flatMap((cycle, index) => index && day(cycle.startDate) <= day(overlapping[index - 1].cutDate) ? [[overlapping[index - 1], cycle]] : []);
+    const pairs = overlapping.flatMap((cycle, index) => index && day(cycle.startDate) <= day(overlapping[index - 1]!.cutDate) ? [[overlapping[index - 1]!, cycle]] : []);
     if (pairs.length) {
       const historical = pairs.every(pair => pair.every(cycle => day(cycle.cutDate) < today && day(cycle.dueDate) < today && cycle.statementAmount != null && cents(cycle.paidAmount) + cents(cycle.postCutCreditAmount) >= cents(cycle.statementAmount)));
       issues.push({ key: `overlap:${card.id}`, scope: historical ? 'HISTORICAL' : 'PROJECTION', message: `Revisa períodos superpuestos de ${card.name}.` });
     }
   }
   const balances = Object.fromEntries(accounts.map(a => [a.id, cents(a.balance)]));
-  const reserve = accounts.reduce((sum, a) => sum + cents(a.reservedAmount), 0), daily = [];
+  const reserve = accounts.reduce((sum, a) => sum + cents(a.reservedAmount), 0), daily: { date: string; balance: number; available: number; incoming: number; outgoing: number; accounts: Record<string, number> }[] = [];
   const accrued = Object.fromEntries(accounts.map(a => [a.id, pendingYields[a.id] || new Prisma.Decimal(0)]));
   for (let date = today; date <= end; date = addDays(date, 1)) {
     let incoming = 0, outgoing = 0;
-    const flows = future.filter(e => e.date === date && accountIds.has(e.accountId));
+    const flows = future.filter(e => e.date === date && accountIds.has(e.accountId || ''));
     // El abono usa los días previamente acumulados. Los movimientos de hoy
     // cambian el capital de hoy, cuyo rendimiento se abonará después.
     for (const account of accounts) {
       const rule = ruleAt(account, date);
       if (date <= today || !paysOn(rule, date)) continue;
-      const value = isRecordedYield(account, actual, date) ? 0 : roundedYieldCents(accrued[account.id], rule);
+      const value = isRecordedYield(account, actual, date) ? 0 : roundedYieldCents(accrued[account.id]!, rule);
       accrued[account.id] = new Prisma.Decimal(0);
       if (value > 0) {
-        balances[account.id] += value; incoming += value;
+        balances[account.id] = balances[account.id]! + value; incoming += value;
         future.push({ key: `yield:${account.id}:${date}`, date, cents: value, label: `Rendimiento · ${account.name}`, kind: 'YIELD', accountId: account.id, status: 'ESTIMATED' });
       }
     }
     for (const e of flows) {
-      balances[e.accountId] += e.cents;
+      balances[e.accountId!] = balances[e.accountId!]! + e.cents;
       if (e.kind !== 'TRANSFER') { if (e.cents > 0) incoming += e.cents; else outgoing -= e.cents; }
     }
-    for (const account of accounts) accrued[account.id] = accrued[account.id].add(dailyYieldCents(balances[account.id], ruleAt(account, date), date));
+    for (const account of accounts) accrued[account.id] = accrued[account.id]!.add(dailyYieldCents(balances[account.id]!, ruleAt(account, date), date));
     const total = Object.values(balances).reduce((a, b) => a + b, 0);
     daily.push({ date, balance: amount(total), available: amount(total - reserve), incoming: amount(incoming), outgoing: amount(outgoing), accounts: Object.fromEntries(Object.entries(balances).map(([id, n]) => [id, amount(n)])) });
   }
   const starting = accounts.reduce((sum, a) => sum + cents(a.balance), 0);
   const monthly = months.map((month, i) => {
     const days = daily.filter(d => d.date.startsWith(month));
-    return { month, opening: i ? daily.filter(d => d.date.startsWith(months[i - 1])).at(-1).balance : amount(starting), incoming: amount(days.reduce((s, d) => s + cents(d.incoming), 0)), outgoing: amount(days.reduce((s, d) => s + cents(d.outgoing), 0)), closing: days.at(-1).balance, minimum: Math.min(...days.map(d => d.balance)) };
+    return { month, opening: i ? daily.filter(d => d.date.startsWith(months[i - 1]!)).at(-1)!.balance : amount(starting), incoming: amount(days.reduce((s, d) => s + cents(d.incoming), 0)), outgoing: amount(days.reduce((s, d) => s + cents(d.outgoing), 0)), closing: days.at(-1)!.balance, minimum: Math.min(...days.map(d => d.balance)) };
   });
   const minimum = daily.reduce((min, d) => d.balance < min.balance ? d : min, { date: today, balance: amount(starting), available: amount(starting - reserve) });
   return {
@@ -246,3 +250,5 @@ export function buildForecast(data, today, options = {}) {
     accountShortfalls: accounts.map(a => ({ id: a.id, name: a.name, date: cents(a.balance) < cents(a.reservedAmount) ? today : daily.find(d => cents(d.accounts[a.id]) < cents(a.reservedAmount))?.date || null })).filter(a => a.date),
   };
 }
+
+export type MoneyForecast = ReturnType<typeof buildForecast>;

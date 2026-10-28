@@ -1,24 +1,11 @@
 import { z } from 'zod';
-import { transferSchema, transferCommandSchema, type TransferFormInput, type TransferCommand } from '@/lib/money/transferContracts';
+import { transferSchema, transferCommandSchema, type TransferCommand } from '@/lib/money/transferContracts';
 
-type TransferField = {
-  name: keyof TransferFormInput;
-  label: string;
-  type?: 'number' | 'date';
-  money?: boolean;
-  options?: { value: string; label: string }[];
-};
-export interface TransferEditorConfiguration {
-  title: string;
-  description: string;
-  action: 'TRANSFER';
-  schema: typeof transferSchema;
-  values: TransferFormInput;
-  fields: TransferField[];
-}
+import type { EditorConfiguration } from './editorContracts';
+export type TransferEditorConfiguration = Extract<EditorConfiguration, { action: 'TRANSFER' }>;
 
 export function createTransferEditor(accounts: unknown, today: string): TransferEditorConfiguration {
-  // La proyección permanece en JS: solo validar los datos usados por el piloto.
+  // Aceptar también consumidores externos del editor; solo requiere IDs/nombres.
   const options = z.array(z.object({ id: z.string(), name: z.string() })).parse(accounts)
     .map(account => ({ value: account.id, label: account.name }));
   return {

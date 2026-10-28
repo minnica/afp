@@ -24,7 +24,7 @@ test('piloto TS: transferencias, recibos, concurrencia, rollback y límites con 
     '@supabase/supabase-js': { createClient: () => ({ auth: { getUser: async () => ({ data: { user: { id: actor } } }) } }) },
     'next/server': { NextResponse: { json: (body, init = {}) => ({ body: JSON.parse(JSON.stringify(body)), status: init.status || 200, headers: new Headers(init.headers) }) } },
   });
-  const route = load('src/app/api/money/route.js'), { todayInMexico, addDays } = load('src/lib/money/dates.js');
+  const route = load('src/app/api/money/route.ts'), { todayInMexico, addDays } = load('src/lib/money/dates.ts');
   const today = todayInMexico(), yesterday = addDays(today, -1);
   const request = body => ({ method: 'POST', url: 'http://localhost/api/money', headers: new Headers({ Authorization: 'Bearer fictitious' }), json: async () => body });
   const post = body => route.POST(request({ operationId: randomUUID(), ...body }));

@@ -1,11 +1,13 @@
 'use client';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Badge, Separator, Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from './ui';
+import type { ForecastResponse } from '@/lib/money/responses';
 
 import { HugeiconsIcon } from '@hugeicons/react';
 import { Alert02Icon, AlertCircleIcon, ArrowDownRight01Icon, ArrowUpRight01Icon, CheckmarkCircle02Icon, MinusSignIcon } from '@hugeicons/core-free-icons';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+
+
+
+
 import { cn } from '@/lib/utils';
 import { money, monthLabel } from './format';
 import { monthlySummaryStatus } from './monthlySummaryStatus';
@@ -14,7 +16,7 @@ import { MINIMUM_PROXIMITY_PERCENT, monthlyMinimumPeriod } from './monthlyMinimu
 const toneClass = { success: 'text-success', warning: 'text-warning', destructive: 'text-destructive' };
 const statusIcons = { success: CheckmarkCircle02Icon, warning: Alert02Icon, destructive: AlertCircleIcon };
 
-export default function MoneyMonthlySummary({ monthly, daily = [], today, reserved = 0, incomplete = false }) {
+export default function MoneyMonthlySummary({ monthly, daily = [], today, reserved = 0, incomplete = false }: { monthly: ForecastResponse['monthly']; daily?: ForecastResponse['daily']; today: string; reserved?: number; incomplete?: boolean }) {
   const minimumPeriods = new Map(monthly.map(month => [month.month, monthlyMinimumPeriod(month, daily, today)]));
   return <section aria-labelledby="money-monthly-summary-title" className="@container/money-summary flex min-w-0 flex-col gap-3">
     <h2 id="money-monthly-summary-title" className="text-lg font-semibold">Resumen de los próximos 12 meses</h2>
@@ -36,11 +38,11 @@ export default function MoneyMonthlySummary({ monthly, daily = [], today, reserv
             </span>
             <span className="flex min-w-0 flex-col justify-between gap-1">
               <span className="font-normal text-muted-foreground">Cierre</span>
-              <span className={cn('break-words text-sm font-medium tabular-nums', toneClass[status.closingTone])}>{money(month.closing)}</span>
+              <span className={cn('break-words text-sm font-medium tabular-nums', status.closingTone && toneClass[status.closingTone])}>{money(month.closing)}</span>
             </span>
             <span className="col-span-full flex min-w-0 flex-col justify-between gap-1 @xs/money-summary:col-span-1">
               <span className="font-normal text-muted-foreground">Saldo más bajo del mes</span>
-              <span className={cn('break-words text-sm font-medium tabular-nums', toneClass[status.minimumTone])}>{money(month.minimum)}</span>
+              <span className={cn('break-words text-sm font-medium tabular-nums', status.minimumTone && toneClass[status.minimumTone])}>{money(month.minimum)}</span>
             </span>
           </span>
         </AccordionTrigger>
@@ -53,10 +55,10 @@ export default function MoneyMonthlySummary({ monthly, daily = [], today, reserv
             </Badge>
             <span className="min-w-0 break-words font-normal text-muted-foreground">{status.change === 0 ? 'Sin cambio' : `${status.change > 0 ? '+' : ''}${money(status.change)} vs. inicio`}</span>
           </div>
-          {minimumPeriods.get(month.month).label && <>
+          {minimumPeriods.get(month.month)?.label && <>
             <div className="flex min-w-0 flex-col gap-1.5">
               <p className="text-muted-foreground">Días cerca del saldo más bajo</p>
-              <p className="break-words font-medium" aria-describedby={`money-minimum-period-help-${month.month}`}>{minimumPeriods.get(month.month).label}</p>
+              <p className="break-words font-medium" aria-describedby={`money-minimum-period-help-${month.month}`}>{minimumPeriods.get(month.month)?.label}</p>
               <p id={`money-minimum-period-help-${month.month}`} className="text-xs text-muted-foreground">Margen del {MINIMUM_PROXIMITY_PERCENT} % respecto al mínimo.</p>
             </div>
             <Separator />
@@ -107,8 +109,8 @@ export default function MoneyMonthlySummary({ monthly, daily = [], today, reserv
               <TableCell className="text-right tabular-nums">{money(month.opening)}</TableCell>
               <TableCell className="text-right tabular-nums">
                 <div className="flex flex-col items-end gap-1.5">
-                  <span className={cn('font-semibold', toneClass[status.closingTone])}>{money(month.closing)}</span>
-                  <span className={cn('inline-flex items-center gap-1 text-xs', toneClass[trendTone] || 'text-muted-foreground')}>
+                  <span className={cn('font-semibold', status.closingTone && toneClass[status.closingTone])}>{money(month.closing)}</span>
+                  <span className={cn('inline-flex items-center gap-1 text-xs', (trendTone && toneClass[trendTone]) || 'text-muted-foreground')}>
                     <HugeiconsIcon icon={trendIcon} size={14} strokeWidth={2} aria-hidden="true" />
                     {status.change === 0 ? 'Sin cambio' : `${status.change > 0 ? '+' : ''}${money(status.change)} vs. inicio`}
                   </span>
@@ -118,8 +120,8 @@ export default function MoneyMonthlySummary({ monthly, daily = [], today, reserv
               <TableCell className="text-right tabular-nums">{money(month.outgoing)}</TableCell>
               <TableCell className="text-right tabular-nums">
                 <div className="flex flex-col items-end gap-1.5">
-                  <span className={cn('font-medium', toneClass[status.minimumTone])}>{money(month.minimum)}</span>
-                  {minimumPeriods.get(month.month).label && <span className="max-w-48 whitespace-normal text-xs text-muted-foreground" aria-describedby="money-minimum-period-help">{minimumPeriods.get(month.month).label}</span>}
+                  <span className={cn('font-medium', status.minimumTone && toneClass[status.minimumTone])}>{money(month.minimum)}</span>
+                  {minimumPeriods.get(month.month)?.label && <span className="max-w-48 whitespace-normal text-xs text-muted-foreground" aria-describedby="money-minimum-period-help">{minimumPeriods.get(month.month)?.label}</span>}
                 </div>
               </TableCell>
             </TableRow>;

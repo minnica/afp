@@ -71,3 +71,20 @@ test('transferencias: frontera JSX valida el callback y conserva configuración 
   assert.throws(() => element.props.onSave({ action: 'REVERSE_TRANSFER', id: 'saved', operationId: body.operationId }));
   assert.equal(saved.length, 2);
 });
+
+
+test('Mi dinero: cliente conserva el cuerpo original y exige recibos de alta completos', async () => {
+  const c = client(), { sendMoney } = c.load('src/lib/money/client.ts');
+  const body = { action: 'WITHDRAWAL', operationId: randomUUID(), accountId: 'a', amount: '12.50', date: '2026-10-27', concept: '  Retiro  ', legacyMetadata: 'conservar' };
+  await sendMoney(body, options);
+  assert.equal(c.requests[0].init.body, JSON.stringify(body));
+  c.respond(async () => Response.json({ ok: true }));
+  await assert.rejects(sendMoney(body, options), { kind: 'invalid', retryable: false });
+  assert.deepEqual(JSON.parse(JSON.stringify(await sendMoney({ action: 'REVERSE_WITHDRAWAL', operationId: randomUUID(), id: 'saved' }, options))), { ok: true });
+});
+
+test('Mi dinero: una consulta incompleta entra en recuperación sin publicar datos inválidos', async () => {
+  const c = client(), { loadMoney } = c.load('src/lib/money/client.ts');
+  c.respond(async () => Response.json({ forecast: {} }));
+  await assert.rejects(loadMoney(new URLSearchParams(), options), { kind: 'invalid', retryable: true });
+});

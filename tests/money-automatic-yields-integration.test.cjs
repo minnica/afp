@@ -12,7 +12,7 @@ test('rendimientos automáticos: reglas históricas, abono real, conciliación y
   const db = new PrismaClient({ adapter: new PrismaPg({ connectionString }) });
   const user = await db.user.create({ data: { email: `auto-yield-${randomUUID()}@example.test` } });
   const load = sourceLoader({ '@/lib/prisma': { prisma: db }, '@/lib/calendar/schedule': { scheduleCalendarSync: () => {} } });
-  const { mutateMoney, loadMoneyData } = load('src/lib/money/service.js'), { buildForecast } = load('src/lib/money/forecast.js');
+  const { mutateMoney, loadMoneyData } = load('src/lib/money/service.ts'), { buildForecast } = load('src/lib/money/forecast.ts');
   const write = (body, date = '2026-10-26') => mutateMoney(db, user.id, { operationId: randomUUID(), ...body }, date);
   const read = date => db.$transaction(async tx => { await tx.$executeRawUnsafe('SET TRANSACTION READ ONLY'); return buildForecast(await loadMoneyData(tx, user.id), date); }, { isolationLevel: 'RepeatableRead' });
   try {

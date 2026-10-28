@@ -13,11 +13,16 @@ test('Mi dinero: API, PostgreSQL, aislamiento, cuentas, abonos, conciliación y 
   const other = await db.user.create({ data: { email: `money-${randomUUID()}@example.test` } });
   let actor = user.id;
   const load = sourceLoader({ '@/lib/prisma': { prisma: db }, '@/lib/calendar/schedule': { scheduleCalendarSync: () => {} }, '@supabase/supabase-js': { createClient: () => ({ auth: { getUser: async token => ({ data: { user: token === 'test' ? { id: actor } : null } }) } }) }, 'next/server': { NextResponse: { json: (body, options = {}) => ({ body: JSON.parse(JSON.stringify(body)), status: options.status || 200, headers: new Headers(options.headers) }) } } });
-  const route = load('src/app/api/money/route.js'), today = load('src/lib/money/dates.js').todayInMexico(), yesterday = load('src/lib/money/dates.js').addDays(today, -1);
+  const route = load('src/app/api/money/route.ts'), today = load('src/lib/money/dates.ts').todayInMexico(), yesterday = load('src/lib/money/dates.ts').addDays(today, -1);
   const request = (body = {}, query = '', token = 'test') => ({ method: 'POST', url: `http://localhost/api/money?${query}`, headers: new Headers(token ? { authorization: `Bearer ${token}` } : {}), json: async () => body });
   const ok = response => { assert.equal(response.status, 200, JSON.stringify(response.body)); return response.body; };
   const write = body => route.POST(request({ operationId: randomUUID(), ...body }));
-  const read = async (query = '') => ok(await route.GET(request({}, query)));
+  const read = async (query = '') => {
+    const body = ok(await route.GET(request({}, query)));
+    // Every real response must satisfy the same JSON contract used by the UI.
+    load('src/lib/money/responses.ts').moneyResponseSchema.parse(body);
+    return body;
+  };
   let account, second, cycle, type, category;
   try {
     await t.test('rechaza anónimos y tokens inválidos sin consultar datos', async () => { assert.equal((await route.GET(request({}, '', ''))).status, 401); assert.equal((await route.POST(request({}, '', 'bad'))).status, 401); });

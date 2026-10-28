@@ -19,7 +19,7 @@ export const accountSchema = z.object({
   yieldInitialPendingDays: z.union([z.literal('').transform(() => null), z.null(), z.coerce.number().int().min(0).max(31)]).optional(),
   yieldCap: z.union([positive, z.literal(''), z.null()]).optional(),
   yieldStartDate: z.union([date, z.literal(''), z.null()]).optional(), yieldEndDate: z.union([date, z.literal(''), z.null()]).optional(), yieldIncomeTypeId: z.string().nullable().optional(),
-}).refine(v => !v.yieldStartDate || !v.yieldEndDate || v.yieldStartDate <= v.yieldEndDate, { path: ['yieldEndDate'], message: 'Revisa la vigencia de la tasa.' }).refine(v => v.yieldMethod !== 'DAILY_AMOUNT' || (v.yieldCap > 0 && typeof v.yieldDailyAmount === 'number'), { path: ['yieldDailyAmount'], message: 'Indica el importe diario y el saldo máximo al que corresponde.' }).refine(v => !v.yieldExcessRate || v.yieldCap > 0, { path: ['yieldCap'], message: 'Indica desde qué saldo aplica la tasa del excedente.' });
+}).refine(v => !v.yieldStartDate || !v.yieldEndDate || v.yieldStartDate <= v.yieldEndDate, { path: ['yieldEndDate'], message: 'Revisa la vigencia de la tasa.' }).refine(v => v.yieldMethod !== 'DAILY_AMOUNT' || (Number(v.yieldCap) > 0 && typeof v.yieldDailyAmount === 'number'), { path: ['yieldDailyAmount'], message: 'Indica el importe diario y el saldo máximo al que corresponde.' }).refine(v => !v.yieldExcessRate || Number(v.yieldCap) > 0, { path: ['yieldCap'], message: 'Indica desde qué saldo aplica la tasa del excedente.' });
 export const reconcileSchema = z.object({ accountId: text, version: z.number().int().positive(), bankBalance: money, reason: text });
 export const planSchema = z.object({
   name: text, kind: z.enum(['PAYROLL', 'INCOME', 'EXPENSE', 'VARIABLE']), amount: positive,
@@ -36,7 +36,7 @@ export const planSchema = z.object({
 });
 export { transferSchema } from '@/lib/money/transferContracts';
 export const withdrawalSchema = z.object({ accountId: text, amount: positive, date, concept: text });
-export const paymentSchema = z.object({ cycleId: text, accountId: text, amount: positive, date, additional: z.literal(true, { error: 'Confirma que es un abono nuevo.' }) });
+export const paymentSchema = z.object({ cycleId: text, accountId: text, amount: positive, date, additional: z.boolean({ error: 'Confirma que es un abono nuevo.' }).refine(value => value, 'Confirma que es un abono nuevo.').transform(() => true as const) });
 export const scenarioSchema = z.object({ stopPayrollDate: z.union([date, z.literal('')]).default(''), collectionDelay: z.coerce.number().int().min(0).max(180).default(0), variablePercent: z.coerce.number().min(0).max(300).default(100), extraAmount: money.refine(v => v >= 0).default(0), extraDate: z.union([date, z.literal('')]).default(''), extraAccountId: z.string().default('') }).superRefine((v, ctx) => {
   if (v.extraAmount > 0 && !v.extraDate) ctx.addIssue({ code: 'custom', path: ['extraDate'], message: 'Indica cuándo harías la compra.' });
   if (v.extraAmount > 0 && !v.extraAccountId) ctx.addIssue({ code: 'custom', path: ['extraAccountId'], message: 'Selecciona la cuenta de salida.' });
