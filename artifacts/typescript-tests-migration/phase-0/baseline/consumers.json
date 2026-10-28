@@ -1,0 +1,1043 @@
+[
+  {
+    "file": "README.md",
+    "line": 136,
+    "source": "| `pnpm test:types` | Comprobar contratos de tipos y casos negativos con la configuración estricta |",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "6c1b62634682150c71e37c59ad15dad6aaaa4244"
+  },
+  {
+    "file": "README.md",
+    "line": 138,
+    "source": "| `pnpm test` | Pruebas Node.js con `--experimental-test-isolation=none` |",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "6c1b62634682150c71e37c59ad15dad6aaaa4244"
+  },
+  {
+    "file": "README.md",
+    "line": 139,
+    "source": "| `pnpm db:verify` | Verificar reconstrucción, actualización, RLS y regresiones en PostgreSQL desechable |",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "6c1b62634682150c71e37c59ad15dad6aaaa4244"
+  },
+  {
+    "file": "README.md",
+    "line": 144,
+    "source": "Las verificaciones obligatorias por lote son `pnpm typecheck`, `pnpm test:types`, `pnpm lint`, `pnpm test` y `pnpm build`. El build conserva la comprobación de TypeScript. `typecheck` y `test:types` generan sus prerrequisitos y funcionan sin una carpeta `.next` previa. Los clientes tipados validan las respuestas antes de entregarlas a las pantallas y conservan el JSON original, incluidos orden, campos omitidos y metadatos usados en recuperación y concurrencia. Los casos de tipos viven en `tests/types/`, con [configuración propia](tsconfig.type-tests.json).",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "6c1b62634682150c71e37c59ad15dad6aaaa4244"
+  },
+  {
+    "file": "README.md",
+    "line": 150,
+    "source": "Sin `AFP_TEST_DATABASE_URL`, `pnpm test` omite las pruebas que requieren PostgreSQL. Una suite con omisiones no valida las transacciones, bloqueos y restricciones contra una base real.",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "6c1b62634682150c71e37c59ad15dad6aaaa4244"
+  },
+  {
+    "file": "README.md",
+    "line": 167,
+    "source": "pnpm test",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "6c1b62634682150c71e37c59ad15dad6aaaa4244"
+  },
+  {
+    "file": "README.md",
+    "line": 171,
+    "source": "pnpm db:verify",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "6c1b62634682150c71e37c59ad15dad6aaaa4244"
+  },
+  {
+    "file": "README.md",
+    "line": 364,
+    "source": "- Conservar `node:test` y cargar fuentes con `tests/helpers/load-source.cjs`: esbuild transforma JS/TS/JSX/TSX, pero no comprueba tipos. Los tests deben inyectar adaptadores de red/BD; el cargador no hereda `process.env` ni carga `.env`. Las rutas con extensión deben señalar el archivo exacto; las rutas sin extensión se resuelven solo si son inequívocas. No se sustituyen extensiones antiguas. Las pruebas `.cjs`, scripts operativos, configuraciones `.mjs` y `public/sw.js` mantienen JavaScript fuera del programa de tipos de la aplicación; Android conserva Kotlin.",
+    "kind": "documentation",
+    "helperTargets": [
+      "tests/helpers/load-source.cjs"
+    ],
+    "lastChangedCommit": "6c1b62634682150c71e37c59ad15dad6aaaa4244"
+  },
+  {
+    "file": "artifacts/auditoria-2026-10-15/informe.md",
+    "line": 51,
+    "source": "| Regresiones ejecutadas ahora | `pnpm test`: **246 casos, 233 correctos, cero fallos y 13 omitidos** por no configurar `AFP_TEST_DATABASE_URL`. Las integraciones omitidas contienen subcasos; este conteo no es comparable directamente con los 337 casos de la ejecución completa anterior. |",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "dc138aa0ca7beffa04602d09bbfc0e2fffda2b2e"
+  },
+  {
+    "file": "artifacts/auditoria-2026-10-15/informe.md",
+    "line": 97,
+    "source": "Para repetir las reproducciones desde la raíz: `node artifacts/auditoria-2026-10-15/repro.cjs`. El script verifica el comportamiento defectuoso observado originalmente y no es una prueba de aceptación de las correcciones. Para A01, las regresiones actuales están en `tests/api-authorization.test.cjs` y `tests/api-fetch.test.cjs`; ejecutar `node --test tests/*.test.cjs` desde la raíz.",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "dc138aa0ca7beffa04602d09bbfc0e2fffda2b2e"
+  },
+  {
+    "file": "artifacts/auditoria-2026-10-15/informe.md",
+    "line": 138,
+    "source": "| Autorización y aislamiento | [32 pruebas nuevas](../../tests/api-authorization.test.cjs) correctas con Auth y persistencia simulados: ausencia de token, tokens inválidos, suplantación de `userId`, aislamiento entre dos usuarios, operaciones propias permitidas, rechazo de vínculos ajenos y protección de `setup-user`. |",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "dc138aa0ca7beffa04602d09bbfc0e2fffda2b2e"
+  },
+  {
+    "file": "artifacts/auditoria-2026-10-15/informe.md",
+    "line": 139,
+    "source": "| Cliente, cola y service worker | [4 pruebas nuevas](../../tests/api-fetch.test.cjs) correctas: uso del token renovado, bloqueo por ausencia o cambio de sesión, conservación de pendientes y exclusión de API de la caché. |",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "dc138aa0ca7beffa04602d09bbfc0e2fffda2b2e"
+  },
+  {
+    "file": "artifacts/auditoria-2026-10-15/informe.md",
+    "line": 140,
+    "source": "| Regresiones existentes | `node --test tests/*.test.cjs` terminó correctamente. La integración con PostgreSQL quedó omitida por falta de `AFP_TEST_DATABASE_URL`. |",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "dc138aa0ca7beffa04602d09bbfc0e2fffda2b2e"
+  },
+  {
+    "file": "artifacts/auditoria-2026-10-15/informe.md",
+    "line": 176,
+    "source": "| Chromium, IndexedDB y Web Locks reales | Respuesta perdida: 2 peticiones, 1 operación. Dos pestañas: la segunda espera; cerrar la primera durante el POST libera el bloqueo y recupera el gasto. La captura concurrente permanece. Cerrar antes del POST permite recuperar el pendiente al reabrir. API simulada; [evidencia](a02-verificacion.json) y [fixture reproducible](../../tests/helpers/offline-browser-server.cjs). |",
+    "kind": "documentation",
+    "helperTargets": [
+      "tests/helpers/offline-browser-server.cjs"
+    ],
+    "lastChangedCommit": "dc138aa0ca7beffa04602d09bbfc0e2fffda2b2e"
+  },
+  {
+    "file": "artifacts/auditoria-2026-10-15/informe.md",
+    "line": 177,
+    "source": "| Suite completa | `node --test --experimental-test-isolation=none tests/*.test.cjs`: **154 casos, 152 correctos, 2 omitidos**, cero fallos. |",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "dc138aa0ca7beffa04602d09bbfc0e2fffda2b2e"
+  },
+  {
+    "file": "artifacts/auditoria-2026-10-15/informe.md",
+    "line": 215,
+    "source": "| Nuevas regresiones | 9 casos en [`card-cycle-payments.test.cjs`](../../tests/card-cycle-payments.test.cjs): parcial, centavos, exceso, cero, edición, deshacer, reintento, validación, rollback simulado y lecturas de ambas API con avisos. |",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "dc138aa0ca7beffa04602d09bbfc0e2fffda2b2e"
+  },
+  {
+    "file": "artifacts/auditoria-2026-10-15/informe.md",
+    "line": 216,
+    "source": "| Suite completa | `node --test --experimental-test-isolation=none tests/*.test.cjs`: **163 casos, 161 correctos, 2 omitidos**, cero fallos. |",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "dc138aa0ca7beffa04602d09bbfc0e2fffda2b2e"
+  },
+  {
+    "file": "artifacts/auditoria-2026-10-15/informe.md",
+    "line": 262,
+    "source": "| Regresiones A05 | [10 pruebas](../../tests/debt-accounts.test.cjs): $100 → $50 en abono, $100 → $200 en principal, pago excedente, cancelaciones, centavos, datos históricos con más decimales, traslado/desvinculación de ingresos, concurrencia simulada y rollback de las cuatro mutaciones. |",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "dc138aa0ca7beffa04602d09bbfc0e2fffda2b2e"
+  },
+  {
+    "file": "artifacts/auditoria-2026-10-15/informe.md",
+    "line": 263,
+    "source": "| Suite completa | `node --test --experimental-test-isolation=none tests/*.test.cjs`: **175 casos, 171 correctos, 4 omitidos**, cero fallos. Las omisiones corresponden a integración sin variable de BD. [Log](a05-pruebas.log). |",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "dc138aa0ca7beffa04602d09bbfc0e2fffda2b2e"
+  },
+  {
+    "file": "artifacts/auditoria-2026-10-15/informe.md",
+    "line": 264,
+    "source": "| PostgreSQL real | [2 pruebas de integración A05](../../tests/debt-accounts-integration.test.cjs) correctas, sin omisiones: diez altas y diez ediciones concurrentes por tipo de cuenta, edición de principal concurrente, cancelación, rollback real de alta/edición/borrado/principal y lecturas de cuentas, Gastos y Dashboard. [Log](a05-postgres.log). |",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "dc138aa0ca7beffa04602d09bbfc0e2fffda2b2e"
+  },
+  {
+    "file": "artifacts/auditoria-2026-10-15/informe.md",
+    "line": 268,
+    "source": "**Cierre actualizado:** corrección implementada, verificada y publicada; resta la aceptación autenticada. Para repetir la integración, configurar `AFP_TEST_DATABASE_URL` con una base local desechable cuyo nombre empiece por `afp_test`, con las migraciones actuales aplicadas, y ejecutar `node --test --experimental-test-isolation=none tests/debt-accounts-integration.test.cjs`. La ejecución original del 17/10 no publicó la app.",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "dc138aa0ca7beffa04602d09bbfc0e2fffda2b2e"
+  },
+  {
+    "file": "artifacts/auditoria-2026-10-15/informe.md",
+    "line": 297,
+    "source": "| Regresiones MSI | [3 pruebas nuevas](../../tests/installment-transactions.test.cjs): fallos tras las tres escrituras, reintento, relaciones ajenas, usuario falsificado, compra sin cuenta y edición con rollback. |",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "dc138aa0ca7beffa04602d09bbfc0e2fffda2b2e"
+  },
+  {
+    "file": "artifacts/auditoria-2026-10-15/informe.md",
+    "line": 298,
+    "source": "| Suite completa | `node --test --experimental-test-isolation=none tests/*.test.cjs`: **179 casos, 174 correctos, 5 omitidos sin variable de BD**, cero fallos. [Log](a06-pruebas.log). |",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "dc138aa0ca7beffa04602d09bbfc0e2fffda2b2e"
+  },
+  {
+    "file": "artifacts/auditoria-2026-10-15/informe.md",
+    "line": 299,
+    "source": "| PostgreSQL real | **5 integraciones correctas, cero omisiones**: A02, A05, A06 y suscripciones. La [nueva prueba A06](../../tests/related-operations-integration.test.cjs) inyecta **24 fallos después de escrituras reales**, verifica rollback exacto de siete tablas y reintenta cada operación. Incluye MSI, gasto con cuenta/saldo/recibo, cobro de suscripción, alta/traslado/borrado de ingreso y cinco reintentos concurrentes del gasto. [Log](a06-postgres.log). |",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "dc138aa0ca7beffa04602d09bbfc0e2fffda2b2e"
+  },
+  {
+    "file": "artifacts/auditoria-2026-10-15/informe.md",
+    "line": 304,
+    "source": "**Cierre actualizado:** corrección implementada, verificada y publicada; resta la aceptación autenticada entre módulos. Para repetir las integraciones, configurar `AFP_TEST_DATABASE_URL` con una base local desechable `afp_test…`, con las migraciones actuales aplicadas, y ejecutar `node --test --experimental-test-isolation=none tests/*integration.test.cjs`. La idempotencia adicional de MSI/Ingresos sigue siendo una mejora distinta de la atomicidad ya cubierta.",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "dc138aa0ca7beffa04602d09bbfc0e2fffda2b2e"
+  },
+  {
+    "file": "artifacts/auditoria-2026-10-15/informe.md",
+    "line": 370,
+    "source": "- **Reproducibilidad:** `packageManager` fija pnpm **10.33.0**, con instalación `--frozen-lockfile`. Se agregan `pnpm test`, `pnpm audit:prod` y `pnpm audit:all`; el [README](../../README.md#dependencias-y-seguridad-a10) documenta el flujo único con pnpm. Trabajo realizado en la rama `fix/a10-dependency-security`.",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "dc138aa0ca7beffa04602d09bbfc0e2fffda2b2e"
+  },
+  {
+    "file": "artifacts/auditoria-2026-10-15/informe.md",
+    "line": 382,
+    "source": "| Regresiones | `pnpm test`: **179 casos, 174 correctos, 5 omitidos sin variable de BD, cero fallos**. [Log](a10-pruebas.log). |",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "dc138aa0ca7beffa04602d09bbfc0e2fffda2b2e"
+  },
+  {
+    "file": "artifacts/auditoria-2026-10-15/informe.md",
+    "line": 488,
+    "source": "| Comandos reproducibles y CI | **PARCIAL** | `packageManager`, lockfile, `pnpm test`, auditorías y flujo pnpm documentados; reconstrucción de BD desde migraciones. | No hay pipeline CI versionado ni separación de ambientes dev/prod documentada. El viejo pendiente de elegir npm/pnpm ya está cubierto. |",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "dc138aa0ca7beffa04602d09bbfc0e2fffda2b2e"
+  },
+  {
+    "file": "artifacts/typescript-migration/phase-0/README.md",
+    "line": 11,
+    "source": "| `pnpm db:verify` | Correcto: 42 migraciones, 45 tablas con RLS; reconstrucción vacía y actualización desde las 13 migraciones históricas | 59,527 s |",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "6715c55c11ee1a639ef17d458001a9283268c765"
+  },
+  {
+    "file": "artifacts/typescript-migration/phase-0/README.md",
+    "line": 55,
+    "source": "| `tests/helpers/load-source.cjs` | Lee ruta exacta, agrega `.js` a imports relativos y `@/`, elimina imports/exports con regex y evalúa en `vm`. Mantener mocks prioritarios, caché y entorno ficticio al incorporar transformación JS/TS. |",
+    "kind": "documentation",
+    "helperTargets": [
+      "tests/helpers/load-source.cjs"
+    ],
+    "lastChangedCommit": "6715c55c11ee1a639ef17d458001a9283268c765"
+  },
+  {
+    "file": "artifacts/typescript-migration/phase-0/README.md",
+    "line": 57,
+    "source": "| `money-browser-server.cjs` | Copia `src`, `package.json`, `jsconfig.json`, `postcss.config.mjs`; usa Auth ficticia y PostgreSQL local. Debe copiar configuración TS y tipos propios cuando existan. |",
+    "kind": "documentation",
+    "helperTargets": [
+      "tests/helpers/money-browser-server.cjs"
+    ],
+    "lastChangedCommit": "6715c55c11ee1a639ef17d458001a9283268c765"
+  },
+  {
+    "file": "artifacts/typescript-migration/phase-0/README.md",
+    "line": 58,
+    "source": "| `capture-browser-server.cjs` | Misma dependencia de copia/configuración; conservar contratos del fixture y restricciones de BD local. Ambos fixtures compilan con webpack en modo producción. |",
+    "kind": "documentation",
+    "helperTargets": [
+      "tests/helpers/capture-browser-server.cjs"
+    ],
+    "lastChangedCommit": "6715c55c11ee1a639ef17d458001a9283268c765"
+  },
+  {
+    "file": "artifacts/typescript-migration/phase-0/README.md",
+    "line": 59,
+    "source": "| `offline-browser-server.cjs` | Lee exactamente `src/lib/offlineExpenses.js`, reemplaza el import de `apiFetch` y sirve ESM crudo como `/queue.js`; necesitará transformación ESM al convertir la cola. |",
+    "kind": "documentation",
+    "helperTargets": [
+      "tests/helpers/offline-browser-server.cjs"
+    ],
+    "lastChangedCommit": "6715c55c11ee1a639ef17d458001a9283268c765"
+  },
+  {
+    "file": "artifacts/typescript-migration/phase-0/README.md",
+    "line": 60,
+    "source": "| `scripts/verify-database-reproduction.cjs` | Ejecuta los `.test.cjs` y carga `cardBalanceTracking.js` mediante `sourceLoader` para comprobar registros históricos. Mantenerlo operativo junto con el cargador. |",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "6715c55c11ee1a639ef17d458001a9283268c765"
+  },
+  {
+    "file": "artifacts/typescript-migration/phase-0/README.md",
+    "line": 97,
+    "source": "Para comparar únicamente el piloto con una BD local ya migrada, ejecutar `node artifacts/typescript-migration/phase-0/transfers.cjs` con la misma variable. `collect.py --inventory-only` regenera solo inventarios; `--build-only` repite el build y añade su resultado a los metadatos existentes. Una ejecución completa regenera logs e inventarios: comparar el diff con esta referencia antes de guardarlos.",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "6715c55c11ee1a639ef17d458001a9283268c765"
+  },
+  {
+    "file": "artifacts/typescript-migration/phase-0/collect.py",
+    "line": 57,
+    "source": "run('transfer-record',['node','artifacts/typescript-migration/phase-0/transfers.cjs','--record'])",
+    "kind": "artifact-executor",
+    "helperTargets": [],
+    "lastChangedCommit": "6715c55c11ee1a639ef17d458001a9283268c765"
+  },
+  {
+    "file": "artifacts/typescript-migration/phase-0/collect.py",
+    "line": 58,
+    "source": "run('transfer-reference',['node','artifacts/typescript-migration/phase-0/transfers.cjs'])",
+    "kind": "artifact-executor",
+    "helperTargets": [],
+    "lastChangedCommit": "6715c55c11ee1a639ef17d458001a9283268c765"
+  },
+  {
+    "file": "artifacts/typescript-migration/phase-0/transfers.cjs",
+    "line": 8,
+    "source": "const { sourceLoader } = require('../../../tests/helpers/load-source.cjs');",
+    "kind": "artifact-executor",
+    "helperTargets": [
+      "tests/helpers/load-source.cjs"
+    ],
+    "lastChangedCommit": "6aad1abc7e5bf91d1be6c750f0c7e30cebc352d2"
+  },
+  {
+    "file": "artifacts/typescript-migration/phase-1/README.md",
+    "line": 9,
+    "source": "- `pnpm typecheck` genera Prisma y tipos de Next antes de `tsc --noEmit`. `pnpm test:types` hace lo mismo para `tsconfig.type-tests.json`. Los siete casos negativos de `tests/types/toolchain.tsx` comprueban entrada/salida Zod, selecciones Prisma, props React, índices y nulabilidad. Son contratos de infraestructura, no una declaración de que el piloto financiero ya esté tipado.",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "2ff43a952175563cfab631252282ecbbede959da"
+  },
+  {
+    "file": "artifacts/typescript-migration/phase-1/collect.py",
+    "line": 50,
+    "source": "process = subprocess.Popen(['node', f'tests/helpers/{name}-browser-server.cjs'], cwd=cwd,",
+    "kind": "artifact-executor",
+    "helperTargets": [],
+    "lastChangedCommit": "2ff43a952175563cfab631252282ecbbede959da"
+  },
+  {
+    "file": "artifacts/typescript-migration/phase-1/collect.py",
+    "line": 102,
+    "source": "run('transfer-reference', ['node', 'artifacts/typescript-migration/phase-0/transfers.cjs'], target)",
+    "kind": "artifact-executor",
+    "helperTargets": [],
+    "lastChangedCommit": "2ff43a952175563cfab631252282ecbbede959da"
+  },
+  {
+    "file": "artifacts/typescript-migration/phase-2/README.md",
+    "line": 54,
+    "source": "El [fixture](../../../tests/helpers/money-browser-server.cjs) compiló con Webpack en un directorio aislado y sirvió la interfaz/API reales con Auth ficticia y PostgreSQL local: [log](money-fixture.log). Se usaron `agent-browser` y el procedimiento de `vercel:verification`; no se simularon las escrituras financieras.",
+    "kind": "documentation",
+    "helperTargets": [
+      "tests/helpers/money-browser-server.cjs"
+    ],
+    "lastChangedCommit": "0c115375ba0f7da3ba7710180de010f3742cd351"
+  },
+  {
+    "file": "artifacts/typescript-migration/phase-2/README.md",
+    "line": 103,
+    "source": "AFP_CAPTURE_TEST_PRODUCTION=1 node tests/helpers/money-browser-server.cjs",
+    "kind": "documentation",
+    "helperTargets": [
+      "tests/helpers/money-browser-server.cjs"
+    ],
+    "lastChangedCommit": "0c115375ba0f7da3ba7710180de010f3742cd351"
+  },
+  {
+    "file": "artifacts/typescript-migration/phase-2/collect.py",
+    "line": 62,
+    "source": "run('transfer-reference', ['node', 'artifacts/typescript-migration/phase-0/transfers.cjs'], target)",
+    "kind": "artifact-executor",
+    "helperTargets": [],
+    "lastChangedCommit": "0c115375ba0f7da3ba7710180de010f3742cd351"
+  },
+  {
+    "file": "artifacts/typescript-migration/phase-3/README.md",
+    "line": 28,
+    "source": "- Instalación, `pnpm typecheck`, `pnpm test:types`, `pnpm lint`, `pnpm test` y `pnpm build`: correctos; tiempos en el registro.",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "099c438feb9e67c361094a1ce2b138c673a6a066"
+  },
+  {
+    "file": "artifacts/typescript-migration/phase-3/README.md",
+    "line": 41,
+    "source": "Se usó el [fixture existente](../../../tests/helpers/money-browser-server.cjs), compilado con Webpack en un directorio aislado, con Auth ficticia y PostgreSQL local. Verificación con `agent-browser`, revisión de React y `vercel:verification`. El [servidor](browser-server.log) confirmó el arranque; [peticiones y comprobaciones](browser-checks.json) y [persistencia posterior](browser-persistence.json) acreditan:",
+    "kind": "documentation",
+    "helperTargets": [
+      "tests/helpers/money-browser-server.cjs"
+    ],
+    "lastChangedCommit": "099c438feb9e67c361094a1ce2b138c673a6a066"
+  },
+  {
+    "file": "artifacts/typescript-migration/phase-3/README.md",
+    "line": 68,
+    "source": "AFP_CAPTURE_TEST_PRODUCTION=1 node tests/helpers/money-browser-server.cjs",
+    "kind": "documentation",
+    "helperTargets": [
+      "tests/helpers/money-browser-server.cjs"
+    ],
+    "lastChangedCommit": "099c438feb9e67c361094a1ce2b138c673a6a066"
+  },
+  {
+    "file": "artifacts/typescript-migration/phase-3/collect.py",
+    "line": 62,
+    "source": "run('transfer-reference', ['node', 'artifacts/typescript-migration/phase-0/transfers.cjs'], target)",
+    "kind": "artifact-executor",
+    "helperTargets": [],
+    "lastChangedCommit": "099c438feb9e67c361094a1ce2b138c673a6a066"
+  },
+  {
+    "file": "artifacts/typescript-migration/phase-4/README.md",
+    "line": 32,
+    "source": "| `pnpm test:types` | Correcto; 11 casos negativos nuevos |",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "4731c766291a77936843c0c1c5f56db77abc3d77"
+  },
+  {
+    "file": "artifacts/typescript-migration/phase-4/README.md",
+    "line": 34,
+    "source": "| `pnpm test` con PostgreSQL | **846 correctas, 0 fallos, 0 omisiones** |",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "4731c766291a77936843c0c1c5f56db77abc3d77"
+  },
+  {
+    "file": "artifacts/typescript-migration/phase-4/README.md",
+    "line": 35,
+    "source": "| `pnpm db:verify` | Reconstrucción y actualización correctas; 42 migraciones, 45 tablas con RLS |",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "4731c766291a77936843c0c1c5f56db77abc3d77"
+  },
+  {
+    "file": "artifacts/typescript-migration/phase-4/README.md",
+    "line": 66,
+    "source": "node tests/helpers/money-browser-server.cjs",
+    "kind": "documentation",
+    "helperTargets": [
+      "tests/helpers/money-browser-server.cjs"
+    ],
+    "lastChangedCommit": "4731c766291a77936843c0c1c5f56db77abc3d77"
+  },
+  {
+    "file": "artifacts/typescript-migration/phase-4/collect.py",
+    "line": 63,
+    "source": "run('transfer-reference', ['node', 'artifacts/typescript-migration/phase-0/transfers.cjs'], target)",
+    "kind": "artifact-executor",
+    "helperTargets": [],
+    "lastChangedCommit": "4731c766291a77936843c0c1c5f56db77abc3d77"
+  },
+  {
+    "file": "artifacts/typescript-migration/phase-5/README.md",
+    "line": 23,
+    "source": "| `pnpm typecheck` y `pnpm test:types` | Configuración estricta; 19 casos negativos nuevos entre Captura, Calendar y offline |",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "39da231760e4ac6a00c8ae32764f65f7eec4230d"
+  },
+  {
+    "file": "artifacts/typescript-migration/phase-5/README.md",
+    "line": 25,
+    "source": "| `pnpm test` con PostgreSQL | **849 correctas, 0 fallos y 0 omisiones**; [log final](offline-final-1-test.log) |",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "39da231760e4ac6a00c8ae32764f65f7eec4230d"
+  },
+  {
+    "file": "artifacts/typescript-migration/phase-5/README.md",
+    "line": 39,
+    "source": "Se utilizó la skill `agent-browser` con el [servidor offline aislado](../../../tests/helpers/offline-browser-server.cjs). El fixture entrega los módulos TS como JavaScript ESM con esbuild; no copia credenciales ni contacta Supabase.",
+    "kind": "documentation",
+    "helperTargets": [
+      "tests/helpers/offline-browser-server.cjs"
+    ],
+    "lastChangedCommit": "39da231760e4ac6a00c8ae32764f65f7eec4230d"
+  },
+  {
+    "file": "artifacts/typescript-migration/phase-5/README.md",
+    "line": 65,
+    "source": "node tests/helpers/offline-browser-server.cjs",
+    "kind": "documentation",
+    "helperTargets": [
+      "tests/helpers/offline-browser-server.cjs"
+    ],
+    "lastChangedCommit": "39da231760e4ac6a00c8ae32764f65f7eec4230d"
+  },
+  {
+    "file": "artifacts/typescript-migration/phase-5/compare-contracts.cjs",
+    "line": 14,
+    "source": "fs.mkdirSync(path.join(temporary, 'tests/helpers'), { recursive: true });",
+    "kind": "artifact-executor",
+    "helperTargets": [],
+    "lastChangedCommit": "39da231760e4ac6a00c8ae32764f65f7eec4230d"
+  },
+  {
+    "file": "artifacts/typescript-migration/phase-5/compare-contracts.cjs",
+    "line": 15,
+    "source": "fs.copyFileSync(path.join(root, 'tests/helpers/load-source.cjs'), path.join(temporary, 'tests/helpers/load-source.cjs'));",
+    "kind": "artifact-executor",
+    "helperTargets": [
+      "tests/helpers/load-source.cjs"
+    ],
+    "lastChangedCommit": "39da231760e4ac6a00c8ae32764f65f7eec4230d"
+  },
+  {
+    "file": "artifacts/typescript-migration/phase-5/compare-contracts.cjs",
+    "line": 17,
+    "source": "const previous = require(path.join(temporary, 'tests/helpers/load-source.cjs')).sourceLoader;",
+    "kind": "artifact-executor",
+    "helperTargets": [
+      "tests/helpers/load-source.cjs"
+    ],
+    "lastChangedCommit": "39da231760e4ac6a00c8ae32764f65f7eec4230d"
+  },
+  {
+    "file": "artifacts/typescript-migration/phase-5/compare-contracts.cjs",
+    "line": 18,
+    "source": "const current = require(path.join(root, 'tests/helpers/load-source.cjs')).sourceLoader;",
+    "kind": "artifact-executor",
+    "helperTargets": [
+      "tests/helpers/load-source.cjs"
+    ],
+    "lastChangedCommit": "39da231760e4ac6a00c8ae32764f65f7eec4230d"
+  },
+  {
+    "file": "artifacts/typescript-migration/phase-6/README.md",
+    "line": 21,
+    "source": "| `pnpm test:types` | Correcto; nueve casos negativos nuevos de interfaz; [log](6-test-types.log) |",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "5b48132c5f28ad4349460c8ba8e33a64df4bdd84"
+  },
+  {
+    "file": "artifacts/typescript-migration/phase-6/README.md",
+    "line": 23,
+    "source": "| `pnpm test` | 854 pruebas correctas, sin fallos ni omisiones; [log](6-test.log) |",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "5b48132c5f28ad4349460c8ba8e33a64df4bdd84"
+  },
+  {
+    "file": "artifacts/typescript-migration/phase-6/README.md",
+    "line": 25,
+    "source": "| `pnpm db:verify` | Reconstrucción y actualización desde 13 migraciones; 42 migraciones, 45 tablas con RLS y 853 regresiones correctas; [log](db-verify.log) |",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "5b48132c5f28ad4349460c8ba8e33a64df4bdd84"
+  },
+  {
+    "file": "artifacts/typescript-migration/phase-6/README.md",
+    "line": 62,
+    "source": "AFP_MIGRATION_TEST_DATABASE_URL=\"$AFP_TEST_DATABASE_URL\" pnpm db:verify",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "5b48132c5f28ad4349460c8ba8e33a64df4bdd84"
+  },
+  {
+    "file": "artifacts/typescript-migration/phase-6/README.md",
+    "line": 65,
+    "source": "node tests/helpers/seed-ui.cjs",
+    "kind": "documentation",
+    "helperTargets": [
+      "tests/helpers/seed-ui.cjs"
+    ],
+    "lastChangedCommit": "5b48132c5f28ad4349460c8ba8e33a64df4bdd84"
+  },
+  {
+    "file": "artifacts/typescript-migration/phase-6/README.md",
+    "line": 68,
+    "source": "node tests/helpers/money-browser-server.cjs",
+    "kind": "documentation",
+    "helperTargets": [
+      "tests/helpers/money-browser-server.cjs"
+    ],
+    "lastChangedCommit": "5b48132c5f28ad4349460c8ba8e33a64df4bdd84"
+  },
+  {
+    "file": "artifacts/typescript-migration/phase-7/README.md",
+    "line": 41,
+    "source": "| [`pnpm test:types`](1-4-pnpm-test-types.log) | Contratos positivos y negativos correctos |",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "6aad1abc7e5bf91d1be6c750f0c7e30cebc352d2"
+  },
+  {
+    "file": "artifacts/typescript-migration/phase-7/README.md",
+    "line": 43,
+    "source": "| [`pnpm test`](1-6-pnpm-test.log) | **854 pruebas correctas**, cero fallos y cero omisiones |",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "6aad1abc7e5bf91d1be6c750f0c7e30cebc352d2"
+  },
+  {
+    "file": "artifacts/typescript-migration/phase-7/README.md",
+    "line": 45,
+    "source": "| [`pnpm db:verify`](1-8-pnpm-db-verify.log) | Reconstrucción y actualización desde las 13 migraciones históricas: 42 migraciones, **45 tablas con RLS** y 854 regresiones correctas |",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "6aad1abc7e5bf91d1be6c750f0c7e30cebc352d2"
+  },
+  {
+    "file": "artifacts/typescript-migration/phase-7/README.md",
+    "line": 87,
+    "source": "node tests/helpers/seed-ui.cjs",
+    "kind": "documentation",
+    "helperTargets": [
+      "tests/helpers/seed-ui.cjs"
+    ],
+    "lastChangedCommit": "6aad1abc7e5bf91d1be6c750f0c7e30cebc352d2"
+  },
+  {
+    "file": "artifacts/typescript-migration/phase-7/README.md",
+    "line": 90,
+    "source": "node tests/helpers/money-browser-server.cjs",
+    "kind": "documentation",
+    "helperTargets": [
+      "tests/helpers/money-browser-server.cjs"
+    ],
+    "lastChangedCommit": "6aad1abc7e5bf91d1be6c750f0c7e30cebc352d2"
+  },
+  {
+    "file": "artifacts/typescript-migration/phase-7/verify.py",
+    "line": 65,
+    "source": "run(['node', 'artifacts/typescript-migration/phase-0/transfers.cjs'], clean)",
+    "kind": "artifact-executor",
+    "helperTargets": [],
+    "lastChangedCommit": "6aad1abc7e5bf91d1be6c750f0c7e30cebc352d2"
+  },
+  {
+    "file": "docs/android-captura.md",
+    "line": 132,
+    "source": "Desde la raíz, `node --test tests/android-assetlinks.test.cjs tests/android-sources.test.cjs` verifica Digital Asset Links y la coincidencia exacta entre fuentes del lector y paquetes visibles del manifest; prohíbe `QUERY_ALL_PACKAGES`. Tres casos correctos el 21 de octubre. `pnpm test` incluye estas regresiones. Lint y build web deben seguir pasando. Los resultados y las comprobaciones físicas pendientes se registran en [el plan](../PLAN_CAPTURA_AUTOMATICA_ANDROID.md) y la [evidencia de ocho fuentes](../artifacts/android-fase1/multi-source-verification.json). La evidencia inicial y el despliegue web de 0.1.1 se conservan como historial; esta actualización no requiere desplegar de nuevo la web.",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "39da231760e4ac6a00c8ae32764f65f7eec4230d"
+  },
+  {
+    "file": "docs/android-captura.md",
+    "line": 198,
+    "source": "- `pnpm test`: protocolos, rechazo de ámbitos de autorización y regresiones existentes. Sin `AFP_TEST_DATABASE_URL` omite las integraciones PostgreSQL.",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "39da231760e4ac6a00c8ae32764f65f7eec4230d"
+  },
+  {
+    "file": "docs/android-captura.md",
+    "line": 199,
+    "source": "- `AFP_TEST_DATABASE_URL=<PostgreSQL local afp_test…> pnpm test`: **234 pruebas correctas, sin omisiones**. Las pruebas de captura cubren dos cuentas, expiración, límites, vinculación concurrente, recibos concurrentes, rollback, respuesta perdida, pausa, cierre de sesión y revocación. Auth es ficticia, Prisma/PostgreSQL son reales.",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "39da231760e4ac6a00c8ae32764f65f7eec4230d"
+  },
+  {
+    "file": "docs/android-captura.md",
+    "line": 200,
+    "source": "- `AFP_MIGRATION_TEST_DATABASE_URL=<PostgreSQL local afp_test…> pnpm db:verify`: reconstrucción/actualización, permisos y todas las regresiones. No usar Supabase ni una base personal.",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "39da231760e4ac6a00c8ae32764f65f7eec4230d"
+  },
+  {
+    "file": "docs/android-captura.md",
+    "line": 209,
+    "source": "node tests/helpers/capture-browser-server.cjs",
+    "kind": "documentation",
+    "helperTargets": [
+      "tests/helpers/capture-browser-server.cjs"
+    ],
+    "lastChangedCommit": "39da231760e4ac6a00c8ae32764f65f7eec4230d"
+  },
+  {
+    "file": "docs/android-captura.md",
+    "line": 392,
+    "source": "AFP_TEST_DATABASE_URL=<la misma base local> node --test --experimental-test-isolation=none tests/*.test.cjs",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "39da231760e4ac6a00c8ae32764f65f7eec4230d"
+  },
+  {
+    "file": "docs/android-captura.md",
+    "line": 393,
+    "source": "AFP_MIGRATION_TEST_DATABASE_URL=<la misma base local> pnpm db:verify",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "39da231760e4ac6a00c8ae32764f65f7eec4230d"
+  },
+  {
+    "file": "docs/android-captura.md",
+    "line": 404,
+    "source": "Para repetir el recorrido de navegador/teléfono con una compilación estable, añadir `AFP_CAPTURE_TEST_PRODUCTION=1` al fixture `tests/helpers/capture-browser-server.cjs`, junto a `AFP_TEST_DATABASE_URL`, `AFP_CAPTURE_TEST_KEY` y `AFP_CAPTURE_TEST_CERTIFICATE` locales. El helper copia la app a un directorio temporal sin `.env`, compila allí con `next build --webpack`, mantiene Auth ficticia y no cambia el registro de analizadores. Este modo estabiliza la prueba; no activa automatización ni publica la web. Usar después los comandos Android de Fase 3, con `--rerun-tasks` si se necesita repetir la entrega JVM contra el servidor actual, y no dar por ejecutada una tarea marcada `UP-TO-DATE`.",
+    "kind": "documentation",
+    "helperTargets": [
+      "tests/helpers/capture-browser-server.cjs"
+    ],
+    "lastChangedCommit": "39da231760e4ac6a00c8ae32764f65f7eec4230d"
+  },
+  {
+    "file": "docs/android-captura.md",
+    "line": 464,
+    "source": "AFP_TEST_DATABASE_URL=postgresql://postgres:afp_test_only@127.0.0.1:55445/afp_test_phase5 pnpm test",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "39da231760e4ac6a00c8ae32764f65f7eec4230d"
+  },
+  {
+    "file": "docs/android-captura.md",
+    "line": 465,
+    "source": "AFP_MIGRATION_TEST_DATABASE_URL=postgresql://postgres:afp_test_only@127.0.0.1:55445/afp_test_phase5 pnpm db:verify",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "39da231760e4ac6a00c8ae32764f65f7eec4230d"
+  },
+  {
+    "file": "docs/android-captura.md",
+    "line": 470,
+    "source": "Para la interfaz, preparar los datos ficticios con `AFP_TEST_DATABASE_URL=<base local anterior> node tests/helpers/seed-capture-review.cjs` e iniciar el fixture estable descrito en Fase 4. Iniciar sesión local con `capture-qa@example.test` y una contraseña ficticia; el helper solo admite una BD localhost `afp_test…`. Incluye nueve tarjetas y avisos inventados, no activa los formatos reales y no copia `.env`. La revisión con Agent Browser comprueba los componentes y API reales contra PostgreSQL, con autenticación ficticia.",
+    "kind": "documentation",
+    "helperTargets": [
+      "tests/helpers/seed-capture-review.cjs"
+    ],
+    "lastChangedCommit": "39da231760e4ac6a00c8ae32764f65f7eec4230d"
+  },
+  {
+    "file": "docs/android-captura.md",
+    "line": 534,
+    "source": "`tests/capture-pilot-integration.test.cjs` usa exclusivamente localhost y una base `afp_test…`. Verifica multiplicidad, dos canales/un cargo, correcciones frente a campos completados, recepción local e histórica, aislamiento, falta de propuesta antigua, recibos repetidos y exclusión de débito incluso ante configuración administrativa forzada. Las regresiones de parser usan un prefijo derivado del aviso de débito y un resto ficticio; no son un fixture validado de crédito.",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "39da231760e4ac6a00c8ae32764f65f7eec4230d"
+  },
+  {
+    "file": "docs/android-captura.md",
+    "line": 706,
+    "source": "Pruebas nuevas: `tests/capture-rollout.test.cjs` y `tests/capture-rollout-integration.test.cjs`. Ejecutar con `AFP_TEST_DATABASE_URL` apuntando exclusivamente a localhost y una base `afp_test…` que tenga las 26 migraciones, por ejemplo el puerto 55450 usado en la aceptación Nu/CFE:",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "39da231760e4ac6a00c8ae32764f65f7eec4230d"
+  },
+  {
+    "file": "docs/android-captura.md",
+    "line": 710,
+    "source": "node --test --experimental-test-isolation=none tests/*.test.cjs",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "39da231760e4ac6a00c8ae32764f65f7eec4230d"
+  },
+  {
+    "file": "docs/android-captura.md",
+    "line": 715,
+    "source": "Resultado web de la aceptación inicial: **329 pruebas correctas sin omisiones**, incluidos 25 escenarios nuevos de integración y cinco unitarios. En aquella aceptación los analizadores reales seguían bloqueados; un cargador de pruebas aislado inyecta contratos ficticios para siete emisores y Wallet, con nueve tarjetas separadas y seis Wallet. Repite presencial, digital/en línea, parciales, suscripción explícita, reintentos, colisiones, aislamiento, versiones nuevas y recuperación. Esas pruebas no acreditan formatos ni canales reales. La preparación de navegador `tests/helpers/seed-capture-review.cjs` crea nueve tarjetas y 24 alias exclusivamente ficticios en la base local y se niega a usar una conexión remota.",
+    "kind": "documentation",
+    "helperTargets": [
+      "tests/helpers/seed-capture-review.cjs"
+    ],
+    "lastChangedCommit": "39da231760e4ac6a00c8ae32764f65f7eec4230d"
+  },
+  {
+    "file": "docs/android-captura.md",
+    "line": 739,
+    "source": "node --test tests/android-notices.test.cjs tests/capture-api.test.cjs tests/dashboard-breakdowns.test.cjs tests/notice-dismissals.test.cjs",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "39da231760e4ac6a00c8ae32764f65f7eec4230d"
+  },
+  {
+    "file": "docs/plan-migracion-tests-typescript.md",
+    "line": 11,
+    "source": "| `tests/*.test.cjs` | Convertir a `.test.ts`, con entradas, resultados y callbacks comprobados |",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "6c1b62634682150c71e37c59ad15dad6aaaa4244"
+  },
+  {
+    "file": "docs/plan-migracion-tests-typescript.md",
+    "line": 12,
+    "source": "| `tests/helpers/*.cjs` | Convertir cargadores, simuladores, servidores de navegador y preparación de datos a `.ts` |",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "6c1b62634682150c71e37c59ad15dad6aaaa4244"
+  },
+  {
+    "file": "docs/plan-migracion-tests-typescript.md",
+    "line": 25,
+    "source": "| Pruebas ejecutables | 106 archivos `.test.cjs` |",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "6c1b62634682150c71e37c59ad15dad6aaaa4244"
+  },
+  {
+    "file": "docs/plan-migracion-tests-typescript.md",
+    "line": 31,
+    "source": "| Uso directo de `vm` | 2 archivos: `api-fetch.test.cjs` y `offline-service-worker.test.cjs` |",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "6c1b62634682150c71e37c59ad15dad6aaaa4244"
+  },
+  {
+    "file": "docs/plan-migracion-tests-typescript.md",
+    "line": 41,
+    "source": "- [load-source.cjs](../tests/helpers/load-source.cjs) transforma módulos con esbuild y los evalúa en `vm`. Su resultado dinámico necesita una frontera de tipos explícita.",
+    "kind": "documentation",
+    "helperTargets": [
+      "tests/helpers/load-source.cjs"
+    ],
+    "lastChangedCommit": "6c1b62634682150c71e37c59ad15dad6aaaa4244"
+  },
+  {
+    "file": "docs/plan-migracion-tests-typescript.md",
+    "line": 42,
+    "source": "- [legacy-route-context.cjs](../tests/helpers/legacy-route-context.cjs) combina exports de varios módulos y expone algunas funciones privadas de handlers. Ese objeto necesita contratos por ruta.",
+    "kind": "documentation",
+    "helperTargets": [
+      "tests/helpers/legacy-route-context.cjs"
+    ],
+    "lastChangedCommit": "6c1b62634682150c71e37c59ad15dad6aaaa4244"
+  },
+  {
+    "file": "docs/plan-migracion-tests-typescript.md",
+    "line": 43,
+    "source": "- [debt-fixture.cjs](../tests/helpers/debt-fixture.cjs) simula persistencia, bloqueo y rollback. Sus tipos deben distinguir registros, consultas y transacciones sin presentarlo como un cliente Prisma completo.",
+    "kind": "documentation",
+    "helperTargets": [
+      "tests/helpers/debt-fixture.cjs"
+    ],
+    "lastChangedCommit": "6c1b62634682150c71e37c59ad15dad6aaaa4244"
+  },
+  {
+    "file": "docs/plan-migracion-tests-typescript.md",
+    "line": 44,
+    "source": "- [package.json](../package.json) y [verify-database-reproduction.cjs](../scripts/verify-database-reproduction.cjs) descubren únicamente `.test.cjs`. El segundo también importa el cargador y crea otro proceso para ejecutar regresiones.",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "6c1b62634682150c71e37c59ad15dad6aaaa4244"
+  },
+  {
+    "file": "docs/plan-migracion-tests-typescript.md",
+    "line": 45,
+    "source": "- [next-fixture.cjs](../tests/helpers/next-fixture.cjs) copia configuraciones por patrón; debe distinguir las necesarias para la web de las exclusivas de pruebas.",
+    "kind": "documentation",
+    "helperTargets": [
+      "tests/helpers/next-fixture.cjs"
+    ],
+    "lastChangedCommit": "6c1b62634682150c71e37c59ad15dad6aaaa4244"
+  },
+  {
+    "file": "docs/plan-migracion-tests-typescript.md",
+    "line": 58,
+    "source": "Crear un único mecanismo de descubrimiento y ejecución, propuesto como `tests/run-tests.ts`, compartido por `pnpm test` y las regresiones de `db:verify`:",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "6c1b62634682150c71e37c59ad15dad6aaaa4244"
+  },
+  {
+    "file": "docs/plan-migracion-tests-typescript.md",
+    "line": 60,
+    "source": "- Durante la transición admite `.test.cjs` y `.test.ts`, ordenados de forma determinista. Rechaza dos archivos con el mismo nombre base para evitar duplicar o esconder escenarios.",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "6c1b62634682150c71e37c59ad15dad6aaaa4244"
+  },
+  {
+    "file": "docs/plan-migracion-tests-typescript.md",
+    "line": 66,
+    "source": "`db:verify` puede conservar su archivo CJS. Su proceso principal debe registrar el soporte TS antes de importar helpers convertidos, y su proceso de regresiones debe usar el mismo ejecutor que `pnpm test`. Evitar depender de un `NODE_OPTIONS` global o de flags que `spawnSync` no hereda automáticamente.",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "6c1b62634682150c71e37c59ad15dad6aaaa4244"
+  },
+  {
+    "file": "docs/plan-migracion-tests-typescript.md",
+    "line": 74,
+    "source": "Crear `pnpm typecheck:tests`, propuesto como `prisma generate && next typegen && tsc --project tsconfig.tests.json --noEmit`. Mantener `pnpm test:types` para los casos de compilación positivos y negativos; estos no se ejecutan con `node:test`. Ambas comprobaciones deben funcionar desde una instalación sin `.next` ni caché de TypeScript.",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "6c1b62634682150c71e37c59ad15dad6aaaa4244"
+  },
+  {
+    "file": "docs/plan-migracion-tests-typescript.md",
+    "line": 138,
+    "source": "- [ ] Añadir el descubrimiento común de `.test.cjs`/`.test.ts` y actualizar `pnpm test` y `db:verify`, incluido su import del cargador y sus procesos hijos.",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "6c1b62634682150c71e37c59ad15dad6aaaa4244"
+  },
+  {
+    "file": "docs/plan-migracion-tests-typescript.md",
+    "line": 139,
+    "source": "- [ ] Convertir una prueba pequeña, como `latest-request.test.cjs`, para verificar convivencia, tipos y ejecución sin arrancar servicios reales. En ese caso puede importarse directamente el módulo puro, tras comprobar que no inicializa dependencias externas; los módulos con mocks seguirán pasando por el cargador en fase 2.",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "6c1b62634682150c71e37c59ad15dad6aaaa4244"
+  },
+  {
+    "file": "docs/plan-migracion-tests-typescript.md",
+    "line": 142,
+    "source": "**Aceptación:** todos los escenarios de referencia siguen descubiertos una sola vez; `pnpm test` y `db:verify` coinciden en la suite completa. La herramienta propuesta funciona desde instalación limpia y no expone variables del entorno real al cargador.",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "6c1b62634682150c71e37c59ad15dad6aaaa4244"
+  },
+  {
+    "file": "docs/plan-migracion-tests-typescript.md",
+    "line": 149,
+    "source": "- [ ] Migrar `money-transfer-client.test.cjs` y `money-transfer-integration.test.cjs` como piloto completo. Tipar mocks HTTP y datos Prisma manteniendo acciones, importes, propietarios, UUID, conflictos y reversión.",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "6c1b62634682150c71e37c59ad15dad6aaaa4244"
+  },
+  {
+    "file": "docs/plan-migracion-tests-typescript.md",
+    "line": 203,
+    "source": "pnpm test:types",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "6c1b62634682150c71e37c59ad15dad6aaaa4244"
+  },
+  {
+    "file": "docs/plan-migracion-tests-typescript.md",
+    "line": 205,
+    "source": "pnpm test",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "6c1b62634682150c71e37c59ad15dad6aaaa4244"
+  },
+  {
+    "file": "docs/plan-migracion-tests-typescript.md",
+    "line": 209,
+    "source": "`typecheck:tests` es un comando propuesto, todavía inexistente. Para una comprobación completa, `pnpm test` debe recibir `AFP_TEST_DATABASE_URL` con PostgreSQL desechable migrado conforme al [README](../README.md#integraciones-con-postgresql). Una ejecución sin esa variable conserva su utilidad para desarrollo, pero sus omisiones no acreditan las integraciones.",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "6c1b62634682150c71e37c59ad15dad6aaaa4244"
+  },
+  {
+    "file": "docs/plan-migracion-tests-typescript.md",
+    "line": 211,
+    "source": "Ejecutar `pnpm db:verify` en fases 0, 1 y 6, y cuando un lote altere su cargador, descubrimiento o ejecución. Verificar fixtures de navegador al cambiar sus helpers o dependencias. Durante la edición, empezar por las pruebas afectadas; repetir controles completos solo tras nuevos cambios, fallos o dudas pendientes.",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "6c1b62634682150c71e37c59ad15dad6aaaa4244"
+  },
+  {
+    "file": "docs/plan-migracion-typescript.md",
+    "line": 23,
+    "source": "| Pruebas | 98 archivos `.test.cjs`; 83 usan `sourceLoader` y 15 contienen ejecución directa con `vm` u otros mecanismos similares; los grupos pueden solaparse |",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "6aad1abc7e5bf91d1be6c750f0c7e30cebc352d2"
+  },
+  {
+    "file": "docs/plan-migracion-typescript.md",
+    "line": 82,
+    "source": "- [x] Ejecutar `pnpm db:verify` para comprobar que la base de pruebas reproduce migraciones y RLS antes de cambiar sus herramientas.",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "6aad1abc7e5bf91d1be6c750f0c7e30cebc352d2"
+  },
+  {
+    "file": "docs/plan-migracion-typescript.md",
+    "line": 93,
+    "source": "**Archivos principales:** [package.json](../package.json), [pnpm-workspace.yaml](../pnpm-workspace.yaml), [eslint.config.mjs](../eslint.config.mjs), [cargador](../tests/helpers/load-source.cjs), fixtures de [Mi dinero](../tests/helpers/money-browser-server.cjs), [captura](../tests/helpers/capture-browser-server.cjs) y [offline](../tests/helpers/offline-browser-server.cjs).",
+    "kind": "documentation",
+    "helperTargets": [
+      "tests/helpers/capture-browser-server.cjs",
+      "tests/helpers/load-source.cjs",
+      "tests/helpers/money-browser-server.cjs",
+      "tests/helpers/offline-browser-server.cjs"
+    ],
+    "lastChangedCommit": "6aad1abc7e5bf91d1be6c750f0c7e30cebc352d2"
+  },
+  {
+    "file": "docs/plan-migracion-typescript.md",
+    "line": 96,
+    "source": "- [x] Añadir una comprobación separada de contratos de tipos, por ejemplo `pnpm test:types`, y hacerla parte de las verificaciones obligatorias. Next genera sus tipos mediante `next typegen`; el [build debe conservar la detección de errores de TypeScript](https://nextjs.org/docs/app/api-reference/config/typescript).",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "6aad1abc7e5bf91d1be6c750f0c7e30cebc352d2"
+  },
+  {
+    "file": "docs/plan-migracion-typescript.md",
+    "line": 114,
+    "source": "**Referencias:** [contratos tipados](../src/lib/money/transferContracts.ts), [persistencia del piloto](../src/lib/money/transfers.ts), [cliente](../src/lib/money/transferClient.ts), [editor compartido actual](../src/components/mi-dinero/MoneyEditor.tsx) (el adaptador del piloto se retiró en fase 7), [esquemas](../src/lib/money/schema.ts), [servicio](../src/lib/money/service.ts), [API](../src/app/api/money/route.ts), [pantalla](../src/components/mi-dinero/MoneyContent.tsx), [editor compartido](../src/components/mi-dinero/MoneyEditor.tsx) y [pruebas de integración](../tests/money-integration.test.cjs).",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "6aad1abc7e5bf91d1be6c750f0c7e30cebc352d2"
+  },
+  {
+    "file": "docs/plan-migracion-typescript.md",
+    "line": 217,
+    "source": "pnpm test:types",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "6aad1abc7e5bf91d1be6c750f0c7e30cebc352d2"
+  },
+  {
+    "file": "docs/plan-migracion-typescript.md",
+    "line": 219,
+    "source": "pnpm test",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "6aad1abc7e5bf91d1be6c750f0c7e30cebc352d2"
+  },
+  {
+    "file": "docs/plan-migracion-typescript.md",
+    "line": 223,
+    "source": "Durante el desarrollo, ejecutar primero las pruebas de los módulos tocados. Al cerrar un lote, comprobar la suite y build del estado final; ampliar o repetir solo ante cambios, fallos o riesgos pendientes. `pnpm test` sin `AFP_TEST_DATABASE_URL` no acredita integraciones: usar una base `afp_test…` local migrada según el [README](../README.md#integraciones-con-postgresql). Auth y Google simulados no equivalen a una aceptación real de los proveedores.",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "6aad1abc7e5bf91d1be6c750f0c7e30cebc352d2"
+  },
+  {
+    "file": "docs/plan-migracion-typescript.md",
+    "line": 225,
+    "source": "Ejecutar `pnpm db:verify` en la referencia inicial, al cambiar las herramientas que lo afectan, si cambian garantías de persistencia y en el cierre final. Conservar únicamente datos ficticios en las evidencias públicas.",
+    "kind": "documentation",
+    "helperTargets": [],
+    "lastChangedCommit": "6aad1abc7e5bf91d1be6c750f0c7e30cebc352d2"
+  },
+  {
+    "file": "package.json",
+    "line": 12,
+    "source": "\"test\": \"node --test --experimental-test-isolation=none tests/*.test.cjs\",",
+    "kind": "active-tool",
+    "helperTargets": [],
+    "lastChangedCommit": "2ff43a952175563cfab631252282ecbbede959da"
+  },
+  {
+    "file": "scripts/verify-database-reproduction.cjs",
+    "line": 10,
+    "source": "const { sourceLoader } = require('../tests/helpers/load-source.cjs');",
+    "kind": "active-tool",
+    "helperTargets": [
+      "tests/helpers/load-source.cjs"
+    ],
+    "lastChangedCommit": "4731c766291a77936843c0c1c5f56db77abc3d77"
+  },
+  {
+    "file": "scripts/verify-database-reproduction.cjs",
+    "line": 78,
+    "source": "const files = readdirSync(path.join(root, 'tests')).filter(name => name.endsWith('.test.cjs')).sort();",
+    "kind": "active-tool",
+    "helperTargets": [],
+    "lastChangedCommit": "4731c766291a77936843c0c1c5f56db77abc3d77"
+  }
+]

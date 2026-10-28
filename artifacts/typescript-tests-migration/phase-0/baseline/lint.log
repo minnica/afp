@@ -1,0 +1,27 @@
+
+> afp@0.1.0 lint /tmp/afp-tests-ts0-a67m254c
+> eslint
+
+
+/tmp/afp-tests-ts0-a67m254c/src/components/gastos/GastosContent.tsx
+  415:18  warning  'loadSubscriptions' is defined but never used  @typescript-eslint/no-unused-vars
+
+/tmp/afp-tests-ts0-a67m254c/src/components/ingresos/IngresosContent.tsx
+  163:11  warning  'activeReceivables' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/tmp/afp-tests-ts0-a67m254c/src/components/ui/data-table.tsx
+  65:17  warning  Compilation Skipped: Use of incompatible library
+
+This API returns functions which cannot be memoized without leading to stale UI. To prevent this, by default React Compiler will skip memoizing this component/hook. However, you may see issues if values from this API are passed to other components/hooks that are memoized.
+
+/tmp/afp-tests-ts0-a67m254c/src/components/ui/data-table.tsx:65:17
+  63 |   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize });
+  64 |
+> 65 |   const table = useReactTable({
+     |                 ^^^^^^^^^^^^^ TanStack Table's `useReactTable()` API returns functions that cannot be memoized safely
+  66 |     data,
+  67 |     columns,
+  68 |     state: { sorting, columnFilters, globalFilter, pagination },  react-hooks/incompatible-library
+
+✖ 3 problems (0 errors, 3 warnings)
+

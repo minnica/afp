@@ -6,6 +6,14 @@ Consolidado el **27 de octubre de 2026** a partir del README del commit `4562aa0
 
 ## 2026-10-28
 
+### Referencia para migrar pruebas y helpers a TypeScript
+
+**Fase 0 completada localmente** sobre `6c1b626`. Se inventariaron 106 pruebas y 11 helpers CJS, ocho archivos de contratos estáticos, 21 fixtures JSON y sus dependencias, rutas dinámicas y consumidores, incluidos documentación y ejecutores de `artifacts/`. El manifiesto identifica los 854 escenarios reales: 555 de primer nivel y 299 subtests; conserva archivo, posición, nombres y jerarquía para comparar la migración sin depender solo del total.
+
+Pasaron `typecheck`, `test:types`, lint, suite completa con PostgreSQL local y build. `db:verify` confirmó reconstrucción y actualización desde las 13 migraciones históricas, 42 migraciones finales, 45 tablas con RLS y la misma secuencia de 854 regresiones. Cero fallos u omisiones en las pruebas. Se conservan las tres advertencias de lint y el aviso de `pg`. El primer intento falló únicamente al cotejar las columnas de `t.test` en el recolector nuevo; quedó registrado y se corrigió antes de repetirlo con salida nueva.
+
+El recolector crea una copia sin `.env`, `.next` ni caché TypeScript, usa dependencias ya instaladas y PostgreSQL desechable, y elimina sus recursos al terminar. Se fijaron hashes de 394 archivos protegidos, 672 artefactos históricos y 11 configuraciones/herramientas; no hubo cambios en fuentes de producto, pruebas, esquema, SQL, fixtures, dependencias ni servicios remotos. README y plan reflejan la fase 0 completada; las fases 1–6 siguen pendientes. Evidencia, exclusiones y reproducción: [fase 0 de pruebas](../artifacts/typescript-tests-migration/phase-0/README.md).
+
 ### Plan de migración de pruebas y helpers a TypeScript
 
 Se preparó el [plan independiente](plan-migracion-tests-typescript.md) sobre `6aad1ab`: 106 archivos de pruebas y 11 helpers CJS. Define referencia, ejecución mixta con `node:test`, contratos del cargador y mocks, piloto de transferencias, conversión por módulos, fixtures de navegador y cierre con PostgreSQL y `db:verify`. La implementación está pendiente; no modifica el cierre de la migración web ni incorpora cambios de código, dependencias o despliegue.

@@ -1,6 +1,6 @@
 # Plan de migración de pruebas y helpers a TypeScript
 
-**Estado:** plan preparado; implementación pendiente. **Base revisada:** `6aad1ab`, 28 de octubre de 2026. La [migración de la web](plan-migracion-typescript.md) permanece completada. Este plan amplía el tipado a las herramientas de prueba sin cambiar el comportamiento de AFP.
+**Estado:** fase 0 completada localmente; fases 1–6 pendientes. **Base revisada del plan:** `6aad1ab`, 28 de octubre de 2026. La [referencia nueva de fase 0](../artifacts/typescript-tests-migration/phase-0/README.md) parte de `6c1b626`. La [migración de la web](plan-migracion-typescript.md) permanece completada. Este plan amplía el tipado a las herramientas de prueba sin cambiar el comportamiento de AFP.
 
 ## Objetivo y alcance
 
@@ -34,7 +34,7 @@ No se requieren cambios en esquema, migraciones SQL, reglas financieras, respues
 | Ejecutor | `node:test`, con `--experimental-test-isolation=none` |
 | Último cierre completo registrado | 854 pruebas correctas, sin fallos ni omisiones, con PostgreSQL local |
 
-Los grupos del inventario se solapan. Los 854 resultados corresponden al [cierre de la migración web](../artifacts/typescript-migration/phase-7/README.md); la fase 0 de este plan deberá establecer una referencia nueva antes de convertir archivos. El avance se medirá por contratos y escenarios conservados, además de archivos migrados.
+Los grupos del inventario se solapan. Los 854 resultados de la tabla corresponden al [cierre de la migración web](../artifacts/typescript-migration/phase-7/README.md). La fase 0 confirmó una referencia nueva con los mismos 854 escenarios: 555 de primer nivel y 299 subtests, identificados por archivo, nombre y jerarquía, con PostgreSQL local y sin omisiones. El avance se medirá por contratos y escenarios conservados, además de archivos migrados.
 
 ### Dependencias que requieren atención
 
@@ -110,7 +110,7 @@ Conservar datos omitidos, nulos, JSON malformado, respuestas perdidas, UUID repe
 
 ## Fases de implementación
 
-Todas las fases están pendientes. Cada lote debe ser revisable y contener el módulo convertido junto con sus consumidores y herramientas afectados.
+La fase 0 está completada; las fases 1–6 siguen pendientes. Cada lote debe ser revisable y contener el módulo convertido junto con sus consumidores y herramientas afectados.
 
 | Fase | Entrega | Dependencia |
 | --- | --- | --- |
@@ -124,12 +124,14 @@ Todas las fases están pendientes. Cada lote debe ser revisable y contener el m�
 
 ### Fase 0 Establecer la referencia
 
-- [ ] Guardar inventario de archivos, escenarios/subtests, fixtures, dependencias, rutas dinámicas y comandos consumidores, incluido `artifacts/` cuando sus ejecutores se sigan usando.
-- [ ] Ejecutar los controles actuales y la suite completa con PostgreSQL local migrado; registrar versiones, commit, duración, fallos, omisiones y avisos preexistentes. Ejecutar `db:verify` para fijar también su referencia.
-- [ ] Separar pruebas de comportamiento, contratos estáticos, lectura de fuentes, scripts y compatibilidad de JS/JSX. Registrar cualquier exclusión real.
-- [ ] Registrar hashes de fuentes de aplicación, esquema, SQL, service worker y fixtures JSON. Identificar dependencias/configuración que sí podrán cambiar por la migración.
+- [x] Guardar inventario de archivos, escenarios/subtests, fixtures, dependencias, rutas dinámicas y comandos consumidores, incluido `artifacts/` cuando sus ejecutores se sigan usando.
+- [x] Ejecutar los controles actuales y la suite completa con PostgreSQL local migrado; registrar versiones, commit, duración, fallos, omisiones y avisos preexistentes. Ejecutar `db:verify` para fijar también su referencia.
+- [x] Separar pruebas de comportamiento, contratos estáticos, lectura de fuentes, scripts y compatibilidad de JS/JSX. Registrar cualquier exclusión real.
+- [x] Registrar hashes de fuentes de aplicación, esquema, SQL, service worker y fixtures JSON. Identificar dependencias/configuración que sí podrán cambiar por la migración.
 
 **Aceptación:** referencia repetible, escenarios identificados y ninguna omisión de integración presentada como éxito. Conservar la evidencia previa sin reemplazar sus resultados por los de esta ejecución.
+
+**Resultado (28 de octubre de 2026):** [fase 0](../artifacts/typescript-tests-migration/phase-0/README.md). Inventariados 117 archivos CJS, ocho contratos estáticos, 21 fixtures JSON y 122 referencias externas. Los 854 escenarios coinciden en orden y jerarquía entre `pnpm test`, su observación con reportero y las regresiones de `db:verify`. Pasaron tipos, contratos, lint y build; reconstrucción/actualización verificó 42 migraciones y 45 tablas con RLS. Se conservan 394 archivos protegidos, 672 artefactos históricos y 11 archivos de configuración/herramientas por hash. Se registraron las advertencias preexistentes y el primer intento del recolector, corregido sin modificar pruebas. Navegador y seeds se inventariaron, sin ejecutarlos; no se omitió ninguna integración de la suite. No se adelantó la conversión ni la infraestructura de fase 1.
 
 ### Fase 1 Preparar ejecución y comprobación de tipos
 
@@ -210,7 +212,7 @@ pnpm build
 
 Ejecutar `pnpm db:verify` en fases 0, 1 y 6, y cuando un lote altere su cargador, descubrimiento o ejecución. Verificar fixtures de navegador al cambiar sus helpers o dependencias. Durante la edición, empezar por las pruebas afectadas; repetir controles completos solo tras nuevos cambios, fallos o dudas pendientes.
 
-Registrar las evidencias futuras en `artifacts/typescript-tests-migration/phase-N/`:
+Registrar las evidencias en `artifacts/typescript-tests-migration/phase-N/`; la [fase 0](../artifacts/typescript-tests-migration/phase-0/README.md) ya contiene la referencia inicial:
 
 - Commit, versiones, archivos/contratos migrados y fronteras que siguen en CJS.
 - Comandos, duración, resultados y omisiones; manifiesto de escenarios/subtests comparado con fase 0. Un total igual o mayor no demuestra por sí solo que se conservaron los casos anteriores.

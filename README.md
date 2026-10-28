@@ -143,6 +143,8 @@ En Chrome del emulador Android, usar `http://10.0.2.2:3000`. [next.config.mjs](n
 
 Las verificaciones obligatorias por lote son `pnpm typecheck`, `pnpm test:types`, `pnpm lint`, `pnpm test` y `pnpm build`. El build conserva la comprobación de TypeScript. `typecheck` y `test:types` generan sus prerrequisitos y funcionan sin una carpeta `.next` previa. Los clientes tipados validan las respuestas antes de entregarlas a las pantallas y conservan el JSON original, incluidos orden, campos omitidos y metadatos usados en recuperación y concurrencia. Los casos de tipos viven en `tests/types/`, con [configuración propia](tsconfig.type-tests.json).
 
+La fase 0 de la [migración de pruebas a TypeScript](docs/plan-migracion-tests-typescript.md) fija la [referencia del 28 de octubre de 2026](artifacts/typescript-tests-migration/phase-0/README.md): 106 archivos de pruebas, 11 helpers y 854 escenarios ejecutados con PostgreSQL, sin omisiones. Incluye inventarios, consumidores, hashes y un recolector reproducible; las fases 1–6 siguen pendientes. Todavía no existe `typecheck:tests` ni se ha cambiado el ejecutor CJS.
+
 Si se necesita comprobar la compilación con Webpack, usar `pnpm exec prisma generate` seguido de `pnpm exec next build --webpack`. Esta alternativa no cambia el script de build del proyecto.
 
 ### Integraciones con PostgreSQL
@@ -382,7 +384,7 @@ La web se despliega en Vercel, proyecto `afp`. El build es `pnpm build`; no apli
 ## Documentación relacionada
 
 - [docs/plan-migracion-typescript.md](docs/plan-migracion-typescript.md): plan por fases y criterios de aceptación; fases 0–7 completadas localmente, con evidencias de cierre.
-- [docs/plan-migracion-tests-typescript.md](docs/plan-migracion-tests-typescript.md): plan independiente para migrar pruebas y helpers a TypeScript; implementación pendiente.
+- [docs/plan-migracion-tests-typescript.md](docs/plan-migracion-tests-typescript.md): plan independiente para migrar pruebas y helpers a TypeScript; fase 0 completada con referencia local, fases 1–6 pendientes.
 - [docs/bitacora.md](docs/bitacora.md): decisiones, migraciones, incidencias y seguimientos históricos con sus evidencias.
 - [PRODUCT.md](PRODUCT.md): propósito, alcance y principios del producto.
 - [docs/android-captura.md](docs/android-captura.md): operación técnica de Android, firma y pruebas.

@@ -1,0 +1,53 @@
+{
+  "baseCommit": "6c1b62634682150c71e37c59ad15dad6aaaa4244",
+  "referenceComplete": true,
+  "testResults": {
+    "test": {
+      "tests": 854,
+      "suites": 0,
+      "pass": 854,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "duration_ms": 45665.202014
+    },
+    "test-scenarios": {
+      "tests": 854,
+      "suites": 0,
+      "pass": 854,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "duration_ms": 45329.533655
+    },
+    "db-verify": {
+      "tests": 854,
+      "suites": 0,
+      "pass": 854,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "duration_ms": 45240.556686
+    }
+  },
+  "sameOrderedScenarios": {
+    "test": true,
+    "test-scenarios": true,
+    "db-verify": true
+  },
+  "allStaticDeclarationsObserved": 775,
+  "testsAndHelpersAndTypeContractsUnchanged": 125,
+  "hashGroupsUnchanged": {
+    "protectedFiles": 394,
+    "historicalArtifacts": 672,
+    "mutableConfiguration": 11
+  },
+  "firstAndFinalScenarioIdentitiesMatch": true,
+  "jsonFilesParsed": 10,
+  "markdownLinkTargetsChecked": 173,
+  "diffCheck": "passed",
+  "temporaryResourcesRemoved": true
+}
