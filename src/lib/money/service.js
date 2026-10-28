@@ -1,8 +1,9 @@
+import { executeTransfer } from '@/lib/money/transfers';
 import { createHash } from 'node:crypto';
 import { ApiAccessError } from '@/lib/apiAuth';
 import { runDebtAccountOperation } from '@/lib/debtAccountService';
 import { getStoredCycleStatus } from '@/lib/calculations/cardCyclePayments';
-import { accountSchema, reconcileSchema, planSchema, transferSchema, withdrawalSchema, paymentSchema } from '@/lib/money/schema';
+import { accountSchema, reconcileSchema, planSchema, withdrawalSchema, paymentSchema } from '@/lib/money/schema';
 import { todayInMexico, day, validDay, addMonths } from '@/lib/money/dates';
 import { buildBudgetPaymentMix } from '@/lib/money/budgets';
 import { Prisma } from '@prisma/client';
@@ -149,14 +150,8 @@ export async function mutateMoney(db, userId, body, today = todayInMexico()) {
       await tx.moneyWithdrawal.update({ where: { id: withdrawal.id, userId }, data: { reversedAt: withdrawal.reversedAt || new Date() } });
       const samples = await tx.captureMoneyPosting.findMany({ where: { userId, withdrawalId: withdrawal.id }, select: { movementId: true } });
       if (samples.length) await tx.captureMoneyPolicy.updateMany({ where: { userId, kind: 'BBVA_WITHDRAWAL', verifiedMovementId: { in: samples.map(s => s.movementId) } }, data: { mode: 'OBSERVATION', verifiedMovementId: null } });
-    } else if (body.action === 'TRANSFER') {
-      const values = parsed(transferSchema, body); requireRecord(data.accounts, values.fromAccountId); requireRecord(data.accounts, values.toAccountId);
-      for (const id of [values.fromAccountId, values.toAccountId]) if (values.date < day(requireRecord(data.accounts, id).asOf)) throw new ApiAccessError('La transferencia debe ser posterior al saldo inicial de ambas cuentas.', 400);
-      const transfer = await tx.moneyTransfer.create({ data: { ...values, date: new Date(values.date), userId } }); result.id = transfer.id;
-    } else if (body.action === 'REVERSE_TRANSFER') {
-      const transfer = requireRecord(data.transfers, body.id);
-      if (data.accounts.some(a => [transfer.fromAccountId, transfer.toAccountId].includes(a.id) && day(a.asOf) > day(transfer.date))) throw new ApiAccessError('La transferencia ya está incluida en una conciliación posterior. Corrige los saldos con una nueva conciliación.', 409);
-      await tx.moneyTransfer.update({ where: { id: transfer.id, userId }, data: { reversedAt: new Date() } });
+    } else if (body.action === 'TRANSFER' || body.action === 'REVERSE_TRANSFER') {
+      result = await executeTransfer(tx, userId, body);
     } else if (body.action === 'CARD_PAYMENT' || body.action === 'REVERSE_PAYMENT') {
       let payment, values;
       if (body.action === 'CARD_PAYMENT') { values = parsed(paymentSchema, body); requireRecord(data.accounts, values.accountId); if (values.date > today || values.date < day(requireRecord(data.accounts, values.accountId).asOf)) throw new ApiAccessError('El pago debe tener una fecha real desde el saldo inicial.', 400); }

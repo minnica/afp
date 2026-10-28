@@ -7,7 +7,7 @@ export async function apiFetch(url, options = {}) {
   if (typeof url !== "string" || !url.startsWith("/api/")) throw new Error("Ruta de API no válida.");
   const {
     expectedUserId = new URL(url, "http://localhost").searchParams.get("userId"),
-    errorMode = "dialog", timeoutMs = 20000, mutationCompleted = false, recoveryHint, ...init
+    errorMode = "dialog", timeoutMs = 20000, mutationCompleted = false, recoveryHint, validateResponse, ...init
   } = options;
   const method = (init.method || "GET").toUpperCase();
   const repeatable = canRepeatRequest(url, method, init.body);
@@ -49,6 +49,8 @@ export async function apiFetch(url, options = {}) {
         const retryAt = retryAfter ? (Number.isFinite(seconds) ? Date.now() + seconds * 1000 : Date.parse(retryAfter)) : undefined;
         throw requestError({ ...details, status: response.status, message: data?.error, retryAt });
       }
+      // Validación opcional del contrato dentro de la recuperación compartida.
+      if (validateResponse) validateResponse(data);
       return response;
     } catch (error) {
       if (init.signal?.aborted) throw init.signal.reason || error;

@@ -1,0 +1,9 @@
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma/schema.prisma.
+Datasource "db": PostgreSQL database "afp_test_ts2", schema "public" at "127.0.0.1:37335"
+
+42 migrations found in prisma/migrations
+
+
+No pending migrations to apply.

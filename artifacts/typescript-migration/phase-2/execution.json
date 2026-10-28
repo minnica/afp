@@ -1,0 +1,146 @@
+{
+  "baseCommit": "2ff43a952175563cfab631252282ecbbede959da",
+  "startedAt": "2026-10-28T04:55:41Z",
+  "checks": [
+    {
+      "name": "install",
+      "command": [
+        "pnpm",
+        "install",
+        "--frozen-lockfile"
+      ],
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "seconds": 3.288
+    },
+    {
+      "name": "typecheck",
+      "command": [
+        "pnpm",
+        "typecheck"
+      ],
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "seconds": 4.384
+    },
+    {
+      "name": "type-contracts",
+      "command": [
+        "pnpm",
+        "test:types"
+      ],
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "seconds": 3.421
+    },
+    {
+      "name": "lint",
+      "command": [
+        "pnpm",
+        "lint"
+      ],
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "seconds": 16.76
+    },
+    {
+      "name": "migrate",
+      "command": [
+        "pnpm",
+        "exec",
+        "prisma",
+        "migrate",
+        "deploy"
+      ],
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "seconds": 0.97
+    },
+    {
+      "name": "tests",
+      "command": [
+        "pnpm",
+        "test"
+      ],
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "seconds": 45.187
+    },
+    {
+      "name": "transfer-reference",
+      "command": [
+        "node",
+        "artifacts/typescript-migration/phase-0/transfers.cjs"
+      ],
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "seconds": 0.647
+    },
+    {
+      "name": "build",
+      "command": [
+        "pnpm",
+        "build"
+      ],
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "seconds": 11.58
+    }
+  ],
+  "node": "v22.23.2",
+  "pnpm": "10.33.0",
+  "schemaSha256": "00828cc74e12eb1c555d9e450ab03bcc5f679612531c8ecf26ec1ba810e80a13",
+  "migrationSha256": {
+    "prisma/migrations/20260509070227_init/migration.sql": "1ff8bca46c1f428981d455d8f4078194aa7dd47e6c58319c54fc584ae70c2b41",
+    "prisma/migrations/20260517045000_add_payable_accounts/migration.sql": "50c239f9c08407ed7107a926a660b785583849dbe729c290b1691ecfb0556e30",
+    "prisma/migrations/20260517222440_add_subscription_frequency/migration.sql": "ab2fce6df5b4b14baac3c10e4d83df85ddda1167140c2d0aa321605b885c3f56",
+    "prisma/migrations/20260517235633_replace_receivable_expected_date_with_charge_day/migration.sql": "1e1f4decb4b19bc185906545755cbd43b6510c3919408e3d077f88446c77c502",
+    "prisma/migrations/20260518002802_replace_receivable_charge_day_with_charge_days/migration.sql": "9a4e80ec04bd471c5f8616da3a38feed07e0d156e128afdcf4c34a0579d9369a",
+    "prisma/migrations/20260518041110_add_expense_subscription_relation/migration.sql": "12c4fe245e66a08076d473b58fa48e07431b93e39e440ade52ba10c07c8fa86b",
+    "prisma/migrations/20260518234708_add_payable_loan_support/migration.sql": "8ef7dcd79b9e4439e96092a131bbb569cb04b405721054e6916e71479a8c40b1",
+    "prisma/migrations/20260604000000_add_subscription_active_fields/migration.sql": "a7a8905cf9facf6135d2b095dff53a0d63392adef65519cfc919f060cd5affb8",
+    "prisma/migrations/20261009000000_add_installment_statement_reconciliations/migration.sql": "c5b70602e66ac44fff6f46d7d432e06277d4d5927227c7935383506099216b5b",
+    "prisma/migrations/20261010000000_add_card_cycle_credits/migration.sql": "bce78dbd21bdae948e03b1a314ab18586da68d7c7ea63088c39ef34bca349497",
+    "prisma/migrations/20261011000000_add_card_usage_verification/migration.sql": "ab7b6a61669a4910c4c6af563e02912944daf58416198f1dbcdb8fddd5032fb3",
+    "prisma/migrations/20261015000000_add_notice_dismissals/migration.sql": "8b082a23fdd3e10c8712590b6c0c1529640c9328f386fc7a5902689ac2cded87",
+    "prisma/migrations/20261016000000_add_subscription_charges/migration.sql": "fe3d2bdd2e3fe3b495e51c5a8a29e398e47e6ee26595ec7a1b91f156ed5add21",
+    "prisma/migrations/20261017000000_add_expense_operations/migration.sql": "ae45ef363c01fd0fbe514c0f29f6ecdcacb57e3f21039d4aebf8036931e01dcf",
+    "prisma/migrations/20261017020000_enable_application_rls/migration.sql": "69325502c6b19dacccf07e518c9f520638b5a3a5f59b8022c71547219952489e",
+    "prisma/migrations/20261017030000_add_post_cut_credits/migration.sql": "d878d5420a86740d69643722d6150bb10e6db784bd6058618beaf15c660231a3",
+    "prisma/migrations/20261020000000_add_cash_expense_contributions/migration.sql": "86f61ad5d5b818a17199a22343516e14961e2f837c849be8fcdfd6752cf336fd",
+    "prisma/migrations/20261021000000_add_android_capture_linking/migration.sql": "c80f3d004d6b34fede13ca5afa2d6f3107eb192fbcf09042cf5df4bc6338d8aa",
+    "prisma/migrations/20261021010000_add_capture_processing/migration.sql": "64882d0b153c5a10f94251b5544f5bc2d77b081f34ec5eec9f67a5afa1843dc5",
+    "prisma/migrations/20261021020000_capture_installment_reconciliation/migration.sql": "4a42bc36c68e092ad788481f0757bcc6c1d472bb6ed12a67b77d768486bdca2e",
+    "prisma/migrations/20261021030000_capture_review_and_reconciliation/migration.sql": "34f04b1ce08cc388006205fbfcbb8e0e8b91de2389ad11c05011767a49cc1c4f",
+    "prisma/migrations/20261021040000_add_card_credit_balances/migration.sql": "5f042600ecc8c93230b8b7ea0814498b22717b892bbadd8a568d577310dafb22",
+    "prisma/migrations/20261022000000_add_card_balance_tracking/migration.sql": "013fcbd00be5ef700fd210e561153523343d5bd64d4788e742fa3b852262492c",
+    "prisma/migrations/20261023000000_add_google_calendar_sync/migration.sql": "7482699faa47bb271aa7a0f51429b9a881464f8c6306a7e794070855b32e8790",
+    "prisma/migrations/20261023010000_capture_wallet_date_policy/migration.sql": "8a91d0ca16506aeb08adb6783569bcf414b051b85c8d294d80ee7f136c3eaec2",
+    "prisma/migrations/20261023020000_capture_nu_cfe_policy/migration.sql": "cf111147b0ee4786093ae2c3b7e65e5585a3da9773f341726a40b00d020b4353",
+    "prisma/migrations/20261023030000_capture_card_payments/migration.sql": "18956971f1b4f4b0f6a2be404fb9e50240521f81b6349b1eb99921d7e75aac3f",
+    "prisma/migrations/20261023040000_automatic_payment_receipts/migration.sql": "30377945f2a3e9f7af3acef63dcf3df6ce3237aa80acf66dae5de19c64bf6111",
+    "prisma/migrations/20261023050000_receivable_balance_adjustment/migration.sql": "7576dd3b6d7bef160ec348e8c890563dae89797014678b1326638c887e90f902",
+    "prisma/migrations/20261023060000_receiver_payment_notices/migration.sql": "6b0aac052e2ad455aef0a230e02cb9036b728bfed7df12c44a5c3cfd1c6bbdbd",
+    "prisma/migrations/20261024010000_capture_mercadopago_purchase_policy/migration.sql": "166646abdaa37e67228d0133740cb0eb451f9134306faef8e4672e8ce8552978",
+    "prisma/migrations/20261024020000_capture_bank_fallback/migration.sql": "fe792871e3417ac18e0ddf5a9fa264769e49c63c3c298cfe8097b4d4750a0f16",
+    "prisma/migrations/20261025000000_add_money_accounts/migration.sql": "9c6c16b3095279e819a0028ab7ea139aa36cd1c420b1ef00fec66f89aded8eb5",
+    "prisma/migrations/20261025010000_money_account_yields/migration.sql": "187f6827879e60af3a4dac5589b3bd302b1bc9cddb237adaa94a53f9c2304518",
+    "prisma/migrations/20261025020000_automatic_money_yields/migration.sql": "a4d21aab627389c21e9a639dde5348d5222766416166830ea5fd1562bb6bfdc7",
+    "prisma/migrations/20261025030000_payroll_business_days/migration.sql": "244c3f541242990d5137bd45c23f2313d282fb8b40e550670cee37aea3829285",
+    "prisma/migrations/20261026000000_expense_refunds/migration.sql": "ebd2a9695a6a7d3d2aa2e4558b4d466769ad5ec538ed347c659b2e976760bea2",
+    "prisma/migrations/20261026010000_debit_payment_method/migration.sql": "6d6cf09901b68930b6eacc11d6e687869a769f0acdf18b4188a7cedce855721a",
+    "prisma/migrations/20261026020000_capture_account_movements/migration.sql": "dc74a0bf84fa66803575d91b18550765f46c110aabff7d375636d6c6566ed536",
+    "prisma/migrations/20261026030000_card_cycle_dates_confirmation/migration.sql": "dca61abfb6631ba981ccd41707da601baef16d70c0165fc4d6e2a4d01b61ed2c",
+    "prisma/migrations/20261027000000_variable_budget_payment_mix/migration.sql": "8d26f706c6f0ace8ad267dde6c3e5be4fd29c8ec342bc6be04873c66eb97708c",
+    "prisma/migrations/20261027010000_bbva_debit_automation/migration.sql": "69cd66286a1d3a3de86d52eb70a072a0e268cf3957567222a3a00cacb985b028"
+  },
+  "lockfileSha256": "c565d057974dc2bc1aa7df7bba47f61742834051f6ec084ee74b29373ff7299c",
+  "sourceLines": {
+    "src/components/mi-dinero/MoneyTransferEditor.tsx": 18,
+    "src/components/mi-dinero/transferEditor.ts": 39,
+    "src/lib/money/transferClient.ts": 23,
+    "src/lib/money/transferContracts.ts": 42,
+    "src/lib/money/transfers.ts": 36
+  },
+  "finishedAt": "2026-10-28T04:57:09Z"
+}

@@ -6,6 +6,14 @@ Consolidado el **27 de octubre de 2026** a partir del README del commit `4562aa0
 
 ## 2026-10-27
 
+### Piloto de transferencias en TypeScript
+
+**Fase 2 completada localmente.** Se tiparon los contratos de `TRANSFER`/`REVERSE_TRANSFER`, su persistencia con `Prisma.TransactionClient`, el cliente con validación de respuesta y el adaptador del formulario compartido. La huella sigue usando el cuerpo original; bloqueo, escritura y recibo permanecen en una sola transacción. Las otras acciones, el handler y el interior del editor continúan en JavaScript.
+
+Pasaron typecheck, ocho nuevos casos negativos de tipos, lint, build y **840 pruebas con PostgreSQL local, sin fallos ni omisiones**. Las 12 respuestas del piloto coinciden con la fase 0. El navegador verificó teclado/foco, móvil/escritorio, centavos, reversión, respuesta perdida con el mismo UUID y recarga fallida después de guardar. Se conservan la advertencia de lint de TanStack Table y la de `pg`.
+
+Sin cambios de esquema, migraciones, lockfile ni despliegue. Se acotaron tres lotes para completar Mi dinero y se documentaron los adaptadores temporales y consultas duplicadas. Evidencias y reproducción: [fase 2](../artifacts/typescript-migration/phase-2/README.md).
+
 ### Herramientas para la migración a TypeScript
 
 **Fase 1 completada localmente.** Se añadieron TypeScript 6.0.3, los tipos de Node 22/React 19, esbuild y `dotenv` como dependencias directas. `tsconfig.json` sustituye a `jsconfig.json`; `typecheck` y `test:types` son verificaciones obligatorias. ESLint comprueba usos inseguros en TS/TSX y el build conserva la detección de errores.

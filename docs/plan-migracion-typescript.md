@@ -1,6 +1,6 @@
 # Plan de migración gradual a TypeScript
 
-**Estado:** fases 0 y 1 completadas; fases 2–7 pendientes. **Base revisada del plan:** `4d7b6e6`, 27 de octubre de 2026. **Referencia ejecutada:** `83a3924`; [resultados y reproducción de la fase 0](../artifacts/typescript-migration/phase-0/README.md).
+**Estado:** fases 0–2 completadas; fases 3–7 pendientes. **Piloto implementado:** [resultados de la fase 2](../artifacts/typescript-migration/phase-2/README.md), sobre `2ff43a9`, 27 de octubre de 2026. **Base revisada del plan:** `4d7b6e6`, 27 de octubre de 2026. **Referencia ejecutada:** `83a3924`; [resultados y reproducción de la fase 0](../artifacts/typescript-migration/phase-0/README.md).
 
 ## Objetivo y alcance
 
@@ -64,7 +64,7 @@ Las validaciones nuevas deberán aceptar las formas que ya admite el contrato p�
 | --- | --- | --- | --- |
 | 0 | Referencia funcional e inventario de dependencias | — | Completada |
 | 1 | Herramientas y pruebas compatibles con JS/TS | 0 | Completada |
-| 2 | Transferencias tipadas de formulario a persistencia | 1 | Pendiente |
+| 2 | Transferencias tipadas de formulario a persistencia | 1 | Completada |
 | 3 | Mi dinero completo | 2 | Pendiente |
 | 4 | Núcleo financiero, API y contratos compartidos | 3 | Pendiente |
 | 5 | Captura, Calendar y cola offline | 4 | Pendiente |
@@ -111,15 +111,15 @@ esbuild [transforma TypeScript pero no comprueba tipos](https://esbuild.github.i
 
 ### Fase 2 — Piloto: transferir entre cuentas propias
 
-**Referencias:** [esquemas](../src/lib/money/schema.js), [servicio](../src/lib/money/service.js), [API](../src/app/api/money/route.js), [pantalla](../src/components/mi-dinero/MoneyContent.jsx), [editor compartido](../src/components/mi-dinero/MoneyEditor.jsx) y [pruebas de integración](../tests/money-integration.test.cjs).
+**Referencias:** [contratos tipados](../src/lib/money/transferContracts.ts), [persistencia del piloto](../src/lib/money/transfers.ts), [cliente](../src/lib/money/transferClient.ts), [adaptador del editor](../src/components/mi-dinero/MoneyTransferEditor.tsx), [esquemas](../src/lib/money/schema.js), [servicio](../src/lib/money/service.js), [API](../src/app/api/money/route.js), [pantalla](../src/components/mi-dinero/MoneyContent.jsx), [editor compartido](../src/components/mi-dinero/MoneyEditor.jsx) y [pruebas de integración](../tests/money-integration.test.cjs).
 
-- [ ] Definir los contratos de `TRANSFER` y `REVERSE_TRANSFER`, sus entradas validadas y respuestas. Mantener `POST /api/money`, acciones, códigos HTTP, UUID y formas JSON existentes.
-- [ ] Extraer la lógica de transferencia a un módulo `.ts` pequeño si hace falta. Recibir la transacción y los datos necesarios: conservar el bloqueo por propietario y el recibo de operación en la transacción actual, sin crear una segunda transacción interna.
-- [ ] Tipar la consulta de las cuentas involucradas y sus conversiones. Verificar propiedad, cuentas distintas, fecha desde la referencia y restricciones de reversión posteriores a conciliación.
-- [ ] Añadir una función de cliente tipada sobre `apiFetch` para ese comando y validar su respuesta. Conservar recuperación de errores, cancelación y cuenta esperada.
-- [ ] Crear un formulario o adaptador de transferencia tipado, reutilizando la interfaz existente. Declarar y probar su frontera con `MoneyEditor` si ese componente sigue en JSX; no contar el interior del editor como comprobado estáticamente todavía.
-- [ ] Mantener las otras acciones de Mi dinero en JavaScript mediante fronteras explícitas. Tipar el flujo elegido no exige convertir de una vez todo `MoneyContent` ni el motor de proyección.
-- [ ] Añadir pocos casos de compilación que demuestren rechazo de campos obligatorios ausentes, acciones incompatibles y respuestas mal usadas. `@ts-expect-error` se admite con explicación en esas pruebas negativas; no como salida para errores del código de producción.
+- [x] Definir los contratos de `TRANSFER` y `REVERSE_TRANSFER`, sus entradas validadas y respuestas. Mantener `POST /api/money`, acciones, códigos HTTP, UUID y formas JSON existentes.
+- [x] Extraer la lógica de transferencia a un módulo `.ts` pequeño si hace falta. Recibir la transacción y los datos necesarios: conservar el bloqueo por propietario y el recibo de operación en la transacción actual, sin crear una segunda transacción interna.
+- [x] Tipar la consulta de las cuentas involucradas y sus conversiones. Verificar propiedad, cuentas distintas, fecha desde la referencia y restricciones de reversión posteriores a conciliación.
+- [x] Añadir una función de cliente tipada sobre `apiFetch` para ese comando y validar su respuesta. Conservar recuperación de errores, cancelación y cuenta esperada.
+- [x] Crear un formulario o adaptador de transferencia tipado, reutilizando la interfaz existente. Declarar y probar su frontera con `MoneyEditor` si ese componente sigue en JSX; no contar el interior del editor como comprobado estáticamente todavía.
+- [x] Mantener las otras acciones de Mi dinero en JavaScript mediante fronteras explícitas. Tipar el flujo elegido no exige convertir de una vez todo `MoneyContent` ni el motor de proyección.
+- [x] Añadir pocos casos de compilación que demuestren rechazo de campos obligatorios ausentes, acciones incompatibles y respuestas mal usadas. `@ts-expect-error` se admite con explicación en esas pruebas negativas; no como salida para errores del código de producción.
 
 **Aceptación funcional**
 
@@ -139,7 +139,11 @@ Las pruebas de integración deben ejecutarse con PostgreSQL local y recorrer for
 
 **Cierre del piloto:** contratos estrictos, sin escapes de tipos injustificados; casos anteriores correctos; ningún cambio en esquema, reglas ni protocolo. Medir esfuerzo real, impacto en tiempos de comprobación y tamaño de los adaptadores. Ajustar los lotes siguientes con esa evidencia.
 
+**Entrega:** [implementación y evidencias de la fase 2](../artifacts/typescript-migration/phase-2/README.md). Cinco módulos TS/TSX (158 líneas), ocho casos negativos de tipos y 840 pruebas con PostgreSQL local correctas, sin omisiones. Las 12 respuestas de fase 0 coinciden; el fixture verifica formulario → API → PostgreSQL, recuperación, foco y móvil/escritorio. `MoneyContent`, `MoneyEditor`, el handler, la coordinación transaccional y las demás acciones siguen en JS con fronteras explícitas; sus interiores no cuentan como migrados. Sin cambios de esquema, SQL, lockfile ni publicación.
+
 ### Fase 3 — Completar Mi dinero
+
+**Ajuste tras el piloto:** revisar en tres lotes: (1) cuentas/conciliaciones y resultado tipado de `loadMoneyData`; (2) rutas/planes y composición de `MoneyEditor`; (3) fuentes, rendimientos, presupuestos y proyección. El piloto necesitó 80 líneas de adaptadores de formulario/cliente y consultas Prisma focalizadas adicionales (una al transferir, dos al revertir); al tipar la instantánea compartida, reutilizar sus datos y retirar esas lecturas duplicadas sin alterar la transacción. Los [tiempos observados](../artifacts/typescript-migration/phase-2/execution.json) y el [intervalo de implementación/verificación](../artifacts/typescript-migration/phase-2/implementation-measurements.json) orientan el tamaño revisable, sin extrapolar un calendario a módulos de mayor complejidad.
 
 - [ ] Migrar cuentas y conciliaciones; después rutas y planes; finalmente fuentes, presupuestos, rendimientos y proyecciones de [src/lib/money/](../src/lib/money/).
 - [ ] Convertir `loadMoneyData` a un resultado con propiedades explícitas y tipos derivados de consultas Prisma. Evitar depender de dos arrays paralelos de nombres y resultados; conservar el orden de consultas y la instantánea transaccional.

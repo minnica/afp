@@ -9,7 +9,7 @@ import { createLatestRequest } from '@/lib/latestRequest';
 import { supabase } from '@/lib/supabase';
 import { ensureUserSetup } from '@/lib/userSetup';
 import { useDialogFocus } from '@/hooks/use-dialog-focus';
-import { accountSchema, reconcileSchema, planSchema, transferSchema, withdrawalSchema, paymentSchema, scenarioSchema } from '@/lib/money/schema';
+import { accountSchema, reconcileSchema, planSchema, withdrawalSchema, paymentSchema, scenarioSchema } from '@/lib/money/schema';
 import { day } from '@/lib/money/dates';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -25,6 +25,10 @@ import { ResponsiveSelect } from '@/components/ui/responsive-select';
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
 import { toast } from '@/components/ui/sonner';
 import MoneyEditor from './MoneyEditor';
+import MoneyTransferEditor from './MoneyTransferEditor';
+import { createTransferEditor } from './transferEditor';
+import { sendTransfer } from '@/lib/money/transferClient';
+import { transferMutationSchema } from '@/lib/money/transferContracts';
 import MoneyProjection from './MoneyProjection';
 import { money, dateLabel, monthLabel, accountOptions } from './format';
 
@@ -89,8 +93,12 @@ export default function MoneyContent() {
     }
     savingRef.current = true; requestRef.current.cancel();
     try {
-      const response = await apiFetch('/api/money', { method: 'POST', expectedUserId: userId, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-      const result = await response.json(); if (!response.ok) throw new Error(result.error || 'No se pudo guardar.');
+      if (payload.action === 'TRANSFER' || payload.action === 'REVERSE_TRANSFER') {
+        await sendTransfer(transferMutationSchema.parse(payload), { expectedUserId: userId });
+      } else {
+        const response = await apiFetch('/api/money', { method: 'POST', expectedUserId: userId, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        const result = await response.json(); if (!response.ok) throw new Error(result.error || 'No se pudo guardar.');
+      }
       toast.success('Cambio guardado');
       await load(userId, { mutationCompleted: true }).catch(() => {});
     } finally { savingRef.current = false; }
@@ -120,8 +128,7 @@ export default function MoneyContent() {
       values: { accountId: account.id, version: account.version, bankBalance: String(account.balance), reason: '' }, fields: [amountField('bankBalance', 'Saldo actual del banco'), field('reason', 'Motivo o referencia')] });
   }
   function openTransfer() {
-    setEditor({ title: 'Transferir entre mis cuentas', description: 'Registra una transferencia realizada o programada. El total de tu dinero no cambia.', action: 'TRANSFER', schema: transferSchema,
-      values: { fromAccountId: '', toAccountId: '', amount: '', date: data.forecast.today, concept: 'Transferencia entre mis cuentas' }, fields: [field('fromAccountId', 'Cuenta de origen', { options: accountOptions(data.forecast.accounts) }), field('toAccountId', 'Cuenta de destino', { options: accountOptions(data.forecast.accounts) }), amountField('amount', 'Importe'), field('date', 'Fecha', { type: 'date' }), field('concept', 'Concepto')] });
+    setEditor(createTransferEditor(data.forecast.accounts, data.forecast.today));
   }
   function openWithdrawal() {
     setEditor({ title: 'Registrar retiro de efectivo', description: 'Descuenta el importe de la cuenta. No crea una compra ni un pago de tarjeta.', action: 'WITHDRAWAL', schema: withdrawalSchema,
@@ -174,7 +181,7 @@ export default function MoneyContent() {
         <TabsContent value="routes" className="flex flex-col gap-4"><h2 className="text-lg font-semibold">Cuentas por defecto</h2><p className="text-sm text-muted-foreground">Una regla específica tiene prioridad sobre la general. Los gastos con débito usan la cuenta elegida en Gastos. Estas reglas asignan los demás movimientos.</p><ItemGroup>{data.routingOptions.map((option, index) => { const rule = data.routes.find(r => r.key === option.key); return <div key={option.key}>{index > 0 && <ItemSeparator />}<Item className="flex-wrap px-0"><ItemContent><ItemTitle>{option.label}</ItemTitle><ItemDescription>{rule ? rule.excluded ? 'Sin efecto en cuentas / descontado en nómina' : accounts.find(a => a.id === rule.accountId)?.name : option.payrollDefault ? 'Ya descontado de la nómina neta (por defecto)' : 'Usar regla general; sin asignación propia'}</ItemDescription></ItemContent><ItemActions><Button variant="outline" className="min-h-11" onClick={() => openRoute(option.key, option.label)}>Configurar</Button></ItemActions></Item></div>; })}</ItemGroup></TabsContent>
       </Tabs>}
     </>}
-    {editor && <MoneyEditor key={`${editor.action}:${editor.extra?.id || editor.extra?.key || editor.title}`} editor={editor} onClose={() => setEditor(null)} onSave={save} restoreFocus={restoreFocus} />}
+    {editor?.action === 'TRANSFER' ? <MoneyTransferEditor editor={editor} onClose={() => setEditor(null)} onSave={save} restoreFocus={restoreFocus} /> : editor && <MoneyEditor key={`${editor.action}:${editor.extra?.id || editor.extra?.key || editor.title}`} editor={editor} onClose={() => setEditor(null)} onSave={save} restoreFocus={restoreFocus} />}
     <AlertDialog open={!!confirmation} onOpenChange={open => { if (!open && !confirming) setConfirmation(null); }}><AlertDialogContent onCloseAutoFocus={restoreFocus}><AlertDialogHeader><AlertDialogTitle>{confirmation?.title}</AlertDialogTitle><AlertDialogDescription>{confirmation?.description}</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel disabled={confirming}>Cancelar</AlertDialogCancel><AlertDialogAction disabled={confirming} onClick={e => { e.preventDefault(); void performConfirmed(); }}>{confirming ? 'Guardando…' : 'Confirmar'}</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
   </div>;
 }

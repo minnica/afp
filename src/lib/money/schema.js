@@ -34,7 +34,7 @@ export const planSchema = z.object({
   if (v.cardId && ['INCOME', 'PAYROLL'].includes(v.kind)) ctx.addIssue({ code: 'custom', path: ['cardId'], message: 'El ingreso se recibe en una cuenta.' });
   if (v.useHistoricalPayments && (v.kind !== 'VARIABLE' || v.cardId)) ctx.addIssue({ code: 'custom', path: ['useHistoricalPayments'], message: 'La estimación histórica requiere un presupuesto variable sin tarjeta fija.' });
 });
-export const transferSchema = z.object({ fromAccountId: text, toAccountId: text, amount: positive, date, concept: text }).refine(v => v.fromAccountId !== v.toAccountId, { path: ['toAccountId'], message: 'Selecciona otra cuenta de destino.' });
+export { transferSchema } from '@/lib/money/transferContracts';
 export const withdrawalSchema = z.object({ accountId: text, amount: positive, date, concept: text });
 export const paymentSchema = z.object({ cycleId: text, accountId: text, amount: positive, date, additional: z.literal(true, { error: 'Confirma que es un abono nuevo.' }) });
 export const scenarioSchema = z.object({ stopPayrollDate: z.union([date, z.literal('')]).default(''), collectionDelay: z.coerce.number().int().min(0).max(180).default(0), variablePercent: z.coerce.number().min(0).max(300).default(100), extraAmount: money.refine(v => v >= 0).default(0), extraDate: z.union([date, z.literal('')]).default(''), extraAccountId: z.string().default('') }).superRefine((v, ctx) => {

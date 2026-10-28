@@ -1,0 +1,142 @@
+{
+  "auth": "fictitious local Supabase fixture",
+  "browser": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+  "checks": [
+    {
+      "amount": "200.25",
+      "check": "lost-response-keeps-draft",
+      "concept": "Transferencia entre mis cuentas",
+      "posts": 1
+    },
+    {
+      "check": "same-command-uuid-and-receipt-after-response-loss",
+      "passed": true
+    },
+    {
+      "check": "confirmed-save-distinguished-from-failed-refresh",
+      "failedReadRetryPreservesPostCount": 2,
+      "title": "Cambio guardado"
+    },
+    {
+      "check": "balances-after-transfer-and-get-only-retry",
+      "destination": 300.35,
+      "focus": "Transferir",
+      "origin": 800,
+      "postRequests": 2,
+      "total": 1100.35
+    },
+    {
+      "check": "mobile-form-through-real-api",
+      "destination": 300.36,
+      "focus": "Transferir",
+      "horizontalOverflow": false,
+      "origin": 799.99,
+      "viewport": [
+        390,
+        844
+      ]
+    },
+    {
+      "check": "mobile-reversal-restores-balances",
+      "destination": 100.1,
+      "origin": 1000.25,
+      "total": 1100.35
+    },
+    {
+      "check": "dialog-title-focus",
+      "focusedTitle": "Transferir entre mis cuentas",
+      "mobile": true
+    },
+    {
+      "check": "escape-cancels-and-restores-focus",
+      "focus": "Transferir",
+      "postRequests": 5
+    }
+  ],
+  "database": "disposable local PostgreSQL",
+  "desktopViewport": [
+    1280,
+    720
+  ],
+  "executedAt": "2026-10-28T05:01:25.526Z",
+  "failGet": false,
+  "losePost": false,
+  "mobileViewport": [
+    390,
+    844
+  ],
+  "origin": "http://127.0.0.1:4216",
+  "posts": [
+    {
+      "command": {
+        "action": "TRANSFER",
+        "amount": 200.25,
+        "concept": "Transferencia entre mis cuentas",
+        "date": "2026-10-27",
+        "fromAccountId": "630dcec8-7869-437d-b8b8-c35e6c9aaaf1",
+        "operationId": "cb6271b0-aeb0-499d-bd7c-ac3a3670a2fd",
+        "toAccountId": "c91411c6-8dd8-4bb4-ad48-b15582d1b65b"
+      },
+      "response": {
+        "id": "c0e6b733-c01b-4a1f-9575-5ec777c95fae",
+        "ok": true
+      },
+      "status": 200
+    },
+    {
+      "command": {
+        "action": "TRANSFER",
+        "amount": 200.25,
+        "concept": "Transferencia entre mis cuentas",
+        "date": "2026-10-27",
+        "fromAccountId": "630dcec8-7869-437d-b8b8-c35e6c9aaaf1",
+        "operationId": "cb6271b0-aeb0-499d-bd7c-ac3a3670a2fd",
+        "toAccountId": "c91411c6-8dd8-4bb4-ad48-b15582d1b65b"
+      },
+      "response": {
+        "id": "c0e6b733-c01b-4a1f-9575-5ec777c95fae",
+        "ok": true
+      },
+      "status": 200
+    },
+    {
+      "command": {
+        "action": "TRANSFER",
+        "amount": 0.01,
+        "concept": "Transferencia móvil ficticia",
+        "date": "2026-10-27",
+        "fromAccountId": "630dcec8-7869-437d-b8b8-c35e6c9aaaf1",
+        "operationId": "c02c999b-d1ad-49a2-a57c-18087637b14b",
+        "toAccountId": "c91411c6-8dd8-4bb4-ad48-b15582d1b65b"
+      },
+      "response": {
+        "id": "abec4f6c-9dff-40d2-803d-016b12023148",
+        "ok": true
+      },
+      "status": 200
+    },
+    {
+      "command": {
+        "action": "REVERSE_TRANSFER",
+        "id": "c0e6b733-c01b-4a1f-9575-5ec777c95fae",
+        "operationId": "99e8232c-88a3-43ce-8917-a75534065e51"
+      },
+      "response": {
+        "ok": true
+      },
+      "status": 200
+    },
+    {
+      "command": {
+        "action": "REVERSE_TRANSFER",
+        "id": "abec4f6c-9dff-40d2-803d-016b12023148",
+        "operationId": "6aaf1ba3-5e3f-42c0-8ca1-ab52c82c93c7"
+      },
+      "response": {
+        "ok": true
+      },
+      "status": 200
+    }
+  ],
+  "applicationErrors": []
+}
