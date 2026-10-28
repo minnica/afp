@@ -1,6 +1,6 @@
 const assert = require("node:assert/strict");
 const { test } = require("node:test");
-const { sourceLoader } = require("./helpers/load-source.cjs");
+const { sourceLoader } = require("./helpers/load-source.ts");
 
 function client(fetcher, { online = true } = {}) {
   let session = { user: { id: "a" }, access_token: "token-1" };

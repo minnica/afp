@@ -1,6 +1,6 @@
 const assert = require('node:assert/strict');
 const { test } = require('node:test');
-const { sourceLoader } = require('./helpers/load-source.cjs');
+const { sourceLoader } = require('./helpers/load-source.ts');
 const { createBalanceTracking, getTrackedCard, isBalanceTrackingValid, runBalanceSnapshot } = sourceLoader()('src/lib/cardBalanceTracking.ts');
 const day = '2026-10-21';
 const empty = () => ({ expenses: [], purchases: [], cycles: [], credits: [] });

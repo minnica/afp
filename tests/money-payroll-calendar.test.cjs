@@ -1,6 +1,6 @@
 const assert = require('node:assert/strict');
 const { test } = require('node:test');
-const { sourceLoader } = require('./helpers/load-source.cjs');
+const { sourceLoader } = require('./helpers/load-source.ts');
 const load = sourceLoader(), { planDates, buildForecast } = load('src/lib/money/forecast.ts');
 const plan = extra => ({ id: 'salary', name: 'Nómina ficticia', kind: 'PAYROLL', amount: 5000, accountId: 'bank', incomeTypeId: 'salary-type', startDate: '2026-10-24', frequencyMonths: 1, days: [15, 31], payrollBusinessDays: true, isActive: true, occurrences: [], ...extra });
 const data = extra => ({ accounts: [{ id: 'bank', name: 'Banco ficticio', openingBalance: 100, reservedAmount: 0, asOf: '2026-10-24', baseline: {} }], plans: [plan()], routes: [{ key: 'incomeType:salary-type', accountId: 'bank' }], transfers: [], cards: [], cycles: [], incomes: [], expenses: [], subscriptions: [], purchases: [], receivables: [], payables: [], ...extra });

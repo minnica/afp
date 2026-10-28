@@ -3,7 +3,7 @@ const { test } = require('node:test');
 const { randomUUID, randomBytes, createHash } = require('node:crypto');
 const { PrismaClient, Prisma } = require('@prisma/client');
 const { PrismaPg } = require('@prisma/adapter-pg');
-const { sourceLoader } = require('./helpers/load-source.cjs');
+const { sourceLoader } = require('./helpers/load-source.ts');
 const connectionString=process.env.AFP_TEST_DATABASE_URL;
 
 test('Fase 4 PostgreSQL: interpretación, resoluciones y escritura financiera atómica', {skip:!connectionString}, async t=>{

@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { sourceLoader } = require('./helpers/load-source.cjs');
+const { sourceLoader } = require('./helpers/load-source.ts');
 const load = sourceLoader();
 // The source loader isolates module objects in a VM realm. Compare JSON values.
 const equal = (actual, expected) => assert.deepEqual(JSON.parse(JSON.stringify(actual)), expected);

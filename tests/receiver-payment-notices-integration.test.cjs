@@ -3,7 +3,7 @@ const { test } = require('node:test');
 const { randomUUID, randomBytes } = require('node:crypto');
 const { PrismaClient } = require('@prisma/client');
 const { PrismaPg } = require('@prisma/adapter-pg');
-const { sourceLoader } = require('./helpers/load-source.cjs');
+const { sourceLoader } = require('./helpers/load-source.ts');
 const fixtures = {
  bank: require('./fixtures/captures/banamex-card-payment.es.v1.json').event,
  mercado: require('./fixtures/captures/mercadopago-card-payment.es.v1.json').event,

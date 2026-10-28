@@ -1,0 +1,29 @@
+{
+  "reason": "Fortalecer los casos negativos para comprobar el retorno inferido unknown sin anotarlo previamente; solo cambia el contrato estático, no los módulos ejecutados.",
+  "checks": [
+    {
+      "command": [
+        "pnpm",
+        "test:types"
+      ],
+      "exitCode": 0,
+      "seconds": 7.472,
+      "log": "final-contract-types.log"
+    },
+    {
+      "command": [
+        "pnpm",
+        "exec",
+        "eslint",
+        "tests/types/source-loader.ts"
+      ],
+      "exitCode": 0,
+      "seconds": 4.763,
+      "log": "final-contract-lint.log"
+    }
+  ],
+  "sha256": {
+    "tests/types/source-loader.ts": "5206a4ed498f0b70ef44da65dd1e75e3dfbd25a578020947a8bb65fd9b17ba44"
+  },
+  "finishedAt": "2026-10-28T08:44:34.780081+00:00"
+}

@@ -1,7 +1,7 @@
 const assert = require("node:assert/strict");
 const { test } = require("node:test");
 const { spawnSync } = require("node:child_process");
-const { sourceLoader } = require("./helpers/load-source.cjs");
+const { sourceLoader } = require("./helpers/load-source.ts");
 
 const { buildPayableNotices, buildImportantNotices } = sourceLoader()("src/lib/importantNotices.ts");
 const now = new Date("2026-10-26T12:00:00Z");
@@ -66,7 +66,7 @@ test("avisos por pagar: prioridad por vencimiento y fecha junto a otros avisos",
 test("avisos por pagar: conserva el día bancario UTC y todo el día local de vencimiento", () => {
   const script = `
     const assert = require('node:assert/strict');
-    const { sourceLoader } = require('./tests/helpers/load-source.cjs');
+    const { sourceLoader } = require('./tests/helpers/load-source.ts');
     const { buildPayableNotices } = sourceLoader()('src/lib/importantNotices.ts');
     const account = { id: 'date', concept: 'Fecha', originalAmount: 10, status: 'ACTIVE', dailyExpenses: [] };
     for (const time of ['00:00:00Z', '23:59:59Z']) {
@@ -77,7 +77,7 @@ test("avisos por pagar: conserva el día bancario UTC y todo el día local de ve
     }
   `;
   for (const TZ of ["UTC", "America/Mexico_City", "Asia/Tokyo"]) {
-    const result = spawnSync(process.execPath, ["-e", script], { cwd: require("node:path").resolve(__dirname, ".."),
+    const result = spawnSync(process.execPath, ["--import", "tsx", "-e", script], { cwd: require("node:path").resolve(__dirname, ".."),
       env: { ...process.env, TZ }, encoding: "utf8" });
     assert.equal(result.status, 0, `${TZ}: ${result.stderr}`);
   }

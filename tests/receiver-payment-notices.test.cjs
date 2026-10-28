@@ -1,6 +1,6 @@
 const assert = require('node:assert/strict');
 const { test } = require('node:test');
-const { sourceLoader } = require('./helpers/load-source.cjs');
+const { sourceLoader } = require('./helpers/load-source.ts');
 const banamex = require('./fixtures/captures/banamex-card-payment.es.v1.json').event;
 const mercado = require('./fixtures/captures/mercadopago-card-payment.es.v1.json').event;
 const debit = require('./fixtures/captures/bbva-debit-card-charge.es.v1.json').event;

@@ -1,6 +1,6 @@
 const assert = require('node:assert/strict');
 const { test } = require('node:test');
-const { sourceLoader } = require('./helpers/load-source.cjs');
+const { sourceLoader } = require('./helpers/load-source.ts');
 
 test('Mi dinero: las lecturas esperan la conexión única y conservan propietario y relaciones', async () => {
   const names = ['moneyAccount', 'moneyRoute', 'moneyPlan', 'moneyTransfer', 'moneyWithdrawal', 'card', 'cardCycle', 'income', 'dailyExpense', 'subscription', 'installmentPurchase', 'receivableAccount', 'payableAccount', 'incomeType', 'category'];

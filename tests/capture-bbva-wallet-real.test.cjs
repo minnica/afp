@@ -1,6 +1,6 @@
 const assert = require('node:assert/strict');
 const { test } = require('node:test');
-const { sourceLoader } = require('./helpers/load-source.cjs');
+const { sourceLoader } = require('./helpers/load-source.ts');
 const fixture = require('./fixtures/captures/wallet-bbva-purchase.es.v1.json');
 const { interpretCapture, captureParsers } = sourceLoader()('src/lib/captureParsers.ts');
 const change = fields => ({ ...fixture.event, fields: { ...fixture.event.fields, ...fields } });

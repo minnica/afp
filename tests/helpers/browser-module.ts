@@ -1,8 +1,8 @@
-const fs = require('node:fs');
-const path = require('node:path');
-const { build } = require('esbuild');
-const { resolveSource } = require('./load-source.cjs');
-async function buildBrowserModule(entry, mocks = {}) {
+import fs from 'node:fs';
+import path from 'node:path';
+import { build } from 'esbuild';
+import { resolveSource, sourceLanguage } from './load-source';
+export async function buildBrowserModule(entry: string, mocks: Readonly<Record<string, string>> = {}): Promise<string> {
   const result = await build({
     entryPoints: [resolveSource(entry)], bundle: true, write: false,
     format: 'esm', platform: 'browser', target: 'es2022',
@@ -16,10 +16,11 @@ async function buildBrowserModule(entry, mocks = {}) {
       });
       builder.onLoad({ filter: /.*/, namespace: 'mock' }, args => ({ contents: mocks[args.path], loader: 'js' }));
       builder.onLoad({ filter: /\.[jt]sx?$/, namespace: 'file' }, args => ({
-        contents: fs.readFileSync(args.path, 'utf8'), loader: path.extname(args.path).slice(1), resolveDir: path.dirname(args.path),
+        contents: fs.readFileSync(args.path, 'utf8'), loader: sourceLanguage(args.path), resolveDir: path.dirname(args.path),
       }));
     } }],
   });
-  return result.outputFiles[0].text;
+  const output = result.outputFiles[0];
+  if (!output) throw new Error(`Módulo de navegador sin salida: ${entry}`);
+  return output.text;
 }
-module.exports = { buildBrowserModule };

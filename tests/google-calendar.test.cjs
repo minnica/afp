@@ -1,6 +1,6 @@
 const assert = require('node:assert/strict');
 const { test } = require('node:test');
-const { sourceLoader } = require('./helpers/load-source.cjs');
+const { sourceLoader } = require('./helpers/load-source.ts');
 const env = { GOOGLE_CALENDAR_CLIENT_ID: 'test-client', GOOGLE_CALENDAR_CLIENT_SECRET: 'test-secret', CALENDAR_ENCRYPTION_KEY: Buffer.alloc(32, 7).toString('base64'), AFP_APP_ORIGIN: 'https://afp.example.test', CRON_SECRET: 'cron-test-secret' };
 const globals = { process: { env }, URLSearchParams, AbortSignal };
 const plain = value => JSON.parse(JSON.stringify(value));

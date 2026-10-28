@@ -4,7 +4,7 @@ const { test } = require('node:test');
 const { randomUUID, randomBytes } = require('node:crypto');
 const { PrismaClient } = require('@prisma/client');
 const { PrismaPg } = require('@prisma/adapter-pg');
-const { sourceLoader } = require('./helpers/load-source.cjs');
+const { sourceLoader } = require('./helpers/load-source.ts');
 const { interpretCapture } = sourceLoader()('src/lib/captureParsers.ts');
 const notice = (body, extra = {}) => ({ sourcePackage: 'com.bancomer.mbanking', postedAt: '2026-10-26T04:06:00Z', receivedAt: '2026-10-26T04:07:00Z', fields: { 'android.title': 'BBVA', 'android.text': body, ...extra } });
 test('BBVA: admite las variantes exactas de cuatro y cinco cifras, sin inferir receptor ni moneda', () => {

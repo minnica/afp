@@ -1,6 +1,6 @@
 const assert = require('node:assert/strict');
 const { test } = require('node:test');
-const { sourceLoader } = require('./helpers/load-source.cjs');
+const { sourceLoader } = require('./helpers/load-source.ts');
 const bank = require('./fixtures/captures/banamex-joy-card-charge.es.v1.json');
 const wallet = require('./fixtures/captures/wallet-banamex2-purchase.es.v1.json');
 const additional = require('./fixtures/captures/banamex-card-charge.es.v1.json');

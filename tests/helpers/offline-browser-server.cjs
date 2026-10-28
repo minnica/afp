@@ -1,7 +1,7 @@
 // Fixture aislada: IndexedDB/Web Locks reales; API/recibos en memoria, sin Supabase.
-// node tests/helpers/offline-browser-server.cjs (http://127.0.0.1:4192)
+// node --import tsx tests/helpers/offline-browser-server.cjs (http://127.0.0.1:4192)
 const http = require("node:http");
-const { buildBrowserModule } = require('./browser-module.cjs');
+const { buildBrowserModule } = require('./browser-module.ts');
 const receipts = new Map(), requests = [], held = [];
 const moduleSource = buildBrowserModule('src/lib/offlineExpenses.ts', {
   '@/lib/apiFetch': 'export const apiFetch = (url, options) => fetch(url, options);',

@@ -1,7 +1,7 @@
 const assert = require("node:assert/strict");
 const { test } = require("node:test");
 const { createHash, randomUUID, randomBytes } = require("node:crypto");
-const { sourceLoader } = require("./helpers/load-source.cjs");
+const { sourceLoader } = require("./helpers/load-source.ts");
 
 const plain = value => JSON.parse(JSON.stringify(value));
 const today = new Date("2026-10-26T12:00:00Z");

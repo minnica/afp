@@ -90,7 +90,7 @@ Cada fase se divide en lotes revisables. Una dependencia compartida puede conver
 
 ### Fase 1 — Preparar herramientas y conservar las pruebas
 
-**Archivos principales:** [package.json](../package.json), [pnpm-workspace.yaml](../pnpm-workspace.yaml), [eslint.config.mjs](../eslint.config.mjs), [cargador](../tests/helpers/load-source.cjs), fixtures de [Mi dinero](../tests/helpers/money-browser-server.cjs), [captura](../tests/helpers/capture-browser-server.cjs) y [offline](../tests/helpers/offline-browser-server.cjs).
+**Archivos principales:** [package.json](../package.json), [pnpm-workspace.yaml](../pnpm-workspace.yaml), [eslint.config.mjs](../eslint.config.mjs), [cargador](../tests/helpers/load-source.ts), fixtures de [Mi dinero](../tests/helpers/money-browser-server.cjs), [captura](../tests/helpers/capture-browser-server.cjs) y [offline](../tests/helpers/offline-browser-server.cjs).
 
 - [x] Añadir las dependencias y configuración descritas arriba. Proponer `pnpm typecheck` como `prisma generate && next typegen && tsc --noEmit`, verificando que funciona desde una instalación limpia.
 - [x] Añadir una comprobación separada de contratos de tipos, por ejemplo `pnpm test:types`, y hacerla parte de las verificaciones obligatorias. Next genera sus tipos mediante `next typegen`; el [build debe conservar la detección de errores de TypeScript](https://nextjs.org/docs/app/api-reference/config/typescript).

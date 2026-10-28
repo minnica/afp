@@ -1,6 +1,6 @@
 const assert = require("node:assert/strict");
 const { test } = require("node:test");
-const { sourceLoader } = require("./helpers/load-source.cjs");
+const { sourceLoader } = require("./helpers/load-source.ts");
 
 function fixture(paymentMethod = "CASH", cardId = null) {
   const subscription = { id: "s", userId: "owner", name: "Luz", amount: "120", paymentMethod, cardId,

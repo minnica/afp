@@ -1,7 +1,7 @@
 const assert = require('node:assert/strict');
 const { test } = require('node:test');
 const { randomUUID } = require('node:crypto');
-const { sourceLoader } = require('./helpers/load-source.cjs');
+const { sourceLoader } = require('./helpers/load-source.ts');
 const load = sourceLoader({ 'next/server': { NextResponse: {} } });
 const { reviewOnlyCapturePackages } = load('src/lib/captureSourcePolicy.ts');
 const { validateCaptureEvent } = load('src/lib/captureProtocol.ts');

@@ -1,6 +1,6 @@
 const assert = require('node:assert/strict');
 const { test } = require('node:test');
-const { sourceLoader } = require('./helpers/load-source.cjs');
+const { sourceLoader } = require('./helpers/load-source.ts');
 const load = sourceLoader();
 const { CALENDAR_EVENT_PALETTE: palette, calendarEventLabel, calendarLabelProperties, ensureCalendarPalette } = load('src/lib/calendar/palette.ts');
 const plain = value => JSON.parse(JSON.stringify(value));

@@ -3,7 +3,7 @@ const { randomUUID } = require('node:crypto');
 const { test } = require('node:test');
 const { PrismaClient } = require('@prisma/client');
 const { PrismaPg } = require('@prisma/adapter-pg');
-const { sourceLoader } = require('./helpers/load-source.cjs');
+const { sourceLoader } = require('./helpers/load-source.ts');
 const connectionString = process.env.AFP_TEST_DATABASE_URL;
 
 test('presupuesto mixto: API real, persistencia, propietario, reintentos y conservación de movimientos', { skip: !connectionString }, async t => {

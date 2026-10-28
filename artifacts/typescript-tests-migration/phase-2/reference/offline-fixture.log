@@ -1,0 +1,19 @@
+✓ A02 · prueba aislada
+  http://127.0.0.1:4192/
+true
+{
+  "importedQueueExports": [
+    "addOfflineExpense",
+    "readOfflineExpenses",
+    "resolveOfflineCapture",
+    "subscribeOfflineExpenses",
+    "syncOfflineExpenses"
+  ],
+  "indexedDB": true,
+  "observer": "function",
+  "webLocks": true
+}
+{"success":true,"data":{"errors":[]},"error":null}
+✓ Browser closed
+Fixture A02: http://127.0.0.1:4192
+Fixture y sesión de navegador cerrados.

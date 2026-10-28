@@ -1,6 +1,6 @@
 const assert = require("node:assert/strict");
 const { test } = require("node:test");
-const { sourceLoader } = require("./helpers/load-source.cjs");
+const { sourceLoader } = require("./helpers/load-source.ts");
 const ctx = sourceLoader()("src/lib/expenseFilters.ts");
 
 const expenses = [

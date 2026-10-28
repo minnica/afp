@@ -3,7 +3,7 @@ const { test } = require("node:test");
 const { randomBytes, randomUUID } = require("node:crypto");
 const { PrismaClient } = require("@prisma/client");
 const { PrismaPg } = require("@prisma/adapter-pg");
-const { sourceLoader } = require("./helpers/load-source.cjs");
+const { sourceLoader } = require("./helpers/load-source.ts");
 const connectionString = process.env.AFP_TEST_DATABASE_URL;
 
 test("Captura PostgreSQL: vinculación, recepción y autorización completa", { skip: !connectionString }, async t => {

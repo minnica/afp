@@ -1,6 +1,6 @@
 const assert = require("node:assert/strict");
 const { test } = require("node:test");
-const { sourceLoader } = require("./helpers/load-source.cjs");
+const { sourceLoader } = require("./helpers/load-source.ts");
 const ctx = sourceLoader()("src/lib/subscriptionCharges.ts");
 const sub = { id: "s", name: "Servicio", amount: 199, chargeDay: 15, startMonth: 1, startYear: 2026,
   frequencyMonths: 1, isActive: true, paymentMethod: "CARD", cardId: "c", charges: [], dailyExpenses: [] };

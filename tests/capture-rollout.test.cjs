@@ -1,6 +1,6 @@
 const assert = require('node:assert/strict');
 const { test } = require('node:test');
-const { sourceLoader } = require('./helpers/load-source.cjs');
+const { sourceLoader } = require('./helpers/load-source.ts');
 const { isReviewedCapture, captureFormatReadiness, buildCaptureRollout } = sourceLoader()('src/lib/captureRollout.ts');
 const sourcePackage = 'mx.hsbc.hsbcmexico';
 const parser = { key: 'synthetic.hsbc.v1', sourcePackage, verified: true };

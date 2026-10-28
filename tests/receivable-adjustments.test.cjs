@@ -1,6 +1,6 @@
 const assert = require('node:assert/strict');
 const { test } = require('node:test');
-const { sourceLoader } = require('./helpers/load-source.cjs');
+const { sourceLoader } = require('./helpers/load-source.ts');
 const { debtFixture } = require('./helpers/debt-fixture.cjs');
 const { getDebtAccountState } = sourceLoader()('src/lib/calculations/debtAccounts.ts');
 const { getPayablesSummary } = sourceLoader()('src/lib/payablesSummary.ts');

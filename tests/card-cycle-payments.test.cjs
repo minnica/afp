@@ -1,6 +1,6 @@
 const assert = require("node:assert/strict");
 const { test } = require("node:test");
-const { sourceLoader } = require("./helpers/load-source.cjs");
+const { sourceLoader } = require("./helpers/load-source.ts");
 const { getCyclePaymentState, getCyclePaymentAmounts, parseCycleMoney } = sourceLoader()("src/lib/calculations/cardCyclePayments.ts");
 const { getDashboardPayment } = sourceLoader()("src/lib/cardPaymentPresentation.ts");
 const now = new Date("2026-10-25T18:00:00Z");

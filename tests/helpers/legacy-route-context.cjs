@@ -1,6 +1,6 @@
 // Adaptación de pruebas históricas: dependencias reales, adaptadores explícitos.
 // Solo expone los helpers privados que ya comprobaban esos escenarios.
-const { sourceLoader } = require('./load-source.cjs');
+const { sourceLoader } = require('./load-source.ts');
 function routeContext(route, globals = {}) {
   const load = sourceLoader({
     '@/lib/prisma': { prisma: globals.prisma || {} },

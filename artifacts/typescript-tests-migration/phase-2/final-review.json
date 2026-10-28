@@ -1,0 +1,72 @@
+{
+  "reviewedAt": "2026-10-28T08:47:54.901498+00:00",
+  "complete": true,
+  "baseCommit": "c0a0a3798a92fc2c0b23281bb95b1a77e32c994f",
+  "validationManifest": "reference/execution.json",
+  "staticFollowUp": "reference/contract-follow-up.json",
+  "executedInputHashesStillMatch": 483,
+  "staticContractChangedAfterCopyAndRechecked": [
+    "tests/types/source-loader.ts"
+  ],
+  "protectedHashes": {
+    "protectedFiles": {
+      "count": 394,
+      "changed": []
+    },
+    "historicalArtifacts": {
+      "count": 672,
+      "changed": []
+    }
+  },
+  "scenarioComparison": {
+    "baselineScenariosPreservedInOrder": 854,
+    "phase1ScenariosPreservedInOrder": 862,
+    "addedScenarios": 1,
+    "allCommandsSameOrderedScenarios": true,
+    "discoveredAndObservedFiles": 107
+  },
+  "noProductOrSchemaChanges": true,
+  "noNewDependencies": true,
+  "remainingPhases": [
+    3,
+    4,
+    5,
+    6
+  ],
+  "knownLintWarnings": 3,
+  "brokenDocumentationLinks": [],
+  "diffCheck": true,
+  "resources": {
+    "temporaryCopyRemoved": true,
+    "containerRemoved": true,
+    "offlineServerAndBrowserClosed": true
+  },
+  "finalTsFileSha256": {
+    "tests/helpers/browser-module.ts": "14b25cd3e9783d021878c2f5bb5f14636189dc3931ef6850e04f90bdca5c7e96",
+    "tests/helpers/dynamic-values.ts": "e73541d333dc179ca0e360dad84137c350c868f6a054429e3a4a91363d2e471d",
+    "tests/helpers/load-source.ts": "c32e8697bcf7d05657d1a7f3d1060b414b84a67a64f6b02516aa5da3be447e6b",
+    "tests/helpers/source-contracts.ts": "c2a5c1b711562c6c4795c669f70c78b9d072629e4bfeefc5502a5fa867c9a832",
+    "tests/latest-request.test.ts": "711ce3356ae5a4ce090cbcee5bcd6eee10408d4256264746962e84fd3646d6a7",
+    "tests/money-transfer-client.test.ts": "7d3c65a5ac1f47c845447b94f120530a21eeb0d8b9085850b3d9c1bfb70f4d17",
+    "tests/money-transfer-integration.test.ts": "db1a2341d256e2257b212731adc0abf6726211743c83cca1111464f71046977b",
+    "tests/run-tests.ts": "b3661d4a758918d736dba2c4ccb4307e4072061afe9f5d762005e9374da1b78c",
+    "tests/source-loader.test.ts": "4b11006b2bbd1d842e8f89287670e4e165ce34c20559f094c44fa3f1ad7887b2",
+    "tests/test-runner.test.ts": "fe077a65437659a2295673c160be683ff72dcd8b607854f9e4fc1a0db93fbf64",
+    "tests/types/calendar.ts": "7961908c665553d3b6a19e59ea882241172fc3e156bc690e926e6a97c0bb8a3c",
+    "tests/types/capture.ts": "86f7a1dbc555afe7ccbe372cb1d607fe2d9b2613b3bdbc89eac9fe0a15cfa279",
+    "tests/types/financial-core.ts": "f6dee187a33ac8925dd28f977545f0e7379aeb26bb50fabf003398cefdf50c89",
+    "tests/types/money.ts": "8c3f583e6eed517f1f29e252b9d45b14e0db4dbbf5729e6f61ebe261d5c1c425",
+    "tests/types/offline.ts": "b425a65b57f5bad6757dabcffb4fabe56ed7da774213831e0d0f03bca1ef0d6c",
+    "tests/types/source-loader.ts": "5206a4ed498f0b70ef44da65dd1e75e3dfbd25a578020947a8bb65fd9b17ba44",
+    "tests/types/test-runner.ts": "f76174d14834c31941a23e4307fc420aecc645add98d392d1842c1bb6d34fb2b",
+    "tests/types/transfers.ts": "c5afe3a85b19969a3c6a8afe62c4598d3559b500de0b64b0199bbaa1e0584026"
+  },
+  "documentationSha256": {
+    "README.md": "44cdb521a232d161989728ec5c513cf60577d8a09f0ee141598141293e2bd5f2",
+    "PRODUCT.md": "8856949364ca6e1d5e48635bf1e52dd43b6945aca0751b35b26aafd6c7c7aa7e",
+    "docs/plan-migracion-tests-typescript.md": "72a48bd64c9eceb288ccddd7ae753e84b4f51312fb7fd8917c4554528bd98439",
+    "docs/plan-migracion-typescript.md": "913dacaaa1a8e8d9e094e1b6449fce575478efdebec773601b79f41b8358c05e",
+    "docs/bitacora.md": "f5689c47c245e6537ce087616868847d7538847a425510cb7a902ed55a105c38",
+    "artifacts/typescript-tests-migration/phase-2/README.md": "4f05201fdbd12491ac0ce91eefa4d5ab1ff16707ea78c593d8fe9cf48cf538a6"
+  }
+}

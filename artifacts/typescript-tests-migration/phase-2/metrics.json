@@ -1,0 +1,18 @@
+{
+  "startOfRecordedEdits": "2026-10-28T08:29:00.248577+00:00",
+  "validationFinishedAt": "2026-10-28T08:44:34.780081+00:00",
+  "elapsedEditToValidationSeconds": 934.532,
+  "measurementLimit": "Intervalo de pared desde el primer script local de conversión; incluye edición, verificaciones y repetición, no acredita tiempo activo ni duración completa de la conversación.",
+  "convertedOriginalFiles": 5,
+  "convertedOriginalLines": 435,
+  "newTypedHelpers": 2,
+  "registeredRoutes": 7,
+  "negativeCases": 20,
+  "compatibilityAdapters": 2,
+  "runtimeTypeScriptFiles": 10,
+  "cjsConsumersEditedOnlyForImportsOrStartup": 98,
+  "phase1TypecheckTestsSeconds": 2.641,
+  "phase2TypecheckTestsSeconds": 8.019,
+  "typecheckTestsDeltaSeconds": 5.378,
+  "decision": "Mantener tsx + esbuild/vm, mapa por ruta y unknown en entradas dinámicas. Ampliar los contratos por lote; no generalizar duraciones de un solo piloto."
+}

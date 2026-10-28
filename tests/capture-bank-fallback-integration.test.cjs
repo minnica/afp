@@ -3,7 +3,7 @@ const { test } = require('node:test');
 const { randomUUID, randomBytes } = require('node:crypto');
 const { PrismaClient } = require('@prisma/client');
 const { PrismaPg } = require('@prisma/adapter-pg');
-const { sourceLoader } = require('./helpers/load-source.cjs');
+const { sourceLoader } = require('./helpers/load-source.ts');
 const fixture = name => require(`./fixtures/captures/${name}.json`).event;
 const connectionString = process.env.AFP_TEST_DATABASE_URL;
 

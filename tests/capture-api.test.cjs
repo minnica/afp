@@ -1,7 +1,7 @@
 const assert = require("node:assert/strict");
 const { test } = require("node:test");
 const { randomBytes, randomUUID } = require("node:crypto");
-const { sourceLoader } = require("./helpers/load-source.cjs");
+const { sourceLoader } = require("./helpers/load-source.ts");
 
 test("Captura: todos los métodos protegidos separan sesión web y credencial nativa antes de leer cuerpo o BD", async () => {
   let databaseCalls = 0;

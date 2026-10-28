@@ -1,0 +1,15 @@
+
+> afp@0.1.0 test:types /home/garatachia/projects/afp
+> prisma generate && next typegen && tsc --project tsconfig.type-tests.json --noEmit
+
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma/schema.prisma.
+
+✔ Generated Prisma Client (v7.10.1) to ./node_modules/.pnpm/@prisma+client@7.10.1_prisma@7.10.1_@types+node@22.20.5_@types+react-dom@19.3.0_@types+_67e1dd834939b123c798939e408e968c/node_modules/@prisma/client in 443ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+
+Generating route types...
+✓ Types generated successfully

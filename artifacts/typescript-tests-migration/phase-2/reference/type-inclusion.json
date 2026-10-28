@@ -1,0 +1,640 @@
+{
+  "programs": {
+    "runtime": [
+      "tests/helpers/browser-module.ts",
+      "tests/helpers/capture-browser-server.cjs",
+      "tests/helpers/debt-fixture.cjs",
+      "tests/helpers/dynamic-values.ts",
+      "tests/helpers/legacy-route-context.cjs",
+      "tests/helpers/load-source.ts",
+      "tests/helpers/money-browser-server.cjs",
+      "tests/helpers/next-fixture.cjs",
+      "tests/helpers/offline-browser-server.cjs",
+      "tests/helpers/seed-capture-review.cjs",
+      "tests/helpers/seed-receiver-payments.cjs",
+      "tests/helpers/seed-ui.cjs",
+      "tests/helpers/source-contracts.ts",
+      "tests/latest-request.test.ts",
+      "tests/money-transfer-client.test.ts",
+      "tests/money-transfer-integration.test.ts",
+      "tests/run-tests.ts",
+      "tests/source-loader.test.ts",
+      "tests/test-runner.test.ts"
+    ],
+    "contracts": [
+      "tests/helpers/browser-module.ts",
+      "tests/helpers/load-source.ts",
+      "tests/helpers/source-contracts.ts",
+      "tests/run-tests.ts",
+      "tests/types/calendar.ts",
+      "tests/types/capture.ts",
+      "tests/types/financial-core.ts",
+      "tests/types/interface.tsx",
+      "tests/types/money.ts",
+      "tests/types/offline.ts",
+      "tests/types/source-loader.ts",
+      "tests/types/test-runner.ts",
+      "tests/types/toolchain.tsx",
+      "tests/types/transfers.ts"
+    ]
+  },
+  "runtimeTsFiles": [
+    "tests/helpers/browser-module.ts",
+    "tests/helpers/dynamic-values.ts",
+    "tests/helpers/load-source.ts",
+    "tests/helpers/source-contracts.ts",
+    "tests/latest-request.test.ts",
+    "tests/money-transfer-client.test.ts",
+    "tests/money-transfer-integration.test.ts",
+    "tests/run-tests.ts",
+    "tests/source-loader.test.ts",
+    "tests/test-runner.test.ts"
+  ],
+  "cjsHelpersChecked": false,
+  "eslint": {
+    "tests/helpers/browser-module.ts": {
+      "projects": {
+        "0": "./tsconfig.json",
+        "1": "./tsconfig.type-tests.json",
+        "2": "./tsconfig.tests.json"
+      },
+      "rules": {
+        "@typescript-eslint/ban-ts-comment": [
+          2,
+          {
+            "ts-expect-error": true,
+            "ts-ignore": true,
+            "ts-nocheck": true,
+            "ts-check": false
+          }
+        ],
+        "@typescript-eslint/no-explicit-any": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-declaration-merging": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-function-type": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-assignment": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-argument": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-call": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-member-access": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-return": [
+          2
+        ],
+        "no-restricted-syntax": [
+          2,
+          {
+            "selector": "TSAsExpression > TSAsExpression, TSAsExpression > TSTypeAssertion, TSTypeAssertion > TSAsExpression, TSTypeAssertion > TSTypeAssertion",
+            "message": "No encadenar conversiones de tipo. Validar o acotar el dato en su frontera."
+          }
+        ]
+      }
+    },
+    "tests/helpers/dynamic-values.ts": {
+      "projects": {
+        "0": "./tsconfig.json",
+        "1": "./tsconfig.type-tests.json",
+        "2": "./tsconfig.tests.json"
+      },
+      "rules": {
+        "@typescript-eslint/ban-ts-comment": [
+          2,
+          {
+            "ts-expect-error": true,
+            "ts-ignore": true,
+            "ts-nocheck": true,
+            "ts-check": false
+          }
+        ],
+        "@typescript-eslint/no-explicit-any": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-declaration-merging": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-function-type": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-assignment": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-argument": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-call": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-member-access": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-return": [
+          2
+        ],
+        "no-restricted-syntax": [
+          2,
+          {
+            "selector": "TSAsExpression > TSAsExpression, TSAsExpression > TSTypeAssertion, TSTypeAssertion > TSAsExpression, TSTypeAssertion > TSTypeAssertion",
+            "message": "No encadenar conversiones de tipo. Validar o acotar el dato en su frontera."
+          }
+        ]
+      }
+    },
+    "tests/helpers/load-source.ts": {
+      "projects": {
+        "0": "./tsconfig.json",
+        "1": "./tsconfig.type-tests.json",
+        "2": "./tsconfig.tests.json"
+      },
+      "rules": {
+        "@typescript-eslint/ban-ts-comment": [
+          2,
+          {
+            "ts-expect-error": true,
+            "ts-ignore": true,
+            "ts-nocheck": true,
+            "ts-check": false
+          }
+        ],
+        "@typescript-eslint/no-explicit-any": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-declaration-merging": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-function-type": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-assignment": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-argument": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-call": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-member-access": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-return": [
+          2
+        ],
+        "no-restricted-syntax": [
+          2,
+          {
+            "selector": "TSAsExpression > TSAsExpression, TSAsExpression > TSTypeAssertion, TSTypeAssertion > TSAsExpression, TSTypeAssertion > TSTypeAssertion",
+            "message": "No encadenar conversiones de tipo. Validar o acotar el dato en su frontera."
+          }
+        ]
+      }
+    },
+    "tests/helpers/source-contracts.ts": {
+      "projects": {
+        "0": "./tsconfig.json",
+        "1": "./tsconfig.type-tests.json",
+        "2": "./tsconfig.tests.json"
+      },
+      "rules": {
+        "@typescript-eslint/ban-ts-comment": [
+          2,
+          {
+            "ts-expect-error": true,
+            "ts-ignore": true,
+            "ts-nocheck": true,
+            "ts-check": false
+          }
+        ],
+        "@typescript-eslint/no-explicit-any": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-declaration-merging": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-function-type": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-assignment": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-argument": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-call": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-member-access": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-return": [
+          2
+        ],
+        "no-restricted-syntax": [
+          2,
+          {
+            "selector": "TSAsExpression > TSAsExpression, TSAsExpression > TSTypeAssertion, TSTypeAssertion > TSAsExpression, TSTypeAssertion > TSTypeAssertion",
+            "message": "No encadenar conversiones de tipo. Validar o acotar el dato en su frontera."
+          }
+        ]
+      }
+    },
+    "tests/latest-request.test.ts": {
+      "projects": {
+        "0": "./tsconfig.json",
+        "1": "./tsconfig.type-tests.json",
+        "2": "./tsconfig.tests.json"
+      },
+      "rules": {
+        "@typescript-eslint/ban-ts-comment": [
+          2,
+          {
+            "ts-expect-error": true,
+            "ts-ignore": true,
+            "ts-nocheck": true,
+            "ts-check": false
+          }
+        ],
+        "@typescript-eslint/no-explicit-any": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-declaration-merging": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-function-type": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-assignment": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-argument": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-call": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-member-access": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-return": [
+          2
+        ],
+        "no-restricted-syntax": [
+          2,
+          {
+            "selector": "TSAsExpression > TSAsExpression, TSAsExpression > TSTypeAssertion, TSTypeAssertion > TSAsExpression, TSTypeAssertion > TSTypeAssertion",
+            "message": "No encadenar conversiones de tipo. Validar o acotar el dato en su frontera."
+          }
+        ]
+      }
+    },
+    "tests/money-transfer-client.test.ts": {
+      "projects": {
+        "0": "./tsconfig.json",
+        "1": "./tsconfig.type-tests.json",
+        "2": "./tsconfig.tests.json"
+      },
+      "rules": {
+        "@typescript-eslint/ban-ts-comment": [
+          2,
+          {
+            "ts-expect-error": true,
+            "ts-ignore": true,
+            "ts-nocheck": true,
+            "ts-check": false
+          }
+        ],
+        "@typescript-eslint/no-explicit-any": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-declaration-merging": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-function-type": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-assignment": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-argument": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-call": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-member-access": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-return": [
+          2
+        ],
+        "no-restricted-syntax": [
+          2,
+          {
+            "selector": "TSAsExpression > TSAsExpression, TSAsExpression > TSTypeAssertion, TSTypeAssertion > TSAsExpression, TSTypeAssertion > TSTypeAssertion",
+            "message": "No encadenar conversiones de tipo. Validar o acotar el dato en su frontera."
+          }
+        ]
+      }
+    },
+    "tests/money-transfer-integration.test.ts": {
+      "projects": {
+        "0": "./tsconfig.json",
+        "1": "./tsconfig.type-tests.json",
+        "2": "./tsconfig.tests.json"
+      },
+      "rules": {
+        "@typescript-eslint/ban-ts-comment": [
+          2,
+          {
+            "ts-expect-error": true,
+            "ts-ignore": true,
+            "ts-nocheck": true,
+            "ts-check": false
+          }
+        ],
+        "@typescript-eslint/no-explicit-any": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-declaration-merging": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-function-type": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-assignment": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-argument": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-call": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-member-access": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-return": [
+          2
+        ],
+        "no-restricted-syntax": [
+          2,
+          {
+            "selector": "TSAsExpression > TSAsExpression, TSAsExpression > TSTypeAssertion, TSTypeAssertion > TSAsExpression, TSTypeAssertion > TSTypeAssertion",
+            "message": "No encadenar conversiones de tipo. Validar o acotar el dato en su frontera."
+          }
+        ]
+      }
+    },
+    "tests/run-tests.ts": {
+      "projects": {
+        "0": "./tsconfig.json",
+        "1": "./tsconfig.type-tests.json",
+        "2": "./tsconfig.tests.json"
+      },
+      "rules": {
+        "@typescript-eslint/ban-ts-comment": [
+          2,
+          {
+            "ts-expect-error": true,
+            "ts-ignore": true,
+            "ts-nocheck": true,
+            "ts-check": false
+          }
+        ],
+        "@typescript-eslint/no-explicit-any": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-declaration-merging": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-function-type": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-assignment": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-argument": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-call": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-member-access": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-return": [
+          2
+        ],
+        "no-restricted-syntax": [
+          2,
+          {
+            "selector": "TSAsExpression > TSAsExpression, TSAsExpression > TSTypeAssertion, TSTypeAssertion > TSAsExpression, TSTypeAssertion > TSTypeAssertion",
+            "message": "No encadenar conversiones de tipo. Validar o acotar el dato en su frontera."
+          }
+        ]
+      }
+    },
+    "tests/source-loader.test.ts": {
+      "projects": {
+        "0": "./tsconfig.json",
+        "1": "./tsconfig.type-tests.json",
+        "2": "./tsconfig.tests.json"
+      },
+      "rules": {
+        "@typescript-eslint/ban-ts-comment": [
+          2,
+          {
+            "ts-expect-error": true,
+            "ts-ignore": true,
+            "ts-nocheck": true,
+            "ts-check": false
+          }
+        ],
+        "@typescript-eslint/no-explicit-any": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-declaration-merging": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-function-type": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-assignment": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-argument": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-call": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-member-access": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-return": [
+          2
+        ],
+        "no-restricted-syntax": [
+          2,
+          {
+            "selector": "TSAsExpression > TSAsExpression, TSAsExpression > TSTypeAssertion, TSTypeAssertion > TSAsExpression, TSTypeAssertion > TSTypeAssertion",
+            "message": "No encadenar conversiones de tipo. Validar o acotar el dato en su frontera."
+          }
+        ]
+      }
+    },
+    "tests/test-runner.test.ts": {
+      "projects": {
+        "0": "./tsconfig.json",
+        "1": "./tsconfig.type-tests.json",
+        "2": "./tsconfig.tests.json"
+      },
+      "rules": {
+        "@typescript-eslint/ban-ts-comment": [
+          2,
+          {
+            "ts-expect-error": true,
+            "ts-ignore": true,
+            "ts-nocheck": true,
+            "ts-check": false
+          }
+        ],
+        "@typescript-eslint/no-explicit-any": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-declaration-merging": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-function-type": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-assignment": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-argument": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-call": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-member-access": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-return": [
+          2
+        ],
+        "no-restricted-syntax": [
+          2,
+          {
+            "selector": "TSAsExpression > TSAsExpression, TSAsExpression > TSTypeAssertion, TSTypeAssertion > TSAsExpression, TSTypeAssertion > TSTypeAssertion",
+            "message": "No encadenar conversiones de tipo. Validar o acotar el dato en su frontera."
+          }
+        ]
+      }
+    },
+    "tests/types/test-runner.ts": {
+      "projects": {
+        "0": "./tsconfig.json",
+        "1": "./tsconfig.type-tests.json",
+        "2": "./tsconfig.tests.json"
+      },
+      "rules": {
+        "@typescript-eslint/ban-ts-comment": [
+          2,
+          {
+            "ts-expect-error": "allow-with-description",
+            "minimumDescriptionLength": 10
+          }
+        ],
+        "@typescript-eslint/no-explicit-any": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-declaration-merging": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-function-type": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-assignment": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-argument": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-call": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-member-access": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-return": [
+          2
+        ],
+        "no-restricted-syntax": [
+          2,
+          {
+            "selector": "TSAsExpression > TSAsExpression, TSAsExpression > TSTypeAssertion, TSTypeAssertion > TSAsExpression, TSTypeAssertion > TSTypeAssertion",
+            "message": "No encadenar conversiones de tipo. Validar o acotar el dato en su frontera."
+          }
+        ]
+      }
+    },
+    "tests/types/source-loader.ts": {
+      "projects": {
+        "0": "./tsconfig.json",
+        "1": "./tsconfig.type-tests.json",
+        "2": "./tsconfig.tests.json"
+      },
+      "rules": {
+        "@typescript-eslint/ban-ts-comment": [
+          2,
+          {
+            "ts-expect-error": "allow-with-description",
+            "minimumDescriptionLength": 10
+          }
+        ],
+        "@typescript-eslint/no-explicit-any": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-declaration-merging": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-function-type": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-assignment": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-argument": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-call": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-member-access": [
+          2
+        ],
+        "@typescript-eslint/no-unsafe-return": [
+          2
+        ],
+        "no-restricted-syntax": [
+          2,
+          {
+            "selector": "TSAsExpression > TSAsExpression, TSAsExpression > TSTypeAssertion, TSTypeAssertion > TSAsExpression, TSTypeAssertion > TSTypeAssertion",
+            "message": "No encadenar conversiones de tipo. Validar o acotar el dato en su frontera."
+          }
+        ]
+      }
+    }
+  }
+}

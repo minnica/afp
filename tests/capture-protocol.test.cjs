@@ -1,7 +1,7 @@
 const assert = require("node:assert/strict");
 const { test } = require("node:test");
 const { randomBytes, randomUUID } = require("node:crypto");
-const { sourceLoader } = require("./helpers/load-source.cjs");
+const { sourceLoader } = require("./helpers/load-source.ts");
 const load = sourceLoader({ "next/server": { NextResponse: { json: (body, options) => ({ body, ...options }) } } });
 const protocol = load("src/lib/captureProtocol.ts");
 const sample = () => ({ contractVersion: 1, eventId: randomUUID(), sourcePackage: "com.bancomer.mbanking",

@@ -1,5 +1,5 @@
 const assert = require('node:assert/strict');
-const { sourceLoader } = require('./load-source.cjs');
+const { sourceLoader } = require('./load-source.ts');
 
 // Persistencia aislada con rollback. El bloqueo se adquiere por el SQL real
 // del servicio; las pruebas PostgreSQL comprueban su semántica en el motor.

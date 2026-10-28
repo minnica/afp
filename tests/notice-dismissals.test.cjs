@@ -1,6 +1,6 @@
 const assert = require("node:assert/strict");
 const { test } = require("node:test");
-const { sourceLoader } = require("./helpers/load-source.cjs");
+const { sourceLoader } = require("./helpers/load-source.ts");
 const ctx = sourceLoader()("src/lib/noticeDismissals.ts");
 const notice = { id: "receivable-a-2026-10-15", type: "RECEIVABLE", date: "2026-10-15T12:00:00Z", amount: 1500 };
 const plain = (value) => JSON.parse(JSON.stringify(value));

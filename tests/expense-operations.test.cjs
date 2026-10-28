@@ -1,7 +1,7 @@
 const assert = require("node:assert/strict");
 const { test } = require("node:test");
 const { randomUUID } = require("node:crypto");
-const { sourceLoader } = require("./helpers/load-source.cjs");
+const { sourceLoader } = require("./helpers/load-source.ts");
 
 // Adaptador transaccional explícito; la concurrencia real de SQL tiene suite independiente.
 function fixture() {

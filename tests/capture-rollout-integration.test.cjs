@@ -3,7 +3,7 @@ const { test } = require('node:test');
 const { randomUUID, randomBytes, createHash } = require('node:crypto');
 const { PrismaClient } = require('@prisma/client');
 const { PrismaPg } = require('@prisma/adapter-pg');
-const { sourceLoader } = require('./helpers/load-source.cjs');
+const { sourceLoader } = require('./helpers/load-source.ts');
 const connectionString = process.env.AFP_TEST_DATABASE_URL;
 
 test('Fase 7 PostgreSQL: activación gradual, evidencia propia y recuperación de nueve tarjetas', { skip: !connectionString }, async t => {

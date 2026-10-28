@@ -3,7 +3,7 @@ const assert=require('node:assert/strict');
 const {test}=require('node:test');
 const {randomUUID,randomBytes}=require('node:crypto');
 const {PrismaClient}=require('@prisma/client'),{PrismaPg}=require('@prisma/adapter-pg');
-const {sourceLoader}=require('./helpers/load-source.cjs');
+const {sourceLoader}=require('./helpers/load-source.ts');
 const connectionString=process.env.AFP_TEST_DATABASE_URL;
 test('captura de cuentas: transferencias Nu, débito confirmado y retiros sin duplicar dinero', {skip:!connectionString}, async t=>{
  const url=new URL(connectionString);assert.ok(['localhost','127.0.0.1'].includes(url.hostname)&&/^\/afp_test\w*$/.test(url.pathname)&&!url.search);

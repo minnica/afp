@@ -1,6 +1,6 @@
 # Plan de migración de pruebas y helpers a TypeScript
 
-**Estado:** fases 0 y 1 completadas localmente; fases 2–6 pendientes. **Base revisada del plan:** `6aad1ab`, 28 de octubre de 2026. La [referencia nueva de fase 0](../artifacts/typescript-tests-migration/phase-0/README.md) parte de `6c1b626`; la [fase 1](../artifacts/typescript-tests-migration/phase-1/README.md) parte de `700afcc`. La [migración de la web](plan-migracion-typescript.md) permanece completada. Este plan amplía el tipado a las herramientas de prueba sin cambiar el comportamiento de AFP.
+**Estado:** fases 0–2 completadas localmente; fases 3–6 pendientes. **Base revisada del plan:** `6aad1ab`, 28 de octubre de 2026. La [referencia nueva de fase 0](../artifacts/typescript-tests-migration/phase-0/README.md) parte de `6c1b626`; la [fase 1](../artifacts/typescript-tests-migration/phase-1/README.md) parte de `700afcc` y la [fase 2](../artifacts/typescript-tests-migration/phase-2/README.md) de `c0a0a37`. La [migración de la web](plan-migracion-typescript.md) permanece completada. Este plan amplía el tipado a las herramientas de prueba sin cambiar el comportamiento de AFP.
 
 ## Objetivo y alcance
 
@@ -38,10 +38,10 @@ Los grupos del inventario se solapan. Los 854 resultados de la tabla corresponde
 
 ### Dependencias que requieren atención
 
-- [load-source.cjs](../tests/helpers/load-source.cjs) transforma módulos con esbuild y los evalúa en `vm`. Su resultado dinámico necesita una frontera de tipos explícita.
+- [load-source.ts](../tests/helpers/load-source.ts) transforma módulos con esbuild y los evalúa en `vm`. Desde fase 2 vincula siete rutas del piloto a sus exports reales; las demás rutas y los exports privados siguen devolviendo `unknown` hasta su conversión.
 - [legacy-route-context.cjs](../tests/helpers/legacy-route-context.cjs) combina exports de varios módulos y expone algunas funciones privadas de handlers. Ese objeto necesita contratos por ruta.
 - [debt-fixture.cjs](../tests/helpers/debt-fixture.cjs) simula persistencia, bloqueo y rollback. Sus tipos deben distinguir registros, consultas y transacciones sin presentarlo como un cliente Prisma completo.
-- [package.json](../package.json) y [verify-database-reproduction.cjs](../scripts/verify-database-reproduction.cjs) descubrían únicamente `.test.cjs` en fase 0. Desde fase 1 comparten el ejecutor mixto; el segundo mantiene su import del cargador CJS y registra tsx en el proceso principal y en las regresiones.
+- [package.json](../package.json) y [verify-database-reproduction.cjs](../scripts/verify-database-reproduction.cjs) descubrían únicamente `.test.cjs` en fase 0. Desde fase 1 comparten el ejecutor mixto; el segundo importa el cargador TS y registra tsx en el proceso principal y en las regresiones.
 - [next-fixture.cjs](../tests/helpers/next-fixture.cjs) copia configuraciones por patrón; debe distinguir las necesarias para la web de las exclusivas de pruebas.
 - Los tres servidores de navegador y los tres scripts de preparación de datos se invocan también desde documentación y ejecutores en `artifacts/`. Un renombre debe actualizar sus consumidores vigentes.
 
@@ -112,7 +112,7 @@ Conservar datos omitidos, nulos, JSON malformado, respuestas perdidas, UUID repe
 
 ## Fases de implementación
 
-Las fases 0 y 1 están completadas; las fases 2–6 siguen pendientes. Cada lote debe ser revisable y contener el módulo convertido junto con sus consumidores y herramientas afectados.
+Las fases 0–2 están completadas; las fases 3–6 siguen pendientes. Cada lote debe ser revisable y contener el módulo convertido junto con sus consumidores y herramientas afectados.
 
 | Fase | Entrega | Dependencia |
 | --- | --- | --- |
@@ -149,13 +149,15 @@ Las fases 0 y 1 están completadas; las fases 2–6 siguen pendientes. Cada lote
 
 ### Fase 2 Tipar el cargador y ejecutar un piloto
 
-- [ ] Convertir `load-source`, `browser-module` y `source-loader.test`, actualizando las referencias exactas de sus consumidores CJS/TS. Actualizar en ese mismo lote el arranque con soporte TS de servidores, seeds y scripts que los importen, aunque sus archivos de entrada continúen en CJS hasta una fase posterior.
-- [ ] Introducir contratos de rutas, mocks y globals. Añadir casos negativos para argumentos incorrectos, exports inexistentes y resultados mal utilizados; comprobar que una ruta dinámica no recibe tipos inventados por el llamador.
-- [ ] Conservar los ocho escenarios actuales del cargador: mezcla de lenguajes, prioridad de mocks, caché/ciclos, resolución, JSX/TSX, aislamiento, errores y transformación offline.
-- [ ] Migrar `money-transfer-client.test.cjs` y `money-transfer-integration.test.cjs` como piloto completo. Tipar mocks HTTP y datos Prisma manteniendo acciones, importes, propietarios, UUID, conflictos y reversión.
-- [ ] Medir esfuerzo, tiempo de comprobación y cantidad de adaptadores. Revisar las decisiones de ejecución y contratos antes de extenderlas.
+- [x] Convertir `load-source`, `browser-module` y `source-loader.test`, actualizando las referencias exactas de sus consumidores CJS/TS. Actualizar en ese mismo lote el arranque con soporte TS de servidores, seeds y scripts que los importen, aunque sus archivos de entrada continúen en CJS hasta una fase posterior.
+- [x] Introducir contratos de rutas, mocks y globals. Añadir casos negativos para argumentos incorrectos, exports inexistentes y resultados mal utilizados; comprobar que una ruta dinámica no recibe tipos inventados por el llamador.
+- [x] Conservar los ocho escenarios actuales del cargador: mezcla de lenguajes, prioridad de mocks, caché/ciclos, resolución, JSX/TSX, aislamiento, errores y transformación offline.
+- [x] Migrar `money-transfer-client.test.cjs` y `money-transfer-integration.test.cjs` como piloto completo. Tipar mocks HTTP y datos Prisma manteniendo acciones, importes, propietarios, UUID, conflictos y reversión.
+- [x] Medir esfuerzo, tiempo de comprobación y cantidad de adaptadores. Revisar las decisiones de ejecución y contratos antes de extenderlas.
 
 **Aceptación:** el piloto detecta incompatibilidades estáticas y conserva sus escenarios de ejecución, incluida la integración real local. Ningún helper migrado devuelve `any` a sus consumidores; las fronteras dinámicas quedan inventariadas y probadas.
+
+**Resultado (28 de octubre de 2026):** [fase 2](../artifacts/typescript-tests-migration/phase-2/README.md). Cargadores y tres pruebas convertidos, siete rutas vinculadas a exports reales, dobles mínimos de HTTP/Auth/formularios y contratos negativos. Se conservan los ocho escenarios del cargador y los catorce del piloto; se añade un escenario de infraestructura. Los consumidores CJS activos y su proceso hijo registran TS explícitamente. La evidencia recoge instalación limpia, controles, PostgreSQL, `db:verify`, carga ESM en Chrome, comparación de escenarios/hashes y límites de los adaptadores. Las fases 3–6 continúan pendientes.
 
 ### Fase 3 Migrar el núcleo financiero
 

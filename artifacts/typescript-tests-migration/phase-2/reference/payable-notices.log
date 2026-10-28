@@ -1,0 +1,44 @@
+
+> afp@0.1.0 test /home/garatachia/projects/afp
+> node --import tsx tests/run-tests.ts payable-notices.test.cjs
+
+TAP version 13
+# Subtest: avisos por pagar: desde dos días antes, hoy y vencidos de meses anteriores
+ok 1 - avisos por pagar: desde dos días antes, hoy y vencidos de meses anteriores
+  ---
+  duration_ms: 11.736668
+  type: 'test'
+  ...
+# Subtest: avisos por pagar: el saldo a centavos decide la liquidación y conserva cancelaciones
+ok 2 - avisos por pagar: el saldo a centavos decide la liquidación y conserva cancelaciones
+  ---
+  duration_ms: 0.68244
+  type: 'test'
+  ...
+# Subtest: avisos por pagar: préstamos usan saldo bancario o capital abonado y fecha contractual
+ok 3 - avisos por pagar: préstamos usan saldo bancario o capital abonado y fecha contractual
+  ---
+  duration_ms: 0.340409
+  type: 'test'
+  ...
+# Subtest: avisos por pagar: prioridad por vencimiento y fecha junto a otros avisos
+ok 4 - avisos por pagar: prioridad por vencimiento y fecha junto a otros avisos
+  ---
+  duration_ms: 1.059739
+  type: 'test'
+  ...
+# Subtest: avisos por pagar: conserva el día bancario UTC y todo el día local de vencimiento
+ok 5 - avisos por pagar: conserva el día bancario UTC y todo el día local de vencimiento
+  ---
+  duration_ms: 593.871361
+  type: 'test'
+  ...
+1..5
+# tests 5
+# suites 0
+# pass 5
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 778.275916

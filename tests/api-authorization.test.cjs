@@ -2,7 +2,7 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const { test } = require("node:test");
-const { sourceLoader } = require("./helpers/load-source.cjs");
+const { sourceLoader } = require("./helpers/load-source.ts");
 
 const plain = value => JSON.parse(JSON.stringify(value));
 const routes = fs.readdirSync(path.join(__dirname, "../src/app/api"), { recursive: true })

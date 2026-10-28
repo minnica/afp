@@ -3,7 +3,7 @@ const { test } = require('node:test');
 const { randomUUID } = require('node:crypto');
 const { PrismaClient, Prisma } = require('@prisma/client');
 const { PrismaPg } = require('@prisma/adapter-pg');
-const { sourceLoader } = require('./helpers/load-source.cjs');
+const { sourceLoader } = require('./helpers/load-source.ts');
 const connectionString = process.env.AFP_TEST_DATABASE_URL;
 
 test('bandeja por tipo: filtros antes de paginar, contadores e independencia de propietario', { skip: !connectionString }, async t => {

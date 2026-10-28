@@ -1,6 +1,6 @@
 const assert = require('node:assert/strict');
 const { test } = require('node:test');
-const { sourceLoader } = require('./helpers/load-source.cjs');
+const { sourceLoader } = require('./helpers/load-source.ts');
 const load = sourceLoader();
 const { buildForecast, planDates } = load('src/lib/money/forecast.ts');
 const { buildSources, accountBalances, exposure } = load('src/lib/money/sources.ts');

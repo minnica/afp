@@ -1,6 +1,6 @@
 const assert = require("node:assert/strict");
 const { test } = require("node:test");
-const { sourceLoader } = require("./helpers/load-source.cjs");
+const { sourceLoader } = require("./helpers/load-source.ts");
 const { buildCurrentCardUsageWaivers, buildCardUsageWaivers, buildCardUsageWaiverHistory } = sourceLoader()("src/lib/calculations/cardUsageWaivers.ts");
 const card = { id: "nu", name: "Mi Nu", usagePolicy: { productKey: "NU" } };
 const expense = (patch = {}) => ({ id: "expense", cardId: card.id, paymentMethod: "CARD", concept: "Compra", amount: 0.01, date: "2026-10-21T12:00:00Z", ...patch });

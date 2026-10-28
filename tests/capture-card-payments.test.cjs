@@ -1,6 +1,6 @@
 const assert = require('node:assert/strict');
 const { test } = require('node:test');
-const { sourceLoader } = require('./helpers/load-source.cjs');
+const { sourceLoader } = require('./helpers/load-source.ts');
 const fixture = require('./fixtures/captures/nu-card-payment.es.v1.json');
 const load = sourceLoader();
 const { interpretCapture } = load('src/lib/captureParsers.ts');

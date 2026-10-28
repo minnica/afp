@@ -1,6 +1,6 @@
 const assert = require('node:assert/strict');
 const { test } = require('node:test');
-const { sourceLoader } = require('./helpers/load-source.cjs');
+const { sourceLoader } = require('./helpers/load-source.ts');
 const load = sourceLoader();
 const { monthlyMinimumPeriod } = load('src/components/mi-dinero/monthlyMinimumPeriod.ts');
 const { buildForecast } = load('src/lib/money/forecast.ts');

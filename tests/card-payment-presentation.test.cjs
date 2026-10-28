@@ -1,6 +1,6 @@
 const assert = require("node:assert/strict");
 const { test } = require("node:test");
-const { sourceLoader } = require("./helpers/load-source.cjs");
+const { sourceLoader } = require("./helpers/load-source.ts");
 const helpers = sourceLoader()("src/lib/cardPaymentPresentation.ts");
 const cycle = { cutDate: "2026-10-14T12:00:00Z", statementAmount: "725.43", calculatedAmount: "800.12" };
 

@@ -1,0 +1,156 @@
+
+> afp@0.1.0 test /tmp/afp-tests-ts2-rmogpa4d
+> node --import tsx tests/run-tests.ts source-loader.test.ts money-transfer-client.test.ts money-transfer-integration.test.ts
+
+TAP version 13
+# Subtest: transferencias: cliente conserva el cuerpo, UUID, cuenta esperada y respuesta por acción
+ok 1 - transferencias: cliente conserva el cuerpo, UUID, cuenta esperada y respuesta por acción
+  ---
+  duration_ms: 34.379934
+  type: 'test'
+  ...
+# Subtest: transferencias: respuesta inválida pasa por recuperación y conserva el resultado incierto
+ok 2 - transferencias: respuesta inválida pasa por recuperación y conserva el resultado incierto
+  ---
+  duration_ms: 18.965651
+  type: 'test'
+  ...
+# Subtest: transferencias: cancelación, validación HTTP y error de red conservan el error compartido
+ok 3 - transferencias: cancelación, validación HTTP y error de red conservan el error compartido
+  ---
+  duration_ms: 11.065679
+  type: 'test'
+  ...
+# Subtest: transferencias: editor compartido valida el formulario y conserva configuración y UUID al reintentar
+ok 4 - transferencias: editor compartido valida el formulario y conserva configuración y UUID al reintentar
+  ---
+  duration_ms: 127.767104
+  type: 'test'
+  ...
+# Subtest: Mi dinero: cliente conserva el cuerpo original y exige recibos de alta completos
+ok 5 - Mi dinero: cliente conserva el cuerpo original y exige recibos de alta completos
+  ---
+  duration_ms: 26.453532
+  type: 'test'
+  ...
+# Subtest: Mi dinero: una consulta incompleta entra en recuperación sin publicar datos inválidos
+ok 6 - Mi dinero: una consulta incompleta entra en recuperación sin publicar datos inválidos
+  ---
+  duration_ms: 27.401031
+  type: 'test'
+  ...
+(node:835879) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+# Subtest: piloto TS: transferencias, recibos, concurrencia, rollback y límites con PostgreSQL
+    # Subtest: solicitudes concurrentes y repetición producen un movimiento y un recibo; total a centavos
+    ok 1 - solicitudes concurrentes y repetición producen un movimiento y un recibo; total a centavos
+      ---
+      duration_ms: 101.364173
+      type: 'test'
+      ...
+    # Subtest: huella conserva texto/número y propiedades adicionales antes de validar
+    ok 2 - huella conserva texto/número y propiedades adicionales antes de validar
+      ---
+      duration_ms: 8.163812
+      type: 'test'
+      ...
+Money operation failed Error
+    # Subtest: fallo después de la escritura revierte movimiento y recibo; UUID reutilizable
+    ok 3 - fallo después de la escritura revierte movimiento y recibo; UUID reutilizable
+      ---
+      duration_ms: 54.470982
+      type: 'test'
+      ...
+    # Subtest: cuentas ajenas e inexistentes no filtran datos; mismo origen/destino y fechas conservan errores
+    ok 4 - cuentas ajenas e inexistentes no filtran datos; mismo origen/destino y fechas conservan errores
+      ---
+      duration_ms: 91.379553
+      type: 'test'
+      ...
+    # Subtest: reversión ajena no filtra; reversión válida conserva historial, saldo y recibo
+    ok 5 - reversión ajena no filtra; reversión válida conserva historial, saldo y recibo
+      ---
+      duration_ms: 68.389217
+      type: 'test'
+      ...
+    # Subtest: fecha programada admitida y mismo día de referencia admitido
+    ok 6 - fecha programada admitida y mismo día de referencia admitido
+      ---
+      duration_ms: 60.090097
+      type: 'test'
+      ...
+    # Subtest: conciliación posterior bloquea reversión, conserva historial y no guarda recibo fallido
+    ok 7 - conciliación posterior bloquea reversión, conserva historial y no guarda recibo fallido
+      ---
+      duration_ms: 79.391535
+      type: 'test'
+      ...
+    1..7
+ok 7 - piloto TS: transferencias, recibos, concurrencia, rollback y límites con PostgreSQL
+  ---
+  duration_ms: 786.538757
+  type: 'test'
+  ...
+# Subtest: cargador: JS → TS → JS, tipos, alias, exports/default y reexports
+ok 8 - cargador: JS → TS → JS, tipos, alias, exports/default y reexports
+  ---
+  duration_ms: 8.570371
+  type: 'test'
+  ...
+# Subtest: cargador: mocks tienen prioridad, incluso módulos inexistentes y valores falsy
+ok 9 - cargador: mocks tienen prioridad, incluso módulos inexistentes y valores falsy
+  ---
+  duration_ms: 1.971048
+  type: 'test'
+  ...
+# Subtest: cargador: caché por instancia, imports circulares y reexports vivos
+ok 10 - cargador: caché por instancia, imports circulares y reexports vivos
+  ---
+  duration_ms: 5.819563
+  type: 'test'
+  ...
+# Subtest: cargador: resolución inequívoca, índices y extensiones explícitas sin sustitución
+ok 11 - cargador: resolución inequívoca, índices y extensiones explícitas sin sustitución
+  ---
+  duration_ms: 7.033913
+  type: 'test'
+  ...
+# Subtest: cargador: JSX y TSX se ejecutan con runtime React
+ok 12 - cargador: JSX y TSX se ejecutan con runtime React
+  ---
+  duration_ms: 2.894337
+  type: 'test'
+  ...
+# Subtest: cargador: no hereda credenciales, no carga dotenv ni abre red o BD
+ok 13 - cargador: no hereda credenciales, no carga dotenv ni abre red o BD
+  ---
+  duration_ms: 9.993359
+  type: 'test'
+  ...
+# Subtest: cargador: elimina de la caché evaluaciones fallidas
+ok 14 - cargador: elimina de la caché evaluaciones fallidas
+  ---
+  duration_ms: 2.956037
+  type: 'test'
+  ...
+# Subtest: fixture offline: transforma TS e imports relativos en ESM con API simulada
+ok 15 - fixture offline: transforma TS e imports relativos en ESM con API simulada
+  ---
+  duration_ms: 17.110002
+  type: 'test'
+  ...
+# Subtest: cargador tipado: rutas conocidas, exports públicos y lenguajes admitidos
+ok 16 - cargador tipado: rutas conocidas, exports públicos y lenguajes admitidos
+  ---
+  duration_ms: 1.890738
+  type: 'test'
+  ...
+1..16
+# tests 23
+# suites 0
+# pass 23
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1356.977392

@@ -6,6 +6,14 @@ Consolidado el **27 de octubre de 2026** a partir del README del commit `4562aa0
 
 ## 2026-10-28
 
+### Cargador de pruebas tipado y piloto de transferencias
+
+**Fase 2 completada localmente** sobre `c0a0a37`. Se convirtieron los cargadores de fuentes/ESM y las pruebas del cargador y transferencias. Siete rutas obtienen sus exports del módulo real; las rutas dinámicas y funciones privadas sin contrato conservan `unknown`. Se tiparon los dobles mínimos y globals, con veinte casos negativos separados de la ejecución. Los consumidores CJS activos actualizan imports y registro TS, incluido un proceso hijo por zona horaria y el servidor offline.
+
+La instalación limpia, los tres controles de tipos, lint, build, suite PostgreSQL y `db:verify` pasaron. Se conservaron en identidad, jerarquía y orden todos los escenarios de fases 0 y 1, con un escenario adicional del cargador, sin omisiones. La reconstrucción y actualización mantuvieron migraciones, checksums y RLS. También se verificaron configuración/tipos del fixture Next y carga ESM de cola/observador en Chrome sin errores. Se conservan las fuentes protegidas, fixtures y evidencia histórica por hash; siguen los avisos preexistentes.
+
+El primer cierre detectó el proceso hijo sin `--import tsx`; se corrigió sin modificar expectativas y se conserva ese intento. La evidencia inventaría dos adaptadores locales, los tiempos medidos y los commits para reproducir los ejecutores históricos CJS fuera de HEAD. README, producto y planes reflejan fases 0–2 completadas y fases 3–6 pendientes. No hubo cambios de producto, esquema, dependencias, servicios remotos ni publicación. Resultados y reproducción: [fase 2 de pruebas](../artifacts/typescript-tests-migration/phase-2/README.md).
+
 ### Ejecución mixta y comprobación estricta de pruebas
 
 **Fase 1 completada localmente** sobre `700afcc`. Se fijó tsx 4.23.15 en desarrollo, manteniendo `node:test`, esbuild, aislamiento y política de instalación. `pnpm test` y las regresiones de `db:verify` comparten descubrimiento/ejecución de CJS y TS, rechazan duplicados y selecciones inválidas, y registran soporte TS explícitamente en los procesos necesarios.

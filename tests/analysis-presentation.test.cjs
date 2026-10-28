@@ -1,6 +1,6 @@
 const assert = require("node:assert/strict");
 const { test } = require("node:test");
-const { sourceLoader } = require("./helpers/load-source.cjs");
+const { sourceLoader } = require("./helpers/load-source.ts");
 const helpers = sourceLoader()("src/lib/analysisPresentation.ts");
 const plain = (value) => JSON.parse(JSON.stringify(value));
 

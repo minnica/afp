@@ -1,6 +1,6 @@
 const assert = require('node:assert/strict');
 const { test } = require('node:test');
-const { sourceLoader } = require('./helpers/load-source.cjs');
+const { sourceLoader } = require('./helpers/load-source.ts');
 
 test('observador offline: ignora lecturas antiguas y deja de publicar al cambiar de cuenta', async () => {
   const reads = [], pending = [], errors = [];

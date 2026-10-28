@@ -120,7 +120,7 @@ test('ejecutor: tsx no expone el entorno del proceso al cargador con vm', () => 
     'environment.ts': 'export const environment = process.env;',
     'environment.test.cjs': `const assert = require('node:assert/strict');
 const { test } = require('node:test');
-const { sourceLoader } = require(${JSON.stringify(path.join(__dirname, 'helpers/load-source.cjs'))});
+const { sourceLoader } = require(${JSON.stringify(path.join(__dirname, 'helpers/load-source.ts'))});
 test('entorno ficticio', () => {
   assert.equal(process.env.AFP_RUNNER_PROBE, 'fictitious');
   const { environment } = sourceLoader()(require('node:path').join(__dirname, 'environment.ts'));

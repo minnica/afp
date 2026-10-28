@@ -16,7 +16,7 @@ test("cobros: API persiste monto y tarjeta de una ocurrencia, valida propietario
     const foreignCard = await db.card.create({ data: { userId: other.id, name: "Ajena", usualCutDay: 25, usualDueDay: 10 } });
     const subscription = await db.subscription.create({ data: { userId: user.id, name: "Luz", amount: "120",
       paymentMethod: "CASH", categoryId: category.id, chargeDay: 1, startMonth: 1, startYear: 2026 } });
-    const { sourceLoader } = require("./helpers/load-source.cjs");
+    const { sourceLoader } = require("./helpers/load-source.ts");
     const load = sourceLoader({
       "@/lib/prisma": { prisma: db },
       "next/server": { NextResponse: { json: (body, options = {}) => ({ body, status: options.status || 200 }) } },
@@ -63,7 +63,7 @@ test("cobros: transacción, concurrencia, omisión, restauración, evidencia y a
   const url = new URL(connectionString);
   assert.ok(["localhost", "127.0.0.1"].includes(url.hostname) && url.pathname.startsWith("/afp_test"), "Solo permite una base local de prueba.");
   const db = new PrismaClient({ adapter: new PrismaPg({ connectionString }) });
-  const ctx = require("./helpers/load-source.cjs").sourceLoader()("src/lib/subscriptionChargeService.ts");
+  const ctx = require("./helpers/load-source.ts").sourceLoader()("src/lib/subscriptionChargeService.ts");
   const user = await db.user.create({ data: { email: `subscription-${Date.now()}@example.test` } });
   const category = await db.category.create({ data: { userId: user.id, name: "Servicios" } });
   const card = await db.card.create({ data: { userId: user.id, name: "Prueba", usualCutDay: 20, usualDueDay: 30 } });
@@ -114,7 +114,7 @@ test("cobros: transacción, concurrencia, omisión, restauración, evidencia y a
     // La captura manual y la confirmación rápida usan el mismo bloqueo.
     const manual = await db.subscription.create({ data: { userId: user.id, name: "Manual", amount: 99,
       paymentMethod: "CASH", categoryId: category.id, chargeDay: 15, startMonth: 1, startYear: 2026 } });
-    const { sourceLoader } = require("./helpers/load-source.cjs");
+    const { sourceLoader } = require("./helpers/load-source.ts");
     const expenses = sourceLoader({
       "@/lib/prisma": { prisma: db },
       "next/server": { NextResponse: { json: (body, options = {}) => ({ body, status: options.status || 200 }) } },

@@ -2,7 +2,7 @@ const assert = require("node:assert/strict");
 const { test } = require("node:test");
 const { IDBFactory } = require("fake-indexeddb");
 const { webcrypto } = require("node:crypto");
-const { sourceLoader } = require("./helpers/load-source.cjs");
+const { sourceLoader } = require("./helpers/load-source.ts");
 
 function fixture() {
   const indexedDB = new IDBFactory(), storage = new Map(), receipts = new Map(), requests = [];

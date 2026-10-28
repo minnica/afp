@@ -2,7 +2,7 @@ const assert = require('node:assert/strict');
 const { test } = require('node:test');
 const { randomUUID } = require('node:crypto');
 const { PrismaClient } = require('@prisma/client'), { PrismaPg } = require('@prisma/adapter-pg');
-const { sourceLoader } = require('./helpers/load-source.cjs');
+const { sourceLoader } = require('./helpers/load-source.ts');
 const connectionString = process.env.AFP_TEST_DATABASE_URL;
 test('nómina hábil: guarda el plan sin duplicados, aplica abonos reales y evita ingresos simulados', { skip: !connectionString }, async () => {
   const url = new URL(connectionString); assert.ok(['127.0.0.1','localhost'].includes(url.hostname) && /^\/afp_test[a-zA-Z0-9_]*$/.test(url.pathname) && !url.search);

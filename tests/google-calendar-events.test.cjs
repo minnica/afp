@@ -1,7 +1,7 @@
 const assert = require('node:assert/strict');
 const { test } = require('node:test');
 const { randomBytes, randomUUID } = require('node:crypto');
-const { sourceLoader } = require('./helpers/load-source.cjs');
+const { sourceLoader } = require('./helpers/load-source.ts');
 
 test('calendar eventos: las mutaciones autenticadas disparan trabajo para el propietario; las lecturas no', async () => {
   const scheduled = [];

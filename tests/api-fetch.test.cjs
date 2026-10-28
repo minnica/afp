@@ -4,7 +4,7 @@ const vm = require("node:vm");
 const { test } = require("node:test");
 const { IDBFactory } = require("fake-indexeddb");
 const { webcrypto } = require("node:crypto");
-const { sourceLoader } = require("./helpers/load-source.cjs");
+const { sourceLoader } = require("./helpers/load-source.ts");
 
 function client() {
   let session = { user: { id: "a" }, access_token: "token-1" };

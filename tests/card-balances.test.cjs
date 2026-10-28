@@ -1,6 +1,6 @@
 const assert = require('node:assert/strict');
 const { test } = require('node:test');
-const { sourceLoader } = require('./helpers/load-source.cjs');
+const { sourceLoader } = require('./helpers/load-source.ts');
 const { randomUUID } = require('node:crypto');
 const { getCardBalance, summarizeCardBalances, creditBalanceSchema } = sourceLoader()('src/lib/cardBalances.ts');
 const plain = value => JSON.parse(JSON.stringify(value));
