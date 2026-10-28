@@ -6,6 +6,10 @@ Consolidado el **27 de octubre de 2026** a partir del README del commit `4562aa0
 
 ## 2026-10-28
 
+### Plan de migración de pruebas y helpers a TypeScript
+
+Se preparó el [plan independiente](plan-migracion-tests-typescript.md) sobre `6aad1ab`: 106 archivos de pruebas y 11 helpers CJS. Define referencia, ejecución mixta con `node:test`, contratos del cargador y mocks, piloto de transferencias, conversión por módulos, fixtures de navegador y cierre con PostgreSQL y `db:verify`. La implementación está pendiente; no modifica el cierre de la migración web ni incorpora cambios de código, dependencias o despliegue.
+
 ### Cierre de la migración web a TypeScript
 
 **Fase 7 completada localmente.** Los 275 módulos TS/TSX de `src/` están incluidos en el programa estricto con `allowJs: false`. Se retiraron los adaptadores de UI de Mi dinero, el wrapper del piloto de transferencias y el cliente financiero temporal sin consumidores. Los 14 archivos vacíos se eliminaron sin contarlos como módulos migrados. El cargador de pruebas exige el archivo exacto cuando la ruta declara una extensión; se actualizaron las referencias históricas que aún lo necesitaban.

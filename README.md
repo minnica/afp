@@ -382,6 +382,7 @@ La web se despliega en Vercel, proyecto `afp`. El build es `pnpm build`; no apli
 ## Documentación relacionada
 
 - [docs/plan-migracion-typescript.md](docs/plan-migracion-typescript.md): plan por fases y criterios de aceptación; fases 0–7 completadas localmente, con evidencias de cierre.
+- [docs/plan-migracion-tests-typescript.md](docs/plan-migracion-tests-typescript.md): plan independiente para migrar pruebas y helpers a TypeScript; implementación pendiente.
 - [docs/bitacora.md](docs/bitacora.md): decisiones, migraciones, incidencias y seguimientos históricos con sus evidencias.
 - [PRODUCT.md](PRODUCT.md): propósito, alcance y principios del producto.
 - [docs/android-captura.md](docs/android-captura.md): operación técnica de Android, firma y pruebas.
