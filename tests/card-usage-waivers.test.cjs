@@ -1,7 +1,7 @@
 const assert = require("node:assert/strict");
 const { test } = require("node:test");
 const { sourceLoader } = require("./helpers/load-source.cjs");
-const ctx = sourceLoader()("src/lib/calculations/cardUsageWaivers.js");
+const ctx = sourceLoader()("src/lib/calculations/cardUsageWaivers.ts");
 const card = { id: "card", name: "Nombre editable", usagePolicy: { productKey: "HSBC_ZERO", verifiedAt: "2026-10-11" } };
 const cycle = { id: "oct", cardId: card.id, year: 2026, month: 10, startDate: "2026-09-11T12:00:00Z", cutDate: "2026-10-10T12:00:00Z" };
 const evidence = { version: 1, source: "statement.pdf", sourceSha256: "a".repeat(64), startDate: "2026-09-09", cutDate: "2026-10-08", subscriptionCharges: [] };

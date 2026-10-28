@@ -8,7 +8,7 @@ function fixture(getUser) {
     '@/lib/calendar/schedule': { scheduleCalendarSync: () => assert.fail('no se agenda una lectura') },
     'next/server': { NextResponse: { json: (body, options) => ({ body, ...options }) } },
   });
-  return load('src/lib/apiAuth.js');
+  return load('src/lib/apiAuth.ts');
 }
 const request = token => ({ method: 'GET', url: 'http://localhost/api/money', headers: new Headers(token ? { authorization: `Bearer ${token}` } : {}) });
 

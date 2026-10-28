@@ -21,7 +21,7 @@ test('Wallet BBVA real: API, observación, política de fecha, activación y gas
   const load = sourceLoader(mocks), protocol = load('src/lib/captureProtocol.js');
   const processing = load('src/lib/captureProcessing.js'), configuration = load('src/lib/captureConfiguration.js');
   const reconciliation = load('src/lib/captureReconciliation.js'), service = load('src/lib/captureService.js');
-  const routes = { events: load('src/app/api/captures/events/route.js'), movements: load('src/app/api/captures/movements/route.js'), expenses: load('src/app/api/expenses/route.js') };
+  const routes = { events: load('src/app/api/captures/events/route.js'), movements: load('src/app/api/captures/movements/route.js'), expenses: load('src/app/api/expenses/route.ts') };
   const card = await db.card.create({ data: { userId: user.id, name: 'Nombre personal de tarjeta', usualCutDay: 25, usualDueDay: 15 } });
   const sibling = await db.card.create({ data: { userId: user.id, name: 'Otra BBVA', usualCutDay: 25, usualDueDay: 15 } });
   const banamex = await db.card.create({ data: { userId: user.id, name: 'Otra marca con cifras distintas', usualCutDay: 25, usualDueDay: 15 } });

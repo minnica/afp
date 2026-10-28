@@ -16,7 +16,7 @@ export async function sendTransfer(command: TransferMutation, options: TransferR
     ...options, method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(command),
     validateResponse: (value: unknown) => { parseTransferResponse(command.action, value); },
   });
-  // Frontera explícita con apiFetch.js; su interior sigue pendiente de migración.
+  // El JSON se valida también dentro de la recuperación HTTP compartida.
   if (!(response instanceof Response)) throw new Error('Respuesta incompleta de Mi dinero.');
   const value: unknown = await response.json();
   return parseTransferResponse(command.action, value);

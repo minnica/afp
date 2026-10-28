@@ -1,6 +1,6 @@
 "use client";
 
-import { apiFetch } from "@/lib/apiFetch";
+import { financialFetch as apiFetch } from "@/lib/financialClient";
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getNoticeKey, getNoticeMonth } from "@/lib/noticeDismissals";

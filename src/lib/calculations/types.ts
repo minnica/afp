@@ -1,0 +1,23 @@
+import type { Prisma, Card, CardCycle, DailyExpense, Income, InstallmentPurchase, Subscription, SubscriptionCharge, PayableAccount, ReceivableAccount } from '@prisma/client';
+export type MoneyValue = Prisma.Decimal | number | string | null | undefined;
+export type DateValue = Date | string;
+type Values<T> = T extends Prisma.Decimal ? Exclude<MoneyValue, undefined> : T extends Date ? DateValue : T extends object ? { [K in keyof T]: Values<T[K]> } : T;
+type Fields<T, K extends keyof T> = Values<Pick<T, K>>;
+export type DebtAccount = Fields<PayableAccount | ReceivableAccount, 'originalAmount' | 'status'> & { accountType?: string; currentBalance?: MoneyValue; balanceAdjustment?: MoneyValue };
+export type DebtPayment = { amount: MoneyValue; loanPrincipalAmount?: MoneyValue };
+export type PaymentCycle = Fields<CardCycle, 'cutDate' | 'dueDate'> & Partial<Fields<CardCycle, 'statementAmount' | 'paidAmount' | 'postCutCreditAmount'>>;
+export type CycleDisplayStatus = 'PAID' | 'NO_PAYMENT_DUE' | 'OVERDUE' | 'PARTIALLY_PAID' | 'PAYMENT_PENDING' | 'CUT' | 'OPEN';
+export type CycleCredit = Values<Prisma.CardCycleCreditGetPayload<{ select: { id: true; userId: true; cycleId: true; incomeId: true; amount: true; notes: true; income: { select: { id: true; userId: true; concept: true; date: true; amount: true } } } }>>;
+export type CreditCycle = { id: string; userId?: string; credits?: CycleCredit[] };
+export type StatementCycle = Fields<CardCycle, 'cardId' | 'year' | 'month'> & { usageReconciliation?: unknown };
+export type FinancialCycle = PaymentCycle & CreditCycle & StatementCycle & Fields<CardCycle, 'startDate'> & { card?: Partial<Fields<Card, 'usualCutDay'>> | null; displayStatus?: string };
+type CaptureRelations = { captureMovements?: { id?: string; status?: string; events?: { sourcePackage: string }[] }[]; reconciliationStatus?: string; reconciledAt?: DateValue | null };
+export type FinancialExpense = Fields<DailyExpense, 'id' | 'concept' | 'amount' | 'date' | 'cardId'> & Partial<Fields<DailyExpense, 'paymentMethod' | 'cashContributionAmount' | 'notes' | 'subscriptionId'>> & CaptureRelations & { category?: { name: string } | null; subscriptionCharge?: { month: string } | null };
+export type FinancialPurchase = Fields<InstallmentPurchase, 'id' | 'concept' | 'cardId' | 'purchaseDate' | 'totalAmount' | 'months' | 'status'> & Partial<Fields<InstallmentPurchase, 'manualMonthlyPayment' | 'initialPaymentsMade'>> & CaptureRelations & { statementReconciliations?: unknown; category?: { name: string } | null };
+export type FinancialSubscription = Fields<Subscription, 'id' | 'name' | 'amount' | 'paymentMethod' | 'cardId' | 'chargeDay' | 'isActive'> & Partial<Fields<Subscription, 'frequencyMonths' | 'startMonth' | 'startYear' | 'deactivatedAt'>> & {
+  charges?: Fields<SubscriptionCharge, 'month' | 'status' | 'expenseId'>[];
+  dailyExpenses?: (Fields<DailyExpense, 'id' | 'date'> & { amount?: MoneyValue } & { paymentMethod?: DailyExpense['paymentMethod']; subscriptionCharge?: { month: string } | null; card?: { name: string } | null })[];
+  category?: { name: string } | null; card?: { name: string } | null;
+};
+export type UsageCard = Fields<Card, 'id' | 'name'> & { usagePolicy?: unknown };
+export type FinancialIncome = Fields<Income, 'id' | 'amount' | 'date'>;

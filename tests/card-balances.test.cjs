@@ -2,7 +2,7 @@ const assert = require('node:assert/strict');
 const { test } = require('node:test');
 const { sourceLoader } = require('./helpers/load-source.cjs');
 const { randomUUID } = require('node:crypto');
-const { getCardBalance, summarizeCardBalances, creditBalanceSchema } = sourceLoader()('src/lib/cardBalances.js');
+const { getCardBalance, summarizeCardBalances, creditBalanceSchema } = sourceLoader()('src/lib/cardBalances.ts');
 const plain = value => JSON.parse(JSON.stringify(value));
 const snapshot = (creditLimit, usedBalance, balanceAsOf = '2026-10-21') => ({ creditLimit, usedBalance, balanceAsOf });
 
@@ -84,7 +84,7 @@ function apiFixture() {
     '@/lib/prisma': { prisma },
     '@supabase/supabase-js': { createClient: () => ({ auth: { getUser: async token => ({ data: { user: ['a', 'b'].includes(token) ? { id: token } : null } }) } }) },
     'next/server': { NextResponse: { json: (body, options = {}) => ({ body: plain(body), status: options.status || 200, headers: new Headers(options.headers) }) } },
-  })('src/app/api/cards/route.js');
+  })('src/app/api/cards/route.ts');
   const attempts = new Map();
   const request = (body, token = 'a') => {
     if (body?.action === 'UPDATE_CREDIT_BALANCE') {

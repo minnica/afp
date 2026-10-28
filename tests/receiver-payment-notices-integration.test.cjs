@@ -41,7 +41,7 @@ test('pagos Banamex/Mercado Pago: API real, reglas, saldos, aislamiento, concurr
     const secret=randomBytes(32).toString('base64url');
     const device=await db.captureDevice.create({data:{userId:user.id,approvedAt:new Date(),secretHash:protocol.captureHash(secret),name:'Teléfono ficticio'}});
     const auth=`Capture ${device.id}.${secret}`;
-    const routes={events:load('src/app/api/captures/events/route.js'),cycles:load('src/app/api/card-cycles/route.js'),cards:load('src/app/api/cards/route.js'),movements:load('src/app/api/captures/movements/route.js')};
+    const routes={events:load('src/app/api/captures/events/route.js'),cycles:load('src/app/api/card-cycles/route.ts'),cards:load('src/app/api/cards/route.ts'),movements:load('src/app/api/captures/movements/route.js')};
     const event=(kind='bank',replacements=[])=>({...fixtures[kind],contractVersion:1,eventId:randomUUID(),notificationKeyHash:protocol.captureHash(randomUUID()),fields:Object.fromEntries(Object.entries(fixtures[kind].fields).map(([k,v])=>[k,replacements.reduce((text,[a,b])=>text.replaceAll(a,b),v)]))});
     const post=(input,authorization=auth)=>routes.events.POST(new Request('http://localhost/api/captures/events',{method:'POST',headers:{authorization,'Content-Type':'application/json'},body:JSON.stringify(input)}));
     const movement=async(input,deviceId=device.id)=>(await db.captureEvent.findUnique({where:{deviceId_eventId:{deviceId,eventId:input.eventId}},include:{movement:true}})).movement;
@@ -105,7 +105,7 @@ test('pagos Banamex/Mercado Pago: API real, reglas, saldos, aislamiento, concurr
   await scenario('Banamex: abono parcial deja saldo y dos abonos distintos concurrentes liquidan una vez',async c=>{
    await c.db.cardCycle.update({where:{id:c.cycle.id},data:{statementAmount:'300'}});
    assert.equal((await c.send(c.event())).reason,'PAYMENT_AUTOMATIC');
-   const state=c.load('src/lib/calculations/cardCyclePayments.js').getCyclePaymentState(await c.readCycle());
+   const state=c.load('src/lib/calculations/cardCyclePayments.ts').getCyclePaymentState(await c.readCycle());
    assert.equal(state.paymentStatus,'PARTIALLY_PAID');assert.equal(state.pendingAmount,176.55);
    await Promise.all([c.send(c.event('bank',[['123.45','100.00']])),c.send(c.event('bank',[['123.45','76.55']]))]);
    assert.equal((await c.readCycle()).status,'PAID');assert.equal(String((await c.readCycle()).paidAmount),'300');assert.equal(await c.count(),3);

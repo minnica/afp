@@ -2,7 +2,7 @@
 
 import ReceivableBalanceAdjustment from "@/components/cuentas-por-cobrar/ReceivableBalanceAdjustment";
 
-import { apiFetch } from "@/lib/apiFetch";
+import { financialFetch as apiFetch } from "@/lib/financialClient";
 
 import { useCreationDraft } from "@/hooks/use-creation-draft";
 import { useIsMobile } from "@/hooks/use-mobile";

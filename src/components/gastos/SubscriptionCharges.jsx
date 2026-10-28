@@ -1,6 +1,6 @@
 "use client";
 
-import { apiFetch } from "@/lib/apiFetch";
+import { financialFetch as apiFetch } from "@/lib/financialClient";
 
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";

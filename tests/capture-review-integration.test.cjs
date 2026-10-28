@@ -34,7 +34,7 @@ test('Fase 5 PostgreSQL: revisión, fuentes y cotejo manual sin alterar decision
   try {
     await t.test('rutas exigen Bearer antes del cuerpo y no aceptan la credencial Capture', async () => {
       for (const route of ['reconciliation', 'movements', 'configuration']) for (const method of ['GET', 'PATCH']) for (const authorization of ['', 'Bearer expired', `Capture ${device.id}.${secret}`]) {
-        const result = await load(`src/app/api/captures/${route}/route.js`)[method]({ headers: new Headers({ authorization }), get body() { throw new Error('No leer'); } });
+        const result = await load(`src/app/api/captures/${route}/route`)[method]({ headers: new Headers({ authorization }), get body() { throw new Error('No leer'); } });
         assert.equal(result.status, 401); assert.equal(result.headers.get('cache-control'), 'private, no-store');
       }
     });
@@ -98,7 +98,7 @@ test('Fase 5 PostgreSQL: revisión, fuentes y cotejo manual sin alterar decision
       assert.equal(await db.dailyExpense.count({ where: { userId: user.id } }), 2);
     });
     await t.test('edición personal conserva cotejo; cambio financiero lo retira y exige cotejar de nuevo', async () => {
-      const api = load('src/app/api/expenses/route.js');
+      const api = load('src/app/api/expenses/route.ts');
       const before = await reconciliation.captureStatement(db, user.id, period);
       const row = before.records.find(row => row.id === expense.id);
       const body = { id: expense.id, date: '2026-10-21', amount: '250.50', concept: 'Nombre personal', paymentMethod: 'CARD', cardId: card.id, categoryId: category.id, notes: 'Nota editada' };

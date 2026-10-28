@@ -1,0 +1,25 @@
+{
+  "cycle": {
+    "paid": 30.1,
+    "pending": 70.15,
+    "statement": 100.25,
+    "status": "PARTIALLY_PAID"
+  },
+  "dashboard": {
+    "dailyExpensesTotal": 37.25,
+    "incomeTotal": 0,
+    "installmentPurchasesTotal": 0,
+    "monthlyDifference": -37.25,
+    "monthlyExpenseTotal": 37.25,
+    "subscriptionsTotal": 0
+  },
+  "dialog": false,
+  "expense": {
+    "concept": "Compra TypeScript fase 4",
+    "count": 1,
+    "total": 37.25
+  },
+  "focused": "BODY",
+  "origin": "http://127.0.0.1:4216",
+  "text": true
+}

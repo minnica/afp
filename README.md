@@ -51,7 +51,7 @@ Este README describe el funcionamiento y los procedimientos del código versiona
 | Área | Implementación |
 | --- | --- |
 | Web | Next.js 16.3.8, App Router y React 19.2.4 |
-| Lenguaje | Transición gradual JS/JSX → TypeScript; Mi dinero tipado (API, servicios, cálculos y formularios), otros módulos en JS/JSX. Alias `@/*` para `src/*` |
+| Lenguaje | Transición gradual JS/JSX → TypeScript; Mi dinero, núcleo financiero y API compartida en TS; interfaz restante y captura/Calendar/offline aún en JS/JSX. Alias `@/*` para `src/*` |
 | UI | Componentes shadcn locales, Radix UI y Tailwind CSS 4; Base UI para el Combobox múltiple |
 | Formularios | React Hook Form y Zod |
 | Tablas y gráficas | TanStack Table 8 y Recharts 3 |
@@ -104,7 +104,7 @@ DIRECT_URL=
 | --- | --- |
 | `NEXT_PUBLIC_SUPABASE_URL` | URL del proyecto de Supabase utilizado para Auth |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Clave pública de Supabase; nunca colocar una clave de servicio aquí |
-| `DATABASE_URL` | Conexión PostgreSQL de la aplicación, utilizada por [src/lib/prisma.js](src/lib/prisma.js) |
+| `DATABASE_URL` | Conexión PostgreSQL de la aplicación, utilizada por [src/lib/prisma.ts](src/lib/prisma.ts) |
 | `DIRECT_URL` | Conexión PostgreSQL para la CLI de Prisma y migraciones, definida en [prisma.config.ts](prisma.config.ts) |
 
 Next.js también carga `.env.local`. La CLI de Prisma usa `dotenv/config`, que carga `.env`; no asumir que leerá `.env.local`. Si se guarda allí una variable de la CLI, cargarla explícitamente en el entorno del proceso. Las dos conexiones PostgreSQL deben apuntar a la misma base del entorno elegido.
@@ -141,7 +141,7 @@ En Chrome del emulador Android, usar `http://10.0.2.2:3000`. [next.config.mjs](n
 | `pnpm audit:prod` / `pnpm audit:all` | Auditar dependencias de producción o del árbol completo |
 | `pnpm icons:generate` | Regenerar iconos PNG/ICO desde `public/icons/app-icon.svg` |
 
-Las verificaciones obligatorias por lote son `pnpm typecheck`, `pnpm test:types`, `pnpm lint`, `pnpm test` y `pnpm build`. El build conserva la comprobación de TypeScript. `typecheck` y `test:types` generan sus prerrequisitos y funcionan sin una carpeta `.next` previa. Los casos de tipos viven en `tests/types/`, con [configuración propia](tsconfig.type-tests.json).
+Las verificaciones obligatorias por lote son `pnpm typecheck`, `pnpm test:types`, `pnpm lint`, `pnpm test` y `pnpm build`. El build conserva la comprobación de TypeScript. `typecheck` y `test:types` generan sus prerrequisitos y funcionan sin una carpeta `.next` previa. Los contratos financieros validan las respuestas antes de entregarlas a las pantallas JSX; sus interiores siguen pendientes de migración. Los casos de tipos viven en `tests/types/`, con [configuración propia](tsconfig.type-tests.json).
 
 Si se necesita comprobar la compilación con Webpack, usar `pnpm exec prisma generate` seguido de `pnpm exec next build --webpack`. Esta alternativa no cambia el script de build del proyecto.
 
@@ -208,12 +208,12 @@ Las migraciones reconstruyen el esquema público de AFP; no restauran usuarios d
 
 ## API y autorización
 
-Los handlers están en [src/app/api/](src/app/api/). Las rutas financieras exigen `Authorization: Bearer <access_token>` de Supabase. [apiAuth.js](src/lib/apiAuth.js) valida la identidad antes de acceder a los datos; el propietario no se toma del cuerpo ni de la URL.
+Los handlers están en [src/app/api/](src/app/api/). Las rutas financieras exigen `Authorization: Bearer <access_token>` de Supabase. [apiAuth.ts](src/lib/apiAuth.ts) valida la identidad antes de acceder a los datos; el propietario no se toma del cuerpo ni de la URL.
 
 - Consultas, escrituras y referencias vinculadas se limitan al usuario autenticado. Un ID ajeno o inexistente devuelve `404`.
 - Sin sesión válida se responde `401`; un fallo temporal de Supabase Auth devuelve `503` para permitir reintentar.
 - Las respuestas privadas usan `Cache-Control: private, no-store` y `Vary: Authorization`. RLS no sustituye la autorización del servidor.
-- El cliente usa [apiFetch.js](src/lib/apiFetch.js) para enviar el token vigente y comprobar la cuenta esperada. El diálogo compartido de recuperación conserva borradores y distingue errores de validación, sesión y conexión.
+- El cliente usa [apiFetch.ts](src/lib/apiFetch.ts) para enviar el token vigente y comprobar la cuenta esperada. El diálogo compartido de recuperación conserva borradores y distingue errores de validación, sesión y conexión.
 - Un alta sin garantía idempotente no se reenvía automáticamente cuando se desconoce si se guardó. Si el guardado terminó y solo falló la recarga, se reintenta la lectura.
 
 ### Rutas financieras
@@ -381,7 +381,7 @@ La web se despliega en Vercel, proyecto `afp`. El build es `pnpm build`; no apli
 
 ## Documentación relacionada
 
-- [docs/plan-migracion-typescript.md](docs/plan-migracion-typescript.md): plan por fases y criterios de aceptación; referencia, herramientas, piloto y Mi dinero completados; siguiente fase: núcleo financiero y API compartida.
+- [docs/plan-migracion-typescript.md](docs/plan-migracion-typescript.md): plan por fases y criterios de aceptación; fases 0–4 completadas; siguiente fase: captura Android, Calendar y offline.
 - [docs/bitacora.md](docs/bitacora.md): decisiones, migraciones, incidencias y seguimientos históricos con sus evidencias.
 - [PRODUCT.md](PRODUCT.md): propósito, alcance y principios del producto.
 - [docs/android-captura.md](docs/android-captura.md): operación técnica de Android, firma y pruebas.

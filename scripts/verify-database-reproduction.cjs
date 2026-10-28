@@ -331,7 +331,7 @@ async function main() {
           // Simula las nueve tarjetas capturadas en producción antes de activar
           // seguimiento: la migración nueva debe conservar exactamente ese saldo.
           runPrisma(['migrate', 'deploy', '--config', beforeTrackingConfig], dbUrl);
-          const today = sourceLoader()('src/lib/cardBalances.js').getBalanceToday();
+          const today = sourceLoader()('src/lib/cardBalances.ts').getBalanceToday();
           const at = new Date(`${today}T12:00:00Z`);
           await db.$executeRaw`UPDATE cards SET "creditLimit" = 20000, "usedBalance" = 3000, "balanceAsOf" = ${at} WHERE id = 'a11-card'`;
           await db.dailyExpense.create({ data: { id: 'a11-existing-charge', userId: 'a11-user', cardId: 'a11-card', categoryId: 'a11-category', date: at, paymentMethod: 'CARD', concept: 'Ya incluido en banco', amount: 500 }, select: { id: true } });
@@ -365,7 +365,7 @@ async function main() {
           assert.equal(historicalCard.creditLimit.toFixed(2), '20000.00');
           assert.equal(historicalCard.usedBalance.toFixed(2), '3000.00');
           assert.equal(historicalCard.balanceTracking.version, 1);
-          const { getTrackedCard, loadBalanceMovements } = sourceLoader()('src/lib/cardBalanceTracking.js');
+          const { getTrackedCard, loadBalanceMovements } = sourceLoader()('src/lib/cardBalanceTracking.ts');
           const day = historicalCard.balanceTracking.day;
           const movements = await loadBalanceMovements(db, 'a11-user', [historicalCard], day);
           assert.equal(getTrackedCard(historicalCard, movements, day).usedBalance, '3000.00');

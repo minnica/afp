@@ -19,7 +19,7 @@ function client() {
 
 test("apiFetch usa el token vigente, preserva headers y signal, y bloquea otros orígenes", async () => {
   const { load, requests, setSession } = client();
-  const { apiFetch } = load("src/lib/apiFetch.js");
+  const { apiFetch } = load("src/lib/apiFetch.ts");
   const controller = new AbortController();
   await apiFetch("/api/expenses?userId=a", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}", signal: controller.signal });
   assert.equal(requests[0].options.headers.get("authorization"), "Bearer token-1");
@@ -36,7 +36,7 @@ test("apiFetch usa el token vigente, preserva headers y signal, y bloquea otros 
 
 test("apiFetch no envía nada sin sesión ni con una cuenta distinta de la pantalla", async () => {
   const { load, requests, setSession } = client();
-  const { apiFetch } = load("src/lib/apiFetch.js");
+  const { apiFetch } = load("src/lib/apiFetch.ts");
   await assert.rejects(apiFetch("/api/expenses?userId=b"), /sesión cambió/);
   await assert.rejects(apiFetch("/api/cards", { method: "DELETE", expectedUserId: "b" }), /sesión cambió/);
   setSession(null);

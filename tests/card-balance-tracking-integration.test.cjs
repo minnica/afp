@@ -18,11 +18,11 @@ test('PostgreSQL: seguimiento desde saldo inicial, movimientos reales, reintento
     '@supabase/supabase-js': { createClient: () => ({ auth: { getUser: async () => ({ data: { user: { id: actor } } }) } }) },
     'next/server': { NextResponse: { json: (body, options = {}) => ({ body: JSON.parse(JSON.stringify(body)), status: options.status || 200 }) } },
   });
-  const cards = load('src/app/api/cards/route.js');
-  const expenses = load('src/app/api/expenses/route.js');
-  const purchases = load('src/app/api/installment-purchases/route.js');
-  const cycles = load('src/app/api/card-cycles/route.js');
-  const today = load('src/lib/cardBalances.js').getBalanceToday();
+  const cards = load('src/app/api/cards/route.ts');
+  const expenses = load('src/app/api/expenses/route.ts');
+  const purchases = load('src/app/api/installment-purchases/route.ts');
+  const cycles = load('src/app/api/card-cycles/route.ts');
+  const today = load('src/lib/cardBalances.ts').getBalanceToday();
   const now = new Date(`${today}T12:00:00Z`);
   const yesterday = new Date(now.getTime() - 86400000);
   const request = (body = {}, query = '') => ({ url: `http://localhost/api/test?${query}`, headers: new Headers({ authorization: 'Bearer test' }), json: async () => body });

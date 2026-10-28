@@ -17,7 +17,7 @@ test("PostgreSQL: gastos compartidos en CRUD, análisis, cortes, idempotencia y 
     "next/server": { NextResponse: { json: (body, options = {}) => ({ body: JSON.parse(JSON.stringify(body)), status: options.status || 200 }) } },
     "@supabase/supabase-js": { createClient: () => ({ auth: { getUser: async token => ({ data: { user: [user, other].find(item => item.id === token) || null } }) } }) },
   }, { console: { error() {} } });
-  const call = (route, method = "GET", body, owner = user, query = "") => load(`src/app/api/${route}/route.js`)[method]({
+  const call = (route, method = "GET", body, owner = user, query = "") => load(`src/app/api/${route}/route`)[method]({
     headers: new Headers(owner ? { authorization: `Bearer ${owner.id}` } : {}),
     url: `http://localhost/api/${route}?clientDate=2026-10-20&${query}`, json: async () => body,
   });

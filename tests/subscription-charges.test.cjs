@@ -1,7 +1,7 @@
 const assert = require("node:assert/strict");
 const { test } = require("node:test");
 const { sourceLoader } = require("./helpers/load-source.cjs");
-const ctx = sourceLoader()("src/lib/subscriptionCharges.js");
+const ctx = sourceLoader()("src/lib/subscriptionCharges.ts");
 const sub = { id: "s", name: "Servicio", amount: 199, chargeDay: 15, startMonth: 1, startYear: 2026,
   frequencyMonths: 1, isActive: true, paymentMethod: "CARD", cardId: "c", charges: [], dailyExpenses: [] };
 const list = (subscription = sub, extra = {}) => ctx.buildSubscriptionCharges({ subscriptions: [subscription], month: "2026-10", today: "2026-10-15", ...extra });

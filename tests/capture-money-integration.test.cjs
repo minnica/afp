@@ -12,7 +12,7 @@ test('captura de cuentas: transferencias Nu, débito confirmado y retiros sin du
  const load=sourceLoader({'@/lib/prisma':{prisma:db},'@/lib/calendar/schedule':{scheduleCalendarSync(){}},'next/server':{NextResponse:{json:(body,opts={})=>({body:JSON.parse(JSON.stringify(body)),status:opts.status||200})}},'@supabase/supabase-js':{createClient:()=>({auth:{getUser:async token=>({data:{user:token==='owner'?user:token==='other'?other:null}})}})}});
  const protocol=load('src/lib/captureProtocol.js'),service=load('src/lib/captureService.js'),processing=load('src/lib/captureProcessing.js');
  const configuration=load('src/lib/captureConfiguration.js'),money=load('src/lib/money/service.ts'),sources=load('src/lib/money/sources.ts');
- const movementsRoute=load('src/app/api/captures/movements/route.js'),expenseRoute=load('src/app/api/expenses/route.js');
+ const movementsRoute=load('src/app/api/captures/movements/route.js'),expenseRoute=load('src/app/api/expenses/route.ts');
  const createAccount=(owner,name,value)=>db.moneyAccount.create({data:{userId:owner.id,name,kind:'BANK',openingBalance:value,asOf:new Date('2026-10-24'),baseline:{}}});
  const nu=await createAccount(user,'Nu QA',10000),bbva=await createAccount(user,'BBVA QA',1000),foreign=await createAccount(other,'Ajena QA',50);
  const device=await db.captureDevice.create({data:{userId:user.id,name:'Ficticio',approvedAt:new Date(),secretHash:protocol.captureHash(randomBytes(32).toString('hex'))}}),credential={id:device.id,secretHash:device.secretHash};

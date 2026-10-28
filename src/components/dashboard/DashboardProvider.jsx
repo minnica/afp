@@ -1,6 +1,6 @@
 "use client";
 
-import { apiFetch } from "@/lib/apiFetch";
+import { financialFetch as apiFetch } from "@/lib/financialClient";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";

@@ -1,7 +1,7 @@
 const assert = require("node:assert/strict");
 const { test } = require("node:test");
 const { sourceLoader } = require("./helpers/load-source.cjs");
-const ctx = sourceLoader()("src/lib/noticeDismissals.js");
+const ctx = sourceLoader()("src/lib/noticeDismissals.ts");
 const notice = { id: "receivable-a-2026-10-15", type: "RECEIVABLE", date: "2026-10-15T12:00:00Z", amount: 1500 };
 const plain = (value) => JSON.parse(JSON.stringify(value));
 
@@ -67,7 +67,7 @@ function api() {
     "@supabase/supabase-js": { createClient: globals.createClient },
     "next/server": { NextResponse: globals.NextResponse },
     "@/lib/calendar/schedule": { scheduleCalendarSync() {} },
-  })("src/app/api/notice-dismissals/route.js");
+  })("src/app/api/notice-dismissals/route.ts");
   const request = (token, body = {}) => ({ url: "http://localhost/api/notice-dismissals?month=2026-10&userId=b", headers: new Map(token ? [["authorization", `Bearer ${token}`]] : []), json: async () => body });
   return { route, calls, request };
 }

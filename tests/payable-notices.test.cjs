@@ -3,7 +3,7 @@ const { test } = require("node:test");
 const { spawnSync } = require("node:child_process");
 const { sourceLoader } = require("./helpers/load-source.cjs");
 
-const { buildPayableNotices, buildImportantNotices } = sourceLoader()("src/lib/importantNotices.js");
+const { buildPayableNotices, buildImportantNotices } = sourceLoader()("src/lib/importantNotices.ts");
 const now = new Date("2026-10-26T12:00:00Z");
 const account = (overrides = {}) => ({
   id: "purchase", concept: "Compra pendiente", accountType: "SIMPLE", status: "ACTIVE",
@@ -67,7 +67,7 @@ test("avisos por pagar: conserva el día bancario UTC y todo el día local de ve
   const script = `
     const assert = require('node:assert/strict');
     const { sourceLoader } = require('./tests/helpers/load-source.cjs');
-    const { buildPayableNotices } = sourceLoader()('src/lib/importantNotices.js');
+    const { buildPayableNotices } = sourceLoader()('src/lib/importantNotices.ts');
     const account = { id: 'date', concept: 'Fecha', originalAmount: 10, status: 'ACTIVE', dailyExpenses: [] };
     for (const time of ['00:00:00Z', '23:59:59Z']) {
       account.expectedDate = '2026-11-01T' + time;

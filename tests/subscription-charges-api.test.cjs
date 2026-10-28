@@ -19,7 +19,7 @@ function api() {
     "next/server": { NextResponse: globals.NextResponse },
     "@/lib/calendar/schedule": { scheduleCalendarSync() {} },
     "@/lib/subscriptionChargeService": globals,
-  })("src/app/api/subscription-charges/route.js");
+  })("src/app/api/subscription-charges/route.ts");
   const request = (token, body) => ({ url: "http://localhost/api/subscription-charges?month=2026-10&userId=other",
     headers: new Map(token ? [["authorization", `Bearer ${token}`]] : []), json: async () => body });
   return { route, calls, request };

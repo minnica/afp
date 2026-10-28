@@ -17,7 +17,7 @@ test('PostgreSQL: captura bancaria persiste sin modificar ciclos, pagos ni movim
     '@/lib/prisma': { prisma: db },
     '@supabase/supabase-js': { createClient: () => ({ auth: { getUser: async () => ({ data: { user: { id: actor } } }) } }) },
     'next/server': { NextResponse: { json: (body, options = {}) => ({ body: JSON.parse(JSON.stringify(body)), status: options.status || 200 }) } },
-  })('src/app/api/cards/route.js');
+  })('src/app/api/cards/route.ts');
   const request = body => ({ url: 'http://localhost/api/cards', headers: new Headers({ authorization: 'Bearer test' }), json: async () => body });
   try {
     const card = await db.card.create({ data: { userId: user.id, name: 'Tarjeta prueba', usualCutDay: 10, usualDueDay: 30, notes: 'Referencia' } });

@@ -176,7 +176,7 @@ integration('calendar DB: revisar corte exige ambos guardados, conserva ID y no 
     '@supabase/supabase-js': { createClient: () => ({ auth: { getUser: async () => ({ data: { user: { id: userId } } }) } }) },
   }, { process: { env }, URLSearchParams, AbortSignal });
   const patch = async body => {
-    const response = await api('src/app/api/card-cycles/route.js').PATCH({ method: 'PATCH', url: 'https://afp.example.test/api/card-cycles',
+    const response = await api('src/app/api/card-cycles/route.ts').PATCH({ method: 'PATCH', url: 'https://afp.example.test/api/card-cycles',
       headers: new Headers({ authorization: 'Bearer valid' }), json: async () => body });
     assert.equal(response.status, 200, JSON.stringify(response.body));
     assert.equal((await perform()).status, 'SYNCED');

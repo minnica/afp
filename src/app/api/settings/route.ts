@@ -1,0 +1,203 @@
+import { readFinancialInput, isPrismaError } from "@/lib/financialContracts";
+import { apiResponse as NextResponse, requireApiUser, apiAccessErrorResponse, requireOwnedReferences } from "@/lib/apiAuth";
+import { prisma } from "@/lib/prisma";
+
+const allowedTypes = ["category", "person", "incomeType"];
+
+const categorySelect = {
+  id: true,
+  userId: true,
+  name: true,
+  createdAt: true,
+};
+
+const personSelect = {
+  id: true,
+  userId: true,
+  name: true,
+  notes: true,
+  createdAt: true,
+};
+
+const incomeTypeSelect = {
+  id: true,
+  userId: true,
+  name: true,
+  createdAt: true,
+};
+
+function getModel(type: string) {
+  if (type === "category") return prisma.category;
+  if (type === "person") return prisma.person;
+  if (type === "incomeType") return prisma.incomeType;
+
+  return null;
+}
+
+export async function GET(request: Request) {
+  try {
+    const user = await requireApiUser(request);
+    const userId = user.id;
+
+    const [categories, people, incomeTypes] = await Promise.all([
+      prisma.category.findMany({
+        where: { userId },
+        select: categorySelect,
+        orderBy: { name: "asc" },
+      }),
+      prisma.person.findMany({
+        where: { userId },
+        select: personSelect,
+        orderBy: { name: "asc" },
+      }),
+      prisma.incomeType.findMany({
+        where: { userId },
+        select: incomeTypeSelect,
+        orderBy: { name: "asc" },
+      }),
+    ]);
+
+    return NextResponse.json({
+      categories,
+      people,
+      incomeTypes,
+    });
+  } catch (error) {
+    const accessResponse = apiAccessErrorResponse(error);
+    if (accessResponse) return accessResponse;
+    console.error("Error loading settings:", error);
+
+    return NextResponse.json(
+      { error: "No se pudo cargar configuración." },
+      { status: 500 },
+    );
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    const user = await requireApiUser(request);
+    const userId = user.id;
+    const body = readFinancialInput(await request.json());
+    await requireOwnedReferences(prisma, userId, body, []);
+    const { type, name, notes } = body;
+
+    if (!userId || !type || !name) {
+      return NextResponse.json(
+        { error: "Faltan datos obligatorios." },
+        { status: 400 },
+      );
+    }
+
+    if (!allowedTypes.includes(type)) {
+      return NextResponse.json(
+        { error: "Tipo no permitido." },
+        { status: 400 },
+      );
+    }
+
+    const cleanName = name.trim();
+
+    if (!cleanName) {
+      return NextResponse.json(
+        { error: "El nombre no puede estar vacío." },
+        { status: 400 },
+      );
+    }
+
+    if (type === "category") {
+      const category = await prisma.category.create({
+        data: {
+          userId,
+          name: cleanName,
+        },
+        select: categorySelect,
+      });
+
+      return NextResponse.json({ item: category });
+    }
+
+    if (type === "incomeType") {
+      const incomeType = await prisma.incomeType.create({
+        data: {
+          userId,
+          name: cleanName,
+        },
+        select: incomeTypeSelect,
+      });
+
+      return NextResponse.json({ item: incomeType });
+    }
+
+    if (type === "person") {
+      const person = await prisma.person.create({
+        data: {
+          userId,
+          name: cleanName,
+          notes: notes?.trim() || null,
+        },
+        select: personSelect,
+      });
+
+      return NextResponse.json({ item: person });
+    }
+  } catch (error) {
+    const accessResponse = apiAccessErrorResponse(error);
+    if (accessResponse) return accessResponse;
+    console.error("Error creating setting:", error);
+
+    if (isPrismaError(error) && error.code === "P2002") {
+      return NextResponse.json(
+        { error: "Ya existe un registro con ese nombre." },
+        { status: 409 },
+      );
+    }
+
+    return NextResponse.json(
+      { error: "No se pudo crear el registro." },
+      { status: 500 },
+    );
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const user = await requireApiUser(request);
+    const userId = user.id;
+    const { searchParams } = new URL(request.url);
+    const type = searchParams.get("type");
+    const id = searchParams.get("id");
+
+    if (!type || !id) {
+      return NextResponse.json({ error: "Faltan type o id." }, { status: 400 });
+    }
+
+    const model = getModel(type);
+
+    if (!model) {
+      return NextResponse.json(
+        { error: "Tipo no permitido." },
+        { status: 400 },
+      );
+    }
+
+    const args = { where: { id, userId } };
+    if (type === "category") await prisma.category.delete(args);
+    else if (type === "person") await prisma.person.delete(args);
+    else await prisma.incomeType.delete(args);
+
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    const accessResponse = apiAccessErrorResponse(error);
+    if (accessResponse) return accessResponse;
+    console.error("Error deleting setting:", error);
+
+    return NextResponse.json(
+      {
+        error:
+          "No se pudo eliminar. Puede que este registro ya esté siendo usado.",
+      },
+      { status: 500 },
+    );
+  }
+}

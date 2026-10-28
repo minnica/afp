@@ -19,7 +19,7 @@ function fixture(paymentMethod = "CASH", cardId = null) {
     } },
     subscriptionCharge: { upsert: async ({ create }) => subscription.charges.push(create) },
   };
-  const { applySubscriptionCharge } = sourceLoader()("src/lib/subscriptionChargeService.js");
+  const { applySubscriptionCharge } = sourceLoader()("src/lib/subscriptionChargeService.ts");
   return { subscription, apply: overrides => applySubscriptionCharge(tx, "owner", {
     subscriptionId: "s", month: "2026-10", action: "confirm", today: "2026-10-21", ...overrides,
   }) };

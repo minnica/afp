@@ -24,7 +24,7 @@ test('Fase 4 PostgreSQL: interpretación, resoluciones y escritura financiera at
  const realLoad=sourceLoader(mocks);
  const protocol=load('src/lib/captureProtocol.js'), service=load('src/lib/captureService.js');
  const configuration=load('src/lib/captureConfiguration.js'), processing=load('src/lib/captureProcessing.js');
- const expenses=load('src/app/api/expenses/route.js');
+ const expenses=load('src/app/api/expenses/route.ts');
  const request=(body={},query='',token='a',method='POST')=>new Request(`http://localhost/api/test?userId=${other.id}&${query}`,{method,headers:{authorization:`Bearer ${token}`,'Content-Type':'application/json'},...(!['GET','HEAD'].includes(method)?{body:JSON.stringify(body)}:{})});
  let sequence=0;
  const event=(options={})=>protocol.validateCaptureEvent({contractVersion:1,eventId:randomUUID(),sourcePackage:options.source||'com.bancomer.mbanking',
@@ -67,7 +67,7 @@ test('Fase 4 PostgreSQL: interpretación, resoluciones y escritura financiera at
  try {
  await t.test('rutas administrativas rechazan anónimos y credencial nativa antes de leer el cuerpo',async()=>{
   for(const name of ['configuration','movements'])for(const method of ['GET','PATCH'])for(const authorization of [null,`Capture ${device.id}.${secret}`,'Bearer invalid']){
-   const response=await realLoad(`src/app/api/captures/${name}/route.js`)[method]({headers:new Headers(authorization?{authorization}:{}),get body(){throw new Error('No leer');}});assert.equal(response.status,401);
+   const response=await realLoad(`src/app/api/captures/${name}/route`)[method]({headers:new Headers(authorization?{authorization}:{}),get body(){throw new Error('No leer');}});assert.equal(response.status,401);
   }
  });
  await t.test('importación por nombres existentes, sin renombrar, conserva ceros y separa física/digital/Wallet',async()=>{
@@ -219,13 +219,13 @@ test('Fase 4 PostgreSQL: interpretación, resoluciones y escritura financiera at
   }
  });
  await t.test('consumo mínimo excluye capturas y MSI por conciliar pero el cálculo de corte sí los incluye',async()=>{
-  const calc=load('src/lib/calculations/cardUsageWaivers.js');
+  const calc=load('src/lib/calculations/cardUsageWaivers.ts');
   const day=new Date('2026-10-21T12:00:00Z');
   const cycle={cardId:card.id,card:{usualCutDay:25},startDate:new Date('2026-10-01T12:00:00Z'),cutDate:new Date('2026-10-25T12:00:00Z'),month:10,year:2026};
   const pendingPurchase=await db.installmentPurchase.findFirst({where:{userId:user.id,reconciliationStatus:'PENDING'}});
   const [output]=calc.buildCardUsageWaivers({cards:[{...card,usagePolicy:{productKey:'HSBC_ZERO',verifiedAt:'2026-10-11'}}],cyclesWithAmounts:[cycle],expenses:[{...autoExpense,date:day}],subscriptions:[],purchases:[pendingPurchase],year:2026,month:10,now:day});
   assert.equal(output.eligibleSpend,0);assert.equal(output.remainingAmount,300);assert.equal(output.breakdown.projectedCharges.length,2);
-  const financial=load('src/lib/calculations/cardCycles.js').calculateCycleAmount({cycle,expenses:[autoExpense],purchases:[pendingPurchase]});
+  const financial=load('src/lib/calculations/cardCycles.ts').calculateCycleAmount({cycle,expenses:[autoExpense],purchases:[pendingPurchase]});
   assert.equal(financial.calculatedAmount,223.45);assert.equal(financial.expensesAmount,123.45);assert.equal(financial.purchasesAmount,100);
 
  });

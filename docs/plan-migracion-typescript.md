@@ -1,6 +1,6 @@
 # Plan de migración gradual a TypeScript
 
-**Estado:** fases 0–3 completadas; fases 4–7 pendientes. **Mi dinero:** [resultados de la fase 3](../artifacts/typescript-migration/phase-3/README.md), sobre `0c11537`, 27 de octubre de 2026. **Piloto implementado:** [resultados de la fase 2](../artifacts/typescript-migration/phase-2/README.md), sobre `2ff43a9`, 27 de octubre de 2026. **Base revisada del plan:** `4d7b6e6`, 27 de octubre de 2026. **Referencia ejecutada:** `83a3924`; [resultados y reproducción de la fase 0](../artifacts/typescript-migration/phase-0/README.md).
+**Estado:** fases 0–4 completadas; fases 5–7 pendientes. **Núcleo financiero:** [resultados de la fase 4](../artifacts/typescript-migration/phase-4/README.md), 27 de octubre de 2026. **Mi dinero:** [resultados de la fase 3](../artifacts/typescript-migration/phase-3/README.md), sobre `0c11537`, 27 de octubre de 2026. **Piloto implementado:** [resultados de la fase 2](../artifacts/typescript-migration/phase-2/README.md), sobre `2ff43a9`, 27 de octubre de 2026. **Base revisada del plan:** `4d7b6e6`, 27 de octubre de 2026. **Referencia ejecutada:** `83a3924`; [resultados y reproducción de la fase 0](../artifacts/typescript-migration/phase-0/README.md).
 
 ## Objetivo y alcance
 
@@ -56,7 +56,7 @@ Zod permite derivar tipos de [entrada y salida](https://zod.dev/basics); Prisma 
 
 Las validaciones nuevas deberán aceptar las formas que ya admite el contrato público, incluidos campos omitidos, nulos y formatos monetarios compatibles. Corregir o restringir esos contratos será otro cambio. Los tipos de identificadores o unidades podrán distinguirse internamente cuando eviten una confusión concreta, sin modificar su representación en JSON o BD.
 
-**Protección de idempotencia:** conservar el cuerpo original utilizado para calcular las huellas, el orden de validación relevante y las respuestas guardadas. Coercionar números, eliminar propiedades o normalizar fechas antes de calcular el hash podría cambiar la identidad de un reintento. El código actual de [Mi dinero](../src/lib/money/service.ts) y [Gastos](../src/lib/expenseOperations.js) es la referencia de compatibilidad.
+**Protección de idempotencia:** conservar el cuerpo original utilizado para calcular las huellas, el orden de validación relevante y las respuestas guardadas. Coercionar números, eliminar propiedades o normalizar fechas antes de calcular el hash podría cambiar la identidad de un reintento. El código actual de [Mi dinero](../src/lib/money/service.ts) y [Gastos](../src/lib/expenseOperations.ts) es la referencia de compatibilidad.
 
 ## Secuencia de implementación
 
@@ -66,7 +66,7 @@ Las validaciones nuevas deberán aceptar las formas que ya admite el contrato p�
 | 1 | Herramientas y pruebas compatibles con JS/TS | 0 | Completada |
 | 2 | Transferencias tipadas de formulario a persistencia | 1 | Completada |
 | 3 | Mi dinero completo | 2 | Completada |
-| 4 | Núcleo financiero, API y contratos compartidos | 3 | Pendiente |
+| 4 | Núcleo financiero, API y contratos compartidos | 3 | Completada |
 | 5 | Captura, Calendar y cola offline | 4 | Pendiente |
 | 6 | Resto de la interfaz, hooks y páginas | 5 | Pendiente |
 | 7 | Retirada de puentes temporales y cierre | 6 | Pendiente |
@@ -159,13 +159,15 @@ Las pruebas de integración deben ejecutarse con PostgreSQL local y recorrer for
 
 Orden de lotes: cálculos de tarjetas/MSI → suscripciones → cuentas e ingresos → gastos y bootstrap → Dashboard y análisis. Incluir los servicios comunes de autorización, operaciones y recuperación cuando sus consumidores estén preparados.
 
-- [ ] Migrar [src/lib/calculations/](../src/lib/calculations/), contratos y handlers correspondientes, aprovechando tipos Prisma para consultas con relaciones.
-- [ ] Definir variantes de gasto por método `CASH`/`CARD`/`DEBIT` y tipos de deuda/cobro, sin sustituir validaciones de propietario ni reglas de negocio.
-- [ ] Tipar resultados de pagos parciales, importes exigibles, referencias bancarias y estados derivados. Conservar cero confirmado frente a ausencia de estado de cuenta.
-- [ ] Completar los contratos de `apiFetch`, errores recuperables y respuestas; las funciones que leen JSON deben validar o acotar el dato, no propagar `any`.
-- [ ] Actualizar consumidores por flujo; conservar adaptadores explícitos donde todavía permanezca JSX.
+- [x] Migrar [src/lib/calculations/](../src/lib/calculations/), contratos y handlers correspondientes, aprovechando tipos Prisma para consultas con relaciones.
+- [x] Definir variantes de gasto por método `CASH`/`CARD`/`DEBIT` y tipos de deuda/cobro, sin sustituir validaciones de propietario ni reglas de negocio.
+- [x] Tipar resultados de pagos parciales, importes exigibles, referencias bancarias y estados derivados. Conservar cero confirmado frente a ausencia de estado de cuenta.
+- [x] Completar los contratos de `apiFetch`, errores recuperables y respuestas; las funciones que leen JSON deben validar o acotar el dato, no propagar `any`.
+- [x] Actualizar consumidores por flujo; conservar adaptadores explícitos donde todavía permanezca JSX.
 
 **Aceptación:** pruebas de autorización, transacciones relacionadas, idempotencia, suscripciones, deudas y cálculos correctas. Conservar acumulados frente a abonos individuales, aportación personal frente a cargo bancario y previsión frente a movimiento confirmado.
+
+**Entrega:** [implementación, contratos y evidencias de la fase 4](../artifacts/typescript-migration/phase-4/README.md). Migrados los ocho módulos con contenido de `calculations/`, sus servicios y los 14 handlers financieros/catálogos restantes; autorización, Prisma, Supabase, operaciones y recuperación HTTP tipados. Los consumidores JSX validan las respuestas mediante una frontera local; sus interiores corresponden a fase 6. Mi dinero importa directamente los cálculos tipados y se retiró `legacyCalculations.ts`. Los tres archivos vacíos de cálculos siguen inventariados, sin contarlos como migrados. Sin cambios de esquema, SQL ni protocolo.
 
 ### Fase 5 — Captura Android, Calendar y offline
 

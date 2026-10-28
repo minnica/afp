@@ -60,7 +60,7 @@ function fixture() {
     '@/lib/prisma': { prisma: db },
     'next/server': { NextResponse: { json: (body, options = {}) => ({ body: JSON.parse(JSON.stringify(body)), status: options.status || 200 }) } },
     '@supabase/supabase-js': { createClient: () => ({ auth: { getUser: async () => ({ data: { user: { id: 'a' } } }) } }) },
-  }, { console: { error() {} } })('src/app/api/installment-purchases/route.js');
+  }, { console: { error() {} } })('src/app/api/installment-purchases/route.ts');
   return {
     call: (method, body) => route[method]({ headers: new Headers({ authorization: 'Bearer a' }), json: async () => body }),
     state: () => structuredClone(state), fail: step => { failAt = step; }, references,

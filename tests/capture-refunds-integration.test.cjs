@@ -19,7 +19,7 @@ test('devoluciones PostgreSQL: confirmación, neto exacto, historial e idempoten
   });
   const protocol = load('src/lib/captureProtocol.js'), service = load('src/lib/captureService.js'), processing = load('src/lib/captureProcessing.js');
   const refunds = load('src/lib/captureRefunds.js'), movementRoute = load('src/app/api/captures/movements/route.js');
-  const expenseRoute = load('src/app/api/expenses/route.js');
+  const expenseRoute = load('src/app/api/expenses/route.ts');
   const card = await db.card.create({ data: { userId: user.id, name: 'MP ficticia', usualCutDay: 25, usualDueDay: 15 } });
   const category = await db.category.create({ data: { userId: user.id, name: 'Transporte ficticio' } });
   const policy = await db.captureAutomation.create({ data: { userId: user.id, cardId: card.id, parserKey: 'mercadopago.card-purchase.es.v1',

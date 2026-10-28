@@ -28,7 +28,7 @@ test('transferencias: cliente conserva el cuerpo, UUID, cuenta esperada y respue
 });
 
 test('transferencias: respuesta inválida pasa por recuperación y conserva el resultado incierto', async () => {
-  const c = client(), body = command(), recovery = c.load('src/lib/requestRecovery.js');
+  const c = client(), body = command(), recovery = c.load('src/lib/requestRecovery.ts');
   c.respond(async () => Response.json({ ok: true }));
   const unsubscribe = recovery.subscribeRecovery(() => {});
   const pending = c.sendTransfer(body, { expectedUserId: 'owner' });

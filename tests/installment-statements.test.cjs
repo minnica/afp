@@ -22,7 +22,7 @@ const cycle = (year, month) => ({
 function routeContext(file) { return loadRoute(file.split("/").at(-2)); }
 
 test("el corte bancario prevalece en tarjetas y dashboard, sin cambiar fecha de compra", () => {
-  for (const file of ["src/app/api/card-cycles/route.js", "src/app/api/dashboard/route.js"]) {
+  for (const file of ["src/app/api/card-cycles/route.ts", "src/app/api/dashboard/route.ts"]) {
     const context = routeContext(file);
     assert.equal(context.getPurchaseCycleNumber(original, cycle(2026, 8), { bbva: 2026 * 12 }), 10);
     assert.equal(context.getPurchaseCycleNumber(verified, cycle(2026, 8), 2026 * 12), 9);
@@ -37,7 +37,7 @@ test("el corte bancario prevalece en tarjetas y dashboard, sin cambiar fecha de 
 });
 
 test("la manta conserva 9/12 aunque falte el primer ciclo en la base", () => {
-  const context = routeContext("src/app/api/card-cycles/route.js");
+  const context = routeContext("src/app/api/card-cycles/route.ts");
   const manta = {
     ...original, id: "manta", purchaseDate: "2025-11-24T12:00:00Z", totalAmount: 483.53,
   };
@@ -50,7 +50,7 @@ test("la manta conserva 9/12 aunque falte el primer ciclo en la base", () => {
 });
 
 test("la lista de compras muestra saldo y progreso del último documento verificado", () => {
-  const context = routeContext("src/app/api/installment-purchases/route.js");
+  const context = routeContext("src/app/api/installment-purchases/route.ts");
   const result = context.formatPurchase(verified);
   assert.equal(result.currentMonth, 9);
   assert.equal(result.remainingMonths, 3);
@@ -61,7 +61,7 @@ test("la lista de compras muestra saldo y progreso del último documento verific
 });
 
 test("los resúmenes mensuales usan la cuota verificada y terminan en el ciclo 12", () => {
-  const context = routeContext("src/app/api/dashboard/route.js");
+  const context = routeContext("src/app/api/dashboard/route.ts");
   assert.equal(context.shouldIncludePurchaseInMonth(verified, 2026, 8), true);
   assert.equal(context.shouldIncludePurchaseInMonth(verified, 2026, 11), true);
   assert.equal(context.shouldIncludePurchaseInMonth(verified, 2026, 12), false);
@@ -74,7 +74,7 @@ test("los resúmenes mensuales usan la cuota verificada y terminan en el ciclo 1
 });
 
 test("referencias inválidas se ignoran; varios cortes siguen la referencia más reciente", () => {
-  const context = routeContext("src/app/api/card-cycles/route.js");
+  const context = routeContext("src/app/api/card-cycles/route.ts");
   const purchase = { ...verified, statementReconciliations: [
     { year: 2026, month: 13, paymentNumber: 9, amount: "71", remainingBalance: "212" },
     { year: 2026, month: 8, paymentNumber: 13, amount: "71", remainingBalance: "212" },

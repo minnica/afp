@@ -1,7 +1,7 @@
 const assert = require("node:assert/strict");
 const { test } = require("node:test");
 const { sourceLoader } = require("./helpers/load-source.cjs");
-const { buildCurrentCardUsageWaivers, buildCardUsageWaivers, buildCardUsageWaiverHistory } = sourceLoader()("src/lib/calculations/cardUsageWaivers.js");
+const { buildCurrentCardUsageWaivers, buildCardUsageWaivers, buildCardUsageWaiverHistory } = sourceLoader()("src/lib/calculations/cardUsageWaivers.ts");
 const card = { id: "nu", name: "Mi Nu", usagePolicy: { productKey: "NU" } };
 const expense = (patch = {}) => ({ id: "expense", cardId: card.id, paymentMethod: "CARD", concept: "Compra", amount: 0.01, date: "2026-10-21T12:00:00Z", ...patch });
 const cycle = {
@@ -114,7 +114,7 @@ test("Dashboard entrega Nu con fecha local del cliente y conserva el aislamiento
     "@supabase/supabase-js": { createClient: () => ({ auth: { getUser: async () => ({ data: { user: { id: "owner" } } }) } }) },
   });
   for (const [clientDate, status] of [["2026-11-20", "DUE_TODAY"], ["2026-11-21", "NOT_MET"]]) {
-    const response = await load("src/app/api/dashboard/route.js").GET({ url: `http://localhost/api/dashboard?clientDate=${clientDate}`, headers: new Headers({ authorization: "Bearer test" }) });
+    const response = await load("src/app/api/dashboard/route.ts").GET({ url: `http://localhost/api/dashboard?clientDate=${clientDate}`, headers: new Headers({ authorization: "Bearer test" }) });
     assert.equal(response.status, 200);
     assert.equal(response.body.cardUsageWaiversCurrent[0].status, status);
     assert.equal(response.body.cardUsageWaiverHistory.length, 0);

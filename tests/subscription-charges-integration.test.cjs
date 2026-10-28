@@ -22,7 +22,7 @@ test("cobros: API persiste monto y tarjeta de una ocurrencia, valida propietario
       "next/server": { NextResponse: { json: (body, options = {}) => ({ body, status: options.status || 200 }) } },
       "@supabase/supabase-js": { createClient: () => ({ auth: { getUser: async () => ({ data: { user } }) } }) },
     });
-    const api = load("src/app/api/subscription-charges/route.js");
+    const api = load("src/app/api/subscription-charges/route.ts");
     const today = new Date().toISOString().slice(0, 10);
     const month = today.slice(0, 7);
     const body = { subscriptionId: subscription.id, month, today, action: "confirm", amount: "135.50", paymentMethod: "CARD", cardId: card.id };
@@ -43,13 +43,13 @@ test("cobros: API persiste monto y tarjeta de una ocurrencia, valida propietario
     assert.equal(String(recurring.amount), "120");
     assert.equal(recurring.paymentMethod, "CASH");
     assert.equal(recurring.cardId, null);
-    const charges = await load("src/lib/subscriptionChargeService.js").loadSubscriptionCharges(db, user.id, month, today);
+    const charges = await load("src/lib/subscriptionChargeService.ts").loadSubscriptionCharges(db, user.id, month, today);
     assert.equal(charges[0].confirmedAmount, 135.5);
     assert.equal(charges[0].confirmedCardName, card.name);
     const next = new Date(`${month}-01T12:00:00Z`);
     next.setUTCMonth(next.getUTCMonth() + 1);
     const nextDay = next.toISOString().slice(0, 10);
-    const upcoming = await load("src/lib/subscriptionChargeService.js").loadSubscriptionCharges(db, user.id, nextDay.slice(0, 7), nextDay);
+    const upcoming = await load("src/lib/subscriptionChargeService.ts").loadSubscriptionCharges(db, user.id, nextDay.slice(0, 7), nextDay);
     assert.equal(upcoming[0].status, "PENDING");
     assert.equal(upcoming[0].amount, 120);
     assert.equal(upcoming[0].paymentMethod, "CASH");
@@ -63,7 +63,7 @@ test("cobros: transacción, concurrencia, omisión, restauración, evidencia y a
   const url = new URL(connectionString);
   assert.ok(["localhost", "127.0.0.1"].includes(url.hostname) && url.pathname.startsWith("/afp_test"), "Solo permite una base local de prueba.");
   const db = new PrismaClient({ adapter: new PrismaPg({ connectionString }) });
-  const ctx = require("./helpers/load-source.cjs").sourceLoader()("src/lib/subscriptionChargeService.js");
+  const ctx = require("./helpers/load-source.cjs").sourceLoader()("src/lib/subscriptionChargeService.ts");
   const user = await db.user.create({ data: { email: `subscription-${Date.now()}@example.test` } });
   const category = await db.category.create({ data: { userId: user.id, name: "Servicios" } });
   const card = await db.card.create({ data: { userId: user.id, name: "Prueba", usualCutDay: 20, usualDueDay: 30 } });
@@ -119,7 +119,7 @@ test("cobros: transacción, concurrencia, omisión, restauración, evidencia y a
       "@/lib/prisma": { prisma: db },
       "next/server": { NextResponse: { json: (body, options = {}) => ({ body, status: options.status || 200 }) } },
       "@supabase/supabase-js": { createClient: () => ({ auth: { getUser: async () => ({ data: { user } }) } }) },
-    })("src/app/api/expenses/route.js");
+    })("src/app/api/expenses/route.ts");
     const request = body => ({ headers: new Headers({ authorization: "Bearer test" }), json: async () => body });
     const payload = { userId: user.id, subscriptionId: manual.id, date: "2026-01-15", amount: 99,
       paymentMethod: "CASH", categoryId: category.id, concept: "Manual" };

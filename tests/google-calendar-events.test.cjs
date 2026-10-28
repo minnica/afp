@@ -10,7 +10,7 @@ test('calendar eventos: las mutaciones autenticadas disparan trabajo para el pro
     'next/server': { NextResponse: { json: body => body } },
     '@supabase/supabase-js': { createClient: () => ({ auth: { getUser: async token => ({ data: { user: token === 'valid' ? { id: 'server-owner' } : null } }) } }) },
   });
-  const { requireApiUser } = load('src/lib/apiAuth.js');
+  const { requireApiUser } = load('src/lib/apiAuth.ts');
   const request = (path, method, token = 'valid') => ({ method, url: `https://afp.example.test/api/${path}?userId=other`, headers: new Headers({ authorization: `Bearer ${token}` }) });
   for (const [path, method] of [['card-cycles', 'PATCH'], ['incomes', 'POST'], ['expenses', 'POST'], ['payables', 'PATCH'], ['receivables', 'DELETE'], ['subscriptions', 'PATCH']]) {
     await requireApiUser(request(path, method));

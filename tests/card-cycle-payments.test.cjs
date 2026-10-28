@@ -1,8 +1,8 @@
 const assert = require("node:assert/strict");
 const { test } = require("node:test");
 const { sourceLoader } = require("./helpers/load-source.cjs");
-const { getCyclePaymentState, parseCycleMoney } = sourceLoader()("src/lib/calculations/cardCyclePayments.js");
-const { getDashboardPayment } = sourceLoader()("src/lib/cardPaymentPresentation.js");
+const { getCyclePaymentState, parseCycleMoney } = sourceLoader()("src/lib/calculations/cardCyclePayments.ts");
+const { getDashboardPayment } = sourceLoader()("src/lib/cardPaymentPresentation.ts");
 const now = new Date("2026-10-25T18:00:00Z");
 const base = {
   id: "cycle", userId: "owner", cardId: "card", month: 10, year: 2026,
@@ -58,8 +58,8 @@ function fixture(initial = {}) {
   }, { Date: class extends Date { constructor(...args) { super(...(args.length ? args : [now])); } }, console: { error() {} } });
   const request = body => ({ url: "http://localhost/api/test", headers: new Headers({ authorization: "Bearer test" }), json: async () => body });
   return {
-    patch: (body) => load("src/app/api/card-cycles/route.js").PATCH(request({ id: "cycle", ...body })),
-    get: (route, params = {}) => load(`src/app/api/${route}/route.js`).GET({
+    patch: (body) => load("src/app/api/card-cycles/route.ts").PATCH(request({ id: "cycle", ...body })),
+    get: (route, params = {}) => load(`src/app/api/${route}/route`).GET({
       ...request(), url: `http://localhost/api/${route}?${new URLSearchParams(params)}`,
     }),
     state: () => plain(cycle), writes: () => writes, reads, locks, fail: () => { fail = true; },

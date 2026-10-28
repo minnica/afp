@@ -2,7 +2,7 @@ const assert = require("node:assert/strict");
 const { test } = require("node:test");
 const { sourceLoader } = require("./helpers/load-source.cjs");
 const { debtFixture } = require("./helpers/debt-fixture.cjs");
-const { getCashContributionError, getPersonalExpenseAmount, sumPersonalExpenses } = sourceLoader()("src/lib/sharedExpenses.js");
+const { getCashContributionError, getPersonalExpenseAmount, sumPersonalExpenses } = sourceLoader()("src/lib/sharedExpenses.ts");
 
 test("aportaciones: gasto personal, cobertura total, centavos y registros anteriores", () => {
   assert.equal(getPersonalExpenseAmount({ amount: "600", cashContributionAmount: "500" }), 100);

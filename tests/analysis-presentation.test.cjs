@@ -1,7 +1,7 @@
 const assert = require("node:assert/strict");
 const { test } = require("node:test");
 const { sourceLoader } = require("./helpers/load-source.cjs");
-const helpers = sourceLoader()("src/lib/analysisPresentation.js");
+const helpers = sourceLoader()("src/lib/analysisPresentation.ts");
 const plain = (value) => JSON.parse(JSON.stringify(value));
 
 test("Análisis conserva cero e importes a centavos al mostrarlos", () => {

@@ -70,7 +70,7 @@ test('Mi dinero: API, PostgreSQL, aislamiento, cuentas, abonos, conciliación y 
       assert.equal((await read()).forecast.summary.balance, 11752); assert.equal(Number((await db.cardCycle.findUnique({ where: { id: cycle.id } })).paidAmount), 250.25);
       assert.equal(await db.dailyExpense.count({ where: { userId: user.id } }), count);
       await assert.rejects(db.cardCycle.update({ where: { id: cycle.id }, data: { paidAmount: 0 } }), error => {
-        assert.equal(load('src/lib/apiAuth.js').apiAccessErrorResponse(error)?.status, 409); return true;
+        assert.equal(load('src/lib/apiAuth.ts').apiAccessErrorResponse(error)?.status, 409); return true;
       });
       assert.equal((await write({ ...body, operationId: randomUUID(), amount: 900 })).status, 409);
       ok(await write({ action: 'REVERSE_PAYMENT', id: payment.id })); assert.equal((await read()).forecast.summary.balance, 12002.25);

@@ -23,6 +23,6 @@ function routeContext(route, globals = {}) {
     'buildWeeklyComparison', 'buildCategoryBreakdown', 'buildCardMonthlyComparison',
     'shouldIncludePurchaseInMonth', 'isSubscriptionChargeableInMonth', 'getMonthlySubscriptions',
   ] : route === 'installment-purchases' ? ['formatPurchase'] : [];
-  return { ...helpers, ...load(`src/app/api/${route}/route.js`, exposed) };
+  return { ...helpers, ...load(`src/app/api/${route}/route`, exposed) };
 }
 module.exports = { routeContext };

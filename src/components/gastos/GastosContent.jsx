@@ -3,7 +3,7 @@ import AutomaticRecordingLink from "@/components/configuracion/AutomaticRecordin
 import CaptureStatus from "@/components/gastos/CaptureStatus";
 import OfflineCaptureConflicts from "@/components/gastos/OfflineCaptureConflicts";
 
-import { apiFetch } from "@/lib/apiFetch";
+import { financialFetch as apiFetch } from "@/lib/financialClient";
 import { RequestError } from "@/lib/requestErrors";
 import { getRecoveryScope, recoverRequest } from "@/lib/requestRecovery";
 

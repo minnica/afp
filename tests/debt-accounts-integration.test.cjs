@@ -41,7 +41,7 @@ for (const [kind, route, accounts, key, model] of [
         'next/server': { NextResponse: { json: (body, options = {}) => ({ body: JSON.parse(JSON.stringify(body)), status: options.status || 200 }) } },
         '@supabase/supabase-js': { createClient: () => ({ auth: { getUser: async () => ({ data: { user } }) } }) },
       }, { console: { error() {} } });
-      const call = (name, method, body = {}) => load(`src/app/api/${name}/route.js`)[method]({
+      const call = (name, method, body = {}) => load(`src/app/api/${name}/route`)[method]({
         headers: new Headers({ authorization: 'Bearer test' }), url: `http://localhost/api/${name}?id=${body.id || ''}`, json: async () => body,
       });
       const ok = async (name, method, body) => {

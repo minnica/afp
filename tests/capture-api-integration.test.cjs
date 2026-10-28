@@ -18,7 +18,7 @@ test("Captura PostgreSQL: vinculación, recepción y autorización completa", { 
     "next/server": { NextResponse: { json: (body, options = {}) => ({ body: JSON.parse(JSON.stringify(body)), status: options.status || 200, headers: new Headers(options.headers) }) } },
     "@supabase/supabase-js": { createClient: () => ({ auth: { getUser: async token => ({ data: { user: sessions.get(token) }, error: sessions.has(token) ? null : new Error("expired") }) } }) },
   });
-  const routes = Object.fromEntries(["pairings", "devices", "device", "events"].map(name => [name, load(`src/app/api/captures/${name}/route.js`)]));
+  const routes = Object.fromEntries(["pairings", "devices", "device", "events"].map(name => [name, load(`src/app/api/captures/${name}/route`)]));
   const call = (route, method, auth, body) => routes[route][method](new Request(`http://localhost/api/captures/${route}?userId=${users[1].id}`, {
     method, headers: { ...(auth ? { authorization: auth } : {}), "Content-Type": "application/json", "x-forwarded-for": "capture-integration" },
     ...(body !== undefined && !["GET", "HEAD"].includes(method) ? { body: JSON.stringify(body) } : {}),
@@ -110,7 +110,7 @@ test("Captura PostgreSQL: vinculación, recepción y autorización completa", { 
     });
     await t.test("otra cuenta no pausa ni revoca y la credencial no accede a datos financieros", async () => {
       for (const action of ["pause", "resume", "revoke"]) assert.equal((await call("devices", "PATCH", "Bearer b", { deviceId: phone.deviceId, action })).status, 404);
-      const expenses = load("src/app/api/expenses/route.js");
+      const expenses = load("src/app/api/expenses/route.ts");
       const response = await expenses.GET(new Request("http://localhost/api/expenses", { headers: { authorization: phone.credential } }));
       assert.equal(response.status, 401);
       assert.equal((await call("events", "POST", `Capture ${phone.deviceId}.${randomBytes(32).toString("base64url")}`, event())).status, 401);

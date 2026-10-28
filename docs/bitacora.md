@@ -6,6 +6,12 @@ Consolidado el **27 de octubre de 2026** a partir del README del commit `4562aa0
 
 ## 2026-10-27
 
+### Núcleo financiero y API compartida en TypeScript
+
+**Fase 4 completada localmente.** Se tiparon cálculos de tarjetas/MSI, suscripciones, deudas, gastos, ingresos, bootstrap, Dashboard y análisis, junto con autorización, operaciones transaccionales, Prisma, Supabase y recuperación HTTP. Las consultas conservan inferencia de relaciones Prisma; los JSON externos se validan o acotan. Gastos distingue efectivo, tarjeta y débito, y se conservan saldos parciales y el cero bancario confirmado.
+
+Los consumidores JSX pasan por una frontera de validación de respuestas dentro de la recuperación compartida. Mi dinero usa directamente el núcleo tipado y se retiró su adaptador temporal de cálculos. La instalación limpia, las pruebas con PostgreSQL, la reconstrucción de BD y las comprobaciones de navegador se documentan en la [fase 4](../artifacts/typescript-migration/phase-4/README.md). Captura, Calendar, offline y el interior de las pantallas restantes siguen en sus fases previstas. Sin cambios de esquema, migraciones, lockfile ni despliegue.
+
 ### Mi dinero completo en TypeScript
 
 **Fase 3 completada localmente.** Se migraron cuentas/conciliaciones, rutas/planes, presupuestos, rendimientos, fuentes y proyección, junto con `/api/money`, los formularios y la presentación mensual. La instantánea de Prisma tiene propiedades explícitas y conserva sus 15 consultas secuenciales; las transferencias reutilizan sus cuentas y movimientos sin lecturas duplicadas. Se validan JSON históricos y respuestas sin cambiar formatos persistidos, fórmulas ni huellas de operación.

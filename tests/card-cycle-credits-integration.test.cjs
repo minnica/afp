@@ -32,7 +32,7 @@ test('PostgreSQL: devoluciones y pagos concurrentes, aislamiento, rollback y avi
     '@supabase/supabase-js': { createClient: () => ({ auth: { getUser: async () => ({ data: { user: { id: actor } } }) } }) },
     'next/server': { NextResponse: { json: (body, options = {}) => ({ body: JSON.parse(JSON.stringify(body)), status: options.status || 200 }) } },
   }, { Date: class extends Date { constructor(...args) { super(...(args.length ? args : ['2026-10-17T18:00:00Z'])); } }, console: { error() {} } });
-  const route = load('src/app/api/card-cycles/route.js');
+  const route = load('src/app/api/card-cycles/route.ts');
   const request = body => ({ url: 'http://localhost/api/test', headers: new Headers({ authorization: 'Bearer test' }), json: async () => body });
   try {
     const card = await db.card.create({ data: { userId: user.id, name: 'BBVA prueba', usualCutDay: 21, usualDueDay: 12 } });
@@ -51,7 +51,7 @@ test('PostgreSQL: devoluciones y pagos concurrentes, aislamiento, rollback y avi
     assert.equal(saved.status, 'PAID');
     assert.equal(await db.income.count({ where: { userId: user.id } }), 0);
     assert.equal(await db.dailyExpense.count({ where: { userId: user.id } }), 0);
-    const dashboard = await load('src/app/api/dashboard/route.js').GET(request());
+    const dashboard = await load('src/app/api/dashboard/route.ts').GET(request());
     assert.equal(dashboard.status, 200);
     assert.equal(dashboard.body.cycles[0].pendingAmount, 0);
     assert.equal(dashboard.body.importantNotices.some(n => n.type === 'CARD_PAYMENT'), false);
@@ -63,7 +63,7 @@ test('PostgreSQL: devoluciones y pagos concurrentes, aislamiento, rollback y avi
     assert.deepEqual(await db.cardCycle.findUnique({ where: { id: cycle.id } }), saved);
     fail = false;
     assert.equal((await route.PATCH(request({ ...refund, postCutCreditAmount: '1499.49' }))).body.cycle.pendingAmount, 0.01);
-    const reopened = await load('src/app/api/dashboard/route.js').GET(request());
+    const reopened = await load('src/app/api/dashboard/route.ts').GET(request());
     assert.equal(reopened.body.importantNotices.find(n => n.type === 'CARD_PAYMENT').amount, 0.01);
   } finally {
     await db.user.deleteMany({ where: { id: { in: [user.id, another.id] } } });

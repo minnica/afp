@@ -42,7 +42,7 @@ function fixture() {
     "next/server": { NextResponse: { json: (body, options = {}) => ({ body: JSON.parse(JSON.stringify(body)), status: options.status || 200 }) } },
     "@supabase/supabase-js": { createClient: () => ({ auth: { getUser: async token => ({ data: { user: { id: token } } }) } }) },
   }, { console: { error() {} } });
-  const { POST } = load("src/app/api/expenses/route.js");
+  const { POST } = load("src/app/api/expenses/route.ts");
   const post = (body, user = "a") => POST({ headers: new Headers({ authorization: `Bearer ${user}` }), json: async () => body });
   return { post, state: () => state, fail: value => { failAt = value; } };
 }

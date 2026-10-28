@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { apiFetch } from "@/lib/apiFetch";
+import { financialFetch as apiFetch } from "@/lib/financialClient";
 import { supabase } from "@/lib/supabase";
 import { ensureUserSetup } from "@/lib/userSetup";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";

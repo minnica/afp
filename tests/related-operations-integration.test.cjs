@@ -39,7 +39,7 @@ test('PostgreSQL A06: rollback de cada paso relacionado, reintentos y traslado d
     'next/server': { NextResponse: { json: (body, options = {}) => ({ body: plain(body), status: options.status || 200 }) } },
     '@supabase/supabase-js': { createClient: () => ({ auth: { getUser: async () => ({ data: { user } }) } }) },
   }, { console: { error() {} } });
-  const call = (route, method, body) => load(`src/app/api/${route}/route.js`)[method]({
+  const call = (route, method, body) => load(`src/app/api/${route}/route`)[method]({
     headers: new Headers({ authorization: 'Bearer test' }), url: `http://localhost/api/${route}?id=${body.id || ''}`, json: async () => body,
   });
   const tables = ['installmentPurchase', 'receivableAccount', 'payableAccount', 'dailyExpense', 'income', 'expenseOperation', 'subscriptionCharge'];

@@ -1,7 +1,7 @@
 "use client";
 import AutomaticRecordingLink from "@/components/configuracion/AutomaticRecordingLink";
 
-import { apiFetch } from "@/lib/apiFetch";
+import { financialFetch as apiFetch } from "@/lib/financialClient";
 import { useDashboard } from "@/components/dashboard/DashboardProvider";
 
 import CreateRecordSurface from "@/components/ui/create-record-surface";

@@ -19,8 +19,8 @@ test("PostgreSQL: unicidad concurrente, rollback y recibo durable de capturas", 
       "next/server": { NextResponse: { json: (body, options = {}) => ({ body, status: options.status || 200 }) } },
       "@supabase/supabase-js": { createClient: () => ({ auth: { getUser: async () => ({ data: { user } }) } }) },
     });
-    const { POST } = load("src/app/api/expenses/route.js");
-    const { runExpenseOperation } = load("src/lib/expenseOperations.js");
+    const { POST } = load("src/app/api/expenses/route.ts");
+    const { runExpenseOperation } = load("src/lib/expenseOperations.ts");
     const body = { operationId: randomUUID(), concept: "Concurrencia", amount: 25, date: "2026-10-17",
       paymentMethod: "CASH", categoryId: category.id, personId: person.id, createReceivable: true };
     const post = input => POST({ headers: new Headers({ authorization: "Bearer test" }), json: async () => input });

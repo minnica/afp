@@ -18,7 +18,7 @@ test('Nu/CFE: regla expresa, suscripción bimestral y avisos resueltos con un so
   const db = new PrismaClient({ adapter: new PrismaPg({ connectionString }) });
   const load = sourceLoader({}, { Date: FixtureClock }), protocol = load('src/lib/captureProtocol.js'), service = load('src/lib/captureService.js');
   const processing = load('src/lib/captureProcessing.js'), configuration = load('src/lib/captureConfiguration.js');
-  const reconciliation = load('src/lib/captureReconciliation.js'), charges = load('src/lib/subscriptionChargeService.js');
+  const reconciliation = load('src/lib/captureReconciliation.js'), charges = load('src/lib/subscriptionChargeService.ts');
   const parserKey = 'nu.cfe-service-payment.es.v2';
   const user = await db.user.create({ data: { email: `nu-cfe-${randomUUID()}@example.test` } });
   const other = await db.user.create({ data: { email: `nu-other-${randomUUID()}@example.test` } });
@@ -42,9 +42,9 @@ test('Nu/CFE: regla expresa, suscripción bimestral y avisos resueltos con un so
   const send = async input => { await service.receiveCaptureEvent(db, credential, input); return (await read(input)).movement; };
   const readiness = async (cardId = card.id) => (await configuration.captureConfiguration(db, user.id)).rollout.find(row => row.cardId === cardId)
     .sources.find(row => row.sourcePackage === fixture.event.sourcePackage)?.formats.find(row => row.parserKey === parserKey);
-  const dashboard = sourceLoader({ '@/lib/prisma': { prisma: db }, '@/lib/apiAuth': { ...load('src/lib/apiAuth.js'),
+  const dashboard = sourceLoader({ '@/lib/prisma': { prisma: db }, '@/lib/apiAuth': { ...load('src/lib/apiAuth.ts'),
     apiResponse: { json: body => body }, requireApiUser: async () => user,
-  } }, { Date: FixtureClock })('src/app/api/dashboard/route.js');
+  } }, { Date: FixtureClock })('src/app/api/dashboard/route.ts');
   const notices = async () => (await dashboard.GET({ url: `http://localhost/api/dashboard?clientDate=${fixtureToday}` })).importantNotices;
   let oldInput, oldReceipt, pilot;
   try {

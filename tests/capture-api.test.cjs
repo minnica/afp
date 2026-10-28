@@ -12,7 +12,7 @@ test("Captura: todos los métodos protegidos separan sesión web y credencial na
   });
   const native = `Capture ${randomUUID()}.${randomBytes(32).toString("base64url")}`;
   for (const name of ["pairings", "devices", "device", "events", "payment-receipts", "notices"]) {
-    const handlers = load(`src/app/api/captures/${name}/route.js`);
+    const handlers = load(`src/app/api/captures/${name}/route`);
     for (const [method, handler] of Object.entries(handlers)) {
       if (name === "pairings" && method === "POST") continue;
       for (const authorization of [undefined, "Bearer invalid", name === "devices" || name === "pairings" ? native : "Capture malformed"]) {

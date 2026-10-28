@@ -50,7 +50,7 @@ test("avisos Android: mismo pago y saldo del Dashboard, sin exponer registros fi
   const { load, request, rows, card } = fixture();
   rows.card.push({ ...card, id: "other", userId: "b", name: "Tarjeta ajena" });
   const native = await load("src/app/api/captures/notices/route.js").GET(request());
-  const dashboard = await load("src/app/api/dashboard/route.js").GET({
+  const dashboard = await load("src/app/api/dashboard/route.ts").GET({
     url: "http://localhost/api/dashboard?clientDate=2026-10-26", headers: new Headers({ authorization: "Bearer test" }),
   });
   assert.equal(native.status, 200);
@@ -70,7 +70,7 @@ test("avisos Android: oculta por mes, retira liquidaciones y vuelve a avisar si 
   const { load, db, rows, cycle } = fixture();
   const { loadAndroidNotices } = load("src/lib/androidNotices.js");
   const initial = await loadAndroidNotices(db, "a", today);
-  const noticeKey = load("src/lib/noticeDismissals.js").getNoticeKey({ type: "CARD_PAYMENT", id: "card-october", date: cycle.dueDate, amount: 900 });
+  const noticeKey = load("src/lib/noticeDismissals.ts").getNoticeKey({ type: "CARD_PAYMENT", id: "card-october", date: cycle.dueDate, amount: 900 });
   rows.noticeDismissal.push({ userId: "a", month: "2026-10", noticeKey });
   assert.equal((await loadAndroidNotices(db, "a", today)).length, 0);
   cycle.paidAmount = 300;
@@ -139,7 +139,7 @@ test("cuentas por pagar: Dashboard y Android comparten saldo, fecha, aislamiento
     accountType: "SIMPLE", expectedDate: "2026-10-28T12:00:00Z", status: "ACTIVE",
     person: { name: "Proveedor" }, dailyExpenses: [{ amount: "100.10" }, { amount: "200.20" }] };
   rows.payableAccount.push(payable, { ...payable, id: "other", userId: "b", concept: "Cuenta ajena" });
-  const dashboard = () => load("src/app/api/dashboard/route.js").GET({
+  const dashboard = () => load("src/app/api/dashboard/route.ts").GET({
     url: "http://localhost/api/dashboard?clientDate=2026-10-26&userId=b", headers: new Headers({ authorization: "Bearer test" }),
   });
   const web = await dashboard();
@@ -159,7 +159,7 @@ test("cuentas por pagar: Dashboard y Android comparten saldo, fecha, aislamiento
   assert.equal(web.body.payables, undefined);
   assert.deepEqual(Object.keys(native.body.notices[0]).sort(), ["body", "key", "path", "title"]);
 
-  const { getNoticeKey } = load("src/lib/noticeDismissals.js");
+  const { getNoticeKey } = load("src/lib/noticeDismissals.ts");
   rows.noticeDismissal.push({ userId: "a", month: "2026-10", noticeKey: getNoticeKey(notice) });
   assert.equal((await load("src/lib/androidNotices.js").loadAndroidNotices(db, "a", today)).length, 0);
   assert.equal((await dashboard()).body.importantNotices.length, 1, "Dashboard conserva los avisos para particionar en el cliente");

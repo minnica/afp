@@ -13,7 +13,7 @@ test('pagos capturados: recepción, revisión y acumulados transaccionales con P
   const db = new PrismaClient({ adapter: new PrismaPg({ connectionString }) });
   const load = sourceLoader(), protocol = load('src/lib/captureProtocol.js');
   const service = load('src/lib/captureService.js'), processing = load('src/lib/captureProcessing.js');
-  const payments = load('src/lib/capturePayments.js'), balances = load('src/lib/cardBalanceTracking.js');
+  const payments = load('src/lib/capturePayments.js'), balances = load('src/lib/cardBalanceTracking.ts');
   const user = await db.user.create({ data: { email: `payment-${randomUUID()}@example.test` } });
   const other = await db.user.create({ data: { email: `payment-other-${randomUUID()}@example.test` } });
   const card = await db.card.create({ data: { userId: user.id, name: 'Nu ficticia', usualCutDay: 10, usualDueDay: 25,

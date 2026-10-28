@@ -12,9 +12,9 @@ function client(fetcher, { online = true } = {}) {
     navigator,
     fetch: (url, init) => { requests.push({ url, init }); return fetcher(url, init, requests.length); },
   });
-  const recovery = load("src/lib/requestRecovery.js");
+  const recovery = load("src/lib/requestRecovery.ts");
   recovery.subscribeRecovery(() => {});
-  return { apiFetch: load("src/lib/apiFetch.js").apiFetch, recovery, requests, navigator,
+  return { apiFetch: load("src/lib/apiFetch.ts").apiFetch, recovery, requests, navigator,
     setSession(value) { session = value; } };
 }
 const tick = () => new Promise(resolve => setImmediate(resolve));

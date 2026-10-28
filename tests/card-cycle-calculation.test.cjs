@@ -2,7 +2,7 @@ const assert = require("node:assert/strict");
 const { test } = require("node:test");
 
 const { sourceLoader } = require("./helpers/load-source.cjs");
-const ctx = sourceLoader()("src/lib/calculations/cardCycles.js");
+const ctx = sourceLoader()("src/lib/calculations/cardCycles.ts");
 const cycle = (month, year = 2024) => ({
   id: `cycle-${year}-${month}`, userId: "u", cardId: "card", year, month,
   startDate: new Date(Date.UTC(year, month - 2, 11, 12)),

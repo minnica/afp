@@ -2,8 +2,8 @@ const assert = require('node:assert/strict');
 const { test } = require('node:test');
 const { sourceLoader } = require('./helpers/load-source.cjs');
 const { debtFixture } = require('./helpers/debt-fixture.cjs');
-const { getDebtAccountState } = sourceLoader()('src/lib/calculations/debtAccounts.js');
-const { getPayablesSummary } = sourceLoader()('src/lib/payablesSummary.js');
+const { getDebtAccountState } = sourceLoader()('src/lib/calculations/debtAccounts.ts');
+const { getPayablesSummary } = sourceLoader()('src/lib/payablesSummary.ts');
 
 test('conciliación: conserva 38 pagos completos, principal original y saldo separado', () => {
   const account = { originalAmount: '179253.89', balanceAdjustment: '23270.51', status: 'ACTIVE' };

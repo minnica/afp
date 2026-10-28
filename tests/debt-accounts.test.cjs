@@ -2,7 +2,7 @@ const assert = require('node:assert/strict');
 const { test } = require('node:test');
 const { sourceLoader } = require('./helpers/load-source.cjs');
 const { debtFixture } = require('./helpers/debt-fixture.cjs');
-const { getDebtAccountState } = sourceLoader()('src/lib/calculations/debtAccounts.js');
+const { getDebtAccountState } = sourceLoader()('src/lib/calculations/debtAccounts.ts');
 
 const payment = (kind, account, amount) => ({ date: '2026-10-17', concept: 'Abono', amount,
   ...(kind === 'payable' ? { paymentMethod: 'CASH', categoryId: 'category-a', payableAccountId: account.id }
