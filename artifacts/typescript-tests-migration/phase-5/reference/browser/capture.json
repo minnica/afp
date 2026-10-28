@@ -1,0 +1,54 @@
+[
+  {
+    "body": {
+      "action": "correct",
+      "correction": {
+        "amount": "350.50",
+        "cardId": "5f97f0c7-8526-409b-8b1f-eb7d42ac0d57",
+        "categoryId": "d71204c6-d972-406d-84b1-bb976988ea0a",
+        "currency": "MXN",
+        "date": "2026-10-21",
+        "merchant": "Revisión ficticia fase 5 pruebas"
+      },
+      "expectedCorrection": "null",
+      "id": "bac6bd9c-19b2-4844-9d04-5b8eee8513c0"
+    },
+    "response": {
+      "movement": {
+        "amount": "350.5",
+        "analysisHistory": null,
+        "cardId": "5f97f0c7-8526-409b-8b1f-eb7d42ac0d57",
+        "correction": {
+          "amount": "350.50",
+          "cardId": "5f97f0c7-8526-409b-8b1f-eb7d42ac0d57",
+          "categoryId": "d71204c6-d972-406d-84b1-bb976988ea0a",
+          "currency": "MXN",
+          "date": "2026-10-21",
+          "merchant": "Revisión ficticia fase 5 pruebas"
+        },
+        "createdAt": "2026-10-28T18:31:03.430Z",
+        "expenseId": null,
+        "fallbackDueAt": null,
+        "id": "bac6bd9c-19b2-4844-9d04-5b8eee8513c0",
+        "installmentPurchaseId": null,
+        "operationDate": "2026-10-21T12:00:00.000Z",
+        "originalExpenseId": null,
+        "parserKey": null,
+        "proposal": {
+          "amount": "350.50",
+          "cardId": "5f97f0c7-8526-409b-8b1f-eb7d42ac0d57",
+          "categoryId": "d71204c6-d972-406d-84b1-bb976988ea0a",
+          "currency": "MXN",
+          "date": "2026-10-21",
+          "merchant": "TIENDA FICTICIA"
+        },
+        "reason": "POSSIBLE_DUPLICATE",
+        "referenceKey": null,
+        "resolvedAt": null,
+        "status": "REVIEW",
+        "userId": "00000000-0000-4000-8000-000000000091"
+      }
+    },
+    "status": 200
+  }
+]

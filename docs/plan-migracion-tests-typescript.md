@@ -1,6 +1,6 @@
 # Plan de migración de pruebas y helpers a TypeScript
 
-**Estado:** fases 0–4 completadas localmente; fases 5–6 pendientes. **Base revisada del plan:** `6aad1ab`, 28 de octubre de 2026. La [referencia nueva de fase 0](../artifacts/typescript-tests-migration/phase-0/README.md) parte de `6c1b626`; la [fase 1](../artifacts/typescript-tests-migration/phase-1/README.md) parte de `700afcc` y la [fase 2](../artifacts/typescript-tests-migration/phase-2/README.md) de `c0a0a37`; la [fase 3](../artifacts/typescript-tests-migration/phase-3/README.md) parte de `dd81d4f`; la [fase 4](../artifacts/typescript-tests-migration/phase-4/README.md) parte de `429d747`. La [migración de la web](plan-migracion-typescript.md) permanece completada. Este plan amplía el tipado a las herramientas de prueba sin cambiar el comportamiento de AFP.
+**Estado:** fases 0–5 completadas localmente; fase 6 pendiente. **Base revisada del plan:** `6aad1ab`, 28 de octubre de 2026. La [referencia nueva de fase 0](../artifacts/typescript-tests-migration/phase-0/README.md) parte de `6c1b626`; la [fase 1](../artifacts/typescript-tests-migration/phase-1/README.md) parte de `700afcc` y la [fase 2](../artifacts/typescript-tests-migration/phase-2/README.md) de `c0a0a37`; la [fase 3](../artifacts/typescript-tests-migration/phase-3/README.md) parte de `dd81d4f`; la [fase 4](../artifacts/typescript-tests-migration/phase-4/README.md) parte de `429d747`. La [fase 5](../artifacts/typescript-tests-migration/phase-5/README.md) parte de `f7c76b9`. La [migración de la web](plan-migracion-typescript.md) permanece completada. Este plan amplía el tipado a las herramientas de prueba sin cambiar el comportamiento de AFP.
 
 ## Objetivo y alcance
 
@@ -42,7 +42,7 @@ Los grupos del inventario se solapan. Los 854 resultados de la tabla corresponde
 - [legacy-route-context.ts](../tests/helpers/legacy-route-context.ts) combina exports de varios módulos y expone algunas funciones privadas de handlers. La fase 3 conserva una lista cerrada y contratos mínimos por ruta, sin exportar funciones desde producción.
 - [debt-fixture.ts](../tests/helpers/debt-fixture.ts) simula persistencia, bloqueo y rollback. Desde fase 3 distingue registros, consultas y transacciones sin presentarse como un cliente Prisma completo; conserva tombstones sin ID y los fallos simulados.
 - [package.json](../package.json) y [verify-database-reproduction.cjs](../scripts/verify-database-reproduction.cjs) descubrían únicamente `.test.cjs` en fase 0. Desde fase 1 comparten el ejecutor mixto; el segundo importa el cargador TS y registra tsx en el proceso principal y en las regresiones.
-- [next-fixture.cjs](../tests/helpers/next-fixture.cjs) copia configuraciones por patrón; debe distinguir las necesarias para la web de las exclusivas de pruebas.
+- [next-fixture.ts](../tests/helpers/next-fixture.ts) copia una lista explícita de configuración web; excluye configuraciones de pruebas, `.env` y tipos Next de otra compilación. Los servidores regeneran los tipos en su copia temporal.
 - Los tres servidores de navegador y los tres scripts de preparación de datos se invocan también desde documentación y ejecutores en `artifacts/`. Un renombre debe actualizar sus consumidores vigentes.
 
 ## Decisiones técnicas
@@ -112,7 +112,7 @@ Conservar datos omitidos, nulos, JSON malformado, respuestas perdidas, UUID repe
 
 ## Fases de implementación
 
-Las fases 0–4 están completadas; las fases 5–6 siguen pendientes. Cada lote debe ser revisable y contener el módulo convertido junto con sus consumidores y herramientas afectados.
+Las fases 0–5 están completadas; la fase 6 sigue pendiente. Cada lote debe ser revisable y contener el módulo convertido junto con sus consumidores y herramientas afectados.
 
 | Fase | Entrega | Dependencia |
 | --- | --- | --- |
@@ -187,13 +187,15 @@ Ejecutar tres lotes: captura → Calendar → cliente HTTP, recuperación y offl
 
 ### Fase 5 Migrar los fixtures de navegador y seeds
 
-- [ ] Convertir `next-fixture`, `money-browser-server`, `capture-browser-server` y `offline-browser-server`, tipando requests, responses, procesos, configuración y estado simulado.
-- [ ] Convertir `seed-ui`, `seed-capture-review` y `seed-receiver-payments`, preservando validación de la conexión, IDs ficticios, relaciones y limpieza de recursos.
-- [ ] Revisar la copia de configuraciones: no copiar `.env`, tipos generados ajenos ni referencias a archivos de pruebas ausentes en el fixture. Regenerar los tipos Next necesarios.
-- [ ] Actualizar comandos vigentes en README, guía Android, scripts y ejecutores reproducibles de `artifacts/`. Conservar logs y snapshots históricos; señalar su commit de reproducción cuando un ejecutor ya no se soporte en HEAD.
-- [ ] Verificar en navegador el formulario/API de transferencias, la revisión de una captura ficticia y la cola offline con dos pestañas, incluyendo respuesta perdida, cambio de cuenta y sincronización única.
+- [x] Convertir `next-fixture`, `money-browser-server`, `capture-browser-server` y `offline-browser-server`, tipando requests, responses, procesos, configuración y estado simulado.
+- [x] Convertir `seed-ui`, `seed-capture-review` y `seed-receiver-payments`, preservando validación de la conexión, IDs ficticios, relaciones y limpieza de recursos.
+- [x] Revisar la copia de configuraciones: no copiar `.env`, tipos generados ajenos ni referencias a archivos de pruebas ausentes en el fixture. Regenerar los tipos Next necesarios.
+- [x] Actualizar comandos vigentes en README, guía Android, scripts y ejecutores reproducibles de `artifacts/`. Conservar logs y snapshots históricos; señalar su commit de reproducción cuando un ejecutor ya no se soporte en HEAD.
+- [x] Verificar en navegador el formulario/API de transferencias, la revisión de una captura ficticia y la cola offline con dos pestañas, incluyendo respuesta perdida, cambio de cuenta y sincronización única.
 
 **Aceptación:** los tres servidores y los tres seeds funcionan con sus nuevos comandos en entornos temporales. Los recorridos afectados conservan solicitudes, respuestas y efectos en BD/IndexedDB, sin errores nuevos de navegador. Detener servidores y recursos temporales al finalizar.
+
+**Resultado (28 de octubre de 2026):** [fase 5](../artifacts/typescript-tests-migration/phase-5/README.md). Convertidos los siete helpers restantes y añadida infraestructura compartida para validar PostgreSQL desechable y cerrar servidores, Next, Prisma y carpetas temporales. Los tres seeds conservan IDs, datos ficticios y relaciones; la credencial de receptores admite un destino temporal propio. La configuración copiada se limita al programa web y los tipos Next se regeneran en cada fixture. Comandos vigentes actualizados; los ejecutores históricos se reproducen en sus commits de cierre sin modificar sus evidencias. Verificados transferencias y correcciones de Captura desde formulario hasta BD, y dos pestañas con IndexedDB/Web Locks, respuesta perdida, cambio de cuenta y un único envío concurrente. Se conservan en orden los 867 escenarios anteriores; tres regresiones nuevas elevan la suite a 870, sin omisiones. Se añaden seis casos negativos; todos los helpers activos usan TS. La fase 6 conserva la retirada de puentes y la auditoría final.
 
 ### Fase 6 Cerrar la migración de pruebas
 

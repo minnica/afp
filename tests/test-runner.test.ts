@@ -142,7 +142,7 @@ test('ejecutor: CLI lista sin ejecutar, acepta archivos y rechaza filtros descon
   const selected = cli(['tests/latest-request.test.ts']);
   assert.equal(selected.status, 0, selected.stdout + selected.stderr);
   assert.match(selected.stdout, /# pass 3/);
-  for (const args of [['missing.test.ts'], ['--test-name-pattern=foo'], ['helpers/seed-ui.cjs']]) {
+  for (const args of [['missing.test.ts'], ['--test-name-pattern=foo'], ['helpers/seed-ui.ts']]) {
     const result = cli(args);
     assert.equal(result.status, 1);
     assert.doesNotMatch(result.stdout, /# pass/);

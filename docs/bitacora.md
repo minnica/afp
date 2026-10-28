@@ -6,6 +6,14 @@ Consolidado el **27 de octubre de 2026** a partir del README del commit `4562aa0
 
 ## 2026-10-28
 
+### Servidores de navegador y seeds en TypeScript
+
+**Fase 5 de pruebas completada localmente** sobre `f7c76b9`. Se convirtieron los siete helpers restantes: preparación Next, tres servidores y tres seeds. La conexión PostgreSQL desechable se valida antes de importar clientes; Next y Prisma se cargan tras preparar el entorno ficticio. Se comparte el cierre de servidores, conexiones y directorios temporales, y la copia de configuración excluye `.env`, configuraciones de pruebas y tipos Next de otra compilación. Los datos ficticios y sus relaciones se conservan; la credencial de receptores permite un archivo temporal propio con permisos `0600`.
+
+Instalación aislada, tipos, contratos, lint, suite PostgreSQL y build verificados. Los 867 escenarios anteriores se conservan en orden y jerarquía; tres regresiones nuevas suman 870 sin omisiones y se añaden seis casos negativos. Los recorridos de navegador comprueban transferencia y revisión de Captura contra la BD real local, y dos pestañas offline con respuesta perdida, cambio de cuenta y un único envío concurrente. Los tres servidores y los recursos de verificación se cierran al finalizar.
+
+README, producto, planes y guía Android usan los comandos TS. Las evidencias históricas conservan sus commits de reproducción. Todos los helpers activos son TS; `allowJs` temporal y el descubrimiento mixto quedan para fase 6. Sin cambios de producto, esquema, SQL, fixtures JSON, service worker, APK, dependencias ni publicación. Resultados e incidencias: [fase 5 de pruebas](../artifacts/typescript-tests-migration/phase-5/README.md).
+
 ### Integraciones, recuperación y persistencia offline con pruebas TypeScript
 
 **Fase 4 de pruebas completada localmente** sobre `429d747`. Se convirtieron las 50 pruebas CJS restantes: parsers, protocolo Android v1, políticas, revisión, conciliación, automatización y recibos de Captura; OAuth, eventos, locks y reintentos de Calendar; Auth/HTTP, contratos de UI, recuperación y cola/observador offline. Los dos contextos `vm` del service worker usan eventos y callbacks tipados. Se preservan fixtures parciales, formatos inválidos, JSON original, duplicados, cambio de cuenta y respuestas perdidas.

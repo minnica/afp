@@ -1,0 +1,24 @@
+textbox Correo electrónico: fill @e2 ('capture-qa@example.test',)
+- textbox "Correo electrónico" [required, ref=e2]
+- textbox "Contraseña" [required, ref=e3]
+- button "Entrar" [ref=e4]
+- button "Crear cuenta" [ref=e5]
+- region "Notifications alt+T" [ref=e1]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e6]
+
+textbox Contraseña: fill @e3 ('fictional-password',)
+- textbox "Correo electrónico" [required, ref=e2]: capture-qa@example.test
+- textbox "Contraseña" [required, ref=e3]
+- button "Entrar" [ref=e4]
+- button "Crear cuenta" [ref=e5]
+- region "Notifications alt+T" [ref=e1]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e6]
+
+button Entrar: click @e4 ()
+- textbox "Correo electrónico" [required, ref=e2]: capture-qa@example.test
+- textbox "Contraseña" [required, ref=e3]: ••••••••••••••••••
+- button "Entrar" [ref=e4]
+- button "Crear cuenta" [ref=e5]
+- region "Notifications alt+T" [ref=e1]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e6]
+

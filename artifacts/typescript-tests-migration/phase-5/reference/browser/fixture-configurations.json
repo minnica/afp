@@ -1,0 +1,16 @@
+[
+  {
+    "fixture": "money",
+    "noEnvironmentFiles": true,
+    "noTestConfiguration": true,
+    "nextTypesRegenerated": true,
+    "isolatedProductionBuild": true
+  },
+  {
+    "fixture": "capture",
+    "noEnvironmentFiles": true,
+    "noTestConfiguration": true,
+    "nextTypesRegenerated": true,
+    "isolatedProductionBuild": true
+  }
+]

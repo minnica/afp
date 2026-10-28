@@ -1,0 +1,9 @@
+{
+  "cards": 2,
+  "cycles": 2,
+  "observationPolicies": 2,
+  "aliases": 1,
+  "devices": 1,
+  "credentialMode": "0600",
+  "credentialShapeVerified": true
+}

@@ -1,0 +1,68 @@
+{
+  "baseCommit": "f7c76b956bcdafdf6daf8733a3e5da3ad0c5ef45",
+  "converted": [
+    {
+      "from": "tests/helpers/next-fixture.cjs",
+      "to": "tests/helpers/next-fixture.ts",
+      "originalLines": 22,
+      "originalSha256": "11384a3e187cb6580671245b6d117c0e22eaade2c533d35539bec901b8a29351",
+      "typescriptSha256": "f12ed0048eb19dd2fbd3b8275f0e2d77fb028214fd29c6483a88bb943802c377"
+    },
+    {
+      "from": "tests/helpers/money-browser-server.cjs",
+      "to": "tests/helpers/money-browser-server.ts",
+      "originalLines": 73,
+      "originalSha256": "ff57d662cc4b5b7c17df04101d575367b634a9728efdf5f2db93e7788475b156",
+      "typescriptSha256": "94b445aa46e32dc56c9210a9bfeb09bba40c321a132ca136893b729051017597"
+    },
+    {
+      "from": "tests/helpers/capture-browser-server.cjs",
+      "to": "tests/helpers/capture-browser-server.ts",
+      "originalLines": 69,
+      "originalSha256": "fec802695824982aaed3927b3d9734d8770652ab539223f918140820da4d97a7",
+      "typescriptSha256": "c31f72dd9fe49ee9ef7650e69ea0fe03a8567ab8ad29ce79368ebf56018f2e24"
+    },
+    {
+      "from": "tests/helpers/offline-browser-server.cjs",
+      "to": "tests/helpers/offline-browser-server.ts",
+      "originalLines": 30,
+      "originalSha256": "8e5bc8df4f640b8d4d01bb36a303dba07191c49f7f7c4814bc15e961986a7fcc",
+      "typescriptSha256": "400654c6bf2442292c4064f5bdc54a2280f3d70f29bbbeed0b0398a27ffd822a"
+    },
+    {
+      "from": "tests/helpers/seed-ui.cjs",
+      "to": "tests/helpers/seed-ui.ts",
+      "originalLines": 29,
+      "originalSha256": "77d09095ab5e6ec03669db58e0e1413bab9820afb69365d5ddaa44f58a11843e",
+      "typescriptSha256": "05a8baf020336b679886134a02dfe609467c5b5b08b5b0580942cc661fe663ac"
+    },
+    {
+      "from": "tests/helpers/seed-capture-review.cjs",
+      "to": "tests/helpers/seed-capture-review.ts",
+      "originalLines": 36,
+      "originalSha256": "799d35d19b43eaf3af3a83e9b34e581b627135986cb8afd9b2412c38ea86c7ec",
+      "typescriptSha256": "f6ccdfab2e9f2cc2a6c32cf046ae3f24ece3174fb2463697b2be88df7ccd7c88"
+    },
+    {
+      "from": "tests/helpers/seed-receiver-payments.cjs",
+      "to": "tests/helpers/seed-receiver-payments.ts",
+      "originalLines": 26,
+      "originalSha256": "1b1f5d071ec31c0557e5fea0507f5fa7bb26a3ae8cdcc96a792cc59f31dda11d",
+      "typescriptSha256": "2a409c8ee5e15bb674d569fc376c34c8ecb96063c566473cef77e49e13a060d9"
+    }
+  ],
+  "newHelpers": [
+    "tests/helpers/fixture-database.ts",
+    "tests/helpers/next-browser-fixture.ts"
+  ],
+  "newRuntimeTests": "tests/browser-fixture.test.ts",
+  "negativeContractFile": "tests/types/browser-fixtures.ts",
+  "negativeCases": 6,
+  "updatedRunnerConsumer": "tests/test-runner.test.ts",
+  "configurationBridgesRetainedForPhase6": [
+    "allowJs: true",
+    "checkJs: false",
+    "mixed .test.cjs/.test.ts discovery"
+  ],
+  "localAssertions": "Only as const for immutable domain literals; JSON starts as unknown; no any, suppressions, chained assertions or wildcard declarations in executable additions."
+}

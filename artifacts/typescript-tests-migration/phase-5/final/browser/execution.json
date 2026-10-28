@@ -1,0 +1,6 @@
+{
+  "failure": "RuntimeError: El puerto 4192 debe estar libre.",
+  "cleanedUp": true,
+  "serversStopped": true,
+  "temporaryDirectories": []
+}

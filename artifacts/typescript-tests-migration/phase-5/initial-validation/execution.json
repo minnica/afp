@@ -1,0 +1,259 @@
+{
+  "baseCommit": "f7c76b956bcdafdf6daf8733a3e5da3ad0c5ef45",
+  "startedAt": "2026-10-28T18:17:03.228096+00:00",
+  "commands": [
+    {
+      "name": "install",
+      "command": [
+        "pnpm",
+        "install",
+        "--frozen-lockfile"
+      ],
+      "seconds": 3.154,
+      "exitCode": 0
+    },
+    {
+      "name": "migrate",
+      "command": [
+        "pnpm",
+        "exec",
+        "prisma",
+        "migrate",
+        "deploy"
+      ],
+      "seconds": 2.846,
+      "exitCode": 0
+    },
+    {
+      "name": "typecheck",
+      "command": [
+        "pnpm",
+        "typecheck"
+      ],
+      "seconds": 12.834,
+      "exitCode": 0
+    },
+    {
+      "name": "typecheck-tests",
+      "command": [
+        "pnpm",
+        "typecheck:tests"
+      ],
+      "seconds": 15.633,
+      "exitCode": 0
+    },
+    {
+      "name": "test-types",
+      "command": [
+        "pnpm",
+        "test:types"
+      ],
+      "seconds": 8.967,
+      "exitCode": 0
+    },
+    {
+      "name": "lint",
+      "command": [
+        "pnpm",
+        "lint"
+      ],
+      "seconds": 48.676,
+      "exitCode": 0
+    },
+    {
+      "name": "test",
+      "command": [
+        "pnpm",
+        "test"
+      ],
+      "seconds": 54.416,
+      "exitCode": 0
+    },
+    {
+      "name": "build",
+      "command": [
+        "pnpm",
+        "build"
+      ],
+      "seconds": 21.164,
+      "exitCode": 0
+    },
+    {
+      "name": "db-verify",
+      "command": [
+        "pnpm",
+        "db:verify"
+      ],
+      "seconds": 78.455,
+      "exitCode": 0
+    },
+    {
+      "name": "test-scenarios",
+      "command": [
+        "node",
+        "--import",
+        "tsx",
+        "--test",
+        "--experimental-test-isolation=none",
+        "--test-reporter=tap",
+        "--test-reporter-destination=stdout",
+        "--test-reporter=./artifacts/typescript-tests-migration/phase-0/scenario-reporter.cjs",
+        "--test-reporter-destination=/home/garatachia/projects/afp/artifacts/typescript-tests-migration/phase-5/initial-validation/scenario-events.ndjson",
+        "tests/analysis-presentation.test.ts",
+        "tests/android-assetlinks.test.ts",
+        "tests/android-notices.test.ts",
+        "tests/android-sources.test.ts",
+        "tests/api-auth-availability.test.ts",
+        "tests/api-authorization.test.ts",
+        "tests/api-fetch.test.ts",
+        "tests/automatic-payment-receipts-integration.test.ts",
+        "tests/automatic-payment-receipts.test.ts",
+        "tests/browser-fixture.test.ts",
+        "tests/capture-api-integration.test.ts",
+        "tests/capture-api.test.ts",
+        "tests/capture-banamex2-real-integration.test.ts",
+        "tests/capture-banamex2-real.test.ts",
+        "tests/capture-bank-fallback-cron.test.ts",
+        "tests/capture-bank-fallback-integration.test.ts",
+        "tests/capture-bbva-debit.test.ts",
+        "tests/capture-bbva-wallet-real-integration.test.ts",
+        "tests/capture-bbva-wallet-real.test.ts",
+        "tests/capture-card-payments-integration.test.ts",
+        "tests/capture-card-payments.test.ts",
+        "tests/capture-didi-wallet-real-integration.test.ts",
+        "tests/capture-didi-wallet-real.test.ts",
+        "tests/capture-inbox-integration.test.ts",
+        "tests/capture-money-integration.test.ts",
+        "tests/capture-nu-mercadopago-real-integration.test.ts",
+        "tests/capture-nu-mercadopago-real.test.ts",
+        "tests/capture-nu-subscription-integration.test.ts",
+        "tests/capture-parsers.test.ts",
+        "tests/capture-pilot-integration.test.ts",
+        "tests/capture-processing-integration.test.ts",
+        "tests/capture-protocol.test.ts",
+        "tests/capture-real-notices-integration.test.ts",
+        "tests/capture-real-notices.test.ts",
+        "tests/capture-refunds-integration.test.ts",
+        "tests/capture-refunds.test.ts",
+        "tests/capture-review-integration.test.ts",
+        "tests/capture-rollout-integration.test.ts",
+        "tests/capture-rollout.test.ts",
+        "tests/capture-santander-real-integration.test.ts",
+        "tests/capture-santander-real.test.ts",
+        "tests/capture-santander-wallet-backup-integration.test.ts",
+        "tests/capture-service-notices.test.ts",
+        "tests/capture-wallet-real-integration.test.ts",
+        "tests/capture-wallet-real.test.ts",
+        "tests/card-balance-tracking-integration.test.ts",
+        "tests/card-balance-tracking.test.ts",
+        "tests/card-balances-integration.test.ts",
+        "tests/card-balances.test.ts",
+        "tests/card-credits.test.ts",
+        "tests/card-cycle-calculation.test.ts",
+        "tests/card-cycle-credits-integration.test.ts",
+        "tests/card-cycle-payments.test.ts",
+        "tests/card-payment-presentation.test.ts",
+        "tests/card-usage-presentation.test.ts",
+        "tests/card-usage-waivers.test.ts",
+        "tests/dashboard-breakdowns.test.ts",
+        "tests/debt-accounts-integration.test.ts",
+        "tests/debt-accounts.test.ts",
+        "tests/expense-filters.test.ts",
+        "tests/expense-operations-integration.test.ts",
+        "tests/expense-operations.test.ts",
+        "tests/financial-contracts-integration.test.ts",
+        "tests/financial-fixtures.test.ts",
+        "tests/google-calendar-events.test.ts",
+        "tests/google-calendar-integration.test.ts",
+        "tests/google-calendar-palette.test.ts",
+        "tests/google-calendar.test.ts",
+        "tests/installment-statements.test.ts",
+        "tests/installment-transactions.test.ts",
+        "tests/interface-contracts.test.ts",
+        "tests/latest-request.test.ts",
+        "tests/migration-history.test.ts",
+        "tests/money-automatic-yields-integration.test.ts",
+        "tests/money-automatic-yields.test.ts",
+        "tests/money-budgets-integration.test.ts",
+        "tests/money-budgets.test.ts",
+        "tests/money-forecast.test.ts",
+        "tests/money-integration.test.ts",
+        "tests/money-loading.test.ts",
+        "tests/money-monthly-minimum-period.test.ts",
+        "tests/money-monthly-summary-status.test.ts",
+        "tests/money-payroll-calendar-integration.test.ts",
+        "tests/money-payroll-calendar.test.ts",
+        "tests/money-projection-breakdown.test.ts",
+        "tests/money-transfer-client.test.ts",
+        "tests/money-transfer-integration.test.ts",
+        "tests/money-typescript-contracts.test.ts",
+        "tests/notice-dismissals.test.ts",
+        "tests/nu-turbo-usage.test.ts",
+        "tests/offline-expense-observer.test.ts",
+        "tests/offline-expenses.test.ts",
+        "tests/offline-service-worker.test.ts",
+        "tests/payable-notices.test.ts",
+        "tests/payables-summary.test.ts",
+        "tests/receivable-adjustments.test.ts",
+        "tests/receiver-payment-notices-integration.test.ts",
+        "tests/receiver-payment-notices.test.ts",
+        "tests/related-operations-integration.test.ts",
+        "tests/request-recovery.test.ts",
+        "tests/shared-expenses-integration.test.ts",
+        "tests/shared-expenses.test.ts",
+        "tests/source-loader.test.ts",
+        "tests/subscription-charges-api.test.ts",
+        "tests/subscription-charges-integration.test.ts",
+        "tests/subscription-charges.test.ts",
+        "tests/subscription-payment-adjustments.test.ts",
+        "tests/subscription-statements.test.ts",
+        "tests/test-runner.test.ts"
+      ],
+      "seconds": 53.071,
+      "exitCode": 0
+    },
+    {
+      "name": "receiver-migrate",
+      "command": [
+        "pnpm",
+        "exec",
+        "prisma",
+        "migrate",
+        "deploy"
+      ],
+      "seconds": 2.574,
+      "exitCode": 0
+    },
+    {
+      "name": "receiver-seed",
+      "command": [
+        "node",
+        "--import",
+        "tsx",
+        "tests/helpers/seed-receiver-payments.ts"
+      ],
+      "seconds": 0.454,
+      "exitCode": 0
+    }
+  ],
+  "workspace": {
+    "copyWithoutEnv": true,
+    "dependencies": "pnpm install --frozen-lockfile in the isolated copy",
+    "nextInitiallyAbsent": true
+  },
+  "versions": {
+    "node": "v22.23.2",
+    "pnpm": "10.33.0",
+    "typescript": "Version 6.0.3",
+    "tsx": "4.23.15",
+    "prisma": "7.10.1"
+  },
+  "postgres": {
+    "address": "127.0.0.1:44975",
+    "image": "docker.io/library/postgres@sha256:cf78e76683b9ca8c5733cbbdce6c9262b45b6767934dd0a95e671f9a0fc20685",
+    "imageId": "75f5a96988cdf694a215073c3e9c001b706b371e2f94df3967f2efdec2787f6b",
+    "version": "postgres (PostgreSQL) 16.15"
+  },
+  "finishedAt": "2026-10-28T18:22:16.279680+00:00",
+  "cleanedUp": true
+}

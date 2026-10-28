@@ -1,0 +1,9 @@
+{
+  "completed": true,
+  "cleanedUp": true,
+  "serversStopped": true,
+  "temporaryDirectories": [
+    "/tmp/afp-money-qa-LCO7zH",
+    "/tmp/afp-capture-qa-E8vv8w"
+  ]
+}

@@ -1,0 +1,406 @@
+textbox Correo electrónico: fill @e2 ('money-qa@example.test',)
+- textbox "Correo electrónico" [required, ref=e2]
+- textbox "Contraseña" [required, ref=e3]
+- button "Entrar" [ref=e4]
+- button "Crear cuenta" [ref=e5]
+- region "Notifications alt+T" [ref=e1]
+
+textbox Contraseña: fill @e3 ('fictional-password',)
+- textbox "Correo electrónico" [required, ref=e2]: money-qa@example.test
+- textbox "Contraseña" [required, ref=e3]
+- button "Entrar" [ref=e4]
+- button "Crear cuenta" [ref=e5]
+- region "Notifications alt+T" [ref=e1]
+
+button Entrar: click @e4 ()
+- textbox "Correo electrónico" [required, ref=e2]: money-qa@example.test
+- textbox "Contraseña" [required, ref=e3]: ••••••••••••••••••
+- button "Entrar" [ref=e4]
+- button "Crear cuenta" [ref=e5]
+- region "Notifications alt+T" [ref=e1]
+
+tab Cuentas: click @e17 ()
+- link "Mi dinero" [ref=e27]
+- link "Gastos" [ref=e28]
+- link "Registro automático" [ref=e29]
+- link "Dashboard" [ref=e30]
+- link "Análisis" [ref=e31]
+- link "Compras a meses" [ref=e32]
+- link "Suscripciones" [ref=e33]
+- link "Ingresos" [ref=e34]
+- link "Cuentas por cobrar" [ref=e35]
+- link "Cuentas por pagar" [ref=e36]
+- link "Tarjetas" [ref=e37]
+- link "Crédito y deuda" [ref=e38]
+- link "Configuración" [ref=e39]
+- button "Cerrar sesión" [ref=e15]
+- button "Toggle Sidebar" [ref=e2]
+- button "Toggle Sidebar" [ref=e6]
+- heading "Mi dinero" [level=1, ref=e7]
+- heading "Mi dinero" [level=2, ref=e3]
+- button "Agregar cuenta" [ref=e4]
+- tablist "ProyecciónCuentasMovimientosPlanesAsignación automática" [ref=e8] focusable [tabindex]
+  - tab "Proyección" [selected, ref=e16]
+  - tab "Cuentas" [ref=e17]
+  - tab "Movimientos" [ref=e18]
+  - tab "Planes" [ref=e19]
+  - tab "Asignación automática" [ref=e20]
+- tabpanel "Proyección" [ref=e5] focusable [tabindex]
+  - button "Simular cambios" [ref=e9]
+  - combobox "Mes" [expanded=false, ref=e10]: octubre de 2026
+    - generic "octubre de 2026" [ref=e21] clickable [onclick]
+  - combobox "Cuenta" [expanded=false, ref=e11]: Todas las cuentas
+    - generic "Todas las cuentas" [ref=e22] clickable [onclick]
+  - generic "2829303102.5k5k7.5k10k" [ref=e12] clickable [onclick]
+    - application "2829303102.5k5k7.5k10k" [ref=e23] focusable [tabindex]
+      - group [ref=e40] clickable [onclick]
+      - group [ref=e41] clickable [onclick]
+      - group [ref=e42] clickable [onclick]
+      - group "2829303102.5k5k7.5k10k" [ref=e43] clickable [onclick]
+  - region "Tu dinero en octubre de 2026" [ref=e13]
+    - heading "Tu dinero en octubre de 2026" [level=2, ref=e24]
+    - heading "Pagos y gastos Tarjetas, deudas y gastos con fecha Total del mes: -$50.00" [level=3, ref=e25]
+      - button "Pagos y gastos Tarjetas, deudas y gastos con fecha Total del mes: -$50.00" [expanded=false, ref=e44]
+  - region "Resumen de los próximos 12 meses" [ref=e14]
+    - heading "Resumen de los próximos 12 meses" [level=2, ref=e26]
+    - table "Resumen de los próximos 12 meses" [ref=e45] focusable [tabindex]
+      - columnheader "Mes" [ref=e118]
+      - columnheader "Inicio" [ref=e119]
+      - columnheader "Cierre" [ref=e120]
+      - columnheader "Entradas" [ref=e121]
+      - columnheader "Salidas" [ref=e122]
+      - columnheader "Saldo más bajo del mes" [ref=e123]
+      - cell "octubre de 2026 Datos pendientes Desde hoy" [ref=e46]
+      - cell "$9,950.00" [ref=e47]
+      - cell "$9,950.00 Sin cambio" [ref=e48]
+      - cell "$0.00" [ref=e49]
+      - cell "$0.00" [ref=e50]
+      - cell "$9,950.00 Días 28–31" [ref=e51]
+      - cell "noviembre de 2026 Datos pendientes" [ref=e52]
+      - cell "$9,950.00" [ref=e53]
+      - cell "$9,950.00 Sin cambio" [ref=e54]
+      - cell "$0.00" [ref=e55]
+      - cell "$0.00" [ref=e56]
+      - cell "$9,950.00 Días 1–30" [ref=e57]
+      - cell "diciembre de 2026 Datos pendientes" [ref=e58]
+      - cell "$9,950.00" [ref=e59]
+      - cell "$9,950.00 Sin cambio" [ref=e60]
+      - cell "$0.00" [ref=e61]
+      - cell "$0.00" [ref=e62]
+      - cell "$9,950.00 Días 1–31" [ref=e63]
+      - cell "enero de 2027 Datos pendientes" [ref=e64]
+      - cell "$9,950.00" [ref=e65]
+      - cell "$9,950.00 Sin cambio" [ref=e66]
+      - cell "$0.00" [ref=e67]
+      - cell "$0.00" [ref=e68]
+      - cell "$9,950.00 Días 1–31" [ref=e69]
+      - cell "febrero de 2027 Datos pendientes" [ref=e70]
+      - cell "$9,950.00" [ref=e71]
+      - cell "$9,950.00 Sin cambio" [ref=e72]
+      - cell "$0.00" [ref=e73]
+      - cell "$0.00" [ref=e74]
+      - cell "$9,950.00 Días 1–28" [ref=e75]
+      - cell "marzo de 2027 Datos pendientes" [ref=e76]
+      - cell "$9,950.00" [ref=e77]
+      - cell "$9,950.00 Sin cambio" [ref=e78]
+      - cell "$0.00" [ref=e79]
+      - cell "$0.00" [ref=e80]
+      - cell "$9,950.00 Días 1–31" [ref=e81]
+      - cell "abril de 2027 Datos pendientes" [ref=e82]
+      - cell "$9,950.00" [ref=e83]
+      - cell "$9,950.00 Sin cambio" [ref=e84]
+      - cell "$0.00" [ref=e85]
+      - cell "$0.00" [ref=e86]
+      - cell "$9,950.00 Días 1–30" [ref=e87]
+      - cell "mayo de 2027 Datos pendientes" [ref=e88]
+      - cell "$9,950.00" [ref=e89]
+      - cell "$9,950.00 Sin cambio" [ref=e90]
+      - cell "$0.00" [ref=e91]
+      - cell "$0.00" [ref=e92]
+      - cell "$9,950.00 Días 1–31" [ref=e93]
+      - cell "junio de 2027 Datos pendientes" [ref=e94]
+      - cell "$9,950.00" [ref=e95]
+      - cell "$9,950.00 Sin cambio" [ref=e96]
+      - cell "$0.00" [ref=e97]
+      - cell "$0.00" [ref=e98]
+      - cell "$9,950.00 Días 1–30" [ref=e99]
+      - cell "julio de 2027 Datos pendientes" [ref=e100]
+      - cell "$9,950.00" [ref=e101]
+      - cell "$9,950.00 Sin cambio" [ref=e102]
+      - cell "$0.00" [ref=e103]
+      - cell "$0.00" [ref=e104]
+      - cell "$9,950.00 Días 1–31" [ref=e105]
+      - cell "agosto de 2027 Datos pendientes" [ref=e106]
+      - cell "$9,950.00" [ref=e107]
+      - cell "$9,950.00 Sin cambio" [ref=e108]
+      - cell "$0.00" [ref=e109]
+      - cell "$0.00" [ref=e110]
+      - cell "$9,950.00 Días 1–31" [ref=e111]
+      - cell "septiembre de 2027 Datos pendientes" [ref=e112]
+      - cell "$9,950.00" [ref=e113]
+      - cell "$9,950.00 Sin cambio" [ref=e114]
+      - cell "$0.00" [ref=e115]
+      - cell "$0.00" [ref=e116]
+      - cell "$9,950.00 Días 1–30" [ref=e117]
+- region "Notifications alt+T" [ref=e1]
+
+button Transferir: click @e9 ()
+- link "Mi dinero" [ref=e22]
+- link "Gastos" [ref=e23]
+- link "Registro automático" [ref=e24]
+- link "Dashboard" [ref=e25]
+- link "Análisis" [ref=e26]
+- link "Compras a meses" [ref=e27]
+- link "Suscripciones" [ref=e28]
+- link "Ingresos" [ref=e29]
+- link "Cuentas por cobrar" [ref=e30]
+- link "Cuentas por pagar" [ref=e31]
+- link "Tarjetas" [ref=e32]
+- link "Crédito y deuda" [ref=e33]
+- link "Configuración" [ref=e34]
+- button "Cerrar sesión" [ref=e16]
+- button "Toggle Sidebar" [ref=e2]
+- button "Toggle Sidebar" [ref=e6]
+- heading "Mi dinero" [level=1, ref=e7]
+- heading "Mi dinero" [level=2, ref=e3]
+- button "Agregar cuenta" [ref=e4]
+- tablist "ProyecciónCuentasMovimientosPlanesAsignación automática" [ref=e8] focusable [tabindex]
+  - tab "Proyección" [ref=e17]
+  - tab "Cuentas" [selected, ref=e18]
+  - tab "Movimientos" [ref=e19]
+  - tab "Planes" [ref=e20]
+  - tab "Asignación automática" [ref=e21]
+- tabpanel "Cuentas" [ref=e5] focusable [tabindex]
+  - button "Transferir" [ref=e9]
+  - button "Registrar retiro" [ref=e10]
+  - button "Abonar a tarjeta" [ref=e11]
+  - button "Conciliar saldo" [ref=e12]
+  - button "Editar" [ref=e13]
+  - button "Conciliar saldo" [ref=e14]
+  - button "Editar" [ref=e15]
+- region "Notifications alt+T" [ref=e1]
+
+combobox Cuenta de origen: click @e6 ()
+- region "Notifications alt+T" [ref=e1]
+- heading "Transferir entre mis cuentas" [level=2, ref=e2]
+- combobox "Cuenta de origen" [expanded=false, ref=e6]: Selecciona una opción
+- combobox "Cuenta de destino" [expanded=false, ref=e7]: Selecciona una opción
+- spinbutton "Importe" [ref=e8]
+- spinbutton "Día Día" [ref=e11]: 28
+- spinbutton "Mes Mes" [ref=e12]: 10
+- spinbutton "Año Año" [ref=e13]: 2026
+- button "Mostrar el selector de fechas Mostrar el selector de fechas" [ref=e10]
+- textbox "Concepto" [ref=e9]: Transferencia entre mis cuentas
+- button "Cancelar" [ref=e4]
+- button "Guardar" [ref=e5]
+- button "Cerrar" [ref=e3]
+
+option Banco ficticio: click @e3 ()
+- region "Notifications alt+T" [ref=e1]
+- listbox [ref=e2]
+  - option "Banco ficticio" [ref=e3]
+  - option "Efectivo ficticio" [ref=e4]
+
+combobox Cuenta de destino: click @e7 ()
+- region "Notifications alt+T" [ref=e1]
+- heading "Transferir entre mis cuentas" [level=2, ref=e2]
+- combobox "Cuenta de origen" [expanded=false, ref=e6]: Banco ficticio
+  - generic "Banco ficticio" [ref=e10] clickable [onclick]
+- combobox "Cuenta de destino" [expanded=false, ref=e7]: Selecciona una opción
+- spinbutton "Importe" [ref=e8]
+- spinbutton "Día Día" [ref=e12]: 28
+- spinbutton "Mes Mes" [ref=e13]: 10
+- spinbutton "Año Año" [ref=e14]: 2026
+- button "Mostrar el selector de fechas Mostrar el selector de fechas" [ref=e11]
+- textbox "Concepto" [ref=e9]: Transferencia entre mis cuentas
+- button "Cancelar" [ref=e4]
+- button "Guardar" [ref=e5]
+- button "Cerrar" [ref=e3]
+
+option Efectivo ficticio: click @e4 ()
+- region "Notifications alt+T" [ref=e1]
+- listbox [ref=e2]
+  - option "Banco ficticio" [ref=e3]
+  - option "Efectivo ficticio" [ref=e4]
+
+spinbutton Importe: fill @e8 ('125.50',)
+- region "Notifications alt+T" [ref=e1]
+- heading "Transferir entre mis cuentas" [level=2, ref=e2]
+- combobox "Cuenta de origen" [expanded=false, ref=e6]: Banco ficticio
+  - generic "Banco ficticio" [ref=e10] clickable [onclick]
+- combobox "Cuenta de destino" [expanded=false, ref=e7]: Efectivo ficticio
+  - generic "Efectivo ficticio" [ref=e11] clickable [onclick]
+- spinbutton "Importe" [ref=e8]
+- spinbutton "Día Día" [ref=e13]: 28
+- spinbutton "Mes Mes" [ref=e14]: 10
+- spinbutton "Año Año" [ref=e15]: 2026
+- button "Mostrar el selector de fechas Mostrar el selector de fechas" [ref=e12]
+- textbox "Concepto" [ref=e9]: Transferencia entre mis cuentas
+- button "Cancelar" [ref=e4]
+- button "Guardar" [ref=e5]
+- button "Cerrar" [ref=e3]
+
+textbox Concepto: fill @e9 ('Transferencia fase 5 pruebas',)
+- region "Notifications alt+T" [ref=e1]
+- heading "Transferir entre mis cuentas" [level=2, ref=e2]
+- combobox "Cuenta de origen" [expanded=false, ref=e6]: Banco ficticio
+  - generic "Banco ficticio" [ref=e10] clickable [onclick]
+- combobox "Cuenta de destino" [expanded=false, ref=e7]: Efectivo ficticio
+  - generic "Efectivo ficticio" [ref=e11] clickable [onclick]
+- spinbutton "Importe" [ref=e8]: 125.5
+- spinbutton "Día Día" [ref=e13]: 28
+- spinbutton "Mes Mes" [ref=e14]: 10
+- spinbutton "Año Año" [ref=e15]: 2026
+- button "Mostrar el selector de fechas Mostrar el selector de fechas" [ref=e12]
+- textbox "Concepto" [ref=e9]: Transferencia entre mis cuentas
+- button "Cancelar" [ref=e4]
+- button "Guardar" [ref=e5]
+- button "Cerrar" [ref=e3]
+
+button Guardar: click @e5 ()
+- region "Notifications alt+T" [ref=e1]
+- heading "Transferir entre mis cuentas" [level=2, ref=e2]
+- combobox "Cuenta de origen" [expanded=false, ref=e6]: Banco ficticio
+  - generic "Banco ficticio" [ref=e10] clickable [onclick]
+- combobox "Cuenta de destino" [expanded=false, ref=e7]: Efectivo ficticio
+  - generic "Efectivo ficticio" [ref=e11] clickable [onclick]
+- spinbutton "Importe" [ref=e8]: 125.5
+- spinbutton "Día Día" [ref=e13]: 28
+- spinbutton "Mes Mes" [ref=e14]: 10
+- spinbutton "Año Año" [ref=e15]: 2026
+- button "Mostrar el selector de fechas Mostrar el selector de fechas" [ref=e12]
+- textbox "Concepto" [ref=e9]: Transferencia fase 5 pruebas
+- button "Cancelar" [ref=e4]
+- button "Guardar" [ref=e5]
+- button "Cerrar" [ref=e3]
+
+textbox Correo electrónico: fill @e2 ('capture-qa@example.test',)
+- textbox "Correo electrónico" [required, ref=e2]
+- textbox "Contraseña" [required, ref=e3]
+- button "Entrar" [ref=e4]
+- button "Crear cuenta" [ref=e5]
+- region "Notifications alt+T" [ref=e1]
+
+textbox Contraseña: fill @e3 ('fictional-password',)
+- textbox "Correo electrónico" [required, ref=e2]: capture-qa@example.test
+- textbox "Contraseña" [required, ref=e3]
+- button "Entrar" [ref=e4]
+- button "Crear cuenta" [ref=e5]
+- region "Notifications alt+T" [ref=e1]
+
+button Entrar: click @e4 ()
+- textbox "Correo electrónico" [required, ref=e2]: capture-qa@example.test
+- textbox "Contraseña" [required, ref=e3]: ••••••••••••••••••
+- button "Entrar" [ref=e4]
+- button "Crear cuenta" [ref=e5]
+- region "Notifications alt+T" [ref=e1]
+
+button Revisar: click @e37 ()
+- link "Mi dinero" [ref=e19]
+- link "Gastos" [ref=e20]
+- link "Registro automático" [ref=e21]
+- link "Dashboard" [ref=e22]
+- link "Análisis" [ref=e23]
+- link "Compras a meses" [ref=e24]
+- link "Suscripciones" [ref=e25]
+- link "Ingresos" [ref=e26]
+- link "Cuentas por cobrar" [ref=e27]
+- link "Cuentas por pagar" [ref=e28]
+- link "Tarjetas" [ref=e29]
+- link "Crédito y deuda" [ref=e30]
+- link "Configuración" [ref=e31]
+- button "Cerrar sesión" [ref=e10]
+- button "Toggle Sidebar" [ref=e2]
+- button "Toggle Sidebar" [ref=e4]
+- heading "Registro automático" [level=1, ref=e5]
+- region "Registro automático" [ref=e3]
+  - heading "Registro automático" [level=2, ref=e6]
+  - button "Ajustes" [ref=e7]
+  - tablist "PendientesGastosPagosDevolucionesCuentasOtros avisos" [ref=e8] focusable [tabindex]
+    - tab "Pendientes" [ref=e11]
+    - tab "Gastos" [ref=e12]
+    - tab "Pagos" [ref=e13]
+    - tab "Devoluciones" [ref=e14]
+    - tab "Cuentas" [ref=e15]
+    - tab "Otros avisos" [selected, ref=e16]
+  - tabpanel "Otros avisos" [ref=e9] focusable [tabindex]
+    - region "Otros avisos" [ref=e17]
+      - button "Filtrar por tarjeta" [expanded=false, ref=e33]
+      - combobox "Filtrar por estado" [expanded=false, ref=e34]: Todos los estados
+        - generic "Todos los estados" [ref=e36] clickable [onclick]
+      - button "Actualizar" [ref=e32]
+      - heading "Otros avisos" [level=2, ref=e35]
+      - button "Revisar" [ref=e37]
+      - button "Descartar" [ref=e38]
+      - button "Revisar" [ref=e39]
+      - button "Descartar" [ref=e40]
+      - button "Revisar" [ref=e41]
+      - button "Descartar" [ref=e42]
+  - button "Cómo funciona el registro automático" [expanded=false, ref=e18]
+- region "Notifications alt+T" [ref=e1]
+
+textbox Concepto: fill @e14 ('Revisión ficticia fase 5 pruebas',)
+- region "Registro automático" [ref=e2]
+  - tabpanel "Otros avisos" [ref=e6] focusable [tabindex]
+    - region "Otros avisos" [ref=e11]
+      - heading "Otros avisos" [level=2, ref=e19]
+- region "Notifications alt+T" [ref=e1]
+- heading "Revisar gasto" [level=2, ref=e3]
+- button "Volver a leer notificación" [ref=e7]
+- textbox "Concepto" [ref=e14]: TIENDA FICTICIA
+- spinbutton "Importe en MXN" [ref=e15]: 350.5
+- button "Fecha: 21 de octubre de 2026" [expanded=false, ref=e16]
+- button "Tarjeta" [expanded=false, ref=e17]
+- combobox "Categoría" [expanded=false, ref=e18]: Compras ficticias
+  - generic "Compras ficticias" [ref=e20] clickable [onclick]
+- button "Guardar y registrar gasto" [ref=e12]
+- button "Guardar sin registrar" [ref=e13]
+- button "Es otra compra" [ref=e8]
+- button "Este gasto ya está registrado" [expanded=false, ref=e9]
+- button "Ver notificación original" [expanded=false, ref=e10]
+- button "Cerrar" [ref=e4]
+- button "Cerrar" [ref=e5]
+
+button Guardar sin registrar: click @e13 ()
+- region "Registro automático" [ref=e2]
+  - tabpanel "Otros avisos" [ref=e6] focusable [tabindex]
+    - region "Otros avisos" [ref=e11]
+      - heading "Otros avisos" [level=2, ref=e19]
+- region "Notifications alt+T" [ref=e1]
+- heading "Revisar gasto" [level=2, ref=e3]
+- button "Volver a leer notificación" [disabled, ref=e7]
+- textbox "Concepto" [ref=e14]: Revisión ficticia fase 5 pruebas
+- spinbutton "Importe en MXN" [ref=e15]: 350.5
+- button "Fecha: 21 de octubre de 2026" [expanded=false, ref=e16]
+- button "Tarjeta" [expanded=false, ref=e17]
+- combobox "Categoría" [expanded=false, ref=e18]: Compras ficticias
+  - generic "Compras ficticias" [ref=e20] clickable [onclick]
+- button "Guardar y registrar gasto" [ref=e12]
+- button "Guardar sin registrar" [ref=e13]
+- button "Es otra compra" [disabled, ref=e8]
+- button "Este gasto ya está registrado" [expanded=false, ref=e9]
+- button "Ver notificación original" [expanded=false, ref=e10]
+- button "Cerrar" [ref=e4]
+- button "Cerrar" [ref=e5]
+
+button Cerrar: click @e4 ()
+- region "Registro automático" [ref=e2]
+  - tabpanel "Otros avisos" [ref=e6] focusable [tabindex]
+    - region "Otros avisos" [ref=e10]
+      - heading "Otros avisos" [level=2, ref=e18]
+- region "Notifications alt+T" [ref=e1]
+- heading "Revisar gasto" [level=2, ref=e3]
+- textbox "Concepto" [ref=e13]: Revisión ficticia fase 5 pruebas
+- spinbutton "Importe en MXN" [ref=e14]: 350.5
+- button "Fecha: 21 de octubre de 2026" [expanded=false, ref=e15]
+- button "Tarjeta" [expanded=false, ref=e16]
+- combobox "Categoría" [expanded=false, ref=e17]: Compras ficticias
+  - generic "Compras ficticias" [ref=e19] clickable [onclick]
+- button "Guardar y registrar gasto" [ref=e11]
+- button "Guardar sin registrar" [ref=e12]
+- button "Es otra compra" [ref=e7]
+- button "Este gasto ya está registrado" [expanded=false, ref=e8]
+- button "Ver notificación original" [expanded=false, ref=e9]
+- button "Cerrar" [ref=e4]
+- button "Cerrar" [ref=e5]
+

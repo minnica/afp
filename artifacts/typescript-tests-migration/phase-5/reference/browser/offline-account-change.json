@@ -1,0 +1,58 @@
+{
+  "a": {
+    "clientId": "c80e0cd4-cda8-41f3-9ef1-080002bed3be",
+    "createdAt": "2026-10-28T18:35:20.269Z",
+    "payload": {
+      "amount": "1.25",
+      "categoryId": "fictional",
+      "concept": "cuenta-a",
+      "date": "2026-10-28",
+      "operationId": "c80e0cd4-cda8-41f3-9ef1-080002bed3be",
+      "paymentMethod": "CASH"
+    },
+    "userId": "user-a"
+  },
+  "b": {
+    "clientId": "fc59531e-8d91-4d5b-9566-8abd360c1a87",
+    "createdAt": "2026-10-28T18:35:20.269Z",
+    "payload": {
+      "amount": "1.25",
+      "categoryId": "fictional",
+      "concept": "cuenta-b",
+      "date": "2026-10-28",
+      "operationId": "fc59531e-8d91-4d5b-9566-8abd360c1a87",
+      "paymentMethod": "CASH"
+    },
+    "userId": "user-b"
+  },
+  "remainingA": [
+    {
+      "clientId": "c80e0cd4-cda8-41f3-9ef1-080002bed3be",
+      "createdAt": "2026-10-28T18:35:20.269Z",
+      "payload": {
+        "amount": "1.25",
+        "categoryId": "fictional",
+        "concept": "cuenta-a",
+        "date": "2026-10-28",
+        "operationId": "c80e0cd4-cda8-41f3-9ef1-080002bed3be",
+        "paymentMethod": "CASH"
+      },
+      "userId": "user-a"
+    }
+  ],
+  "result": {
+    "confirmations": [
+      {
+        "alreadyConfirmed": false,
+        "clientId": "fc59531e-8d91-4d5b-9566-8abd360c1a87"
+      }
+    ],
+    "failedExpenses": [],
+    "syncedExpenses": [
+      {
+        "concept": "cuenta-b",
+        "id": "fc59531e-8d91-4d5b-9566-8abd360c1a87"
+      }
+    ]
+  }
+}

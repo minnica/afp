@@ -1,0 +1,18 @@
+{
+  "completed": true,
+  "controls": "final/execution.json",
+  "scenarios": "final/scenarios.json",
+  "browser": "reference/browser/execution.json",
+  "finalCliShutdown": "development/dev-shutdown/results.json",
+  "receiverSeed": "final/receiver-seed.json",
+  "hashComparison": "final/hash-comparison.json",
+  "revisionNote": "Los recorridos HTTP/BD/IndexedDB se verificaron antes de ajustar exclusivamente la terminación CLI de los dos servidores Next. Ese ajuste posterior se comprobó en la copia limpia final (seis controles, suite y db:verify) y con SIGINT, SIGTERM y fallo de arranque en dev. La repetición adicional de navegador de final/ rechazó los puertos ocupados por el recorrido anterior; no cuestiona esos controles ni modifica fuentes. Se conservan ambos resultados.",
+  "counts": {
+    "runtimeTests": 109,
+    "scenarios": 870,
+    "activeTypedModules": 130,
+    "remainingCjsHelpers": 0,
+    "newNegativeCases": 6
+  },
+  "resourcesCleanedUp": true
+}

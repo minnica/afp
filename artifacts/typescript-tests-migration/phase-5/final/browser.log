@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "/tmp/afp-tests-ts5-edpqp_tx/artifacts/typescript-tests-migration/phase-5/browser.py", line 242, in <module>
+    raise RuntimeError(f'El puerto {port} debe estar libre.')
+RuntimeError: El puerto 4192 debe estar libre.

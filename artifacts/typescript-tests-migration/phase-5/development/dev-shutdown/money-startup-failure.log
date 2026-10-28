@@ -1,0 +1,9 @@
+✓ Running next.config took 8ms
+Fixture cerrado y directorio temporal eliminado.
+Error: ENOENT: no such file or directory, open '/home/garatachia/projects/afp/artifacts/typescript-tests-migration/phase-5/development/dev-shutdown/missing.key'
+    at runNextBrowserFixture (tests/helpers/next-browser-fixture.ts:82:51) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/garatachia/projects/afp/artifacts/typescript-tests-migration/phase-5/development/dev-shutdown/missing.key'
+}

@@ -1,0 +1,56 @@
+✓ Running next.config took 10ms
+ POST /api/captures/events 401 in 2.8s (next.js: 2.7s, application-code: 139ms)
+ GET /api/captures/device 401 in 255ms (next.js: 167ms, application-code: 87ms)
+ PATCH /api/captures/pairings 401 in 188ms (next.js: 133ms, application-code: 55ms)
+ GET /api/captures/devices 401 in 174ms (next.js: 122ms, application-code: 53ms)
+Fixture directory: /tmp/afp-capture-qa-7fC7Vh
+Capture API ready on 4208; protected routes compiled.
+○ Compiling /login ...
+ GET /login 200 in 13.2s (next.js: 12.6s, application-code: 549ms)
+[browser] Can't perform a React state update on a component that hasn't mounted yet. This indicates that you have a side-effect in your render function that asynchronously tries to update the component. Move this work to useEffect instead. 
+ GET /login 200 in 42ms (next.js: 4ms, application-code: 38ms)
+ GET /login 200 in 14ms (next.js: 1.9ms, application-code: 12ms)
+ GET /login 200 in 15ms (next.js: 2ms, application-code: 12ms)
+ GET /login? 200 in 25ms (next.js: 2ms, application-code: 22ms)
+ GET /login 200 in 19ms (next.js: 3ms, application-code: 16ms)
+ GET /login 200 in 29ms (next.js: 1.8ms, application-code: 27ms)
+ GET /login 200 in 18ms (next.js: 1.8ms, application-code: 16ms)
+ GET /login 200 in 17ms (next.js: 2.0ms, application-code: 15ms)
+ GET /login 200 in 15ms (next.js: 2ms, application-code: 13ms)
+ GET /login 200 in 26ms (next.js: 3ms, application-code: 24ms)
+ GET /login 200 in 14ms (next.js: 1.8ms, application-code: 12ms)
+○ Compiling /dashboard ...
+ GET /dashboard 200 in 4.9s (next.js: 4.9s, application-code: 30ms)
+ GET /dashboard 200 in 45ms (next.js: 2ms, application-code: 42ms)
+ GET /dashboard 200 in 30ms (next.js: 3ms, application-code: 27ms)
+ GET /dashboard 200 in 13ms (next.js: 1.8ms, application-code: 11ms)
+ GET /dashboard 200 in 143ms (next.js: 103ms, application-code: 40ms)
+ GET /api/dashboard?userId=00000000-0000-4000-8000-000000000091&clientDate=2026-10-28 200 in 2.0s (next.js: 1765ms, application-code: 262ms)
+○ Compiling /registro-automatico ...
+ GET /registro-automatico?tipo=otros 200 in 5.8s (next.js: 5.5s, application-code: 341ms)
+ GET /api/captures/configuration 200 in 1354ms (next.js: 1189ms, application-code: 165ms)
+ GET /api/captures/movements?kind=OTHER 200 in 1228ms (next.js: 1109ms, application-code: 119ms)
+ GET /registro-automatico?tipo=otros 200 in 50ms (next.js: 36ms, application-code: 14ms)
+ GET /registro-automatico?tipo=otros 200 in 20ms (next.js: 1.7ms, application-code: 18ms)
+ GET /registro-automatico?tipo=otros 200 in 19ms (next.js: 1.4ms, application-code: 17ms)
+ GET /registro-automatico?tipo=otros 200 in 14ms (next.js: 1.6ms, application-code: 12ms)
+ GET /api/captures/movements?id=24596207-f47b-48d4-b5a2-2f1bf8ceba89 200 in 22ms (next.js: 1.2ms, application-code: 21ms)
+ GET /registro-automatico?tipo=otros 200 in 23ms (next.js: 3ms, application-code: 20ms)
+ GET /registro-automatico?tipo=otros 200 in 19ms (next.js: 1.6ms, application-code: 18ms)
+ GET /registro-automatico?tipo=otros 200 in 18ms (next.js: 3ms, application-code: 15ms)
+ GET /registro-automatico?tipo=otros 200 in 208ms (next.js: 2ms, application-code: 205ms)
+ GET /registro-automatico?tipo=otros 200 in 17ms (next.js: 1.6ms, application-code: 16ms)
+ PATCH /api/captures/movements 200 in 40ms (next.js: 1.1ms, application-code: 39ms)
+ GET /api/captures/movements?kind=OTHER 200 in 29ms (next.js: 1.1ms, application-code: 27ms)
+ GET /api/captures/movements?id=24596207-f47b-48d4-b5a2-2f1bf8ceba89 200 in 16ms (next.js: 1.5ms, application-code: 14ms)
+ GET /registro-automatico?tipo=otros 200 in 19ms (next.js: 2.0ms, application-code: 17ms)
+ GET /api/captures/configuration 200 in 35ms (next.js: 6ms, application-code: 29ms)
+ GET /api/captures/movements?kind=OTHER 200 in 15ms (next.js: 1.5ms, application-code: 13ms)
+Fixture cerrado y directorio temporal eliminado.
+⨯ unhandledRejection: Error: ENOENT: no such file or directory, scandir '/tmp/afp-capture-qa-7fC7Vh/src/app'
+    at ignore-listed frames {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'scandir',
+  path: '/tmp/afp-capture-qa-7fC7Vh/src/app'
+}
