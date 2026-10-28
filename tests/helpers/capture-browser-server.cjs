@@ -15,7 +15,8 @@ for (const name of ['node_modules', 'public']) {
   if (!fs.existsSync(path.join(qaDir, name))) fs.symlinkSync(path.join(root, name), path.join(qaDir, name), 'dir');
 }
 fs.cpSync(path.join(root, 'src'), path.join(qaDir, 'src'), { recursive: true });
-for (const name of ['package.json', 'jsconfig.json', 'postcss.config.mjs']) fs.copyFileSync(path.join(root, name), path.join(qaDir, name));
+const { copyNextConfiguration, generateNextTypes } = require('./next-fixture.cjs');
+copyNextConfiguration(qaDir);
 const origin = 'http://127.0.0.1:4208';
 process.env.NEXT_PUBLIC_SUPABASE_URL = origin;
 process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'qa-public-key';
@@ -27,6 +28,7 @@ const next = require('../../node_modules/next');
 const db = new PrismaClient({ adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }) });
 const user = { id: '00000000-0000-4000-8000-000000000091', aud: 'authenticated', email: 'capture-qa@example.test' };
 const token = `${Buffer.from('{"alg":"HS256","typ":"JWT"}').toString('base64url')}.${Buffer.from(JSON.stringify({ sub: user.id, exp: 2000000000, role: 'authenticated' })).toString('base64url')}.fake`;
+generateNextTypes(qaDir);
 if (productionFixture) {
   // Compilación aislada: no copia .env ni permite una BD remota. Evita que HMR
   // reinicie interacciones durante pruebas simultáneas de navegador/teléfono.

@@ -51,7 +51,7 @@ Este README describe el funcionamiento y los procedimientos del código versiona
 | Área | Implementación |
 | --- | --- |
 | Web | Next.js 16.3.8, App Router y React 19.2.4 |
-| Lenguaje | JavaScript/JSX; alias `@/*` para `src/*`. Prisma conserva su archivo de configuración `.ts` |
+| Lenguaje | Transición gradual JS/JSX → TypeScript; herramientas estrictas preparadas, aplicación aún en JS/JSX. Alias `@/*` para `src/*` |
 | UI | Componentes shadcn locales, Radix UI y Tailwind CSS 4; Base UI para el Combobox múltiple |
 | Formularios | React Hook Form y Zod |
 | Tablas y gráficas | TanStack Table 8 y Recharts 3 |
@@ -132,12 +132,16 @@ En Chrome del emulador Android, usar `http://10.0.2.2:3000`. [next.config.mjs](n
 | `pnpm dev` | Servidor de desarrollo en el puerto 3000 |
 | `pnpm build` | Generar Prisma Client y compilar la web para producción |
 | `pnpm start` | Servir una compilación previa |
-| `pnpm lint` | Ejecutar ESLint |
+| `pnpm typecheck` | Generar Prisma y tipos de Next; comprobar TypeScript sin emitir archivos |
+| `pnpm test:types` | Comprobar contratos de tipos y casos negativos con la configuración estricta |
+| `pnpm lint` | Ejecutar ESLint; reglas de seguridad de tipos en TS/TSX |
 | `pnpm test` | Pruebas Node.js con `--experimental-test-isolation=none` |
 | `pnpm db:verify` | Verificar reconstrucción, actualización, RLS y regresiones en PostgreSQL desechable |
 | `pnpm db:audit-history` | Comparar nombres y checksums de migraciones contra una BD explícita, en solo lectura |
 | `pnpm audit:prod` / `pnpm audit:all` | Auditar dependencias de producción o del árbol completo |
 | `pnpm icons:generate` | Regenerar iconos PNG/ICO desde `public/icons/app-icon.svg` |
+
+Las verificaciones obligatorias por lote son `pnpm typecheck`, `pnpm test:types`, `pnpm lint`, `pnpm test` y `pnpm build`. El build conserva la comprobación de TypeScript. `typecheck` y `test:types` generan sus prerrequisitos y funcionan sin una carpeta `.next` previa. Los casos de tipos viven en `tests/types/`, con [configuración propia](tsconfig.type-tests.json).
 
 Si se necesita comprobar la compilación con Webpack, usar `pnpm exec prisma generate` seguido de `pnpm exec next build --webpack`. Esta alternativa no cambia el script de build del proyecto.
 
@@ -356,7 +360,8 @@ Desconectar retira eventos de hoy en adelante, conserva el historial y elimina l
 ## Convenciones de desarrollo
 
 - Leer este README y [PRODUCT.md](PRODUCT.md) antes de cambiar arquitectura o comportamiento. Actualizar la documentación afectada en la misma tarea; registrar los hitos relevantes en [docs/bitacora.md](docs/bitacora.md) y guardar los resultados detallados de ejecución en `artifacts/`.
-- Mantener JavaScript/JSX en la web; usar JSDoc cuando se necesiten tipos. Código en inglés e interfaz en español. No convertir componentes a TypeScript sin instrucción expresa.
+- Seguir el [plan de migración gradual a TypeScript](docs/plan-migracion-typescript.md): fases 0 y 1 completas, piloto de transferencias pendiente. `tsconfig.json` permite JS sin comprobarlo (`allowJs: true`, `checkJs: false`); TS/TSX usa `strict` y `noUncheckedIndexedAccess`. No considerar tipado el código JS restante. Código en inglés e interfaz en español.
+- Conservar `node:test` y cargar fuentes con `tests/helpers/load-source.cjs`: esbuild transforma JS/TS/JSX/TSX, pero no comprueba tipos. Los tests deben inyectar adaptadores de red/BD; el cargador no hereda `process.env` ni carga `.env`. Actualizar rutas literales al convertir archivos; el fallback de extensión inequívoco es temporal hasta la fase 7.
 - Reutilizar [src/components/ui/](src/components/ui/) y la configuración `radix-mira` de [components.json](components.json). Formularios con React Hook Form + Zod; fechas con `DatePicker`; importes con `NumberInput`; selectores con `ResponsiveSelect`/`SearchableSelect`.
 - Conservar la interacción móvil de `CreateRecordSurface`, los borradores por usuario y el foco de los diálogos. Los borrados requieren el `AlertDialog` compartido. No ocultar errores ni presentar una recarga fallida como un alta no guardada.
 - Mantener autorización por propietario, validación de relaciones, transacciones y las garantías idempotentes de cada flujo. Agregar verificaciones pertinentes cuando cambie una regla financiera o contrato.
@@ -367,7 +372,7 @@ Desconectar retira eventos de hoy en adelante, conserva el historial y elimina l
 
 La web se despliega en Vercel, proyecto `afp`. El build es `pnpm build`; no aplica migraciones. La APK Android se compila y distribuye por separado. No modificar producción, activar automatizaciones ni cargar datos reales sin autorización explícita del propietario.
 
-1. Revisar cambios y variables del entorno de destino; ejecutar lint, pruebas pertinentes, build y auditorías de dependencias. Para cambios de persistencia, verificar también las integraciones y la reconstrucción de BD.
+1. Revisar cambios y variables del entorno de destino; ejecutar typecheck, test:types, lint, pruebas pertinentes, build y auditorías de dependencias. Para cambios de persistencia, verificar también las integraciones y la reconstrucción de BD.
 2. Si hay migraciones pendientes, revisar respaldo, checksums y alcance antes de aplicarlas con `prisma migrate deploy`. Regenerar Prisma y publicar una versión compatible con el esquema.
 3. Configurar por separado las URL de Supabase Auth, OAuth de Google, secretos y tareas programadas que use ese entorno. El callback OAuth y `AFP_APP_ORIGIN` deben corresponder al dominio publicado.
 4. Tras publicar, comprobar acceso, rechazo de peticiones sin sesión, los flujos afectados y los registros de errores. Guardar evidencias con fecha y alcance en `artifacts/`, sin datos privados.
@@ -376,7 +381,7 @@ La web se despliega en Vercel, proyecto `afp`. El build es `pnpm build`; no apli
 
 ## Documentación relacionada
 
-- [docs/plan-migracion-typescript.md](docs/plan-migracion-typescript.md): plan por fases, piloto de transferencias y criterios de aceptación; implementación pendiente.
+- [docs/plan-migracion-typescript.md](docs/plan-migracion-typescript.md): plan por fases y criterios de aceptación; referencia y herramientas completadas, piloto de transferencias pendiente.
 - [docs/bitacora.md](docs/bitacora.md): decisiones, migraciones, incidencias y seguimientos históricos con sus evidencias.
 - [PRODUCT.md](PRODUCT.md): propósito, alcance y principios del producto.
 - [docs/android-captura.md](docs/android-captura.md): operación técnica de Android, firma y pruebas.

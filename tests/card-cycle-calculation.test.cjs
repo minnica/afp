@@ -1,17 +1,8 @@
 const assert = require("node:assert/strict");
-const fs = require("node:fs");
-const path = require("node:path");
-const vm = require("node:vm");
 const { test } = require("node:test");
 
-const root = path.resolve(__dirname, "..");
-const source = ["../subscriptionCharges", "installmentStatements", "subscriptionStatements", "cardCredits", "cardCycles"]
-  .map((name) => fs.readFileSync(path.join(root, `src/lib/calculations/${name}.js`), "utf8")
-    .replace(/^import[\s\S]*?from\s+["'][^"']+["'];\r?\n/gm, "")
-    .replace(/^export /gm, ""))
-  .join("\n");
-const ctx = vm.createContext({});
-vm.runInContext(source, ctx);
+const { sourceLoader } = require("./helpers/load-source.cjs");
+const ctx = sourceLoader()("src/lib/calculations/cardCycles.js");
 const cycle = (month, year = 2024) => ({
   id: `cycle-${year}-${month}`, userId: "u", cardId: "card", year, month,
   startDate: new Date(Date.UTC(year, month - 2, 11, 12)),

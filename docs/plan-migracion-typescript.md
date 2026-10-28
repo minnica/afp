@@ -1,6 +1,6 @@
 # Plan de migración gradual a TypeScript
 
-**Estado:** fase 0 completada; fases 1–7 pendientes. **Base revisada del plan:** `4d7b6e6`, 27 de octubre de 2026. **Referencia ejecutada:** `83a3924`; [resultados y reproducción de la fase 0](../artifacts/typescript-migration/phase-0/README.md).
+**Estado:** fases 0 y 1 completadas; fases 2–7 pendientes. **Base revisada del plan:** `4d7b6e6`, 27 de octubre de 2026. **Referencia ejecutada:** `83a3924`; [resultados y reproducción de la fase 0](../artifacts/typescript-migration/phase-0/README.md).
 
 ## Objetivo y alcance
 
@@ -63,7 +63,7 @@ Las validaciones nuevas deberán aceptar las formas que ya admite el contrato p�
 | Fase | Resultado | Depende de | Estado |
 | --- | --- | --- | --- |
 | 0 | Referencia funcional e inventario de dependencias | — | Completada |
-| 1 | Herramientas y pruebas compatibles con JS/TS | 0 | Pendiente |
+| 1 | Herramientas y pruebas compatibles con JS/TS | 0 | Completada |
 | 2 | Transferencias tipadas de formulario a persistencia | 1 | Pendiente |
 | 3 | Mi dinero completo | 2 | Pendiente |
 | 4 | Núcleo financiero, API y contratos compartidos | 3 | Pendiente |
@@ -92,18 +92,20 @@ Cada fase se divide en lotes revisables. Una dependencia compartida puede conver
 
 **Archivos principales:** [package.json](../package.json), [pnpm-workspace.yaml](../pnpm-workspace.yaml), [eslint.config.mjs](../eslint.config.mjs), [cargador](../tests/helpers/load-source.cjs), fixtures de [Mi dinero](../tests/helpers/money-browser-server.cjs), [captura](../tests/helpers/capture-browser-server.cjs) y [offline](../tests/helpers/offline-browser-server.cjs).
 
-- [ ] Añadir las dependencias y configuración descritas arriba. Proponer `pnpm typecheck` como `prisma generate && next typegen && tsc --noEmit`, verificando que funciona desde una instalación limpia.
-- [ ] Añadir una comprobación separada de contratos de tipos, por ejemplo `pnpm test:types`, y hacerla parte de las verificaciones obligatorias. Next genera sus tipos mediante `next typegen`; el [build debe conservar la detección de errores de TypeScript](https://nextjs.org/docs/app/api-reference/config/typescript).
-- [ ] Conservar `node:test` y la interfaz pública del cargador. Sustituir la eliminación de imports mediante expresiones regulares por transformación de módulos JS/TS/JSX/TSX a CommonJS en memoria con esbuild como dependencia de desarrollo.
-- [ ] Mantener un resolvedor controlado de imports relativos y `@/`, prioridad de mocks, caché por cargador y entorno simulado. Soportar exports nombrados/default, imports solo de tipos y reexports. Detectar archivos ambiguos en vez de elegir entre dos implementaciones del mismo módulo.
-- [ ] Actualizar las referencias literales a `.js` en cada conversión. Durante la transición, el resolvedor puede admitir una referencia histórica solo cuando no exista el archivo exacto y el destino sea inequívoco; retirar ese puente al cerrar la migración.
-- [ ] Mantener el aislamiento de credenciales del cargador: `process.env` ficticio por defecto, dependencias de red/BD simuladas explícitamente y ninguna carga automática de `.env`.
-- [ ] Adaptar las pruebas con `vm` directo para usar la transformación compartida cuando lo necesiten. No eliminar escenarios ni reemplazar pruebas de comportamiento por comprobaciones de nombres o texto fuente.
-- [ ] Actualizar los fixtures de navegador para copiar `tsconfig.json`, sus configuraciones auxiliares necesarias y declaraciones propias, y regenerar los tipos de Next. Conservar sus restricciones a PostgreSQL local y la ausencia de `.env` copiado.
-- [ ] Preparar el servidor offline para entregar JavaScript ESM transformado cuando se convierta la cola, manteniendo su API ficticia. Revisar también las cargas realizadas por `scripts/verify-database-reproduction.cjs`.
-- [ ] Comprobar la instalación de esbuild con la política `allowBuilds` de pnpm; autorizar solo el paquete concreto si requiere instalación nativa. No habilitar indiscriminadamente scripts de dependencias.
+- [x] Añadir las dependencias y configuración descritas arriba. Proponer `pnpm typecheck` como `prisma generate && next typegen && tsc --noEmit`, verificando que funciona desde una instalación limpia.
+- [x] Añadir una comprobación separada de contratos de tipos, por ejemplo `pnpm test:types`, y hacerla parte de las verificaciones obligatorias. Next genera sus tipos mediante `next typegen`; el [build debe conservar la detección de errores de TypeScript](https://nextjs.org/docs/app/api-reference/config/typescript).
+- [x] Conservar `node:test` y la interfaz pública del cargador. Sustituir la eliminación de imports mediante expresiones regulares por transformación de módulos JS/TS/JSX/TSX a CommonJS en memoria con esbuild como dependencia de desarrollo.
+- [x] Mantener un resolvedor controlado de imports relativos y `@/`, prioridad de mocks, caché por cargador y entorno simulado. Soportar exports nombrados/default, imports solo de tipos y reexports. Detectar archivos ambiguos en vez de elegir entre dos implementaciones del mismo módulo.
+- [x] Actualizar las referencias literales a `.js` en cada conversión. Durante la transición, el resolvedor puede admitir una referencia histórica solo cuando no exista el archivo exacto y el destino sea inequívoco; retirar ese puente al cerrar la migración.
+- [x] Mantener el aislamiento de credenciales del cargador: `process.env` ficticio por defecto, dependencias de red/BD simuladas explícitamente y ninguna carga automática de `.env`.
+- [x] Adaptar las pruebas con `vm` directo para usar la transformación compartida cuando lo necesiten. No eliminar escenarios ni reemplazar pruebas de comportamiento por comprobaciones de nombres o texto fuente.
+- [x] Actualizar los fixtures de navegador para copiar `tsconfig.json`, sus configuraciones auxiliares necesarias y declaraciones propias, y regenerar los tipos de Next. Conservar sus restricciones a PostgreSQL local y la ausencia de `.env` copiado.
+- [x] Preparar el servidor offline para entregar JavaScript ESM transformado cuando se convierta la cola, manteniendo su API ficticia. Revisar también las cargas realizadas por `scripts/verify-database-reproduction.cjs`.
+- [x] Comprobar la instalación de esbuild con la política `allowBuilds` de pnpm; autorizar solo el paquete concreto si requiere instalación nativa. No habilitar indiscriminadamente scripts de dependencias.
 
 esbuild [transforma TypeScript pero no comprueba tipos](https://esbuild.github.io/content-types/#typescript); `tsc` seguirá siendo obligatorio. La [API de transformación](https://esbuild.github.io/api/#transform) permite conservar el ejecutor actual sin una migración simultánea a otro framework de pruebas.
+
+**Entrega:** [implementación, comprobaciones y reproducción de la fase 1](../artifacts/typescript-migration/phase-1/README.md). TypeScript 6.0.3, esbuild, configuración estricta, contratos negativos y fixtures compatibles; el código de aplicación permanece en JavaScript.
 
 **Aceptación:** la suite previa conserva sus escenarios y aislamiento; se prueban imports JS↔TS, mocks, exports y eliminación de tipos con ejemplos pequeños. Funcionan los fixtures y `db:verify`. `typecheck`, comprobación de contratos, lint y build no ocultan errores. Una instalación con el lockfile resulta reproducible. Esta fase aún no altera reglas financieras.
 
@@ -194,7 +196,7 @@ Dividir esta fase en tres lotes independientes y verificados secuencialmente.
 
 ## Validación y seguimiento por lote
 
-Los siguientes comandos serán parte del flujo de implementación. `typecheck` y `test:types` son scripts propuestos que todavía no existen:
+Los siguientes comandos son obligatorios por lote desde la fase 1. `typecheck` y `test:types` generan Prisma y los tipos de Next antes de comprobar sus respectivos programas:
 
 ```bash
 pnpm typecheck

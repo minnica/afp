@@ -1,10 +1,7 @@
 const assert = require("node:assert/strict");
-const fs = require("node:fs");
-const path = require("node:path");
-const vm = require("node:vm");
 const { test } = require("node:test");
-const ctx = vm.createContext({});
-vm.runInContext(fs.readFileSync(path.join(__dirname, "../src/lib/expenseFilters.js"), "utf8").replace(/^export /gm, ""), ctx);
+const { sourceLoader } = require("./helpers/load-source.cjs");
+const ctx = sourceLoader()("src/lib/expenseFilters.js");
 
 const expenses = [
   { id: "coffee", categoryId: "food", paymentMethod: "CASH", concept: "CAFÉ con leche", amount: "45.50" },

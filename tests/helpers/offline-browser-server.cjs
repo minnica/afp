@@ -1,14 +1,14 @@
 // Fixture aislada: IndexedDB/Web Locks reales; API/recibos en memoria, sin Supabase.
 // node tests/helpers/offline-browser-server.cjs (http://127.0.0.1:4192)
 const http = require("node:http");
-const fs = require("node:fs");
-const path = require("node:path");
+const { buildBrowserModule } = require('./browser-module.cjs');
 const receipts = new Map(), requests = [], held = [];
-const moduleSource = fs.readFileSync(path.join(__dirname, "../../src/lib/offlineExpenses.js"), "utf8")
-  .replace('import { apiFetch } from "@/lib/apiFetch";', 'const apiFetch = (url, options) => fetch(url, options);');
+const moduleSource = buildBrowserModule('src/lib/offlineExpenses', {
+  '@/lib/apiFetch': 'export const apiFetch = (url, options) => fetch(url, options);',
+});
 const json = (res, value) => { res.setHeader("Content-Type", "application/json"); res.end(JSON.stringify(value)); };
 http.createServer(async (req, res) => {
-  if (req.url === "/queue.js") { res.setHeader("Content-Type", "text/javascript"); res.end(moduleSource); return; }
+  if (req.url === "/queue.js") { res.setHeader("Content-Type", "text/javascript"); res.end(await moduleSource); return; }
   if (req.url === "/state") { json(res, { requests, receipts: [...receipts.values()], held: held.length }); return; }
   if (req.url === "/release") { held.splice(0).forEach(send => send()); json(res, { ok: true }); return; }
   if (req.url === "/api/expenses") {

@@ -1,10 +1,7 @@
 const assert = require("node:assert/strict");
-const fs = require("node:fs");
-const path = require("node:path");
-const vm = require("node:vm");
 const { test } = require("node:test");
-const helpers = vm.createContext({});
-vm.runInContext(fs.readFileSync(path.join(__dirname, "../src/lib/cardPaymentPresentation.js"), "utf8").replace(/^export /gm, ""), helpers);
+const { sourceLoader } = require("./helpers/load-source.cjs");
+const helpers = sourceLoader()("src/lib/cardPaymentPresentation.js");
 const cycle = { cutDate: "2026-10-14T12:00:00Z", statementAmount: "725.43", calculatedAmount: "800.12" };
 
 test("antes del corte usa el calculado incluso con estado capturado anticipadamente", () => {

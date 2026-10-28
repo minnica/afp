@@ -6,11 +6,17 @@ Consolidado el **27 de octubre de 2026** a partir del README del commit `4562aa0
 
 ## 2026-10-27
 
+### Herramientas para la migración a TypeScript
+
+**Fase 1 completada localmente.** Se añadieron TypeScript 6.0.3, los tipos de Node 22/React 19, esbuild y `dotenv` como dependencias directas. `tsconfig.json` sustituye a `jsconfig.json`; `typecheck` y `test:types` son verificaciones obligatorias. ESLint comprueba usos inseguros en TS/TSX y el build conserva la detección de errores.
+
+Las pruebas usan transformación en memoria con imports reales y mocks explícitos, conservando `node:test`, caché y entorno ficticio. Se adaptaron los cargadores históricos y los tres fixtures. Pasaron 828 pruebas con PostgreSQL local, sin fallos ni omisiones; las 820 anteriores se conservan y se añaden ocho de infraestructura. No se modificaron reglas financieras, fuentes de aplicación, esquema ni migraciones, ni se publicó. Resultados, instalación limpia y límites: [fase 1](../artifacts/typescript-migration/phase-1/README.md). Sigue pendiente el piloto de transferencias de la fase 2.
+
 ### Referencia para la migración gradual a TypeScript
 
 **Fase 0 completada localmente.** Se inventariaron 263 archivos JS/JSX (249 con contenido), contratos y cargadores de pruebas. PostgreSQL desechable verificó 42 migraciones y 45 tablas con RLS; pasaron 820 pruebas sin omisiones, lint y build. Un piloto con dos usuarios ficticios conserva 12 respuestas de transferencias y saldos, comparadas en una segunda ejecución con reloj fijo.
 
-Se registraron la advertencia existente de `pg` y un fallo de preparación del build aislado, resuelto copiando sus dependencias. No hubo conversión de código, cambios de esquema ni despliegue. Evidencias y reproducción: [fase 0](../artifacts/typescript-migration/phase-0/README.md). Continúa pendiente la fase 1 del [plan](plan-migracion-typescript.md).
+Se registraron la advertencia existente de `pg` y un fallo de preparación del build aislado, resuelto copiando sus dependencias. No hubo conversión de código, cambios de esquema ni despliegue. Evidencias y reproducción: [fase 0](../artifacts/typescript-migration/phase-0/README.md). Esta referencia precede la fase 1 del [plan](plan-migracion-typescript.md).
 
 ### Presupuestos diarios y previsiones de cobro
 

@@ -1,8 +1,24 @@
 import { defineConfig, globalIgnores } from "eslint/config";
 import nextVitals from "eslint-config-next/core-web-vitals";
 
+import nextTypescript from "eslint-config-next/typescript";
+
 const eslintConfig = defineConfig([
   ...nextVitals,
+  ...nextTypescript.map(config => ({ ...config, files: ["**/*.ts", "**/*.tsx"] })),
+  {
+    files: ["src/**/*.ts", "src/**/*.tsx", "prisma.config.ts", "tests/types/**/*.ts", "tests/types/**/*.tsx"],
+    languageOptions: { parserOptions: { project: ["./tsconfig.json", "./tsconfig.type-tests.json"], tsconfigRootDir: import.meta.dirname } },
+    rules: {
+      "@typescript-eslint/no-explicit-any": "error",
+      "@typescript-eslint/no-unsafe-assignment": "error",
+      "@typescript-eslint/no-unsafe-argument": "error",
+      "@typescript-eslint/no-unsafe-call": "error",
+      "@typescript-eslint/no-unsafe-member-access": "error",
+      "@typescript-eslint/no-unsafe-return": "error",
+      "@typescript-eslint/ban-ts-comment": ["error", { "ts-expect-error": "allow-with-description", "minimumDescriptionLength": 10 }],
+    },
+  },
   // Override default ignores of eslint-config-next.
   globalIgnores([
     // Default ignores of eslint-config-next:
@@ -10,6 +26,7 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    "estados_cuenta/**",
   ]),
 ]);
 

@@ -1,10 +1,7 @@
 const assert = require("node:assert/strict");
-const fs = require("node:fs");
-const path = require("node:path");
-const vm = require("node:vm");
 const { test } = require("node:test");
-const ctx = vm.createContext({ Date });
-vm.runInContext(fs.readFileSync(path.join(__dirname, "../src/lib/subscriptionCharges.js"), "utf8").replace(/^export /gm, ""), ctx);
+const { sourceLoader } = require("./helpers/load-source.cjs");
+const ctx = sourceLoader()("src/lib/subscriptionCharges.js");
 const sub = { id: "s", name: "Servicio", amount: 199, chargeDay: 15, startMonth: 1, startYear: 2026,
   frequencyMonths: 1, isActive: true, paymentMethod: "CARD", cardId: "c", charges: [], dailyExpenses: [] };
 const list = (subscription = sub, extra = {}) => ctx.buildSubscriptionCharges({ subscriptions: [subscription], month: "2026-10", today: "2026-10-15", ...extra });

@@ -1,20 +1,7 @@
 const assert = require("node:assert/strict");
-const fs = require("node:fs");
-const path = require("node:path");
-const vm = require("node:vm");
 const { test } = require("node:test");
-const root = path.resolve(__dirname, "..");
-const read = (file) => fs.readFileSync(path.join(root, file), "utf8")
-  .replace(/^import[\s\S]*?from\s+["'][^"']+["'];\r?\n/gm, "")
-  .replace(/^export /gm, "");
-function context(route = "dashboard", globals = {}) {
-  const ctx = vm.createContext({ URL, console, requireApiUser: async () => ({ id: "u" }), apiAccessErrorResponse: () => null, ...globals });
-  const helpers = ["../sharedExpenses", "../subscriptionCharges", "installmentStatements", "subscriptionStatements", "cardCredits", "cardCycles", "cardCyclePayments", "cycleDataQuality", "cardUsageWaivers"]
-    .map((name) => read(`src/lib/calculations/${name}.js`)).join("\n");
-  vm.runInContext(helpers + "\n" + read("src/lib/importantNotices.js") + "\n" + read(`src/app/api/${route}/route.js`), ctx);
-  return ctx;
-}
-const ctx = context();
+const { routeContext: context } = require("./helpers/legacy-route-context.cjs");
+const ctx = context("dashboard");
 const card = { id: "card", name: "Tarjeta", usualCutDay: 10 };
 const cycle = (month) => ({ id: `cycle-${month}`, cardId: card.id, card, year: 2024, month,
   startDate: new Date(Date.UTC(2024, month - 2, 11, 12)).toISOString(),

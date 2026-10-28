@@ -1,20 +1,7 @@
 const assert = require('node:assert/strict');
-const fs = require('node:fs');
-const path = require('node:path');
-const vm = require('node:vm');
 const { test } = require('node:test');
-const root = path.resolve(__dirname, '..');
-const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
-const helpers = ['../sharedExpenses', '../subscriptionCharges', 'installmentStatements', 'cardCredits', 'subscriptionStatements', 'cardCycles']
-  .map(name => read(`src/lib/calculations/${name}.js`).replace(/^import[\s\S]*?from\s+["'][^"']+["'];\r?\n/gm, '').replace(/^export /gm, '')).join('\n');
-const contexts = ['card-cycles', 'dashboard'].map(route => {
-  const ctx = vm.createContext({});
-  const source = read(`src/app/api/${route}/route.js`)
-    .replace(/^import[\s\S]*?from\s+["'][^"']+["'];\r?\n/gm, '')
-    .replace(/^export /gm, '');
-  vm.runInContext(helpers + '\n' + source, ctx);
-  return { route, ctx };
-});
+const { routeContext } = require("./helpers/legacy-route-context.cjs");
+const contexts = ['card-cycles', 'dashboard'].map(route => ({ route, ctx: routeContext(route) }));
 const subscription = { id: 'internet', cardId: 'card', name: 'Internet', amount: '379.00',
   chargeDay: 3, paymentMethod: 'CARD', frequencyMonths: 1, startMonth: 1,
   startYear: 2026, isActive: true };

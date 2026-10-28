@@ -1,15 +1,7 @@
 const assert = require("node:assert/strict");
-const fs = require("node:fs");
-const path = require("node:path");
-const vm = require("node:vm");
 const { test } = require("node:test");
-const root = path.resolve(__dirname, "..");
-const source = (file) => fs.readFileSync(path.join(root, file), "utf8")
-  .replace(/^import[\s\S]*?from\s+["'][^"']+["'];\r?\n/gm, "")
-  .replace(/^export /gm, "");
-const helpers = source("src/lib/noticeDismissals.js");
-const ctx = vm.createContext({ Date, Set, JSON });
-vm.runInContext(helpers, ctx);
+const { sourceLoader } = require("./helpers/load-source.cjs");
+const ctx = sourceLoader()("src/lib/noticeDismissals.js");
 const notice = { id: "receivable-a-2026-10-15", type: "RECEIVABLE", date: "2026-10-15T12:00:00Z", amount: 1500 };
 const plain = (value) => JSON.parse(JSON.stringify(value));
 
@@ -61,7 +53,7 @@ test("cuentas por pagar: permite ocultar y restaurar, distingue fechas y vence c
 function api() {
   const entries = [];
   const calls = [];
-  const route = vm.createContext({ Headers, URL, Date, Set, JSON, process: { env: {} }, console: { error() {} },
+  const globals = { Headers, URL, Date, Set, JSON, process: { env: {} }, console: { error() {} },
     createClient: () => ({ auth: { getUser: async (token) => ({ data: { user: token === "valid-a" ? { id: "a" } : token === "valid-b" ? { id: "b" } : null }, error: token.startsWith("valid-") ? null : new Error("invalid") }) } }),
     NextResponse: { json: (body, options = {}) => ({ body: plain(body), status: options.status || 200 }) },
     prisma: { noticeDismissal: {
@@ -69,8 +61,13 @@ function api() {
       deleteMany: async ({ where }) => { calls.push(where); const index = entries.findIndex((entry) => Object.keys(where).every((key) => entry[key] === where[key])); if (index !== -1) entries.splice(index, 1); },
       findMany: async ({ where }) => { calls.push(where); return entries.filter((entry) => entry.userId === where.userId && entry.month === where.month).map(({ month, noticeKey }) => ({ month, noticeKey })); },
     } },
-  });
-  vm.runInContext(source("src/lib/apiAuth.js") + "\n" + helpers + "\n" + source("src/app/api/notice-dismissals/route.js"), route);
+  };
+  const route = sourceLoader({
+    "@/lib/prisma": { prisma: globals.prisma },
+    "@supabase/supabase-js": { createClient: globals.createClient },
+    "next/server": { NextResponse: globals.NextResponse },
+    "@/lib/calendar/schedule": { scheduleCalendarSync() {} },
+  })("src/app/api/notice-dismissals/route.js");
   const request = (token, body = {}) => ({ url: "http://localhost/api/notice-dismissals?month=2026-10&userId=b", headers: new Map(token ? [["authorization", `Bearer ${token}`]] : []), json: async () => body });
   return { route, calls, request };
 }

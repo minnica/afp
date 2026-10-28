@@ -1,11 +1,7 @@
 const assert = require("node:assert/strict");
-const fs = require("node:fs");
-const path = require("node:path");
-const vm = require("node:vm");
 const { test } = require("node:test");
-const source = fs.readFileSync(path.resolve(__dirname, "../src/lib/analysisPresentation.js"), "utf8").replace(/^export /gm, "");
-const helpers = vm.createContext({ Intl, Map });
-vm.runInContext(source, helpers);
+const { sourceLoader } = require("./helpers/load-source.cjs");
+const helpers = sourceLoader()("src/lib/analysisPresentation.js");
 const plain = (value) => JSON.parse(JSON.stringify(value));
 
 test("Análisis conserva cero e importes a centavos al mostrarlos", () => {

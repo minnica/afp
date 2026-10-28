@@ -1,14 +1,7 @@
 const assert = require("node:assert/strict");
-const fs = require("node:fs");
-const path = require("node:path");
-const vm = require("node:vm");
 const { test } = require("node:test");
 
-const root = path.resolve(__dirname, "..");
-const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
-const helpers = ["../sharedExpenses", "../subscriptionCharges", "installmentStatements", "cardCredits", "subscriptionStatements", "cardCycles", "cardCyclePayments", "cycleDataQuality"]
-  .map((name) => read(`src/lib/calculations/${name}.js`).replace(/^import[\s\S]*?from\s+["'][^"']+["'];\r?\n/gm, "").replace(/^export /gm, ""))
-  .join("\n");
+const { routeContext: context } = require("./helpers/legacy-route-context.cjs");
 const routes = ["card-cycles", "dashboard"];
 const income = {
   id: "cashback", userId: "owner", amount: "4499.70",
@@ -37,14 +30,6 @@ const purchases = [{
   }],
 }];
 
-function context(route, globals = {}) {
-  const source = read(`src/app/api/${route}/route.js`)
-    .replace(/^import[\s\S]*?from\s+["'][^"']+["'];\r?\n/gm, "")
-    .replace(/^export /gm, "");
-  const ctx = vm.createContext(globals);
-  vm.runInContext(helpers + "\n" + source, ctx);
-  return ctx;
-}
 
 test("Santander agosto descuenta solo la aplicación al corte en ambas rutas", () => {
   const cycle = { ...august, credits: [credit] };
@@ -147,10 +132,7 @@ test("la API incluye notas de bonificación y mantiene septiembre y sus pagos", 
 
 test("un ingreso aplicado no se borra ni se reduce por debajo de sus aplicaciones", async () => {
   let writes = 0;
-  const source = read("src/app/api/incomes/route.js")
-    .replace(/^import[\s\S]*?from\s+["'][^"']+["'];\r?\n/gm, "")
-    .replace(/^export /gm, "");
-  const ctx = vm.createContext({
+  const globals = {
     URL, console, requireApiUser: async () => ({ id: "owner" }), apiAccessErrorResponse: () => null, requireOwnedReferences: async () => {},
     NextResponse: { json: (body, options) => ({ body, status: options?.status || 200 }) },
     prisma: {
@@ -160,11 +142,10 @@ test("un ingreso aplicado no se borra ni se reduce por debajo de sus aplicacione
       },
       cardCycleCredit: { aggregate: async () => ({ _sum: { amount: "1472.57" } }) },
     },
-  });
-  ctx.prisma.$transaction = async run => run(ctx.prisma);
-  ctx.prisma.$queryRaw = async () => [{ locked: 1 }];
-  Object.assign(ctx, require('./helpers/load-source.cjs').sourceLoader()('src/lib/debtAccountService.js'));
-  vm.runInContext(source, ctx);
+  };
+  globals.prisma.$transaction = async run => run(globals.prisma);
+  globals.prisma.$queryRaw = async () => [{ locked: 1 }];
+  const ctx = context("incomes", globals);
   assert.equal((await ctx.DELETE({ url: "http://localhost/api/incomes?id=cashback" })).status, 409);
   assert.equal((await ctx.PATCH({ json: async () => ({
     id: "cashback", date: "2026-07-15", incomeTypeId: "extra", source: "Santander",

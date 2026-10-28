@@ -1,22 +1,7 @@
 const assert = require("node:assert/strict");
-const fs = require("node:fs");
-const path = require("node:path");
-const vm = require("node:vm");
 const { test } = require("node:test");
 
-const root = path.resolve(__dirname, "..");
-const helper = fs.readFileSync(
-  path.join(root, "src/lib/calculations/installmentStatements.js"),
-  "utf8",
-).replace(/^export /gm, "");
-const creditHelper = fs.readFileSync(
-  path.join(root, "src/lib/calculations/cardCredits.js"), "utf8",
-).replace(/^export /gm, "");
-const cycleHelpers = ["../sharedExpenses", "subscriptionStatements", "cardCycles"]
-  .map((name) => fs.readFileSync(path.join(root, `src/lib/calculations/${name}.js`), "utf8")
-    .replace(/^import[\s\S]*?from\s+["'][^"']+["'];\r?\n/gm, "")
-    .replace(/^export /gm, ""))
-  .join("\n");
+const { routeContext: loadRoute } = require("./helpers/legacy-route-context.cjs");
 const original = {
   id: "rasuradora", cardId: "bbva", purchaseDate: "2025-11-21T12:00:00Z",
   totalAmount: 851.38, months: 12, status: "ACTIVE", initialPaymentsMade: 5,
@@ -34,16 +19,7 @@ const cycle = (year, month) => ({
   cutDate: new Date(Date.UTC(year, month - 1, 21, 12)).toISOString(),
 });
 
-function routeContext(file) {
-  const source = fs.readFileSync(path.join(root, file), "utf8")
-    .split("export async function GET")[0]
-    .replace(/^import[\s\S]*?from\s+["'][^"']+["'];\r?\n/gm, "");
-  const context = vm.createContext({});
-  const notices = fs.readFileSync(path.join(root, "src/lib/importantNotices.js"), "utf8")
-    .replace(/^import[\s\S]*?from\s+["'][^"']+["'];\r?\n/gm, "").replace(/^export /gm, "");
-  vm.runInContext(notices + "\n" + helper + "\n" + creditHelper + "\n" + cycleHelpers + "\n" + source, context);
-  return context;
-}
+function routeContext(file) { return loadRoute(file.split("/").at(-2)); }
 
 test("el corte bancario prevalece en tarjetas y dashboard, sin cambiar fecha de compra", () => {
   for (const file of ["src/app/api/card-cycles/route.js", "src/app/api/dashboard/route.js"]) {

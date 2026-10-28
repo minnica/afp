@@ -1,10 +1,7 @@
 const assert = require("node:assert/strict");
-const fs = require("node:fs");
-const path = require("node:path");
-const vm = require("node:vm");
 const { test } = require("node:test");
-const helpers = vm.createContext({ Intl });
-vm.runInContext(fs.readFileSync(path.join(__dirname, "../src/lib/cardUsagePresentation.js"), "utf8").replace(/^export /gm, ""), helpers);
+const { sourceLoader } = require("./helpers/load-source.cjs");
+const helpers = sourceLoader()("src/lib/cardUsagePresentation.js");
 const row = (name, cutDate, year = 2026, month = 10) => ({ card: { name }, selectedCycle: { cutDate, year, month } });
 
 test("cortes próximos primero, fechas ausentes al final y empates por nombre", () => {

@@ -1,7 +1,4 @@
 const assert = require("node:assert/strict");
-const fs = require("node:fs");
-const path = require("node:path");
-const vm = require("node:vm");
 const { test } = require("node:test");
 const { PrismaClient } = require("@prisma/client");
 const { PrismaPg } = require("@prisma/adapter-pg");
@@ -66,10 +63,7 @@ test("cobros: transacción, concurrencia, omisión, restauración, evidencia y a
   const url = new URL(connectionString);
   assert.ok(["localhost", "127.0.0.1"].includes(url.hostname) && url.pathname.startsWith("/afp_test"), "Solo permite una base local de prueba.");
   const db = new PrismaClient({ adapter: new PrismaPg({ connectionString }) });
-  const ctx = vm.createContext({ Date });
-  const read = file => fs.readFileSync(path.join(__dirname, "../src/lib", file), "utf8")
-    .replace(/^import .*;\n/gm, "").replace(/^export /gm, "");
-  vm.runInContext(read("subscriptionCharges.js") + "\n" + read("subscriptionChargeService.js"), ctx);
+  const ctx = require("./helpers/load-source.cjs").sourceLoader()("src/lib/subscriptionChargeService.js");
   const user = await db.user.create({ data: { email: `subscription-${Date.now()}@example.test` } });
   const category = await db.category.create({ data: { userId: user.id, name: "Servicios" } });
   const card = await db.card.create({ data: { userId: user.id, name: "Prueba", usualCutDay: 20, usualDueDay: 30 } });

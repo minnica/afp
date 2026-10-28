@@ -1,22 +1,25 @@
 const assert = require("node:assert/strict");
-const fs = require("node:fs");
-const path = require("node:path");
-const vm = require("node:vm");
 const { test } = require("node:test");
+
+const { sourceLoader } = require("./helpers/load-source.cjs");
 
 function api() {
   const calls = [];
-  const source = file => fs.readFileSync(path.join(__dirname, "..", file), "utf8")
-    .replace(/^import .*;\n/gm, "").replace(/^export /gm, "");
   class SubscriptionChargeError extends Error {}
-  const route = vm.createContext({ Headers, Date, URL, process: { env: {} }, console, SubscriptionChargeError,
+  const globals = { Headers, Date, URL, process: { env: {} }, console, SubscriptionChargeError,
     createClient: () => ({ auth: { getUser: async token => ({ data: { user: token === "valid" ? { id: "owner" } : null } }) } }),
     NextResponse: { json: (body, options = {}) => ({ body, status: options.status || 200, headers: options.headers }) },
     prisma: { $transaction: async run => run("transaction") },
     loadSubscriptionCharges: async (...args) => { calls.push(args); return []; },
     applySubscriptionCharge: async (...args) => { calls.push(args); return { expenseId: "expense" }; },
-  });
-  vm.runInContext(source("src/lib/apiAuth.js") + "\n" + source("src/lib/subscriptionCharges.js") + "\n" + source("src/app/api/subscription-charges/route.js"), route);
+  };
+  const route = sourceLoader({
+    "@/lib/prisma": { prisma: globals.prisma },
+    "@supabase/supabase-js": { createClient: globals.createClient },
+    "next/server": { NextResponse: globals.NextResponse },
+    "@/lib/calendar/schedule": { scheduleCalendarSync() {} },
+    "@/lib/subscriptionChargeService": globals,
+  })("src/app/api/subscription-charges/route.js");
   const request = (token, body) => ({ url: "http://localhost/api/subscription-charges?month=2026-10&userId=other",
     headers: new Map(token ? [["authorization", `Bearer ${token}`]] : []), json: async () => body });
   return { route, calls, request };
@@ -30,7 +33,7 @@ test("cobros API: exige sesión y obtiene el usuario del token", async () => {
   const result = await route.GET(request("valid"));
   assert.equal(result.status, 200);
   assert.equal(calls[0][1], "owner");
-  assert.equal(result.headers["Cache-Control"], "private, no-store");
+  assert.equal(result.headers.get("Cache-Control"), "private, no-store");
   await route.POST(request("valid", { month: "2026-10", userId: "other", amount: "135.50", paymentMethod: "CARD", cardId: "card",
     createReceivable: true, expenseData: { userId: "other", categoryId: "foreign" } }));
   assert.equal(calls[1][0], "transaction");
