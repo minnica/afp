@@ -1,0 +1,58 @@
+Lockfile is up to date, resolution step is skipped
+Progress: resolved 1, reused 0, downloaded 0, added 0
+Packages: +819
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Progress: resolved 819, reused 819, downloaded 0, added 819, done
+
+dependencies:
++ @base-ui/react 1.9.0
++ @hookform/resolvers 5.9.1
++ @hugeicons/core-free-icons 4.3.5
++ @hugeicons/react 1.1.10
++ @prisma/adapter-pg 7.10.1
++ @prisma/client 7.10.1
++ @supabase/supabase-js 2.118.0
++ @tanstack/react-table 8.21.3
++ class-variance-authority 0.7.1
++ clsx 2.1.1
++ cmdk 1.1.1
++ date-fns 4.4.0
++ lucide-react 1.59.0
++ next 16.3.8
++ next-themes 0.4.6
++ prisma 7.10.1
++ radix-ui 1.8.1
++ react 19.2.4
++ react-day-picker 10.0.2
++ react-dom 19.2.4
++ react-hook-form 7.90.0
++ react-number-format 5.4.5
++ recharts 3.10.1
++ sonner 2.0.8
++ tailwind-merge 3.7.0
++ tw-animate-css 1.4.0
++ zod 4.6.7
+
+devDependencies:
++ @tailwindcss/postcss 4.3.3
++ @types/node 22.20.5
++ @types/react 19.3.0
++ @types/react-dom 19.3.0
++ dotenv 18.0.9
++ esbuild 0.28.2
++ eslint 9.39.5
++ eslint-config-next 16.3.8
++ fake-indexeddb 6.2.6
++ shadcn 4.22.0
++ sharp 0.35.5
++ tailwindcss 4.3.3
++ tsx 4.23.15
++ typescript 6.0.3
+
+. postinstall$ prisma generate
+. postinstall: Loaded Prisma config from prisma.config.ts.
+. postinstall: Prisma schema loaded from prisma/schema.prisma.
+. postinstall: ✔ Generated Prisma Client (v7.10.1) to ./node_modules/.pnpm/@prisma+client@7.10.1_prisma@7.10.1_@types+node@22.20.5_@types+react-dom@19.3.0_@types+_67e1dd834939b123c798939e408e968c/node_modules/@prisma/client in 403ms
+. postinstall: Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+. postinstall: Done
+Done in 2.8s using pnpm v10.33.0

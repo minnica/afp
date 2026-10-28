@@ -1,0 +1,5 @@
+✓ Running next.config took 7ms
+ GET /api/money 401 in 2.6s (next.js: 2.5s, application-code: 116ms)
+Fixture directory: /tmp/afp-money-qa-blDMip
+Money/UI QA ready on 4216; real API and local PostgreSQL.
+Fixture cerrado y directorio temporal eliminado.

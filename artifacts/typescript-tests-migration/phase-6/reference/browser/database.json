@@ -1,0 +1,62 @@
+{
+  "stored": {
+    "id": "81f9439f-0c51-463d-ae31-6449af05fadf",
+    "userId": "00000000-0000-4000-8000-000000000094",
+    "fromAccountId": "683aed10-7d45-4a91-b920-bfab9ab94479",
+    "toAccountId": "7e007a91-f60f-4523-961f-df9e2dfb9aa5",
+    "amount": "125.5",
+    "date": "2026-10-28T00:00:00.000Z",
+    "concept": "Transferencia fase 5 pruebas",
+    "reversedAt": null,
+    "createdAt": "2026-10-28T19:07:59.654Z"
+  },
+  "operations": [
+    {
+      "userId": "00000000-0000-4000-8000-000000000094",
+      "operationId": "503784e9-d463-4e9a-8a06-76252d80974f",
+      "fingerprint": "797bf6a84521b654f82745eabcf9c8d7b0c4c4206d463296fcf176116a8a102f",
+      "result": {
+        "id": "81f9439f-0c51-463d-ae31-6449af05fadf",
+        "ok": true
+      },
+      "createdAt": "2026-10-28T19:07:59.657Z"
+    }
+  ],
+  "movement": {
+    "id": "d2292a8b-fcd7-45c5-93fc-1e28a93260d3",
+    "userId": "00000000-0000-4000-8000-000000000091",
+    "status": "REVIEW",
+    "reason": "POSSIBLE_DUPLICATE",
+    "parserKey": null,
+    "proposal": {
+      "date": "2026-10-21",
+      "amount": "350.50",
+      "cardId": "b117f81b-6ea0-47e0-a1be-b3053fc369bd",
+      "currency": "MXN",
+      "merchant": "TIENDA FICTICIA",
+      "categoryId": "a79187b6-f28d-4541-9b88-c70f605774fb"
+    },
+    "correction": {
+      "date": "2026-10-21",
+      "amount": "350.50",
+      "cardId": "b117f81b-6ea0-47e0-a1be-b3053fc369bd",
+      "currency": "MXN",
+      "merchant": "Revisión ficticia fase 5 pruebas",
+      "categoryId": "a79187b6-f28d-4541-9b88-c70f605774fb"
+    },
+    "analysisHistory": null,
+    "cardId": "b117f81b-6ea0-47e0-a1be-b3053fc369bd",
+    "amount": "350.5",
+    "operationDate": "2026-10-21T12:00:00.000Z",
+    "referenceKey": null,
+    "expenseId": null,
+    "originalExpenseId": null,
+    "installmentPurchaseId": null,
+    "createdAt": "2026-10-28T19:05:20.833Z",
+    "resolvedAt": null,
+    "fallbackDueAt": null
+  },
+  "cards": 9,
+  "aliases": 24,
+  "events": 3
+}

@@ -1,0 +1,26 @@
+[
+  {
+    "fixture": "money",
+    "signal": "SIGINT",
+    "startupFailure": false,
+    "exitCode": 0,
+    "directoryRemoved": true,
+    "noUnhandledRejections": true
+  },
+  {
+    "fixture": "capture",
+    "signal": "SIGTERM",
+    "startupFailure": false,
+    "exitCode": 0,
+    "directoryRemoved": true,
+    "noUnhandledRejections": true
+  },
+  {
+    "fixture": "money",
+    "signal": null,
+    "startupFailure": true,
+    "exitCode": 1,
+    "directoryRemoved": true,
+    "noUnhandledRejections": true
+  }
+]

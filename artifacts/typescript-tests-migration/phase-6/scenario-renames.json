@@ -1,0 +1,10 @@
+{
+  "ejecutor: descubre CJS y TS una vez en orden, sin contratos, seeds, helpers ni artefactos": {
+    "current": "ejecutor: descubre solo TS una vez en orden, sin contratos, seeds, helpers ni artefactos",
+    "reason": "Retirada del descubrimiento CJS; conserva orden y exclusiones de contratos, seeds, helpers, directorios y artefactos."
+  },
+  "ejecutor: convivencia CJS/TS, imports relativos y dinámicos, entorno explícito y aislamiento compartido": {
+    "current": "ejecutor: TS con dependencias CJS, imports relativos y dinámicos, entorno explícito y aislamiento compartido",
+    "reason": "Las dos entradas ejecutables ahora son TS; conserva imports relativos, dinámicos y require de dependencia CJS generada, entorno explícito, orden compartido y selección de una sola prueba."
+  }
+}

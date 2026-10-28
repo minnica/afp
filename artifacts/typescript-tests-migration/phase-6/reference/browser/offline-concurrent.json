@@ -1,0 +1,88 @@
+{
+  "entry": {
+    "clientId": "68a63eda-be66-43dc-ba8c-ba7e95be3c23",
+    "createdAt": "2026-10-28T19:09:22.794Z",
+    "payload": {
+      "amount": "8.75",
+      "categoryId": "fictional",
+      "concept": "cierre",
+      "date": "2026-10-28",
+      "operationId": "68a63eda-be66-43dc-ba8c-ba7e95be3c23",
+      "paymentMethod": "CASH"
+    },
+    "userId": "user-a"
+  },
+  "firstTab": {
+    "remaining": [],
+    "result": {
+      "confirmations": [],
+      "failedExpenses": [],
+      "syncedExpenses": []
+    }
+  },
+  "secondTab": {
+    "observed": [
+      {
+        "confirmed": false,
+        "userId": "user-a"
+      },
+      {
+        "confirmed": false,
+        "userId": "user-a"
+      },
+      {
+        "confirmed": true,
+        "userId": "user-a"
+      },
+      {
+        "confirmed": true,
+        "userId": "user-a"
+      },
+      {}
+    ],
+    "remaining": [],
+    "result": {
+      "confirmations": [
+        {
+          "alreadyConfirmed": false,
+          "clientId": "68a63eda-be66-43dc-ba8c-ba7e95be3c23"
+        }
+      ],
+      "failedExpenses": [],
+      "syncedExpenses": [
+        {
+          "concept": "cierre",
+          "id": "68a63eda-be66-43dc-ba8c-ba7e95be3c23"
+        }
+      ]
+    }
+  },
+  "server": {
+    "requests": [
+      "f10bf720-6033-470e-a06b-6fd535d61b8b",
+      "f10bf720-6033-470e-a06b-6fd535d61b8b",
+      "c05b0e45-ffff-4643-bf0a-5697f0dad704",
+      "1ee177d4-4aa6-4df4-bdce-30f5b44235f9",
+      "68a63eda-be66-43dc-ba8c-ba7e95be3c23"
+    ],
+    "receipts": [
+      {
+        "id": "f10bf720-6033-470e-a06b-6fd535d61b8b",
+        "concept": "perdida"
+      },
+      {
+        "id": "c05b0e45-ffff-4643-bf0a-5697f0dad704",
+        "concept": "cuenta-b"
+      },
+      {
+        "id": "1ee177d4-4aa6-4df4-bdce-30f5b44235f9",
+        "concept": "cuenta-a"
+      },
+      {
+        "id": "68a63eda-be66-43dc-ba8c-ba7e95be3c23",
+        "concept": "cierre"
+      }
+    ],
+    "held": 0
+  }
+}

@@ -3,9 +3,8 @@
   "compilerOptions": {
     "incremental": false,
     "allowImportingTsExtensions": true,
-    "allowJs": true,
-    "checkJs": false
+    "allowJs": false
   },
-  "include": ["next-env.d.ts", "types/**/*.d.ts", "tests/**/*.ts", "tests/**/*.tsx", "tests/helpers/**/*.cjs"],
+  "include": ["next-env.d.ts", "types/**/*.d.ts", "tests/**/*.ts", "tests/**/*.tsx"],
   "exclude": ["node_modules", "tests/types"]
 }

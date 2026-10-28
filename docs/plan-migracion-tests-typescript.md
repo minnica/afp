@@ -1,6 +1,6 @@
 # Plan de migración de pruebas y helpers a TypeScript
 
-**Estado:** fases 0–5 completadas localmente; fase 6 pendiente. **Base revisada del plan:** `6aad1ab`, 28 de octubre de 2026. La [referencia nueva de fase 0](../artifacts/typescript-tests-migration/phase-0/README.md) parte de `6c1b626`; la [fase 1](../artifacts/typescript-tests-migration/phase-1/README.md) parte de `700afcc` y la [fase 2](../artifacts/typescript-tests-migration/phase-2/README.md) de `c0a0a37`; la [fase 3](../artifacts/typescript-tests-migration/phase-3/README.md) parte de `dd81d4f`; la [fase 4](../artifacts/typescript-tests-migration/phase-4/README.md) parte de `429d747`. La [fase 5](../artifacts/typescript-tests-migration/phase-5/README.md) parte de `f7c76b9`. La [migración de la web](plan-migracion-typescript.md) permanece completada. Este plan amplía el tipado a las herramientas de prueba sin cambiar el comportamiento de AFP.
+**Estado:** fases 0–6 completadas localmente. **Cierre:** [fase 6](../artifacts/typescript-tests-migration/phase-6/README.md), 28 de octubre de 2026, sobre `05c553a`. **Base revisada del plan:** `6aad1ab`, 28 de octubre de 2026. La [referencia nueva de fase 0](../artifacts/typescript-tests-migration/phase-0/README.md) parte de `6c1b626`; la [fase 1](../artifacts/typescript-tests-migration/phase-1/README.md) parte de `700afcc` y la [fase 2](../artifacts/typescript-tests-migration/phase-2/README.md) de `c0a0a37`; la [fase 3](../artifacts/typescript-tests-migration/phase-3/README.md) parte de `dd81d4f`; la [fase 4](../artifacts/typescript-tests-migration/phase-4/README.md) parte de `429d747`. La [fase 5](../artifacts/typescript-tests-migration/phase-5/README.md) parte de `f7c76b9`. La [migración de la web](plan-migracion-typescript.md) permanece completada. Este plan amplía el tipado a las herramientas de prueba sin cambiar el comportamiento de AFP.
 
 ## Objetivo y alcance
 
@@ -41,7 +41,7 @@ Los grupos del inventario se solapan. Los 854 resultados de la tabla corresponde
 - [load-source.ts](../tests/helpers/load-source.ts) transforma módulos con esbuild y los evalúa en `vm`. Desde fase 2 vincula rutas a sus exports reales; la fase 3 amplía los contratos del núcleo financiero y la fase 4 los de Captura, Calendar, HTTP y offline, con 97 módulos vinculados y comprobación de esquemas, constantes y constructores. Las rutas dinámicas siguen devolviendo `unknown`; los helpers privados financieros tienen contratos mínimos por ruta.
 - [legacy-route-context.ts](../tests/helpers/legacy-route-context.ts) combina exports de varios módulos y expone algunas funciones privadas de handlers. La fase 3 conserva una lista cerrada y contratos mínimos por ruta, sin exportar funciones desde producción.
 - [debt-fixture.ts](../tests/helpers/debt-fixture.ts) simula persistencia, bloqueo y rollback. Desde fase 3 distingue registros, consultas y transacciones sin presentarse como un cliente Prisma completo; conserva tombstones sin ID y los fallos simulados.
-- [package.json](../package.json) y [verify-database-reproduction.cjs](../scripts/verify-database-reproduction.cjs) descubrían únicamente `.test.cjs` en fase 0. Desde fase 1 comparten el ejecutor mixto; el segundo importa el cargador TS y registra tsx en el proceso principal y en las regresiones.
+- [package.json](../package.json) y [verify-database-reproduction.cjs](../scripts/verify-database-reproduction.cjs) descubrían únicamente `.test.cjs` en fase 0. Desde fase 1 comparten el ejecutor; desde fase 6 solo descubre `.test.ts`. El segundo importa el cargador TS y registra tsx en el proceso principal y en las regresiones.
 - [next-fixture.ts](../tests/helpers/next-fixture.ts) copia una lista explícita de configuración web; excluye configuraciones de pruebas, `.env` y tipos Next de otra compilación. Los servidores regeneran los tipos en su copia temporal.
 - Los tres servidores de navegador y los tres scripts de preparación de datos se invocan también desde documentación y ejecutores en `artifacts/`. Un renombre debe actualizar sus consumidores vigentes.
 
@@ -57,13 +57,13 @@ Mantener esbuild dentro de `sourceLoader` y del generador de módulos de navegad
 
 Desde fase 1, [tests/run-tests.ts](../tests/run-tests.ts) es el único mecanismo de descubrimiento y ejecución compartido por `pnpm test` y las regresiones de `db:verify`:
 
-- Durante la transición admite `.test.cjs` y `.test.ts`, ordenados de forma determinista. Rechaza dos archivos con el mismo nombre base para evitar duplicar o esconder escenarios.
+- Durante la transición admitió `.test.cjs` y `.test.ts`, ordenados de forma determinista. Desde fase 6 descubre solo `.test.ts` y rechaza entradas JS/CJS, incluso con selección parcial, para evitar esconder escenarios. Conserva el rechazo de nombres base duplicados.
 - No ejecuta `tests/types/`, helpers, seeds, fixtures de datos ni artefactos como pruebas.
 - Permite ejecutar archivos concretos durante el desarrollo, sin que un filtro accidental reduzca la suite obligatoria de cierre.
 - Propaga explícitamente el registro de tsx, opciones de aislamiento, entorno de prueba y códigos de salida a los procesos hijos. Comprueba también fallos de arranque y terminaciones por señal.
-- Al cerrar la transición descubre únicamente `.test.ts`. Se retiran puentes temporales y referencias obsoletas.
+- La transición está cerrada: `allowJs: false`, sin inclusión CJS ni configuración temporal `checkJs` en el programa de pruebas. Las fronteras con scripts JS externos quedan documentadas en la auditoría final.
 
-Sin argumentos ejecuta la suite completa. `pnpm test archivo.test.ts otro.test.cjs` selecciona rutas exactas, conservando el orden de descubrimiento; rechaza rutas ajenas, ausentes o repetidas y opciones desconocidas. `pnpm test --list` lista sin ejecutar; `node --import tsx tests/run-tests.ts --list` entrega solo el JSON. Los cierres usan los comandos sin selección.
+Sin argumentos ejecuta la suite completa. `pnpm test archivo.test.ts otro.test.ts` selecciona rutas exactas, conservando el orden de descubrimiento; rechaza rutas ajenas, ausentes o repetidas y opciones desconocidas. `pnpm test --list` lista sin ejecutar; `node --import tsx tests/run-tests.ts --list` entrega solo el JSON. Los cierres usan los comandos sin selección.
 
 `db:verify` puede conservar su archivo CJS. Su proceso principal debe registrar el soporte TS antes de importar helpers convertidos, y su proceso de regresiones debe usar el mismo ejecutor que `pnpm test`. Evitar depender de un `NODE_OPTIONS` global o de flags que `spawnSync` no hereda automáticamente.
 
@@ -71,7 +71,7 @@ Sin argumentos ejecuta la suite completa. `pnpm test archivo.test.ts otro.test.c
 
 Añadir `tsconfig.tests.json` para las pruebas ejecutables, helpers y ejecutor. Heredar las reglas estrictas de la aplicación, incluido `noUncheckedIndexedAccess`, y conservar `noEmit`, los tipos Node/DOM necesarios y la configuración JSX para módulos TSX alcanzados. Ajustar resolución e imports a la opción de ejecución verificada en fase 1.
 
-La configuración principal de la web mantiene `allowJs: false` y sus inclusiones actuales. Solo la configuración de pruebas podrá usar temporalmente `allowJs: true` y `checkJs: false` para consumir helpers CJS aún pendientes; esos archivos no se contarán como tipados. La configuración final de pruebas usará `allowJs: false`.
+La configuración principal de la web mantiene `allowJs: false` y sus inclusiones actuales. La configuración de pruebas usó temporalmente `allowJs: true` y `checkJs: false` para consumir helpers CJS pendientes, sin contarlos como tipados. Desde fase 6 también usa `allowJs: false`; sus 131 módulos activos y los trece archivos de contratos negativos están incluidos en sus programas estrictos y en ESLint.
 
 `pnpm typecheck:tests` ejecuta `prisma generate && next typegen && tsc --project tsconfig.tests.json --noEmit` desde fase 1. Mantener `pnpm test:types` para los casos de compilación positivos y negativos; estos no se ejecutan con `node:test`. Se verificaron las tres comprobaciones de tipos desde una instalación sin `.next` ni caché de TypeScript. El programa de pruebas habilita imports relativos con extensión `.ts`; conserva la resolución `bundler` comprobada con tsx.
 
@@ -112,7 +112,7 @@ Conservar datos omitidos, nulos, JSON malformado, respuestas perdidas, UUID repe
 
 ## Fases de implementación
 
-Las fases 0–5 están completadas; la fase 6 sigue pendiente. Cada lote debe ser revisable y contener el módulo convertido junto con sus consumidores y herramientas afectados.
+Las fases 0–6 están completadas localmente; las entregas siguientes conservan su recorrido y evidencias. Cada lote debe ser revisable y contener el módulo convertido junto con sus consumidores y herramientas afectados.
 
 | Fase | Entrega | Dependencia |
 | --- | --- | --- |
@@ -199,13 +199,15 @@ Ejecutar tres lotes: captura → Calendar → cliente HTTP, recuperación y offl
 
 ### Fase 6 Cerrar la migración de pruebas
 
-- [ ] Confirmar que los 117 archivos originales están convertidos o tienen una resolución explícita sin perder escenarios. Incluir también todos los helpers/ejecutores nuevos en el programa de tipos.
-- [ ] Desactivar `allowJs` en la configuración final de pruebas, retirar puentes temporales y limitar descubrimiento a `.test.ts`. Mantener únicamente las fronteras documentadas con herramientas JS fuera del alcance.
-- [ ] Auditar `any`, supresiones, conversiones dobles, declaraciones comodín, archivos fuera del programa y tipos inventados por el cargador. Revisar las conversiones locales justificadas.
-- [ ] Ejecutar instalación limpia con lockfile, todos los controles, suite PostgreSQL, `db:verify` y los fixtures afectados. Comparar escenarios y hashes con fase 0.
-- [ ] Actualizar README, convenciones, plan y bitácora con el resultado real, comandos finales y excepciones. Mantener el plan de la web como una migración ya cerrada.
+- [x] Confirmar que los 117 archivos originales están convertidos o tienen una resolución explícita sin perder escenarios. Incluir también todos los helpers/ejecutores nuevos en el programa de tipos.
+- [x] Desactivar `allowJs` en la configuración final de pruebas, retirar puentes temporales y limitar descubrimiento a `.test.ts`. Mantener únicamente las fronteras documentadas con herramientas JS fuera del alcance.
+- [x] Auditar `any`, supresiones, conversiones dobles, declaraciones comodín, archivos fuera del programa y tipos inventados por el cargador. Revisar las conversiones locales justificadas.
+- [x] Ejecutar instalación limpia con lockfile, todos los controles, suite PostgreSQL, `db:verify` y los fixtures afectados. Comparar escenarios y hashes con fase 0.
+- [x] Actualizar README, convenciones, plan y bitácora con el resultado real, comandos finales y excepciones. Mantener el plan de la web como una migración ya cerrada.
 
 **Aceptación final:** ninguna prueba/helper activo queda en JS/CJS; todos los módulos TS se comprueban estrictamente; no se pierden ni omiten escenarios de referencia; build y reconstrucción de BD correctos. El código ejecutable JS generado como fixture y los scripts externos expresamente excluidos no cuentan como pendientes.
+
+**Resultado (28 de octubre de 2026):** [fase 6](../artifacts/typescript-tests-migration/phase-6/README.md). Los 117 archivos CJS originales tienen su conversión TS comprobada; hay 109 pruebas ejecutables y 131 módulos activos incluidos en TypeScript y ESLint, más trece archivos separados con 125 casos negativos explicados. Retirados `allowJs`, `checkJs` y el descubrimiento mixto; una regresión impide ocultar entradas JS pendientes. Se conservan en orden y jerarquía los 854 escenarios originales y los 870 de fase 5, con correspondencia explícita para dos títulos de infraestructura actualizados; la suite final tiene 871 escenarios sin omisiones. Auditoría de 97 contratos públicos reales, 462 conversiones `as const` y catorce conversiones locales justificadas, sin `any`, supresiones ejecutables, conversiones dobles ni declaraciones comodín. Pasaron instalación limpia, los seis controles, PostgreSQL, reconstrucción/actualización y los tres servidores/seeds. Se mantienen 394 archivos protegidos y toda la evidencia anterior por hash. Las tres declaraciones específicas de scripts CJS, el ejecutor operativo `db:verify` y los fixtures JS generados son fronteras expresamente fuera de conversión, no módulos activos pendientes. README, convenciones, producto, planes, guía Android y bitácora reflejan el cierre; el plan de la web continúa completado.
 
 ## Validación y evidencias
 
@@ -238,6 +240,6 @@ Los 854 casos del cierre anterior orientan la referencia, pero no fijan artifici
 
 Mantener lotes pequeños que reviertan conjuntamente renombres, imports, configuración, scripts y documentación. No borrar datos, colas, recibos ni fixtures para resolver incompatibilidades. La ausencia de cambios de esquema y producto permite volver al lote anterior sin una migración inversa de datos.
 
-La primera entrega útil comprende **fases 0–2**: referencia nueva, herramientas compatibles y transferencias con pruebas/helpers tipados. Continuar con los demás módulos cuando ese piloto demuestre comprobación estática útil y conservación del comportamiento. Estimar el esfuerzo restante con sus tiempos y adaptadores reales; no asignar una duración sin esa medición.
+La primera entrega útil comprendió **fases 0–2**: referencia nueva, herramientas compatibles y transferencias con pruebas/helpers tipados. El piloto permitió continuar con los demás módulos; las fases 3–6 completaron la migración con comprobación estática y conservación de comportamiento verificadas. Las evidencias conservan los tiempos y límites reales de cada entrega.
 
 La ejecución de este plan no necesita publicación ni cambios en servicios remotos. La automatización en CI puede abordarse por separado una vez establecidos los comandos; no es requisito para completar esta migración.

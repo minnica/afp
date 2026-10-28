@@ -6,6 +6,16 @@ Consolidado el **27 de octubre de 2026** a partir del README del commit `4562aa0
 
 ## 2026-10-28
 
+### Cierre de la migración de pruebas y helpers a TypeScript
+
+**Fase 6 completada localmente** sobre `05c553a`. Los 117 archivos CJS originales tienen su conversión comprobada; los 131 módulos activos de pruebas, helpers y ejecutor usan TypeScript estricto con `allowJs: false`. Se retiran `checkJs`, la inclusión CJS y el descubrimiento mixto. El ejecutor acepta solo `.test.ts` y rechaza entradas JS pendientes incluso al seleccionar otra prueba.
+
+La auditoría revisa los 97 contratos públicos del cargador, 462 conversiones `as const` y catorce conversiones locales justificadas. No hay `any`, supresiones ejecutables, conversiones dobles, declaraciones comodín ni archivos activos fuera del programa o ESLint. Los trece archivos de contratos negativos conservan 125 casos explicados. Permanecen las fronteras explícitas con tres scripts CJS externos, el ejecutor operativo de BD y el código JS generado para compatibilidad.
+
+Pasaron instalación limpia con lockfile, los seis controles, suite PostgreSQL, reconstrucción/actualización, tres seeds y recorridos de navegador para transferencia, revisión de Captura y cola offline en dos pestañas. La suite final tiene 871 escenarios correctos sin omisiones: conserva los 854 originales y los 870 de fase 5, con correspondencia revisable de dos títulos del ejecutor. Los hashes de producto, esquema, SQL, fixtures, worker, Android y evidencias anteriores se conservan. Se mantienen las tres advertencias de lint y el aviso previo de `pg`.
+
+README, convenciones, producto, planes y guía Android reflejan el cierre; el plan de la web sigue completado. No hubo publicación ni cambios en servicios remotos. Comandos, duraciones, auditoría, límites y reproducción: [fase 6 de pruebas](../artifacts/typescript-tests-migration/phase-6/README.md).
+
 ### Servidores de navegador y seeds en TypeScript
 
 **Fase 5 de pruebas completada localmente** sobre `f7c76b9`. Se convirtieron los siete helpers restantes: preparación Next, tres servidores y tres seeds. La conexión PostgreSQL desechable se valida antes de importar clientes; Next y Prisma se cargan tras preparar el entorno ficticio. Se comparte el cierre de servidores, conexiones y directorios temporales, y la copia de configuración excluye `.env`, configuraciones de pruebas y tipos Next de otra compilación. Los datos ficticios y sus relaciones se conservan; la credencial de receptores permite un archivo temporal propio con permisos `0600`.

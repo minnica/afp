@@ -10,7 +10,7 @@ El plan se ajustó el 21 de octubre de 2026 para preparar el diagnóstico de tod
 
 La [fase 5 de migración a TypeScript](plan-migracion-typescript.md#fase-5--captura-android-calendar-y-offline), verificada localmente el 28 de octubre de 2026, convierte los módulos web de Captura y sus endpoints a `.ts`. Conserva el contrato Android v1, credenciales y reglas; esta conversión no requiere otra APK ni activa automatizaciones. Evidencias y límites: [fase 5](../artifacts/typescript-migration/phase-5/README.md).
 
-La [fase 5 de migración de pruebas](../artifacts/typescript-tests-migration/phase-5/README.md) convierte servidores y seeds a TypeScript. Todos sus comandos requieren `node --import tsx`; conservan Auth ficticia y PostgreSQL local `afp_test…`. En recorridos completos, usar `AFP_CAPTURE_TEST_REAL_DASHBOARD=1` para cargar el dashboard desde esa BD. Los servidores eliminan su copia temporal al recibir `SIGINT` o `SIGTERM`.
+La [fase 5 de migración de pruebas](../artifacts/typescript-tests-migration/phase-5/README.md) convierte servidores y seeds a TypeScript. Todos sus comandos requieren `node --import tsx`; conservan Auth ficticia y PostgreSQL local `afp_test…`. En recorridos completos, usar `AFP_CAPTURE_TEST_REAL_DASHBOARD=1` para cargar el dashboard desde esa BD. Los servidores eliminan su copia temporal al recibir `SIGINT` o `SIGTERM`. La [fase 6](../artifacts/typescript-tests-migration/phase-6/README.md) cierra la migración de pruebas con `allowJs: false`, descubrimiento exclusivo de `.test.ts` y nueva verificación de los tres servidores y seeds; no cambia el protocolo ni requiere otra APK.
 
 ## Compilación y firma
 

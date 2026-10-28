@@ -1,0 +1,20 @@
+{
+  "scope": "Preparación anterior al recolector limpio; no hubo fallos en escenarios de AFP.",
+  "targetedRunner": {
+    "command": "pnpm test test-runner.test.ts",
+    "tests": 9,
+    "pass": 9,
+    "fail": 0,
+    "skipped": 0
+  },
+  "auditPreparation": [
+    {
+      "finding": "El programa negativo incluye también next-env.d.ts y declaraciones web, compartidos con el programa ejecutable. La primera aserción de separación era demasiado amplia.",
+      "resolution": "Limitar el conjunto de casos negativos a tests/types/, manteniendo la comprobación de inclusión de todos los módulos."
+    },
+    {
+      "finding": "ESLint.calculateConfigForFile tiene un retorno any en la declaración instalada; el primer lint del auditor detectó tres usos inseguros.",
+      "resolution": "Recibir la respuesta como unknown y comprobar sus objetos antes de leer rules; sin supresiones ni conversiones."
+    }
+  ]
+}

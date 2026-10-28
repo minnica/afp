@@ -1,0 +1,34 @@
+{
+  "before": [
+    {
+      "clientId": "f10bf720-6033-470e-a06b-6fd535d61b8b",
+      "createdAt": "2026-10-28T19:09:12.083Z",
+      "lastError": "Unexpected end of JSON input",
+      "lastStatus": null,
+      "payload": {
+        "amount": "12.34",
+        "categoryId": "fictional",
+        "concept": "perdida",
+        "date": "2026-10-28",
+        "operationId": "f10bf720-6033-470e-a06b-6fd535d61b8b",
+        "paymentMethod": "CASH"
+      },
+      "userId": "user-a"
+    }
+  ],
+  "result": {
+    "confirmations": [
+      {
+        "alreadyConfirmed": false,
+        "clientId": "f10bf720-6033-470e-a06b-6fd535d61b8b"
+      }
+    ],
+    "failedExpenses": [],
+    "syncedExpenses": [
+      {
+        "concept": "perdida",
+        "id": "f10bf720-6033-470e-a06b-6fd535d61b8b"
+      }
+    ]
+  }
+}

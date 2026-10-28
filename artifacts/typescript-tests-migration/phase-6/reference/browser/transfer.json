@@ -1,0 +1,18 @@
+[
+  {
+    "body": {
+      "action": "TRANSFER",
+      "amount": 125.5,
+      "concept": "Transferencia fase 5 pruebas",
+      "date": "2026-10-28",
+      "fromAccountId": "683aed10-7d45-4a91-b920-bfab9ab94479",
+      "operationId": "503784e9-d463-4e9a-8a06-76252d80974f",
+      "toAccountId": "7e007a91-f60f-4523-961f-df9e2dfb9aa5"
+    },
+    "response": {
+      "id": "81f9439f-0c51-463d-ae31-6449af05fadf",
+      "ok": true
+    },
+    "status": 200
+  }
+]

@@ -1,0 +1,147 @@
+{
+  "scope": "Todas las pruebas, helpers, ejecutor, contratos negativos y tres declaraciones CJS específicas; las fuentes de producto se conservan por hash.",
+  "summary": {
+    "assertions": 476,
+    "constAssertions": 462,
+    "localAssertions": 14,
+    "explicitAny": 0,
+    "doubleAssertions": 0,
+    "wildcardDeclarations": 0,
+    "executableSuppressions": 0,
+    "explainedNegativeCases": 125
+  },
+  "localAssertions": [
+    {
+      "file": "tests/api-authorization.test.ts",
+      "line": 121,
+      "target": "keyof typeof resources",
+      "expression": "name",
+      "reason": "El mapa local references contiene solo rutas de resources; Object.entries ensancha sus claves a string. La consulta recupera esa correlación revisada y present rechaza una clave ausente. Se conservan las pruebas de relaciones por propietario antes de escribir."
+    },
+    {
+      "file": "tests/financial-contracts-integration.test.ts",
+      "line": 32,
+      "target": "keyof typeof uiResponseSchemas",
+      "expression": "resource",
+      "reason": "La clave dinámica se comprueba con resource in uiResponseSchemas antes de seleccionar su esquema real; valida respuesta de API y conserva JSON original."
+    },
+    {
+      "file": "tests/helpers/financial-fixtures.ts",
+      "line": 16,
+      "target": "Jsonified<T>",
+      "expression": "result",
+      "reason": "JSON.parse devuelve unknown; el contrato modela toJSON, arrays y propiedades de la entrada. La conversión solo comunica la transformación JSON, sin validar ni completar fixtures."
+    },
+    {
+      "file": "tests/helpers/financial-fixtures.ts",
+      "line": 61,
+      "target": "SparseModule<M>",
+      "expression": "module",
+      "reason": "Frontera central para cálculos con proyecciones parciales históricas; conserva tipos escalares, callbacks y resultados reales y excluye firmas con persistencia. Los contratos negativos verifican esos límites."
+    },
+    {
+      "file": "tests/helpers/financial-fixtures.ts",
+      "line": 105,
+      "target": "Extract<T, Record<K, unknown>>",
+      "expression": "value",
+      "reason": "La existencia de la clave se afirma antes del retorno; la rama queda derivada de la unión original. Los contratos negativos impiden inventar claves."
+    },
+    {
+      "file": "tests/helpers/financial-fixtures.ts",
+      "line": 113,
+      "target": "ReturnType<F>",
+      "expression": "result",
+      "reason": "Inyección explícita de datos deliberadamente inválidos mediante Reflect.apply; mantiene el retorno de la función real sin normalizar antes la entrada ni debilitar producción."
+    },
+    {
+      "file": "tests/helpers/integration-fixtures.ts",
+      "line": 86,
+      "target": "ReturnType<F>",
+      "expression": "result",
+      "reason": "Reflect.apply inyecta solo el cliente mínimo interceptado; los demás argumentos y el retorno derivan de la función real. No presenta el cliente parcial como PrismaClient."
+    },
+    {
+      "file": "tests/helpers/integration-fixtures.ts",
+      "line": 119,
+      "target": "ReturnType<Worker>",
+      "expression": "result",
+      "reason": "Worker real con doble mínimo de estado y sync; los demás callbacks y opciones proceden del worker. La conversión queda en la frontera Reflect.apply."
+    },
+    {
+      "file": "tests/helpers/legacy-route-context.ts",
+      "line": 65,
+      "target": "Partial<DashboardPrivate & PurchasePrivate>",
+      "expression": "exports",
+      "reason": "vm devuelve unknown. Comprueba cada función expuesta y limita los helpers privados por ruta; sus contratos mínimos locales se contrastan con los escenarios financieros existentes."
+    },
+    {
+      "file": "tests/helpers/notice-fixture.ts",
+      "line": 21,
+      "target": "(keyof NoticeRows)[]",
+      "expression": "Object.keys(rows)",
+      "reason": "Las claves proceden del objeto NoticeRows concreto del fixture; conserva la correlación de colecciones sin agregar propiedades a los registros."
+    },
+    {
+      "file": "tests/helpers/notice-fixture.ts",
+      "line": 22,
+      "target": "NoticeDelegates",
+      "expression": "Object.fromEntries(entries.map(([model, records]) => [model, {\n    findMany: async ({ where }: Query) => { onRead(model, where); return records.filter(row => row.userId === where.userId && (!where.month || ('month' in row && row.month === where.month))); },\n  }]))",
+      "reason": "Object.fromEntries pierde la correlación entre modelo y tipo de filas. Cada delegate se construye desde su colección propia; solo filtra propietario/mes, sin simular un cliente Prisma completo."
+    },
+    {
+      "file": "tests/money-transfer-client.test.ts",
+      "line": 77,
+      "target": "() => T",
+      "expression": "initial",
+      "reason": "El doble useState discrimina typeof initial === function antes de evaluar el inicializador genérico; replica la convención de React para inicializadores perezosos."
+    },
+    {
+      "file": "tests/money-transfer-integration.test.ts",
+      "line": 35,
+      "target": "Prisma.TransactionClient",
+      "expression": "tx",
+      "reason": "Cliente extendido real de Prisma sobre una transacción PostgreSQL real, con todos sus delegates. La firma generada de $extends difiere en $transaction. Se conserva comprobación de rollback tras insertar el recibo; no es un mock parcial."
+    },
+    {
+      "file": "tests/types/interface.tsx",
+      "line": 21,
+      "target": "RefObject<HTMLDivElement | null>",
+      "expression": "{ current: null }",
+      "reason": "Ref nula usada únicamente en un contrato estático para comprobar una referencia de otro elemento con @ts-expect-error; nunca se ejecuta como prueba."
+    }
+  ],
+  "retainedBoundaries": [
+    {
+      "file": "tests/helpers/load-source.ts",
+      "reason": "Sobrecarga restringida a keyof SourceModules; 97 rutas públicas derivan de typeof import real y source-exports comprueba nombres/clases al cruzar vm. Rutas dinámicas y exports privados no registrados devuelven unknown. Las comprobaciones de forma no prueban semántica: la suite y los contratos negativos la complementan."
+    },
+    {
+      "file": "tests/helpers/financial-fixtures.ts",
+      "reason": "Adaptadores mínimos para Request/respuestas ficticias, proyecciones parciales e inyección inválida. No completan datos ausentes ni convierten un doble parcial en PrismaClient o NextResponse. Las funciones/resultados mantienen derivación del módulo real."
+    },
+    {
+      "file": "tests/helpers/integration-fixtures.ts",
+      "reason": "Transporte parcial, callbacks de worker y eventos de service worker explícitos; conserva metadatos Next y pruebas con PostgreSQL real. Las rutas dinámicas y JSON sin validar siguen como unknown."
+    },
+    {
+      "file": "tests/helpers/legacy-route-context.ts",
+      "reason": "Lista cerrada de cuatro rutas y siete helpers privados ya ejercitados; firmas mínimas locales necesarias porque no son exports públicos. No se exportan desde producción para tipar las pruebas."
+    },
+    {
+      "file": "scripts/android-assetlinks.d.cts",
+      "reason": "Contrato específico del script CJS fuera del alcance, revisado contra sus exports y ejercitado por android-assetlinks.test.ts y tests/types/financial-fixtures.ts."
+    },
+    {
+      "file": "scripts/audit-migration-history.d.cts",
+      "reason": "Contrato específico del script CJS fuera del alcance, revisado contra sus exports y ejercitado por migration-history.test.ts y tests/types/financial-fixtures.ts."
+    },
+    {
+      "file": "scripts/configure-capture-bank-fallback-cron.d.cts",
+      "reason": "Contrato específico del script CJS fuera del alcance, revisado contra sus exports y ejercitado por capture-bank-fallback-cron.test.ts y tests/types/financial-fixtures.ts."
+    },
+    {
+      "file": "scripts/verify-database-reproduction.cjs",
+      "reason": "Ejecutor operativo excluido; registra tsx explícitamente e importa el cargador y runTests de TypeScript. Usa el mismo descubrimiento y aislamiento; su suite completa se compara con pnpm test."
+    }
+  ]
+}

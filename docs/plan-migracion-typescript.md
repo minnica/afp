@@ -8,6 +8,8 @@ Migrar el código activo de la web de AFP a TypeScript para comprobar los contra
 
 La migración se realizó por flujos completos y módulos, con JavaScript y TypeScript coexistiendo durante la transición. El primer flujo fue **transferencias entre cuentas propias en Mi dinero**. Su resultado permitió ajustar el esfuerzo y la secuencia del resto. Las decisiones y entregas siguientes conservan el recorrido de implementación; el estado final usa `allowJs: false` y no mantiene puentes temporales en `src/`.
 
+La [migración independiente de pruebas y helpers](plan-migracion-tests-typescript.md) también está completada en sus fases 0–6, con `allowJs: false` y descubrimiento exclusivo de `.test.ts`. Su cierre no reabre las fases de esta migración web.
+
 Alcance final: código activo de `src/app`, `src/components`, `src/hooks` y `src/lib`. Las pruebas `.cjs`, scripts operativos, configuraciones `.mjs`, `public/sw.js` y la aplicación Android Kotlin pueden conservar su lenguaje; sus consumidores y herramientas deben seguir funcionando. Los archivos vacíos se inventariarán como tales y no contarán como módulos migrados.
 
 Este trabajo no requiere cambiar el esquema de PostgreSQL. Cambios de producto, fórmulas, diseño, autenticación, formatos bancarios o versiones mayores de Next.js, Prisma y React se tramitarán por separado. La publicación seguirá el [procedimiento del README](../README.md#despliegue).

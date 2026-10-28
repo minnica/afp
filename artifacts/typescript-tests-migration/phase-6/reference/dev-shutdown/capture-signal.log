@@ -1,0 +1,8 @@
+✓ Running next.config took 9ms
+ POST /api/captures/events 401 in 2.8s (next.js: 2.6s, application-code: 135ms)
+ GET /api/captures/device 401 in 281ms (next.js: 190ms, application-code: 92ms)
+ PATCH /api/captures/pairings 401 in 192ms (next.js: 137ms, application-code: 55ms)
+ GET /api/captures/devices 401 in 184ms (next.js: 128ms, application-code: 56ms)
+Fixture directory: /tmp/afp-capture-qa-in5V7q
+Capture API ready on 4208; protected routes compiled.
+Fixture cerrado y directorio temporal eliminado.
