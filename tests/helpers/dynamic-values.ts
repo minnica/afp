@@ -23,3 +23,13 @@ export function call(value: unknown, ...args: unknown[]): unknown {
   const result: unknown = Reflect.apply(value, undefined, args);
   return result;
 }
+
+// Las respuestas financieras también contienen mapas de meses con claves
+// numéricas. No confundirlos con arrays al inspeccionar su JSON sin normalizar.
+export function indexed(value: unknown): Record<number, unknown> {
+  assert.ok(isIndexed(value));
+  return value;
+}
+function isIndexed(value: unknown): value is Record<number, unknown> {
+  return value !== null && typeof value === 'object';
+}

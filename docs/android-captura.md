@@ -129,7 +129,7 @@ Las **nueve pruebas unitarias** verifican los ocho paquetes, selección individu
 
 Las pruebas instrumentadas de Gradle instalan y retiran sus paquetes al terminar. Para continuar el diagnóstico manual, instala después la APK deseada y concede su permiso especial. Las variantes usan identidades distintas: autorizar desarrollo no autoriza producción. El 20 de octubre se verificaron seis pruebas unitarias y siete instrumentadas en el S24 Ultra, y se preparó la APK `release` para continuar las pruebas manuales como **AFP**.
 
-Desde la raíz, `node --test tests/android-assetlinks.test.cjs tests/android-sources.test.cjs` verifica Digital Asset Links y la coincidencia exacta entre fuentes del lector y paquetes visibles del manifest; prohíbe `QUERY_ALL_PACKAGES`. Tres casos correctos el 21 de octubre. `pnpm test` incluye estas regresiones. Lint y build web deben seguir pasando. Los resultados y las comprobaciones físicas pendientes se registran en [el plan](../PLAN_CAPTURA_AUTOMATICA_ANDROID.md) y la [evidencia de ocho fuentes](../artifacts/android-fase1/multi-source-verification.json). La evidencia inicial y el despliegue web de 0.1.1 se conservan como historial; esta actualización no requiere desplegar de nuevo la web.
+Desde la raíz, `pnpm test android-assetlinks.test.ts android-sources.test.ts` verifica Digital Asset Links y la coincidencia exacta entre fuentes del lector y paquetes visibles del manifest; prohíbe `QUERY_ALL_PACKAGES`. Tres casos correctos el 21 de octubre. `pnpm test` incluye estas regresiones. Lint y build web deben seguir pasando. Los resultados y las comprobaciones físicas pendientes se registran en [el plan](../PLAN_CAPTURA_AUTOMATICA_ANDROID.md) y la [evidencia de ocho fuentes](../artifacts/android-fase1/multi-source-verification.json). La evidencia inicial y el despliegue web de 0.1.1 se conservan como historial; esta actualización no requiere desplegar de nuevo la web.
 
 Fuentes técnicas: [TWA](https://developer.chrome.com/docs/android/trusted-web-activity/), [Android Browser Helper](https://github.com/GoogleChrome/android-browser-helper), [NotificationListenerService](https://developer.android.com/reference/android/service/notification/NotificationListenerService), [compatibilidad de AGP 9.1.1](https://developer.android.com/build/releases/agp-9-1-0-release-notes) y [Kotlin incorporado](https://developer.android.com/build/migrate-to-built-in-kotlin).
 
@@ -389,7 +389,7 @@ Con PostgreSQL 16 local desechable, sin reutilizar datos personales:
 
 ```bash
 DIRECT_URL=<PostgreSQL localhost afp_test…> pnpm exec prisma migrate deploy
-AFP_TEST_DATABASE_URL=<la misma base local> node --test --experimental-test-isolation=none tests/*.test.cjs
+AFP_TEST_DATABASE_URL=<la misma base local> pnpm test
 AFP_MIGRATION_TEST_DATABASE_URL=<la misma base local> pnpm db:verify
 pnpm lint
 pnpm exec next build --webpack
@@ -707,7 +707,7 @@ Pruebas nuevas: `tests/capture-rollout.test.cjs` y `tests/capture-rollout-integr
 
 ```bash
 AFP_TEST_DATABASE_URL=postgresql://postgres:afp_test_only@127.0.0.1:55450/afp_test_nu_cfe \
-  node --test --experimental-test-isolation=none tests/*.test.cjs
+  pnpm test
 pnpm lint
 pnpm exec next build --webpack
 ```
@@ -736,7 +736,7 @@ Las claves por ocurrencia, fase y mes se guardan en el teléfono para que no sue
 Comprobaciones funcionales sin capturas ni revisión visual:
 
 ```bash
-node --test tests/android-notices.test.cjs tests/capture-api.test.cjs tests/dashboard-breakdowns.test.cjs tests/notice-dismissals.test.cjs
+pnpm test android-notices.test.cjs capture-api.test.cjs dashboard-breakdowns.test.ts notice-dismissals.test.ts
 pnpm exec next build --webpack
 pnpm lint
 # Dentro de android/, con un JDK completo configurado:

@@ -1,0 +1,70 @@
+
+> afp@0.1.0 test /home/garatachia/projects/afp
+> node --import tsx tests/run-tests.ts shared-expenses-integration.test.ts financial-fixtures.test.ts payable-notices.test.ts
+
+TAP version 13
+# Subtest: contratos financieros: vm comprueba esquemas, constantes y constructores registrados
+ok 1 - contratos financieros: vm comprueba esquemas, constantes y constructores registrados
+  ---
+  duration_ms: 45.011311
+  type: 'test'
+  ...
+# Subtest: fixtures financieros: los cálculos conservan las propiedades ausentes y los datos originales
+ok 2 - fixtures financieros: los cálculos conservan las propiedades ausentes y los datos originales
+  ---
+  duration_ms: 5.005936
+  type: 'test'
+  ...
+# Subtest: fixtures HTTP: el adaptador conserva JSON y rechaza handlers o estados inválidos
+ok 3 - fixtures HTTP: el adaptador conserva JSON y rechaza handlers o estados inválidos
+  ---
+  duration_ms: 1.870628
+  type: 'test'
+  ...
+# Subtest: avisos por pagar: desde dos días antes, hoy y vencidos de meses anteriores
+ok 4 - avisos por pagar: desde dos días antes, hoy y vencidos de meses anteriores
+  ---
+  duration_ms: 11.16991
+  type: 'test'
+  ...
+# Subtest: avisos por pagar: el saldo a centavos decide la liquidación y conserva cancelaciones
+ok 5 - avisos por pagar: el saldo a centavos decide la liquidación y conserva cancelaciones
+  ---
+  duration_ms: 0.65601
+  type: 'test'
+  ...
+# Subtest: avisos por pagar: préstamos usan saldo bancario o capital abonado y fecha contractual
+ok 6 - avisos por pagar: préstamos usan saldo bancario o capital abonado y fecha contractual
+  ---
+  duration_ms: 0.352099
+  type: 'test'
+  ...
+# Subtest: avisos por pagar: prioridad por vencimiento y fecha junto a otros avisos
+ok 7 - avisos por pagar: prioridad por vencimiento y fecha junto a otros avisos
+  ---
+  duration_ms: 0.69695
+  type: 'test'
+  ...
+# Subtest: avisos por pagar: conserva el día bancario UTC y todo el día local de vencimiento
+ok 8 - avisos por pagar: conserva el día bancario UTC y todo el día local de vencimiento
+  ---
+  duration_ms: 591.45944
+  type: 'test'
+  ...
+(node:904027) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+# Subtest: PostgreSQL: gastos compartidos en CRUD, análisis, cortes, idempotencia y aislamiento
+ok 9 - PostgreSQL: gastos compartidos en CRUD, análisis, cortes, idempotencia y aislamiento
+  ---
+  duration_ms: 703.908522
+  type: 'test'
+  ...
+1..9
+# tests 9
+# suites 0
+# pass 9
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1631.364427

@@ -6,6 +6,12 @@ Consolidado el **27 de octubre de 2026** a partir del README del commit `4562aa0
 
 ## 2026-10-28
 
+### Pruebas financieras y persistencia en TypeScript
+
+**Fase 3 de pruebas completada localmente** sobre `dd81d4f`. Se convirtieron 52 pruebas de tarjetas/MSI, presentación, suscripciones, gastos, deudas, ingresos y Mi dinero, junto con los helpers de contexto de rutas y persistencia de deudas. Los mocks distinguen consultas, escrituras, bloqueo y rollback; las integraciones conservan PostgreSQL real. Las proyecciones parciales y entradas inválidas pasan por fronteras de prueba explícitas sin completar los datos históricos ni modificar firmas de producción. Tres scripts operativos CJS tienen declaraciones específicas adyacentes.
+
+Se conservan en orden y jerarquía todos los escenarios de fases 0 y 2 y se añaden tres para los adaptadores. Instalación aislada, controles de tipos, lint, suite PostgreSQL sin omisiones, build y reconstrucción/actualización de la base verificados; las fuentes protegidas y evidencias anteriores conservan sus hashes. README, plan y comandos Android reflejan la ejecución mixta vigente. Las fases 4–6, incluidos los siete helpers CJS de navegador y seeds, continúan pendientes. Sin cambios de producto, esquema, SQL, dependencias, servicios remotos ni publicación. Resultados, incidencias del recolector y reproducción: [fase 3 de pruebas](../artifacts/typescript-tests-migration/phase-3/README.md).
+
 ### Cargador de pruebas tipado y piloto de transferencias
 
 **Fase 2 completada localmente** sobre `c0a0a37`. Se convirtieron los cargadores de fuentes/ESM y las pruebas del cargador y transferencias. Siete rutas obtienen sus exports del módulo real; las rutas dinámicas y funciones privadas sin contrato conservan `unknown`. Se tiparon los dobles mínimos y globals, con veinte casos negativos separados de la ejecución. Los consumidores CJS activos actualizan imports y registro TS, incluido un proceso hijo por zona horaria y el servidor offline.

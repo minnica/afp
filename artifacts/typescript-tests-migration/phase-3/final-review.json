@@ -1,0 +1,20 @@
+{
+  "implementationHashesCurrent": 87,
+  "brokenLocalDocumentationLinks": [],
+  "fullSuite": 866,
+  "fullSuiteSkips": 0,
+  "originalScenariosPreservedInOrder": {
+    "0": {
+      "reference": 854,
+      "preservedInOrder": 854
+    },
+    "2": {
+      "reference": 863,
+      "preservedInOrder": 863
+    }
+  },
+  "followUpCommandsPassed": 4,
+  "finalTypeProgramsPassed": true,
+  "resourceCleanup": true,
+  "finalLintPassed": true
+}

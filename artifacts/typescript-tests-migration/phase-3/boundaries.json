@@ -1,0 +1,140 @@
+{
+  "publicModules": "SourceModules derives 54 modules with typeof import; sourceExports requires every runtime export and its real kind.",
+  "dynamicRoutes": "Unknown paths stay unknown; testHandler/dynamic-values check handlers and JSON at use sites.",
+  "privateExports": {
+    "file": "tests/helpers/legacy-route-context.ts",
+    "routes": {
+      "dashboard": [
+        "buildWeeklyComparison",
+        "buildCategoryBreakdown",
+        "buildCardMonthlyComparison",
+        "shouldIncludePurchaseInMonth",
+        "isSubscriptionChargeableInMonth",
+        "getMonthlySubscriptions"
+      ],
+      "installment-purchases": [
+        "formatPurchase"
+      ]
+    },
+    "retirement": "Replace only if production exposes a suitable public contract; never export internals solely for tests."
+  },
+  "sparseCalculations": {
+    "file": "tests/helpers/financial-fixtures.ts",
+    "purpose": "Preserve historically omitted fields and Decimal/Date versus JSON representations; scalar types and real results remain checked. Persistence signatures are excluded.",
+    "retirement": "Review each call when its fixtures or production query shape change; never fill omitted fields globally."
+  },
+  "uncheckedFixture": {
+    "purpose": "Inject deliberately malformed or minimal legacy inputs into strict internal functions without normalizing them. ReturnType comes from the function, never a consumer-selected module contract.",
+    "callSites": [
+      {
+        "file": "tests/card-cycle-calculation.test.ts",
+        "line": 141,
+        "source": "const result = uncheckedFixture(calc, 7, { purchases, cycle: { ...cycle(7), statementAmount: 0 } });"
+      },
+      {
+        "file": "tests/card-cycle-calculation.test.ts",
+        "line": 147,
+        "source": "const compact = uncheckedFixture(calc, 7, { purchases, includeBreakdown: false });"
+      },
+      {
+        "file": "tests/card-usage-presentation.test.ts",
+        "line": 11,
+        "source": "assert.deepEqual(Array.from(uncheckedFixture(helpers.sortUsageByCutDate, items), (item) => present(item.card).name), [\"A\", \"B\", \"Noviembre\", \"Sin fecha\"]);"
+      },
+      {
+        "file": "tests/card-usage-presentation.test.ts",
+        "line": 12,
+        "source": "assert.deepEqual(Array.from(uncheckedFixture(helpers.sortUsageByCutDate, items, \"desc\"), (item) => present(item.card).name), [\"Noviembre\", \"A\", \"B\", \"Sin fecha\"]);"
+      },
+      {
+        "file": "tests/card-usage-presentation.test.ts",
+        "line": 17,
+        "source": "const options = uncheckedFixture(helpers.usageHistoryOptions, [row(\"A\", \"2026-12-08\", 2026, 12), row(\"B\", \"2026-12-18\", 2026, 12), row(\"A\", \"2027-01-08\", 2027, 1)]);"
+      },
+      {
+        "file": "tests/card-usage-presentation.test.ts",
+        "line": 25,
+        "source": "assert.deepEqual(Array.from(uncheckedFixture(helpers.sortUsageByCutDate, items), (item) => present(item.card).name), [\"Antes\", \"Nu\", \"Después\"]);"
+      },
+      {
+        "file": "tests/card-usage-presentation.test.ts",
+        "line": 26,
+        "source": "assert.equal(uncheckedFixture(helpers.usageHistoryPeriod, nu), \"\");"
+      },
+      {
+        "file": "tests/card-usage-presentation.test.ts",
+        "line": 31,
+        "source": "assert.equal(uncheckedFixture(helpers.formatUsageCutDate, row(\"A\", \"2026-10-13T00:00:00Z\"), today), \"Corte: 13 oct · hoy\");"
+      },
+      {
+        "file": "tests/card-usage-presentation.test.ts",
+        "line": 32,
+        "source": "assert.equal(uncheckedFixture(helpers.formatUsageCutDate, row(\"A\", \"2026-10-14T00:00:00Z\"), today), \"Corte: 14 oct · mañana\");"
+      },
+      {
+        "file": "tests/card-usage-presentation.test.ts",
+        "line": 33,
+        "source": "assert.equal(uncheckedFixture(helpers.formatUsageCutDate, row(\"A\", \"2026-10-18T00:00:00Z\"), today), \"Corte: 18 oct · en 5 días\");"
+      },
+      {
+        "file": "tests/card-usage-presentation.test.ts",
+        "line": 34,
+        "source": "assert.equal(uncheckedFixture(helpers.formatUsageCutDate, { ...row(\"A\", \"2026-10-08\"), periodVerified: true }, today, true), \"Corte: 8 oct\");"
+      },
+      {
+        "file": "tests/card-usage-presentation.test.ts",
+        "line": 35,
+        "source": "assert.equal(uncheckedFixture(helpers.formatUsageCutDate, { card: { name: \"A\" } }, today), \"Período sin registrar\");"
+      },
+      {
+        "file": "tests/money-projection-breakdown.test.ts",
+        "line": 111,
+        "source": "const selected = uncheckedFixture(monthlyBreakdownEvents, forecast, '2026-10');"
+      },
+      {
+        "file": "tests/money-projection-breakdown.test.ts",
+        "line": 137,
+        "source": "const summarize = (forecast: ReturnType<typeof buildForecast>, month: string) => buildProjectionBreakdown(uncheckedFixture(monthlyBreakdownEvents, forecast, month), forecast.accounts, data.plans);"
+      },
+      {
+        "file": "tests/money-projection-breakdown.test.ts",
+        "line": 182,
+        "source": "const selected = uncheckedFixture(monthlyBreakdownEvents, forecast, '2026-10', 'a');"
+      },
+      {
+        "file": "tests/money-projection-breakdown.test.ts",
+        "line": 186,
+        "source": "assert.equal(uncheckedFixture(monthlyBreakdownEvents, forecast, '2026-09').length, 0);"
+      },
+      {
+        "file": "tests/notice-dismissals.test.ts",
+        "line": 33,
+        "source": "for (const value of [null, { ...notice, type: \"NEW\" }, { ...notice, date: \"bad\" }, { ...notice, id: 42 }]) assert.equal(uncheckedFixture(ctx.getNoticeKey, value), null);"
+      }
+    ]
+  },
+  "assertions": [
+    {
+      "file": "tests/helpers/financial-fixtures.ts",
+      "items": [
+        "Jsonified JSON clone",
+        "SparseModule for pure calculations",
+        "Extract for checked union branches",
+        "ReturnType of unchecked injection"
+      ]
+    },
+    {
+      "file": "tests/helpers/legacy-route-context.ts",
+      "items": [
+        "Closed list of private exports checked as functions"
+      ]
+    }
+  ],
+  "http": "TestRequest and TestReply are explicit test adapters; raw legacy JSON responses stay raw and are not described as NextResponse.",
+  "persistence": "debt-fixture uses minimal delegates and original locking/rollback. faultingTransactions accepts a real PrismaClient and declares the callback transaction contract it intercepts.",
+  "externalCjsDeclarations": [
+    "scripts/audit-migration-history.d.cts",
+    "scripts/android-assetlinks.d.cts",
+    "scripts/configure-capture-bank-fallback-cron.d.cts"
+  ]
+}

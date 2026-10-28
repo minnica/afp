@@ -1,0 +1,92 @@
+{
+  "baseCommit": "dd81d4f80d6f52a32f5189f4412dfe2fdd9abcd1",
+  "startedAt": "2026-10-28T09:29:47.956013+00:00",
+  "commands": [
+    {
+      "name": "migrate",
+      "command": [
+        "pnpm",
+        "exec",
+        "prisma",
+        "migrate",
+        "deploy"
+      ],
+      "seconds": 2.607,
+      "exitCode": 0
+    },
+    {
+      "name": "typecheck",
+      "command": [
+        "pnpm",
+        "typecheck"
+      ],
+      "seconds": 11.645,
+      "exitCode": 0
+    },
+    {
+      "name": "typecheck-tests",
+      "command": [
+        "pnpm",
+        "typecheck:tests"
+      ],
+      "seconds": 10.645,
+      "exitCode": 0
+    },
+    {
+      "name": "test-types",
+      "command": [
+        "pnpm",
+        "test:types"
+      ],
+      "seconds": 7.864,
+      "exitCode": 0
+    },
+    {
+      "name": "lint",
+      "command": [
+        "pnpm",
+        "lint"
+      ],
+      "seconds": 34.686,
+      "exitCode": 0
+    },
+    {
+      "name": "test",
+      "command": [
+        "pnpm",
+        "test"
+      ],
+      "seconds": 50.976,
+      "exitCode": 0
+    },
+    {
+      "name": "build",
+      "command": [
+        "pnpm",
+        "build"
+      ],
+      "seconds": 2.023,
+      "exitCode": 1
+    }
+  ],
+  "workspace": {
+    "copyWithoutEnv": true,
+    "dependencies": "existing node_modules symlink; no installation",
+    "nextInitiallyAbsent": true
+  },
+  "versions": {
+    "node": "v22.23.2",
+    "pnpm": "10.33.0",
+    "typescript": "Version 6.0.3",
+    "tsx": "4.23.15",
+    "prisma": "7.10.1"
+  },
+  "postgres": {
+    "address": "127.0.0.1:44703",
+    "image": "docker.io/library/postgres:16-alpine",
+    "imageId": "75f5a96988cdf694a215073c3e9c001b706b371e2f94df3967f2efdec2787f6b",
+    "version": "postgres (PostgreSQL) 16.15"
+  },
+  "finishedAt": "2026-10-28T09:31:53.552256+00:00",
+  "cleanedUp": true
+}

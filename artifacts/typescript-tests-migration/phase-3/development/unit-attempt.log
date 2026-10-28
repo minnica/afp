@@ -1,0 +1,3417 @@
+
+> afp@0.1.0 test /home/garatachia/projects/afp
+> node --import tsx tests/run-tests.ts
+
+TAP version 13
+# Subtest: Análisis conserva cero e importes a centavos al mostrarlos
+ok 1 - Análisis conserva cero e importes a centavos al mostrarlos
+  ---
+  duration_ms: 4.383755
+  type: 'test'
+  ...
+# Subtest: enero compara diciembre anterior y conserva categorías sin gasto actual
+ok 2 - enero compara diciembre anterior y conserva categorías sin gasto actual
+  ---
+  duration_ms: 0.59878
+  type: 'test'
+  ...
+# Subtest: categorías se unen por ID aunque cambien nombre, sin mutar importes
+ok 3 - categorías se unen por ID aunque cambien nombre, sin mutar importes
+  ---
+  duration_ms: 0.16013
+  type: 'test'
+  ...
+# Subtest: Digital Asset Links valida huellas SHA-256 y conserva la identidad de producción
+ok 4 - Digital Asset Links valida huellas SHA-256 y conserva la identidad de producción
+  ---
+  duration_ms: 0.429459
+  type: 'test'
+  ...
+# Subtest: Digital Asset Links rechaza una firma, paquete o relación distintos y contenido inválido
+ok 5 - Digital Asset Links rechaza una firma, paquete o relación distintos y contenido inválido
+  ---
+  duration_ms: 0.21419
+  type: 'test'
+  ...
+# Subtest: avisos Android: mismo pago y saldo del Dashboard, sin exponer registros financieros
+ok 6 - avisos Android: mismo pago y saldo del Dashboard, sin exponer registros financieros
+  ---
+  duration_ms: 55.615243
+  type: 'test'
+  ...
+# Subtest: avisos Android: oculta por mes, retira liquidaciones y vuelve a avisar si cambia el saldo
+ok 7 - avisos Android: oculta por mes, retira liquidaciones y vuelve a avisar si cambia el saldo
+  ---
+  duration_ms: 20.085369
+  type: 'test'
+  ...
+# Subtest: avisos Android: identidad estable entre consultas, cambia al vencer y al mes siguiente
+ok 8 - avisos Android: identidad estable entre consultas, cambia al vencer y al mes siguiente
+  ---
+  duration_ms: 23.028047
+  type: 'test'
+  ...
+# Subtest: avisos Android: cálculo sin estado conserva las bonificaciones documentadas del corte
+ok 9 - avisos Android: cálculo sin estado conserva las bonificaciones documentadas del corte
+  ---
+  duration_ms: 20.520699
+  type: 'test'
+  ...
+# Subtest: avisos Android: suscripciones, cobros y cortes conservan destino y reglas compartidas
+ok 10 - avisos Android: suscripciones, cobros y cortes conservan destino y reglas compartidas
+  ---
+  duration_ms: 20.896118
+  type: 'test'
+  ...
+# Subtest: avisos Android: fecha local de México, cambio de mes y zonas inválidas
+ok 11 - avisos Android: fecha local de México, cambio de mes y zonas inválidas
+  ---
+  duration_ms: 19.48072
+  type: 'test'
+  ...
+# Subtest: cuentas por pagar: Dashboard y Android comparten saldo, fecha, aislamiento y liquidación
+ok 12 - cuentas por pagar: Dashboard y Android comparten saldo, fecha, aislamiento y liquidación
+  ---
+  duration_ms: 51.031218
+  type: 'test'
+  ...
+# Subtest: avisos Android: credencial, pausa y revocación se comprueban antes de leer finanzas
+ok 13 - avisos Android: credencial, pausa y revocación se comprueban antes de leer finanzas
+  ---
+  duration_ms: 147.913119
+  type: 'test'
+  ...
+# Subtest: avisos Android: un fallo de lectura nunca se presenta como una lista vacía válida
+ok 14 - avisos Android: un fallo de lectura nunca se presenta como una lista vacía válida
+  ---
+  duration_ms: 37.521782
+  type: 'test'
+  ...
+# Subtest: avisos Android: zona inválida y límite de consultas no consultan registros financieros
+ok 15 - avisos Android: zona inválida y límite de consultas no consultan registros financieros
+  ---
+  duration_ms: 78.06474
+  type: 'test'
+  ...
+# Subtest: Android and API accept the same eleven exact sources, including three services in review
+ok 16 - Android and API accept the same eleven exact sources, including three services in review
+  ---
+  duration_ms: 10.995559
+  type: 'test'
+  ...
+# Subtest: Auth: las interrupciones de red y errores temporales devuelven 503, conservando la denegación
+ok 17 - Auth: las interrupciones de red y errores temporales devuelven 503, conservando la denegación
+  ---
+  duration_ms: 16.390814
+  type: 'test'
+  ...
+# Subtest: Auth: tokens rechazados o identidad ausente siguen devolviendo 401
+ok 18 - Auth: tokens rechazados o identidad ausente siguen devolviendo 401
+  ---
+  duration_ms: 11.084808
+  type: 'test'
+  ...
+# Subtest: Auth: la recuperación valida de nuevo el token y obtiene la identidad del servidor
+ok 19 - Auth: la recuperación valida de nuevo el token y obtiene la identidad del servidor
+  ---
+  duration_ms: 3.130047
+  type: 'test'
+  ...
+# Subtest: card-cycles: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+ok 20 - card-cycles: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+  ---
+  duration_ms: 30.646779
+  type: 'test'
+  ...
+# Subtest: cards: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+ok 21 - cards: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+  ---
+  duration_ms: 14.906415
+  type: 'test'
+  ...
+# Subtest: dashboard: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+ok 22 - dashboard: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+  ---
+  duration_ms: 28.405681
+  type: 'test'
+  ...
+# Subtest: expenses: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+ok 23 - expenses: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+  ---
+  duration_ms: 101.463076
+  type: 'test'
+  ...
+# Subtest: incomes: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+ok 24 - incomes: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+  ---
+  duration_ms: 13.697596
+  type: 'test'
+  ...
+# Subtest: installment-purchases: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+ok 25 - installment-purchases: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+  ---
+  duration_ms: 14.719575
+  type: 'test'
+  ...
+# Subtest: money: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+ok 26 - money: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+  ---
+  duration_ms: 46.131363
+  type: 'test'
+  ...
+# Subtest: notice-dismissals: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+ok 27 - notice-dismissals: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+  ---
+  duration_ms: 12.884207
+  type: 'test'
+  ...
+# Subtest: payables: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+ok 28 - payables: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+  ---
+  duration_ms: 13.779686
+  type: 'test'
+  ...
+# Subtest: receivables: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+ok 29 - receivables: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+  ---
+  duration_ms: 13.055707
+  type: 'test'
+  ...
+# Subtest: settings: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+ok 30 - settings: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+  ---
+  duration_ms: 10.02824
+  type: 'test'
+  ...
+# Subtest: setup-user: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+ok 31 - setup-user: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+  ---
+  duration_ms: 7.398732
+  type: 'test'
+  ...
+# Subtest: subscription-charges: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+ok 32 - subscription-charges: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+  ---
+  duration_ms: 13.214986
+  type: 'test'
+  ...
+# Subtest: subscriptions: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+ok 33 - subscriptions: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+  ---
+  duration_ms: 10.30904
+  type: 'test'
+  ...
+# Subtest: calendar/google: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+ok 34 - calendar/google: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+  ---
+  duration_ms: 24.464435
+  type: 'test'
+  ...
+# Subtest: cron/capture-bank-fallback: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+ok 35 - cron/capture-bank-fallback: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+  ---
+  duration_ms: 91.015537
+  type: 'test'
+  ...
+# Subtest: gastos/bootstrap: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+ok 36 - gastos/bootstrap: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+  ---
+  duration_ms: 9.42065
+  type: 'test'
+  ...
+# Subtest: calendar/google/connect: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+ok 37 - calendar/google/connect: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+  ---
+  duration_ms: 24.838005
+  type: 'test'
+  ...
+# Subtest: calendar/google/disconnect: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+ok 38 - calendar/google/disconnect: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+  ---
+  duration_ms: 23.737776
+  type: 'test'
+  ...
+# Subtest: calendar/google/sync: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+ok 39 - calendar/google/sync: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+  ---
+  duration_ms: 7.771862
+  type: 'test'
+  ...
+# Subtest: cards: ignora userId falsificado; A y B solo leen, crean, editan y borran lo propio
+ok 40 - cards: ignora userId falsificado; A y B solo leen, crean, editan y borran lo propio
+  ---
+  duration_ms: 17.486662
+  type: 'test'
+  ...
+# Subtest: expenses: ignora userId falsificado; A y B solo leen, crean, editan y borran lo propio
+ok 41 - expenses: ignora userId falsificado; A y B solo leen, crean, editan y borran lo propio
+  ---
+  duration_ms: 95.933402
+  type: 'test'
+  ...
+# Subtest: incomes: ignora userId falsificado; A y B solo leen, crean, editan y borran lo propio
+ok 42 - incomes: ignora userId falsificado; A y B solo leen, crean, editan y borran lo propio
+  ---
+  duration_ms: 16.095243
+  type: 'test'
+  ...
+# Subtest: subscriptions: ignora userId falsificado; A y B solo leen, crean, editan y borran lo propio
+ok 43 - subscriptions: ignora userId falsificado; A y B solo leen, crean, editan y borran lo propio
+  ---
+  duration_ms: 11.141569
+  type: 'test'
+  ...
+# Subtest: installment-purchases: ignora userId falsificado; A y B solo leen, crean, editan y borran lo propio
+ok 44 - installment-purchases: ignora userId falsificado; A y B solo leen, crean, editan y borran lo propio
+  ---
+  duration_ms: 15.309234
+  type: 'test'
+  ...
+# Subtest: receivables: ignora userId falsificado; A y B solo leen, crean, editan y borran lo propio
+ok 45 - receivables: ignora userId falsificado; A y B solo leen, crean, editan y borran lo propio
+  ---
+  duration_ms: 16.616773
+  type: 'test'
+  ...
+# Subtest: payables: ignora userId falsificado; A y B solo leen, crean, editan y borran lo propio
+ok 46 - payables: ignora userId falsificado; A y B solo leen, crean, editan y borran lo propio
+  ---
+  duration_ms: 13.626046
+  type: 'test'
+  ...
+# Subtest: expenses: rechaza vínculos de otro propietario antes de cualquier escritura
+ok 47 - expenses: rechaza vínculos de otro propietario antes de cualquier escritura
+  ---
+  duration_ms: 93.951024
+  type: 'test'
+  ...
+# Subtest: installment-purchases: rechaza vínculos de otro propietario antes de cualquier escritura
+ok 48 - installment-purchases: rechaza vínculos de otro propietario antes de cualquier escritura
+  ---
+  duration_ms: 21.596598
+  type: 'test'
+  ...
+# Subtest: subscriptions: rechaza vínculos de otro propietario antes de cualquier escritura
+ok 49 - subscriptions: rechaza vínculos de otro propietario antes de cualquier escritura
+  ---
+  duration_ms: 47.415561
+  type: 'test'
+  ...
+# Subtest: incomes: rechaza vínculos de otro propietario antes de cualquier escritura
+ok 50 - incomes: rechaza vínculos de otro propietario antes de cualquier escritura
+  ---
+  duration_ms: 12.688747
+  type: 'test'
+  ...
+# Subtest: receivables: rechaza vínculos de otro propietario antes de cualquier escritura
+ok 51 - receivables: rechaza vínculos de otro propietario antes de cualquier escritura
+  ---
+  duration_ms: 12.389188
+  type: 'test'
+  ...
+# Subtest: payables: rechaza vínculos de otro propietario antes de cualquier escritura
+ok 52 - payables: rechaza vínculos de otro propietario antes de cualquier escritura
+  ---
+  duration_ms: 13.182656
+  type: 'test'
+  ...
+# Subtest: settings: aísla los tres catálogos y sus eliminaciones
+ok 53 - settings: aísla los tres catálogos y sus eliminaciones
+  ---
+  duration_ms: 10.841699
+  type: 'test'
+  ...
+# Subtest: ciclos: todas las acciones exigen el propietario; activar/desactivar suscripciones también
+ok 54 - ciclos: todas las acciones exigen el propietario; activar/desactivar suscripciones también
+  ---
+  duration_ms: 32.073518
+  type: 'test'
+  ...
+# Subtest: setup-user: ID y correo solo salen del usuario validado
+not ok 55 - setup-user: ID y correo solo salen del usuario validado
+  ---
+  duration_ms: 13.850646
+  type: 'test'
+  location: '/home/garatachia/projects/afp/tests/api-authorization.test.ts:2:11381'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert.ok(isRecord(value))
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    record (/home/garatachia/projects/afp/tests/helpers/dynamic-values.ts:7:10)
+    TestContext.<anonymous> (/home/garatachia/projects/afp/tests/api-authorization.test.ts:164:50)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: dashboard, bootstrap y ciclos: todas las consultas usan la identidad validada
+ok 56 - dashboard, bootstrap y ciclos: todas las consultas usan la identidad validada
+  ---
+  duration_ms: 68.76475
+  type: 'test'
+  ...
+# Subtest: no permite inyectar filtros Prisma en IDs del cuerpo
+ok 57 - no permite inyectar filtros Prisma en IDs del cuerpo
+  ---
+  duration_ms: 167.959468
+  type: 'test'
+  ...
+# Subtest: apiFetch usa el token vigente, preserva headers y signal, y bloquea otros orígenes
+ok 58 - apiFetch usa el token vigente, preserva headers y signal, y bloquea otros orígenes
+  ---
+  duration_ms: 7.127153
+  type: 'test'
+  ...
+# Subtest: apiFetch no envía nada sin sesión ni con una cuenta distinta de la pantalla
+ok 59 - apiFetch no envía nada sin sesión ni con una cuenta distinta de la pantalla
+  ---
+  duration_ms: 6.174844
+  type: 'test'
+  ...
+Google Calendar OAuth: FAILED
+# Subtest: la cola conserva los pendientes si cambia la cuenta y los sincroniza con su propietario
+ok 60 - la cola conserva los pendientes si cambia la cuenta y los sincroniza con su propietario
+  ---
+  duration_ms: 47.941201
+  type: 'test'
+  ...
+# Subtest: el service worker no intercepta API ni siquiera como navegación; elimina caché anterior
+ok 61 - el service worker no intercepta API ni siquiera como navegación; elimina caché anterior
+  ---
+  duration_ms: 0.825459
+  type: 'test'
+  ...
+# Subtest: pagos automáticos: comprobantes y Nu con reglas explícitas, recibos y aislamiento reales
+ok 62 - pagos automáticos: comprobantes y Nu con reglas explícitas, recibos y aislamiento reales # SKIP
+  ---
+  duration_ms: 0.04159
+  type: 'test'
+  ...
+# Subtest: comprobante BBVA: destino, importe, día bancario, concepto y rastreo; no infiere moneda o tarjeta
+ok 63 - comprobante BBVA: destino, importe, día bancario, concepto y rastreo; no infiere moneda o tarjeta
+  ---
+  duration_ms: 2.121077
+  type: 'test'
+  ...
+# Subtest: comprobante: errores de dígitos OCR, fechas, importes o rastreo no habilitan abonos
+ok 64 - comprobante: errores de dígitos OCR, fechas, importes o rastreo no habilitan abonos
+  ---
+  duration_ms: 0.75167
+  type: 'test'
+  ...
+# Subtest: concepto noviembre se conserva como noviembre; no se sustituye por el mes de operación
+ok 65 - concepto noviembre se conserva como noviembre; no se sustituye por el mes de operación
+  ---
+  duration_ms: 0.447419
+  type: 'test'
+  ...
+# Subtest: Captura PostgreSQL: vinculación, recepción y autorización completa
+ok 66 - Captura PostgreSQL: vinculación, recepción y autorización completa # SKIP
+  ---
+  duration_ms: 0.0363
+  type: 'test'
+  ...
+# Subtest: Captura: todos los métodos protegidos separan sesión web y credencial nativa antes de leer cuerpo o BD
+ok 67 - Captura: todos los métodos protegidos separan sesión web y credencial nativa antes de leer cuerpo o BD
+  ---
+  duration_ms: 105.598092
+  type: 'test'
+  ...
+# Subtest: BANAMEX 1/2: mismo Wallet, activación independiente y dos evidencias para un gasto
+ok 68 - BANAMEX 1/2: mismo Wallet, activación independiente y dos evidencias para un gasto # SKIP
+  ---
+  duration_ms: 0.05163
+  type: 'test'
+  ...
+# Subtest: BANAMEX 2 reutiliza exactamente el analizador Wallet de BANAMEX 1 y conserva origen de fecha
+ok 69 - BANAMEX 2 reutiliza exactamente el analizador Wallet de BANAMEX 1 y conserva origen de fecha
+  ---
+  duration_ms: 1.482339
+  type: 'test'
+  ...
+# Subtest: JOY BANAMEX bancario conserva comercio completo, centavos, tres cifras, fecha AM/PM y autorización solo como evidencia
+ok 70 - JOY BANAMEX bancario conserva comercio completo, centavos, tres cifras, fecha AM/PM y autorización solo como evidencia
+  ---
+  duration_ms: 0.968619
+  type: 'test'
+  ...
+# Subtest: JOY bancario rechaza cuerpos contradictorios, importes inválidos, calendarios imposibles y operaciones futuras
+ok 71 - JOY bancario rechaza cuerpos contradictorios, importes inválidos, calendarios imposibles y operaciones futuras
+  ---
+  duration_ms: 1.062308
+  type: 'test'
+  ...
+# Subtest: JOY no amplía el formato bancario a otra marca, fuente, referencias, moneda supuesta ni avisos especiales
+ok 72 - JOY no amplía el formato bancario a otra marca, fuente, referencias, moneda supuesta ni avisos especiales
+  ---
+  duration_ms: 1.494889
+  type: 'test'
+  ...
+# Subtest: respaldo: programación idempotente y SQL condicional con adaptadores locales de cron/net/Vault
+ok 73 - respaldo: programación idempotente y SQL condicional con adaptadores locales de cron/net/Vault # SKIP
+  ---
+  duration_ms: 0.03671
+  type: 'test'
+  ...
+# Subtest: Wallet principal y respaldo bancario persistente: API y PostgreSQL
+ok 74 - Wallet principal y respaldo bancario persistente: API y PostgreSQL # SKIP
+  ---
+  duration_ms: 0.02919
+  type: 'test'
+  ...
+# Subtest: BBVA: admite las variantes exactas de cuatro y cinco cifras, sin inferir receptor ni moneda
+ok 75 - BBVA: admite las variantes exactas de cuatro y cinco cifras, sin inferir receptor ni moneda
+  ---
+  duration_ms: 0.886189
+  type: 'test'
+  ...
+# Subtest: BBVA: importes ambiguos, moneda extranjera, devolución, contradicción y otra app quedan sin propuesta de gasto
+ok 76 - BBVA: importes ambiguos, moneda extranjera, devolución, contradicción y otra app quedan sin propuesta de gasto
+  ---
+  duration_ms: 0.851559
+  type: 'test'
+  ...
+# Subtest: BBVA: regla, efecto financiero, corrección e idempotencia con PostgreSQL
+ok 77 - BBVA: regla, efecto financiero, corrección e idempotencia con PostgreSQL # SKIP
+  ---
+  duration_ms: 0.03573
+  type: 'test'
+  ...
+# Subtest: Wallet BBVA real: API, observación, política de fecha, activación y gasto único
+ok 78 - Wallet BBVA real: API, observación, política de fecha, activación y gasto único # SKIP
+  ---
+  duration_ms: 0.03103
+  type: 'test'
+  ...
+# Subtest: BBVA Wallet: TDC Platinum conserva MXN, descriptor, alias bancario y fecha del aviso México
+ok 79 - BBVA Wallet: TDC Platinum conserva MXN, descriptor, alias bancario y fecha del aviso México
+  ---
+  duration_ms: 0.29825
+  type: 'test'
+  ...
+# Subtest: BBVA Wallet: envío tardío no sustituye el día de publicación por el de recepción
+ok 80 - BBVA Wallet: envío tardío no sustituye el día de publicación por el de recepción
+  ---
+  duration_ms: 0.263909
+  type: 'test'
+  ...
+# Subtest: BBVA Wallet: separadores estrictos, centavos y límites sin redondeos
+ok 81 - BBVA Wallet: separadores estrictos, centavos y límites sin redondeos
+  ---
+  duration_ms: 1.439149
+  type: 'test'
+  ...
+# Subtest: BBVA Wallet: fecha, moneda y campos contradictorios requieren revisión
+ok 82 - BBVA Wallet: fecha, moneda y campos contradictorios requieren revisión
+  ---
+  duration_ms: 1.266229
+  type: 'test'
+  ...
+# Subtest: BBVA Wallet: no amplía otros productos, fuentes o estructuras sin muestra
+ok 83 - BBVA Wallet: no amplía otros productos, fuentes o estructuras sin muestra
+  ---
+  duration_ms: 1.059658
+  type: 'test'
+  ...
+# Subtest: pagos capturados: recepción, revisión y acumulados transaccionales con PostgreSQL
+ok 84 - pagos capturados: recepción, revisión y acumulados transaccionales con PostgreSQL # SKIP
+  ---
+  duration_ms: 0.03681
+  type: 'test'
+  ...
+# Subtest: pago Nu real anonimizado: identifica recepción, conserva ausencias y usa fecha propuesta explícita
+ok 85 - pago Nu real anonimizado: identifica recepción, conserva ausencias y usa fecha propuesta explícita
+  ---
+  duration_ms: 0.34892
+  type: 'test'
+  ...
+# Subtest: Cajita, ingreso a Cuenta Nu, recordatorio y pago CFE no son abonos a tarjeta
+ok 86 - Cajita, ingreso a Cuenta Nu, recordatorio y pago CFE no son abonos a tarjeta
+  ---
+  duration_ms: 0.919159
+  type: 'test'
+  ...
+# Subtest: pago Nu: texto contradictorio, otro paquete, fecha inválida y cancelación no acreditan pago
+ok 87 - pago Nu: texto contradictorio, otro paquete, fecha inválida y cancelación no acreditan pago
+  ---
+  duration_ms: 0.792209
+  type: 'test'
+  ...
+# Subtest: concepto de estado: reconoce mes, conserva año ausente y rechaza texto ambiguo
+ok 88 - concepto de estado: reconoce mes, conserva año ausente y rechaza texto ambiguo
+  ---
+  duration_ms: 0.15123
+  type: 'test'
+  ...
+# Subtest: Wallet DiDi real: API, observación, política de fecha, activación y gasto único
+ok 89 - Wallet DiDi real: API, observación, política de fecha, activación y gasto único # SKIP
+  ---
+  duration_ms: 0.04598
+  type: 'test'
+  ...
+# Subtest: Wallet DiDi real: importe y MXN explícitos, comercio, alias bancario y fecha del aviso México separados de operación
+ok 90 - Wallet DiDi real: importe y MXN explícitos, comercio, alias bancario y fecha del aviso México separados de operación
+  ---
+  duration_ms: 0.744729
+  type: 'test'
+  ...
+# Subtest: Wallet DiDi real: centavos y miles exactos; medianoche y recepción tardía conservan el día de publicación
+ok 91 - Wallet DiDi real: centavos y miles exactos; medianoche y recepción tardía conservan el día de publicación
+  ---
+  duration_ms: 1.162499
+  type: 'test'
+  ...
+# Subtest: Wallet DiDi real: estructura, marca y terminación exactas; importes inválidos o texto añadido no crean propuestas
+ok 92 - Wallet DiDi real: estructura, marca y terminación exactas; importes inválidos o texto añadido no crean propuestas
+  ---
+  duration_ms: 1.356069
+  type: 'test'
+  ...
+# Subtest: Wallet DiDi real: fechas inválidas o futuras, campos ausentes y cuerpos contradictorios conservan revisión
+ok 93 - Wallet DiDi real: fechas inválidas o futuras, campos ausentes y cuerpos contradictorios conservan revisión
+  ---
+  duration_ms: 1.331418
+  type: 'test'
+  ...
+# Subtest: Wallet DiDi real: moneda ajena y avisos especiales no se completan; el paquete DiDi no hereda el formato Wallet
+ok 94 - Wallet DiDi real: moneda ajena y avisos especiales no se completan; el paquete DiDi no hereda el formato Wallet
+  ---
+  duration_ms: 1.134009
+  type: 'test'
+  ...
+# Subtest: Wallet: Banamex, DiDi y Santander conservan perfiles, bancos y políticas separados
+ok 95 - Wallet: Banamex, DiDi y Santander conservan perfiles, bancos y políticas separados
+  ---
+  duration_ms: 0.38238
+  type: 'test'
+  ...
+# Subtest: bandeja por tipo: filtros antes de paginar, contadores e independencia de propietario
+ok 96 - bandeja por tipo: filtros antes de paginar, contadores e independencia de propietario # SKIP
+  ---
+  duration_ms: 0.03389
+  type: 'test'
+  ...
+# Subtest: captura de cuentas: transferencias Nu, débito confirmado y retiros sin duplicar dinero
+ok 97 - captura de cuentas: transferencias Nu, débito confirmado y retiros sin duplicar dinero # SKIP
+  ---
+  duration_ms: 0.02957
+  type: 'test'
+  ...
+# Subtest: Nu y Mercado Pago: muestras reales anonimizadas, regla expresa y registro único mediante API/PostgreSQL
+ok 98 - Nu y Mercado Pago: muestras reales anonimizadas, regla expresa y registro único mediante API/PostgreSQL # SKIP
+  ---
+  duration_ms: 0.026929
+  type: 'test'
+  ...
+# Subtest: Nu Wallet conserva MXN, alias bancario y día de publicación México; token NFC separado
+ok 99 - Nu Wallet conserva MXN, alias bancario y día de publicación México; token NFC separado
+  ---
+  duration_ms: 3.199007
+  type: 'test'
+  ...
+# Subtest: Nu Wallet exige producto y estructura observados, importes válidos y campos coherentes
+ok 100 - Nu Wallet exige producto y estructura observados, importes válidos y campos coherentes
+  ---
+  duration_ms: 0.699249
+  type: 'test'
+  ...
+# Subtest: Nu banco queda como evidencia parcial; título y cuerpo deben coincidir en importe
+ok 101 - Nu banco queda como evidencia parcial; título y cuerpo deben coincidir en importe
+  ---
+  duration_ms: 0.94116
+  type: 'test'
+  ...
+# Subtest: Mercado Pago solo obtiene importe y comercio del aviso; no supone moneda ni tarjeta sin regla
+ok 102 - Mercado Pago solo obtiene importe y comercio del aviso; no supone moneda ni tarjeta sin regla
+  ---
+  duration_ms: 1.697839
+  type: 'test'
+  ...
+# Subtest: Mercado Pago rechaza moneda contradictoria, revisiones, pagos y estructura desconocida
+ok 103 - Mercado Pago rechaza moneda contradictoria, revisiones, pagos y estructura desconocida
+  ---
+  duration_ms: 0.689799
+  type: 'test'
+  ...
+# Subtest: las reglas Nu/CFE y Mercado Pago requieren aceptaciones independientes; solo CFE exige suscripción
+ok 104 - las reglas Nu/CFE y Mercado Pago requieren aceptaciones independientes; solo CFE exige suscripción
+  ---
+  duration_ms: 2.186458
+  type: 'test'
+  ...
+# Subtest: Nu/CFE: regla expresa, suscripción bimestral y avisos resueltos con un solo gasto
+ok 105 - Nu/CFE: regla expresa, suscripción bimestral y avisos resueltos con un solo gasto # SKIP
+  ---
+  duration_ms: 0.03701
+  type: 'test'
+  ...
+# Subtest: analizadores: importes exactos sin sumar ni convertir mediante punto flotante
+ok 106 - analizadores: importes exactos sin sumar ni convertir mediante punto flotante
+  ---
+  duration_ms: 0.12858
+  type: 'test'
+  ...
+# Subtest: analizadores: fecha de operación México, día bancario independiente de recepción, calendario y DST
+ok 107 - analizadores: fecha de operación México, día bancario independiente de recepción, calendario y DST
+  ---
+  duration_ms: 0.161489
+  type: 'test'
+  ...
+# Subtest: analizadores: BBVA y Wallet sintéticos conservan tipo, referencia, ceros iniciales y versión sin afirmar cobertura real
+ok 108 - analizadores: BBVA y Wallet sintéticos conservan tipo, referencia, ceros iniciales y versión sin afirmar cobertura real
+  ---
+  duration_ms: 0.865399
+  type: 'test'
+  ...
+# Subtest: BBVA débito: cargo a cuenta confirmado fuera del piloto no propone una compra de crédito
+ok 109 - BBVA débito: cargo a cuenta confirmado fuera del piloto no propone una compra de crédito
+  ---
+  duration_ms: 0.6566
+  type: 'test'
+  ...
+# Subtest: BBVA incompleto: texto contradictorio, importe inválido y movimiento especial no proponen una compra
+ok 110 - BBVA incompleto: texto contradictorio, importe inválido y movimiento especial no proponen una compra
+  ---
+  duration_ms: 0.564969
+  type: 'test'
+  ...
+# Subtest: analizadores: desconocidos, importes incompletos y campos contradictorios nunca admiten una compra
+ok 111 - analizadores: desconocidos, importes incompletos y campos contradictorios nunca admiten una compra
+  ---
+  duration_ms: 1.166319
+  type: 'test'
+  ...
+# Subtest: analizadores: MSI, retenciones, devoluciones, cancelaciones, abonos, rechazos, pedidos, promociones y OTP van a revisión
+ok 112 - analizadores: MSI, retenciones, devoluciones, cancelaciones, abonos, rechazos, pedidos, promociones y OTP van a revisión
+  ---
+  duration_ms: 0.638949
+  type: 'test'
+  ...
+# Subtest: analizadores: publicación y recepción no completan fecha ausente y una operación futura queda bloqueada
+ok 113 - analizadores: publicación y recepción no completan fecha ausente y una operación futura queda bloqueada
+  ---
+  duration_ms: 0.38544
+  type: 'test'
+  ...
+# Subtest: Fase 6 PostgreSQL: seguimiento del piloto sin atribuir cobertura ni crear gastos al observar
+ok 114 - Fase 6 PostgreSQL: seguimiento del piloto sin atribuir cobertura ni crear gastos al observar # SKIP
+  ---
+  duration_ms: 0.04067
+  type: 'test'
+  ...
+# Subtest: Fase 4 PostgreSQL: interpretación, resoluciones y escritura financiera atómica
+ok 115 - Fase 4 PostgreSQL: interpretación, resoluciones y escritura financiera atómica # SKIP
+  ---
+  duration_ms: 0.02863
+  type: 'test'
+  ...
+# Subtest: Captura: secreto de 256 bits, código separado y vigencia de cinco minutos
+ok 116 - Captura: secreto de 256 bits, código separado y vigencia de cinco minutos
+  ---
+  duration_ms: 0.278099
+  type: 'test'
+  ...
+# Subtest: Captura: credencial Capture separada de Bearer y hash en tiempo constante
+ok 117 - Captura: credencial Capture separada de Bearer y hash en tiempo constante
+  ---
+  duration_ms: 0.36402
+  type: 'test'
+  ...
+# Subtest: Captura: contrato limitado, fechas normalizadas y hash independiente del orden JSON
+ok 118 - Captura: contrato limitado, fechas normalizadas y hash independiente del orden JSON
+  ---
+  duration_ms: 2.896547
+  type: 'test'
+  ...
+# Subtest: Captura: lectura JSON acotada también sin Content-Length
+ok 119 - Captura: lectura JSON acotada también sin Content-Length
+  ---
+  duration_ms: 3.302507
+  type: 'test'
+  ...
+# Subtest: Captura: propietario y revocación tienen prioridad sobre expiración y pausa
+ok 120 - Captura: propietario y revocación tienen prioridad sobre expiración y pausa
+  ---
+  duration_ms: 0.12119
+  type: 'test'
+  ...
+# Subtest: Nu CFE PostgreSQL: aviso real anonimizado conserva recepción y exige revisión financiera explícita
+ok 121 - Nu CFE PostgreSQL: aviso real anonimizado conserva recepción y exige revisión financiera explícita # SKIP
+  ---
+  duration_ms: 0.04341
+  type: 'test'
+  ...
+# Subtest: Nu real anonimizado: pago CFE conserva solo importe/comercio y exige completar tarjeta, moneda y fecha
+ok 122 - Nu real anonimizado: pago CFE conserva solo importe/comercio y exige completar tarjeta, moneda y fecha
+  ---
+  duration_ms: 0.44536
+  type: 'test'
+  ...
+# Subtest: Nu CFE: ni el resto de campos Android ni sus fechas completan datos bancarios ausentes
+ok 123 - Nu CFE: ni el resto de campos Android ni sus fechas completan datos bancarios ausentes
+  ---
+  duration_ms: 0.24334
+  type: 'test'
+  ...
+# Subtest: Nu CFE: importes inválidos, textos contradictorios y avisos ampliados quedan sin propuesta
+ok 124 - Nu CFE: importes inválidos, textos contradictorios y avisos ampliados quedan sin propuesta
+  ---
+  duration_ms: 0.724629
+  type: 'test'
+  ...
+# Subtest: Nu CFE: no generaliza a otros destinatarios, bancos o avisos financieros
+ok 125 - Nu CFE: no generaliza a otros destinatarios, bancos o avisos financieros
+  ---
+  duration_ms: 0.546559
+  type: 'test'
+  ...
+# Subtest: devoluciones PostgreSQL: confirmación, neto exacto, historial e idempotencia con aislamiento
+ok 126 - devoluciones PostgreSQL: confirmación, neto exacto, historial e idempotencia con aislamiento # SKIP
+  ---
+  duration_ms: 0.04188
+  type: 'test'
+  ...
+# Subtest: devoluciones reales: conserva datos impresos sin inventar tarjeta, MXN ni referencia
+ok 127 - devoluciones reales: conserva datos impresos sin inventar tarjeta, MXN ni referencia
+  ---
+  duration_ms: 2.701168
+  type: 'test'
+  ...
+# Subtest: devoluciones: enteros observados; importes, textos contradictorios y fuentes ajenas requieren revisión
+ok 128 - devoluciones: enteros observados; importes, textos contradictorios y fuentes ajenas requieren revisión
+  ---
+  duration_ms: 1.210758
+  type: 'test'
+  ...
+# Subtest: Fase 5 PostgreSQL: revisión, fuentes y cotejo manual sin alterar decisiones personales
+ok 129 - Fase 5 PostgreSQL: revisión, fuentes y cotejo manual sin alterar decisiones personales # SKIP
+  ---
+  duration_ms: 0.04494
+  type: 'test'
+  ...
+# Subtest: Fase 7 PostgreSQL: activación gradual, evidencia propia y recuperación de nueve tarjetas
+ok 130 - Fase 7 PostgreSQL: activación gradual, evidencia propia y recuperación de nueve tarjetas # SKIP
+  ---
+  duration_ms: 0.03655
+  type: 'test'
+  ...
+# Subtest: activación: requiere propuesta de observación, vínculo resuelto, cotejo y datos financieros vigentes
+ok 131 - activación: requiere propuesta de observación, vínculo resuelto, cotejo y datos financieros vigentes
+  ---
+  duration_ms: 4.569746
+  type: 'test'
+  ...
+# Subtest: activación: corregir un campo interpretado no acredita que el analizador acertó
+ok 132 - activación: corregir un campo interpretado no acredita que el analizador acertó
+  ---
+  duration_ms: 1.902358
+  type: 'test'
+  ...
+# Subtest: activación: no usa avisos de otra fuente, versión ni tarjeta, o un registro automático como observación
+ok 133 - activación: no usa avisos de otra fuente, versión ni tarjeta, o un registro automático como observación
+  ---
+  duration_ms: 0.803289
+  type: 'test'
+  ...
+# Subtest: activación: formatos sin verificar, débito y alias no verificados o ambiguos bloquean el alta
+ok 134 - activación: formatos sin verificar, débito y alias no verificados o ambiguos bloquean el alta
+  ---
+  duration_ms: 0.929139
+  type: 'test'
+  ...
+# Subtest: cobertura: los nombres editables no eligen banco ni asignan evidencia de Wallet
+ok 135 - cobertura: los nombres editables no eligen banco ni asignan evidencia de Wallet
+  ---
+  duration_ms: 0.523049
+  type: 'test'
+  ...
+# Subtest: Santander real anonimizado: API, revisión, activación y un gasto por compra con evidencia Wallet
+ok 136 - Santander real anonimizado: API, revisión, activación y un gasto por compra con evidencia Wallet # SKIP
+  ---
+  duration_ms: 0.26698
+  type: 'test'
+  ...
+# Subtest: Santander real: compra MXN con fecha bancaria México, comercio y terminación física/digital
+ok 137 - Santander real: compra MXN con fecha bancaria México, comercio y terminación física/digital
+  ---
+  duration_ms: 0.539939
+  type: 'test'
+  ...
+# Subtest: Santander real: centavos, miles y fecha bancaria distinta del día de recepción
+ok 138 - Santander real: centavos, miles y fecha bancaria distinta del día de recepción
+  ---
+  duration_ms: 0.75661
+  type: 'test'
+  ...
+# Subtest: Santander real: incompletos, importes inválidos, calendarios imposibles y fechas futuras no registran
+ok 139 - Santander real: incompletos, importes inválidos, calendarios imposibles y fechas futuras no registran
+  ---
+  duration_ms: 1.843089
+  type: 'test'
+  ...
+# Subtest: Santander real: títulos y cuerpos contradictorios no eligen datos; otra moneda queda por revisar
+ok 140 - Santander real: títulos y cuerpos contradictorios no eligen datos; otra moneda queda por revisar
+  ---
+  duration_ms: 1.106069
+  type: 'test'
+  ...
+# Subtest: Wallet Santander v2: propone fecha del aviso México con alias bancario, sin fecha bancaria inventada
+ok 141 - Wallet Santander v2: propone fecha del aviso México con alias bancario, sin fecha bancaria inventada
+  ---
+  duration_ms: 0.2956
+  type: 'test'
+  ...
+# Subtest: Wallet Santander v2: la publicación define el día México incluso con entrega tardía o cambio UTC de día
+ok 142 - Wallet Santander v2: la publicación define el día México incluso con entrega tardía o cambio UTC de día
+  ---
+  duration_ms: 0.26641
+  type: 'test'
+  ...
+# Subtest: Wallet Santander real: otra tarjeta, moneda, estructura, fecha o contenido contradictorio conserva revisión
+ok 143 - Wallet Santander real: otra tarjeta, moneda, estructura, fecha o contenido contradictorio conserva revisión
+  ---
+  duration_ms: 2.176358
+  type: 'test'
+  ...
+# Subtest: Santander Wallet de respaldo: legado vinculado, fecha aceptada y un gasto con API/PostgreSQL
+ok 144 - Santander Wallet de respaldo: legado vinculado, fecha aceptada y un gasto con API/PostgreSQL # SKIP
+  ---
+  duration_ms: 0.04654
+  type: 'test'
+  ...
+# Subtest: Viajes y pedidos: cada paquete exacto conserva texto original sin interpretar cobros ni tarjetas
+ok 145 - Viajes y pedidos: cada paquete exacto conserva texto original sin interpretar cobros ni tarjetas
+  ---
+  duration_ms: 1.871148
+  type: 'test'
+  ...
+# Subtest: Viajes y pedidos: no aceptan alias de tarjetas ni inventarios bancarios
+ok 146 - Viajes y pedidos: no aceptan alias de tarjetas ni inventarios bancarios
+  ---
+  duration_ms: 1.972058
+  type: 'test'
+  ...
+# Subtest: Wallet/Banamex reales anonimizados: observación, fecha aceptada y un gasto por compra
+ok 147 - Wallet/Banamex reales anonimizados: observación, fecha aceptada y un gasto por compra # SKIP
+  ---
+  duration_ms: 0.04303
+  type: 'test'
+  ...
+# Subtest: Wallet real: MXN, comercio y título de Banamex; fecha de aviso México separada de operación bancaria
+ok 148 - Wallet real: MXN, comercio y título de Banamex; fecha de aviso México separada de operación bancaria
+  ---
+  duration_ms: 0.522469
+  type: 'test'
+  ...
+# Subtest: Wallet real: no admite importes inválidos, otra marca, sufijo incompleto, texto extendido o fechas inválidas
+ok 149 - Wallet real: no admite importes inválidos, otra marca, sufijo incompleto, texto extendido o fechas inválidas
+  ---
+  duration_ms: 1.509008
+  type: 'test'
+  ...
+# Subtest: Banamex real: cargo parcial, sufijo de tres cifras, fecha de operación AM/PM y autorización sin unicidad inventada
+ok 150 - Banamex real: cargo parcial, sufijo de tres cifras, fecha de operación AM/PM y autorización sin unicidad inventada
+  ---
+  duration_ms: 0.48585
+  type: 'test'
+  ...
+# Subtest: Banamex real: contradicciones, calendario imposible y tipo de aviso cambiado no se completan
+ok 151 - Banamex real: contradicciones, calendario imposible y tipo de aviso cambiado no se completan
+  ---
+  duration_ms: 0.41115
+  type: 'test'
+  ...
+# Subtest: PostgreSQL: seguimiento desde saldo inicial, movimientos reales, reintentos, conciliación y concurrencia
+ok 152 - PostgreSQL: seguimiento desde saldo inicial, movimientos reales, reintentos, conciliación y concurrencia # SKIP
+  ---
+  duration_ms: 0.04119
+  type: 'test'
+  ...
+# Subtest: seguimiento: el punto de partida conserva exactamente la captura, aunque ya haya cargos, MSI y pagos
+ok 153 - seguimiento: el punto de partida conserva exactamente la captura, aunque ya haya cargos, MSI y pagos
+  ---
+  duration_ms: 0.76438
+  type: 'test'
+  ...
+# Subtest: seguimiento: cargos completos a centavos, edición, efectivo, aportación y otra tarjeta
+ok 154 - seguimiento: cargos completos a centavos, edición, efectivo, aportación y otra tarjeta
+  ---
+  duration_ms: 0.843499
+  type: 'test'
+  ...
+# Subtest: seguimiento: cargo anterior al día base queda incluido en el banco; futuro espera su fecha
+ok 155 - seguimiento: cargo anterior al día base queda incluido en el banco; futuro espera su fecha
+  ---
+  duration_ms: 0.15285
+  type: 'test'
+  ...
+# Subtest: seguimiento: pagos acumulados aplican diferencia y deshacer revierte el pago
+ok 156 - seguimiento: pagos acumulados aplican diferencia y deshacer revierte el pago
+  ---
+  duration_ms: 0.493599
+  type: 'test'
+  ...
+# Subtest: seguimiento: completar la fecha de un pago histórico aplica solo el incremento del total
+ok 157 - seguimiento: completar la fecha de un pago histórico aplica solo el incremento del total
+  ---
+  duration_ms: 0.14713
+  type: 'test'
+  ...
+# Subtest: seguimiento: MSI suma todo una vez; cuotas y liquidación administrativa no liberan crédito
+ok 158 - seguimiento: MSI suma todo una vez; cuotas y liquidación administrativa no liberan crédito
+  ---
+  duration_ms: 0.27897
+  type: 'test'
+  ...
+# Subtest: seguimiento: convertir un gasto a MSI conserva el cargo sin duplicarlo
+ok 159 - seguimiento: convertir un gasto a MSI conserva el cargo sin duplicarlo
+  ---
+  duration_ms: 0.141959
+  type: 'test'
+  ...
+# Subtest: seguimiento: devoluciones, bonificaciones y pagos pueden producir saldo a favor
+ok 160 - seguimiento: devoluciones, bonificaciones y pagos pueden producir saldo a favor
+  ---
+  duration_ms: 0.17259
+  type: 'test'
+  ...
+# Subtest: seguimiento: nueva conciliación absorbe cambios previos y conserva los siguientes
+ok 161 - seguimiento: nueva conciliación absorbe cambios previos y conserva los siguientes
+  ---
+  duration_ms: 0.2273
+  type: 'test'
+  ...
+# Subtest: seguimiento: un snapshot concurrente se reintenta solo por error de serialización
+ok 162 - seguimiento: un snapshot concurrente se reintenta solo por error de serialización
+  ---
+  duration_ms: 1.660748
+  type: 'test'
+  ...
+# Subtest: PostgreSQL: captura bancaria persiste sin modificar ciclos, pagos ni movimientos; actualización atómica
+ok 163 - PostgreSQL: captura bancaria persiste sin modificar ciclos, pagos ni movimientos; actualización atómica # SKIP
+  ---
+  duration_ms: 0.06832
+  type: 'test'
+  ...
+# Subtest: saldos: sin captura no es cero; una captura explícita de cero sí cuenta
+ok 164 - saldos: sin captura no es cero; una captura explícita de cero sí cuenta
+  ---
+  duration_ms: 0.39993
+  type: 'test'
+  ...
+# Subtest: saldos: suma a centavos y calcula el disponible de cada tarjeta antes de sumar
+ok 165 - saldos: suma a centavos y calcula el disponible de cada tarjeta antes de sumar
+  ---
+  duration_ms: 0.196
+  type: 'test'
+  ...
+# Subtest: saldos: límite cero, sobregiro y saldo a favor mantienen su significado
+ok 166 - saldos: límite cero, sobregiro y saldo a favor mantienen su significado
+  ---
+  duration_ms: 0.154299
+  type: 'test'
+  ...
+# Subtest: saldos: validación compartida rechaza importes inválidos y fechas imposibles o futuras
+ok 167 - saldos: validación compartida rechaza importes inválidos y fechas imposibles o futuras
+  ---
+  duration_ms: 2.938367
+  type: 'test'
+  ...
+# Subtest: saldos API: exige identidad, propiedad e importes válidos antes de guardar
+ok 168 - saldos API: exige identidad, propiedad e importes válidos antes de guardar
+  ---
+  duration_ms: 21.857758
+  type: 'test'
+  ...
+# Subtest: saldos API: guardar sustituye la captura; editar la tarjeta conserva los saldos y las notas
+ok 169 - saldos API: guardar sustituye la captura; editar la tarjeta conserva los saldos y las notas
+  ---
+  duration_ms: 19.40421
+  type: 'test'
+  ...
+# Subtest: Santander agosto descuenta solo la aplicación al corte en ambas rutas
+ok 170 - Santander agosto descuenta solo la aplicación al corte en ambas rutas
+  ---
+  duration_ms: 92.760795
+  type: 'test'
+  ...
+# Subtest: sin aplicación se conserva la diferencia y no se descuentan ingresos generales
+ok 171 - sin aplicación se conserva la diferencia y no se descuentan ingresos generales
+  ---
+  duration_ms: 183.064203
+  type: 'test'
+  ...
+# Subtest: un estado de cero con bonificación completa concilia correctamente
+ok 172 - un estado de cero con bonificación completa concilia correctamente
+  ---
+  duration_ms: 90.795127
+  type: 'test'
+  ...
+# Subtest: se rechazan aplicaciones duplicadas, de otro usuario/ciclo e importes inválidos
+ok 173 - se rechazan aplicaciones duplicadas, de otro usuario/ciclo e importes inválidos
+  ---
+  duration_ms: 48.444001
+  type: 'test'
+  ...
+# Subtest: la API incluye notas de bonificación y mantiene septiembre y sus pagos
+ok 174 - la API incluye notas de bonificación y mantiene septiembre y sus pagos
+  ---
+  duration_ms: 48.135891
+  type: 'test'
+  ...
+# Subtest: un ingreso aplicado no se borra ni se reduce por debajo de sus aplicaciones
+ok 175 - un ingreso aplicado no se borra ni se reduce por debajo de sus aplicaciones
+  ---
+  duration_ms: 34.295645
+  type: 'test'
+  ...
+# Subtest: cuotas independientes del listado/detalle y sin mensualidad adicional al liquidar
+ok 176 - cuotas independientes del listado/detalle y sin mensualidad adicional al liquidar
+  ---
+  duration_ms: 0.689829
+  type: 'test'
+  ...
+# Subtest: la fecha de corte incluye todo el día y la cuota siguiente empieza después
+ok 177 - la fecha de corte incluye todo el día y la cuota siguiente empieza después
+  ---
+  duration_ms: 0.19592
+  type: 'test'
+  ...
+# Subtest: cuotas cruzan año y febrero corto; una compra liquidada no proyecta pagos futuros
+ok 178 - cuotas cruzan año y febrero corto; una compra liquidada no proyecta pagos futuros
+  ---
+  duration_ms: 0.132839
+  type: 'test'
+  ...
+# Subtest: gastos incluidos por día completo, sin huecos ni duplicación entre cortes
+ok 179 - gastos incluidos por día completo, sin huecos ni duplicación entre cortes
+  ---
+  duration_ms: 0.18761
+  type: 'test'
+  ...
+# Subtest: frecuencia anual usa mes del cobro, nunca un mes previo al inicio
+ok 180 - frecuencia anual usa mes del cobro, nunca un mes previo al inicio
+  ---
+  duration_ms: 0.41755
+  type: 'test'
+  ...
+# Subtest: recorre meses intermedios y ajusta día31 a febrero bisiesto
+ok 181 - recorre meses intermedios y ajusta día31 a febrero bisiesto
+  ---
+  duration_ms: 0.17381
+  type: 'test'
+  ...
+# Subtest: baja conserva cargo del mismo día, excluye posteriores
+ok 182 - baja conserva cargo del mismo día, excluye posteriores
+  ---
+  duration_ms: 0.186499
+  type: 'test'
+  ...
+# Subtest: gasto vinculado sustituye previsión y conserva importe real, incluso en otro ciclo
+ok 183 - gasto vinculado sustituye previsión y conserva importe real, incluso en otro ciclo
+  ---
+  duration_ms: 0.23932
+  type: 'test'
+  ...
+# Subtest: ajustar el método o tarjeta del cobro retira la previsión original y suma solo el pago real
+ok 184 - ajustar el método o tarjeta del cobro retira la previsión original y suma solo el pago real
+  ---
+  duration_ms: 0.33667
+  type: 'test'
+  ...
+# Subtest: arrays sin mapas no mezclan tarjetas y otro plástico no elimina una previsión
+ok 185 - arrays sin mapas no mezclan tarjetas y otro plástico no elimina una previsión
+  ---
+  duration_ms: 0.14827
+  type: 'test'
+  ...
+# Subtest: referencia verificada prevalece en cuota e importe y termina al completar meses
+ok 186 - referencia verificada prevalece en cuota e importe y termina al completar meses
+  ---
+  duration_ms: 0.250629
+  type: 'test'
+  ...
+# Subtest: partidas a centavos suman exactamente los subtotales mostrados y respetan estado cero
+ok 187 - partidas a centavos suman exactamente los subtotales mostrados y respetan estado cero
+  ---
+  duration_ms: 0.33006
+  type: 'test'
+  ...
+# Subtest: bonificación se descuenta una sola vez y estado cero concilia
+ok 188 - bonificación se descuenta una sola vez y estado cero concilia
+  ---
+  duration_ms: 0.15099
+  type: 'test'
+  ...
+# Subtest: omitir una suscripción retira solo su período y confirmar en otro mes sustituye la previsión
+ok 189 - omitir una suscripción retira solo su período y confirmar en otro mes sustituye la previsión
+  ---
+  duration_ms: 0.2291
+  type: 'test'
+  ...
+# Subtest: PostgreSQL: devoluciones y pagos concurrentes, aislamiento, rollback y avisos
+ok 190 - PostgreSQL: devoluciones y pagos concurrentes, aislamiento, rollback y avisos # SKIP
+  ---
+  duration_ms: 0.03396
+  type: 'test'
+  ...
+# Subtest: el detalle de captura calcula el saldo con importes sin necesitar fechas del corte
+ok 191 - el detalle de captura calcula el saldo con importes sin necesitar fechas del corte
+  ---
+  duration_ms: 0.129029
+  type: 'test'
+  ...
+# Subtest: las fechas reales se confirman al guardar, incluso sin cambiarlas; importe y pago no las confirman
+ok 192 - las fechas reales se confirman al guardar, incluso sin cambiarlas; importe y pago no las confirman
+  ---
+  duration_ms: 31.264378
+  type: 'test'
+  ...
+# Subtest: fechas inválidas o un guardado fallido no registran confirmación
+ok 193 - fechas inválidas o un guardado fallido no registran confirmación
+  ---
+  duration_ms: 28.962351
+  type: 'test'
+  ...
+# Subtest: un peso de mil conserva 999 pendientes, aun con PAID/paidAt históricos
+ok 194 - un peso de mil conserva 999 pendientes, aun con PAID/paidAt históricos
+  ---
+  duration_ms: 0.14886
+  type: 'test'
+  ...
+# Subtest: el pago sigue vigente todo el día bancario de vencimiento
+ok 195 - el pago sigue vigente todo el día bancario de vencimiento
+  ---
+  duration_ms: 0.260539
+  type: 'test'
+  ...
+# Subtest: solo vence al empezar el día local siguiente, incluidos cambios de mes y año
+ok 196 - solo vence al empezar el día local siguiente, incluidos cambios de mes y año
+  ---
+  duration_ms: 0.16788
+  type: 'test'
+  ...
+# Subtest: el corte se presenta desde el inicio de su día bancario
+ok 197 - el corte se presenta desde el inicio de su día bancario
+  ---
+  duration_ms: 0.08173
+  type: 'test'
+  ...
+# Subtest: Dashboard usa la fecha del cliente para el estado y el aviso de vencimiento
+ok 198 - Dashboard usa la fecha del cliente para el estado y el aviso de vencimiento
+  ---
+  duration_ms: 31.604738
+  type: 'test'
+  ...
+# Subtest: centavos, excedente, cero y falta de estado tienen situaciones distintas
+ok 199 - centavos, excedente, cero y falta de estado tienen situaciones distintas
+  ---
+  duration_ms: 0.15259
+  type: 'test'
+  ...
+# Subtest: PATCH, listado, Dashboard y avisos comparten saldo sin reducir el total mensual
+ok 200 - PATCH, listado, Dashboard y avisos comparten saldo sin reducir el total mensual
+  ---
+  duration_ms: 47.788571
+  type: 'test'
+  ...
+# Subtest: lecturas corrigen PAID antiguo sin escribir ni ocultar avisos parciales
+ok 201 - lecturas corrigen PAID antiguo sin escribir ni ocultar avisos parciales
+  ---
+  duration_ms: 29.602549
+  type: 'test'
+  ...
+# Subtest: cero numérico y texto cierran sin pago ficticio y sin avisos de vencimiento
+ok 202 - cero numérico y texto cierran sin pago ficticio y sin avisos de vencimiento
+  ---
+  duration_ms: 90.057738
+  type: 'test'
+  ...
+# Subtest: editar el estado recalcula pago completo, parcial, excedente y cero; deshacer reabre
+ok 203 - editar el estado recalcula pago completo, parcial, excedente y cero; deshacer reabre
+  ---
+  duration_ms: 33.461046
+  type: 'test'
+  ...
+# Subtest: guardar total reemplaza el anterior; repetir no acumula y disminuir reabre
+ok 204 - guardar total reemplaza el anterior; repetir no acumula y disminuir reabre
+  ---
+  duration_ms: 30.313619
+  type: 'test'
+  ...
+# Subtest: rechaza importes ambiguos, fechas imposibles y pago sin estado capturado
+ok 205 - rechaza importes ambiguos, fechas imposibles y pago sin estado capturado
+  ---
+  duration_ms: 63.055776
+  type: 'test'
+  ...
+# Subtest: fallo de escritura revierte el cambio y el estado dentro de la transacción
+ok 206 - fallo de escritura revierte el cambio y el estado dentro de la transacción
+  ---
+  duration_ms: 31.903537
+  type: 'test'
+  ...
+# Subtest: BBVA: devolución posterior liquida septiembre sin modificar estado, pago ni cálculo de cargos
+ok 207 - BBVA: devolución posterior liquida septiembre sin modificar estado, pago ni cálculo de cargos
+  ---
+  duration_ms: 43.199286
+  type: 'test'
+  ...
+# Subtest: reducir o retirar devolución reabre el saldo y los avisos; deshacer pago conserva la devolución
+ok 208 - reducir o retirar devolución reabre el saldo y los avisos; deshacer pago conserva la devolución
+  ---
+  duration_ms: 43.880185
+  type: 'test'
+  ...
+# Subtest: devolución total cubre sin pago ficticio; parcial sin pago conserva avisos; excedente se informa
+ok 209 - devolución total cubre sin pago ficticio; parcial sin pago conserva avisos; excedente se informa
+  ---
+  duration_ms: 61.925107
+  type: 'test'
+  ...
+# Subtest: bonificaciones de cargos y otro corte no descuentan de nuevo una devolución del pago
+ok 210 - bonificaciones de cargos y otro corte no descuentan de nuevo una devolución del pago
+  ---
+  duration_ms: 0.340669
+  type: 'test'
+  ...
+# Subtest: devoluciones: validación de importe, evidencia, fecha, corte y propietario sin escrituras
+ok 211 - devoluciones: validación de importe, evidencia, fecha, corte y propietario sin escrituras
+  ---
+  duration_ms: 63.275996
+  type: 'test'
+  ...
+# Subtest: editar estado o fechas conserva coherencia de la devolución y rollback conserva evidencia
+ok 212 - editar estado o fechas conserva coherencia de la devolución y rollback conserva evidencia
+  ---
+  duration_ms: 28.85044
+  type: 'test'
+  ...
+# Subtest: antes del corte usa el calculado incluso con estado capturado anticipadamente
+ok 213 - antes del corte usa el calculado incluso con estado capturado anticipadamente
+  ---
+  duration_ms: 0.11787
+  type: 'test'
+  ...
+# Subtest: desde el día de corte usa el estado registrado, incluido cero
+ok 214 - desde el día de corte usa el estado registrado, incluido cero
+  ---
+  duration_ms: 0.11503
+  type: 'test'
+  ...
+# Subtest: corte sin estado conserva el estimado; pagos no modifican el importe del período
+ok 215 - corte sin estado conserva el estimado; pagos no modifican el importe del período
+  ---
+  duration_ms: 0.10032
+  type: 'test'
+  ...
+# Subtest: respeta cambios de mes/año, no muta ciclos y maneja importes a centavos
+ok 216 - respeta cambios de mes/año, no muta ciclos y maneja importes a centavos
+  ---
+  duration_ms: 0.15799
+  type: 'test'
+  ...
+# Subtest: las leyendas conservan el día bancario y la opción de fecha larga
+ok 217 - las leyendas conservan el día bancario y la opción de fecha larga
+  ---
+  duration_ms: 1.956798
+  type: 'test'
+  ...
+# Subtest: el corte compacto omite la fecha sin alterar las leyendas ni sus otros consumidores
+ok 218 - el corte compacto omite la fecha sin alterar las leyendas ni sus otros consumidores
+  ---
+  duration_ms: 0.454389
+  type: 'test'
+  ...
+# Subtest: cortes próximos primero, fechas ausentes al final y empates por nombre
+ok 219 - cortes próximos primero, fechas ausentes al final y empates por nombre
+  ---
+  duration_ms: 0.33911
+  type: 'test'
+  ...
+# Subtest: historial distingue años, deduplica períodos y ofrece el más reciente primero
+ok 220 - historial distingue años, deduplica períodos y ofrece el más reciente primero
+  ---
+  duration_ms: 0.473559
+  type: 'test'
+  ...
+# Subtest: renovaciones de Turbo se ordenan junto a los cortes por su fecha límite
+ok 221 - renovaciones de Turbo se ordenan junto a los cortes por su fecha límite
+  ---
+  duration_ms: 0.15556
+  type: 'test'
+  ...
+# Subtest: fecha de corte respeta el día almacenado y hoy, mañana y días restantes
+ok 222 - fecha de corte respeta el día almacenado y hoy, mañana y días restantes
+  ---
+  duration_ms: 0.45872
+  type: 'test'
+  ...
+# Subtest: en curso reúne octubre y noviembre según el período de cada tarjeta
+ok 223 - en curso reúne octubre y noviembre según el período de cada tarjeta
+  ---
+  duration_ms: 0.76075
+  type: 'test'
+  ...
+# Subtest: el día de corte completo sigue vigente y al día siguiente cambia de período
+ok 224 - el día de corte completo sigue vigente y al día siguiente cambia de período
+  ---
+  duration_ms: 0.231089
+  type: 'test'
+  ...
+# Subtest: cortes terminados salen de en curso aunque hayan cumplido o tengan cargos por confirmar
+ok 225 - cortes terminados salen de en curso aunque hayan cumplido o tengan cargos por confirmar
+  ---
+  duration_ms: 0.21997
+  type: 'test'
+  ...
+# Subtest: la selección vigente usa el período bancario verificado
+ok 226 - la selección vigente usa el período bancario verificado
+  ---
+  duration_ms: 0.46717
+  type: 'test'
+  ...
+# Subtest: diciembre selecciona enero del siguiente año y no arrastra la meta anterior
+ok 227 - diciembre selecciona enero del siguiente año y no arrastra la meta anterior
+  ---
+  duration_ms: 0.713859
+  type: 'test'
+  ...
+# Subtest: sin período vigente conserva la tarjeta sin seleccionar ciclos futuros ni inválidos
+ok 228 - sin período vigente conserva la tarjeta sin seleccionar ciclos futuros ni inválidos
+  ---
+  duration_ms: 0.45724
+  type: 'test'
+  ...
+# Subtest: períodos superpuestos requieren revisión y no acreditan una meta ambigua
+ok 229 - períodos superpuestos requieren revisión y no acreditan una meta ambigua
+  ---
+  duration_ms: 0.215349
+  type: 'test'
+  ...
+# Subtest: historial incluye cortes terminados de años distintos y excluye vigentes y futuros
+ok 230 - historial incluye cortes terminados de años distintos y excluye vigentes y futuros
+  ---
+  duration_ms: 0.59246
+  type: 'test'
+  ...
+# Subtest: HSBC octubre: comisiones e IVA no completan los $300
+ok 231 - HSBC octubre: comisiones e IVA no completan los $300
+  ---
+  duration_ms: 0.324109
+  type: 'test'
+  ...
+# Subtest: Banamex octubre: la inactividad no convierte $272.95 en meta cumplida
+ok 232 - Banamex octubre: la inactividad no convierte $272.95 en meta cumplida
+  ---
+  duration_ms: 0.19248
+  type: 'test'
+  ...
+# Subtest: la regla depende del producto verificado y sobrevive a renombrar una tarjeta
+ok 233 - la regla depende del producto verificado y sobrevive a renombrar una tarjeta
+  ---
+  duration_ms: 0.36688
+  type: 'test'
+  ...
+# Subtest: las fechas bancarias verificadas incluyen compras omitidas por el rango estimado
+ok 234 - las fechas bancarias verificadas incluyen compras omitidas por el rango estimado
+  ---
+  duration_ms: 0.23372
+  type: 'test'
+  ...
+# Subtest: una nota bancaria o evidencia conserva la exclusión al cambiar el concepto
+ok 235 - una nota bancaria o evidencia conserva la exclusión al cambiar el concepto
+  ---
+  duration_ms: 0.428759
+  type: 'test'
+  ...
+# Subtest: una comisión comercial no se confunde con una comisión del banco
+ok 236 - una comisión comercial no se confunde con una comisión del banco
+  ---
+  duration_ms: 0.17464
+  type: 'test'
+  ...
+# Subtest: futuras y vencidas sin evidencia siguen siendo proyecciones
+ok 237 - futuras y vencidas sin evidencia siguen siendo proyecciones
+  ---
+  duration_ms: 0.18723
+  type: 'test'
+  ...
+# Subtest: distingue suscripciones por cobrar y por confirmar de otros movimientos previstos
+ok 238 - distingue suscripciones por cobrar y por confirmar de otros movimientos previstos
+  ---
+  duration_ms: 0.326809
+  type: 'test'
+  ...
+# Subtest: una suscripción confirmada conserva importe y fecha históricos
+ok 239 - una suscripción confirmada conserva importe y fecha históricos
+  ---
+  duration_ms: 0.2975
+  type: 'test'
+  ...
+# Subtest: gasto vinculado, recibo y calendario no triplican una suscripción
+ok 240 - gasto vinculado, recibo y calendario no triplican una suscripción
+  ---
+  duration_ms: 0.2753
+  type: 'test'
+  ...
+# Subtest: frecuencia bimestral usa el mes real del cobro y respeta desactivación
+ok 241 - frecuencia bimestral usa el mes real del cobro y respeta desactivación
+  ---
+  duration_ms: 0.231629
+  type: 'test'
+  ...
+# Subtest: dos cargos reales iguales conservan su multiplicidad al emparejar un gasto vinculado
+ok 242 - dos cargos reales iguales conservan su multiplicidad al emparejar un gasto vinculado
+  ---
+  duration_ms: 0.23236
+  type: 'test'
+  ...
+# Subtest: un estado revisado no inventa una suscripción ausente
+ok 243 - un estado revisado no inventa una suscripción ausente
+  ---
+  duration_ms: 0.13176
+  type: 'test'
+  ...
+# Subtest: MSI nueva cuenta una vez aunque ya esté liquidada; cuotas antiguas y canceladas no
+ok 244 - MSI nueva cuenta una vez aunque ya esté liquidada; cuotas antiguas y canceladas no
+  ---
+  duration_ms: 0.14616
+  type: 'test'
+  ...
+# Subtest: MSI y gastos de fecha futura no marcan cumplimiento; centavos exactos
+ok 245 - MSI y gastos de fecha futura no marcan cumplimiento; centavos exactos
+  ---
+  duration_ms: 0.18591
+  type: 'test'
+  ...
+# Subtest: sin ciclo y evidencia inválida nunca producen un cumplimiento inventado
+ok 246 - sin ciclo y evidencia inválida nunca producen un cumplimiento inventado
+  ---
+  duration_ms: 0.129929
+  type: 'test'
+  ...
+# Subtest: fechas bancarias malformadas conservan el período previsto y sus movimientos
+ok 247 - fechas bancarias malformadas conservan el período previsto y sus movimientos
+  ---
+  duration_ms: 0.31985
+  type: 'test'
+  ...
+# Subtest: fechas imposibles no se normalizan como fechas bancarias verificadas
+ok 248 - fechas imposibles no se normalizan como fechas bancarias verificadas
+  ---
+  duration_ms: 0.10942
+  type: 'test'
+  ...
+# Subtest: recibos nulos o malformados no interrumpen el cálculo ni suman consumo
+ok 249 - recibos nulos o malformados no interrumpen el cálculo ni suman consumo
+  ---
+  duration_ms: 0.26369
+  type: 'test'
+  ...
+# Subtest: un nombre malformado conserva el importe válido sin romper el desglose
+ok 250 - un nombre malformado conserva el importe válido sin romper el desglose
+  ---
+  duration_ms: 0.13998
+  type: 'test'
+  ...
+# Subtest: un gasto distinto al comprobante queda por revisar sin acreditar una meta falsa
+ok 251 - un gasto distinto al comprobante queda por revisar sin acreditar una meta falsa
+  ---
+  duration_ms: 0.379289
+  type: 'test'
+  ...
+# Subtest: grupos ambiguos conservan multiplicidad e importes fuera del consumo confirmado
+ok 252 - grupos ambiguos conservan multiplicidad e importes fuera del consumo confirmado
+  ---
+  duration_ms: 0.53038
+  type: 'test'
+  ...
+# Subtest: emparejamientos exactos con distinta posición no crean discrepancias
+ok 253 - emparejamientos exactos con distinta posición no crean discrepancias
+  ---
+  duration_ms: 0.219919
+  type: 'test'
+  ...
+# Subtest: un comprobante adicional no consume la coincidencia exacta de otro cargo
+ok 254 - un comprobante adicional no consume la coincidencia exacta de otro cargo
+  ---
+  duration_ms: 0.17837
+  type: 'test'
+  ...
+# Subtest: omitir no cuenta como consumo y elimina la previsión del período
+ok 255 - omitir no cuenta como consumo y elimina la previsión del período
+  ---
+  duration_ms: 0.12199
+  type: 'test'
+  ...
+# Subtest: gastos compartidos: semanas, categorías y tarjetas usan la parte personal y el banco conserva el cargo
+ok 256 - gastos compartidos: semanas, categorías y tarjetas usan la parte personal y el banco conserva el cargo
+  ---
+  duration_ms: 1.672168
+  type: 'test'
+  ...
+# Subtest: aportaciones: respeta el día UTC del corte, el estado cero y la cobertura completa
+ok 257 - aportaciones: respeta el día UTC del corte, el estado cero y la cobertura completa
+  ---
+  duration_ms: 0.31259
+  type: 'test'
+  ...
+# Subtest: cero bancario prevalece sobre estimación y no genera aviso de pago
+ok 258 - cero bancario prevalece sobre estimación y no genera aviso de pago
+  ---
+  duration_ms: 0.15353
+  type: 'test'
+  ...
+# Subtest: cuotas mensuales no se acortan con pagos previos ni siguen fuera del plazo
+ok 259 - cuotas mensuales no se acortan con pagos previos ni siguen fuera del plazo
+  ---
+  duration_ms: 0.19745
+  type: 'test'
+  ...
+# Subtest: gasto vinculado sustituye previsión también al cambiar categoría o método
+ok 260 - gasto vinculado sustituye previsión también al cambiar categoría o método
+  ---
+  duration_ms: 0.474179
+  type: 'test'
+  ...
+# Subtest: baja en el mismo día conserva cargo en resúmenes y desglose
+ok 261 - baja en el mismo día conserva cargo en resúmenes y desglose
+  ---
+  duration_ms: 0.08829
+  type: 'test'
+  ...
+# Subtest: descuento conciliado conserva importe en categorías, semanas y ciclo
+ok 262 - descuento conciliado conserva importe en categorías, semanas y ciclo
+  ---
+  duration_ms: 0.551939
+  type: 'test'
+  ...
+# Subtest: fechas consecutivas, solapadas y con huecos se distinguen sin mutar ciclos
+ok 263 - fechas consecutivas, solapadas y con huecos se distinguen sin mutar ciclos
+  ---
+  duration_ms: 0.13167
+  type: 'test'
+  ...
+# Subtest: API listado/detalle devuelve mismos importes y obtiene vínculos de gastos
+ok 264 - API listado/detalle devuelve mismos importes y obtiene vínculos de gastos
+  ---
+  duration_ms: 53.382346
+  type: 'test'
+  ...
+# Subtest: API conserva diciembre anterior para enero sin mezclar diciembre futuro
+ok 265 - API conserva diciembre anterior para enero sin mezclar diciembre futuro
+  ---
+  duration_ms: 44.537264
+  type: 'test'
+  ...
+# Subtest: API separa consumo vigente e historial sin cambiar los cortes financieros
+ok 266 - API separa consumo vigente e historial sin cambiar los cortes financieros
+  ---
+  duration_ms: 45.624183
+  type: 'test'
+  ...
+# Subtest: omitir o confirmar por período retira la previsión y el aviso de efectivo
+ok 267 - omitir o confirmar por período retira la previsión y el aviso de efectivo
+  ---
+  duration_ms: 0.23983
+  type: 'test'
+  ...
+# Subtest: PostgreSQL A05 payable: abonos simultáneos, principal, cancelación y rollback
+ok 268 - PostgreSQL A05 payable: abonos simultáneos, principal, cancelación y rollback # SKIP
+  ---
+  duration_ms: 0.05075
+  type: 'test'
+  ...
+# Subtest: PostgreSQL A05 receivable: abonos simultáneos, principal, cancelación y rollback
+ok 269 - PostgreSQL A05 receivable: abonos simultáneos, principal, cancelación y rollback # SKIP
+  ---
+  duration_ms: 0.03278
+  type: 'test'
+  ...
+# Subtest: préstamos: saldo bancario conciliado conserva capital e intereses separados, incluido cero
+ok 270 - préstamos: saldo bancario conciliado conserva capital e intereses separados, incluido cero
+  ---
+  duration_ms: 0.25767
+  type: 'test'
+  ...
+# Subtest: préstamos: GET conserva el saldo bancario al registrar reembolsos o gastos
+ok 271 - préstamos: GET conserva el saldo bancario al registrar reembolsos o gastos
+  ---
+  duration_ms: 103.376664
+  type: 'test'
+  ...
+# Subtest: préstamos: desglose usa los ingresos vigentes sin descontarlos del banco ni modificar el historial
+ok 272 - préstamos: desglose usa los ingresos vigentes sin descontarlos del banco ni modificar el historial
+  ---
+  duration_ms: 24.400135
+  type: 'test'
+  ...
+# Subtest: préstamos: cuenta de reembolso cancelada y préstamo propio conservan su identidad
+ok 273 - préstamos: cuenta de reembolso cancelada y préstamo propio conservan su identidad
+  ---
+  duration_ms: 14.957505
+  type: 'test'
+  ...
+# Subtest: payable: editar abono o principal reabre/liquida y borrar actualiza saldo y grupo
+ok 274 - payable: editar abono o principal reabre/liquida y borrar actualiza saldo y grupo
+  ---
+  duration_ms: 100.055828
+  type: 'test'
+  ...
+# Subtest: payable: centavos exactos, abonos concurrentes y edición simultánea del principal
+ok 275 - payable: centavos exactos, abonos concurrentes y edición simultánea del principal
+  ---
+  duration_ms: 98.536339
+  type: 'test'
+  ...
+# Subtest: payable: CANCELLED se conserva al crear, editar, borrar abonos y cambiar principal
+ok 276 - payable: CANCELLED se conserva al crear, editar, borrar abonos y cambiar principal
+  ---
+  duration_ms: 99.521548
+  type: 'test'
+  ...
+# Subtest: payable: fallo del estado revierte alta, edición, borrado y cambio del principal
+ok 277 - payable: fallo del estado revierte alta, edición, borrado y cambio del principal
+  ---
+  duration_ms: 96.069252
+  type: 'test'
+  ...
+# Subtest: receivable: editar abono o principal reabre/liquida y borrar actualiza saldo y grupo
+ok 278 - receivable: editar abono o principal reabre/liquida y borrar actualiza saldo y grupo
+  ---
+  duration_ms: 17.951172
+  type: 'test'
+  ...
+# Subtest: receivable: centavos exactos, abonos concurrentes y edición simultánea del principal
+ok 279 - receivable: centavos exactos, abonos concurrentes y edición simultánea del principal
+  ---
+  duration_ms: 16.794942
+  type: 'test'
+  ...
+# Subtest: receivable: CANCELLED se conserva al crear, editar, borrar abonos y cambiar principal
+ok 280 - receivable: CANCELLED se conserva al crear, editar, borrar abonos y cambiar principal
+  ---
+  duration_ms: 14.999345
+  type: 'test'
+  ...
+# Subtest: receivable: fallo del estado revierte alta, edición, borrado y cambio del principal
+ok 281 - receivable: fallo del estado revierte alta, edición, borrado y cambio del principal
+  ---
+  duration_ms: 19.085351
+  type: 'test'
+  ...
+# Subtest: ingresos: dos traslados simultáneos recalculan origen y destino; desvincular reabre
+ok 282 - ingresos: dos traslados simultáneos recalculan origen y destino; desvincular reabre
+  ---
+  duration_ms: 15.546214
+  type: 'test'
+  ...
+# Subtest: cálculo compartido redondea cada partida histórica y conserva cancelaciones y excedentes
+ok 283 - cálculo compartido redondea cada partida histórica y conserva cancelaciones y excedentes
+  ---
+  duration_ms: 2.133567
+  type: 'test'
+  ...
+# Subtest: varias categorías y pagos son alternativas, y los campos distintos se intersectan
+ok 284 - varias categorías y pagos son alternativas, y los campos distintos se intersectan
+  ---
+  duration_ms: 1.603879
+  type: 'test'
+  ...
+# Subtest: conceptos ignoran mayúsculas y acentos, permitiendo alternativas y búsquedas parciales
+ok 285 - conceptos ignoran mayúsculas y acentos, permitiendo alternativas y búsquedas parciales
+  ---
+  duration_ms: 0.558909
+  type: 'test'
+  ...
+# Subtest: montos comparan centavos y aplican igual a guardados y pendientes
+ok 286 - montos comparan centavos y aplican igual a guardados y pendientes
+  ---
+  duration_ms: 0.14067
+  type: 'test'
+  ...
+# Subtest: la entrada de montos acepta MXN y rechaza números ambiguos o incompletos
+ok 287 - la entrada de montos acepta MXN y rechaza números ambiguos o incompletos
+  ---
+  duration_ms: 0.22741
+  type: 'test'
+  ...
+# Subtest: PostgreSQL: unicidad concurrente, rollback y recibo durable de capturas
+ok 288 - PostgreSQL: unicidad concurrente, rollback y recibo durable de capturas # SKIP
+  ---
+  duration_ms: 0.04521
+  type: 'test'
+  ...
+# Subtest: POST concurrentes y respuesta perdida devuelven el mismo gasto y cuenta
+ok 289 - POST concurrentes y respuesta perdida devuelven el mismo gasto y cuenta
+  ---
+  duration_ms: 92.583315
+  type: 'test'
+  ...
+# Subtest: reutilizar UUID con otro contenido da 409; propietario y orden de claves son independientes
+ok 290 - reutilizar UUID con otro contenido da 409; propietario y orden de claves son independientes
+  ---
+  duration_ms: 101.791886
+  type: 'test'
+  ...
+# Subtest: fallo del gasto o del recibo revierte también la cuenta creada y permite reintentar
+ok 291 - fallo del gasto o del recibo revierte también la cuenta creada y permite reintentar
+  ---
+  duration_ms: 186.27537
+  type: 'test'
+  ...
+# Subtest: validaciones fallidas no consumen la operación y UUID inválido se rechaza
+ok 292 - validaciones fallidas no consumen la operación y UUID inválido se rechaza
+  ---
+  duration_ms: 93.800174
+  type: 'test'
+  ...
+# Subtest: editar o eliminar un gasto confirmado no permite recrearlo mediante un reintento viejo
+ok 293 - editar o eliminar un gasto confirmado no permite recrearlo mediante un reintento viejo
+  ---
+  duration_ms: 91.651616
+  type: 'test'
+  ...
+# Subtest: aportación recibida: guarda el cargo y el efectivo una vez, sin crear cuentas
+ok 294 - aportación recibida: guarda el cargo y el efectivo una vez, sin crear cuentas
+  ---
+  duration_ms: 95.760272
+  type: 'test'
+  ...
+# Subtest: aportación inválida o cuenta duplicada no consume recibo ni crea gasto
+ok 295 - aportación inválida o cuenta duplicada no consume recibo ni crea gasto
+  ---
+  duration_ms: 100.033668
+  type: 'test'
+  ...
+# Subtest: PostgreSQL: contratos JSON de todos los flujos financieros, variantes y pago parcial
+ok 296 - PostgreSQL: contratos JSON de todos los flujos financieros, variantes y pago parcial # SKIP
+  ---
+  duration_ms: 0.05783
+  type: 'test'
+  ...
+# Subtest: calendar eventos: las mutaciones autenticadas disparan trabajo para el propietario; las lecturas no
+ok 297 - calendar eventos: las mutaciones autenticadas disparan trabajo para el propietario; las lecturas no
+  ---
+  duration_ms: 3.725956
+  type: 'test'
+  ...
+# Subtest: calendar eventos: captura nativa solicita sincronización después del commit y usa al dueño autenticado
+ok 298 - calendar eventos: captura nativa solicita sincronización después del commit y usa al dueño autenticado
+  ---
+  duration_ms: 9.342771
+  type: 'test'
+  ...
+# Subtest: calendar eventos: consume lotes y cambios concurrentes; termina al quedar al día
+ok 299 - calendar eventos: consume lotes y cambios concurrentes; termina al quedar al día
+  ---
+  duration_ms: 20.370469
+  type: 'test'
+  ...
+# Subtest: calendar eventos: no mantiene temporizadores ante errores, bloqueos, cuotas o agotamiento de tiempo
+ok 300 - calendar eventos: no mantiene temporizadores ante errores, bloqueos, cuotas o agotamiento de tiempo
+  ---
+  duration_ms: 18.641581
+  type: 'test'
+  ...
+# Subtest: calendar DB: OAuth vinculado al navegador, expiración, un solo uso y cuenta estable
+ok 301 - calendar DB: OAuth vinculado al navegador, expiración, un solo uso y cuenta estable # SKIP
+  ---
+  duration_ms: 0.04948
+  type: 'test'
+  ...
+# Subtest: calendar DB: sincronización idempotente, fecha corregida, pago parcial/liquidado y borrado
+ok 302 - calendar DB: sincronización idempotente, fecha corregida, pago parcial/liquidado y borrado # SKIP
+  ---
+  duration_ms: 0.0327
+  type: 'test'
+  ...
+# Subtest: calendar DB: corrige un cobro futuro marcado como cobrado en Google sin duplicar eventos ni ingresos
+ok 303 - calendar DB: corrige un cobro futuro marcado como cobrado en Google sin duplicar eventos ni ingresos # SKIP
+  ---
+  duration_ms: 0.03114
+  type: 'test'
+  ...
+# Subtest: calendar eventos DB: fechas y pagos de tarjeta, cobros y gastos vinculados actualizan Google al guardar
+ok 304 - calendar eventos DB: fechas y pagos de tarjeta, cobros y gastos vinculados actualizan Google al guardar # SKIP
+  ---
+  duration_ms: 0.02798
+  type: 'test'
+  ...
+# Subtest: calendar DB: revisar corte exige ambos guardados, conserva ID y no registra pagos
+ok 305 - calendar DB: revisar corte exige ambos guardados, conserva ID y no registra pagos # SKIP
+  ---
+  duration_ms: 0.02823
+  type: 'test'
+  ...
+# Subtest: calendar DB: respuesta perdida y evento borrado en Google se recuperan sin duplicados activos
+ok 306 - calendar DB: respuesta perdida y evento borrado en Google se recuperan sin duplicados activos # SKIP
+  ---
+  duration_ms: 0.02966
+  type: 'test'
+  ...
+# Subtest: calendar DB: solo selecciona pendientes y revisión diaria; respeta esperas y desconexiones
+ok 307 - calendar DB: solo selecciona pendientes y revisión diaria; respeta esperas y desconexiones # SKIP
+  ---
+  duration_ms: 0.02618
+  type: 'test'
+  ...
+# Subtest: calendar DB: termina lotes interrumpidos y conserva cambios recibidos durante la sincronización
+ok 308 - calendar DB: termina lotes interrumpidos y conserva cambios recibidos durante la sincronización # SKIP
+  ---
+  duration_ms: 0.02934
+  type: 'test'
+  ...
+# Subtest: calendar DB: exclusión mutua, expiración del bloqueo, pausa por cuota y revocación
+ok 309 - calendar DB: exclusión mutua, expiración del bloqueo, pausa por cuota y revocación # SKIP
+  ---
+  duration_ms: 0.02659
+  type: 'test'
+  ...
+# Subtest: calendar DB: triggers atómicos por propietario y desconexión limpia sin borrar historial
+ok 310 - calendar DB: triggers atómicos por propietario y desconexión limpia sin borrar historial # SKIP
+  ---
+  duration_ms: 0.02647
+  type: 'test'
+  ...
+# Subtest: calendar DB: recupera la creación del calendario y conserva cambios concurrentes pendientes
+ok 311 - calendar DB: recupera la creación del calendario y conserva cambios concurrentes pendientes # SKIP
+  ---
+  duration_ms: 0.02835
+  type: 'test'
+  ...
+# Subtest: calendar palette: fechas de México separan vencidos, cobros de hoy y suscripciones futuras sin cambiar sus textos
+ok 312 - calendar palette: fechas de México separan vencidos, cobros de hoy y suscripciones futuras sin cambiar sus textos
+  ---
+  duration_ms: 10.729779
+  type: 'test'
+  ...
+# Subtest: calendar palette: seis roles con prioridad explícita, sin convertir cortes o parciales en vencidos
+ok 313 - calendar palette: seis roles con prioridad explícita, sin convertir cortes o parciales en vencidos
+  ---
+  duration_ms: 0.25435
+  type: 'test'
+  ...
+# Subtest: calendar palette: conserva etiquetas personales y propiedades, actualiza solo sus seis colores y es idempotente
+ok 314 - calendar palette: conserva etiquetas personales y propiedades, actualiza solo sus seis colores y es idempotente
+  ---
+  duration_ms: 0.25424
+  type: 'test'
+  ...
+# Subtest: calendar palette: respeta el máximo de 200 etiquetas sin borrar otras para hacer espacio
+ok 315 - calendar palette: respeta el máximo de 200 etiquetas sin borrar otras para hacer espacio
+  ---
+  duration_ms: 0.220349
+  type: 'test'
+  ...
+# Subtest: calendar palette: una edición concurrente en Google se recupera leyendo de nuevo y usando If-Match
+ok 316 - calendar palette: una edición concurrente en Google se recupera leyendo de nuevo y usando If-Match
+  ---
+  duration_ms: 0.32201
+  type: 'test'
+  ...
+# Subtest: calendar palette: no reescribe una paleta correcta ni escribe sin ETag; respeta cuotas
+ok 317 - calendar palette: no reescribe una paleta correcta ni escribe sin ETag; respeta cuotas
+  ---
+  duration_ms: 0.28196
+  type: 'test'
+  ...
+# Subtest: calendar palette: limita reintentos ante conflictos continuos
+ok 318 - calendar palette: limita reintentos ante conflictos continuos
+  ---
+  duration_ms: 0.226249
+  type: 'test'
+  ...
+# Subtest: calendar client: envía If-Match conservando autorización y codificación JSON
+ok 319 - calendar client: envía If-Match conservando autorización y codificación JSON
+  ---
+  duration_ms: 9.507491
+  type: 'test'
+  ...
+# Subtest: calendar: credenciales cifradas ligadas al propietario, autenticadas y no deterministas
+ok 320 - calendar: credenciales cifradas ligadas al propietario, autenticadas y no deterministas
+  ---
+  duration_ms: 2.013878
+  type: 'test'
+  ...
+# Subtest: calendar: conserva el día bancario, ajusta febrero bisiesto y usa fin exclusivo
+ok 321 - calendar: conserva el día bancario, ajusta febrero bisiesto y usa fin exclusivo
+  ---
+  duration_ms: 1.190098
+  type: 'test'
+  ...
+# Subtest: calendar: corrección de fechas mantiene clave, saldo parcial y liquidación sin recordatorio
+ok 322 - calendar: corrección de fechas mantiene clave, saldo parcial y liquidación sin recordatorio
+  ---
+  duration_ms: 1.227219
+  type: 'test'
+  ...
+# Subtest: calendar: corte verde requiere fechas confirmadas y monto, conserva pago independiente y acepta cero
+ok 323 - calendar: corte verde requiere fechas confirmadas y monto, conserva pago independiente y acepta cero
+  ---
+  duration_ms: 3.020407
+  type: 'test'
+  ...
+# Subtest: calendar: cuentas cobradas, canceladas y con pago parcial respetan el saldo real
+ok 324 - calendar: cuentas cobradas, canceladas y con pago parcial respetan el saldo real
+  ---
+  duration_ms: 1.225229
+  type: 'test'
+  ...
+# Subtest: calendar: el color representa el estado en todos los tipos y los parciales conservan su aviso
+ok 325 - calendar: el color representa el estado en todos los tipos y los parciales conservan su aviso
+  ---
+  duration_ms: 0.19396
+  type: 'test'
+  ...
+# Subtest: calendar: abonos de cuentas usan naranja y texto parcial; al liquidar pasan a verde
+ok 326 - calendar: abonos de cuentas usan naranja y texto parcial; al liquidar pasan a verde
+  ---
+  duration_ms: 1.021269
+  type: 'test'
+  ...
+# Subtest: calendar: un cobro quincenal no marca la siguiente fecha como cobrada, ni al llegar ese día
+ok 327 - calendar: un cobro quincenal no marca la siguiente fecha como cobrada, ni al llegar ese día
+  ---
+  duration_ms: 10.175349
+  type: 'test'
+  ...
+# Subtest: calendar: abonos se suman a centavos y los días ajustados a fin de mes no duplican cobros
+ok 328 - calendar: abonos se suman a centavos y los días ajustados a fin de mes no duplican cobros
+  ---
+  duration_ms: 10.509739
+  type: 'test'
+  ...
+# Subtest: calendar: ingresos futuros no liquidan ni retiran los cobros previstos de una cuenta activa
+ok 329 - calendar: ingresos futuros no liquidan ni retiran los cobros previstos de una cuenta activa
+  ---
+  duration_ms: 1.388539
+  type: 'test'
+  ...
+# Subtest: calendar: cuotas y denegación no revelan respuestas de Google; reintento respeta Retry-After
+ok 330 - calendar: cuotas y denegación no revelan respuestas de Google; reintento respeta Retry-After
+  ---
+  duration_ms: 15.255954
+  type: 'test'
+  ...
+# Subtest: calendar: cron exige su secreto incluso cuando falta configuración y no expone usuarios
+ok 331 - calendar: cron exige su secreto incluso cuando falta configuración y no expone usuarios
+  ---
+  duration_ms: 10.723509
+  type: 'test'
+  ...
+# Subtest: calendar: callback usa origen fijo, borra cookie y no refleja mensajes del proveedor
+ok 332 - calendar: callback usa origen fijo, borra cookie y no refleja mensajes del proveedor
+  ---
+  duration_ms: 5.499835
+  type: 'test'
+  ...
+# Subtest: calendar: suscripciones omiten saltos, respetan frecuencia y desactivación, y retiran avisos al confirmar
+ok 333 - calendar: suscripciones omiten saltos, respetan frecuencia y desactivación, y retiran avisos al confirmar
+  ---
+  duration_ms: 1.194278
+  type: 'test'
+  ...
+# Subtest: calendar: la API usa el propietario de sesión e impide preferencias y userId arbitrarios
+ok 334 - calendar: la API usa el propietario de sesión e impide preferencias y userId arbitrarios
+  ---
+  duration_ms: 6.455244
+  type: 'test'
+  ...
+# Subtest: el corte bancario prevalece en tarjetas y dashboard, sin cambiar fecha de compra
+ok 335 - el corte bancario prevalece en tarjetas y dashboard, sin cambiar fecha de compra
+  ---
+  duration_ms: 93.216495
+  type: 'test'
+  ...
+# Subtest: la manta conserva 9/12 aunque falte el primer ciclo en la base
+ok 336 - la manta conserva 9/12 aunque falte el primer ciclo en la base
+  ---
+  duration_ms: 50.483969
+  type: 'test'
+  ...
+# Subtest: la lista de compras muestra saldo y progreso del último documento verificado
+ok 337 - la lista de compras muestra saldo y progreso del último documento verificado
+  ---
+  duration_ms: 33.862345
+  type: 'test'
+  ...
+# Subtest: los resúmenes mensuales usan la cuota verificada y terminan en el ciclo 12
+ok 338 - los resúmenes mensuales usan la cuota verificada y terminan en el ciclo 12
+  ---
+  duration_ms: 40.818599
+  type: 'test'
+  ...
+# Subtest: referencias inválidas se ignoran; varios cortes siguen la referencia más reciente
+ok 339 - referencias inválidas se ignoran; varios cortes siguen la referencia más reciente
+  ---
+  duration_ms: 43.930235
+  type: 'test'
+  ...
+# Subtest: MSI: fallo después de cada escritura revierte cuenta, compra y origen; reintentar crea solo un par
+ok 340 - MSI: fallo después de cada escritura revierte cuenta, compra y origen; reintentar crea solo un par
+  ---
+  duration_ms: 45.394113
+  type: 'test'
+  ...
+# Subtest: MSI: valida propietarios antes de escribir, ignora userId del cuerpo y admite compra propia sin cuenta
+ok 341 - MSI: valida propietarios antes de escribir, ignora userId del cuerpo y admite compra propia sin cuenta
+  ---
+  duration_ms: 14.377246
+  type: 'test'
+  ...
+# Subtest: MSI: editar valida en transacción y revierte el cambio ante un fallo
+ok 342 - MSI: editar valida en transacción y revierte el cambio ante un fallo
+  ---
+  duration_ms: 13.936936
+  type: 'test'
+  ...
+# Subtest: cliente UI valida el recurso y conserva los metadatos y los valores serializados
+ok 343 - cliente UI valida el recurso y conserva los metadatos y los valores serializados
+  ---
+  duration_ms: 39.80738
+  type: 'test'
+  ...
+# Subtest: una respuesta incompleta entra en recuperación antes de entregarse a la pantalla
+ok 344 - una respuesta incompleta entra en recuperación antes de entregarse a la pantalla
+  ---
+  duration_ms: 34.656875
+  type: 'test'
+  ...
+# Subtest: el contrato de interfaz acepta propuestas históricas parciales y rechaza importes estructurados
+ok 345 - el contrato de interfaz acepta propuestas históricas parciales y rechaza importes estructurados
+  ---
+  duration_ms: 27.827782
+  type: 'test'
+  ...
+# Subtest: el cliente conserva el orden de la corrección usado por el control optimista
+ok 346 - el cliente conserva el orden de la corrección usado por el control optimista
+  ---
+  duration_ms: 35.764053
+  type: 'test'
+  ...
+# Subtest: lecturas: foco y visibilidad comparten la petición pendiente sin cancelarla
+ok 347 - lecturas: foco y visibilidad comparten la petición pendiente sin cancelarla
+  ---
+  duration_ms: 0.24436
+  type: 'test'
+  ...
+# Subtest: lecturas: cambiar de escenario o usuario cancela la anterior sin liberar la nueva
+ok 348 - lecturas: cambiar de escenario o usuario cancela la anterior sin liberar la nueva
+  ---
+  duration_ms: 0.14162
+  type: 'test'
+  ...
+# Subtest: lecturas: un fallo permite reintentar y cancelar impide enviar trabajo pendiente
+ok 349 - lecturas: un fallo permite reintentar y cancelar impide enviar trabajo pendiente
+  ---
+  duration_ms: 0.281409
+  type: 'test'
+  ...
+# Subtest: A11: recupera la migración original y conserva los trece checksums aplicados
+ok 350 - A11: recupera la migración original y conserva los trece checksums aplicados
+  ---
+  duration_ms: 1.088809
+  type: 'test'
+  ...
+# Subtest: A11: rechaza SQL alterado, ausente y migraciones fallidas
+ok 351 - A11: rechaza SQL alterado, ausente y migraciones fallidas
+  ---
+  duration_ms: 2.672737
+  type: 'test'
+  ...
+# Subtest: A11: una base creada desde Git tiene todos los checksums y ningún pendiente
+ok 352 - A11: una base creada desde Git tiene todos los checksums y ningún pendiente
+  ---
+  duration_ms: 1.363849
+  type: 'test'
+  ...
+# Subtest: rendimientos automáticos: reglas históricas, abono real, conciliación y referencia en PostgreSQL
+ok 353 - rendimientos automáticos: reglas históricas, abono real, conciliación y referencia en PostgreSQL # SKIP
+  ---
+  duration_ms: 0.03556
+  type: 'test'
+  ...
+# Subtest: /home/garatachia/projects/afp/tests/money-automatic-yields.test.ts
+not ok 354 - /home/garatachia/projects/afp/tests/money-automatic-yields.test.ts
+  ---
+  duration_ms: 0.03085
+  type: 'test'
+  name: 'TransformError'
+  error: |-
+    Transform failed with 2 errors:
+    /home/garatachia/projects/afp/tests/money-automatic-yields.test.ts:79:2: ERROR: Invalid assignment target
+    /home/garatachia/projects/afp/tests/money-automatic-yields.test.ts:84:2: ERROR: Invalid assignment target
+  name: 'TransformError'
+  stack: |-
+    failureErrorWithLog (/home/garatachia/projects/afp/node_modules/.pnpm/esbuild@0.28.2/node_modules/esbuild/lib/main.js:1752:15)
+    /home/garatachia/projects/afp/node_modules/.pnpm/esbuild@0.28.2/node_modules/esbuild/lib/main.js:1019:50
+    responseCallbacks.<computed> (/home/garatachia/projects/afp/node_modules/.pnpm/esbuild@0.28.2/node_modules/esbuild/lib/main.js:886:9)
+    handleIncomingPacket (/home/garatachia/projects/afp/node_modules/.pnpm/esbuild@0.28.2/node_modules/esbuild/lib/main.js:941:12)
+    Socket.readFromStdout (/home/garatachia/projects/afp/node_modules/.pnpm/esbuild@0.28.2/node_modules/esbuild/lib/main.js:864:7)
+    Socket.emit (node:events:519:28)
+    addChunk (node:internal/streams/readable:561:12)
+    readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
+    Readable.push (node:internal/streams/readable:392:5)
+    Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+  ...
+# Subtest: presupuesto mixto: API real, persistencia, propietario, reintentos y conservación de movimientos
+ok 355 - presupuesto mixto: API real, persistencia, propietario, reintentos y conservación de movimientos # SKIP
+  ---
+  duration_ms: 0.02963
+  type: 'test'
+  ...
+# Subtest: presupuesto mixto: un importe por categoría conserva el total y difiere el crédito hasta su pago
+ok 356 - presupuesto mixto: un importe por categoría conserva el total y difiere el crédito hasta su pago
+  ---
+  duration_ms: 32.994676
+  type: 'test'
+  ...
+# Subtest: presupuesto mixto: un gasto real de crédito cubre la cuota diaria completa, sin exigir coincidencia de medio
+ok 357 - presupuesto mixto: un gasto real de crédito cubre la cuota diaria completa, sin exigir coincidencia de medio
+  ---
+  duration_ms: 22.461787
+  type: 'test'
+  ...
+# Subtest: presupuesto mixto: adelantos recuperables completos no consumen el presupuesto personal ni desaparecen del saldo real
+ok 358 - presupuesto mixto: adelantos recuperables completos no consumen el presupuesto personal ni desaparecen del saldo real
+  ---
+  duration_ms: 16.356603
+  type: 'test'
+  ...
+# Subtest: presupuesto mixto: un adelanto parcial cuenta solo su parte personal y no depende de haber cobrado
+ok 359 - presupuesto mixto: un adelanto parcial cuenta solo su parte personal y no depende de haber cobrado
+  ---
+  duration_ms: 27.023133
+  type: 'test'
+  ...
+# Subtest: presupuesto mixto: varios gastos de un mismo adelanto reparten el principal sin perder centavos ni duplicar aportaciones
+ok 360 - presupuesto mixto: varios gastos de un mismo adelanto reparten el principal sin perder centavos ni duplicar aportaciones
+  ---
+  duration_ms: 0.768709
+  type: 'test'
+  ...
+# Subtest: presupuesto mixto: la muestra combina efectivo, débito y tarjetas y excluye deuda, suscripciones, adelantos y gastos vinculados
+ok 361 - presupuesto mixto: la muestra combina efectivo, débito y tarjetas y excluye deuda, suscripciones, adelantos y gastos vinculados
+  ---
+  duration_ms: 0.525769
+  type: 'test'
+  ...
+# Subtest: presupuesto mixto: centavos, importes grandes y orden de prioridades conservan exactamente el importe
+ok 362 - presupuesto mixto: centavos, importes grandes y orden de prioridades conservan exactamente el importe
+  ---
+  duration_ms: 20.928879
+  type: 'test'
+  ...
+# Subtest: presupuesto mixto: el escenario modifica el consumo total una sola vez
+ok 363 - presupuesto mixto: el escenario modifica el consumo total una sola vez
+  ---
+  duration_ms: 15.901574
+  type: 'test'
+  ...
+# Subtest: presupuesto mixto: una tarjeta eliminada conserva la salida estimada y produce un solo movimiento diario
+ok 364 - presupuesto mixto: una tarjeta eliminada conserva la salida estimada y produce un solo movimiento diario
+  ---
+  duration_ms: 13.184466
+  type: 'test'
+  ...
+# Subtest: proyección completa: los períodos antiguos liquidados quedan como revisión histórica; una deuda pendiente mantiene el aviso actual
+ok 365 - proyección completa: los períodos antiguos liquidados quedan como revisión histórica; una deuda pendiente mantiene el aviso actual
+  ---
+  duration_ms: 35.247204
+  type: 'test'
+  ...
+# Subtest: Mi dinero: saldo inicial, efectivo, aportaciones y transferencias conservan centavos y no cuentan crédito como salida
+ok 366 - Mi dinero: saldo inicial, efectivo, aportaciones y transferencias conservan centavos y no cuentan crédito como salida
+  ---
+  duration_ms: 27.569292
+  type: 'test'
+  ...
+# Subtest: Mi dinero: las capturas iniciales no reaplican movimientos; cambios posteriores, borrados y asignación tardía
+ok 367 - Mi dinero: las capturas iniciales no reaplican movimientos; cambios posteriores, borrados y asignación tardía
+  ---
+  duration_ms: 47.299772
+  type: 'test'
+  ...
+# Subtest: Mi dinero: cargo de tarjeta, abonos capturados, acumulado y devolución se cuentan una sola vez
+ok 368 - Mi dinero: cargo de tarjeta, abonos capturados, acumulado y devolución se cuentan una sola vez
+  ---
+  duration_ms: 21.701087
+  type: 'test'
+  ...
+# Subtest: Mi dinero: una bonificación aplicada al crédito no es dinero depositado
+ok 369 - Mi dinero: una bonificación aplicada al crédito no es dinero depositado
+  ---
+  duration_ms: 14.575336
+  type: 'test'
+  ...
+# Subtest: Mi dinero: fuentes futuras no modifican el saldo actual
+ok 370 - Mi dinero: fuentes futuras no modifican el saldo actual
+  ---
+  duration_ms: 12.730667
+  type: 'test'
+  ...
+# Subtest: Mi dinero: cuotas y suscripciones pasan por el pago de tarjeta, con cuotas que terminan
+ok 371 - Mi dinero: cuotas y suscripciones pasan por el pago de tarjeta, con cuotas que terminan
+  ---
+  duration_ms: 13.712086
+  type: 'test'
+  ...
+# Subtest: Mi dinero: una suscripción confirmada u omitida no se vuelve a prever
+ok 372 - Mi dinero: una suscripción confirmada u omitida no se vuelve a prever
+  ---
+  duration_ms: 9.97073
+  type: 'test'
+  ...
+# Subtest: Mi dinero: los cobros se reparten por fecha y terminan al recuperar el saldo
+ok 373 - Mi dinero: los cobros se reparten por fecha y terminan al recuperar el saldo
+  ---
+  duration_ms: 19.43719
+  type: 'test'
+  ...
+# Subtest: Mi dinero: el importe de un cobro quincenal se aplica completo en cada fecha
+ok 374 - Mi dinero: el importe de un cobro quincenal se aplica completo en cada fecha
+  ---
+  duration_ms: 9.176681
+  type: 'test'
+  ...
+# Subtest: Mi dinero: excluir un cobro incierto conserva su registro y los abonos reales
+ok 375 - Mi dinero: excluir un cobro incierto conserva su registro y los abonos reales
+  ---
+  duration_ms: 31.783837
+  type: 'test'
+  ...
+# Subtest: Mi dinero: excluir previsión sin calendario permite recibir nuevos abonos incluso con fecha futura
+ok 376 - Mi dinero: excluir previsión sin calendario permite recibir nuevos abonos incluso con fecha futura
+  ---
+  duration_ms: 28.599241
+  type: 'test'
+  ...
+# Subtest: Mi dinero: la cuenta prevista para un cobro es independiente de sus ingresos reales
+ok 377 - Mi dinero: la cuenta prevista para un cobro es independiente de sus ingresos reales
+  ---
+  duration_ms: 16.335683
+  type: 'test'
+  ...
+# Subtest: Mi dinero: fechas de cobro ajustadas a febrero no duplican el importe por ocurrencia
+ok 378 - Mi dinero: fechas de cobro ajustadas a febrero no duplican el importe por ocurrencia
+  ---
+  duration_ms: 9.344781
+  type: 'test'
+  ...
+# Subtest: Mi dinero: ofrece una regla de previsión independiente solo para cuentas por cobrar activas
+ok 379 - Mi dinero: ofrece una regla de previsión independiente solo para cuentas por cobrar activas
+  ---
+  duration_ms: 37.767061
+  type: 'test'
+  ...
+# Subtest: Mi dinero: nómina neta no descuenta dos veces los préstamos, y permite pago externo explícito
+ok 380 - Mi dinero: nómina neta no descuenta dos veces los préstamos, y permite pago externo explícito
+  ---
+  duration_ms: 36.904313
+  type: 'test'
+  ...
+# Subtest: Mi dinero: nómina registrada reemplaza la previsión mensual con abonos parciales
+ok 381 - Mi dinero: nómina registrada reemplaza la previsión mensual con abonos parciales
+  ---
+  duration_ms: 19.8575
+  type: 'test'
+  ...
+# Subtest: Mi dinero: omitir una nómina no consume el ingreso que cubre la siguiente
+ok 382 - Mi dinero: omitir una nómina no consume el ingreso que cubre la siguiente
+  ---
+  duration_ms: 9.137981
+  type: 'test'
+  ...
+# Subtest: Mi dinero: vínculo explícito reemplaza una ocurrencia aunque el cobro llegue en otro mes
+ok 383 - Mi dinero: vínculo explícito reemplaza una ocurrencia aunque el cobro llegue en otro mes
+  ---
+  duration_ms: 10.480259
+  type: 'test'
+  ...
+# Subtest: Mi dinero: consumo registrado cubre la cuota diaria, separado de suscripciones, deudas y otras previsiones
+ok 384 - Mi dinero: consumo registrado cubre la cuota diaria, separado de suscripciones, deudas y otras previsiones
+  ---
+  duration_ms: 20.911589
+  type: 'test'
+  ...
+# Subtest: Mi dinero: cinco días pendientes no concentran el presupuesto sin gastar ni desaparecen al superarlo
+ok 385 - Mi dinero: cinco días pendientes no concentran el presupuesto sin gastar ni desaparecen al superarlo
+  ---
+  duration_ms: 26.526953
+  type: 'test'
+  ...
+# Subtest: Mi dinero: registrar hoy reduce solo la estimación de hoy y conserva el saldo real
+ok 386 - Mi dinero: registrar hoy reduce solo la estimación de hoy y conserva el saldo real
+  ---
+  duration_ms: 27.377592
+  type: 'test'
+  ...
+# Subtest: Mi dinero: un gasto futuro registrado sustituye su estimación diaria y conserva su importe completo
+ok 387 - Mi dinero: un gasto futuro registrado sustituye su estimación diaria y conserva su importe completo
+  ---
+  duration_ms: 17.700821
+  type: 'test'
+  ...
+# Subtest: Mi dinero: vigencia parcial conserva el ritmo mensual y respeta el cambio de mes
+ok 388 - Mi dinero: vigencia parcial conserva el ritmo mensual y respeta el cambio de mes
+  ---
+  duration_ms: 12.944337
+  type: 'test'
+  ...
+# Subtest: Mi dinero: referencia diaria conserva centavos en meses de 28, 29, 30 y 31 días
+ok 389 - Mi dinero: referencia diaria conserva centavos en meses de 28, 29, 30 y 31 días
+  ---
+  duration_ms: 89.592539
+  type: 'test'
+  ...
+# Subtest: Mi dinero: releer días después no mueve centavos entre fechas ni acumula días sin gasto
+ok 390 - Mi dinero: releer días después no mueve centavos entre fechas ni acumula días sin gasto
+  ---
+  duration_ms: 18.83492
+  type: 'test'
+  ...
+# Subtest: Mi dinero: escenario de gasto variable ajusta el ritmo sin crear movimientos ni cambiar saldos
+ok 391 - Mi dinero: escenario de gasto variable ajusta el ritmo sin crear movimientos ni cambiar saldos
+  ---
+  duration_ms: 36.187813
+  type: 'test'
+  ...
+# Subtest: Mi dinero: consumo diario a crédito sustituye compras registradas y sale al pagar cada corte
+ok 392 - Mi dinero: consumo diario a crédito sustituye compras registradas y sale al pagar cada corte
+  ---
+  duration_ms: 9.67526
+  type: 'test'
+  ...
+# Subtest: Mi dinero: detecta falta de liquidez antes de una nómina aunque el cierre sea positivo
+ok 393 - Mi dinero: detecta falta de liquidez antes de una nómina aunque el cierre sea positivo
+  ---
+  duration_ms: 8.231832
+  type: 'test'
+  ...
+# Subtest: Mi dinero: rendimiento diario compuesto, redondeo, topes y reservas a la vista
+ok 394 - Mi dinero: rendimiento diario compuesto, redondeo, topes y reservas a la vista
+  ---
+  duration_ms: 35.468304
+  type: 'test'
+  ...
+# Subtest: Mi dinero: abono real del rendimiento sustituye estimación de ese día; vigencia termina
+ok 395 - Mi dinero: abono real del rendimiento sustituye estimación de ese día; vigencia termina
+  ---
+  duration_ms: 9.87339
+  type: 'test'
+  ...
+# Subtest: Mi dinero: retirar todo no bloquea dinero ni genera rendimiento sobre saldo negativo
+ok 396 - Mi dinero: retirar todo no bloquea dinero ni genera rendimiento sobre saldo negativo
+  ---
+  duration_ms: 11.111568
+  type: 'test'
+  ...
+# Subtest: Mi dinero: ausencia de cuentas y datos faltantes no simulan un saldo verificado
+ok 397 - Mi dinero: ausencia de cuentas y datos faltantes no simulan un saldo verificado
+  ---
+  duration_ms: 11.264539
+  type: 'test'
+  ...
+# Subtest: Mi dinero: fin de mes y año bisiesto sin duplicar días ajustados
+ok 398 - Mi dinero: fin de mes y año bisiesto sin duplicar días ajustados
+  ---
+  duration_ms: 0.146769
+  type: 'test'
+  ...
+# Subtest: Mi dinero: validación de saldos, tasas y planes
+ok 399 - Mi dinero: validación de saldos, tasas y planes
+  ---
+  duration_ms: 4.667396
+  type: 'test'
+  ...
+# Subtest: Mi dinero: API, PostgreSQL, aislamiento, cuentas, abonos, conciliación y proyección
+ok 400 - Mi dinero: API, PostgreSQL, aislamiento, cuentas, abonos, conciliación y proyección # SKIP
+  ---
+  duration_ms: 0.04175
+  type: 'test'
+  ...
+# Subtest: Mi dinero: las lecturas esperan la conexión única y conservan propietario y relaciones
+ok 401 - Mi dinero: las lecturas esperan la conexión única y conservan propietario y relaciones
+  ---
+  duration_ms: 37.905011
+  type: 'test'
+  ...
+# Subtest: Mi dinero: libera la transacción antes de calcular y serializar ambos escenarios
+ok 402 - Mi dinero: libera la transacción antes de calcular y serializar ambos escenarios
+  ---
+  duration_ms: 17.697252
+  type: 'test'
+  ...
+# Subtest: Mi dinero: saturación de conexión o transacción vencida devuelve un fallo recuperable
+ok 403 - Mi dinero: saturación de conexión o transacción vencida devuelve un fallo recuperable
+  ---
+  duration_ms: 29.61281
+  type: 'test'
+  ...
+# Subtest: mínimo mensual: incluye el margen en centavos y agrupa solo días consecutivos
+ok 404 - mínimo mensual: incluye el margen en centavos y agrupa solo días consecutivos
+  ---
+  duration_ms: 2.586438
+  type: 'test'
+  ...
+# Subtest: mínimo mensual: conserva períodos separados y días aislados
+ok 405 - mínimo mensual: conserva períodos separados y días aislados
+  ---
+  duration_ms: 0.16467
+  type: 'test'
+  ...
+# Subtest: mínimo mensual: respeta el mes, hoy y los huecos sin inventar fechas
+ok 406 - mínimo mensual: respeta el mes, hoy y los huecos sin inventar fechas
+  ---
+  duration_ms: 0.12513
+  type: 'test'
+  ...
+# Subtest: mínimo mensual: negativos y cero usan un margen coherente sin cambiar el importe
+ok 407 - mínimo mensual: negativos y cero usan un margen coherente sin cambiar el importe
+  ---
+  duration_ms: 0.22926
+  type: 'test'
+  ...
+# Subtest: mínimo mensual: un mes constante y febrero bisiesto agrupan hasta su último día
+ok 408 - mínimo mensual: un mes constante y febrero bisiesto agrupan hasta su último día
+  ---
+  duration_ms: 0.22198
+  type: 'test'
+  ...
+# Subtest: mínimo mensual: ordena y deduplica fechas sin modificar la proyección original
+ok 409 - mínimo mensual: ordena y deduplica fechas sin modificar la proyección original
+  ---
+  duration_ms: 0.15689
+  type: 'test'
+  ...
+# Subtest: mínimo mensual: sigue el total global y el escenario con el motor real
+ok 410 - mínimo mensual: sigue el total global y el escenario con el motor real
+  ---
+  duration_ms: 51.889507
+  type: 'test'
+  ...
+# Subtest: estado mensual: un cierre en aumento no oculta un déficit previo al ingreso
+ok 411 - estado mensual: un cierre en aumento no oculta un déficit previo al ingreso
+  ---
+  duration_ms: 17.480782
+  type: 'test'
+  ...
+# Subtest: estado mensual: advierte si se usa la reserva aunque el cierre se recupere
+ok 412 - estado mensual: advierte si se usa la reserva aunque el cierre se recupere
+  ---
+  duration_ms: 13.429256
+  type: 'test'
+  ...
+# Subtest: estado mensual: distingue cero, límite y margen de un centavo sobre la reserva
+ok 413 - estado mensual: distingue cero, límite y margen de un centavo sobre la reserva
+  ---
+  duration_ms: 0.12926
+  type: 'test'
+  ...
+# Subtest: estado mensual: un saldo positivo que baja requiere cautela
+ok 414 - estado mensual: un saldo positivo que baja requiere cautela
+  ---
+  duration_ms: 0.08616
+  type: 'test'
+  ...
+# Subtest: estado mensual: los datos pendientes impiden un indicador global verde
+ok 415 - estado mensual: los datos pendientes impiden un indicador global verde
+  ---
+  duration_ms: 0.06843
+  type: 'test'
+  ...
+# Subtest: estado mensual: sin reserva usa saldo positivo sin inventar umbrales de seguridad
+ok 416 - estado mensual: sin reserva usa saldo positivo sin inventar umbrales de seguridad
+  ---
+  duration_ms: 0.07186
+  type: 'test'
+  ...
+# Subtest: nómina hábil: guarda el plan sin duplicados, aplica abonos reales y evita ingresos simulados
+ok 417 - nómina hábil: guarda el plan sin duplicados, aplica abonos reales y evita ingresos simulados # SKIP
+  ---
+  duration_ms: 0.03072
+  type: 'test'
+  ...
+# Subtest: nómina: adelanta fines de semana y festivos bancarios conservando el calendario nominal
+ok 418 - nómina: adelanta fines de semana y festivos bancarios conservando el calendario nominal
+  ---
+  duration_ms: 0.530339
+  type: 'test'
+  ...
+# Subtest: nómina: respeta inicio y fin nominales, fase bimestral y pago único adelantado
+ok 419 - nómina: respeta inicio y fin nominales, fase bimestral y pago único adelantado
+  ---
+  duration_ms: 14.008786
+  type: 'test'
+  ...
+# Subtest: nómina: un depósito adelantado al mes anterior se incluye y concilia en el mes del depósito
+ok 420 - nómina: un depósito adelantado al mes anterior se incluye y concilia en el mes del depósito
+  ---
+  duration_ms: 12.369907
+  type: 'test'
+  ...
+# Subtest: nómina: omisiones, vínculos y escenario usan la fecha adelantada
+ok 421 - nómina: omisiones, vínculos y escenario usan la fecha adelantada
+  ---
+  duration_ms: 38.248821
+  type: 'test'
+  ...
+# Subtest: desglose: agrupa los días por categoría y los rendimientos por cuenta conservando centavos
+ok 422 - desglose: agrupa los días por categoría y los rendimientos por cuenta conservando centavos
+  ---
+  duration_ms: 0.766899
+  type: 'test'
+  ...
+# Subtest: desglose: conserva cuenta, fechas y certeza cuando un concepto tiene distintos estados
+ok 423 - desglose: conserva cuenta, fechas y certeza cuando un concepto tiene distintos estados
+  ---
+  duration_ms: 0.23158
+  type: 'test'
+  ...
+# Subtest: desglose: las transferencias tienen efecto neto cero y conservan su efecto al filtrar una cuenta
+ok 424 - desglose: las transferencias tienen efecto neto cero y conservan su efecto al filtrar una cuenta
+  ---
+  duration_ms: 0.13095
+  type: 'test'
+  ...
+# Subtest: desglose: los importes sin cuenta o excluidos no se presentan como parte del saldo proyectado
+ok 425 - desglose: los importes sin cuenta o excluidos no se presentan como parte del saldo proyectado
+  ---
+  duration_ms: 0.12303
+  type: 'test'
+  ...
+# Subtest: desglose: coincide con el flujo mensual del motor y el crédito variable pasa una sola vez por la tarjeta
+ok 426 - desglose: coincide con el flujo mensual del motor y el crédito variable pasa una sola vez por la tarjeta
+  ---
+  duration_ms: 36.614002
+  type: 'test'
+  ...
+# Subtest: mes completo: suma historial anterior a la referencia, hoy y previsiones sin duplicar registros futuros ni crédito
+ok 427 - mes completo: suma historial anterior a la referencia, hoy y previsiones sin duplicar registros futuros ni crédito
+  ---
+  duration_ms: 17.583082
+  type: 'test'
+  ...
+# Subtest: mes completo: el mes futuro solo tiene previsiones y el escenario conserva los importes ya registrados
+ok 428 - mes completo: el mes futuro solo tiene previsiones y el escenario conserva los importes ya registrados
+  ---
+  duration_ms: 31.571938
+  type: 'test'
+  ...
+# Subtest: mes completo: identifica abonos de rendimiento y conserva los cálculos históricos fuera de Registrado
+ok 429 - mes completo: identifica abonos de rendimiento y conserva los cálculos históricos fuera de Registrado
+  ---
+  duration_ms: 0.16059
+  type: 'test'
+  ...
+# Subtest: mes completo: agrupa gasto histórico por categoría sin mezclar suscripciones, deuda ni previsiones vinculadas
+ok 430 - mes completo: agrupa gasto histórico por categoría sin mezclar suscripciones, deuda ni previsiones vinculadas
+  ---
+  duration_ms: 0.18573
+  type: 'test'
+  ...
+# Subtest: mes completo: filtra el historial por cuenta y mes, evita claves repetidas y no inventa días sin registros
+ok 431 - mes completo: filtra el historial por cuenta y mes, evita claves repetidas y no inventa días sin registros
+  ---
+  duration_ms: 0.14328
+  type: 'test'
+  ...
+# Subtest: transferencias: cliente conserva el cuerpo, UUID, cuenta esperada y respuesta por acción
+ok 432 - transferencias: cliente conserva el cuerpo, UUID, cuenta esperada y respuesta por acción
+  ---
+  duration_ms: 13.407057
+  type: 'test'
+  ...
+# Subtest: transferencias: respuesta inválida pasa por recuperación y conserva el resultado incierto
+ok 433 - transferencias: respuesta inválida pasa por recuperación y conserva el resultado incierto
+  ---
+  duration_ms: 57.905321
+  type: 'test'
+  ...
+# Subtest: transferencias: cancelación, validación HTTP y error de red conservan el error compartido
+ok 434 - transferencias: cancelación, validación HTTP y error de red conservan el error compartido
+  ---
+  duration_ms: 10.869059
+  type: 'test'
+  ...
+# Subtest: transferencias: editor compartido valida el formulario y conserva configuración y UUID al reintentar
+ok 435 - transferencias: editor compartido valida el formulario y conserva configuración y UUID al reintentar
+  ---
+  duration_ms: 92.934685
+  type: 'test'
+  ...
+# Subtest: Mi dinero: cliente conserva el cuerpo original y exige recibos de alta completos
+ok 436 - Mi dinero: cliente conserva el cuerpo original y exige recibos de alta completos
+  ---
+  duration_ms: 23.550826
+  type: 'test'
+  ...
+# Subtest: Mi dinero: una consulta incompleta entra en recuperación sin publicar datos inválidos
+ok 437 - Mi dinero: una consulta incompleta entra en recuperación sin publicar datos inválidos
+  ---
+  duration_ms: 19.75973
+  type: 'test'
+  ...
+# Subtest: piloto TS: transferencias, recibos, concurrencia, rollback y límites con PostgreSQL
+ok 438 - piloto TS: transferencias, recibos, concurrencia, rollback y límites con PostgreSQL # SKIP
+  ---
+  duration_ms: 0.04724
+  type: 'test'
+  ...
+# Subtest: Mi dinero: JSON heredado conserva ceros, texto monetario, nulos y metadatos
+ok 439 - Mi dinero: JSON heredado conserva ceros, texto monetario, nulos y metadatos
+  ---
+  duration_ms: 12.666497
+  type: 'test'
+  ...
+# Subtest: Mi dinero: la instantánea conserva orden de consultas, relaciones y propietario
+ok 440 - Mi dinero: la instantánea conserva orden de consultas, relaciones y propietario
+  ---
+  duration_ms: 1.482218
+  type: 'test'
+  ...
+# Subtest: Mi dinero: transferir y revertir reutilizan cuentas y movimientos de la instantánea
+ok 441 - Mi dinero: transferir y revertir reutilizan cuentas y movimientos de la instantánea
+  ---
+  duration_ms: 7.475623
+  type: 'test'
+  ...
+# Subtest: solo oculta la ocurrencia seleccionada durante el mes de confirmación
+not ok 442 - solo oculta la ocurrencia seleccionada durante el mes de confirmación
+  ---
+  duration_ms: 0.11816
+  type: 'test'
+  location: '/home/garatachia/projects/afp/tests/notice-dismissals.test.ts:2:1480'
+  failureType: 'testCodeFailure'
+  error: 'present is not defined'
+  code: 'ERR_TEST_FAILURE'
+  name: 'ReferenceError'
+  stack: |-
+    TestContext.<anonymous> (/home/garatachia/projects/afp/tests/notice-dismissals.test.ts:15:51)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: un corte oculto no oculta el pago y los cambios de importe/fecha lo hacen reaparecer
+not ok 443 - un corte oculto no oculta el pago y los cambios de importe/fecha lo hacen reaparecer
+  ---
+  duration_ms: 0.1262
+  type: 'test'
+  location: '/home/garatachia/projects/afp/tests/notice-dismissals.test.ts:2:2368'
+  failureType: 'testCodeFailure'
+  error: 'present is not defined'
+  code: 'ERR_TEST_FAILURE'
+  name: 'ReferenceError'
+  stack: |-
+    TestContext.<anonymous> (/home/garatachia/projects/afp/tests/notice-dismissals.test.ts:27:20)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: los avisos desconocidos o inválidos no se pueden ocultar
+not ok 444 - los avisos desconocidos o inválidos no se pueden ocultar
+  ---
+  duration_ms: 0.10233
+  type: 'test'
+  location: '/home/garatachia/projects/afp/tests/notice-dismissals.test.ts:2:3265'
+  failureType: 'testCodeFailure'
+  error: 'present is not defined'
+  code: 'ERR_TEST_FAILURE'
+  name: 'ReferenceError'
+  stack: |-
+    TestContext.<anonymous> (/home/garatachia/projects/afp/tests/notice-dismissals.test.ts:37:20)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: cuentas por pagar: permite ocultar y restaurar, distingue fechas y vence cada mes
+ok 445 - cuentas por pagar: permite ocultar y restaurar, distingue fechas y vence cada mes
+  ---
+  duration_ms: 13.094267
+  type: 'test'
+  ...
+# Subtest: la API exige sesión validada e ignora userId del cliente
+not ok 446 - la API exige sesión validada e ignora userId del cliente
+  ---
+  duration_ms: 7.364203
+  type: 'test'
+  location: '/home/garatachia/projects/afp/tests/notice-dismissals.test.ts:2:6896'
+  failureType: 'testCodeFailure'
+  error: 'present is not defined'
+  code: 'ERR_TEST_FAILURE'
+  name: 'ReferenceError'
+  stack: |-
+    TestContext.<anonymous> (/home/garatachia/projects/afp/tests/notice-dismissals.test.ts:84:47)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: ocultar y recuperar son idempotentes y no aceptan identidades inválidas
+not ok 447 - ocultar y recuperar son idempotentes y no aceptan identidades inválidas
+  ---
+  duration_ms: 6.947213
+  type: 'test'
+  location: '/home/garatachia/projects/afp/tests/notice-dismissals.test.ts:2:7733'
+  failureType: 'testCodeFailure'
+  error: 'present is not defined'
+  code: 'ERR_TEST_FAILURE'
+  name: 'ReferenceError'
+  stack: |-
+    TestContext.<anonymous> (/home/garatachia/projects/afp/tests/notice-dismissals.test.ts:94:84)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: Nu aparece por producto verificado aunque no haya ciclo y no inventa una meta monetaria
+ok 448 - Nu aparece por producto verificado aunque no haya ciclo y no inventa una meta monetaria
+  ---
+  duration_ms: 0.38892
+  type: 'test'
+  ...
+# Subtest: cualquier importe positivo renueva 30 días, sin depender del mes ni del corte
+ok 449 - cualquier importe positivo renueva 30 días, sin depender del mes ni del corte
+  ---
+  duration_ms: 0.486889
+  type: 'test'
+  ...
+# Subtest: el día 30 pide comprar hoy; el plazo conserva todo el día y cambia al siguiente
+ok 450 - el día 30 pide comprar hoy; el plazo conserva todo el día y cambia al siguiente
+  ---
+  duration_ms: 1.674879
+  type: 'test'
+  ...
+# Subtest: futuros, capturas pendientes, efectivo, otra tarjeta e importes inválidos no acreditan compras
+ok 451 - futuros, capturas pendientes, efectivo, otra tarjeta e importes inválidos no acreditan compras
+  ---
+  duration_ms: 0.655419
+  type: 'test'
+  ...
+# Subtest: comisiones, impuestos bancarios, intereses y disposiciones no son compras
+ok 452 - comisiones, impuestos bancarios, intereses y disposiciones no son compras
+  ---
+  duration_ms: 0.560949
+  type: 'test'
+  ...
+# Subtest: MSI cuenta solo en la fecha original, incluso liquidada; sus mensualidades no renuevan
+ok 453 - MSI cuenta solo en la fecha original, incluso liquidada; sus mensualidades no renuevan
+  ---
+  duration_ms: 0.19217
+  type: 'test'
+  ...
+# Subtest: suscripciones cuentan por gasto o evidencia verificada una vez, nunca por previsión
+ok 454 - suscripciones cuentan por gasto o evidencia verificada una vez, nunca por previsión
+  ---
+  duration_ms: 0.35155
+  type: 'test'
+  ...
+# Subtest: la última compra determina la renovación; las antiguas quedan fuera del listado reciente
+ok 455 - la última compra determina la renovación; las antiguas quedan fuera del listado reciente
+  ---
+  duration_ms: 0.14853
+  type: 'test'
+  ...
+# Subtest: Turbo no crea cortes históricos ni una posible comisión por falta de compras
+ok 456 - Turbo no crea cortes históricos ni una posible comisión por falta de compras
+  ---
+  duration_ms: 0.12255
+  type: 'test'
+  ...
+# Subtest: Dashboard entrega Nu con fecha local del cliente y conserva el aislamiento del usuario
+ok 457 - Dashboard entrega Nu con fecha local del cliente y conserva el aislamiento del usuario
+  ---
+  duration_ms: 31.165748
+  type: 'test'
+  ...
+# Subtest: observador offline: ignora lecturas antiguas y deja de publicar al cambiar de cuenta
+ok 458 - observador offline: ignora lecturas antiguas y deja de publicar al cambiar de cuenta
+  ---
+  duration_ms: 2.647657
+  type: 'test'
+  ...
+# Subtest: IndexedDB v1 anterior: respuesta perdida, cambio de cuenta y dos pestañas conservan recibo y metadatos
+ok 459 - IndexedDB v1 anterior: respuesta perdida, cambio de cuenta y dos pestañas conservan recibo y metadatos
+  ---
+  duration_ms: 21.091528
+  type: 'test'
+  ...
+# Subtest: conflicto con captura: decisión explícita conserva UUID, notas y aportación al registrar otra compra
+ok 460 - conflicto con captura: decisión explícita conserva UUID, notas y aportación al registrar otra compra
+  ---
+  duration_ms: 13.978766
+  type: 'test'
+  ...
+# Subtest: conservar gasto existente solo retira un conflicto confirmado, sin borrar otros pendientes
+ok 461 - conservar gasto existente solo retira un conflicto confirmado, sin borrar otros pendientes
+  ---
+  duration_ms: 7.626792
+  type: 'test'
+  ...
+# Subtest: aportación offline: recarga, error y reintento conservan el importe y UUID
+ok 462 - aportación offline: recarga, error y reintento conservan el importe y UUID
+  ---
+  duration_ms: 12.575167
+  type: 'test'
+  ...
+# Subtest: respuesta perdida después de guardar: recargar y reintentar conserva el UUID
+ok 463 - respuesta perdida después de guardar: recargar y reintentar conserva el UUID
+  ---
+  duration_ms: 12.506337
+  type: 'test'
+  ...
+# Subtest: dos pestañas sin Web Locks: conservan un mismo UUID y no resucitan un error tardío
+ok 464 - dos pestañas sin Web Locks: conservan un mismo UUID y no resucitan un error tardío
+  ---
+  duration_ms: 14.534896
+  type: 'test'
+  ...
+# Subtest: capturar en otra pestaña durante sync no pierde la nueva entrada ni la de otro usuario
+ok 465 - capturar en otra pestaña durante sync no pierde la nueva entrada ni la de otro usuario
+  ---
+  duration_ms: 12.348547
+  type: 'test'
+  ...
+# Subtest: cerrar tras persistir y antes del POST permite recuperar y sincronizar
+ok 466 - cerrar tras persistir y antes del POST permite recuperar y sincronizar
+  ---
+  duration_ms: 10.825249
+  type: 'test'
+  ...
+# Subtest: migración concurrente conserva la copia local y no reimporta confirmados
+ok 467 - migración concurrente conserva la copia local y no reimporta confirmados
+  ---
+  duration_ms: 11.706278
+  type: 'test'
+  ...
+# Subtest: JSON corrupto, validación y confirmación incompleta nunca eliminan pendientes
+ok 468 - JSON corrupto, validación y confirmación incompleta nunca eliminan pendientes
+  ---
+  duration_ms: 12.085848
+  type: 'test'
+  ...
+# Subtest: fallo de almacenamiento no confirma una captura ni envía un POST
+ok 469 - fallo de almacenamiento no confirma una captura ni envía un POST
+  ---
+  duration_ms: 4.956754
+  type: 'test'
+  ...
+# Subtest: Web Locks serializa dos pestañas y la segunda relee la cola al obtener el bloqueo
+ok 470 - Web Locks serializa dos pestañas y la segunda relee la cola al obtener el bloqueo
+  ---
+  duration_ms: 11.350439
+  type: 'test'
+  ...
+# Subtest: service worker servido como JavaScript: todas las API privadas pasan directo a la red
+ok 471 - service worker servido como JavaScript: todas las API privadas pasan directo a la red
+  ---
+  duration_ms: 0.951929
+  type: 'test'
+  ...
+# Subtest: avisos por pagar: desde dos días antes, hoy y vencidos de meses anteriores
+ok 472 - avisos por pagar: desde dos días antes, hoy y vencidos de meses anteriores
+  ---
+  duration_ms: 2.236458
+  type: 'test'
+  ...
+# Subtest: avisos por pagar: el saldo a centavos decide la liquidación y conserva cancelaciones
+ok 473 - avisos por pagar: el saldo a centavos decide la liquidación y conserva cancelaciones
+  ---
+  duration_ms: 0.340129
+  type: 'test'
+  ...
+# Subtest: avisos por pagar: préstamos usan saldo bancario o capital abonado y fecha contractual
+ok 474 - avisos por pagar: préstamos usan saldo bancario o capital abonado y fecha contractual
+  ---
+  duration_ms: 0.26186
+  type: 'test'
+  ...
+# Subtest: avisos por pagar: prioridad por vencimiento y fecha junto a otros avisos
+ok 475 - avisos por pagar: prioridad por vencimiento y fecha junto a otros avisos
+  ---
+  duration_ms: 0.33097
+  type: 'test'
+  ...
+# Subtest: avisos por pagar: conserva el día bancario UTC y todo el día local de vencimiento
+ok 476 - avisos por pagar: conserva el día bancario UTC y todo el día local de vencimiento
+  ---
+  duration_ms: 618.699017
+  type: 'test'
+  ...
+# Subtest: resumen: resta únicamente reembolsos pendientes y conserva la deuda bancaria
+ok 477 - resumen: resta únicamente reembolsos pendientes y conserva la deuda bancaria
+  ---
+  duration_ms: 0.55378
+  type: 'test'
+  ...
+# Subtest: resumen: cancelaciones y excedentes no compensan las otras deudas
+ok 478 - resumen: cancelaciones y excedentes no compensan las otras deudas
+  ---
+  duration_ms: 0.18051
+  type: 'test'
+  ...
+# Subtest: resumen: una cuenta vinculada varias veces se descuenta una sola vez
+ok 479 - resumen: una cuenta vinculada varias veces se descuenta una sola vez
+  ---
+  duration_ms: 0.1793
+  type: 'test'
+  ...
+# Subtest: resumen: conserva cobros pendientes de préstamos liquidados y expone el sobrante
+ok 480 - resumen: conserva cobros pendientes de préstamos liquidados y expone el sobrante
+  ---
+  duration_ms: 0.114669
+  type: 'test'
+  ...
+# Subtest: resumen: cuentas propias, centavos y estado vacío no inventan reembolsos
+ok 481 - resumen: cuentas propias, centavos y estado vacío no inventan reembolsos
+  ---
+  duration_ms: 0.11958
+  type: 'test'
+  ...
+# Subtest: resumen: registrar y editar un ingreso actualiza el neto sin amortizar el banco
+ok 482 - resumen: registrar y editar un ingreso actualiza el neto sin amortizar el banco
+  ---
+  duration_ms: 18.322051
+  type: 'test'
+  ...
+# Subtest: conciliación: conserva 38 pagos completos, principal original y saldo separado
+ok 483 - conciliación: conserva 38 pagos completos, principal original y saldo separado
+  ---
+  duration_ms: 0.37166
+  type: 'test'
+  ...
+# Subtest: conciliación: cero, ajustes negativos, centavos, cancelación y excedentes
+ok 484 - conciliación: cero, ajustes negativos, centavos, cancelación y excedentes
+  ---
+  duration_ms: 0.829639
+  type: 'test'
+  ...
+# Subtest: conciliación: ingresos y edición del principal conservan el ajuste sin crear dinero
+ok 485 - conciliación: ingresos y edición del principal conservan el ajuste sin crear dinero
+  ---
+  duration_ms: 16.270574
+  type: 'test'
+  ...
+# Subtest: conciliación: cuenta vinculada, resumen y banco usan el saldo correcto
+ok 486 - conciliación: cuenta vinculada, resumen y banco usan el saldo correcto
+  ---
+  duration_ms: 14.648555
+  type: 'test'
+  ...
+# Subtest: pagos Banamex/Mercado Pago: API real, reglas, saldos, aislamiento, concurrencia y duplicados
+ok 487 - pagos Banamex/Mercado Pago: API real, reglas, saldos, aislamiento, concurrencia y duplicados # SKIP
+  ---
+  duration_ms: 0.05194
+  type: 'test'
+  ...
+# Subtest: Banamex: pago SPEI real, medianoche 00 AM, tres cifras y fecha bancaria; no inventa moneda o corte
+ok 488 - Banamex: pago SPEI real, medianoche 00 AM, tres cifras y fecha bancaria; no inventa moneda o corte
+  ---
+  duration_ms: 1.786628
+  type: 'test'
+  ...
+# Subtest: Banamex: fechas imposibles, hora contradictoria, importe inválido y operación futura conservan revisión
+ok 489 - Banamex: fechas imposibles, hora contradictoria, importe inválido y operación futura conservan revisión
+  ---
+  duration_ms: 1.088058
+  type: 'test'
+  ...
+# Subtest: Mercado Pago: pago total recibido con fecha de publicación México, sin inventar tarjeta ni fecha bancaria
+ok 490 - Mercado Pago: pago total recibido con fecha de publicación México, sin inventar tarjeta ni fecha bancaria
+  ---
+  duration_ms: 0.7813
+  type: 'test'
+  ...
+# Subtest: pagos receptores: otro paquete, campos contradictorios, cancelaciones y otros productos no acreditan abonos
+ok 491 - pagos receptores: otro paquete, campos contradictorios, cancelaciones y otros productos no acreditan abonos
+  ---
+  duration_ms: 0.725729
+  type: 'test'
+  ...
+# Subtest: BBVA TDD: solo salida de dinero; no identifica crédito ni habilita un segundo abono
+ok 492 - BBVA TDD: solo salida de dinero; no identifica crédito ni habilita un segundo abono
+  ---
+  duration_ms: 0.957379
+  type: 'test'
+  ...
+# Subtest: formatos receptores y débito permanecen fuera de la automatización de compras
+ok 493 - formatos receptores y débito permanecen fuera de la automatización de compras
+  ---
+  duration_ms: 0.10302
+  type: 'test'
+  ...
+# Subtest: PostgreSQL A06: rollback de cada paso relacionado, reintentos y traslado de ingresos
+ok 494 - PostgreSQL A06: rollback de cada paso relacionado, reintentos y traslado de ingresos # SKIP
+  ---
+  duration_ms: 0.03583
+  type: 'test'
+  ...
+# Subtest: agrupa cargas fallidas y recupera cada interacción; no duplica clics ni consume el JSON
+ok 495 - agrupa cargas fallidas y recupera cada interacción; no duplica clics ni consume el JSON
+  ---
+  duration_ms: 12.444347
+  type: 'test'
+  ...
+# Subtest: reintentar conserva cuerpo/propietario y renueva token; un nuevo fallo mantiene el diálogo
+ok 496 - reintentar conserva cuerpo/propietario y renueva token; un nuevo fallo mantiene el diálogo
+  ---
+  duration_ms: 6.387764
+  type: 'test'
+  ...
+# Subtest: no reenvía altas no idempotentes cuando se pierde la respuesta o llega un 5xx
+ok 497 - no reenvía altas no idempotentes cuando se pierde la respuesta o llega un 5xx
+  ---
+  duration_ms: 11.699059
+  type: 'test'
+  ...
+# Subtest: un alta bloqueada antes del envío por falta de conexión sí admite reintento
+ok 498 - un alta bloqueada antes del envío por falta de conexión sí admite reintento
+  ---
+  duration_ms: 6.023603
+  type: 'test'
+  ...
+# Subtest: sesión vencida y cambio de cuenta nunca repiten la mutación con otro propietario
+ok 499 - sesión vencida y cambio de cuenta nunca repiten la mutación con otro propietario
+  ---
+  duration_ms: 6.912923
+  type: 'test'
+  ...
+# Subtest: cancelar libera la interacción; abortar y cambiar de sección retiran los pendientes
+ok 500 - cancelar libera la interacción; abortar y cambiar de sección retiran los pendientes
+  ---
+  duration_ms: 19.67888
+  type: 'test'
+  ...
+# Subtest: las respuestas tardías y peticiones abortadas no abren diálogos en otra sección
+ok 501 - las respuestas tardías y peticiones abortadas no abren diálogos en otra sección
+  ---
+  duration_ms: 5.960444
+  type: 'test'
+  ...
+# Subtest: un timeout cancela la red y se puede recuperar; JSON incompleto también informa el fallo
+ok 502 - un timeout cancela la red y se puede recuperar; JSON incompleto también informa el fallo
+  ---
+  duration_ms: 26.464653
+  type: 'test'
+  ...
+# Subtest: validación y consultas de fondo no interrumpen; permisos/conflictos explican el bloqueo
+ok 503 - validación y consultas de fondo no interrumpen; permisos/conflictos explican el bloqueo
+  ---
+  duration_ms: 39.569579
+  type: 'test'
+  ...
+# Subtest: un bloqueo al eliminar muestra el motivo en un diálogo sin volver a enviar
+ok 504 - un bloqueo al eliminar muestra el motivo en un diálogo sin volver a enviar
+  ---
+  duration_ms: 6.855333
+  type: 'test'
+  ...
+# Subtest: respeta Retry-After y nunca reenvía un POST exitoso al recuperar su lectura posterior
+ok 505 - respeta Retry-After y nunca reenvía un POST exitoso al recuperar su lectura posterior
+  ---
+  duration_ms: 12.677777
+  type: 'test'
+  ...
+# Subtest: abortar una petición en curso cancela fetch sin mostrar recuperación
+ok 506 - abortar una petición en curso cancela fetch sin mostrar recuperación
+  ---
+  duration_ms: 5.677115
+  type: 'test'
+  ...
+# Subtest: salir durante un reintento impide que el resultado tardío reabra el diálogo
+ok 507 - salir durante un reintento impide que el resultado tardío reabra el diálogo
+  ---
+  duration_ms: 9.58641
+  type: 'test'
+  ...
+# Subtest: PostgreSQL: gastos compartidos en CRUD, análisis, cortes, idempotencia y aislamiento
+ok 508 - PostgreSQL: gastos compartidos en CRUD, análisis, cortes, idempotencia y aislamiento # SKIP
+  ---
+  duration_ms: 0.0517
+  type: 'test'
+  ...
+# Subtest: aportaciones: gasto personal, cobertura total, centavos y registros anteriores
+ok 509 - aportaciones: gasto personal, cobertura total, centavos y registros anteriores
+  ---
+  duration_ms: 0.11857
+  type: 'test'
+  ...
+# Subtest: aportaciones: valida límites, centavos y tipos sin coerciones inesperadas
+ok 510 - aportaciones: valida límites, centavos y tipos sin coerciones inesperadas
+  ---
+  duration_ms: 0.276829
+  type: 'test'
+  ...
+# Subtest: editar: agrega, conserva con cliente anterior, corrige y retira la aportación
+ok 511 - editar: agrega, conserva con cliente anterior, corrige y retira la aportación
+  ---
+  duration_ms: 93.251745
+  type: 'test'
+  ...
+# Subtest: cargador: JS → TS → JS, tipos, alias, exports/default y reexports
+ok 512 - cargador: JS → TS → JS, tipos, alias, exports/default y reexports
+  ---
+  duration_ms: 11.109529
+  type: 'test'
+  ...
+# Subtest: cargador: mocks tienen prioridad, incluso módulos inexistentes y valores falsy
+ok 513 - cargador: mocks tienen prioridad, incluso módulos inexistentes y valores falsy
+  ---
+  duration_ms: 1.904318
+  type: 'test'
+  ...
+# Subtest: cargador: caché por instancia, imports circulares y reexports vivos
+ok 514 - cargador: caché por instancia, imports circulares y reexports vivos
+  ---
+  duration_ms: 6.256113
+  type: 'test'
+  ...
+# Subtest: cargador: resolución inequívoca, índices y extensiones explícitas sin sustitución
+ok 515 - cargador: resolución inequívoca, índices y extensiones explícitas sin sustitución
+  ---
+  duration_ms: 6.938603
+  type: 'test'
+  ...
+# Subtest: cargador: JSX y TSX se ejecutan con runtime React
+ok 516 - cargador: JSX y TSX se ejecutan con runtime React
+  ---
+  duration_ms: 2.565067
+  type: 'test'
+  ...
+# Subtest: cargador: no hereda credenciales, no carga dotenv ni abre red o BD
+ok 517 - cargador: no hereda credenciales, no carga dotenv ni abre red o BD
+  ---
+  duration_ms: 12.213648
+  type: 'test'
+  ...
+# Subtest: cargador: elimina de la caché evaluaciones fallidas
+ok 518 - cargador: elimina de la caché evaluaciones fallidas
+  ---
+  duration_ms: 3.228247
+  type: 'test'
+  ...
+# Subtest: fixture offline: transforma TS e imports relativos en ESM con API simulada
+ok 519 - fixture offline: transforma TS e imports relativos en ESM con API simulada
+  ---
+  duration_ms: 20.107439
+  type: 'test'
+  ...
+# Subtest: cargador tipado: rutas conocidas, exports públicos y lenguajes admitidos
+ok 520 - cargador tipado: rutas conocidas, exports públicos y lenguajes admitidos
+  ---
+  duration_ms: 2.007198
+  type: 'test'
+  ...
+# Subtest: cobros API: exige sesión y obtiene el usuario del token
+ok 521 - cobros API: exige sesión y obtiene el usuario del token
+  ---
+  duration_ms: 9.74841
+  type: 'test'
+  ...
+# Subtest: cobros API: rechaza meses, días y cuerpos inválidos antes de escribir
+ok 522 - cobros API: rechaza meses, días y cuerpos inválidos antes de escribir
+  ---
+  duration_ms: 9.45196
+  type: 'test'
+  ...
+# Subtest: cobros: API persiste monto y tarjeta de una ocurrencia, valida propietario y conserva recurrencia
+ok 523 - cobros: API persiste monto y tarjeta de una ocurrencia, valida propietario y conserva recurrencia # SKIP
+  ---
+  duration_ms: 0.04945
+  type: 'test'
+  ...
+# Subtest: cobros: transacción, concurrencia, omisión, restauración, evidencia y aislamiento
+ok 524 - cobros: transacción, concurrencia, omisión, restauración, evidencia y aislamiento # SKIP
+  ---
+  duration_ms: 0.03418
+  type: 'test'
+  ...
+# Subtest: aparece el día del cobro, sin generar gastos ni modificar los datos
+ok 525 - aparece el día del cobro, sin generar gastos ni modificar los datos
+  ---
+  duration_ms: 1.169309
+  type: 'test'
+  ...
+# Subtest: frecuencia, inicio, años y último día del mes
+ok 526 - frecuencia, inicio, años y último día del mes
+  ---
+  duration_ms: 0.09661
+  type: 'test'
+  ...
+# Subtest: desactivar conserva los cobros hasta el día de baja
+ok 527 - desactivar conserva los cobros hasta el día de baja
+  ---
+  duration_ms: 0.1224
+  type: 'test'
+  ...
+# Subtest: un gasto vinculado sustituye automáticamente el previsto
+ok 528 - un gasto vinculado sustituye automáticamente el previsto
+  ---
+  duration_ms: 0.576329
+  type: 'test'
+  ...
+# Subtest: el historial identifica la tarjeta real aunque la suscripción se pague habitualmente en efectivo
+ok 529 - el historial identifica la tarjeta real aunque la suscripción se pague habitualmente en efectivo
+  ---
+  duration_ms: 0.11007
+  type: 'test'
+  ...
+# Subtest: la decisión identifica el período aunque el gasto se contabilice en otro mes
+ok 530 - la decisión identifica el período aunque el gasto se contabilice en otro mes
+  ---
+  duration_ms: 0.1157
+  type: 'test'
+  ...
+# Subtest: omitir afecta solo ese mes y borrar el gasto confirmado devuelve el pendiente
+ok 531 - omitir afecta solo ese mes y borrar el gasto confirmado devuelve el pendiente
+  ---
+  duration_ms: 0.575729
+  type: 'test'
+  ...
+# Subtest: evidencia bancaria válida reconoce el cobro sin crear otro gasto
+ok 532 - evidencia bancaria válida reconoce el cobro sin crear otro gasto
+  ---
+  duration_ms: 0.33147
+  type: 'test'
+  ...
+# Subtest: rechaza fechas y meses inválidos
+ok 533 - rechaza fechas y meses inválidos
+  ---
+  duration_ms: 0.09711
+  type: 'test'
+  ...
+# Subtest: un cobro de $120 en efectivo se confirma por $135.50 en una tarjeta sin cambiar la suscripción
+ok 534 - un cobro de $120 en efectivo se confirma por $135.50 en una tarjeta sin cambiar la suscripción
+  ---
+  duration_ms: 6.534403
+  type: 'test'
+  ...
+# Subtest: permite otra tarjeta y al pagar en efectivo elimina la tarjeta del gasto
+ok 535 - permite otra tarjeta y al pagar en efectivo elimina la tarjeta del gasto
+  ---
+  duration_ms: 13.560586
+  type: 'test'
+  ...
+# Subtest: rechaza métodos inválidos, tarjetas ajenas o ausentes y filtros Prisma antes de crear el gasto
+ok 536 - rechaza métodos inválidos, tarjetas ajenas o ausentes y filtros Prisma antes de crear el gasto
+  ---
+  duration_ms: 48.78089
+  type: 'test'
+  ...
+# Subtest: confirmar sin ajustes sigue usando los datos recurrentes
+ok 537 - confirmar sin ajustes sigue usando los datos recurrentes
+  ---
+  duration_ms: 7.232293
+  type: 'test'
+  ...
+# Subtest: descuento temporal concilia ambas rutas sin cambiar la tarifa ni duplicar cargos
+ok 538 - descuento temporal concilia ambas rutas sin cambiar la tarifa ni duplicar cargos
+  ---
+  duration_ms: 0.530739
+  type: 'test'
+  ...
+# Subtest: otros cortes y otra suscripción conservan su importe
+ok 539 - otros cortes y otra suscripción conservan su importe
+  ---
+  duration_ms: 0.2876
+  type: 'test'
+  ...
+# Subtest: evidencia histórica solo de consumo mínimo no cambia cálculos financieros
+ok 540 - evidencia histórica solo de consumo mínimo no cambia cálculos financieros
+  ---
+  duration_ms: 0.09764
+  type: 'test'
+  ...
+# Subtest: rechaza referencias inválidas, fechas imposibles e importes que no son cargos
+ok 541 - rechaza referencias inválidas, fechas imposibles e importes que no son cargos
+  ---
+  duration_ms: 1.605768
+  type: 'test'
+  ...
+# Subtest: no colapsa cargos múltiples ambiguos del mismo mes
+ok 542 - no colapsa cargos múltiples ambiguos del mismo mes
+  ---
+  duration_ms: 0.09011
+  type: 'test'
+  ...
+# Subtest: la baja de una suscripción conserva las reglas de inclusión del corte
+ok 543 - la baja de una suscripción conserva las reglas de inclusión del corte
+  ---
+  duration_ms: 0.19022
+  type: 'test'
+  ...
+# Subtest: ejecutor: descubre CJS y TS una vez en orden, sin contratos, seeds, helpers ni artefactos
+ok 544 - ejecutor: descubre CJS y TS una vez en orden, sin contratos, seeds, helpers ni artefactos
+  ---
+  duration_ms: 1.051769
+  type: 'test'
+  ...
+# Subtest: ejecutor: selección exacta conserva el orden y rechaza rutas ajenas o repetidas
+ok 545 - ejecutor: selección exacta conserva el orden y rechaza rutas ajenas o repetidas
+  ---
+  duration_ms: 0.603839
+  type: 'test'
+  ...
+# Subtest: ejecutor: rechaza nombres base duplicados aunque se seleccione otra prueba
+ok 546 - ejecutor: rechaza nombres base duplicados aunque se seleccione otra prueba
+  ---
+  duration_ms: 0.38316
+  type: 'test'
+  ...
+# Subtest: ejecutor: ausencia de pruebas y errores de arranque nunca se presentan como éxito
+ok 547 - ejecutor: ausencia de pruebas y errores de arranque nunca se presentan como éxito
+  ---
+  duration_ms: 8.029102
+  type: 'test'
+  ...
+# Subtest: ejecutor: convivencia CJS/TS, imports relativos y dinámicos, entorno explícito y aislamiento compartido
+ok 548 - ejecutor: convivencia CJS/TS, imports relativos y dinámicos, entorno explícito y aislamiento compartido
+  ---
+  duration_ms: 383.890247
+  type: 'test'
+  ...
+# Subtest: ejecutor: propaga aserciones fallidas, códigos de salida y terminaciones por señal
+ok 549 - ejecutor: propaga aserciones fallidas, códigos de salida y terminaciones por señal
+  ---
+  duration_ms: 511.166568
+  type: 'test'
+  ...
+# Subtest: ejecutor: tsx no expone el entorno del proceso al cargador con vm
+ok 550 - ejecutor: tsx no expone el entorno del proceso al cargador con vm
+  ---
+  duration_ms: 213.803752
+  type: 'test'
+  ...
+# Subtest: ejecutor: CLI lista sin ejecutar, acepta archivos y rechaza filtros desconocidos
+ok 551 - ejecutor: CLI lista sin ejecutar, acepta archivos y rechaza filtros desconocidos
+  ---
+  duration_ms: 518.13342
+  type: 'test'
+  ...
+1..551
+# tests 551
+# suites 0
+# pass 494
+# fail 7
+# cancelled 0
+# skipped 50
+# todo 0
+# duration_ms 11260.620565
+ ELIFECYCLE  Test failed. See above for more details.

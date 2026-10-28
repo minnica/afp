@@ -1,0 +1,166 @@
+
+> afp@0.1.0 test /home/garatachia/projects/afp
+> node --import tsx tests/run-tests.ts debt-accounts.test.ts debt-accounts-integration.test.ts related-operations-integration.test.ts card-cycle-credits-integration.test.ts shared-expenses.test.ts receivable-adjustments.test.ts
+
+TAP version 13
+# Subtest: PostgreSQL: devoluciones y pagos concurrentes, aislamiento, rollback y avisos
+ok 1 - PostgreSQL: devoluciones y pagos concurrentes, aislamiento, rollback y avisos
+  ---
+  duration_ms: 492.776247
+  type: 'test'
+  ...
+(node:924449) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+# Subtest: PostgreSQL A05 payable: abonos simultáneos, principal, cancelación y rollback
+ok 2 - PostgreSQL A05 payable: abonos simultáneos, principal, cancelación y rollback
+  ---
+  duration_ms: 696.510768
+  type: 'test'
+  ...
+# Subtest: PostgreSQL A05 receivable: abonos simultáneos, principal, cancelación y rollback
+ok 3 - PostgreSQL A05 receivable: abonos simultáneos, principal, cancelación y rollback
+  ---
+  duration_ms: 562.822676
+  type: 'test'
+  ...
+# Subtest: préstamos: saldo bancario conciliado conserva capital e intereses separados, incluido cero
+ok 4 - préstamos: saldo bancario conciliado conserva capital e intereses separados, incluido cero
+  ---
+  duration_ms: 0.518439
+  type: 'test'
+  ...
+# Subtest: préstamos: GET conserva el saldo bancario al registrar reembolsos o gastos
+ok 5 - préstamos: GET conserva el saldo bancario al registrar reembolsos o gastos
+  ---
+  duration_ms: 103.392409
+  type: 'test'
+  ...
+# Subtest: préstamos: desglose usa los ingresos vigentes sin descontarlos del banco ni modificar el historial
+ok 6 - préstamos: desglose usa los ingresos vigentes sin descontarlos del banco ni modificar el historial
+  ---
+  duration_ms: 21.338962
+  type: 'test'
+  ...
+# Subtest: préstamos: cuenta de reembolso cancelada y préstamo propio conservan su identidad
+ok 7 - préstamos: cuenta de reembolso cancelada y préstamo propio conservan su identidad
+  ---
+  duration_ms: 14.536717
+  type: 'test'
+  ...
+# Subtest: payable: editar abono o principal reabre/liquida y borrar actualiza saldo y grupo
+ok 8 - payable: editar abono o principal reabre/liquida y borrar actualiza saldo y grupo
+  ---
+  duration_ms: 96.534385
+  type: 'test'
+  ...
+# Subtest: payable: centavos exactos, abonos concurrentes y edición simultánea del principal
+ok 9 - payable: centavos exactos, abonos concurrentes y edición simultánea del principal
+  ---
+  duration_ms: 92.815208
+  type: 'test'
+  ...
+# Subtest: payable: CANCELLED se conserva al crear, editar, borrar abonos y cambiar principal
+ok 10 - payable: CANCELLED se conserva al crear, editar, borrar abonos y cambiar principal
+  ---
+  duration_ms: 96.842815
+  type: 'test'
+  ...
+# Subtest: payable: fallo del estado revierte alta, edición, borrado y cambio del principal
+ok 11 - payable: fallo del estado revierte alta, edición, borrado y cambio del principal
+  ---
+  duration_ms: 96.087396
+  type: 'test'
+  ...
+# Subtest: receivable: editar abono o principal reabre/liquida y borrar actualiza saldo y grupo
+ok 12 - receivable: editar abono o principal reabre/liquida y borrar actualiza saldo y grupo
+  ---
+  duration_ms: 17.078085
+  type: 'test'
+  ...
+# Subtest: receivable: centavos exactos, abonos concurrentes y edición simultánea del principal
+ok 13 - receivable: centavos exactos, abonos concurrentes y edición simultánea del principal
+  ---
+  duration_ms: 16.583955
+  type: 'test'
+  ...
+# Subtest: receivable: CANCELLED se conserva al crear, editar, borrar abonos y cambiar principal
+ok 14 - receivable: CANCELLED se conserva al crear, editar, borrar abonos y cambiar principal
+  ---
+  duration_ms: 15.178447
+  type: 'test'
+  ...
+# Subtest: receivable: fallo del estado revierte alta, edición, borrado y cambio del principal
+ok 15 - receivable: fallo del estado revierte alta, edición, borrado y cambio del principal
+  ---
+  duration_ms: 16.005026
+  type: 'test'
+  ...
+# Subtest: ingresos: dos traslados simultáneos recalculan origen y destino; desvincular reabre
+ok 16 - ingresos: dos traslados simultáneos recalculan origen y destino; desvincular reabre
+  ---
+  duration_ms: 13.739488
+  type: 'test'
+  ...
+# Subtest: cálculo compartido redondea cada partida histórica y conserva cancelaciones y excedentes
+ok 17 - cálculo compartido redondea cada partida histórica y conserva cancelaciones y excedentes
+  ---
+  duration_ms: 0.212329
+  type: 'test'
+  ...
+# Subtest: conciliación: conserva 38 pagos completos, principal original y saldo separado
+ok 18 - conciliación: conserva 38 pagos completos, principal original y saldo separado
+  ---
+  duration_ms: 0.49323
+  type: 'test'
+  ...
+# Subtest: conciliación: cero, ajustes negativos, centavos, cancelación y excedentes
+ok 19 - conciliación: cero, ajustes negativos, centavos, cancelación y excedentes
+  ---
+  duration_ms: 0.14989
+  type: 'test'
+  ...
+# Subtest: conciliación: ingresos y edición del principal conservan el ajuste sin crear dinero
+ok 20 - conciliación: ingresos y edición del principal conservan el ajuste sin crear dinero
+  ---
+  duration_ms: 19.300463
+  type: 'test'
+  ...
+# Subtest: conciliación: cuenta vinculada, resumen y banco usan el saldo correcto
+ok 21 - conciliación: cuenta vinculada, resumen y banco usan el saldo correcto
+  ---
+  duration_ms: 14.966437
+  type: 'test'
+  ...
+# Subtest: PostgreSQL A06: rollback de cada paso relacionado, reintentos y traslado de ingresos
+ok 22 - PostgreSQL A06: rollback de cada paso relacionado, reintentos y traslado de ingresos
+  ---
+  duration_ms: 558.928659
+  type: 'test'
+  ...
+# Subtest: aportaciones: gasto personal, cobertura total, centavos y registros anteriores
+ok 23 - aportaciones: gasto personal, cobertura total, centavos y registros anteriores
+  ---
+  duration_ms: 0.25855
+  type: 'test'
+  ...
+# Subtest: aportaciones: valida límites, centavos y tipos sin coerciones inesperadas
+ok 24 - aportaciones: valida límites, centavos y tipos sin coerciones inesperadas
+  ---
+  duration_ms: 0.265609
+  type: 'test'
+  ...
+# Subtest: editar: agrega, conserva con cliente anterior, corrige y retira la aportación
+ok 25 - editar: agrega, conserva con cliente anterior, corrige y retira la aportación
+  ---
+  duration_ms: 91.0697
+  type: 'test'
+  ...
+1..25
+# tests 25
+# suites 0
+# pass 25
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3335.93604

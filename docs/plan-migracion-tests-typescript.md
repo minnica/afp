@@ -1,6 +1,6 @@
 # Plan de migración de pruebas y helpers a TypeScript
 
-**Estado:** fases 0–2 completadas localmente; fases 3–6 pendientes. **Base revisada del plan:** `6aad1ab`, 28 de octubre de 2026. La [referencia nueva de fase 0](../artifacts/typescript-tests-migration/phase-0/README.md) parte de `6c1b626`; la [fase 1](../artifacts/typescript-tests-migration/phase-1/README.md) parte de `700afcc` y la [fase 2](../artifacts/typescript-tests-migration/phase-2/README.md) de `c0a0a37`. La [migración de la web](plan-migracion-typescript.md) permanece completada. Este plan amplía el tipado a las herramientas de prueba sin cambiar el comportamiento de AFP.
+**Estado:** fases 0–3 completadas localmente; fases 4–6 pendientes. **Base revisada del plan:** `6aad1ab`, 28 de octubre de 2026. La [referencia nueva de fase 0](../artifacts/typescript-tests-migration/phase-0/README.md) parte de `6c1b626`; la [fase 1](../artifacts/typescript-tests-migration/phase-1/README.md) parte de `700afcc` y la [fase 2](../artifacts/typescript-tests-migration/phase-2/README.md) de `c0a0a37`; la [fase 3](../artifacts/typescript-tests-migration/phase-3/README.md) parte de `dd81d4f`. La [migración de la web](plan-migracion-typescript.md) permanece completada. Este plan amplía el tipado a las herramientas de prueba sin cambiar el comportamiento de AFP.
 
 ## Objetivo y alcance
 
@@ -38,9 +38,9 @@ Los grupos del inventario se solapan. Los 854 resultados de la tabla corresponde
 
 ### Dependencias que requieren atención
 
-- [load-source.ts](../tests/helpers/load-source.ts) transforma módulos con esbuild y los evalúa en `vm`. Desde fase 2 vincula siete rutas del piloto a sus exports reales; las demás rutas y los exports privados siguen devolviendo `unknown` hasta su conversión.
-- [legacy-route-context.cjs](../tests/helpers/legacy-route-context.cjs) combina exports de varios módulos y expone algunas funciones privadas de handlers. Ese objeto necesita contratos por ruta.
-- [debt-fixture.cjs](../tests/helpers/debt-fixture.cjs) simula persistencia, bloqueo y rollback. Sus tipos deben distinguir registros, consultas y transacciones sin presentarlo como un cliente Prisma completo.
+- [load-source.ts](../tests/helpers/load-source.ts) transforma módulos con esbuild y los evalúa en `vm`. Desde fase 2 vincula rutas a sus exports reales; la fase 3 amplía los contratos del núcleo financiero y comprueba también esquemas, constantes y constructores. Las rutas dinámicas siguen devolviendo `unknown`; los helpers privados financieros tienen contratos mínimos por ruta.
+- [legacy-route-context.ts](../tests/helpers/legacy-route-context.ts) combina exports de varios módulos y expone algunas funciones privadas de handlers. La fase 3 conserva una lista cerrada y contratos mínimos por ruta, sin exportar funciones desde producción.
+- [debt-fixture.ts](../tests/helpers/debt-fixture.ts) simula persistencia, bloqueo y rollback. Desde fase 3 distingue registros, consultas y transacciones sin presentarse como un cliente Prisma completo; conserva tombstones sin ID y los fallos simulados.
 - [package.json](../package.json) y [verify-database-reproduction.cjs](../scripts/verify-database-reproduction.cjs) descubrían únicamente `.test.cjs` en fase 0. Desde fase 1 comparten el ejecutor mixto; el segundo importa el cargador TS y registra tsx en el proceso principal y en las regresiones.
 - [next-fixture.cjs](../tests/helpers/next-fixture.cjs) copia configuraciones por patrón; debe distinguir las necesarias para la web de las exclusivas de pruebas.
 - Los tres servidores de navegador y los tres scripts de preparación de datos se invocan también desde documentación y ejecutores en `artifacts/`. Un renombre debe actualizar sus consumidores vigentes.
@@ -112,7 +112,7 @@ Conservar datos omitidos, nulos, JSON malformado, respuestas perdidas, UUID repe
 
 ## Fases de implementación
 
-Las fases 0–2 están completadas; las fases 3–6 siguen pendientes. Cada lote debe ser revisable y contener el módulo convertido junto con sus consumidores y herramientas afectados.
+Las fases 0–3 están completadas; las fases 4–6 siguen pendientes. Cada lote debe ser revisable y contener el módulo convertido junto con sus consumidores y herramientas afectados.
 
 | Fase | Entrega | Dependencia |
 | --- | --- | --- |
@@ -163,12 +163,14 @@ Las fases 0–2 están completadas; las fases 3–6 siguen pendientes. Cada lote
 
 Orden de lotes: cálculos de tarjetas/MSI y presentación → suscripciones y gastos → deudas e ingresos → Mi dinero, rendimientos, presupuestos y proyección.
 
-- [ ] Convertir `legacy-route-context` y `debt-fixture` junto con el primer grupo de consumidores que los use. Conservar bloqueo, rollback y fallos simulados.
-- [ ] Migrar pruebas y factories por dominio, derivando contratos de consultas y comandos existentes. Mantener datos mínimos cuando el caso depende de campos ausentes.
-- [ ] Tipar pruebas de autorización, relaciones por propietario, pagos, abonos, recibos y transacciones sin alterar resultados financieros.
-- [ ] Actualizar las pruebas de scripts, migraciones y fuentes Android que no encajen en otro lote; declarar de forma específica los contratos de scripts CJS externos al alcance.
+- [x] Convertir `legacy-route-context` y `debt-fixture` junto con el primer grupo de consumidores que los use. Conservar bloqueo, rollback y fallos simulados.
+- [x] Migrar pruebas y factories por dominio, derivando contratos de consultas y comandos existentes. Mantener datos mínimos cuando el caso depende de campos ausentes.
+- [x] Tipar pruebas de autorización, relaciones por propietario, pagos, abonos, recibos y transacciones sin alterar resultados financieros.
+- [x] Actualizar las pruebas de scripts, migraciones y fuentes Android que no encajen en otro lote; declarar de forma específica los contratos de scripts CJS externos al alcance.
 
 **Aceptación:** escenarios de referencia conservados, incluyendo diferencias entre cargo bancario y aportación personal, pagos individuales y acumulados, cero confirmado y ausencia, previsión y movimiento real. Las integraciones usan PostgreSQL y no se sustituyen por mocks adicionales para facilitar el tipado.
+
+**Resultado (28 de octubre de 2026):** [fase 3](../artifacts/typescript-tests-migration/phase-3/README.md). Convertidas 52 pruebas y los dos helpers de contexto/persistencia, con factories por dominio, consultas y fallos PostgreSQL reales. Se conservan los 854 escenarios de fase 0 y los 863 de fase 2, con tres escenarios adicionales para exports, fixtures parciales y adaptadores HTTP: 866 sin omisiones. Los scripts CJS externos al alcance tienen tres declaraciones específicas y casos negativos. La evidencia recoge instalación aislada, tipos, lint, suite completa, build, reconstrucción/actualización, correspondencia de escenarios, hashes y fronteras temporales. Captura, Calendar, HTTP/offline y los siete helpers CJS de navegador/seeds siguen pendientes en fases 4–6. Sin cambios de producto, esquema, SQL, fixtures JSON ni dependencias.
 
 ### Fase 4 Migrar integraciones y persistencia offline
 

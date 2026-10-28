@@ -1,0 +1,139 @@
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma/schema.prisma.
+Datasource "db": PostgreSQL database "afp_test_phase3", schema "public" at "127.0.0.1:44703"
+
+42 migrations found in prisma/migrations
+
+Applying migration `20260509070227_init`
+Applying migration `20260517045000_add_payable_accounts`
+Applying migration `20260517222440_add_subscription_frequency`
+Applying migration `20260517235633_replace_receivable_expected_date_with_charge_day`
+Applying migration `20260518002802_replace_receivable_charge_day_with_charge_days`
+Applying migration `20260518041110_add_expense_subscription_relation`
+Applying migration `20260518234708_add_payable_loan_support`
+Applying migration `20260604000000_add_subscription_active_fields`
+Applying migration `20261009000000_add_installment_statement_reconciliations`
+Applying migration `20261010000000_add_card_cycle_credits`
+Applying migration `20261011000000_add_card_usage_verification`
+Applying migration `20261015000000_add_notice_dismissals`
+Applying migration `20261016000000_add_subscription_charges`
+Applying migration `20261017000000_add_expense_operations`
+Applying migration `20261017020000_enable_application_rls`
+Applying migration `20261017030000_add_post_cut_credits`
+Applying migration `20261020000000_add_cash_expense_contributions`
+Applying migration `20261021000000_add_android_capture_linking`
+Applying migration `20261021010000_add_capture_processing`
+Applying migration `20261021020000_capture_installment_reconciliation`
+Applying migration `20261021030000_capture_review_and_reconciliation`
+Applying migration `20261021040000_add_card_credit_balances`
+Applying migration `20261022000000_add_card_balance_tracking`
+Applying migration `20261023000000_add_google_calendar_sync`
+Applying migration `20261023010000_capture_wallet_date_policy`
+Applying migration `20261023020000_capture_nu_cfe_policy`
+Applying migration `20261023030000_capture_card_payments`
+Applying migration `20261023040000_automatic_payment_receipts`
+Applying migration `20261023050000_receivable_balance_adjustment`
+Applying migration `20261023060000_receiver_payment_notices`
+Applying migration `20261024010000_capture_mercadopago_purchase_policy`
+Applying migration `20261024020000_capture_bank_fallback`
+Applying migration `20261025000000_add_money_accounts`
+Applying migration `20261025010000_money_account_yields`
+Applying migration `20261025020000_automatic_money_yields`
+Applying migration `20261025030000_payroll_business_days`
+Applying migration `20261026000000_expense_refunds`
+Applying migration `20261026010000_debit_payment_method`
+Applying migration `20261026020000_capture_account_movements`
+Applying migration `20261026030000_card_cycle_dates_confirmation`
+Applying migration `20261027000000_variable_budget_payment_mix`
+Applying migration `20261027010000_bbva_debit_automation`
+
+The following migration(s) have been applied:
+
+migrations/
+  └─ 20260509070227_init/
+    └─ migration.sql
+  └─ 20260517045000_add_payable_accounts/
+    └─ migration.sql
+  └─ 20260517222440_add_subscription_frequency/
+    └─ migration.sql
+  └─ 20260517235633_replace_receivable_expected_date_with_charge_day/
+    └─ migration.sql
+  └─ 20260518002802_replace_receivable_charge_day_with_charge_days/
+    └─ migration.sql
+  └─ 20260518041110_add_expense_subscription_relation/
+    └─ migration.sql
+  └─ 20260518234708_add_payable_loan_support/
+    └─ migration.sql
+  └─ 20260604000000_add_subscription_active_fields/
+    └─ migration.sql
+  └─ 20261009000000_add_installment_statement_reconciliations/
+    └─ migration.sql
+  └─ 20261010000000_add_card_cycle_credits/
+    └─ migration.sql
+  └─ 20261011000000_add_card_usage_verification/
+    └─ migration.sql
+  └─ 20261015000000_add_notice_dismissals/
+    └─ migration.sql
+  └─ 20261016000000_add_subscription_charges/
+    └─ migration.sql
+  └─ 20261017000000_add_expense_operations/
+    └─ migration.sql
+  └─ 20261017020000_enable_application_rls/
+    └─ migration.sql
+  └─ 20261017030000_add_post_cut_credits/
+    └─ migration.sql
+  └─ 20261020000000_add_cash_expense_contributions/
+    └─ migration.sql
+  └─ 20261021000000_add_android_capture_linking/
+    └─ migration.sql
+  └─ 20261021010000_add_capture_processing/
+    └─ migration.sql
+  └─ 20261021020000_capture_installment_reconciliation/
+    └─ migration.sql
+  └─ 20261021030000_capture_review_and_reconciliation/
+    └─ migration.sql
+  └─ 20261021040000_add_card_credit_balances/
+    └─ migration.sql
+  └─ 20261022000000_add_card_balance_tracking/
+    └─ migration.sql
+  └─ 20261023000000_add_google_calendar_sync/
+    └─ migration.sql
+  └─ 20261023010000_capture_wallet_date_policy/
+    └─ migration.sql
+  └─ 20261023020000_capture_nu_cfe_policy/
+    └─ migration.sql
+  └─ 20261023030000_capture_card_payments/
+    └─ migration.sql
+  └─ 20261023040000_automatic_payment_receipts/
+    └─ migration.sql
+  └─ 20261023050000_receivable_balance_adjustment/
+    └─ migration.sql
+  └─ 20261023060000_receiver_payment_notices/
+    └─ migration.sql
+  └─ 20261024010000_capture_mercadopago_purchase_policy/
+    └─ migration.sql
+  └─ 20261024020000_capture_bank_fallback/
+    └─ migration.sql
+  └─ 20261025000000_add_money_accounts/
+    └─ migration.sql
+  └─ 20261025010000_money_account_yields/
+    └─ migration.sql
+  └─ 20261025020000_automatic_money_yields/
+    └─ migration.sql
+  └─ 20261025030000_payroll_business_days/
+    └─ migration.sql
+  └─ 20261026000000_expense_refunds/
+    └─ migration.sql
+  └─ 20261026010000_debit_payment_method/
+    └─ migration.sql
+  └─ 20261026020000_capture_account_movements/
+    └─ migration.sql
+  └─ 20261026030000_card_cycle_dates_confirmation/
+    └─ migration.sql
+  └─ 20261027000000_variable_budget_payment_mix/
+    └─ migration.sql
+  └─ 20261027010000_bbva_debit_automation/
+    └─ migration.sql
+
+All migrations have been successfully applied.

@@ -1,0 +1,345 @@
+{
+  "baseCommit": "dd81d4f80d6f52a32f5189f4412dfe2fdd9abcd1",
+  "converted": [
+    {
+      "before": "tests/analysis-presentation.test.cjs",
+      "after": "tests/analysis-presentation.test.ts",
+      "beforeLines": 24,
+      "afterLines": 24
+    },
+    {
+      "before": "tests/android-assetlinks.test.cjs",
+      "after": "tests/android-assetlinks.test.ts",
+      "beforeLines": 28,
+      "afterLines": 29
+    },
+    {
+      "before": "tests/android-sources.test.cjs",
+      "after": "tests/android-sources.test.ts",
+      "beforeLines": 24,
+      "afterLines": 24
+    },
+    {
+      "before": "tests/api-authorization.test.cjs",
+      "after": "tests/api-authorization.test.ts",
+      "beforeLines": 176,
+      "afterLines": 179
+    },
+    {
+      "before": "tests/capture-bank-fallback-cron.test.cjs",
+      "after": "tests/capture-bank-fallback-cron.test.ts",
+      "beforeLines": 54,
+      "afterLines": 57
+    },
+    {
+      "before": "tests/card-balance-tracking-integration.test.cjs",
+      "after": "tests/card-balance-tracking-integration.test.ts",
+      "beforeLines": 115,
+      "afterLines": 117
+    },
+    {
+      "before": "tests/card-balance-tracking.test.cjs",
+      "after": "tests/card-balance-tracking.test.ts",
+      "beforeLines": 103,
+      "afterLines": 110
+    },
+    {
+      "before": "tests/card-balances-integration.test.cjs",
+      "after": "tests/card-balances-integration.test.ts",
+      "beforeLines": 53,
+      "afterLines": 55
+    },
+    {
+      "before": "tests/card-balances.test.cjs",
+      "after": "tests/card-balances.test.ts",
+      "beforeLines": 134,
+      "afterLines": 134
+    },
+    {
+      "before": "tests/card-credits.test.cjs",
+      "after": "tests/card-credits.test.ts",
+      "beforeLines": 155,
+      "afterLines": 157
+    },
+    {
+      "before": "tests/card-cycle-calculation.test.cjs",
+      "after": "tests/card-cycle-calculation.test.ts",
+      "beforeLines": 171,
+      "afterLines": 172
+    },
+    {
+      "before": "tests/card-cycle-credits-integration.test.cjs",
+      "after": "tests/card-cycle-credits-integration.test.ts",
+      "beforeLines": 72,
+      "afterLines": 64
+    },
+    {
+      "before": "tests/card-cycle-payments.test.cjs",
+      "after": "tests/card-cycle-payments.test.ts",
+      "beforeLines": 382,
+      "afterLines": 385
+    },
+    {
+      "before": "tests/card-payment-presentation.test.cjs",
+      "after": "tests/card-payment-presentation.test.ts",
+      "beforeLines": 74,
+      "afterLines": 75
+    },
+    {
+      "before": "tests/card-usage-presentation.test.cjs",
+      "after": "tests/card-usage-presentation.test.ts",
+      "beforeLines": 35,
+      "afterLines": 36
+    },
+    {
+      "before": "tests/card-usage-waivers.test.cjs",
+      "after": "tests/card-usage-waivers.test.ts",
+      "beforeLines": 377,
+      "afterLines": 378
+    },
+    {
+      "before": "tests/dashboard-breakdowns.test.cjs",
+      "after": "tests/dashboard-breakdowns.test.ts",
+      "beforeLines": 187,
+      "afterLines": 189
+    },
+    {
+      "before": "tests/debt-accounts-integration.test.cjs",
+      "after": "tests/debt-accounts-integration.test.ts",
+      "beforeLines": 107,
+      "afterLines": 101
+    },
+    {
+      "before": "tests/debt-accounts.test.cjs",
+      "after": "tests/debt-accounts.test.ts",
+      "beforeLines": 191,
+      "afterLines": 193
+    },
+    {
+      "before": "tests/expense-filters.test.cjs",
+      "after": "tests/expense-filters.test.ts",
+      "beforeLines": 39,
+      "afterLines": 40
+    },
+    {
+      "before": "tests/expense-operations-integration.test.cjs",
+      "after": "tests/expense-operations-integration.test.ts",
+      "beforeLines": 49,
+      "afterLines": 51
+    },
+    {
+      "before": "tests/expense-operations.test.cjs",
+      "after": "tests/expense-operations.test.ts",
+      "beforeLines": 130,
+      "afterLines": 133
+    },
+    {
+      "before": "tests/financial-contracts-integration.test.cjs",
+      "after": "tests/financial-contracts-integration.test.ts",
+      "beforeLines": 79,
+      "afterLines": 85
+    },
+    {
+      "before": "tests/helpers/debt-fixture.cjs",
+      "after": "tests/helpers/debt-fixture.ts",
+      "beforeLines": 99,
+      "afterLines": 135
+    },
+    {
+      "before": "tests/helpers/legacy-route-context.cjs",
+      "after": "tests/helpers/legacy-route-context.ts",
+      "beforeLines": 28,
+      "afterLines": 68
+    },
+    {
+      "before": "tests/installment-statements.test.cjs",
+      "after": "tests/installment-statements.test.ts",
+      "beforeLines": 89,
+      "afterLines": 89
+    },
+    {
+      "before": "tests/installment-transactions.test.cjs",
+      "after": "tests/installment-transactions.test.ts",
+      "beforeLines": 122,
+      "afterLines": 128
+    },
+    {
+      "before": "tests/migration-history.test.cjs",
+      "after": "tests/migration-history.test.ts",
+      "beforeLines": 56,
+      "afterLines": 57
+    },
+    {
+      "before": "tests/money-automatic-yields-integration.test.cjs",
+      "after": "tests/money-automatic-yields-integration.test.ts",
+      "beforeLines": 50,
+      "afterLines": 53
+    },
+    {
+      "before": "tests/money-automatic-yields.test.cjs",
+      "after": "tests/money-automatic-yields.test.ts",
+      "beforeLines": 91,
+      "afterLines": 94
+    },
+    {
+      "before": "tests/money-budgets-integration.test.cjs",
+      "after": "tests/money-budgets-integration.test.ts",
+      "beforeLines": 89,
+      "afterLines": 92
+    },
+    {
+      "before": "tests/money-budgets.test.cjs",
+      "after": "tests/money-budgets.test.ts",
+      "beforeLines": 94,
+      "afterLines": 97
+    },
+    {
+      "before": "tests/money-forecast.test.cjs",
+      "after": "tests/money-forecast.test.ts",
+      "beforeLines": 266,
+      "afterLines": 270
+    },
+    {
+      "before": "tests/money-integration.test.cjs",
+      "after": "tests/money-integration.test.ts",
+      "beforeLines": 142,
+      "afterLines": 145
+    },
+    {
+      "before": "tests/money-loading.test.cjs",
+      "after": "tests/money-loading.test.ts",
+      "beforeLines": 61,
+      "afterLines": 64
+    },
+    {
+      "before": "tests/money-monthly-minimum-period.test.cjs",
+      "after": "tests/money-monthly-minimum-period.test.ts",
+      "beforeLines": 69,
+      "afterLines": 70
+    },
+    {
+      "before": "tests/money-monthly-summary-status.test.cjs",
+      "after": "tests/money-monthly-summary-status.test.ts",
+      "beforeLines": 74,
+      "afterLines": 75
+    },
+    {
+      "before": "tests/money-payroll-calendar-integration.test.cjs",
+      "after": "tests/money-payroll-calendar-integration.test.ts",
+      "beforeLines": 33,
+      "afterLines": 37
+    },
+    {
+      "before": "tests/money-payroll-calendar.test.cjs",
+      "after": "tests/money-payroll-calendar.test.ts",
+      "beforeLines": 34,
+      "afterLines": 37
+    },
+    {
+      "before": "tests/money-projection-breakdown.test.cjs",
+      "after": "tests/money-projection-breakdown.test.ts",
+      "beforeLines": 189,
+      "afterLines": 190
+    },
+    {
+      "before": "tests/money-typescript-contracts.test.cjs",
+      "after": "tests/money-typescript-contracts.test.ts",
+      "beforeLines": 56,
+      "afterLines": 62
+    },
+    {
+      "before": "tests/notice-dismissals.test.cjs",
+      "after": "tests/notice-dismissals.test.ts",
+      "beforeLines": 98,
+      "afterLines": 99
+    },
+    {
+      "before": "tests/nu-turbo-usage.test.cjs",
+      "after": "tests/nu-turbo-usage.test.ts",
+      "beforeLines": 123,
+      "afterLines": 124
+    },
+    {
+      "before": "tests/payable-notices.test.cjs",
+      "after": "tests/payable-notices.test.ts",
+      "beforeLines": 84,
+      "afterLines": 86
+    },
+    {
+      "before": "tests/payables-summary.test.cjs",
+      "after": "tests/payables-summary.test.ts",
+      "beforeLines": 113,
+      "afterLines": 115
+    },
+    {
+      "before": "tests/receivable-adjustments.test.cjs",
+      "after": "tests/receivable-adjustments.test.ts",
+      "beforeLines": 72,
+      "afterLines": 74
+    },
+    {
+      "before": "tests/related-operations-integration.test.cjs",
+      "after": "tests/related-operations-integration.test.ts",
+      "beforeLines": 119,
+      "afterLines": 106
+    },
+    {
+      "before": "tests/shared-expenses-integration.test.cjs",
+      "after": "tests/shared-expenses-integration.test.ts",
+      "beforeLines": 107,
+      "afterLines": 109
+    },
+    {
+      "before": "tests/shared-expenses.test.cjs",
+      "after": "tests/shared-expenses.test.ts",
+      "beforeLines": 42,
+      "afterLines": 44
+    },
+    {
+      "before": "tests/subscription-charges-api.test.cjs",
+      "after": "tests/subscription-charges-api.test.ts",
+      "beforeLines": 54,
+      "afterLines": 56
+    },
+    {
+      "before": "tests/subscription-charges-integration.test.cjs",
+      "after": "tests/subscription-charges-integration.test.ts",
+      "beforeLines": 145,
+      "afterLines": 147
+    },
+    {
+      "before": "tests/subscription-charges.test.cjs",
+      "after": "tests/subscription-charges.test.ts",
+      "beforeLines": 78,
+      "afterLines": 79
+    },
+    {
+      "before": "tests/subscription-payment-adjustments.test.cjs",
+      "after": "tests/subscription-payment-adjustments.test.ts",
+      "beforeLines": 74,
+      "afterLines": 77
+    },
+    {
+      "before": "tests/subscription-statements.test.cjs",
+      "after": "tests/subscription-statements.test.ts",
+      "beforeLines": 60,
+      "afterLines": 61
+    }
+  ],
+  "convertedTests": 52,
+  "convertedHelpers": 2,
+  "originalLines": 5570,
+  "finalLines": 5728,
+  "publicModuleContracts": 54,
+  "typeNegativeCases": 18,
+  "newInfrastructureScenarios": 3,
+  "remainingCjsHelpers": [
+    "tests/helpers/capture-browser-server.cjs",
+    "tests/helpers/money-browser-server.cjs",
+    "tests/helpers/next-fixture.cjs",
+    "tests/helpers/offline-browser-server.cjs",
+    "tests/helpers/seed-capture-review.cjs",
+    "tests/helpers/seed-receiver-payments.cjs",
+    "tests/helpers/seed-ui.cjs"
+  ]
+}

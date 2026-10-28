@@ -1,0 +1,35 @@
+{
+  "commands": [
+    [
+      "pnpm",
+      "exec",
+      "tsc",
+      "-p",
+      "tsconfig.tests.json",
+      "--noEmit"
+    ],
+    [
+      "pnpm",
+      "exec",
+      "tsc",
+      "-p",
+      "tsconfig.type-tests.json",
+      "--noEmit"
+    ],
+    [
+      "pnpm",
+      "exec",
+      "eslint",
+      "tests/helpers/financial-fixtures.ts",
+      "tests/helpers/financial-persistence.ts",
+      "tests/helpers/debt-fixture.ts",
+      "tests/types/financial-fixtures.ts"
+    ]
+  ],
+  "exitCode": 0,
+  "reason": "Exclude persistence signatures from SparseModule and check the final negative case; type-only change",
+  "logs": [
+    "final-contracts.log",
+    "final-lint.log"
+  ]
+}

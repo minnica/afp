@@ -5,9 +5,9 @@ import nextTypescript from "eslint-config-next/typescript";
 
 const eslintConfig = defineConfig([
   ...nextVitals,
-  ...nextTypescript.map(config => ({ ...config, files: ["**/*.ts", "**/*.tsx"] })),
+  ...nextTypescript.map(config => ({ ...config, files: ["**/*.ts", "**/*.tsx", "**/*.cts"] })),
   {
-    files: ["src/**/*.ts", "src/**/*.tsx", "prisma.config.ts", "tests/**/*.ts", "tests/**/*.tsx"],
+    files: ["src/**/*.ts", "src/**/*.tsx", "prisma.config.ts", "scripts/*.d.cts", "tests/**/*.ts", "tests/**/*.tsx"],
     languageOptions: { parserOptions: { project: ["./tsconfig.json", "./tsconfig.type-tests.json", "./tsconfig.tests.json"], tsconfigRootDir: import.meta.dirname } },
     rules: {
       "@typescript-eslint/no-explicit-any": "error",

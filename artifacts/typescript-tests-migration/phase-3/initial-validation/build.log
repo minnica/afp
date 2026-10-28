@@ -1,0 +1,60 @@
+
+> afp@0.1.0 build /tmp/afp-tests-ts3-s20wgs6k
+> prisma generate && next build
+
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma/schema.prisma.
+
+✔ Generated Prisma Client (v7.10.1) to ./../../home/garatachia/projects/afp/node_modules/.pnpm/@prisma+client@7.10.1_prisma@7.10.1_@types+node@22.20.5_@types+react-dom@19.3.0_@types+_67e1dd834939b123c798939e408e968c/node_modules/@prisma/client in 410ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+
+▲ Next.js 16.3.8 (Turbopack)
+✓ Running next.config.mjs took 11ms
+⚠ No build cache found. Please configure build caching for faster rebuilds. Read more: https://nextjs.org/docs/messages/no-cache
+
+  Creating an optimized production build ...
+[1m[31mFATAL[39m[0m: An unexpected Turbopack error occurred:
+Symlink [project]/node_modules is invalid, it points out of the filesystem root
+
+Debug info:
+- Execution of get_all_written_entrypoints_with_issues_operation failed
+- Execution of EntrypointsOperation::new failed
+- Execution of all_entrypoints_write_to_disk_operation failed
+- Execution of output_assets_operation failed
+- Execution of Project::get_all_endpoint_groups_with_app_route_filter failed
+- Execution of Project::entrypoints_with_app_route_filter failed
+- Execution of AppProject::routes_with_filter failed
+- Execution of directory_tree_to_entrypoints_internal failed
+- Execution of directory_tree_to_loader_tree failed
+- Execution of try_get_next_package failed
+- Execution of resolve failed
+- Execution of resolve_internal failed
+- Execution of find_package failed
+- Symlink [project]/node_modules is invalid, it points out of the filesystem root
+
+> Build error occurred
+Error [TurbopackInternalError]: Symlink [project]/node_modules is invalid, it points out of the filesystem root
+
+Debug info:
+- Execution of get_all_written_entrypoints_with_issues_operation failed
+- Execution of EntrypointsOperation::new failed
+- Execution of all_entrypoints_write_to_disk_operation failed
+- Execution of output_assets_operation failed
+- Execution of Project::get_all_endpoint_groups_with_app_route_filter failed
+- Execution of Project::entrypoints_with_app_route_filter failed
+- Execution of AppProject::routes_with_filter failed
+- Execution of directory_tree_to_entrypoints_internal failed
+- Execution of directory_tree_to_loader_tree failed
+- Execution of try_get_next_package failed
+- Execution of resolve failed
+- Execution of resolve_internal failed
+- Execution of find_package failed
+- Symlink [project]/node_modules is invalid, it points out of the filesystem root
+    at ignore-listed frames {
+  type: 'TurbopackInternalError',
+  location: undefined
+}
+ ELIFECYCLE  Command failed with exit code 1.

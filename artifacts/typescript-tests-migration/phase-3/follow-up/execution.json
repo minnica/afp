@@ -1,0 +1,40 @@
+[
+  {
+    "command": [
+      "pnpm",
+      "typecheck:tests"
+    ],
+    "seconds": 10.73,
+    "exitCode": 0
+  },
+  {
+    "command": [
+      "pnpm",
+      "test:types"
+    ],
+    "seconds": 7.737,
+    "exitCode": 0
+  },
+  {
+    "command": [
+      "pnpm",
+      "lint"
+    ],
+    "seconds": 35.198,
+    "exitCode": 0
+  },
+  {
+    "command": [
+      "pnpm",
+      "test",
+      "debt-accounts.test.ts",
+      "debt-accounts-integration.test.ts",
+      "related-operations-integration.test.ts",
+      "card-cycle-credits-integration.test.ts",
+      "shared-expenses.test.ts",
+      "receivable-adjustments.test.ts"
+    ],
+    "seconds": 3.749,
+    "exitCode": 0
+  }
+]

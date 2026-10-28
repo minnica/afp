@@ -1,9 +1,9 @@
+import { transformSync,type Format,type Loader } from 'esbuild';
 import fs from 'node:fs';
+import { createRequire } from 'node:module';
 import path from 'node:path';
 import vm from 'node:vm';
-import { createRequire } from 'node:module';
-import { transformSync, type Format, type Loader } from 'esbuild';
-import type { SourceGlobals, SourceMocks, SourceModules } from './source-contracts';
+import type { SourceGlobals,SourceMocks,SourceModules } from './source-contracts';
 const nativeRequire: (specifier: string) => unknown = createRequire(__filename);
 const root = path.resolve(__dirname, "../..");
 const extensions = [".js", ".ts", ".jsx", ".tsx"];
@@ -43,25 +43,18 @@ export function transformSource(source: string, filename: string, format: Format
 
 // Ejecuta fuentes de confianza del repositorio; vm no es un sandbox de seguridad.
 // Conserva mocks prioritarios, caché por cargador y process.env ficticio.
-const publicFunctions = {
-  'src/lib/money/transferClient.ts': ['sendTransfer'],
-  'src/lib/money/client.ts': ['errorMessage', 'loadMoney', 'sendMoney'],
-  'src/lib/money/dates.ts': ['day', 'todayInMexico', 'validDay', 'addDays', 'monthDay', 'addMonths', 'monthRange'],
-  'src/lib/requestRecovery.ts': ['subscribeRecovery', 'getRecoverySnapshot', 'getServerRecoverySnapshot', 'getRecoveryScope', 'dismissRecovery', 'resetRecovery', 'recoverRequest', 'retryRecovery'],
-  'src/components/mi-dinero/transferEditor.ts': ['createTransferEditor'],
-  'src/components/mi-dinero/MoneyEditor.tsx': ['default'],
-  'src/app/api/money/route.ts': ['GET', 'POST'],
-} as const satisfies { [P in keyof SourceModules]: readonly (keyof SourceModules[P])[] };
+import { sourceExports } from './source-exports';
 
 export function checkSourceExports(file: keyof SourceModules, value: unknown): void {
   checkPublicExports(path.resolve(root, file), value);
 }
 
 function checkPublicExports(full: string, value: unknown) {
-  for (const [file, names] of Object.entries(publicFunctions)) {
+  for (const [file, names] of Object.entries(sourceExports)) {
     if (full !== path.resolve(root, file)) continue;
-    for (const name of names) {
-      if (!value || typeof value !== 'object' || !(name in value) || typeof Reflect.get(value, name) !== 'function') {
+    for (const [name, kind] of Object.entries(names)) {
+      const exported: unknown = value && typeof value === 'object' && name in value ? Reflect.get(value, name) : undefined;
+      if (typeof exported !== kind || exported === null) {
         throw new Error(`Export público inválido: ${file}#${name}`);
       }
     }
