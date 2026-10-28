@@ -1,6 +1,6 @@
 # Plan de migración gradual a TypeScript
 
-**Estado:** preparado; implementación pendiente. **Base revisada:** `4d7b6e6`, 27 de octubre de 2026.
+**Estado:** fase 0 completada; fases 1–7 pendientes. **Base revisada del plan:** `4d7b6e6`, 27 de octubre de 2026. **Referencia ejecutada:** `83a3924`; [resultados y reproducción de la fase 0](../artifacts/typescript-migration/phase-0/README.md).
 
 ## Objetivo y alcance
 
@@ -24,7 +24,7 @@ Este trabajo no requiere cambiar el esquema de PostgreSQL. Cambios de producto, 
 | Contratos existentes | Zod valida entradas; Prisma genera tipos, pero las respuestas HTTP y numerosos objetos internos carecen de contratos estáticos explícitos |
 | Acoplamientos a JavaScript | Cargador de pruebas, fixtures de navegador, rutas literales a `.js` y comprobaciones que inspeccionan código fuente |
 
-Estos números describen el inventario, no una medición de cobertura ni una nueva ejecución de las pruebas. La fase 0 establecerá la referencia reproducible.
+Estos números describen el inventario, no una medición de cobertura. La fase 0 confirmó el inventario y ejecutó 820 pruebas con PostgreSQL local, sin fallos ni omisiones; lint, reconstrucción de BD, comparación del piloto y build correctos. Los resultados y límites están en la referencia enlazada arriba.
 
 ## Decisiones técnicas
 
@@ -62,7 +62,7 @@ Las validaciones nuevas deberán aceptar las formas que ya admite el contrato p�
 
 | Fase | Resultado | Depende de | Estado |
 | --- | --- | --- | --- |
-| 0 | Referencia funcional e inventario de dependencias | — | Pendiente |
+| 0 | Referencia funcional e inventario de dependencias | — | Completada |
 | 1 | Herramientas y pruebas compatibles con JS/TS | 0 | Pendiente |
 | 2 | Transferencias tipadas de formulario a persistencia | 1 | Pendiente |
 | 3 | Mi dinero completo | 2 | Pendiente |
@@ -77,12 +77,14 @@ Cada fase se divide en lotes revisables. Una dependencia compartida puede conver
 
 **Trabajo**
 
-- [ ] Crear un inventario por módulo de archivos activos, consumidores, formatos de datos y pruebas. Identificar archivos vacíos y APIs de compatibilidad que deban conservarse.
-- [ ] Registrar commit, versiones, tiempos de pruebas/build y resultados actuales de lint, pruebas unitarias e integraciones en PostgreSQL local desechable.
-- [ ] Ejecutar `pnpm db:verify` para comprobar que la base de pruebas reproduce migraciones y RLS antes de cambiar sus herramientas.
-- [ ] Registrar las diferencias preexistentes: fallos, omisiones y advertencias, sin atribuirlas posteriormente a TypeScript ni ocultarlas.
-- [ ] Preparar datos ficticios de dos usuarios y dos cuentas para el piloto. Guardar respuestas de referencia de alta, repetición, conflicto, reversión y consulta de saldos; fijar el día y normalizar únicamente IDs/horas no deterministas al comparar.
-- [ ] Revisar todas las cargas por nombre de archivo: `sourceLoader`, las pruebas que usan `vm`, los tres servidores de pruebas y el verificador de reconstrucción de BD.
+- [x] Crear un inventario por módulo de archivos activos, consumidores, formatos de datos y pruebas. Identificar archivos vacíos y APIs de compatibilidad que deban conservarse.
+- [x] Registrar commit, versiones, tiempos de pruebas/build y resultados actuales de lint, pruebas unitarias e integraciones en PostgreSQL local desechable.
+- [x] Ejecutar `pnpm db:verify` para comprobar que la base de pruebas reproduce migraciones y RLS antes de cambiar sus herramientas.
+- [x] Registrar las diferencias preexistentes: fallos, omisiones y advertencias, sin atribuirlas posteriormente a TypeScript ni ocultarlas.
+- [x] Preparar datos ficticios de dos usuarios y dos cuentas para el piloto. Guardar respuestas de referencia de alta, repetición, conflicto, reversión y consulta de saldos; fijar el día y normalizar únicamente IDs/horas no deterministas al comparar.
+- [x] Revisar todas las cargas por nombre de archivo: `sourceLoader`, las pruebas que usan `vm`, los tres servidores de pruebas y el verificador de reconstrucción de BD.
+
+**Entrega:** [inventario, contratos, evidencias y comandos](../artifacts/typescript-migration/phase-0/README.md). Las 12 respuestas del piloto coinciden en dos ejecuciones con datos nuevos. Se resolvió un fallo de preparación del build aislado (enlace externo de dependencias) y se conservaron su log y las advertencias preexistentes. Esta fase no certifica interacciones de navegador ni proveedores externos reales.
 
 **Aceptación:** existe una referencia repetible con PostgreSQL real local; sus casos de integración no figuran como omitidos. Cualquier fallo preexistente que impida verificar el piloto se resuelve o aísla antes de seguir. No usar Supabase personal para construir esta referencia.
 

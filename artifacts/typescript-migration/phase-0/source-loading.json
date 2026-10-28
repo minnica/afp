@@ -1,0 +1,2417 @@
+[
+  {
+    "file": "scripts/android-assetlinks.cjs",
+    "line": 45,
+    "source": "      const current = JSON.parse(fs.readFileSync(destination, \"utf8\"));"
+  },
+  {
+    "file": "scripts/audit-migration-history.cjs",
+    "line": 2,
+    "source": "const { readdirSync, readFileSync } = require('node:fs');"
+  },
+  {
+    "file": "scripts/audit-migration-history.cjs",
+    "line": 12,
+    "source": "      const sql = readFileSync(path.join(root, 'prisma/migrations', entry.name, 'migration.sql'));"
+  },
+  {
+    "file": "scripts/generate-likeu-pattern.cjs",
+    "line": 141,
+    "source": "  const flamePaths = fs.readFileSync(path.join(output, \"santander-flame.svg\"), \"utf8\").replace(/^<svg[^>]*>/, \"\").replace(/<\\/svg>\\s*$/, \"\");"
+  },
+  {
+    "file": "scripts/verify-database-reproduction.cjs",
+    "line": 3,
+    "source": "const { readFileSync, readdirSync, writeFileSync, mkdirSync, cpSync, mkdtempSync, rmSync } = require('node:fs');"
+  },
+  {
+    "file": "scripts/verify-database-reproduction.cjs",
+    "line": 10,
+    "source": "const { sourceLoader } = require('../tests/helpers/load-source.cjs');"
+  },
+  {
+    "file": "scripts/verify-database-reproduction.cjs",
+    "line": 13,
+    "source": "const metadataSql = readFileSync(path.join(__dirname, 'database-metadata.sql'), 'utf8');"
+  },
+  {
+    "file": "scripts/verify-database-reproduction.cjs",
+    "line": 14,
+    "source": "const automationSql = readFileSync(path.join(__dirname, 'database-automation.sql'), 'utf8');"
+  },
+  {
+    "file": "scripts/verify-database-reproduction.cjs",
+    "line": 334,
+    "source": "          const today = sourceLoader()('src/lib/cardBalances.js').getBalanceToday();"
+  },
+  {
+    "file": "scripts/verify-database-reproduction.cjs",
+    "line": 368,
+    "source": "          const { getTrackedCard, loadBalanceMovements } = sourceLoader()('src/lib/cardBalanceTracking.js');"
+  },
+  {
+    "file": "tests/analysis-presentation.test.cjs",
+    "line": 6,
+    "source": "const source = fs.readFileSync(path.resolve(__dirname, \"../src/lib/analysisPresentation.js\"), \"utf8\").replace(/^export /gm, \"\");"
+  },
+  {
+    "file": "tests/analysis-presentation.test.cjs",
+    "line": 8,
+    "source": "vm.runInContext(source, helpers);"
+  },
+  {
+    "file": "tests/android-notices.test.cjs",
+    "line": 4,
+    "source": "const { sourceLoader } = require(\"./helpers/load-source.cjs\");"
+  },
+  {
+    "file": "tests/android-notices.test.cjs",
+    "line": 35,
+    "source": "  const load = sourceLoader({"
+  },
+  {
+    "file": "tests/android-notices.test.cjs",
+    "line": 52,
+    "source": "  const native = await load(\"src/app/api/captures/notices/route.js\").GET(request());"
+  },
+  {
+    "file": "tests/android-notices.test.cjs",
+    "line": 53,
+    "source": "  const dashboard = await load(\"src/app/api/dashboard/route.js\").GET({"
+  },
+  {
+    "file": "tests/android-notices.test.cjs",
+    "line": 71,
+    "source": "  const { loadAndroidNotices } = load(\"src/lib/androidNotices.js\");"
+  },
+  {
+    "file": "tests/android-notices.test.cjs",
+    "line": 73,
+    "source": "  const noticeKey = load(\"src/lib/noticeDismissals.js\").getNoticeKey({ type: \"CARD_PAYMENT\", id: \"card-october\", date: cycle.dueDate, amount: 900 });"
+  },
+  {
+    "file": "tests/android-notices.test.cjs",
+    "line": 86,
+    "source": "  const { loadAndroidNotices } = load(\"src/lib/androidNotices.js\");"
+  },
+  {
+    "file": "tests/android-notices.test.cjs",
+    "line": 107,
+    "source": "  const notices = await load(\"src/lib/androidNotices.js\").loadAndroidNotices(db, \"a\", today);"
+  },
+  {
+    "file": "tests/android-notices.test.cjs",
+    "line": 120,
+    "source": "  const service = load(\"src/lib/androidNotices.js\");"
+  },
+  {
+    "file": "tests/android-notices.test.cjs",
+    "line": 129,
+    "source": "  const { noticeLocalDate } = load(\"src/lib/androidNotices.js\");"
+  },
+  {
+    "file": "tests/android-notices.test.cjs",
+    "line": 142,
+    "source": "  const dashboard = () => load(\"src/app/api/dashboard/route.js\").GET({"
+  },
+  {
+    "file": "tests/android-notices.test.cjs",
+    "line": 146,
+    "source": "  const native = await load(\"src/app/api/captures/notices/route.js\").GET(request());"
+  },
+  {
+    "file": "tests/android-notices.test.cjs",
+    "line": 162,
+    "source": "  const { getNoticeKey } = load(\"src/lib/noticeDismissals.js\");"
+  },
+  {
+    "file": "tests/android-notices.test.cjs",
+    "line": 164,
+    "source": "  assert.equal((await load(\"src/lib/androidNotices.js\").loadAndroidNotices(db, \"a\", today)).length, 0);"
+  },
+  {
+    "file": "tests/android-notices.test.cjs",
+    "line": 169,
+    "source": "  assert.equal((await load(\"src/lib/androidNotices.js\").loadAndroidNotices(db, \"a\", today)).length, 0);"
+  },
+  {
+    "file": "tests/android-notices.test.cjs",
+    "line": 173,
+    "source": "  assert.equal((await load(\"src/lib/androidNotices.js\").loadAndroidNotices(db, \"a\", today)).length, 0);"
+  },
+  {
+    "file": "tests/android-notices.test.cjs",
+    "line": 183,
+    "source": "    const response = await load(\"src/app/api/captures/notices/route.js\").GET(request());"
+  },
+  {
+    "file": "tests/android-notices.test.cjs",
+    "line": 192,
+    "source": "  const response = await load(\"src/app/api/captures/notices/route.js\").GET(request());"
+  },
+  {
+    "file": "tests/android-notices.test.cjs",
+    "line": 203,
+    "source": "  assert.equal((await invalidZone.load(\"src/app/api/captures/notices/route.js\").GET(request)).status, 400);"
+  },
+  {
+    "file": "tests/android-notices.test.cjs",
+    "line": 208,
+    "source": "  const response = await limited.load(\"src/app/api/captures/notices/route.js\").GET(limited.request());"
+  },
+  {
+    "file": "tests/android-sources.test.cjs",
+    "line": 3,
+    "source": "const { readFileSync } = require('node:fs');"
+  },
+  {
+    "file": "tests/android-sources.test.cjs",
+    "line": 5,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/android-sources.test.cjs",
+    "line": 9,
+    "source": "  const policy = readFileSync(resolve(root, 'android/app/src/main/java/com/garatachia/afp/CapturePolicy.kt'), 'utf8');"
+  },
+  {
+    "file": "tests/android-sources.test.cjs",
+    "line": 10,
+    "source": "  const manifest = readFileSync(resolve(root, 'android/app/src/main/AndroidManifest.xml'), 'utf8');"
+  },
+  {
+    "file": "tests/android-sources.test.cjs",
+    "line": 21,
+    "source": "  const load = sourceLoader({ 'next/server': { NextResponse: {} } });"
+  },
+  {
+    "file": "tests/android-sources.test.cjs",
+    "line": 22,
+    "source": "  assert.deepEqual(Array.from(load('src/lib/captureProtocol.js').capturePackages).sort(), expected);"
+  },
+  {
+    "file": "tests/api-auth-availability.test.cjs",
+    "line": 3,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/api-auth-availability.test.cjs",
+    "line": 6,
+    "source": "  const load = sourceLoader({"
+  },
+  {
+    "file": "tests/api-auth-availability.test.cjs",
+    "line": 11,
+    "source": "  return load('src/lib/apiAuth.js');"
+  },
+  {
+    "file": "tests/api-authorization.test.cjs",
+    "line": 5,
+    "source": "const { sourceLoader } = require(\"./helpers/load-source.cjs\");"
+  },
+  {
+    "file": "tests/api-authorization.test.cjs",
+    "line": 46,
+    "source": "  const load = sourceLoader({"
+  },
+  {
+    "file": "tests/api-authorization.test.cjs",
+    "line": 54,
+    "source": "  return { load, calls, writes, rows, route: name => load(`src/app/api/${name}/route.js`) };"
+  },
+  {
+    "file": "tests/api-fetch.test.cjs",
+    "line": 7,
+    "source": "const { sourceLoader } = require(\"./helpers/load-source.cjs\");"
+  },
+  {
+    "file": "tests/api-fetch.test.cjs",
+    "line": 12,
+    "source": "  const load = sourceLoader({ \"@/lib/supabase\": { supabase: { auth: { getSession: async () => ({ data: { session } }) } } } }, {"
+  },
+  {
+    "file": "tests/api-fetch.test.cjs",
+    "line": 22,
+    "source": "  const { apiFetch } = load(\"src/lib/apiFetch.js\");"
+  },
+  {
+    "file": "tests/api-fetch.test.cjs",
+    "line": 39,
+    "source": "  const { apiFetch } = load(\"src/lib/apiFetch.js\");"
+  },
+  {
+    "file": "tests/api-fetch.test.cjs",
+    "line": 49,
+    "source": "  const offline = load(\"src/lib/offlineExpenses.js\");"
+  },
+  {
+    "file": "tests/api-fetch.test.cjs",
+    "line": 65,
+    "source": "  vm.runInNewContext(fs.readFileSync(\"public/sw.js\", \"utf8\"), {"
+  },
+  {
+    "file": "tests/automatic-payment-receipts-integration.test.cjs",
+    "line": 6,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/automatic-payment-receipts-integration.test.cjs",
+    "line": 13,
+    "source": "  const load = sourceLoader(), service = load('src/lib/captureService.js'), protocol = load('src/lib/captureProtocol.js');"
+  },
+  {
+    "file": "tests/automatic-payment-receipts-integration.test.cjs",
+    "line": 14,
+    "source": "  const { paymentReceiptSource } = load('src/lib/paymentReceipts.js');"
+  },
+  {
+    "file": "tests/automatic-payment-receipts-integration.test.cjs",
+    "line": 75,
+    "source": "      const route = sourceLoader({ '@/lib/prisma': { prisma: db } })('src/app/api/captures/payment-receipts/route.js');"
+  },
+  {
+    "file": "tests/automatic-payment-receipts.test.cjs",
+    "line": 3,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/automatic-payment-receipts.test.cjs",
+    "line": 5,
+    "source": "const { parsePaymentReceipt, paymentReceiptSource, validClabe } = sourceLoader()('src/lib/paymentReceipts.js');"
+  },
+  {
+    "file": "tests/capture-api-integration.test.cjs",
+    "line": 6,
+    "source": "const { sourceLoader } = require(\"./helpers/load-source.cjs\");"
+  },
+  {
+    "file": "tests/capture-api-integration.test.cjs",
+    "line": 16,
+    "source": "  const load = sourceLoader({"
+  },
+  {
+    "file": "tests/capture-api-integration.test.cjs",
+    "line": 21,
+    "source": "  const routes = Object.fromEntries([\"pairings\", \"devices\", \"device\", \"events\"].map(name => [name, load(`src/app/api/captures/${name}/route.js`)]));"
+  },
+  {
+    "file": "tests/capture-api-integration.test.cjs",
+    "line": 113,
+    "source": "      const expenses = load(\"src/app/api/expenses/route.js\");"
+  },
+  {
+    "file": "tests/capture-api-integration.test.cjs",
+    "line": 128,
+    "source": "      const { capturePackages } = load(\"src/lib/captureProtocol.js\");"
+  },
+  {
+    "file": "tests/capture-api-integration.test.cjs",
+    "line": 129,
+    "source": "      const { reviewOnlyCapturePackages } = load(\"src/lib/captureSourcePolicy.js\");"
+  },
+  {
+    "file": "tests/capture-api-integration.test.cjs",
+    "line": 161,
+    "source": "      const service = load(\"src/lib/captureService.js\"), protocol = load(\"src/lib/captureProtocol.js\");"
+  },
+  {
+    "file": "tests/capture-api-integration.test.cjs",
+    "line": 192,
+    "source": "      const service = load(\"src/lib/captureService.js\"), protocol = load(\"src/lib/captureProtocol.js\");"
+  },
+  {
+    "file": "tests/capture-api-integration.test.cjs",
+    "line": 203,
+    "source": "    const { captureHash } = load(\"src/lib/captureProtocol.js\");"
+  },
+  {
+    "file": "tests/capture-api.test.cjs",
+    "line": 4,
+    "source": "const { sourceLoader } = require(\"./helpers/load-source.cjs\");"
+  },
+  {
+    "file": "tests/capture-api.test.cjs",
+    "line": 8,
+    "source": "  const load = sourceLoader({"
+  },
+  {
+    "file": "tests/capture-api.test.cjs",
+    "line": 15,
+    "source": "    const handlers = load(`src/app/api/captures/${name}/route.js`);"
+  },
+  {
+    "file": "tests/capture-banamex2-real-integration.test.cjs",
+    "line": 6,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/capture-banamex2-real-integration.test.cjs",
+    "line": 21,
+    "source": "  const load = sourceLoader(mocks), protocol = load('src/lib/captureProtocol.js');"
+  },
+  {
+    "file": "tests/capture-banamex2-real-integration.test.cjs",
+    "line": 22,
+    "source": "  const processing = load('src/lib/captureProcessing.js'), service = load('src/lib/captureService.js');"
+  },
+  {
+    "file": "tests/capture-banamex2-real-integration.test.cjs",
+    "line": 23,
+    "source": "  const configuration = load('src/lib/captureConfiguration.js'), reconciliation = load('src/lib/captureReconciliation.js');"
+  },
+  {
+    "file": "tests/capture-banamex2-real-integration.test.cjs",
+    "line": 24,
+    "source": "  const eventsRoute = load('src/app/api/captures/events/route.js'), movementsRoute = load('src/app/api/captures/movements/route.js');"
+  },
+  {
+    "file": "tests/capture-banamex2-real-integration.test.cjs",
+    "line": 71,
+    "source": "      const parsers = load('src/lib/captureParsers.js');"
+  },
+  {
+    "file": "tests/capture-banamex2-real-integration.test.cjs",
+    "line": 72,
+    "source": "      const old = sourceLoader({ ...mocks, '@/lib/captureParsers': { ...parsers, interpretCapture: () => ({ reason: 'UNKNOWN_FORMAT', proposal: {} }) } })('src/lib/captureService.js');"
+  },
+  {
+    "file": "tests/capture-banamex2-real.test.cjs",
+    "line": 3,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/capture-banamex2-real.test.cjs",
+    "line": 8,
+    "source": "const { interpretCapture, captureParsers } = sourceLoader()('src/lib/captureParsers.js');"
+  },
+  {
+    "file": "tests/capture-bank-fallback-integration.test.cjs",
+    "line": 6,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/capture-bank-fallback-integration.test.cjs",
+    "line": 20,
+    "source": "  const load = sourceLoader(mocks), protocol = load('src/lib/captureProtocol.js'), config = load('src/lib/captureConfiguration.js');"
+  },
+  {
+    "file": "tests/capture-bank-fallback-integration.test.cjs",
+    "line": 21,
+    "source": "  const processing = load('src/lib/captureProcessing.js'), worker = load('src/lib/captureBankFallbackWorker.js');"
+  },
+  {
+    "file": "tests/capture-bank-fallback-integration.test.cjs",
+    "line": 22,
+    "source": "  const route = load('src/app/api/captures/events/route.js'), configRoute = load('src/app/api/captures/configuration/route.js');"
+  },
+  {
+    "file": "tests/capture-bank-fallback-integration.test.cjs",
+    "line": 205,
+    "source": "      const env = { CRON_SECRET: 's'.repeat(40) }, r = sourceLoader(mocks, { process: { env } })('src/app/api/cron/capture-bank-fallback/route.js');"
+  },
+  {
+    "file": "tests/capture-bank-fallback-integration.test.cjs",
+    "line": 209,
+    "source": "      const brokenRoute = sourceLoader({ ...mocks, '@/lib/captureBankFallbackWorker': { runBankFallbacks: async () => ({ registered: 0, failed: 1, users: [] }) } }, { process: { env } })('src/app/api/cron/capture-bank-fallback/route.js');"
+  },
+  {
+    "file": "tests/capture-bbva-debit.test.cjs",
+    "line": 7,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/capture-bbva-debit.test.cjs",
+    "line": 8,
+    "source": "const { interpretCapture } = sourceLoader()('src/lib/captureParsers.js');"
+  },
+  {
+    "file": "tests/capture-bbva-debit.test.cjs",
+    "line": 30,
+    "source": "  const load = sourceLoader({ '@/lib/prisma': { prisma: db }, '@/lib/calendar/schedule': { scheduleCalendarSync() {} }, 'next/server': { NextResponse: { json: (body, opts = {}) => ({ body: JSON.parse(JSON.stringify(body)), status: opts.status || 200 }) } }, '@supabase/supabase-js': { createClient: () => ({ auth: { getUser: async token => ({ data: { user: token === 'owner' ? user : other } }) } }) } });"
+  },
+  {
+    "file": "tests/capture-bbva-debit.test.cjs",
+    "line": 31,
+    "source": "  const protocol = load('src/lib/captureProtocol.js'), service = load('src/lib/captureService.js'), processing = load('src/lib/captureProcessing.js');"
+  },
+  {
+    "file": "tests/capture-bbva-debit.test.cjs",
+    "line": 32,
+    "source": "  const config = load('src/lib/captureConfiguration.js'), money = load('src/lib/money/service.js'), sources = load('src/lib/money/sources.js');"
+  },
+  {
+    "file": "tests/capture-bbva-debit.test.cjs",
+    "line": 33,
+    "source": "  const route = load('src/app/api/captures/movements/route.js');"
+  },
+  {
+    "file": "tests/capture-bbva-wallet-real-integration.test.cjs",
+    "line": 6,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/capture-bbva-wallet-real-integration.test.cjs",
+    "line": 21,
+    "source": "  const load = sourceLoader(mocks), protocol = load('src/lib/captureProtocol.js');"
+  },
+  {
+    "file": "tests/capture-bbva-wallet-real-integration.test.cjs",
+    "line": 22,
+    "source": "  const processing = load('src/lib/captureProcessing.js'), configuration = load('src/lib/captureConfiguration.js');"
+  },
+  {
+    "file": "tests/capture-bbva-wallet-real-integration.test.cjs",
+    "line": 23,
+    "source": "  const reconciliation = load('src/lib/captureReconciliation.js'), service = load('src/lib/captureService.js');"
+  },
+  {
+    "file": "tests/capture-bbva-wallet-real-integration.test.cjs",
+    "line": 24,
+    "source": "  const routes = { events: load('src/app/api/captures/events/route.js'), movements: load('src/app/api/captures/movements/route.js'), expenses: load('src/app/api/expenses/route.js') };"
+  },
+  {
+    "file": "tests/capture-bbva-wallet-real-integration.test.cjs",
+    "line": 73,
+    "source": "      const parsers = load('src/lib/captureParsers.js');"
+  },
+  {
+    "file": "tests/capture-bbva-wallet-real-integration.test.cjs",
+    "line": 74,
+    "source": "      const previous = sourceLoader({ ...mocks, '@/lib/captureParsers': { ...parsers, interpretCapture: () => ({ reason: 'UNKNOWN_FORMAT', proposal: {} }) } })('src/lib/captureService.js');"
+  },
+  {
+    "file": "tests/capture-bbva-wallet-real.test.cjs",
+    "line": 3,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/capture-bbva-wallet-real.test.cjs",
+    "line": 5,
+    "source": "const { interpretCapture, captureParsers } = sourceLoader()('src/lib/captureParsers.js');"
+  },
+  {
+    "file": "tests/capture-card-payments-integration.test.cjs",
+    "line": 6,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/capture-card-payments-integration.test.cjs",
+    "line": 14,
+    "source": "  const load = sourceLoader(), protocol = load('src/lib/captureProtocol.js');"
+  },
+  {
+    "file": "tests/capture-card-payments-integration.test.cjs",
+    "line": 15,
+    "source": "  const service = load('src/lib/captureService.js'), processing = load('src/lib/captureProcessing.js');"
+  },
+  {
+    "file": "tests/capture-card-payments-integration.test.cjs",
+    "line": 16,
+    "source": "  const payments = load('src/lib/capturePayments.js'), balances = load('src/lib/cardBalanceTracking.js');"
+  },
+  {
+    "file": "tests/capture-card-payments.test.cjs",
+    "line": 3,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/capture-card-payments.test.cjs",
+    "line": 5,
+    "source": "const load = sourceLoader();"
+  },
+  {
+    "file": "tests/capture-card-payments.test.cjs",
+    "line": 6,
+    "source": "const { interpretCapture } = load('src/lib/captureParsers.js');"
+  },
+  {
+    "file": "tests/capture-card-payments.test.cjs",
+    "line": 7,
+    "source": "const { paymentStatementPeriod } = load('src/lib/capturePaymentParsers.js');"
+  },
+  {
+    "file": "tests/capture-didi-wallet-real-integration.test.cjs",
+    "line": 6,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/capture-didi-wallet-real-integration.test.cjs",
+    "line": 21,
+    "source": "  const load = sourceLoader(mocks), protocol = load('src/lib/captureProtocol.js');"
+  },
+  {
+    "file": "tests/capture-didi-wallet-real-integration.test.cjs",
+    "line": 22,
+    "source": "  const processing = load('src/lib/captureProcessing.js'), configuration = load('src/lib/captureConfiguration.js');"
+  },
+  {
+    "file": "tests/capture-didi-wallet-real-integration.test.cjs",
+    "line": 23,
+    "source": "  const reconciliation = load('src/lib/captureReconciliation.js'), service = load('src/lib/captureService.js');"
+  },
+  {
+    "file": "tests/capture-didi-wallet-real-integration.test.cjs",
+    "line": 24,
+    "source": "  const routes = { events: load('src/app/api/captures/events/route.js'), movements: load('src/app/api/captures/movements/route.js'), expenses: load('src/app/api/expenses/route.js') };"
+  },
+  {
+    "file": "tests/capture-didi-wallet-real-integration.test.cjs",
+    "line": 73,
+    "source": "      const parsers = load('src/lib/captureParsers.js');"
+  },
+  {
+    "file": "tests/capture-didi-wallet-real-integration.test.cjs",
+    "line": 74,
+    "source": "      const previous = sourceLoader({ ...mocks, '@/lib/captureParsers': { ...parsers, interpretCapture: () => ({ reason: 'UNKNOWN_FORMAT', proposal: {} }) } })('src/lib/captureService.js');"
+  },
+  {
+    "file": "tests/capture-didi-wallet-real.test.cjs",
+    "line": 3,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/capture-didi-wallet-real.test.cjs",
+    "line": 7,
+    "source": "const { interpretCapture, captureParsers } = sourceLoader()('src/lib/captureParsers.js');"
+  },
+  {
+    "file": "tests/capture-inbox-integration.test.cjs",
+    "line": 6,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/capture-inbox-integration.test.cjs",
+    "line": 16,
+    "source": "  const load = sourceLoader({ '@/lib/prisma': { prisma: db }, '@/lib/calendar/schedule': { scheduleCalendarSync() {} },"
+  },
+  {
+    "file": "tests/capture-inbox-integration.test.cjs",
+    "line": 20,
+    "source": "  const route = load('src/app/api/captures/movements/route.js');"
+  },
+  {
+    "file": "tests/capture-money-integration.test.cjs",
+    "line": 6,
+    "source": "const {sourceLoader}=require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/capture-money-integration.test.cjs",
+    "line": 12,
+    "source": " const load=sourceLoader({'@/lib/prisma':{prisma:db},'@/lib/calendar/schedule':{scheduleCalendarSync(){}},'next/server':{NextResponse:{json:(body,opts={})=>({body:JSON.parse(JSON.stringify(body)),status:opts.status||200})}},'@supabase/supabase-js':{createClient:()=>({auth:{getUser:async token=>({data:{user:token==='owner'?user:token==='other'?other:null}})}})}});"
+  },
+  {
+    "file": "tests/capture-money-integration.test.cjs",
+    "line": 13,
+    "source": " const protocol=load('src/lib/captureProtocol.js'),service=load('src/lib/captureService.js'),processing=load('src/lib/captureProcessing.js');"
+  },
+  {
+    "file": "tests/capture-money-integration.test.cjs",
+    "line": 14,
+    "source": " const configuration=load('src/lib/captureConfiguration.js'),money=load('src/lib/money/service.js'),sources=load('src/lib/money/sources.js');"
+  },
+  {
+    "file": "tests/capture-money-integration.test.cjs",
+    "line": 15,
+    "source": " const movementsRoute=load('src/app/api/captures/movements/route.js'),expenseRoute=load('src/app/api/expenses/route.js');"
+  },
+  {
+    "file": "tests/capture-nu-mercadopago-real-integration.test.cjs",
+    "line": 6,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/capture-nu-mercadopago-real-integration.test.cjs",
+    "line": 21,
+    "source": "  const load = sourceLoader(mocks), protocol = load('src/lib/captureProtocol.js');"
+  },
+  {
+    "file": "tests/capture-nu-mercadopago-real-integration.test.cjs",
+    "line": 22,
+    "source": "  const service = load('src/lib/captureService.js'), processing = load('src/lib/captureProcessing.js');"
+  },
+  {
+    "file": "tests/capture-nu-mercadopago-real-integration.test.cjs",
+    "line": 23,
+    "source": "  const configuration = load('src/lib/captureConfiguration.js'), reconciliation = load('src/lib/captureReconciliation.js');"
+  },
+  {
+    "file": "tests/capture-nu-mercadopago-real-integration.test.cjs",
+    "line": 24,
+    "source": "  const eventsRoute = load('src/app/api/captures/events/route.js'), configRoute = load('src/app/api/captures/configuration/route.js');"
+  },
+  {
+    "file": "tests/capture-nu-mercadopago-real-integration.test.cjs",
+    "line": 60,
+    "source": "      const parsers = load('src/lib/captureParsers.js');"
+  },
+  {
+    "file": "tests/capture-nu-mercadopago-real-integration.test.cjs",
+    "line": 61,
+    "source": "      const prior = sourceLoader({ ...mocks, '@/lib/captureParsers': { ...parsers, interpretCapture: () => ({ reason: 'UNKNOWN_FORMAT', proposal: {} }) } })('src/lib/captureService.js');"
+  },
+  {
+    "file": "tests/capture-nu-mercadopago-real.test.cjs",
+    "line": 3,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/capture-nu-mercadopago-real.test.cjs",
+    "line": 7,
+    "source": "const load = sourceLoader(), { interpretCapture, captureParsers } = load('src/lib/captureParsers.js');"
+  },
+  {
+    "file": "tests/capture-nu-mercadopago-real.test.cjs",
+    "line": 60,
+    "source": "  const { matchesCapturePolicy } = load('src/lib/captureFormatPolicy.js');"
+  },
+  {
+    "file": "tests/capture-nu-subscription-integration.test.cjs",
+    "line": 6,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/capture-nu-subscription-integration.test.cjs",
+    "line": 19,
+    "source": "  const load = sourceLoader({}, { Date: FixtureClock }), protocol = load('src/lib/captureProtocol.js'), service = load('src/lib/captureService.js');"
+  },
+  {
+    "file": "tests/capture-nu-subscription-integration.test.cjs",
+    "line": 20,
+    "source": "  const processing = load('src/lib/captureProcessing.js'), configuration = load('src/lib/captureConfiguration.js');"
+  },
+  {
+    "file": "tests/capture-nu-subscription-integration.test.cjs",
+    "line": 21,
+    "source": "  const reconciliation = load('src/lib/captureReconciliation.js'), charges = load('src/lib/subscriptionChargeService.js');"
+  },
+  {
+    "file": "tests/capture-nu-subscription-integration.test.cjs",
+    "line": 45,
+    "source": "  const dashboard = sourceLoader({ '@/lib/prisma': { prisma: db }, '@/lib/apiAuth': { ...load('src/lib/apiAuth.js'),"
+  },
+  {
+    "file": "tests/capture-nu-subscription-integration.test.cjs",
+    "line": 47,
+    "source": "  } }, { Date: FixtureClock })('src/app/api/dashboard/route.js');"
+  },
+  {
+    "file": "tests/capture-nu-subscription-integration.test.cjs",
+    "line": 71,
+    "source": "      const parsers = load('src/lib/captureParsers.js');"
+  },
+  {
+    "file": "tests/capture-nu-subscription-integration.test.cjs",
+    "line": 72,
+    "source": "      const prior = sourceLoader({ '@/lib/captureParsers': { ...parsers, interpretCapture: () => ({ reason: 'UNKNOWN_FORMAT', proposal: {} }) } })('src/lib/captureService.js');"
+  },
+  {
+    "file": "tests/capture-parsers.test.cjs",
+    "line": 3,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/capture-parsers.test.cjs",
+    "line": 4,
+    "source": "const { captureAmount, captureOperationTime, interpretCapture, captureParsers } = sourceLoader()('src/lib/captureParsers.js');"
+  },
+  {
+    "file": "tests/capture-pilot-integration.test.cjs",
+    "line": 6,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/capture-pilot-integration.test.cjs",
+    "line": 15,
+    "source": "  const load = sourceLoader();"
+  },
+  {
+    "file": "tests/capture-pilot-integration.test.cjs",
+    "line": 16,
+    "source": "  const { captureStatement, reconcileCaptureStatement } = load('src/lib/captureReconciliation.js');"
+  },
+  {
+    "file": "tests/capture-pilot-integration.test.cjs",
+    "line": 17,
+    "source": "  const { configureCapture } = load('src/lib/captureConfiguration.js');"
+  },
+  {
+    "file": "tests/capture-pilot-integration.test.cjs",
+    "line": 18,
+    "source": "  const { receiveCaptureEvent } = load('src/lib/captureService.js');"
+  },
+  {
+    "file": "tests/capture-pilot-integration.test.cjs",
+    "line": 19,
+    "source": "  const { validateCaptureEvent, captureHash } = load('src/lib/captureProtocol.js');"
+  },
+  {
+    "file": "tests/capture-pilot-integration.test.cjs",
+    "line": 81,
+    "source": "      const config = await load('src/lib/captureConfiguration.js').captureConfiguration(db, user.id);"
+  },
+  {
+    "file": "tests/capture-processing-integration.test.cjs",
+    "line": 6,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/capture-processing-integration.test.cjs",
+    "line": 14,
+    "source": " const base=sourceLoader()('src/lib/captureParsers.js');"
+  },
+  {
+    "file": "tests/capture-processing-integration.test.cjs",
+    "line": 23,
+    "source": " const load=sourceLoader({...mocks,'@/lib/captureParsers':{...base,captureParsers:base.captureParsers.map(parser=>({...parser,verified:true})),interpretCapture:event=>({...base.interpretCapture(event),verified:true})}});"
+  },
+  {
+    "file": "tests/capture-processing-integration.test.cjs",
+    "line": 24,
+    "source": " const realLoad=sourceLoader(mocks);"
+  },
+  {
+    "file": "tests/capture-processing-integration.test.cjs",
+    "line": 25,
+    "source": " const protocol=load('src/lib/captureProtocol.js'), service=load('src/lib/captureService.js');"
+  },
+  {
+    "file": "tests/capture-processing-integration.test.cjs",
+    "line": 26,
+    "source": " const configuration=load('src/lib/captureConfiguration.js'), processing=load('src/lib/captureProcessing.js');"
+  },
+  {
+    "file": "tests/capture-processing-integration.test.cjs",
+    "line": 27,
+    "source": " const expenses=load('src/app/api/expenses/route.js');"
+  },
+  {
+    "file": "tests/capture-processing-integration.test.cjs",
+    "line": 42,
+    "source": "  const route=loader('src/app/api/captures/events/route.js');"
+  },
+  {
+    "file": "tests/capture-processing-integration.test.cjs",
+    "line": 49,
+    "source": "  const rollout=load('src/lib/captureRollout.js');"
+  },
+  {
+    "file": "tests/capture-processing-integration.test.cjs",
+    "line": 58,
+    "source": "   const reconciliation=load('src/lib/captureReconciliation.js');"
+  },
+  {
+    "file": "tests/capture-processing-integration.test.cjs",
+    "line": 70,
+    "source": "   const response=await realLoad(`src/app/api/captures/${name}/route.js`)[method]({headers:new Headers(authorization?{authorization}:{}),get body(){throw new Error('No leer');}});assert.equal(response.status,401);"
+  },
+  {
+    "file": "tests/capture-processing-integration.test.cjs",
+    "line": 82,
+    "source": "  await assert.rejects(realLoad('src/lib/captureConfiguration.js').configureCapture(db,user.id,{action:'automation',cardId:card.id,parserKey:'bbva.purchase.es.v1',mode:'AUTOMATIC'}),e=>e.status===409);"
+  },
+  {
+    "file": "tests/capture-processing-integration.test.cjs",
+    "line": 222,
+    "source": "  const calc=load('src/lib/calculations/cardUsageWaivers.js');"
+  },
+  {
+    "file": "tests/capture-processing-integration.test.cjs",
+    "line": 228,
+    "source": "  const financial=load('src/lib/calculations/cardCycles.js').calculateCycleAmount({cycle,expenses:[autoExpense],purchases:[pendingPurchase]});"
+  },
+  {
+    "file": "tests/capture-processing-integration.test.cjs",
+    "line": 233,
+    "source": "  const list=await load('src/app/api/captures/movements/route.js').GET(request({},'','b','GET'));assert.equal(list.status,200);assert.equal(list.body.movements.length,0);"
+  },
+  {
+    "file": "tests/capture-processing-integration.test.cjs",
+    "line": 237,
+    "source": "  const page=await load('src/app/api/captures/movements/route.js').GET(request({},`cursor=${owned.id}`,'b','GET'));assert.equal(page.status,404);"
+  },
+  {
+    "file": "tests/capture-processing-integration.test.cjs",
+    "line": 238,
+    "source": "  assert.equal((await load('src/app/api/captures/configuration/route.js').PATCH(request({action:'automation',cardId:card.id,parserKey:'bbva.purchase.es.v1',mode:'AUTOMATIC',userId:user.id},'','b','PATCH'))).status,400);"
+  },
+  {
+    "file": "tests/capture-protocol.test.cjs",
+    "line": 4,
+    "source": "const { sourceLoader } = require(\"./helpers/load-source.cjs\");"
+  },
+  {
+    "file": "tests/capture-protocol.test.cjs",
+    "line": 5,
+    "source": "const load = sourceLoader({ \"next/server\": { NextResponse: { json: (body, options) => ({ body, ...options }) } } });"
+  },
+  {
+    "file": "tests/capture-protocol.test.cjs",
+    "line": 6,
+    "source": "const protocol = load(\"src/lib/captureProtocol.js\");"
+  },
+  {
+    "file": "tests/capture-real-notices-integration.test.cjs",
+    "line": 6,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/capture-real-notices-integration.test.cjs",
+    "line": 15,
+    "source": "  const load = sourceLoader();"
+  },
+  {
+    "file": "tests/capture-real-notices-integration.test.cjs",
+    "line": 16,
+    "source": "  const protocol = load('src/lib/captureProtocol.js');"
+  },
+  {
+    "file": "tests/capture-real-notices-integration.test.cjs",
+    "line": 17,
+    "source": "  const service = load('src/lib/captureService.js');"
+  },
+  {
+    "file": "tests/capture-real-notices-integration.test.cjs",
+    "line": 18,
+    "source": "  const processing = load('src/lib/captureProcessing.js');"
+  },
+  {
+    "file": "tests/capture-real-notices-integration.test.cjs",
+    "line": 19,
+    "source": "  const configuration = load('src/lib/captureConfiguration.js');"
+  },
+  {
+    "file": "tests/capture-real-notices-integration.test.cjs",
+    "line": 58,
+    "source": "      const parsers = load('src/lib/captureParsers.js');"
+  },
+  {
+    "file": "tests/capture-real-notices-integration.test.cjs",
+    "line": 59,
+    "source": "      const prior = sourceLoader({ '@/lib/captureParsers': { ...parsers, interpretCapture: () => ({ reason: 'UNKNOWN_FORMAT', proposal: {} }) } })('src/lib/captureService.js');"
+  },
+  {
+    "file": "tests/capture-real-notices.test.cjs",
+    "line": 3,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/capture-real-notices.test.cjs",
+    "line": 5,
+    "source": "const { interpretCapture, captureParsers } = sourceLoader()('src/lib/captureParsers.js');"
+  },
+  {
+    "file": "tests/capture-refunds-integration.test.cjs",
+    "line": 6,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/capture-refunds-integration.test.cjs",
+    "line": 16,
+    "source": "  const load = sourceLoader({ '@/lib/prisma': { prisma: db }, '@/lib/calendar/schedule': { scheduleCalendarSync() {} },"
+  },
+  {
+    "file": "tests/capture-refunds-integration.test.cjs",
+    "line": 20,
+    "source": "  const protocol = load('src/lib/captureProtocol.js'), service = load('src/lib/captureService.js'), processing = load('src/lib/captureProcessing.js');"
+  },
+  {
+    "file": "tests/capture-refunds-integration.test.cjs",
+    "line": 21,
+    "source": "  const refunds = load('src/lib/captureRefunds.js'), movementRoute = load('src/app/api/captures/movements/route.js');"
+  },
+  {
+    "file": "tests/capture-refunds-integration.test.cjs",
+    "line": 22,
+    "source": "  const expenseRoute = load('src/app/api/expenses/route.js');"
+  },
+  {
+    "file": "tests/capture-refunds-integration.test.cjs",
+    "line": 165,
+    "source": "      const original = load('src/lib/captureParsers.js');"
+  },
+  {
+    "file": "tests/capture-refunds-integration.test.cjs",
+    "line": 166,
+    "source": "      const legacy = sourceLoader({ '@/lib/captureParsers': { ...original, interpretCapture: () => ({ reason: 'UNKNOWN_FORMAT', proposal: {} }) } })('src/lib/captureProcessing.js');"
+  },
+  {
+    "file": "tests/capture-refunds.test.cjs",
+    "line": 3,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/capture-refunds.test.cjs",
+    "line": 6,
+    "source": "const { interpretCapture } = sourceLoader()('src/lib/captureParsers.js');"
+  },
+  {
+    "file": "tests/capture-refunds.test.cjs",
+    "line": 7,
+    "source": "const { refundCaptureKind } = sourceLoader()('src/lib/captureRefundParsers.js');"
+  },
+  {
+    "file": "tests/capture-review-integration.test.cjs",
+    "line": 6,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/capture-review-integration.test.cjs",
+    "line": 15,
+    "source": "  const load = sourceLoader({ '@/lib/prisma': { prisma: db },"
+  },
+  {
+    "file": "tests/capture-review-integration.test.cjs",
+    "line": 19,
+    "source": "  const processing = load('src/lib/captureProcessing.js'), reconciliation = load('src/lib/captureReconciliation.js');"
+  },
+  {
+    "file": "tests/capture-review-integration.test.cjs",
+    "line": 20,
+    "source": "  const configuration = load('src/lib/captureConfiguration.js'), service = load('src/lib/captureService.js');"
+  },
+  {
+    "file": "tests/capture-review-integration.test.cjs",
+    "line": 21,
+    "source": "  const protocol = load('src/lib/captureProtocol.js');"
+  },
+  {
+    "file": "tests/capture-review-integration.test.cjs",
+    "line": 37,
+    "source": "        const result = await load(`src/app/api/captures/${route}/route.js`)[method]({ headers: new Headers({ authorization }), get body() { throw new Error('No leer'); } });"
+  },
+  {
+    "file": "tests/capture-review-integration.test.cjs",
+    "line": 85,
+    "source": "      const route = load('src/app/api/captures/movements/route.js');"
+  },
+  {
+    "file": "tests/capture-review-integration.test.cjs",
+    "line": 101,
+    "source": "      const api = load('src/app/api/expenses/route.js');"
+  },
+  {
+    "file": "tests/capture-review-integration.test.cjs",
+    "line": 199,
+    "source": "      const route = load('src/app/api/captures/device/route.js');"
+  },
+  {
+    "file": "tests/capture-rollout-integration.test.cjs",
+    "line": 6,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/capture-rollout-integration.test.cjs",
+    "line": 15,
+    "source": "  const base = sourceLoader()('src/lib/captureParsers.js');"
+  },
+  {
+    "file": "tests/capture-rollout-integration.test.cjs",
+    "line": 16,
+    "source": "  const protocol = sourceLoader()('src/lib/captureProtocol.js');"
+  },
+  {
+    "file": "tests/capture-rollout-integration.test.cjs",
+    "line": 21,
+    "source": "  const load = sourceLoader({ '@/lib/captureParsers': { ...base, captureParsers: parsers, interpretCapture: event => ({"
+  },
+  {
+    "file": "tests/capture-rollout-integration.test.cjs",
+    "line": 25,
+    "source": "  const configuration = load('src/lib/captureConfiguration.js');"
+  },
+  {
+    "file": "tests/capture-rollout-integration.test.cjs",
+    "line": 26,
+    "source": "  const service = load('src/lib/captureService.js');"
+  },
+  {
+    "file": "tests/capture-rollout-integration.test.cjs",
+    "line": 27,
+    "source": "  const processing = load('src/lib/captureProcessing.js');"
+  },
+  {
+    "file": "tests/capture-rollout-integration.test.cjs",
+    "line": 28,
+    "source": "  const reconciliation = load('src/lib/captureReconciliation.js');"
+  },
+  {
+    "file": "tests/capture-rollout-integration.test.cjs",
+    "line": 29,
+    "source": "  const real = sourceLoader()('src/lib/captureConfiguration.js');"
+  },
+  {
+    "file": "tests/capture-rollout-integration.test.cjs",
+    "line": 186,
+    "source": "      const rollout = load('src/lib/captureRollout.js');"
+  },
+  {
+    "file": "tests/capture-rollout.test.cjs",
+    "line": 3,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/capture-rollout.test.cjs",
+    "line": 4,
+    "source": "const { isReviewedCapture, captureFormatReadiness, buildCaptureRollout } = sourceLoader()('src/lib/captureRollout.js');"
+  },
+  {
+    "file": "tests/capture-santander-real-integration.test.cjs",
+    "line": 6,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/capture-santander-real-integration.test.cjs",
+    "line": 23,
+    "source": "  const load = sourceLoader(mocks), protocol = load('src/lib/captureProtocol.js');"
+  },
+  {
+    "file": "tests/capture-santander-real-integration.test.cjs",
+    "line": 24,
+    "source": "  const processing = load('src/lib/captureProcessing.js'), configuration = load('src/lib/captureConfiguration.js');"
+  },
+  {
+    "file": "tests/capture-santander-real-integration.test.cjs",
+    "line": 25,
+    "source": "  const reconciliation = load('src/lib/captureReconciliation.js');"
+  },
+  {
+    "file": "tests/capture-santander-real-integration.test.cjs",
+    "line": 26,
+    "source": "  const eventRoute = load('src/app/api/captures/events/route.js'), movementRoute = load('src/app/api/captures/movements/route.js');"
+  },
+  {
+    "file": "tests/capture-santander-real-integration.test.cjs",
+    "line": 61,
+    "source": "      const parsers = load('src/lib/captureParsers.js');"
+  },
+  {
+    "file": "tests/capture-santander-real-integration.test.cjs",
+    "line": 62,
+    "source": "      const previous = sourceLoader({ ...mocks, '@/lib/captureParsers': { ...parsers, interpretCapture: () => ({ reason: 'UNKNOWN_FORMAT', proposal: {} }) } })('src/lib/captureService.js');"
+  },
+  {
+    "file": "tests/capture-santander-real.test.cjs",
+    "line": 3,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/capture-santander-real.test.cjs",
+    "line": 6,
+    "source": "const { interpretCapture, captureParsers } = sourceLoader()('src/lib/captureParsers.js');"
+  },
+  {
+    "file": "tests/capture-santander-wallet-backup-integration.test.cjs",
+    "line": 6,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/capture-santander-wallet-backup-integration.test.cjs",
+    "line": 20,
+    "source": "  const load = sourceLoader(mocks), protocol = load('src/lib/captureProtocol.js'), parsers = load('src/lib/captureParsers.js');"
+  },
+  {
+    "file": "tests/capture-santander-wallet-backup-integration.test.cjs",
+    "line": 21,
+    "source": "  const config = load('src/lib/captureConfiguration.js'), reconciliation = load('src/lib/captureReconciliation.js');"
+  },
+  {
+    "file": "tests/capture-santander-wallet-backup-integration.test.cjs",
+    "line": 22,
+    "source": "  const eventsRoute = load('src/app/api/captures/events/route.js'), route = load('src/app/api/captures/movements/route.js');"
+  },
+  {
+    "file": "tests/capture-santander-wallet-backup-integration.test.cjs",
+    "line": 23,
+    "source": "  const oldReceive = sourceLoader({ ...mocks, '@/lib/captureParsers': { ...parsers, interpretCapture: event => {"
+  },
+  {
+    "file": "tests/capture-santander-wallet-backup-integration.test.cjs",
+    "line": 28,
+    "source": "  } } })('src/lib/captureService.js');"
+  },
+  {
+    "file": "tests/capture-santander-wallet-backup-integration.test.cjs",
+    "line": 114,
+    "source": "      await load('src/lib/captureProcessing.js').archiveCapturedExpense(db,await db.dailyExpense.findUnique({where:{id:m.expenseId}}));await db.dailyExpense.delete({where:{id:m.expenseId}});"
+  },
+  {
+    "file": "tests/capture-service-notices.test.cjs",
+    "line": 4,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/capture-service-notices.test.cjs",
+    "line": 5,
+    "source": "const load = sourceLoader({ 'next/server': { NextResponse: {} } });"
+  },
+  {
+    "file": "tests/capture-service-notices.test.cjs",
+    "line": 6,
+    "source": "const { reviewOnlyCapturePackages } = load('src/lib/captureSourcePolicy.js');"
+  },
+  {
+    "file": "tests/capture-service-notices.test.cjs",
+    "line": 7,
+    "source": "const { validateCaptureEvent } = load('src/lib/captureProtocol.js');"
+  },
+  {
+    "file": "tests/capture-service-notices.test.cjs",
+    "line": 8,
+    "source": "const { interpretCapture, captureParsers } = load('src/lib/captureParsers.js');"
+  },
+  {
+    "file": "tests/capture-service-notices.test.cjs",
+    "line": 9,
+    "source": "const { captureInventorySchema, configureCapture } = load('src/lib/captureConfiguration.js');"
+  },
+  {
+    "file": "tests/capture-wallet-real-integration.test.cjs",
+    "line": 6,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/capture-wallet-real-integration.test.cjs",
+    "line": 15,
+    "source": "  const load = sourceLoader();"
+  },
+  {
+    "file": "tests/capture-wallet-real-integration.test.cjs",
+    "line": 16,
+    "source": "  const protocol = load('src/lib/captureProtocol.js');"
+  },
+  {
+    "file": "tests/capture-wallet-real-integration.test.cjs",
+    "line": 17,
+    "source": "  const service = load('src/lib/captureService.js');"
+  },
+  {
+    "file": "tests/capture-wallet-real-integration.test.cjs",
+    "line": 18,
+    "source": "  const processing = load('src/lib/captureProcessing.js');"
+  },
+  {
+    "file": "tests/capture-wallet-real-integration.test.cjs",
+    "line": 19,
+    "source": "  const configuration = load('src/lib/captureConfiguration.js');"
+  },
+  {
+    "file": "tests/capture-wallet-real-integration.test.cjs",
+    "line": 20,
+    "source": "  const reconciliation = load('src/lib/captureReconciliation.js');"
+  },
+  {
+    "file": "tests/capture-wallet-real-integration.test.cjs",
+    "line": 139,
+    "source": "      const base = load('src/lib/captureParsers.js');"
+  },
+  {
+    "file": "tests/capture-wallet-real-integration.test.cjs",
+    "line": 140,
+    "source": "      const previous = sourceLoader({ '@/lib/captureParsers': { ...base, interpretCapture: () => ({ reason: 'UNKNOWN_FORMAT', proposal: {} }) } })('src/lib/captureService.js');"
+  },
+  {
+    "file": "tests/capture-wallet-real.test.cjs",
+    "line": 3,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/capture-wallet-real.test.cjs",
+    "line": 6,
+    "source": "const { interpretCapture } = sourceLoader()('src/lib/captureParsers.js');"
+  },
+  {
+    "file": "tests/card-balance-tracking-integration.test.cjs",
+    "line": 6,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/card-balance-tracking-integration.test.cjs",
+    "line": 16,
+    "source": "  const load = sourceLoader({"
+  },
+  {
+    "file": "tests/card-balance-tracking-integration.test.cjs",
+    "line": 21,
+    "source": "  const cards = load('src/app/api/cards/route.js');"
+  },
+  {
+    "file": "tests/card-balance-tracking-integration.test.cjs",
+    "line": 22,
+    "source": "  const expenses = load('src/app/api/expenses/route.js');"
+  },
+  {
+    "file": "tests/card-balance-tracking-integration.test.cjs",
+    "line": 23,
+    "source": "  const purchases = load('src/app/api/installment-purchases/route.js');"
+  },
+  {
+    "file": "tests/card-balance-tracking-integration.test.cjs",
+    "line": 24,
+    "source": "  const cycles = load('src/app/api/card-cycles/route.js');"
+  },
+  {
+    "file": "tests/card-balance-tracking-integration.test.cjs",
+    "line": 25,
+    "source": "  const today = load('src/lib/cardBalances.js').getBalanceToday();"
+  },
+  {
+    "file": "tests/card-balance-tracking.test.cjs",
+    "line": 3,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/card-balance-tracking.test.cjs",
+    "line": 4,
+    "source": "const { createBalanceTracking, getTrackedCard, isBalanceTrackingValid, runBalanceSnapshot } = sourceLoader()('src/lib/cardBalanceTracking.js');"
+  },
+  {
+    "file": "tests/card-balances-integration.test.cjs",
+    "line": 6,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/card-balances-integration.test.cjs",
+    "line": 16,
+    "source": "  const api = sourceLoader({"
+  },
+  {
+    "file": "tests/card-balances-integration.test.cjs",
+    "line": 20,
+    "source": "  })('src/app/api/cards/route.js');"
+  },
+  {
+    "file": "tests/card-balances.test.cjs",
+    "line": 3,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/card-balances.test.cjs",
+    "line": 5,
+    "source": "const { getCardBalance, summarizeCardBalances, creditBalanceSchema } = sourceLoader()('src/lib/cardBalances.js');"
+  },
+  {
+    "file": "tests/card-balances.test.cjs",
+    "line": 83,
+    "source": "  const route = sourceLoader({"
+  },
+  {
+    "file": "tests/card-balances.test.cjs",
+    "line": 87,
+    "source": "  })('src/app/api/cards/route.js');"
+  },
+  {
+    "file": "tests/card-credits.test.cjs",
+    "line": 8,
+    "source": "const read = (file) => fs.readFileSync(path.join(root, file), \"utf8\");"
+  },
+  {
+    "file": "tests/card-credits.test.cjs",
+    "line": 10,
+    "source": "  .map((name) => read(`src/lib/calculations/${name}.js`).replace(/^import[\\s\\S]*?from\\s+[\"'][^\"']+[\"'];\\r?\\n/gm, \"\").replace(/^export /gm, \"\"))"
+  },
+  {
+    "file": "tests/card-credits.test.cjs",
+    "line": 41,
+    "source": "  const source = read(`src/app/api/${route}/route.js`)"
+  },
+  {
+    "file": "tests/card-credits.test.cjs",
+    "line": 45,
+    "source": "  vm.runInContext(helpers + \"\\n\" + source, ctx);"
+  },
+  {
+    "file": "tests/card-credits.test.cjs",
+    "line": 150,
+    "source": "  const source = read(\"src/app/api/incomes/route.js\")"
+  },
+  {
+    "file": "tests/card-credits.test.cjs",
+    "line": 166,
+    "source": "  Object.assign(ctx, require('./helpers/load-source.cjs').sourceLoader()('src/lib/debtAccountService.js'));"
+  },
+  {
+    "file": "tests/card-credits.test.cjs",
+    "line": 167,
+    "source": "  vm.runInContext(source, ctx);"
+  },
+  {
+    "file": "tests/card-cycle-calculation.test.cjs",
+    "line": 9,
+    "source": "  .map((name) => fs.readFileSync(path.join(root, `src/lib/calculations/${name}.js`), \"utf8\")"
+  },
+  {
+    "file": "tests/card-cycle-calculation.test.cjs",
+    "line": 14,
+    "source": "vm.runInContext(source, ctx);"
+  },
+  {
+    "file": "tests/card-cycle-credits-integration.test.cjs",
+    "line": 6,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/card-cycle-credits-integration.test.cjs",
+    "line": 30,
+    "source": "  const load = sourceLoader({"
+  },
+  {
+    "file": "tests/card-cycle-credits-integration.test.cjs",
+    "line": 35,
+    "source": "  const route = load('src/app/api/card-cycles/route.js');"
+  },
+  {
+    "file": "tests/card-cycle-credits-integration.test.cjs",
+    "line": 54,
+    "source": "    const dashboard = await load('src/app/api/dashboard/route.js').GET(request());"
+  },
+  {
+    "file": "tests/card-cycle-credits-integration.test.cjs",
+    "line": 66,
+    "source": "    const reopened = await load('src/app/api/dashboard/route.js').GET(request());"
+  },
+  {
+    "file": "tests/card-cycle-payments.test.cjs",
+    "line": 3,
+    "source": "const { sourceLoader } = require(\"./helpers/load-source.cjs\");"
+  },
+  {
+    "file": "tests/card-cycle-payments.test.cjs",
+    "line": 4,
+    "source": "const { getCyclePaymentState, parseCycleMoney } = sourceLoader()(\"src/lib/calculations/cardCyclePayments.js\");"
+  },
+  {
+    "file": "tests/card-cycle-payments.test.cjs",
+    "line": 5,
+    "source": "const { getDashboardPayment } = sourceLoader()(\"src/lib/cardPaymentPresentation.js\");"
+  },
+  {
+    "file": "tests/card-cycle-payments.test.cjs",
+    "line": 54,
+    "source": "  const load = sourceLoader({"
+  },
+  {
+    "file": "tests/card-cycle-payments.test.cjs",
+    "line": 61,
+    "source": "    patch: (body) => load(\"src/app/api/card-cycles/route.js\").PATCH(request({ id: \"cycle\", ...body })),"
+  },
+  {
+    "file": "tests/card-cycle-payments.test.cjs",
+    "line": 62,
+    "source": "    get: (route, params = {}) => load(`src/app/api/${route}/route.js`).GET({"
+  },
+  {
+    "file": "tests/card-payment-presentation.test.cjs",
+    "line": 7,
+    "source": "vm.runInContext(fs.readFileSync(path.join(__dirname, \"../src/lib/cardPaymentPresentation.js\"), \"utf8\").replace(/^export /gm, \"\"), helpers);"
+  },
+  {
+    "file": "tests/card-usage-presentation.test.cjs",
+    "line": 7,
+    "source": "vm.runInContext(fs.readFileSync(path.join(__dirname, \"../src/lib/cardUsagePresentation.js\"), \"utf8\").replace(/^export /gm, \"\"), helpers);"
+  },
+  {
+    "file": "tests/card-usage-waivers.test.cjs",
+    "line": 7,
+    "source": "vm.runInContext(fs.readFileSync(path.join(__dirname, \"../src/lib/subscriptionCharges.js\"), \"utf8\").replace(/^export /gm, \"\"), ctx);"
+  },
+  {
+    "file": "tests/card-usage-waivers.test.cjs",
+    "line": 8,
+    "source": "vm.runInContext(fs.readFileSync(path.join(__dirname, \"../src/lib/calculations/cardUsageWaivers.js\"), \"utf8\").replace(/^import .*;\\n/gm, \"\").replace(/^export /gm, \"\"), ctx);"
+  },
+  {
+    "file": "tests/dashboard-breakdowns.test.cjs",
+    "line": 7,
+    "source": "const read = (file) => fs.readFileSync(path.join(root, file), \"utf8\")"
+  },
+  {
+    "file": "tests/dashboard-breakdowns.test.cjs",
+    "line": 13,
+    "source": "    .map((name) => read(`src/lib/calculations/${name}.js`)).join(\"\\n\");"
+  },
+  {
+    "file": "tests/dashboard-breakdowns.test.cjs",
+    "line": 14,
+    "source": "  vm.runInContext(helpers + \"\\n\" + read(\"src/lib/importantNotices.js\") + \"\\n\" + read(`src/app/api/${route}/route.js`), ctx);"
+  },
+  {
+    "file": "tests/debt-accounts-integration.test.cjs",
+    "line": 6,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/debt-accounts-integration.test.cjs",
+    "line": 39,
+    "source": "      const load = sourceLoader({"
+  },
+  {
+    "file": "tests/debt-accounts-integration.test.cjs",
+    "line": 44,
+    "source": "      const call = (name, method, body = {}) => load(`src/app/api/${name}/route.js`)[method]({"
+  },
+  {
+    "file": "tests/debt-accounts.test.cjs",
+    "line": 3,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/debt-accounts.test.cjs",
+    "line": 5,
+    "source": "const { getDebtAccountState } = sourceLoader()('src/lib/calculations/debtAccounts.js');"
+  },
+  {
+    "file": "tests/expense-filters.test.cjs",
+    "line": 7,
+    "source": "vm.runInContext(fs.readFileSync(path.join(__dirname, \"../src/lib/expenseFilters.js\"), \"utf8\").replace(/^export /gm, \"\"), ctx);"
+  },
+  {
+    "file": "tests/expense-operations-integration.test.cjs",
+    "line": 6,
+    "source": "const { sourceLoader } = require(\"./helpers/load-source.cjs\");"
+  },
+  {
+    "file": "tests/expense-operations-integration.test.cjs",
+    "line": 17,
+    "source": "    const load = sourceLoader({"
+  },
+  {
+    "file": "tests/expense-operations-integration.test.cjs",
+    "line": 22,
+    "source": "    const { POST } = load(\"src/app/api/expenses/route.js\");"
+  },
+  {
+    "file": "tests/expense-operations-integration.test.cjs",
+    "line": 23,
+    "source": "    const { runExpenseOperation } = load(\"src/lib/expenseOperations.js\");"
+  },
+  {
+    "file": "tests/expense-operations.test.cjs",
+    "line": 4,
+    "source": "const { sourceLoader } = require(\"./helpers/load-source.cjs\");"
+  },
+  {
+    "file": "tests/expense-operations.test.cjs",
+    "line": 40,
+    "source": "  const load = sourceLoader({"
+  },
+  {
+    "file": "tests/expense-operations.test.cjs",
+    "line": 45,
+    "source": "  const { POST } = load(\"src/app/api/expenses/route.js\");"
+  },
+  {
+    "file": "tests/google-calendar-events.test.cjs",
+    "line": 4,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/google-calendar-events.test.cjs",
+    "line": 8,
+    "source": "  const load = sourceLoader({"
+  },
+  {
+    "file": "tests/google-calendar-events.test.cjs",
+    "line": 13,
+    "source": "  const { requireApiUser } = load('src/lib/apiAuth.js');"
+  },
+  {
+    "file": "tests/google-calendar-events.test.cjs",
+    "line": 29,
+    "source": "  const load = sourceLoader({"
+  },
+  {
+    "file": "tests/google-calendar-events.test.cjs",
+    "line": 38,
+    "source": "  const { captureRequest } = load('src/lib/captureApi.js');"
+  },
+  {
+    "file": "tests/google-calendar-events.test.cjs",
+    "line": 54,
+    "source": "  const { runCalendarSync } = sourceLoader({ '@/lib/prisma': { prisma: db } })('src/lib/calendar/worker.js');"
+  },
+  {
+    "file": "tests/google-calendar-events.test.cjs",
+    "line": 66,
+    "source": "  const { runCalendarSync } = sourceLoader({ '@/lib/prisma': { prisma: db } })('src/lib/calendar/worker.js');"
+  },
+  {
+    "file": "tests/google-calendar-integration.test.cjs",
+    "line": 6,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/google-calendar-integration.test.cjs",
+    "line": 14,
+    "source": "  const load = sourceLoader({ '@/lib/prisma': { prisma: db } }, { process: { env }, URLSearchParams, AbortSignal });"
+  },
+  {
+    "file": "tests/google-calendar-integration.test.cjs",
+    "line": 15,
+    "source": "  const config = load('src/lib/calendar/config.js');"
+  },
+  {
+    "file": "tests/google-calendar-integration.test.cjs",
+    "line": 16,
+    "source": "  const service = load('src/lib/calendar/service.js');"
+  },
+  {
+    "file": "tests/google-calendar-integration.test.cjs",
+    "line": 17,
+    "source": "  const sync = load('src/lib/calendar/sync.js');"
+  },
+  {
+    "file": "tests/google-calendar-integration.test.cjs",
+    "line": 123,
+    "source": "  assert.equal(fixed.eventLabelId, load('src/lib/calendar/palette.js').CALENDAR_EVENT_PALETTE.pending.id);"
+  },
+  {
+    "file": "tests/google-calendar-integration.test.cjs",
+    "line": 143,
+    "source": "  const api = sourceLoader({ '@/lib/prisma': { prisma: db },"
+  },
+  {
+    "file": "tests/google-calendar-integration.test.cjs",
+    "line": 148,
+    "source": "  const worker = load('src/lib/calendar/worker.js');"
+  },
+  {
+    "file": "tests/google-calendar-integration.test.cjs",
+    "line": 151,
+    "source": "    const response = await api(`src/app/api/${path}/route.js`)[method](request(path, method, body));"
+  },
+  {
+    "file": "tests/google-calendar-integration.test.cjs",
+    "line": 172,
+    "source": "  const palette = load('src/lib/calendar/palette.js').CALENDAR_EVENT_PALETTE;"
+  },
+  {
+    "file": "tests/google-calendar-integration.test.cjs",
+    "line": 173,
+    "source": "  const api = sourceLoader({ '@/lib/prisma': { prisma: db },"
+  },
+  {
+    "file": "tests/google-calendar-integration.test.cjs",
+    "line": 179,
+    "source": "    const response = await api('src/app/api/card-cycles/route.js').PATCH({ method: 'PATCH', url: 'https://afp.example.test/api/card-cycles',"
+  },
+  {
+    "file": "tests/google-calendar-integration.test.cjs",
+    "line": 237,
+    "source": "  const { calendarPendingWhere, calendarNeedsSync } = load('src/lib/calendar/pending.js');"
+  },
+  {
+    "file": "tests/google-calendar-palette.test.cjs",
+    "line": 3,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/google-calendar-palette.test.cjs",
+    "line": 4,
+    "source": "const load = sourceLoader();"
+  },
+  {
+    "file": "tests/google-calendar-palette.test.cjs",
+    "line": 5,
+    "source": "const { CALENDAR_EVENT_PALETTE: palette, calendarEventLabel, calendarLabelProperties, ensureCalendarPalette } = load('src/lib/calendar/palette.js');"
+  },
+  {
+    "file": "tests/google-calendar-palette.test.cjs",
+    "line": 10,
+    "source": "  const { buildCalendarEvents } = load('src/lib/calendar/events.js');"
+  },
+  {
+    "file": "tests/google-calendar-palette.test.cjs",
+    "line": 105,
+    "source": "  const google = sourceLoader({}, { process: { env }, URLSearchParams, AbortSignal, fetch: async (url, options) => {"
+  },
+  {
+    "file": "tests/google-calendar-palette.test.cjs",
+    "line": 108,
+    "source": "  } })('src/lib/calendar/google.js');"
+  },
+  {
+    "file": "tests/google-calendar.test.cjs",
+    "line": 3,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/google-calendar.test.cjs",
+    "line": 7,
+    "source": "const load = sourceLoader({}, globals);"
+  },
+  {
+    "file": "tests/google-calendar.test.cjs",
+    "line": 8,
+    "source": "const config = load('src/lib/calendar/config.js');"
+  },
+  {
+    "file": "tests/google-calendar.test.cjs",
+    "line": 9,
+    "source": "const { buildCalendarEvents, googleEvent, mexicoDay } = load('src/lib/calendar/events.js');"
+  },
+  {
+    "file": "tests/google-calendar.test.cjs",
+    "line": 10,
+    "source": "const palette = load('src/lib/calendar/palette.js').CALENDAR_EVENT_PALETTE;"
+  },
+  {
+    "file": "tests/google-calendar.test.cjs",
+    "line": 200,
+    "source": "  const google = sourceLoader({}, { ...globals, fetch: async () => new Response(JSON.stringify({ error: { errors: [{ reason: 'rateLimitExceeded' }], message: 'private-provider-body' } }), { status: 403, headers: { 'retry-after': '300' } }) })('src/lib/calendar/google.js');"
+  },
+  {
+    "file": "tests/google-calendar.test.cjs",
+    "line": 202,
+    "source": "  const revoked = sourceLoader({}, { ...globals, fetch: async () => new Response(JSON.stringify({ error: 'invalid_grant' }), { status: 400 }) })('src/lib/calendar/google.js');"
+  },
+  {
+    "file": "tests/google-calendar.test.cjs",
+    "line": 210,
+    "source": "  const route = sourceLoader(mocks, globals)('src/app/api/cron/calendar-sync/route.js');"
+  },
+  {
+    "file": "tests/google-calendar.test.cjs",
+    "line": 215,
+    "source": "  const missing = sourceLoader(mocks, { ...globals, process: { env: {} } })('src/app/api/cron/calendar-sync/route.js');"
+  },
+  {
+    "file": "tests/google-calendar.test.cjs",
+    "line": 223,
+    "source": "  const route = sourceLoader(mocks, globals)('src/app/api/calendar/google/callback/route.js');"
+  },
+  {
+    "file": "tests/google-calendar.test.cjs",
+    "line": 250,
+    "source": "  const api = sourceLoader(mocks, globals)('src/app/api/calendar/google/route.js');"
+  },
+  {
+    "file": "tests/helpers/capture-browser-server.cjs",
+    "line": 18,
+    "source": "for (const name of ['package.json', 'jsconfig.json', 'postcss.config.mjs']) fs.copyFileSync(path.join(root, name), path.join(qaDir, name));"
+  },
+  {
+    "file": "tests/helpers/capture-browser-server.cjs",
+    "line": 64,
+    "source": "  if (process.env.AFP_CAPTURE_TEST_KEY && process.env.AFP_CAPTURE_TEST_CERTIFICATE) https.createServer({ key: fs.readFileSync(process.env.AFP_CAPTURE_TEST_KEY), cert: fs.readFileSync(process.env.AFP_CAPTURE_TEST_CERTIFICATE) }, handler)"
+  },
+  {
+    "file": "tests/helpers/debt-fixture.cjs",
+    "line": 2,
+    "source": "const { sourceLoader } = require('./load-source.cjs');"
+  },
+  {
+    "file": "tests/helpers/debt-fixture.cjs",
+    "line": 84,
+    "source": "  const load = sourceLoader({"
+  },
+  {
+    "file": "tests/helpers/debt-fixture.cjs",
+    "line": 89,
+    "source": "  const call = (route, method, body = {}) => load(`src/app/api/${route}/route.js`)[method]({"
+  },
+  {
+    "file": "tests/helpers/load-source.cjs",
+    "line": 7,
+    "source": "function sourceLoader(mocks = {}, globals = {}) {"
+  },
+  {
+    "file": "tests/helpers/load-source.cjs",
+    "line": 12,
+    "source": "    let source = fs.readFileSync(full, \"utf8\");"
+  },
+  {
+    "file": "tests/helpers/load-source.cjs",
+    "line": 16,
+    "source": "        ? `src/${specifier.slice(2)}.js` : path.resolve(path.dirname(full), `${specifier}.js`)));"
+  },
+  {
+    "file": "tests/helpers/load-source.cjs",
+    "line": 29,
+    "source": "    const result = vm.runInContext(`${source}\\n;({${exported.join(\",\")}})`, context, { filename: full });"
+  },
+  {
+    "file": "tests/helpers/load-source.cjs",
+    "line": 34,
+    "source": "module.exports = { sourceLoader };"
+  },
+  {
+    "file": "tests/helpers/money-browser-server.cjs",
+    "line": 18,
+    "source": "for (const name of ['package.json', 'jsconfig.json', 'postcss.config.mjs']) fs.copyFileSync(path.join(root, name), path.join(qaDir, name));"
+  },
+  {
+    "file": "tests/helpers/money-browser-server.cjs",
+    "line": 66,
+    "source": "  if (process.env.AFP_CAPTURE_TEST_KEY && process.env.AFP_CAPTURE_TEST_CERTIFICATE) https.createServer({ key: fs.readFileSync(process.env.AFP_CAPTURE_TEST_KEY), cert: fs.readFileSync(process.env.AFP_CAPTURE_TEST_CERTIFICATE) }, handler)"
+  },
+  {
+    "file": "tests/helpers/offline-browser-server.cjs",
+    "line": 7,
+    "source": "const moduleSource = fs.readFileSync(path.join(__dirname, \"../../src/lib/offlineExpenses.js\"), \"utf8\")"
+  },
+  {
+    "file": "tests/installment-statements.test.cjs",
+    "line": 8,
+    "source": "const helper = fs.readFileSync("
+  },
+  {
+    "file": "tests/installment-statements.test.cjs",
+    "line": 9,
+    "source": "  path.join(root, \"src/lib/calculations/installmentStatements.js\"),"
+  },
+  {
+    "file": "tests/installment-statements.test.cjs",
+    "line": 12,
+    "source": "const creditHelper = fs.readFileSync("
+  },
+  {
+    "file": "tests/installment-statements.test.cjs",
+    "line": 13,
+    "source": "  path.join(root, \"src/lib/calculations/cardCredits.js\"), \"utf8\","
+  },
+  {
+    "file": "tests/installment-statements.test.cjs",
+    "line": 16,
+    "source": "  .map((name) => fs.readFileSync(path.join(root, `src/lib/calculations/${name}.js`), \"utf8\")"
+  },
+  {
+    "file": "tests/installment-statements.test.cjs",
+    "line": 38,
+    "source": "  const source = fs.readFileSync(path.join(root, file), \"utf8\")"
+  },
+  {
+    "file": "tests/installment-statements.test.cjs",
+    "line": 42,
+    "source": "  const notices = fs.readFileSync(path.join(root, \"src/lib/importantNotices.js\"), \"utf8\")"
+  },
+  {
+    "file": "tests/installment-statements.test.cjs",
+    "line": 44,
+    "source": "  vm.runInContext(notices + \"\\n\" + helper + \"\\n\" + creditHelper + \"\\n\" + cycleHelpers + \"\\n\" + source, context);"
+  },
+  {
+    "file": "tests/installment-statements.test.cjs",
+    "line": 49,
+    "source": "  for (const file of [\"src/app/api/card-cycles/route.js\", \"src/app/api/dashboard/route.js\"]) {"
+  },
+  {
+    "file": "tests/installment-statements.test.cjs",
+    "line": 64,
+    "source": "  const context = routeContext(\"src/app/api/card-cycles/route.js\");"
+  },
+  {
+    "file": "tests/installment-statements.test.cjs",
+    "line": 77,
+    "source": "  const context = routeContext(\"src/app/api/installment-purchases/route.js\");"
+  },
+  {
+    "file": "tests/installment-statements.test.cjs",
+    "line": 88,
+    "source": "  const context = routeContext(\"src/app/api/dashboard/route.js\");"
+  },
+  {
+    "file": "tests/installment-statements.test.cjs",
+    "line": 101,
+    "source": "  const context = routeContext(\"src/app/api/card-cycles/route.js\");"
+  },
+  {
+    "file": "tests/installment-transactions.test.cjs",
+    "line": 3,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/installment-transactions.test.cjs",
+    "line": 59,
+    "source": "  const route = sourceLoader({"
+  },
+  {
+    "file": "tests/installment-transactions.test.cjs",
+    "line": 63,
+    "source": "  }, { console: { error() {} } })('src/app/api/installment-purchases/route.js');"
+  },
+  {
+    "file": "tests/latest-request.test.cjs",
+    "line": 3,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/latest-request.test.cjs",
+    "line": 4,
+    "source": "const { createLatestRequest } = sourceLoader()('src/lib/latestRequest.js');"
+  },
+  {
+    "file": "tests/money-automatic-yields-integration.test.cjs",
+    "line": 6,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/money-automatic-yields-integration.test.cjs",
+    "line": 14,
+    "source": "  const load = sourceLoader({ '@/lib/prisma': { prisma: db }, '@/lib/calendar/schedule': { scheduleCalendarSync: () => {} } });"
+  },
+  {
+    "file": "tests/money-automatic-yields-integration.test.cjs",
+    "line": 15,
+    "source": "  const { mutateMoney, loadMoneyData } = load('src/lib/money/service.js'), { buildForecast } = load('src/lib/money/forecast.js');"
+  },
+  {
+    "file": "tests/money-automatic-yields.test.cjs",
+    "line": 3,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/money-automatic-yields.test.cjs",
+    "line": 4,
+    "source": "const load = sourceLoader();"
+  },
+  {
+    "file": "tests/money-automatic-yields.test.cjs",
+    "line": 5,
+    "source": "const { buildForecast } = load('src/lib/money/forecast.js');"
+  },
+  {
+    "file": "tests/money-automatic-yields.test.cjs",
+    "line": 6,
+    "source": "const { buildSources } = load('src/lib/money/sources.js');"
+  },
+  {
+    "file": "tests/money-automatic-yields.test.cjs",
+    "line": 7,
+    "source": "const { yieldRule, changedYieldHistory, bankHolidays } = load('src/lib/money/yieldRules.js');"
+  },
+  {
+    "file": "tests/money-budgets-integration.test.cjs",
+    "line": 6,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/money-budgets-integration.test.cjs",
+    "line": 16,
+    "source": "  const load = sourceLoader({ '@/lib/prisma': { prisma: db }, '@/lib/calendar/schedule': { scheduleCalendarSync: () => {} }, '@supabase/supabase-js': { createClient: () => ({ auth: { getUser: async token => ({ data: { user: token === 'test' ? { id: actor } : null } }) } }) }, 'next/server': { NextResponse: { json: (body, options = {}) => ({ body: JSON.parse(JSON.stringify(body)), status: options.status || 200, headers: new Headers(options.headers) }) } } });"
+  },
+  {
+    "file": "tests/money-budgets-integration.test.cjs",
+    "line": 17,
+    "source": "  const route = load('src/app/api/money/route.js');"
+  },
+  {
+    "file": "tests/money-budgets.test.cjs",
+    "line": 3,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/money-budgets.test.cjs",
+    "line": 4,
+    "source": "const load = sourceLoader();"
+  },
+  {
+    "file": "tests/money-budgets.test.cjs",
+    "line": 5,
+    "source": "const { buildForecast } = load('src/lib/money/forecast.js');"
+  },
+  {
+    "file": "tests/money-budgets.test.cjs",
+    "line": 6,
+    "source": "const { allocateBudgetCents, personalExpenseAmounts, buildBudgetPaymentMix } = load('src/lib/money/budgets.js');"
+  },
+  {
+    "file": "tests/money-budgets.test.cjs",
+    "line": 7,
+    "source": "const { cents } = load('src/lib/money/sources.js');"
+  },
+  {
+    "file": "tests/money-forecast.test.cjs",
+    "line": 3,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/money-forecast.test.cjs",
+    "line": 4,
+    "source": "const load = sourceLoader();"
+  },
+  {
+    "file": "tests/money-forecast.test.cjs",
+    "line": 5,
+    "source": "const { buildForecast, planDates } = load('src/lib/money/forecast.js');"
+  },
+  {
+    "file": "tests/money-forecast.test.cjs",
+    "line": 6,
+    "source": "const { buildSources, accountBalances, exposure } = load('src/lib/money/sources.js');"
+  },
+  {
+    "file": "tests/money-forecast.test.cjs",
+    "line": 7,
+    "source": "const { accountSchema, planSchema } = load('src/lib/money/schema.js');"
+  },
+  {
+    "file": "tests/money-forecast.test.cjs",
+    "line": 113,
+    "source": "  const service = sourceLoader({ '@/lib/apiAuth': { ApiAccessError: class extends Error {} } })('src/lib/money/service.js');"
+  },
+  {
+    "file": "tests/money-integration.test.cjs",
+    "line": 6,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/money-integration.test.cjs",
+    "line": 15,
+    "source": "  const load = sourceLoader({ '@/lib/prisma': { prisma: db }, '@/lib/calendar/schedule': { scheduleCalendarSync: () => {} }, '@supabase/supabase-js': { createClient: () => ({ auth: { getUser: async token => ({ data: { user: token === 'test' ? { id: actor } : null } }) } }) }, 'next/server': { NextResponse: { json: (body, options = {}) => ({ body: JSON.parse(JSON.stringify(body)), status: options.status || 200, headers: new Headers(options.headers) }) } } });"
+  },
+  {
+    "file": "tests/money-integration.test.cjs",
+    "line": 16,
+    "source": "  const route = load('src/app/api/money/route.js'), today = load('src/lib/money/dates.js').todayInMexico(), yesterday = load('src/lib/money/dates.js').addDays(today, -1);"
+  },
+  {
+    "file": "tests/money-integration.test.cjs",
+    "line": 68,
+    "source": "        assert.equal(load('src/lib/apiAuth.js').apiAccessErrorResponse(error)?.status, 409); return true;"
+  },
+  {
+    "file": "tests/money-loading.test.cjs",
+    "line": 3,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/money-loading.test.cjs",
+    "line": 14,
+    "source": "  const load = sourceLoader({ '@/lib/apiAuth': { ApiAccessError: class extends Error {} } });"
+  },
+  {
+    "file": "tests/money-loading.test.cjs",
+    "line": 15,
+    "source": "  const data = await load('src/lib/money/service.js').loadMoneyData(db, 'owner');"
+  },
+  {
+    "file": "tests/money-loading.test.cjs",
+    "line": 27,
+    "source": "  const load = sourceLoader({"
+  },
+  {
+    "file": "tests/money-loading.test.cjs",
+    "line": 44,
+    "source": "  return { route: load('src/app/api/money/route.js'), counts: () => ({ reads, builds }) };"
+  },
+  {
+    "file": "tests/money-monthly-minimum-period.test.cjs",
+    "line": 3,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/money-monthly-minimum-period.test.cjs",
+    "line": 4,
+    "source": "const load = sourceLoader();"
+  },
+  {
+    "file": "tests/money-monthly-minimum-period.test.cjs",
+    "line": 5,
+    "source": "const { monthlyMinimumPeriod } = load('src/components/mi-dinero/monthlyMinimumPeriod.js');"
+  },
+  {
+    "file": "tests/money-monthly-minimum-period.test.cjs",
+    "line": 6,
+    "source": "const { buildForecast } = load('src/lib/money/forecast.js');"
+  },
+  {
+    "file": "tests/money-monthly-summary-status.test.cjs",
+    "line": 3,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/money-monthly-summary-status.test.cjs",
+    "line": 4,
+    "source": "const load = sourceLoader();"
+  },
+  {
+    "file": "tests/money-monthly-summary-status.test.cjs",
+    "line": 5,
+    "source": "const { monthlySummaryStatus } = load('src/components/mi-dinero/monthlySummaryStatus.js');"
+  },
+  {
+    "file": "tests/money-monthly-summary-status.test.cjs",
+    "line": 6,
+    "source": "const { buildForecast } = load('src/lib/money/forecast.js');"
+  },
+  {
+    "file": "tests/money-payroll-calendar-integration.test.cjs",
+    "line": 5,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/money-payroll-calendar-integration.test.cjs",
+    "line": 11,
+    "source": "  const load = sourceLoader({ '@/lib/prisma': { prisma: db }, '@/lib/calendar/schedule': { scheduleCalendarSync: () => {} } });"
+  },
+  {
+    "file": "tests/money-payroll-calendar-integration.test.cjs",
+    "line": 12,
+    "source": "  const { mutateMoney, loadMoneyData } = load('src/lib/money/service.js'), { buildForecast } = load('src/lib/money/forecast.js');"
+  },
+  {
+    "file": "tests/money-payroll-calendar.test.cjs",
+    "line": 3,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/money-payroll-calendar.test.cjs",
+    "line": 4,
+    "source": "const load = sourceLoader(), { planDates, buildForecast } = load('src/lib/money/forecast.js');"
+  },
+  {
+    "file": "tests/money-projection-breakdown.test.cjs",
+    "line": 3,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/money-projection-breakdown.test.cjs",
+    "line": 4,
+    "source": "const load = sourceLoader();"
+  },
+  {
+    "file": "tests/money-projection-breakdown.test.cjs",
+    "line": 5,
+    "source": "const { buildProjectionBreakdown, monthlyBreakdownEvents } = load('src/components/mi-dinero/projectionBreakdown.js');"
+  },
+  {
+    "file": "tests/money-projection-breakdown.test.cjs",
+    "line": 6,
+    "source": "const { buildForecast } = load('src/lib/money/forecast.js');"
+  },
+  {
+    "file": "tests/notice-dismissals.test.cjs",
+    "line": 7,
+    "source": "const source = (file) => fs.readFileSync(path.join(root, file), \"utf8\")"
+  },
+  {
+    "file": "tests/notice-dismissals.test.cjs",
+    "line": 10,
+    "source": "const helpers = source(\"src/lib/noticeDismissals.js\");"
+  },
+  {
+    "file": "tests/notice-dismissals.test.cjs",
+    "line": 12,
+    "source": "vm.runInContext(helpers, ctx);"
+  },
+  {
+    "file": "tests/notice-dismissals.test.cjs",
+    "line": 73,
+    "source": "  vm.runInContext(source(\"src/lib/apiAuth.js\") + \"\\n\" + helpers + \"\\n\" + source(\"src/app/api/notice-dismissals/route.js\"), route);"
+  },
+  {
+    "file": "tests/nu-turbo-usage.test.cjs",
+    "line": 3,
+    "source": "const { sourceLoader } = require(\"./helpers/load-source.cjs\");"
+  },
+  {
+    "file": "tests/nu-turbo-usage.test.cjs",
+    "line": 4,
+    "source": "const { buildCurrentCardUsageWaivers, buildCardUsageWaivers, buildCardUsageWaiverHistory } = sourceLoader()(\"src/lib/calculations/cardUsageWaivers.js\");"
+  },
+  {
+    "file": "tests/nu-turbo-usage.test.cjs",
+    "line": 111,
+    "source": "  const load = sourceLoader({"
+  },
+  {
+    "file": "tests/nu-turbo-usage.test.cjs",
+    "line": 117,
+    "source": "    const response = await load(\"src/app/api/dashboard/route.js\").GET({ url: `http://localhost/api/dashboard?clientDate=${clientDate}`, headers: new Headers({ authorization: \"Bearer test\" }) });"
+  },
+  {
+    "file": "tests/offline-expenses.test.cjs",
+    "line": 5,
+    "source": "const { sourceLoader } = require(\"./helpers/load-source.cjs\");"
+  },
+  {
+    "file": "tests/offline-expenses.test.cjs",
+    "line": 16,
+    "source": "  const tab = () => sourceLoader({ \"@/lib/apiFetch\": { apiFetch: async (_url, options) => {"
+  },
+  {
+    "file": "tests/offline-expenses.test.cjs",
+    "line": 20,
+    "source": "  } } }, globals)(\"src/lib/offlineExpenses.js\");"
+  },
+  {
+    "file": "tests/payable-notices.test.cjs",
+    "line": 4,
+    "source": "const { sourceLoader } = require(\"./helpers/load-source.cjs\");"
+  },
+  {
+    "file": "tests/payable-notices.test.cjs",
+    "line": 6,
+    "source": "const { buildPayableNotices, buildImportantNotices } = sourceLoader()(\"src/lib/importantNotices.js\");"
+  },
+  {
+    "file": "tests/payable-notices.test.cjs",
+    "line": 69,
+    "source": "    const { sourceLoader } = require('./tests/helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/payable-notices.test.cjs",
+    "line": 70,
+    "source": "    const { buildPayableNotices } = sourceLoader()('src/lib/importantNotices.js');"
+  },
+  {
+    "file": "tests/payables-summary.test.cjs",
+    "line": 3,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/payables-summary.test.cjs",
+    "line": 5,
+    "source": "const { getPayablesSummary } = sourceLoader()('src/lib/payablesSummary.js');"
+  },
+  {
+    "file": "tests/receivable-adjustments.test.cjs",
+    "line": 3,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/receivable-adjustments.test.cjs",
+    "line": 5,
+    "source": "const { getDebtAccountState } = sourceLoader()('src/lib/calculations/debtAccounts.js');"
+  },
+  {
+    "file": "tests/receivable-adjustments.test.cjs",
+    "line": 6,
+    "source": "const { getPayablesSummary } = sourceLoader()('src/lib/payablesSummary.js');"
+  },
+  {
+    "file": "tests/receiver-payment-notices-integration.test.cjs",
+    "line": 6,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/receiver-payment-notices-integration.test.cjs",
+    "line": 24,
+    "source": "    const load = sourceLoader({"
+  },
+  {
+    "file": "tests/receiver-payment-notices-integration.test.cjs",
+    "line": 29,
+    "source": "    const protocol=load('src/lib/captureProtocol.js');"
+  },
+  {
+    "file": "tests/receiver-payment-notices-integration.test.cjs",
+    "line": 44,
+    "source": "    const routes={events:load('src/app/api/captures/events/route.js'),cycles:load('src/app/api/card-cycles/route.js'),cards:load('src/app/api/cards/route.js'),movements:load('src/app/api/captures/movements/route.js')};"
+  },
+  {
+    "file": "tests/receiver-payment-notices-integration.test.cjs",
+    "line": 80,
+    "source": "   const config=await load('src/lib/captureConfiguration.js').captureConfiguration(db,user.id);"
+  },
+  {
+    "file": "tests/receiver-payment-notices-integration.test.cjs",
+    "line": 88,
+    "source": "   await assert.rejects(c.load('src/lib/captureConfiguration.js').configureCapture(c.db,c.user.id,{action:'paymentAutomation',id:c.policies[1].id,mode:'AUTOMATIC'}),e=>e.status===409);"
+  },
+  {
+    "file": "tests/receiver-payment-notices-integration.test.cjs",
+    "line": 89,
+    "source": "   await assert.rejects(c.load('src/lib/captureConfiguration.js').configureCapture(c.db,c.user.id,{action:'automation',cardId:c.card.id,parserKey:'banamex.card-payment.es.v1',mode:'AUTOMATIC'}),e=>e.status===409);"
+  },
+  {
+    "file": "tests/receiver-payment-notices-integration.test.cjs",
+    "line": 108,
+    "source": "   const state=c.load('src/lib/calculations/cardCyclePayments.js').getCyclePaymentState(await c.readCycle());"
+  },
+  {
+    "file": "tests/receiver-payment-notices-integration.test.cjs",
+    "line": 143,
+    "source": "   const result=await c.load('src/lib/captureService.js').receiveCaptureEvent(c.db,{id:c.device.id,secretHash:c.device.secretHash},input);"
+  },
+  {
+    "file": "tests/receiver-payment-notices-integration.test.cjs",
+    "line": 149,
+    "source": "   await c.load('src/lib/captureProcessing.js').resolveCaptureMovement(c.db,c.user.id,{id:m.id,action:'reversePayment'});"
+  },
+  {
+    "file": "tests/receiver-payment-notices-integration.test.cjs",
+    "line": 163,
+    "source": "   await assert.rejects(c.load('src/lib/captureConfiguration.js').configureCapture(c.db,c.other.id,{action:'paymentAutomation',id:c.policies[0].id,mode:'OBSERVATION'}),e=>e.status===404);"
+  },
+  {
+    "file": "tests/receiver-payment-notices-integration.test.cjs",
+    "line": 167,
+    "source": "   await assert.rejects(c.load('src/lib/captureService.js').receiveCaptureEvent(broken,{id:c.device.id,secretHash:c.device.secretHash},c.event()),/Fallo de persistencia simulado/);"
+  },
+  {
+    "file": "tests/receiver-payment-notices-integration.test.cjs",
+    "line": 173,
+    "source": "   await c.load('src/lib/captureConfiguration.js').configureCapture(c.db,c.user.id,{action:'paymentAutomation',id:c.policies[0].id,mode:'AUTOMATIC'});"
+  },
+  {
+    "file": "tests/receiver-payment-notices-integration.test.cjs",
+    "line": 175,
+    "source": "   const interpreted=await c.load('src/lib/captureProcessing.js').resolveCaptureMovement(c.db,c.user.id,{id:m.id,action:'reinterpret'});"
+  },
+  {
+    "file": "tests/receiver-payment-notices.test.cjs",
+    "line": 3,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/receiver-payment-notices.test.cjs",
+    "line": 7,
+    "source": "const { interpretCapture, captureParsers } = sourceLoader()('src/lib/captureParsers.js');"
+  },
+  {
+    "file": "tests/related-operations-integration.test.cjs",
+    "line": 6,
+    "source": "const { sourceLoader } = require('./helpers/load-source.cjs');"
+  },
+  {
+    "file": "tests/related-operations-integration.test.cjs",
+    "line": 37,
+    "source": "  const load = sourceLoader({"
+  },
+  {
+    "file": "tests/related-operations-integration.test.cjs",
+    "line": 42,
+    "source": "  const call = (route, method, body) => load(`src/app/api/${route}/route.js`)[method]({"
+  },
+  {
+    "file": "tests/request-recovery.test.cjs",
+    "line": 3,
+    "source": "const { sourceLoader } = require(\"./helpers/load-source.cjs\");"
+  },
+  {
+    "file": "tests/request-recovery.test.cjs",
+    "line": 9,
+    "source": "  const load = sourceLoader({"
+  },
+  {
+    "file": "tests/request-recovery.test.cjs",
+    "line": 15,
+    "source": "  const recovery = load(\"src/lib/requestRecovery.js\");"
+  },
+  {
+    "file": "tests/request-recovery.test.cjs",
+    "line": 17,
+    "source": "  return { apiFetch: load(\"src/lib/apiFetch.js\").apiFetch, recovery, requests, navigator,"
+  },
+  {
+    "file": "tests/shared-expenses-integration.test.cjs",
+    "line": 6,
+    "source": "const { sourceLoader } = require(\"./helpers/load-source.cjs\");"
+  },
+  {
+    "file": "tests/shared-expenses-integration.test.cjs",
+    "line": 15,
+    "source": "  const load = sourceLoader({"
+  },
+  {
+    "file": "tests/shared-expenses-integration.test.cjs",
+    "line": 20,
+    "source": "  const call = (route, method = \"GET\", body, owner = user, query = \"\") => load(`src/app/api/${route}/route.js`)[method]({"
+  },
+  {
+    "file": "tests/shared-expenses.test.cjs",
+    "line": 3,
+    "source": "const { sourceLoader } = require(\"./helpers/load-source.cjs\");"
+  },
+  {
+    "file": "tests/shared-expenses.test.cjs",
+    "line": 5,
+    "source": "const { getCashContributionError, getPersonalExpenseAmount, sumPersonalExpenses } = sourceLoader()(\"src/lib/sharedExpenses.js\");"
+  },
+  {
+    "file": "tests/subscription-charges-api.test.cjs",
+    "line": 9,
+    "source": "  const source = file => fs.readFileSync(path.join(__dirname, \"..\", file), \"utf8\")"
+  },
+  {
+    "file": "tests/subscription-charges-api.test.cjs",
+    "line": 19,
+    "source": "  vm.runInContext(source(\"src/lib/apiAuth.js\") + \"\\n\" + source(\"src/lib/subscriptionCharges.js\") + \"\\n\" + source(\"src/app/api/subscription-charges/route.js\"), route);"
+  },
+  {
+    "file": "tests/subscription-charges-integration.test.cjs",
+    "line": 22,
+    "source": "    const { sourceLoader } = require(\"./helpers/load-source.cjs\");"
+  },
+  {
+    "file": "tests/subscription-charges-integration.test.cjs",
+    "line": 23,
+    "source": "    const load = sourceLoader({"
+  },
+  {
+    "file": "tests/subscription-charges-integration.test.cjs",
+    "line": 28,
+    "source": "    const api = load(\"src/app/api/subscription-charges/route.js\");"
+  },
+  {
+    "file": "tests/subscription-charges-integration.test.cjs",
+    "line": 49,
+    "source": "    const charges = await load(\"src/lib/subscriptionChargeService.js\").loadSubscriptionCharges(db, user.id, month, today);"
+  },
+  {
+    "file": "tests/subscription-charges-integration.test.cjs",
+    "line": 55,
+    "source": "    const upcoming = await load(\"src/lib/subscriptionChargeService.js\").loadSubscriptionCharges(db, user.id, nextDay.slice(0, 7), nextDay);"
+  },
+  {
+    "file": "tests/subscription-charges-integration.test.cjs",
+    "line": 70,
+    "source": "  const read = file => fs.readFileSync(path.join(__dirname, \"../src/lib\", file), \"utf8\")"
+  },
+  {
+    "file": "tests/subscription-charges-integration.test.cjs",
+    "line": 72,
+    "source": "  vm.runInContext(read(\"subscriptionCharges.js\") + \"\\n\" + read(\"subscriptionChargeService.js\"), ctx);"
+  },
+  {
+    "file": "tests/subscription-charges-integration.test.cjs",
+    "line": 123,
+    "source": "    const { sourceLoader } = require(\"./helpers/load-source.cjs\");"
+  },
+  {
+    "file": "tests/subscription-charges-integration.test.cjs",
+    "line": 124,
+    "source": "    const expenses = sourceLoader({"
+  },
+  {
+    "file": "tests/subscription-charges-integration.test.cjs",
+    "line": 128,
+    "source": "    })(\"src/app/api/expenses/route.js\");"
+  },
+  {
+    "file": "tests/subscription-charges.test.cjs",
+    "line": 7,
+    "source": "vm.runInContext(fs.readFileSync(path.join(__dirname, \"../src/lib/subscriptionCharges.js\"), \"utf8\").replace(/^export /gm, \"\"), ctx);"
+  },
+  {
+    "file": "tests/subscription-payment-adjustments.test.cjs",
+    "line": 3,
+    "source": "const { sourceLoader } = require(\"./helpers/load-source.cjs\");"
+  },
+  {
+    "file": "tests/subscription-payment-adjustments.test.cjs",
+    "line": 22,
+    "source": "  const { applySubscriptionCharge } = sourceLoader()(\"src/lib/subscriptionChargeService.js\");"
+  },
+  {
+    "file": "tests/subscription-statements.test.cjs",
+    "line": 7,
+    "source": "const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');"
+  },
+  {
+    "file": "tests/subscription-statements.test.cjs",
+    "line": 9,
+    "source": "  .map(name => read(`src/lib/calculations/${name}.js`).replace(/^import[\\s\\S]*?from\\s+[\"'][^\"']+[\"'];\\r?\\n/gm, '').replace(/^export /gm, '')).join('\\n');"
+  },
+  {
+    "file": "tests/subscription-statements.test.cjs",
+    "line": 12,
+    "source": "  const source = read(`src/app/api/${route}/route.js`)"
+  },
+  {
+    "file": "tests/subscription-statements.test.cjs",
+    "line": 15,
+    "source": "  vm.runInContext(helpers + '\\n' + source, ctx);"
+  }
+]

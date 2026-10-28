@@ -1,0 +1,33 @@
+
+> afp@0.1.0 lint /home/garatachia/projects/afp
+> eslint
+
+
+/home/garatachia/projects/afp/estados_cuenta/git-privacy-comprobantes-2026-10-23-mty5jome/clean-worktree/src/components/ui/data-table.jsx
+  61:17  warning  Compilation Skipped: Use of incompatible library
+
+This API returns functions which cannot be memoized without leading to stale UI. To prevent this, by default React Compiler will skip memoizing this component/hook. However, you may see issues if values from this API are passed to other components/hooks that are memoized.
+
+  59 |   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize });
+  60 |
+> 61 |   const table = useReactTable({
+     |                 ^^^^^^^^^^^^^ TanStack Table's `useReactTable()` API returns functions that cannot be memoized safely
+  62 |     data,
+  63 |     columns,
+  64 |     state: { sorting, columnFilters, globalFilter, pagination },  react-hooks/incompatible-library
+
+/home/garatachia/projects/afp/src/components/ui/data-table.jsx
+  61:17  warning  Compilation Skipped: Use of incompatible library
+
+This API returns functions which cannot be memoized without leading to stale UI. To prevent this, by default React Compiler will skip memoizing this component/hook. However, you may see issues if values from this API are passed to other components/hooks that are memoized.
+
+  59 |   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize });
+  60 |
+> 61 |   const table = useReactTable({
+     |                 ^^^^^^^^^^^^^ TanStack Table's `useReactTable()` API returns functions that cannot be memoized safely
+  62 |     data,
+  63 |     columns,
+  64 |     state: { sorting, columnFilters, globalFilter, pagination },  react-hooks/incompatible-library
+
+✖ 2 problems (0 errors, 2 warnings)
+

@@ -6,6 +6,12 @@ Consolidado el **27 de octubre de 2026** a partir del README del commit `4562aa0
 
 ## 2026-10-27
 
+### Referencia para la migración gradual a TypeScript
+
+**Fase 0 completada localmente.** Se inventariaron 263 archivos JS/JSX (249 con contenido), contratos y cargadores de pruebas. PostgreSQL desechable verificó 42 migraciones y 45 tablas con RLS; pasaron 820 pruebas sin omisiones, lint y build. Un piloto con dos usuarios ficticios conserva 12 respuestas de transferencias y saldos, comparadas en una segunda ejecución con reloj fijo.
+
+Se registraron la advertencia existente de `pg` y un fallo de preparación del build aislado, resuelto copiando sus dependencias. No hubo conversión de código, cambios de esquema ni despliegue. Evidencias y reproducción: [fase 0](../artifacts/typescript-migration/phase-0/README.md). Continúa pendiente la fase 1 del [plan](plan-migracion-typescript.md).
+
 ### Presupuestos diarios y previsiones de cobro
 
 **Publicado.** El presupuesto variable pasó a estimar consumo por día para evitar concentrar el remanente mensual al final del mes. El gasto personal de una fecha cubre la previsión de ese día; superar el presupuesto antes no elimina las previsiones posteriores. Se añadió una mezcla de efectivo/débito y crédito basada en meses históricos, manteniendo el pago de crédito en su tarjeta.
