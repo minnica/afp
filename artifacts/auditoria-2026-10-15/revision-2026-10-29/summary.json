@@ -1,0 +1,317 @@
+{
+  "reviewedAt": "2026-10-29T07:34:32.516460+00:00",
+  "reviewDate": "2026-10-29",
+  "timeZone": "America/Mexico_City",
+  "baseCommit": "673daab7c84bb1b8a463bb8b105ddab15eec9193",
+  "scope": "Actualización documental de los 14 hallazgos y apartados Android/producto; sin correcciones funcionales.",
+  "production": {
+    "inspectedRemotely": false,
+    "financialDataRead": false,
+    "writes": false,
+    "deployed": false,
+    "publicationClaims": "Historical artifacts only; current TypeScript commit not compared with live deployment"
+  },
+  "findings": {
+    "A01": "CUBIERTA",
+    "A02": "CUBIERTA",
+    "A03": "CUBIERTA",
+    "A04": "PARCIAL",
+    "A05": "CUBIERTA",
+    "A06": "CUBIERTA",
+    "A07": "PENDIENTE",
+    "A08": "PENDIENTE",
+    "A09": "PENDIENTE",
+    "A10": "PARCIAL",
+    "A11": "CUBIERTA",
+    "A12": "PENDIENTE",
+    "A13": "PENDIENTE",
+    "A14": "PENDIENTE"
+  },
+  "counts": {
+    "CUBIERTA": 6,
+    "PARCIAL": 2,
+    "PENDIENTE": 6
+  },
+  "commands": [
+    {
+      "command": [
+        "pnpm",
+        "exec",
+        "prisma",
+        "migrate",
+        "deploy"
+      ],
+      "startedAt": "2026-10-29T07:21:55.615129+00:00",
+      "seconds": 2.732,
+      "exitCode": 0,
+      "output": "migrate.log",
+      "environment": "isolated local PostgreSQL; no production connection"
+    },
+    {
+      "command": [
+        "pnpm",
+        "typecheck"
+      ],
+      "startedAt": "2026-10-29T07:21:48.359139+00:00",
+      "seconds": 4.481,
+      "exitCode": 0,
+      "output": "typecheck.log",
+      "environment": "isolated local PostgreSQL; no production connection"
+    },
+    {
+      "command": [
+        "pnpm",
+        "typecheck:tests"
+      ],
+      "startedAt": "2026-10-29T07:21:52.840091+00:00",
+      "seconds": 16.049,
+      "exitCode": 0,
+      "output": "typecheck-tests.log",
+      "environment": "isolated local PostgreSQL; no production connection"
+    },
+    {
+      "command": [
+        "pnpm",
+        "test:types"
+      ],
+      "startedAt": "2026-10-29T07:22:08.889143+00:00",
+      "seconds": 8.708,
+      "exitCode": 0,
+      "output": "test-types.log",
+      "environment": "isolated local PostgreSQL; no production connection"
+    },
+    {
+      "command": [
+        "pnpm",
+        "lint"
+      ],
+      "startedAt": "2026-10-29T07:21:18.962377+00:00",
+      "seconds": 45.602,
+      "exitCode": 0,
+      "output": "lint.log",
+      "environment": "isolated local PostgreSQL; no production connection"
+    },
+    {
+      "command": [
+        "pnpm",
+        "test"
+      ],
+      "startedAt": "2026-10-29T07:21:58.347318+00:00",
+      "seconds": 54.251,
+      "exitCode": 0,
+      "output": "test.log",
+      "environment": "isolated local PostgreSQL; no production connection"
+    },
+    {
+      "command": [
+        "pnpm",
+        "build"
+      ],
+      "startedAt": "2026-10-29T07:22:54.189750+00:00",
+      "seconds": 23.776,
+      "exitCode": 0,
+      "output": "build.log",
+      "environment": "isolated local PostgreSQL; no production connection"
+    },
+    {
+      "command": [
+        "pnpm",
+        "db:verify"
+      ],
+      "startedAt": "2026-10-29T07:22:52.598689+00:00",
+      "seconds": 72.235,
+      "exitCode": 0,
+      "output": "db-verify.log",
+      "environment": "isolated local PostgreSQL; no production connection"
+    },
+    {
+      "command": [
+        "pnpm",
+        "audit",
+        "--prod",
+        "--json"
+      ],
+      "startedAt": "2026-10-29T07:21:54.342488+00:00",
+      "seconds": 3.349,
+      "exitCode": 1,
+      "output": "audit-prod.json",
+      "environment": "isolated local PostgreSQL; no production connection"
+    },
+    {
+      "command": [
+        "pnpm",
+        "audit",
+        "--json"
+      ],
+      "startedAt": "2026-10-29T07:21:57.691705+00:00",
+      "seconds": 3.372,
+      "exitCode": 1,
+      "output": "audit-all.json",
+      "environment": "isolated local PostgreSQL; no production connection"
+    }
+  ],
+  "tests": {
+    "total": 871,
+    "passed": 871,
+    "failed": 0,
+    "skipped": 0,
+    "topLevel": 572,
+    "subtests": 299,
+    "database": "Disposable local PostgreSQL 16, migrated from versioned SQL",
+    "auth": "simulated",
+    "google": "simulated"
+  },
+  "databaseReproduction": {
+    "migrations": 42,
+    "rlsTablesIncludingHistory": 45,
+    "emptyDatabase": true,
+    "historicalUpgrade": true,
+    "checksumsPreserved": true,
+    "catalogEquivalent": true,
+    "recordsPreserved": true,
+    "schemaDiffEmpty": true,
+    "regressionTests": 871
+  },
+  "lint": {
+    "errors": 0,
+    "warnings": 3,
+    "existing": [
+      "loadSubscriptions unused",
+      "activeReceivables unused",
+      "TanStack useReactTable / React Compiler"
+    ]
+  },
+  "build": {
+    "defaultCommand": "pnpm build",
+    "bundler": "Turbopack",
+    "passed": true,
+    "nextVersion": "16.3.8",
+    "databaseAndAuthEnvironment": "Explicit local/fictitious values override .env files; provider variables not printed"
+  },
+  "reproductions": {
+    "script": "reproduce.ts",
+    "result": "reproductions.json",
+    "findings": [
+      "A04",
+      "A07",
+      "A08",
+      "A09"
+    ],
+    "realSource": true,
+    "persistenceAndHttp": "simulated",
+    "browser": false,
+    "acceptanceTests": false
+  },
+  "dependencyAudit": {
+    "freshValidResult": false,
+    "attempts": [
+      {
+        "environment": "sandbox",
+        "scopes": [
+          "prod",
+          "all"
+        ],
+        "error": "EAI_AGAIN"
+      },
+      {
+        "environment": "escalated retry",
+        "scopes": [
+          "prod",
+          "all"
+        ],
+        "error": "ETIMEDOUT"
+      }
+    ],
+    "latestCompleteEvidence": "../../mi-dinero/presupuesto-diario/dependency-audit.json",
+    "evidenceDate": "2026-10-27",
+    "prod": {
+      "critical": 2,
+      "high": 1,
+      "moderate": 2,
+      "low": 2
+    },
+    "all": {
+      "critical": 2,
+      "high": 2,
+      "moderate": 2,
+      "low": 2
+    },
+    "currentAffectedVersionsStillInLockfile": {
+      "next": "16.3.8",
+      "fast-uri": "3.1.8",
+      "body-parser": "2.3.0"
+    },
+    "exploitabilityDemonstrated": false
+  },
+  "sandboxLimitations": [
+    "Podman state directory read-only; retried with approved escalation.",
+    "Local PostgreSQL connection blocked with P1001; migration and integrations retried outside sandbox.",
+    "npm audits: DNS in sandbox, timeout after approved escalation."
+  ],
+  "priorBrowserEvidence": "../../typescript-tests-migration/phase-6/README.md",
+  "browserRepeated": false,
+  "androidRepeated": false,
+  "cleanup": {
+    "container": "afp-audit-20261029-postgres",
+    "startedWithRm": true,
+    "stoppedAfterChecks": true,
+    "applicationDataChanged": false
+  },
+  "sourceSha256": {
+    "README.md": "2a6a86fa39bda42bb1a62674594a7b576b249c1e0c2367ae43aee1cd2bf9e2e3",
+    "package.json": "27078fcfb2ae431fad8d0644ad5546087036baf8d2bdf884934a132baf09b6e0",
+    "pnpm-lock.yaml": "b35d42a9c0e93bd028790958c31c6e8d5f4e33ef6ca47e8099881300b76f7b7c",
+    "src/lib/apiAuth.ts": "cc401696d24704e00835b3edd9a9da397d5d62fc2c9e7ead26dd5be7e02c2882",
+    "src/lib/apiFetch.ts": "3a9f470771594a0cd97991b0c86a75ab7b1ec35b28154844b867a933bc77ebbf",
+    "public/sw.js": "03f2a85166e175193f80d8c4db478c4c0a71a5290532f8b2da612cebf8ecf15d",
+    "src/lib/offlineExpenses.ts": "a33db15933fa90c4015386cf9f766c71158d179b9d65de49e5a1e1be1606ae8a",
+    "src/lib/expenseOperations.ts": "77b0eaab3b524cc115bd6119979e7d783dacce1973942eb0f50b80315eb48e0d",
+    "src/lib/expenseService.ts": "25cced7a663c3632fe9d877df7f1d0ef367e779c5d50f6d7ac7196def93da747",
+    "src/lib/financialContracts.ts": "32ec6415cc9aa3e7a14e8a48632453f68c64f275d69cfc227e2395c256444dc5",
+    "src/lib/debtAccountService.ts": "84bf30095bc928892e074b6db876eec597eaf1efe549b69a419b6d2f075510b3",
+    "src/lib/calculations/cardCyclePayments.ts": "ed349cbb166547f1e7e66f80544c078e856de1e70708ec5edadb5f5cf49b0f86",
+    "src/lib/calculations/debtAccounts.ts": "cf511d020878fe563d55fa7455cef3ca58c97947021a4bf4bab1a1272adf0d5b",
+    "src/app/api/incomes/route.ts": "530044d1340a3988cf2b247a050e1b78ca451ff3a4803c513b9f8086cc801a00",
+    "src/app/api/expenses/route.ts": "29d62bf91ce4893106ed12ea86756946321616b483f1a32f961797dd6519bca1",
+    "src/app/api/payables/route.ts": "040933554d516bbd2dd92eb84b00af33681bb02deba45f6023e13cabe1b4bd8c",
+    "src/app/api/receivables/route.ts": "97ec0dbe0c8427b0bed2f5d7f7935a72a27d5dfe61bfe5e75b0df70b56bd3275",
+    "src/app/api/installment-purchases/route.ts": "713b652595b5df4730871e57b4f7b5aa0f99a957624af308297f6200310ae335",
+    "src/app/api/card-cycles/route.ts": "fbe0cbe8019d37c33f84ebee7268c877822ecea3ca6d7194fe73e38025270a02",
+    "src/app/api/dashboard/route.ts": "7f681c048b81768d3af05fcc5bca32c9c4c5496a5590f8eedeef4e8e6650dcfd",
+    "src/components/gastos/GastosContent.tsx": "e422c3437f233bcc38b75397858923291d2d643ad478fb82f7e357d6f3e5c897",
+    "src/components/dashboard/DashboardProvider.tsx": "0b97a3f0dad643f844c154844d5a761f258f95ddae9a07310e3df57f2f732089",
+    "src/components/layout/AppSidebar.tsx": "ec50a5b6411f2b6a948b22b8a0d9a0d89a47c002461bd6816b720b9035490e4c",
+    "src/app/login/page.tsx": "9ee33e3a114303e9d1a81610af4c55c936f44e23a6eddc2b719b873333c0181a",
+    "src/components/ui/button.tsx": "2a220082981632d9883de5df86247d992b0c480a729e65af4a73a8e191d93c9d",
+    "src/components/ui/input.tsx": "5860debf2bf1b7e81bb653bea3c3fe2840ebd8f3cd6f10d314026320ffffc2dc",
+    "src/lib/latestRequest.ts": "7a1a6b991cbfd277cf3f70a45afa700189ba0b47a4d92c7d1281cbdf9a714671",
+    "src/lib/money/dates.ts": "f1c8cc47930a9edeccbfd6804b5b628dd0483d8d94e7a3031b5b09b7a13ad1ba",
+    "src/lib/money/schema.ts": "987b4861db528e34ad34918afe697803a767cca43ac8eb0e96e003c1e9bf181e",
+    "src/lib/money/forecast.ts": "58af73bd096947e0c7ab67e70e32db29337b9d90f66debdfc6169bcd3bc9f777",
+    "src/lib/money/service.ts": "307554038679cd5fb38174b95c63cf150fceb01a1eb3bb4ab95526da930b3133",
+    "src/lib/capturePayments.ts": "bbaaeebcb8d3a58198706d734fccb49d44a86f447ed3e373f5b37741d6f88b51",
+    "src/lib/calendar/events.ts": "7884701b038a2e2b23a4cadc3a21495b5fd837cd7d2763c1d1ef9536e724ce3d",
+    "prisma/schema.prisma": "00828cc74e12eb1c555d9e450ab03bcc5f679612531c8ecf26ec1ba810e80a13",
+    "android/app/build.gradle.kts": "40e8cddfd0d31b7b3571cb0e88d9b5d2fc43f89a8acf0d1cee9e4cbbee72f587",
+    "tests/card-cycle-payments.test.ts": "97cdbfd931aebb0dab6e79c5d30e8724f96495815e61ad84c195e3b755a61a87",
+    "tests/api-authorization.test.ts": "e528ea79fe0d9ef245193f4f64de320439294691aafaa692a394199003a56dcf",
+    "tests/debt-accounts-integration.test.ts": "e49aee9071905224c457afad2dd595e1a15d8d85ca532f4c54c6aef8f3e329ab",
+    "tests/related-operations-integration.test.ts": "92903a0c5250654c39243703e020f52cea772d9a11b67de59afa8c8fb691356f",
+    "tests/expense-operations-integration.test.ts": "08f2ce428e4cd124b90439755b4c605685b6b70ab554d43ee89936dde3b51b81"
+  },
+  "limits": [
+    "No new authenticated acceptance using two real Supabase accounts.",
+    "No new performance or accessibility measurement.",
+    "No fresh live production, device-rule, or dependency-security certification.",
+    "Historical reproduction commands targeting removed JavaScript paths are obsolete; current runner uses TypeScript."
+  ],
+  "historicalEvidenceFilesModified": false,
+  "reportSha256": "59dd4ca061d8975a777dd37b9a5b1c6ae174383ba1a50fb9342af030f03c3ff8",
+  "documentationValidation": {
+    "localLinksExist": true,
+    "internalAnchorsExist": true,
+    "fourteenStatusEntriesAgree": true,
+    "sourceFilesMatchBaseCommit": true,
+    "jsonArtifactsParse": true
+  }
+}

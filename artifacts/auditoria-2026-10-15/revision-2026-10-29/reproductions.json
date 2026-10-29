@@ -1,0 +1,101 @@
+{
+  "reviewedAt": "2026-10-29T07:25:31.946Z",
+  "source": "working tree",
+  "productionAccess": false,
+  "persistence": "memory only",
+  "findings": [
+    {
+      "id": "A04",
+      "status": "PARCIAL",
+      "originalMorningDefectFixed": true,
+      "sameInstant": "2026-10-16T00:01:00Z",
+      "mexicoLocalTime": "2026-10-15 18:01",
+      "states": {
+        "UTC": {
+          "morning": "PAYMENT_PENDING",
+          "evening": "OVERDUE"
+        },
+        "America/Mexico_City": {
+          "morning": "PAYMENT_PENDING",
+          "evening": "PAYMENT_PENDING"
+        }
+      },
+      "limit": "Función real; no determina la zona configurada en producción."
+    },
+    {
+      "id": "A07",
+      "status": "PENDIENTE",
+      "realCount": 101,
+      "returnedCount": 100,
+      "realTotal": 1010,
+      "returnedTotal": 1000,
+      "limit": "Handler real con findMany ficticio que respeta take."
+    },
+    {
+      "id": "A08",
+      "status": "PENDIENTE",
+      "input": {
+        "date": "2026-02-30",
+        "amount": "10.123",
+        "source": "   ",
+        "concept": "   ",
+        "incomeTypeId": "audit-type"
+      },
+      "income": {
+        "httpStatus": 200,
+        "value": {
+          "id": "audit-income",
+          "userId": "audit-user",
+          "date": "2026-03-02T12:00:00.000Z",
+          "incomeTypeId": "audit-type",
+          "source": "",
+          "concept": "",
+          "amount": 10.123,
+          "receivableAccountId": null,
+          "notes": null
+        }
+      },
+      "expense": {
+        "httpStatus": 200,
+        "value": {
+          "id": "audit-expense",
+          "userId": "audit-user",
+          "date": "2026-03-02T12:00:00.000Z",
+          "paymentMethod": "CASH",
+          "cardId": null,
+          "debitAccountId": null,
+          "concept": "",
+          "amount": 10.123,
+          "cashContributionAmount": 0,
+          "categoryId": "audit-category",
+          "notes": null,
+          "personId": null,
+          "receivableAccountId": null,
+          "payableAccountId": null,
+          "subscriptionId": null,
+          "reconciliationStatus": "CONFIRMED"
+        }
+      },
+      "writes": 2,
+      "limit": "Handlers y validadores reales; datos en memoria. No afirma cómo PostgreSQL redondearía el Decimal."
+    },
+    {
+      "id": "A09",
+      "status": "PENDIENTE",
+      "currentFilter": "B",
+      "rendered": [
+        "A"
+      ],
+      "loadingWhileFirstPending": false,
+      "requestOrder": [
+        "/api/expenses?filter=A",
+        "/api/expenses?filter=B"
+      ],
+      "responseOrder": [
+        "B",
+        "A"
+      ],
+      "limit": "Función loadExpenses extraída literalmente y transformada con esbuild; HTTP/estado simulados, sin navegador."
+    }
+  ]
+}

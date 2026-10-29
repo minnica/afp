@@ -1,0 +1,13 @@
+{
+  "command": [
+    "pnpm",
+    "audit",
+    "--prod",
+    "--json"
+  ],
+  "startedAt": "2026-10-29T07:21:54.342488+00:00",
+  "seconds": 3.349,
+  "exitCode": 1,
+  "output": "audit-prod.json",
+  "environment": "isolated local PostgreSQL; no production connection"
+}

@@ -1,0 +1,11 @@
+{
+  "command": [
+    "pnpm",
+    "typecheck:tests"
+  ],
+  "startedAt": "2026-10-29T07:21:52.840091+00:00",
+  "seconds": 16.049,
+  "exitCode": 0,
+  "output": "typecheck-tests.log",
+  "environment": "isolated local PostgreSQL; no production connection"
+}

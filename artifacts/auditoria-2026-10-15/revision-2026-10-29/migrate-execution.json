@@ -1,0 +1,14 @@
+{
+  "command": [
+    "pnpm",
+    "exec",
+    "prisma",
+    "migrate",
+    "deploy"
+  ],
+  "startedAt": "2026-10-29T07:21:55.615129+00:00",
+  "seconds": 2.732,
+  "exitCode": 0,
+  "output": "migrate.log",
+  "environment": "isolated local PostgreSQL; no production connection"
+}

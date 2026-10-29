@@ -1,0 +1,11 @@
+{
+  "command": [
+    "pnpm",
+    "test"
+  ],
+  "startedAt": "2026-10-29T07:21:58.347318+00:00",
+  "seconds": 54.251,
+  "exitCode": 0,
+  "output": "test.log",
+  "environment": "isolated local PostgreSQL; no production connection"
+}

@@ -1,0 +1,6 @@
+{
+  "error": {
+    "code": "ETIMEDOUT",
+    "message": "request to https://registry.npmjs.org/-/npm/v1/security/audits/quick failed, reason: "
+  }
+}
