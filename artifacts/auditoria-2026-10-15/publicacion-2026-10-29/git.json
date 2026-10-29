@@ -1,0 +1,68 @@
+{
+  "checkedAt": "2026-10-29T09:47:36.459Z",
+  "head": "08aee7c1de08533fc19124e3842c454f59cf743f",
+  "originMaster": "08aee7c1de08533fc19124e3842c454f59cf743f",
+  "deployedCommit": "08aee7c1de08533fc19124e3842c454f59cf743f",
+  "matchesLocalAndTrackingRef": true,
+  "findings": [
+    {
+      "finding": "A04",
+      "commit": "eead77a1f345b4e75463a7ff207035fb43e31c6a",
+      "subject": "feat(*): fase A04 complete audit",
+      "isAncestor": true
+    },
+    {
+      "finding": "A07",
+      "commit": "5d4683cf39c5daca21107a6db3f0cdacef471e1e",
+      "subject": "feat(*): fase A07 complete audit",
+      "isAncestor": true
+    },
+    {
+      "finding": "A08",
+      "commit": "be596435d41e4c20c774819367b1dd1f61f616f7",
+      "subject": "feat(*): fase A08 complete audit",
+      "isAncestor": true
+    },
+    {
+      "finding": "A09",
+      "commit": "ca53e80979df18e94bd989904134347ad0c34cfa",
+      "subject": "feat(*): fase A09 complete audit",
+      "isAncestor": true
+    },
+    {
+      "finding": "A10",
+      "commit": "08aee7c1de08533fc19124e3842c454f59cf743f",
+      "subject": "feat(*): fase A10 complete audit",
+      "isAncestor": true
+    }
+  ],
+  "versionsInDeployedCommit": {
+    "next": "16.4.3",
+    "eslintConfigNext": "16.4.3"
+  },
+  "matchingTestedFiles": {
+    "package.json": {
+      "sha256": "cd2f41db7be48fd80bf186a7b55863d3722c390573eae5f16d67248923b0dfce",
+      "matchesA10LocalEvidence": true
+    },
+    "pnpm-lock.yaml": {
+      "sha256": "5065473f5482aed75105c715e4560973f05365747ad2a4bb1ebef8765654f29f",
+      "matchesA10LocalEvidence": true
+    }
+  },
+  "schemaOrAndroidChanges": [],
+  "typeScriptClosures": [
+    {
+      "area": "web",
+      "commit": "6aad1abc7e5bf91d1be6c750f0c7e30cebc352d2",
+      "subject": "feat(*): fase 7 js to ts complete",
+      "isAncestor": true
+    },
+    {
+      "area": "tests",
+      "commit": "673daab7c84bb1b8a463bb8b105ddab15eec9193",
+      "subject": "feat(*): fase 6 complete test js to ts",
+      "isAncestor": true
+    }
+  ]
+}

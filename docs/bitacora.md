@@ -6,6 +6,14 @@ Consolidado el **27 de octubre de 2026** a partir del README del commit `4562aa0
 
 ## 2026-10-29
 
+### Publicación confirmada de A04/A07/A08/A09 y la actualización A10
+
+**Cotejo remoto de solo lectura.** Vercel confirma el commit `08aee7c1de08533fc19124e3842c454f59cf743f` de `master`, idéntico a HEAD y `origin/master` al consultar, en el despliegue de producción `dpl_DMUG88ufc6cqJheyt8khaRwVUvxM`. Estado **READY**, dominio `finanzas.garatachia.com` asignado y sin error de alias; listo el 29/10 a las **09:33:52 UTC / 03:33:52 México**. Incluye los commits de A04, A07, A08, A09 y A10, además de la migración web a TypeScript.
+
+El informe pasa A04/A07/A08/A09 de «implementada localmente» a **CUBIERTA, publicación confirmada**. A10 conserva su estado parcial por el aviso bajo de desarrollo de la última auditoría, pero deja de tener publicación pendiente. Las aceptaciones con sesión Supabase real y los pendientes A12/A13/A14 no cambian. Las entradas siguientes y sus artefactos conservan el alcance histórico de los cierres locales, que no realizaron el despliegue.
+
+Se cotejaron metadatos de Vercel, historial Git y respuestas HTTP anónimas; no se ejecutaron registros financieros, nuevas migraciones, pruebas de aceptación ni auditorías de dependencias en producción. README e informe actualizados con su evidencia y límites. [Publicación verificada](../artifacts/auditoria-2026-10-15/publicacion-2026-10-29/README.md).
+
 ### A10: actualización de dependencias y diagnóstico vigente
 
 **Actualización local verificada** sobre `ca53e80`. Next.js y `eslint-config-next` pasan de 16.3.8 a **16.4.3**; el lockfile actualiza fast-uri a **3.1.9**, body-parser a **2.4.0** y systeminformation a **5.33.18**, dentro de los rangos compatibles. Se conservan React, Prisma, Sharp, shadcn en desarrollo y la política de scripts. Se retira una supresión ESLint de Gastos que las reglas nuevas consideran innecesaria. No se añaden overrides ni se ocultan avisos.
@@ -352,7 +360,7 @@ Estos puntos conservan el estado de la evidencia citada; antes de retomarlos, co
 
 | Tema | Último estado documentado | Evidencia |
 | --- | --- | --- |
-| Dependencias | Actualización local A10 del 29/10: cero avisos de producción y uno bajo de desarrollo, deepmerge sin parche publicado; publicación pendiente y ambas auditorías antes de desplegar | [Resultados vigentes](../artifacts/auditoria-2026-10-15/a10-2026-10-29/README.md) |
+| Dependencias | Actualización A10 publicada en `08aee7c`; últimas auditorías locales: cero avisos del árbol de producción y uno bajo de desarrollo, deepmerge sin parche en la consulta. Seguimiento del aviso y ambas auditorías antes de la siguiente publicación | [Auditorías](../artifacts/auditoria-2026-10-15/a10-2026-10-29/README.md) · [Publicación](../artifacts/auditoria-2026-10-15/publicacion-2026-10-29/README.md) |
 | Nómina automática | Solicitada, sin regla implementada ni activa al 27 de octubre. Falta una notificación Android que permita verificar importe real, fecha y terminación; el buzón interno bancario no demuestra esos campos | README histórico, sección «Automatización de nómina solicitada», recuperable con el comando indicado abajo |
 | Avisos importantes Android | Backend publicado y APK instalada; faltaba activar la opción, conceder permiso y confirmar recepción | [Cierre del 26 de octubre](../artifacts/android-important-notices/production.json) |
 | Mi dinero | Publicación pendiente en los cierres locales de carga, capital total y resumen; advertencia de `pg` sin causa demostrada del fallo original | [Carga](../artifacts/mi-dinero/carga-resiliente/verificacion.json), [capital total](../artifacts/mi-dinero/capital-total/verificacion.json), [resumen](../artifacts/mi-dinero/resumen-escritorio/verificacion.json) |

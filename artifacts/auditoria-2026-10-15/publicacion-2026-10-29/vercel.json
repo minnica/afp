@@ -1,0 +1,46 @@
+{
+  "checkedAt": "2026-10-29 09:45:03 UTC",
+  "projectId": "prj_FUBRDkPPFpOgJG9zuLLhTwm3JHKV",
+  "teamId": "team_5jQEAASyPb5wB0LxR9KsHf5X",
+  "origin": "https://finanzas.garatachia.com",
+  "lookup": "get_deployment by production custom hostname, with Git metadata",
+  "deployment": {
+    "id": "dpl_DMUG88ufc6cqJheyt8khaRwVUvxM",
+    "url": "afp-4f9tp8p54-minnicas-projects.vercel.app",
+    "state": "READY",
+    "target": "production",
+    "source": "git",
+    "createdAt": "2026-10-29T09:31:57.084Z",
+    "readyAt": "2026-10-29T09:33:52.215Z",
+    "alias": [
+      "afp-virid.vercel.app",
+      "finanzas.garatachia.com",
+      "afp-minnicas-projects.vercel.app",
+      "afp-git-master-minnicas-projects.vercel.app"
+    ],
+    "aliasError": null,
+    "git": {
+      "organization": "minnica",
+      "repository": "afp",
+      "branch": "master",
+      "commit": "08aee7c1de08533fc19124e3842c454f59cf743f",
+      "message": "feat(*): fase A10 complete audit"
+    }
+  },
+  "scope": {
+    "confirmed": "deployment identity, production target, READY state and production domain assignment",
+    "notConfirmed": [
+      "authenticated financial flows",
+      "Supabase Auth acceptance with two real users",
+      "Google Calendar delivery/synchronization",
+      "Android APK installation or bank-notification reception",
+      "remote database schema, migrations or data",
+      "new dependency audit or tests in production"
+    ]
+  },
+  "connectorApiLimitation": {
+    "code": "deployment_authentication_required",
+    "status": 401,
+    "meaning": "Connector classified HTTP 401 as deployment protection; direct unauthenticated HTTP verification is recorded separately."
+  }
+}

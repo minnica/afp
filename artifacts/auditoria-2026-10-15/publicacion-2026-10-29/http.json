@@ -1,0 +1,44 @@
+{
+  "checkedAt": "2026-10-29T09:45:04.350Z",
+  "origin": "https://finanzas.garatachia.com",
+  "authentication": "none",
+  "results": [
+    {
+      "route": "/login",
+      "status": 200,
+      "cacheControl": "public, max-age=0, must-revalidate",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "route": "/api/incomes",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "Authorization",
+      "contentType": "application/json",
+      "body": {
+        "error": "Inicia sesión para continuar."
+      }
+    },
+    {
+      "route": "/api/expenses",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "Authorization",
+      "contentType": "application/json",
+      "body": {
+        "error": "Inicia sesión para continuar."
+      }
+    },
+    {
+      "route": "/api/card-cycles",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "Authorization",
+      "contentType": "application/json",
+      "body": {
+        "error": "Inicia sesión para continuar."
+      }
+    }
+  ]
+}
