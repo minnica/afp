@@ -26,7 +26,9 @@ Este README describe el funcionamiento y los procedimientos del código versiona
 
 ## Módulos
 
-`/` redirige a `/dashboard`; el inicio de sesión y el manifest de la PWA también usan esa ruta como entrada. La navegación compartida se define en [src/lib/navigation.tsx](src/lib/navigation.tsx).
+`/` abre `/gastos` en móvil (ancho menor de 768 px) y `/dashboard` en escritorio. El inicio de sesión y el manifest de la PWA usan `/` como entrada; la APK Android abre `/gastos`. El manifest conserva `/dashboard` como identificador de la PWA para mantener la identidad de las instalaciones existentes. La navegación compartida se define en [src/lib/navigation.tsx](src/lib/navigation.tsx).
+
+Las páginas muestran primero su contenido normal. Los formularios de creación en diálogo se abren al pulsar «Nuevo gasto», «Nueva compra», «Nueva suscripción» o la acción equivalente de cada sección; no se abren automáticamente al entrar ni al volver a una página. Se conservan los borradores por usuario y los formularios integrados de escritorio.
 
 | Ruta | Función |
 | --- | --- |

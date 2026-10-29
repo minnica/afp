@@ -1,0 +1,210 @@
+{
+  "environment": "Chromium, viewport móvil emulado, build de producción, Auth ficticia, PostgreSQL local",
+  "mobileLogin": {
+    "path": "/gastos",
+    "width": 390,
+    "dialogs": 0,
+    "overflow": false
+  },
+  "forms": [
+    {
+      "route": "/compras-a-meses",
+      "initial": {
+        "dialogs": 0,
+        "heading": "Compras a meses",
+        "overflow": false,
+        "path": "/compras-a-meses",
+        "width": 390
+      },
+      "openedDialogs": 1,
+      "closed": {
+        "dialogs": 0,
+        "focus": "Nueva compra",
+        "heading": "Compras a meses",
+        "overflow": false,
+        "path": "/compras-a-meses",
+        "width": 390
+      }
+    },
+    {
+      "route": "/suscripciones",
+      "initial": {
+        "dialogs": 0,
+        "heading": "Suscripciones",
+        "overflow": false,
+        "path": "/suscripciones",
+        "width": 390
+      },
+      "openedDialogs": 1,
+      "closed": {
+        "dialogs": 0,
+        "focus": "Nueva suscripción",
+        "heading": "Suscripciones",
+        "overflow": false,
+        "path": "/suscripciones",
+        "width": 390
+      }
+    },
+    {
+      "route": "/ingresos",
+      "initial": {
+        "dialogs": 0,
+        "heading": "Ingresos",
+        "overflow": false,
+        "path": "/ingresos",
+        "width": 390
+      },
+      "openedDialogs": 1,
+      "closed": {
+        "dialogs": 0,
+        "focus": "Nuevo ingreso",
+        "heading": "Ingresos",
+        "overflow": false,
+        "path": "/ingresos",
+        "width": 390
+      }
+    },
+    {
+      "route": "/cuentas-por-cobrar",
+      "initial": {
+        "dialogs": 0,
+        "heading": "Cuentas por cobrar",
+        "overflow": false,
+        "path": "/cuentas-por-cobrar",
+        "width": 390
+      },
+      "openedDialogs": 1,
+      "closed": {
+        "dialogs": 0,
+        "focus": "Nueva cuenta por cobrar",
+        "heading": "Cuentas por cobrar",
+        "overflow": false,
+        "path": "/cuentas-por-cobrar",
+        "width": 390
+      }
+    },
+    {
+      "route": "/cuentas-por-pagar",
+      "initial": {
+        "dialogs": 0,
+        "heading": "Cuentas por pagar",
+        "overflow": false,
+        "path": "/cuentas-por-pagar",
+        "width": 390
+      },
+      "openedDialogs": 1,
+      "closed": {
+        "dialogs": 0,
+        "focus": "Nueva cuenta por pagar",
+        "heading": "Cuentas por pagar",
+        "overflow": false,
+        "path": "/cuentas-por-pagar",
+        "width": 390
+      }
+    },
+    {
+      "route": "/gastos",
+      "initial": {
+        "dialogs": 0,
+        "heading": "Gastos",
+        "overflow": false,
+        "path": "/gastos",
+        "width": 390
+      },
+      "openedDialogs": 1,
+      "closed": {
+        "dialogs": 0,
+        "focus": "Nuevo gasto",
+        "heading": "Gastos",
+        "overflow": false,
+        "path": "/gastos",
+        "width": 390
+      }
+    }
+  ],
+  "draftAfterNavigation": "Borrador ficticio de navegación",
+  "openAfterOrientationChange": {
+    "dialogs": 1,
+    "heading": "Gastos",
+    "overflow": false,
+    "path": "/gastos",
+    "width": 844
+  },
+  "dashboardFromMobileMenu": {
+    "dialogs": 0,
+    "heading": "Dashboard",
+    "overflow": false,
+    "path": "/dashboard",
+    "width": 390
+  },
+  "cardsFromMobileMenu": {
+    "dialogs": 0,
+    "heading": "Tarjetas",
+    "overflow": false,
+    "path": "/tarjetas",
+    "width": 390
+  },
+  "desktopLogin": {
+    "dialogs": 0,
+    "heading": "Dashboard",
+    "overflow": false,
+    "path": "/dashboard",
+    "width": 1440
+  },
+  "rootEntries": [
+    {
+      "dialogs": 0,
+      "heading": "Gastos",
+      "overflow": false,
+      "path": "/gastos",
+      "width": 390
+    },
+    {
+      "dialogs": 0,
+      "heading": "Gastos",
+      "overflow": false,
+      "path": "/gastos",
+      "width": 767
+    },
+    {
+      "dialogs": 0,
+      "heading": "Dashboard",
+      "overflow": false,
+      "path": "/dashboard",
+      "width": 768
+    }
+  ],
+  "manifest": {
+    "id": "/dashboard",
+    "start_url": "/"
+  },
+  "pwaStartUrlMobile": {
+    "dialogs": 0,
+    "heading": "Gastos",
+    "overflow": false,
+    "path": "/gastos",
+    "width": 390
+  },
+  "reloadMobile": {
+    "dialogs": 0,
+    "heading": "Gastos",
+    "overflow": false,
+    "path": "/gastos",
+    "width": 390
+  },
+  "offlineMobileStart": {
+    "dialogs": 0,
+    "heading": "Gastos",
+    "overflow": false,
+    "path": "/gastos",
+    "width": 390
+  },
+  "offlineFormOpened": true,
+  "offlineNotice": [
+    "Sin conexión. Los gastos nuevos se guardarán en este dispositivo y se sincronizarán cuando vuelva internet.",
+    "3 gastos guardados · Total del filtro $150.00 · Tu parte $150.00",
+    "Sin conexión. El gasto quedará pendiente hasta recuperar internet."
+  ],
+  "browserUserAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+  "errors": ""
+}

@@ -6,6 +6,12 @@ Consolidado el **27 de octubre de 2026** a partir del README del commit `4562aa0
 
 ## 2026-10-29
 
+### Inicio móvil en Gastos y formularios por acción explícita
+
+La entrada `/` y el acceso después del login llevan a Gastos con ancho menor de 768 px y a Dashboard en escritorio. La PWA usa esa entrada, conserva su identificador anterior y renueva la caché del shell. La configuración de la APK abre `/gastos`; requiere una APK actualizada para aplicar esa ruta.
+
+Los seis formularios de creación que usan diálogo comienzan cerrados y se abren con su botón. Se verificaron navegación, cierre con retorno de foco, conservación del borrador y cambio de orientación. Pasaron los seis controles del README y **965 escenarios sin fallos ni omisiones**; se actualizó la expectativa existente de limpieza de caché a la versión nueva. Chromium con viewport móvil emulado, Auth ficticia y PostgreSQL local; recursos Android debug generados correctamente. Implementación local, pendiente de publicación e instalación. [Evidencias y límites](../artifacts/inicio-mobile-2026-10-29/README.md).
+
 ### Revisión posterior a A14: publicación y pendientes vigentes
 
 Vercel confirma el commit `834b2f75805da8e406538d898914970647516cb3` de `master` en producción, despliegue `dpl_B1T1UmSsmF9CryKibZ8if5fYhf7g`, **READY** desde las 18:42:44 UTC / 12:42:44 México y asociado a `finanzas.garatachia.com`. Coincide con HEAD y `master` remoto e incluye A12/A13/A14. El informe queda en **13 hallazgos cubiertos y A10 parcial**; las menciones de publicación pendiente en los cierres anteriores son históricas.

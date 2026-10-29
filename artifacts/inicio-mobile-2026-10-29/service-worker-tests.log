@@ -1,0 +1,44 @@
+
+> afp@0.1.0 test /home/garatachia/projects/afp
+> node --import tsx tests/run-tests.ts api-fetch.test.ts offline-service-worker.test.ts
+
+TAP version 13
+# Subtest: apiFetch usa el token vigente, preserva headers y signal, y bloquea otros orígenes
+ok 1 - apiFetch usa el token vigente, preserva headers y signal, y bloquea otros orígenes
+  ---
+  duration_ms: 25.299103
+  type: 'test'
+  ...
+# Subtest: apiFetch no envía nada sin sesión ni con una cuenta distinta de la pantalla
+ok 2 - apiFetch no envía nada sin sesión ni con una cuenta distinta de la pantalla
+  ---
+  duration_ms: 9.233317
+  type: 'test'
+  ...
+# Subtest: la cola conserva los pendientes si cambia la cuenta y los sincroniza con su propietario
+ok 3 - la cola conserva los pendientes si cambia la cuenta y los sincroniza con su propietario
+  ---
+  duration_ms: 32.718921
+  type: 'test'
+  ...
+# Subtest: el service worker no intercepta API ni siquiera como navegación; elimina caché anterior
+ok 4 - el service worker no intercepta API ni siquiera como navegación; elimina caché anterior
+  ---
+  duration_ms: 1.39535
+  type: 'test'
+  ...
+# Subtest: service worker servido como JavaScript: todas las API privadas pasan directo a la red
+ok 5 - service worker servido como JavaScript: todas las API privadas pasan directo a la red
+  ---
+  duration_ms: 2.839749
+  type: 'test'
+  ...
+1..5
+# tests 5
+# suites 0
+# pass 5
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 322.361129

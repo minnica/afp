@@ -1,0 +1,56 @@
+[
+  {
+    "command": "pnpm typecheck",
+    "exitCode": 0,
+    "seconds": 12.2,
+    "log": "typecheck.log"
+  },
+  {
+    "command": "pnpm typecheck:tests",
+    "exitCode": 0,
+    "seconds": 17.8,
+    "log": "typecheck-tests.log"
+  },
+  {
+    "command": "pnpm test:types",
+    "exitCode": 0,
+    "seconds": 9.8,
+    "log": "test-types.log"
+  },
+  {
+    "command": "pnpm lint",
+    "exitCode": 0,
+    "seconds": 45.7,
+    "log": "lint.log"
+  },
+  {
+    "command": "pnpm test",
+    "exitCode": 1,
+    "seconds": 72.1,
+    "log": "test.log"
+  },
+  {
+    "command": "pnpm build",
+    "exitCode": 0,
+    "seconds": 20.6,
+    "log": "build.log"
+  },
+  {
+    "command": "pnpm typecheck:tests",
+    "exitCode": 0,
+    "seconds": 15.1,
+    "log": "typecheck-tests-final.log"
+  },
+  {
+    "command": "pnpm exec eslint tests/api-fetch.test.ts",
+    "exitCode": 0,
+    "seconds": 6.5,
+    "log": "lint-test-final.log"
+  },
+  {
+    "command": "pnpm test",
+    "exitCode": 0,
+    "seconds": 75.8,
+    "log": "test-final.log"
+  }
+]

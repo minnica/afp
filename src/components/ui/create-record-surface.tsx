@@ -36,8 +36,7 @@ export default function CreateRecordSurface({
   const mobile = useIsMobile()
   const errorId = providedErrorId ?? `${generatedId}-error`
   const submittingRef = useRef(false)
-  // La captura comienza abierta en móvil; los cierres posteriores se respetan.
-  const [open, setOpen] = useState(compact)
+  const [open, setOpen] = useState(false)
   const [saveFeedback, setSaveFeedback] = useState<"" | { message: string; type: string }>("")
   const contentRef = useRef<HTMLDivElement | null>(null)
   const formRef = useRef<HTMLFormElement | null>(null)

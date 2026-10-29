@@ -22,7 +22,7 @@ android {
         versionName = "0.8.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         manifestPlaceholders["webHost"] = "finanzas.garatachia.com"
-        resValue("string", "web_url", "https://finanzas.garatachia.com/dashboard")
+        resValue("string", "web_url", "https://finanzas.garatachia.com/gastos")
         resValue("string", "capture_origin", "https://finanzas.garatachia.com")
         resValue("string", "asset_statements", """[{"relation":["delegate_permission/common.handle_all_urls"],"target":{"namespace":"web","site":"https://finanzas.garatachia.com"}}]""")
     }

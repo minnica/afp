@@ -2,7 +2,7 @@ import * as React from "react"
 
 const MOBILE_BREAKPOINT = 768
 // Coincide con el breakpoint de CSS, incluso con anchos fraccionarios.
-const MOBILE_QUERY = `(width < ${MOBILE_BREAKPOINT}px)`
+export const MOBILE_QUERY = `(width < ${MOBILE_BREAKPOINT}px)`
 
 function subscribeToMobileQuery(onChange: () => void) {
   const query = window.matchMedia(MOBILE_QUERY)

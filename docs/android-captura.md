@@ -44,7 +44,7 @@ El wrapper oficial se incluye con el SHA-256 de la distribución. `GRADLE_USER_H
 
 ## Digital Asset Links y TWA
 
-La APK declara `https://finanzas.garatachia.com` como origen confiable y abre `/dashboard`. El navegador comprueba también la relación inversa mediante `https://finanzas.garatachia.com/.well-known/assetlinks.json`.
+La APK declara `https://finanzas.garatachia.com` como origen confiable y abre `/gastos`. El cambio de URL de entrada requiere compilar e instalar la APK actualizada. El navegador comprueba también la relación inversa mediante `https://finanzas.garatachia.com/.well-known/assetlinks.json`.
 
 `public/.well-known/assetlinks.json` contiene únicamente el paquete de **producción** y el SHA-256 público de su certificado. Se generó a partir de la identidad local, sin claves de ejemplo ni huellas de desarrollo. Antes de distribuir o cambiar la firma, contrasta la APK real:
 

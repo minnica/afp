@@ -63,7 +63,7 @@ export default function LoginPage() {
         reopenLocalData(data.user.id);
         await ensureUserSetup(data.user);
 
-        router.push("/dashboard");
+        router.push("/");
         router.refresh();
       }
 

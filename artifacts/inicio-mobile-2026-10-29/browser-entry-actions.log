@@ -1,0 +1,13 @@
+Inicio de escritorio y límite móvil de 768 px verificados.
+Traceback (most recent call last):
+  File "/tmp/afp_mobile_entry_browser.py", line 49, in <module>
+    ui.click_named('button', 'Nuevo gasto')
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/afp_mobile_browser.py", line 19, in click_named
+    browser('click', '@' + match.group(1))
+    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/afp_mobile_browser.py", line 8, in browser
+    raise RuntimeError(' '.join(args) + '\n' + result.stdout + result.stderr)
+RuntimeError: click @e445
+✗ Element '@e445' is covered by <div> at its click point, so the input would land on that element instead. Dismiss or interact with the covering element first (it is often a dialog, banner, or sticky header).
+

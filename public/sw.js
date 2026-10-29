@@ -1,4 +1,4 @@
-const CACHE_NAME = "afp-shell-v4";
+const CACHE_NAME = "afp-shell-v5";
 const APP_SHELL_URLS = [
   "/",
   "/gastos",

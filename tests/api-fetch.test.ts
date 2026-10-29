@@ -67,7 +67,7 @@ test("el service worker no intercepta API ni siquiera como navegación; elimina 
   const handlers = serviceWorkerListeners(), removed: string[] = [];
   vm.runInNewContext(fs.readFileSync("public/sw.js", "utf8"), {
     URL, self: { location: { origin: "http://localhost" }, addEventListener: handlers.register, clients: { claim() {} } },
-    caches: { keys: async () => ["afp-shell-v3", "afp-shell-v4"], delete: async (name: string) => { removed.push(name); } },
+    caches: { keys: async () => ["afp-shell-v3", "afp-shell-v4", "afp-shell-v5"], delete: async (name: string) => { removed.push(name); } },
   });
   for (const mode of ["navigate", "cors"] as const) {
     handlers.fetch({ request: { method: "GET", mode, url: "http://localhost/api/expenses?userId=b" }, respondWith: () => assert.fail("API interceptada") });
@@ -75,5 +75,5 @@ test("el service worker no intercepta API ni siquiera como navegación; elimina 
   let cleanup: Promise<unknown> | undefined;
   handlers.activate({ waitUntil: promise => { cleanup = promise; } });
   await cleanup;
-  assert.deepEqual(removed, ["afp-shell-v3"]);
+  assert.deepEqual(removed, ["afp-shell-v3", "afp-shell-v4"]);
 });
