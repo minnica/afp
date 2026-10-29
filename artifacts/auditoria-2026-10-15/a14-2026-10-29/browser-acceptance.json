@@ -1,0 +1,1684 @@
+{
+  "engine": "Chromium 150.0.7871.24",
+  "automation": "agent-browser; CDP para toque y escala de página",
+  "auth": "ficticia, sin escrituras remotas",
+  "scenarios": {
+    "mobile-login-390x844": {
+      "alert": null,
+      "controls": [
+        {
+          "autocomplete": "username",
+          "bottom": 389.75,
+          "disabled": false,
+          "enterkeyhint": "next",
+          "fontSize": "16px",
+          "height": 48,
+          "id": "email",
+          "inputmode": "email",
+          "labels": [
+            "Correo electrónico"
+          ],
+          "name": "email",
+          "tag": "INPUT",
+          "text": null,
+          "top": 341.75,
+          "width": 326
+        },
+        {
+          "autocomplete": "current-password",
+          "bottom": 482.25,
+          "disabled": false,
+          "enterkeyhint": "go",
+          "fontSize": "16px",
+          "height": 48,
+          "id": "password",
+          "inputmode": null,
+          "labels": [
+            "Contraseña"
+          ],
+          "name": "password",
+          "tag": "INPUT",
+          "text": null,
+          "top": 434.25,
+          "width": 326
+        },
+        {
+          "autocomplete": null,
+          "bottom": 550.25,
+          "disabled": false,
+          "enterkeyhint": null,
+          "fontSize": "16px",
+          "height": 48,
+          "id": null,
+          "inputmode": null,
+          "labels": [],
+          "name": null,
+          "tag": "BUTTON",
+          "text": "Entrar",
+          "top": 502.25,
+          "width": 326
+        },
+        {
+          "autocomplete": null,
+          "bottom": 622.25,
+          "disabled": false,
+          "enterkeyhint": null,
+          "fontSize": "16px",
+          "height": 48,
+          "id": null,
+          "inputmode": null,
+          "labels": [],
+          "name": null,
+          "tag": "BUTTON",
+          "text": "Crear cuenta",
+          "top": 574.25,
+          "width": 130.78125
+        }
+      ],
+      "height": 844,
+      "rootFontSize": "16px",
+      "scrollHeight": 844,
+      "scrollWidth": 390,
+      "status": null,
+      "title": "Iniciar sesión",
+      "viewport": "width=device-width, initial-scale=1",
+      "visualViewport": {
+        "height": 844,
+        "scale": 1,
+        "width": 390
+      },
+      "width": 390
+    },
+    "mobile-loading": {
+      "alert": null,
+      "controls": [
+        {
+          "autocomplete": "username",
+          "bottom": 389.75,
+          "disabled": true,
+          "enterkeyhint": "next",
+          "fontSize": "16px",
+          "height": 48,
+          "id": "email",
+          "inputmode": "email",
+          "labels": [
+            "Correo electrónico"
+          ],
+          "name": "email",
+          "tag": "INPUT",
+          "text": null,
+          "top": 341.75,
+          "width": 326
+        },
+        {
+          "autocomplete": "current-password",
+          "bottom": 482.25,
+          "disabled": true,
+          "enterkeyhint": "go",
+          "fontSize": "16px",
+          "height": 48,
+          "id": "password",
+          "inputmode": null,
+          "labels": [
+            "Contraseña"
+          ],
+          "name": "password",
+          "tag": "INPUT",
+          "text": null,
+          "top": 434.25,
+          "width": 326
+        },
+        {
+          "autocomplete": null,
+          "bottom": 550.25,
+          "disabled": true,
+          "enterkeyhint": null,
+          "fontSize": "16px",
+          "height": 48,
+          "id": null,
+          "inputmode": null,
+          "labels": [],
+          "name": null,
+          "tag": "BUTTON",
+          "text": "Procesando...",
+          "top": 502.25,
+          "width": 326
+        },
+        {
+          "autocomplete": null,
+          "bottom": 622.25,
+          "disabled": true,
+          "enterkeyhint": null,
+          "fontSize": "16px",
+          "height": 48,
+          "id": null,
+          "inputmode": null,
+          "labels": [],
+          "name": null,
+          "tag": "BUTTON",
+          "text": "Crear cuenta",
+          "top": 574.25,
+          "width": 130.78125
+        }
+      ],
+      "height": 844,
+      "rootFontSize": "16px",
+      "scrollHeight": 844,
+      "scrollWidth": 390,
+      "status": "",
+      "title": "Iniciar sesión",
+      "viewport": "width=device-width, initial-scale=1",
+      "visualViewport": {
+        "height": 844,
+        "scale": 1,
+        "width": 390
+      },
+      "width": 390
+    },
+    "mobile-error": {
+      "alert": "El correo o la contraseña no son correctos.",
+      "controls": [
+        {
+          "autocomplete": "username",
+          "bottom": 363,
+          "disabled": false,
+          "enterkeyhint": "next",
+          "fontSize": "16px",
+          "height": 48,
+          "id": "email",
+          "inputmode": "email",
+          "labels": [
+            "Correo electrónico"
+          ],
+          "name": "email",
+          "tag": "INPUT",
+          "text": null,
+          "top": 315,
+          "width": 326
+        },
+        {
+          "autocomplete": "current-password",
+          "bottom": 455.5,
+          "disabled": false,
+          "enterkeyhint": "go",
+          "fontSize": "16px",
+          "height": 48,
+          "id": "password",
+          "inputmode": null,
+          "labels": [
+            "Contraseña"
+          ],
+          "name": "password",
+          "tag": "INPUT",
+          "text": null,
+          "top": 407.5,
+          "width": 326
+        },
+        {
+          "autocomplete": null,
+          "bottom": 577,
+          "disabled": false,
+          "enterkeyhint": null,
+          "fontSize": "16px",
+          "height": 48,
+          "id": null,
+          "inputmode": null,
+          "labels": [],
+          "name": null,
+          "tag": "BUTTON",
+          "text": "Entrar",
+          "top": 529,
+          "width": 326
+        },
+        {
+          "autocomplete": null,
+          "bottom": 649,
+          "disabled": false,
+          "enterkeyhint": null,
+          "fontSize": "16px",
+          "height": 48,
+          "id": null,
+          "inputmode": null,
+          "labels": [],
+          "name": null,
+          "tag": "BUTTON",
+          "text": "Crear cuenta",
+          "top": 601,
+          "width": 130.78125
+        }
+      ],
+      "height": 844,
+      "rootFontSize": "16px",
+      "scrollHeight": 844,
+      "scrollWidth": 390,
+      "status": null,
+      "title": "Iniciar sesión",
+      "viewport": "width=device-width, initial-scale=1",
+      "visualViewport": {
+        "height": 844,
+        "scale": 1,
+        "width": 390
+      },
+      "width": 390
+    },
+    "mobile-register-390x844": {
+      "alert": null,
+      "controls": [
+        {
+          "autocomplete": "username",
+          "bottom": 389.75,
+          "disabled": false,
+          "enterkeyhint": "next",
+          "fontSize": "16px",
+          "height": 48,
+          "id": "email",
+          "inputmode": "email",
+          "labels": [
+            "Correo electrónico"
+          ],
+          "name": "email",
+          "tag": "INPUT",
+          "text": null,
+          "top": 341.75,
+          "width": 326
+        },
+        {
+          "autocomplete": "new-password",
+          "bottom": 482.25,
+          "disabled": false,
+          "enterkeyhint": "done",
+          "fontSize": "16px",
+          "height": 48,
+          "id": "password",
+          "inputmode": null,
+          "labels": [
+            "Contraseña"
+          ],
+          "name": "password",
+          "tag": "INPUT",
+          "text": null,
+          "top": 434.25,
+          "width": 326
+        },
+        {
+          "autocomplete": null,
+          "bottom": 550.25,
+          "disabled": false,
+          "enterkeyhint": null,
+          "fontSize": "16px",
+          "height": 48,
+          "id": null,
+          "inputmode": null,
+          "labels": [],
+          "name": null,
+          "tag": "BUTTON",
+          "text": "Crear cuenta",
+          "top": 502.25,
+          "width": 326
+        },
+        {
+          "autocomplete": null,
+          "bottom": 622.25,
+          "disabled": false,
+          "enterkeyhint": null,
+          "fontSize": "16px",
+          "height": 48,
+          "id": null,
+          "inputmode": null,
+          "labels": [],
+          "name": null,
+          "tag": "BUTTON",
+          "text": "Iniciar sesión",
+          "top": 574.25,
+          "width": 132.40625
+        }
+      ],
+      "height": 844,
+      "rootFontSize": "16px",
+      "scrollHeight": 844,
+      "scrollWidth": 390,
+      "status": null,
+      "title": "Crear cuenta",
+      "viewport": "width=device-width, initial-scale=1",
+      "visualViewport": {
+        "height": 844,
+        "scale": 1,
+        "width": 390
+      },
+      "width": 390
+    },
+    "mobile-register-confirmation": {
+      "alert": null,
+      "controls": [
+        {
+          "autocomplete": "username",
+          "bottom": 353.25,
+          "disabled": false,
+          "enterkeyhint": "next",
+          "fontSize": "16px",
+          "height": 48,
+          "id": "email",
+          "inputmode": "email",
+          "labels": [
+            "Correo electrónico"
+          ],
+          "name": "email",
+          "tag": "INPUT",
+          "text": null,
+          "top": 305.25,
+          "width": 326
+        },
+        {
+          "autocomplete": "new-password",
+          "bottom": 445.75,
+          "disabled": false,
+          "enterkeyhint": "done",
+          "fontSize": "16px",
+          "height": 48,
+          "id": "password",
+          "inputmode": null,
+          "labels": [
+            "Contraseña"
+          ],
+          "name": "password",
+          "tag": "INPUT",
+          "text": null,
+          "top": 397.75,
+          "width": 326
+        },
+        {
+          "autocomplete": null,
+          "bottom": 586.75,
+          "disabled": false,
+          "enterkeyhint": null,
+          "fontSize": "16px",
+          "height": 48,
+          "id": null,
+          "inputmode": null,
+          "labels": [],
+          "name": null,
+          "tag": "BUTTON",
+          "text": "Crear cuenta",
+          "top": 538.75,
+          "width": 326
+        },
+        {
+          "autocomplete": null,
+          "bottom": 658.75,
+          "disabled": false,
+          "enterkeyhint": null,
+          "fontSize": "16px",
+          "height": 48,
+          "id": null,
+          "inputmode": null,
+          "labels": [],
+          "name": null,
+          "tag": "BUTTON",
+          "text": "Iniciar sesión",
+          "top": 610.75,
+          "width": 132.40625
+        }
+      ],
+      "height": 844,
+      "rootFontSize": "16px",
+      "scrollHeight": 844,
+      "scrollWidth": 390,
+      "status": "Cuenta creada. Revisa tu correo si Supabase pide confirmación.",
+      "title": "Crear cuenta",
+      "viewport": "width=device-width, initial-scale=1",
+      "visualViewport": {
+        "height": 844,
+        "scale": 1,
+        "width": 390
+      },
+      "width": 390
+    },
+    "mobile-return-login": {
+      "alert": null,
+      "controls": [
+        {
+          "autocomplete": "username",
+          "bottom": 389.75,
+          "disabled": false,
+          "enterkeyhint": "next",
+          "fontSize": "16px",
+          "height": 48,
+          "id": "email",
+          "inputmode": "email",
+          "labels": [
+            "Correo electrónico"
+          ],
+          "name": "email",
+          "tag": "INPUT",
+          "text": null,
+          "top": 341.75,
+          "width": 326
+        },
+        {
+          "autocomplete": "current-password",
+          "bottom": 482.25,
+          "disabled": false,
+          "enterkeyhint": "go",
+          "fontSize": "16px",
+          "height": 48,
+          "id": "password",
+          "inputmode": null,
+          "labels": [
+            "Contraseña"
+          ],
+          "name": "password",
+          "tag": "INPUT",
+          "text": null,
+          "top": 434.25,
+          "width": 326
+        },
+        {
+          "autocomplete": null,
+          "bottom": 550.25,
+          "disabled": false,
+          "enterkeyhint": null,
+          "fontSize": "16px",
+          "height": 48,
+          "id": null,
+          "inputmode": null,
+          "labels": [],
+          "name": null,
+          "tag": "BUTTON",
+          "text": "Entrar",
+          "top": 502.25,
+          "width": 326
+        },
+        {
+          "autocomplete": null,
+          "bottom": 622.25,
+          "disabled": false,
+          "enterkeyhint": null,
+          "fontSize": "16px",
+          "height": 48,
+          "id": null,
+          "inputmode": null,
+          "labels": [],
+          "name": null,
+          "tag": "BUTTON",
+          "text": "Crear cuenta",
+          "top": 574.25,
+          "width": 130.78125
+        }
+      ],
+      "height": 844,
+      "rootFontSize": "16px",
+      "scrollHeight": 844,
+      "scrollWidth": 390,
+      "status": null,
+      "title": "Iniciar sesión",
+      "viewport": "width=device-width, initial-scale=1",
+      "visualViewport": {
+        "height": 844,
+        "scale": 1,
+        "width": 390
+      },
+      "width": 390
+    },
+    "narrow-login": {
+      "alert": null,
+      "controls": [
+        {
+          "autocomplete": "username",
+          "bottom": 241.75,
+          "disabled": false,
+          "enterkeyhint": "next",
+          "fontSize": "16px",
+          "height": 48,
+          "id": "email",
+          "inputmode": "email",
+          "labels": [
+            "Correo electrónico"
+          ],
+          "name": "email",
+          "tag": "INPUT",
+          "text": null,
+          "top": 193.75,
+          "width": 256
+        },
+        {
+          "autocomplete": "current-password",
+          "bottom": 334.25,
+          "disabled": false,
+          "enterkeyhint": "go",
+          "fontSize": "16px",
+          "height": 48,
+          "id": "password",
+          "inputmode": null,
+          "labels": [
+            "Contraseña"
+          ],
+          "name": "password",
+          "tag": "INPUT",
+          "text": null,
+          "top": 286.25,
+          "width": 256
+        },
+        {
+          "autocomplete": null,
+          "bottom": 402.25,
+          "disabled": false,
+          "enterkeyhint": null,
+          "fontSize": "16px",
+          "height": 48,
+          "id": null,
+          "inputmode": null,
+          "labels": [],
+          "name": null,
+          "tag": "BUTTON",
+          "text": "Entrar",
+          "top": 354.25,
+          "width": 256
+        },
+        {
+          "autocomplete": null,
+          "bottom": 494.25,
+          "disabled": false,
+          "enterkeyhint": null,
+          "fontSize": "16px",
+          "height": 48,
+          "id": null,
+          "inputmode": null,
+          "labels": [],
+          "name": null,
+          "tag": "BUTTON",
+          "text": "Crear cuenta",
+          "top": 446.25,
+          "width": 130.78125
+        }
+      ],
+      "height": 568,
+      "rootFontSize": "16px",
+      "scrollHeight": 568,
+      "scrollWidth": 320,
+      "status": null,
+      "title": "Iniciar sesión",
+      "viewport": "width=device-width, initial-scale=1",
+      "visualViewport": {
+        "height": 568,
+        "scale": 1,
+        "width": 320
+      },
+      "width": 320
+    },
+    "narrow-register": {
+      "alert": null,
+      "controls": [
+        {
+          "autocomplete": "username",
+          "bottom": 241.75,
+          "disabled": false,
+          "enterkeyhint": "next",
+          "fontSize": "16px",
+          "height": 48,
+          "id": "email",
+          "inputmode": "email",
+          "labels": [
+            "Correo electrónico"
+          ],
+          "name": "email",
+          "tag": "INPUT",
+          "text": null,
+          "top": 193.75,
+          "width": 256
+        },
+        {
+          "autocomplete": "new-password",
+          "bottom": 334.25,
+          "disabled": false,
+          "enterkeyhint": "done",
+          "fontSize": "16px",
+          "height": 48,
+          "id": "password",
+          "inputmode": null,
+          "labels": [
+            "Contraseña"
+          ],
+          "name": "password",
+          "tag": "INPUT",
+          "text": null,
+          "top": 286.25,
+          "width": 256
+        },
+        {
+          "autocomplete": null,
+          "bottom": 402.25,
+          "disabled": false,
+          "enterkeyhint": null,
+          "fontSize": "16px",
+          "height": 48,
+          "id": null,
+          "inputmode": null,
+          "labels": [],
+          "name": null,
+          "tag": "BUTTON",
+          "text": "Crear cuenta",
+          "top": 354.25,
+          "width": 256
+        },
+        {
+          "autocomplete": null,
+          "bottom": 494.25,
+          "disabled": false,
+          "enterkeyhint": null,
+          "fontSize": "16px",
+          "height": 48,
+          "id": null,
+          "inputmode": null,
+          "labels": [],
+          "name": null,
+          "tag": "BUTTON",
+          "text": "Iniciar sesión",
+          "top": 446.25,
+          "width": 132.40625
+        }
+      ],
+      "height": 568,
+      "rootFontSize": "16px",
+      "scrollHeight": 568,
+      "scrollWidth": 320,
+      "status": null,
+      "title": "Crear cuenta",
+      "viewport": "width=device-width, initial-scale=1",
+      "visualViewport": {
+        "height": 568,
+        "scale": 1,
+        "width": 320
+      },
+      "width": 320
+    },
+    "short-login": {
+      "alert": null,
+      "controls": [
+        {
+          "autocomplete": "username",
+          "bottom": 208,
+          "disabled": false,
+          "enterkeyhint": "next",
+          "fontSize": "16px",
+          "height": 48,
+          "id": "email",
+          "inputmode": "email",
+          "labels": [
+            "Correo electrónico"
+          ],
+          "name": "email",
+          "tag": "INPUT",
+          "text": null,
+          "top": 160,
+          "width": 311
+        },
+        {
+          "autocomplete": "current-password",
+          "bottom": 300.5,
+          "disabled": false,
+          "enterkeyhint": "go",
+          "fontSize": "16px",
+          "height": 48,
+          "id": "password",
+          "inputmode": null,
+          "labels": [
+            "Contraseña"
+          ],
+          "name": "password",
+          "tag": "INPUT",
+          "text": null,
+          "top": 252.5,
+          "width": 311
+        },
+        {
+          "autocomplete": null,
+          "bottom": 368.5,
+          "disabled": false,
+          "enterkeyhint": null,
+          "fontSize": "16px",
+          "height": 48,
+          "id": null,
+          "inputmode": null,
+          "labels": [],
+          "name": null,
+          "tag": "BUTTON",
+          "text": "Entrar",
+          "top": 320.5,
+          "width": 311
+        },
+        {
+          "autocomplete": null,
+          "bottom": 440.5,
+          "disabled": false,
+          "enterkeyhint": null,
+          "fontSize": "16px",
+          "height": 48,
+          "id": null,
+          "inputmode": null,
+          "labels": [],
+          "name": null,
+          "tag": "BUTTON",
+          "text": "Crear cuenta",
+          "top": 392.5,
+          "width": 130.78125
+        }
+      ],
+      "height": 360,
+      "rootFontSize": "16px",
+      "scrollHeight": 481,
+      "scrollWidth": 375,
+      "status": null,
+      "title": "Iniciar sesión",
+      "viewport": "width=device-width, initial-scale=1",
+      "visualViewport": {
+        "height": 360,
+        "scale": 1,
+        "width": 375
+      },
+      "width": 390
+    },
+    "short-register": {
+      "alert": null,
+      "controls": [
+        {
+          "autocomplete": "username",
+          "bottom": 87,
+          "disabled": false,
+          "enterkeyhint": "next",
+          "fontSize": "16px",
+          "height": 48,
+          "id": "email",
+          "inputmode": "email",
+          "labels": [
+            "Correo electrónico"
+          ],
+          "name": "email",
+          "tag": "INPUT",
+          "text": null,
+          "top": 39,
+          "width": 311
+        },
+        {
+          "autocomplete": "new-password",
+          "bottom": 179.5,
+          "disabled": false,
+          "enterkeyhint": "done",
+          "fontSize": "16px",
+          "height": 48,
+          "id": "password",
+          "inputmode": null,
+          "labels": [
+            "Contraseña"
+          ],
+          "name": "password",
+          "tag": "INPUT",
+          "text": null,
+          "top": 131.5,
+          "width": 311
+        },
+        {
+          "autocomplete": null,
+          "bottom": 247.5,
+          "disabled": false,
+          "enterkeyhint": null,
+          "fontSize": "16px",
+          "height": 48,
+          "id": null,
+          "inputmode": null,
+          "labels": [],
+          "name": null,
+          "tag": "BUTTON",
+          "text": "Crear cuenta",
+          "top": 199.5,
+          "width": 311
+        },
+        {
+          "autocomplete": null,
+          "bottom": 319.5,
+          "disabled": false,
+          "enterkeyhint": null,
+          "fontSize": "16px",
+          "height": 48,
+          "id": null,
+          "inputmode": null,
+          "labels": [],
+          "name": null,
+          "tag": "BUTTON",
+          "text": "Iniciar sesión",
+          "top": 271.5,
+          "width": 132.40625
+        }
+      ],
+      "height": 360,
+      "rootFontSize": "16px",
+      "scrollHeight": 481,
+      "scrollWidth": 375,
+      "status": null,
+      "title": "Crear cuenta",
+      "viewport": "width=device-width, initial-scale=1",
+      "visualViewport": {
+        "height": 360,
+        "scale": 1,
+        "width": 375
+      },
+      "width": 390
+    },
+    "landscape-login": {
+      "alert": null,
+      "controls": [
+        {
+          "autocomplete": "username",
+          "bottom": 117,
+          "disabled": false,
+          "enterkeyhint": "next",
+          "fontSize": "16px",
+          "height": 48,
+          "id": "email",
+          "inputmode": "email",
+          "labels": [
+            "Correo electrónico"
+          ],
+          "name": "email",
+          "tag": "INPUT",
+          "text": null,
+          "top": 69,
+          "width": 416
+        },
+        {
+          "autocomplete": "current-password",
+          "bottom": 209.5,
+          "disabled": false,
+          "enterkeyhint": "go",
+          "fontSize": "16px",
+          "height": 48,
+          "id": "password",
+          "inputmode": null,
+          "labels": [
+            "Contraseña"
+          ],
+          "name": "password",
+          "tag": "INPUT",
+          "text": null,
+          "top": 161.5,
+          "width": 416
+        },
+        {
+          "autocomplete": null,
+          "bottom": 277.5,
+          "disabled": false,
+          "enterkeyhint": null,
+          "fontSize": "16px",
+          "height": 48,
+          "id": null,
+          "inputmode": null,
+          "labels": [],
+          "name": null,
+          "tag": "BUTTON",
+          "text": "Entrar",
+          "top": 229.5,
+          "width": 416
+        },
+        {
+          "autocomplete": null,
+          "bottom": 349.5,
+          "disabled": false,
+          "enterkeyhint": null,
+          "fontSize": "16px",
+          "height": 48,
+          "id": null,
+          "inputmode": null,
+          "labels": [],
+          "name": null,
+          "tag": "BUTTON",
+          "text": "Crear cuenta",
+          "top": 301.5,
+          "width": 130.78125
+        }
+      ],
+      "height": 390,
+      "rootFontSize": "16px",
+      "scrollHeight": 481,
+      "scrollWidth": 829,
+      "status": null,
+      "title": "Iniciar sesión",
+      "viewport": "width=device-width, initial-scale=1",
+      "visualViewport": {
+        "height": 390,
+        "scale": 1,
+        "width": 829
+      },
+      "width": 844
+    },
+    "landscape-register": {
+      "alert": null,
+      "controls": [
+        {
+          "autocomplete": "username",
+          "bottom": 117,
+          "disabled": false,
+          "enterkeyhint": "next",
+          "fontSize": "16px",
+          "height": 48,
+          "id": "email",
+          "inputmode": "email",
+          "labels": [
+            "Correo electrónico"
+          ],
+          "name": "email",
+          "tag": "INPUT",
+          "text": null,
+          "top": 69,
+          "width": 416
+        },
+        {
+          "autocomplete": "new-password",
+          "bottom": 209.5,
+          "disabled": false,
+          "enterkeyhint": "done",
+          "fontSize": "16px",
+          "height": 48,
+          "id": "password",
+          "inputmode": null,
+          "labels": [
+            "Contraseña"
+          ],
+          "name": "password",
+          "tag": "INPUT",
+          "text": null,
+          "top": 161.5,
+          "width": 416
+        },
+        {
+          "autocomplete": null,
+          "bottom": 277.5,
+          "disabled": false,
+          "enterkeyhint": null,
+          "fontSize": "16px",
+          "height": 48,
+          "id": null,
+          "inputmode": null,
+          "labels": [],
+          "name": null,
+          "tag": "BUTTON",
+          "text": "Crear cuenta",
+          "top": 229.5,
+          "width": 416
+        },
+        {
+          "autocomplete": null,
+          "bottom": 349.5,
+          "disabled": false,
+          "enterkeyhint": null,
+          "fontSize": "16px",
+          "height": 48,
+          "id": null,
+          "inputmode": null,
+          "labels": [],
+          "name": null,
+          "tag": "BUTTON",
+          "text": "Iniciar sesión",
+          "top": 301.5,
+          "width": 132.40625
+        }
+      ],
+      "height": 390,
+      "rootFontSize": "16px",
+      "scrollHeight": 481,
+      "scrollWidth": 829,
+      "status": null,
+      "title": "Crear cuenta",
+      "viewport": "width=device-width, initial-scale=1",
+      "visualViewport": {
+        "height": 390,
+        "scale": 1,
+        "width": 829
+      },
+      "width": 844
+    },
+    "tablet-login": {
+      "alert": null,
+      "controls": [
+        {
+          "autocomplete": "username",
+          "bottom": 479.75,
+          "disabled": false,
+          "enterkeyhint": "next",
+          "fontSize": "16px",
+          "height": 48,
+          "id": "email",
+          "inputmode": "email",
+          "labels": [
+            "Correo electrónico"
+          ],
+          "name": "email",
+          "tag": "INPUT",
+          "text": null,
+          "top": 431.75,
+          "width": 416
+        },
+        {
+          "autocomplete": "current-password",
+          "bottom": 572.25,
+          "disabled": false,
+          "enterkeyhint": "go",
+          "fontSize": "16px",
+          "height": 48,
+          "id": "password",
+          "inputmode": null,
+          "labels": [
+            "Contraseña"
+          ],
+          "name": "password",
+          "tag": "INPUT",
+          "text": null,
+          "top": 524.25,
+          "width": 416
+        },
+        {
+          "autocomplete": null,
+          "bottom": 640.25,
+          "disabled": false,
+          "enterkeyhint": null,
+          "fontSize": "16px",
+          "height": 48,
+          "id": null,
+          "inputmode": null,
+          "labels": [],
+          "name": null,
+          "tag": "BUTTON",
+          "text": "Entrar",
+          "top": 592.25,
+          "width": 416
+        },
+        {
+          "autocomplete": null,
+          "bottom": 712.25,
+          "disabled": false,
+          "enterkeyhint": null,
+          "fontSize": "16px",
+          "height": 48,
+          "id": null,
+          "inputmode": null,
+          "labels": [],
+          "name": null,
+          "tag": "BUTTON",
+          "text": "Crear cuenta",
+          "top": 664.25,
+          "width": 130.78125
+        }
+      ],
+      "height": 1024,
+      "rootFontSize": "16px",
+      "scrollHeight": 1024,
+      "scrollWidth": 768,
+      "status": null,
+      "title": "Iniciar sesión",
+      "viewport": "width=device-width, initial-scale=1",
+      "visualViewport": {
+        "height": 1024,
+        "scale": 1,
+        "width": 768
+      },
+      "width": 768
+    },
+    "tablet-register": {
+      "alert": null,
+      "controls": [
+        {
+          "autocomplete": "username",
+          "bottom": 479.75,
+          "disabled": false,
+          "enterkeyhint": "next",
+          "fontSize": "16px",
+          "height": 48,
+          "id": "email",
+          "inputmode": "email",
+          "labels": [
+            "Correo electrónico"
+          ],
+          "name": "email",
+          "tag": "INPUT",
+          "text": null,
+          "top": 431.75,
+          "width": 416
+        },
+        {
+          "autocomplete": "new-password",
+          "bottom": 572.25,
+          "disabled": false,
+          "enterkeyhint": "done",
+          "fontSize": "16px",
+          "height": 48,
+          "id": "password",
+          "inputmode": null,
+          "labels": [
+            "Contraseña"
+          ],
+          "name": "password",
+          "tag": "INPUT",
+          "text": null,
+          "top": 524.25,
+          "width": 416
+        },
+        {
+          "autocomplete": null,
+          "bottom": 640.25,
+          "disabled": false,
+          "enterkeyhint": null,
+          "fontSize": "16px",
+          "height": 48,
+          "id": null,
+          "inputmode": null,
+          "labels": [],
+          "name": null,
+          "tag": "BUTTON",
+          "text": "Crear cuenta",
+          "top": 592.25,
+          "width": 416
+        },
+        {
+          "autocomplete": null,
+          "bottom": 712.25,
+          "disabled": false,
+          "enterkeyhint": null,
+          "fontSize": "16px",
+          "height": 48,
+          "id": null,
+          "inputmode": null,
+          "labels": [],
+          "name": null,
+          "tag": "BUTTON",
+          "text": "Iniciar sesión",
+          "top": 664.25,
+          "width": 132.40625
+        }
+      ],
+      "height": 1024,
+      "rootFontSize": "16px",
+      "scrollHeight": 1024,
+      "scrollWidth": 768,
+      "status": null,
+      "title": "Crear cuenta",
+      "viewport": "width=device-width, initial-scale=1",
+      "visualViewport": {
+        "height": 1024,
+        "scale": 1,
+        "width": 768
+      },
+      "width": 768
+    },
+    "desktop-login": {
+      "alert": null,
+      "controls": [
+        {
+          "autocomplete": "username",
+          "bottom": 417.75,
+          "disabled": false,
+          "enterkeyhint": "next",
+          "fontSize": "16px",
+          "height": 48,
+          "id": "email",
+          "inputmode": "email",
+          "labels": [
+            "Correo electrónico"
+          ],
+          "name": "email",
+          "tag": "INPUT",
+          "text": null,
+          "top": 369.75,
+          "width": 416
+        },
+        {
+          "autocomplete": "current-password",
+          "bottom": 510.25,
+          "disabled": false,
+          "enterkeyhint": "go",
+          "fontSize": "16px",
+          "height": 48,
+          "id": "password",
+          "inputmode": null,
+          "labels": [
+            "Contraseña"
+          ],
+          "name": "password",
+          "tag": "INPUT",
+          "text": null,
+          "top": 462.25,
+          "width": 416
+        },
+        {
+          "autocomplete": null,
+          "bottom": 578.25,
+          "disabled": false,
+          "enterkeyhint": null,
+          "fontSize": "16px",
+          "height": 48,
+          "id": null,
+          "inputmode": null,
+          "labels": [],
+          "name": null,
+          "tag": "BUTTON",
+          "text": "Entrar",
+          "top": 530.25,
+          "width": 416
+        },
+        {
+          "autocomplete": null,
+          "bottom": 650.25,
+          "disabled": false,
+          "enterkeyhint": null,
+          "fontSize": "16px",
+          "height": 48,
+          "id": null,
+          "inputmode": null,
+          "labels": [],
+          "name": null,
+          "tag": "BUTTON",
+          "text": "Crear cuenta",
+          "top": 602.25,
+          "width": 130.78125
+        }
+      ],
+      "height": 900,
+      "rootFontSize": "16px",
+      "scrollHeight": 900,
+      "scrollWidth": 1440,
+      "status": null,
+      "title": "Iniciar sesión",
+      "viewport": "width=device-width, initial-scale=1",
+      "visualViewport": {
+        "height": 900,
+        "scale": 1,
+        "width": 1440
+      },
+      "width": 1440
+    },
+    "desktop-register": {
+      "alert": null,
+      "controls": [
+        {
+          "autocomplete": "username",
+          "bottom": 417.75,
+          "disabled": false,
+          "enterkeyhint": "next",
+          "fontSize": "16px",
+          "height": 48,
+          "id": "email",
+          "inputmode": "email",
+          "labels": [
+            "Correo electrónico"
+          ],
+          "name": "email",
+          "tag": "INPUT",
+          "text": null,
+          "top": 369.75,
+          "width": 416
+        },
+        {
+          "autocomplete": "new-password",
+          "bottom": 510.25,
+          "disabled": false,
+          "enterkeyhint": "done",
+          "fontSize": "16px",
+          "height": 48,
+          "id": "password",
+          "inputmode": null,
+          "labels": [
+            "Contraseña"
+          ],
+          "name": "password",
+          "tag": "INPUT",
+          "text": null,
+          "top": 462.25,
+          "width": 416
+        },
+        {
+          "autocomplete": null,
+          "bottom": 578.25,
+          "disabled": false,
+          "enterkeyhint": null,
+          "fontSize": "16px",
+          "height": 48,
+          "id": null,
+          "inputmode": null,
+          "labels": [],
+          "name": null,
+          "tag": "BUTTON",
+          "text": "Crear cuenta",
+          "top": 530.25,
+          "width": 416
+        },
+        {
+          "autocomplete": null,
+          "bottom": 650.25,
+          "disabled": false,
+          "enterkeyhint": null,
+          "fontSize": "16px",
+          "height": 48,
+          "id": null,
+          "inputmode": null,
+          "labels": [],
+          "name": null,
+          "tag": "BUTTON",
+          "text": "Iniciar sesión",
+          "top": 602.25,
+          "width": 132.40625
+        }
+      ],
+      "height": 900,
+      "rootFontSize": "16px",
+      "scrollHeight": 900,
+      "scrollWidth": 1440,
+      "status": null,
+      "title": "Crear cuenta",
+      "viewport": "width=device-width, initial-scale=1",
+      "visualViewport": {
+        "height": 900,
+        "scale": 1,
+        "width": 1440
+      },
+      "width": 1440
+    },
+    "text-200-percent-narrow-login": {
+      "alert": null,
+      "controls": [
+        {
+          "autocomplete": "username",
+          "bottom": 630,
+          "disabled": false,
+          "enterkeyhint": "next",
+          "fontSize": "32px",
+          "height": 96,
+          "id": "email",
+          "inputmode": "email",
+          "labels": [
+            "Correo electrónico"
+          ],
+          "name": "email",
+          "tag": "INPUT",
+          "text": null,
+          "top": 534,
+          "width": 177
+        },
+        {
+          "autocomplete": "current-password",
+          "bottom": 815,
+          "disabled": false,
+          "enterkeyhint": "go",
+          "fontSize": "32px",
+          "height": 96,
+          "id": "password",
+          "inputmode": null,
+          "labels": [
+            "Contraseña"
+          ],
+          "name": "password",
+          "tag": "INPUT",
+          "text": null,
+          "top": 719,
+          "width": 177
+        },
+        {
+          "autocomplete": null,
+          "bottom": 951,
+          "disabled": false,
+          "enterkeyhint": null,
+          "fontSize": "32px",
+          "height": 96,
+          "id": null,
+          "inputmode": null,
+          "labels": [],
+          "name": null,
+          "tag": "BUTTON",
+          "text": "Entrar",
+          "top": 855,
+          "width": 177
+        },
+        {
+          "autocomplete": null,
+          "bottom": 1209,
+          "disabled": false,
+          "enterkeyhint": null,
+          "fontSize": "32px",
+          "height": 130,
+          "id": null,
+          "inputmode": null,
+          "labels": [],
+          "name": null,
+          "tag": "BUTTON",
+          "text": "Crear cuenta",
+          "top": 1079,
+          "width": 177
+        }
+      ],
+      "height": 568,
+      "rootFontSize": "32px",
+      "scrollHeight": 1289,
+      "scrollWidth": 305,
+      "status": null,
+      "title": "Iniciar sesión",
+      "viewport": "width=device-width, initial-scale=1",
+      "visualViewport": {
+        "height": 568,
+        "scale": 1,
+        "width": 305
+      },
+      "width": 320
+    },
+    "text-200-percent-narrow-register": {
+      "alert": null,
+      "controls": [
+        {
+          "autocomplete": "username",
+          "bottom": -91,
+          "disabled": false,
+          "enterkeyhint": "next",
+          "fontSize": "32px",
+          "height": 96,
+          "id": "email",
+          "inputmode": "email",
+          "labels": [
+            "Correo electrónico"
+          ],
+          "name": "email",
+          "tag": "INPUT",
+          "text": null,
+          "top": -187,
+          "width": 177
+        },
+        {
+          "autocomplete": "new-password",
+          "bottom": 94,
+          "disabled": false,
+          "enterkeyhint": "done",
+          "fontSize": "32px",
+          "height": 96,
+          "id": "password",
+          "inputmode": null,
+          "labels": [
+            "Contraseña"
+          ],
+          "name": "password",
+          "tag": "INPUT",
+          "text": null,
+          "top": -2,
+          "width": 177
+        },
+        {
+          "autocomplete": null,
+          "bottom": 264,
+          "disabled": false,
+          "enterkeyhint": null,
+          "fontSize": "32px",
+          "height": 130,
+          "id": null,
+          "inputmode": null,
+          "labels": [],
+          "name": null,
+          "tag": "BUTTON",
+          "text": "Crear cuenta",
+          "top": 134,
+          "width": 177
+        },
+        {
+          "autocomplete": null,
+          "bottom": 522,
+          "disabled": false,
+          "enterkeyhint": null,
+          "fontSize": "32px",
+          "height": 130,
+          "id": null,
+          "inputmode": null,
+          "labels": [],
+          "name": null,
+          "tag": "BUTTON",
+          "text": "Iniciar sesión",
+          "top": 392,
+          "width": 177
+        }
+      ],
+      "height": 568,
+      "rootFontSize": "32px",
+      "scrollHeight": 1323,
+      "scrollWidth": 305,
+      "status": null,
+      "title": "Crear cuenta",
+      "viewport": "width=device-width, initial-scale=1",
+      "visualViewport": {
+        "height": 568,
+        "scale": 1,
+        "width": 305
+      },
+      "width": 320
+    },
+    "mobile-page-scale-200-percent": {
+      "alert": null,
+      "controls": [
+        {
+          "autocomplete": "username",
+          "bottom": 389.75,
+          "disabled": false,
+          "enterkeyhint": "next",
+          "fontSize": "16px",
+          "height": 48,
+          "id": "email",
+          "inputmode": "email",
+          "labels": [
+            "Correo electrónico"
+          ],
+          "name": "email",
+          "tag": "INPUT",
+          "text": null,
+          "top": 341.75,
+          "width": 326
+        },
+        {
+          "autocomplete": "current-password",
+          "bottom": 482.25,
+          "disabled": false,
+          "enterkeyhint": "go",
+          "fontSize": "16px",
+          "height": 48,
+          "id": "password",
+          "inputmode": null,
+          "labels": [
+            "Contraseña"
+          ],
+          "name": "password",
+          "tag": "INPUT",
+          "text": null,
+          "top": 434.25,
+          "width": 326
+        },
+        {
+          "autocomplete": null,
+          "bottom": 550.25,
+          "disabled": false,
+          "enterkeyhint": null,
+          "fontSize": "16px",
+          "height": 48,
+          "id": null,
+          "inputmode": null,
+          "labels": [],
+          "name": null,
+          "tag": "BUTTON",
+          "text": "Entrar",
+          "top": 502.25,
+          "width": 326
+        },
+        {
+          "autocomplete": null,
+          "bottom": 622.25,
+          "disabled": false,
+          "enterkeyhint": null,
+          "fontSize": "16px",
+          "height": 48,
+          "id": null,
+          "inputmode": null,
+          "labels": [],
+          "name": null,
+          "tag": "BUTTON",
+          "text": "Crear cuenta",
+          "top": 574.25,
+          "width": 130.78125
+        }
+      ],
+      "height": 844,
+      "rootFontSize": "16px",
+      "scrollHeight": 844,
+      "scrollWidth": 390,
+      "status": null,
+      "title": "Iniciar sesión",
+      "viewport": "width=device-width, initial-scale=1",
+      "visualViewport": {
+        "height": 422,
+        "scale": 2,
+        "width": 195
+      },
+      "width": 390
+    }
+  },
+  "keyboard": [
+    {
+      "name": "password",
+      "ring": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.555999 -0.00000530481 0.000012964 / 0.3) 0px 0px 0px 2px, rgba(0, 0, 0, 0) 0px 0px 0px 0px",
+      "visible": true
+    },
+    {
+      "name": "Entrar",
+      "ring": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.555999 -0.00000530481 0.000012964 / 0.3) 0px 0px 0px 2px, rgba(0, 0, 0, 0) 0px 0px 0px 0px",
+      "visible": true
+    },
+    {
+      "name": "Crear cuenta",
+      "ring": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.555999 -0.00000530481 0.000012964 / 0.3) 0px 0px 0px 2px, rgba(0, 0, 0, 0) 0px 0px 0px 0px",
+      "visible": true
+    }
+  ],
+  "touch": {
+    "source": "CDP Input.dispatchTouchEvent, iPhone 14 emulado en Chromium",
+    "emailFocused": true
+  },
+  "nativeValidation": {
+    "invalidEmailBlockedBeforeRequest": true
+  },
+  "authRequests": [
+    {
+      "method": "POST",
+      "path": "/auth/v1/token?grant_type=password"
+    },
+    {
+      "method": "POST",
+      "path": "/auth/v1/signup"
+    }
+  ],
+  "shortViewportFocus": {
+    "bottom": 203.5,
+    "height": 360,
+    "top": 155.5,
+    "submitReachable": true
+  },
+  "pageErrors": {
+    "errors": []
+  }
+}

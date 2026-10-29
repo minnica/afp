@@ -1,0 +1,55 @@
+{
+  "finding": "A14",
+  "date": "2026-10-29",
+  "verifiedAt": "2026-10-29T18:33:59.021293+00:00",
+  "baseCommit": "b701fb4882caa2d7defd6faf002cb1a5a9af179b",
+  "status": "implemented_locally",
+  "published": false,
+  "remoteServicesAccessed": false,
+  "newMigrations": false,
+  "dependencyChanges": false,
+  "checks": "checks.json",
+  "suite": {
+    "tests": 965,
+    "passed": 965,
+    "failed": 0,
+    "skipped": 0,
+    "postgres": "16 local desechable, afp_test_a14"
+  },
+  "initialSuiteFailure": {
+    "passed": 963,
+    "failed": 2,
+    "skipped": 0,
+    "assertion": "capture-rollout-integration.test.ts:99: !JSON.stringify(data.rollout).includes('1000')",
+    "isolatedRepeatPassed": 26,
+    "testModified": false,
+    "causeEstablished": false,
+    "log": "tests-local-initial.log"
+  },
+  "lint": {
+    "errors": 0,
+    "existingWarnings": 2
+  },
+  "impeccableFindings": [],
+  "browser": {
+    "measurements": "browser-acceptance.json",
+    "scenarios": 19,
+    "normalControlHeightPx": 48,
+    "normalInputFontPx": 16,
+    "pageErrors": [],
+    "textEnlargementPercent": 200,
+    "mobilePageScale": 2,
+    "auth": "fake local fixture"
+  },
+  "remainingAcceptance": [
+    "publicación",
+    "Supabase Auth real",
+    "teléfonos físicos: teclado virtual, gestor de contraseñas y zoom Safari/iOS"
+  ],
+  "sourcesSha256": {
+    "src/app/login/page.tsx": "fb0c52fec8c30552105b21bd2d5f967298605f032fbaa51ebea0dd9805fdc94c",
+    "src/components/ui/input.tsx": "2fe3f094845766039237e24df771aee26cefdfd7852f03d17290f254ce25c570",
+    "src/components/ui/button.tsx": "f768d6f3914832d38094e745f5d55c313270a1cc8215d20f8e13eadda7de24df",
+    "artifacts/auditoria-2026-10-15/a14-2026-10-29/auth-fixture.ts": "9ec0b420a404b692fc9d79bfbd6bc698106b48e854b28f04d4b8e428144dc761"
+  }
+}

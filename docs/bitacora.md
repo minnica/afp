@@ -6,6 +6,14 @@ Consolidado el **27 de octubre de 2026** a partir del README del commit `4562aa0
 
 ## 2026-10-29
 
+### A14: controles táctiles y legibilidad del login
+
+**Implementación local verificada.** Acceso y registro usan campos y botones con altura mínima de 48 px, incluidos envío y cambio de modo. Los campos mantienen texto de 16 px y declaran teclado/autocompletado de correo y contraseña según la operación. Input y Button incorporan opciones explícitas; sus tamaños predeterminados se conservan. El formulario permite desplazamiento en pantallas bajas y reacomoda el pie y los botones al ampliar el texto.
+
+Navegador Chromium con Auth ficticia: medidas en móvil/escritorio, teclado, toque sintetizado, carga/error/confirmación, viewport bajo y ampliación. Los seis controles del README pasan; la suite final conserva los 965 escenarios sin omisiones con PostgreSQL local. La primera ejecución falló en una aserción previa de Captura; se conserva ese resultado junto con las repeticiones correctas, sin modificar la prueba ni atribuirle una causa no comprobada.
+
+README e informe actualizados: A14 queda implementada localmente. Sin migraciones, cambios de dependencias ni publicación. Restan la publicación y la aceptación con Auth real y teléfonos físicos, incluidos teclado virtual y gestor de contraseñas. [Mediciones, capturas, reproducción y límites](../artifacts/auditoria-2026-10-15/a14-2026-10-29/README.md).
+
 ### A13: consultas acotadas y resumen de cabecera
 
 **Implementación local verificada**, sin publicación, migraciones ni cambios de dependencias. Dashboard y Análisis leen el año elegido y sus bordes; otras secciones móviles consultan un resumen sin matrices anuales. Gastos y su bootstrap comparten páginas, meses agrupados y totales SQL del filtro completo en `RepeatableRead`. Ciclos pagina por año y carga un detalle por ID, con sus advertencias y desglose bajo demanda. Se conservan pendientes históricos, el batch de pago, anclas MSI, ocurrencias contabilizadas fuera de mes y referencias de Turbo. Ingresos del mes y abonos de deudas se suman en SQL.

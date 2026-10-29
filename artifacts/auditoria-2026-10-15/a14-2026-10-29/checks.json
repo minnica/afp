@@ -1,0 +1,50 @@
+[
+  {
+    "name": "migrate",
+    "command": "pnpm exec prisma migrate deploy",
+    "exitCode": 0,
+    "seconds": 2.4
+  },
+  {
+    "name": "typecheck",
+    "command": "pnpm typecheck",
+    "exitCode": 0,
+    "seconds": 10.73
+  },
+  {
+    "name": "typecheck-tests",
+    "command": "pnpm typecheck:tests",
+    "exitCode": 0,
+    "seconds": 14.34
+  },
+  {
+    "name": "test-types",
+    "command": "pnpm test:types",
+    "exitCode": 0,
+    "seconds": 8.15
+  },
+  {
+    "name": "lint",
+    "command": "pnpm lint",
+    "exitCode": 0,
+    "seconds": 43.86
+  },
+  {
+    "name": "tests-local-initial",
+    "command": "pnpm test",
+    "exitCode": 1,
+    "seconds": 73.08
+  },
+  {
+    "name": "build",
+    "command": "pnpm build",
+    "exitCode": 0,
+    "seconds": 14.95
+  },
+  {
+    "name": "tests-local",
+    "command": "pnpm test",
+    "exitCode": 0,
+    "seconds": 69.08
+  }
+]

@@ -11,7 +11,7 @@ import { RequestError } from "@/lib/requestErrors";
 import { getRecoveryScope, recoverRequest } from "@/lib/requestRecovery";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Spinner } from "@/components/ui/spinner";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -85,7 +85,7 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-background px-4 text-foreground">
+    <main className="flex min-h-dvh items-center justify-center bg-background px-4 py-6 text-foreground">
       <Card className="w-full max-w-md rounded-2xl border-border bg-card">
         <CardHeader>
           <p className="text-sm text-muted-foreground">AFP</p>
@@ -98,33 +98,47 @@ export default function LoginPage() {
         </CardHeader>
 
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div className="space-y-2">
-              <Label htmlFor="email">Correo electrónico</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="tu@email.com"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                required
-                disabled={isLoading}
-              />
-            </div>
+          <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+            <FieldGroup className="gap-5">
+              <Field data-disabled={isLoading}>
+                <FieldLabel htmlFor="email">Correo electrónico</FieldLabel>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  density="comfortable"
+                  autoComplete="username"
+                  inputMode="email"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck={false}
+                  enterKeyHint="next"
+                  placeholder="tu@email.com"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  required
+                  disabled={isLoading}
+                />
+              </Field>
 
-            <div className="space-y-2">
-              <Label htmlFor="password">Contraseña</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Mínimo 6 caracteres"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                required
-                minLength={6}
-                disabled={isLoading}
-              />
-            </div>
+              <Field data-disabled={isLoading}>
+                <FieldLabel htmlFor="password">Contraseña</FieldLabel>
+                <Input
+                  id="password"
+                  name="password"
+                  type="password"
+                  density="comfortable"
+                  autoComplete={mode === "login" ? "current-password" : "new-password"}
+                  enterKeyHint={mode === "login" ? "go" : "done"}
+                  placeholder="Mínimo 6 caracteres"
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  required
+                  minLength={6}
+                  disabled={isLoading}
+                />
+              </Field>
+            </FieldGroup>
 
             {error ? (
               <Alert variant="destructive">
@@ -138,7 +152,7 @@ export default function LoginPage() {
               </Alert>
             ) : null}
 
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button type="submit" size="touch" className="w-full" disabled={isLoading}>
               {isLoading ? <Spinner /> : null}
               {isLoading
                 ? "Procesando..."
@@ -148,42 +162,22 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          <div className="mt-6 text-center text-sm text-muted-foreground">
-            {mode === "login" ? (
-              <>
-                ¿No tienes cuenta?{" "}
-                <Button
-                  type="button"
-                  variant="link"
-                  className="h-auto p-0 text-sm"
-                  disabled={isLoading}
-                  onClick={() => {
-                    setMode("register");
-                    setError("");
-                    setMessage("");
-                  }}
-                >
-                  Crear cuenta
-                </Button>
-              </>
-            ) : (
-              <>
-                ¿Ya tienes cuenta?{" "}
-                <Button
-                  type="button"
-                  variant="link"
-                  className="h-auto p-0 text-sm"
-                  disabled={isLoading}
-                  onClick={() => {
-                    setMode("login");
-                    setError("");
-                    setMessage("");
-                  }}
-                >
-                  Iniciar sesión
-                </Button>
-              </>
-            )}
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-x-1 text-center text-sm text-muted-foreground">
+            <span>{mode === "login" ? "¿No tienes cuenta?" : "¿Ya tienes cuenta?"}</span>
+            <Button
+              type="button"
+              variant="link"
+              size="touch"
+              className="max-w-full"
+              disabled={isLoading}
+              onClick={() => {
+                setMode(mode === "login" ? "register" : "login");
+                setError("");
+                setMessage("");
+              }}
+            >
+              {mode === "login" ? "Crear cuenta" : "Iniciar sesión"}
+            </Button>
           </div>
         </CardContent>
       </Card>
