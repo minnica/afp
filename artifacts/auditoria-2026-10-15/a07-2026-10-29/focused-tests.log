@@ -1,0 +1,297 @@
+
+> afp@0.1.0 test /home/garatachia/projects/afp
+> node --import tsx tests/run-tests.ts income-history.test.ts api-authorization.test.ts
+
+TAP version 13
+# Subtest: card-cycles: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+ok 1 - card-cycles: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+  ---
+  duration_ms: 145.320232
+  type: 'test'
+  ...
+# Subtest: cards: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+ok 2 - cards: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+  ---
+  duration_ms: 16.917129
+  type: 'test'
+  ...
+# Subtest: dashboard: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+ok 3 - dashboard: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+  ---
+  duration_ms: 33.011709
+  type: 'test'
+  ...
+# Subtest: expenses: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+ok 4 - expenses: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+  ---
+  duration_ms: 103.135629
+  type: 'test'
+  ...
+# Subtest: incomes: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+ok 5 - incomes: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+  ---
+  duration_ms: 17.709608
+  type: 'test'
+  ...
+# Subtest: installment-purchases: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+ok 6 - installment-purchases: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+  ---
+  duration_ms: 17.843857
+  type: 'test'
+  ...
+# Subtest: money: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+ok 7 - money: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+  ---
+  duration_ms: 47.246673
+  type: 'test'
+  ...
+# Subtest: notice-dismissals: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+ok 8 - notice-dismissals: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+  ---
+  duration_ms: 12.551827
+  type: 'test'
+  ...
+# Subtest: payables: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+ok 9 - payables: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+  ---
+  duration_ms: 15.604071
+  type: 'test'
+  ...
+# Subtest: receivables: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+ok 10 - receivables: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+  ---
+  duration_ms: 15.088683
+  type: 'test'
+  ...
+# Subtest: settings: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+ok 11 - settings: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+  ---
+  duration_ms: 11.855689
+  type: 'test'
+  ...
+# Subtest: setup-user: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+ok 12 - setup-user: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+  ---
+  duration_ms: 8.968494
+  type: 'test'
+  ...
+# Subtest: subscription-charges: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+ok 13 - subscription-charges: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+  ---
+  duration_ms: 18.114576
+  type: 'test'
+  ...
+# Subtest: subscriptions: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+ok 14 - subscriptions: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+  ---
+  duration_ms: 12.831957
+  type: 'test'
+  ...
+# Subtest: calendar/google: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+ok 15 - calendar/google: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+  ---
+  duration_ms: 26.5844
+  type: 'test'
+  ...
+# Subtest: cron/capture-bank-fallback: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+ok 16 - cron/capture-bank-fallback: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+  ---
+  duration_ms: 85.769222
+  type: 'test'
+  ...
+# Subtest: gastos/bootstrap: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+ok 17 - gastos/bootstrap: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+  ---
+  duration_ms: 10.069001
+  type: 'test'
+  ...
+# Subtest: calendar/google/connect: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+ok 18 - calendar/google/connect: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+  ---
+  duration_ms: 26.450941
+  type: 'test'
+  ...
+# Subtest: calendar/google/disconnect: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+ok 19 - calendar/google/disconnect: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+  ---
+  duration_ms: 23.666617
+  type: 'test'
+  ...
+# Subtest: calendar/google/sync: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+ok 20 - calendar/google/sync: cada método rechaza ausencia de sesión y tokens inválidos sin tocar BD
+  ---
+  duration_ms: 8.238264
+  type: 'test'
+  ...
+# Subtest: cards: ignora userId falsificado; A y B solo leen, crean, editan y borran lo propio
+ok 21 - cards: ignora userId falsificado; A y B solo leen, crean, editan y borran lo propio
+  ---
+  duration_ms: 17.961617
+  type: 'test'
+  ...
+# Subtest: expenses: ignora userId falsificado; A y B solo leen, crean, editan y borran lo propio
+ok 22 - expenses: ignora userId falsificado; A y B solo leen, crean, editan y borran lo propio
+  ---
+  duration_ms: 91.111322
+  type: 'test'
+  ...
+# Subtest: incomes: ignora userId falsificado; A y B solo leen, crean, editan y borran lo propio
+ok 23 - incomes: ignora userId falsificado; A y B solo leen, crean, editan y borran lo propio
+  ---
+  duration_ms: 19.227254
+  type: 'test'
+  ...
+# Subtest: subscriptions: ignora userId falsificado; A y B solo leen, crean, editan y borran lo propio
+ok 24 - subscriptions: ignora userId falsificado; A y B solo leen, crean, editan y borran lo propio
+  ---
+  duration_ms: 11.969298
+  type: 'test'
+  ...
+# Subtest: installment-purchases: ignora userId falsificado; A y B solo leen, crean, editan y borran lo propio
+ok 25 - installment-purchases: ignora userId falsificado; A y B solo leen, crean, editan y borran lo propio
+  ---
+  duration_ms: 15.919571
+  type: 'test'
+  ...
+# Subtest: receivables: ignora userId falsificado; A y B solo leen, crean, editan y borran lo propio
+ok 26 - receivables: ignora userId falsificado; A y B solo leen, crean, editan y borran lo propio
+  ---
+  duration_ms: 15.003312
+  type: 'test'
+  ...
+# Subtest: payables: ignora userId falsificado; A y B solo leen, crean, editan y borran lo propio
+ok 27 - payables: ignora userId falsificado; A y B solo leen, crean, editan y borran lo propio
+  ---
+  duration_ms: 18.410726
+  type: 'test'
+  ...
+# Subtest: expenses: rechaza vínculos de otro propietario antes de cualquier escritura
+ok 28 - expenses: rechaza vínculos de otro propietario antes de cualquier escritura
+  ---
+  duration_ms: 90.022173
+  type: 'test'
+  ...
+# Subtest: installment-purchases: rechaza vínculos de otro propietario antes de cualquier escritura
+ok 29 - installment-purchases: rechaza vínculos de otro propietario antes de cualquier escritura
+  ---
+  duration_ms: 21.437401
+  type: 'test'
+  ...
+# Subtest: subscriptions: rechaza vínculos de otro propietario antes de cualquier escritura
+ok 30 - subscriptions: rechaza vínculos de otro propietario antes de cualquier escritura
+  ---
+  duration_ms: 11.633308
+  type: 'test'
+  ...
+# Subtest: incomes: rechaza vínculos de otro propietario antes de cualquier escritura
+ok 31 - incomes: rechaza vínculos de otro propietario antes de cualquier escritura
+  ---
+  duration_ms: 17.493788
+  type: 'test'
+  ...
+# Subtest: receivables: rechaza vínculos de otro propietario antes de cualquier escritura
+ok 32 - receivables: rechaza vínculos de otro propietario antes de cualquier escritura
+  ---
+  duration_ms: 20.127093
+  type: 'test'
+  ...
+# Subtest: payables: rechaza vínculos de otro propietario antes de cualquier escritura
+ok 33 - payables: rechaza vínculos de otro propietario antes de cualquier escritura
+  ---
+  duration_ms: 22.524978
+  type: 'test'
+  ...
+# Subtest: settings: aísla los tres catálogos y sus eliminaciones
+ok 34 - settings: aísla los tres catálogos y sus eliminaciones
+  ---
+  duration_ms: 19.825783
+  type: 'test'
+  ...
+# Subtest: ciclos: todas las acciones exigen el propietario; activar/desactivar suscripciones también
+ok 35 - ciclos: todas las acciones exigen el propietario; activar/desactivar suscripciones también
+  ---
+  duration_ms: 45.981125
+  type: 'test'
+  ...
+# Subtest: setup-user: ID y correo solo salen del usuario validado
+ok 36 - setup-user: ID y correo solo salen del usuario validado
+  ---
+  duration_ms: 13.675195
+  type: 'test'
+  ...
+# Subtest: dashboard, bootstrap y ciclos: todas las consultas usan la identidad validada
+ok 37 - dashboard, bootstrap y ciclos: todas las consultas usan la identidad validada
+  ---
+  duration_ms: 87.327418
+  type: 'test'
+  ...
+# Subtest: no permite inyectar filtros Prisma en IDs del cuerpo
+ok 38 - no permite inyectar filtros Prisma en IDs del cuerpo
+  ---
+  duration_ms: 190.397729
+  type: 'test'
+  ...
+# Subtest: A07: rechaza paginación y filtros inválidos antes de consultar ingresos
+ok 39 - A07: rechaza paginación y filtros inválidos antes de consultar ingresos
+  ---
+  duration_ms: 46.164174
+  type: 'test'
+  ...
+# Subtest: A07: el cliente exige conteo y metadatos de paginación válidos
+ok 40 - A07: el cliente exige conteo y metadatos de paginación válidos
+  ---
+  duration_ms: 0.733149
+  type: 'test'
+  ...
+# Subtest: PostgreSQL A07: historial completo, filtros, suma global, orden y cambios de página
+    # Subtest: el ingreso 101 es accesible y ambas páginas conservan $1,010 y el conteo global
+    ok 1 - el ingreso 101 es accesible y ambas páginas conservan $1,010 y el conteo global
+      ---
+      duration_ms: 66.900646
+      type: 'test'
+      ...
+    # Subtest: búsqueda de concepto, fuente, notas, tipo, deuda y persona alcanza el registro antiguo
+    ok 2 - búsqueda de concepto, fuente, notas, tipo, deuda y persona alcanza el registro antiguo
+      ---
+      duration_ms: 34.034757
+      type: 'test'
+      ...
+    # Subtest: filtros combinados y límites inclusivos de fecha comparten conteo y suma
+    ok 3 - filtros combinados y límites inclusivos de fecha comparten conteo y suma
+      ---
+      duration_ms: 220.652973
+      type: 'test'
+      ...
+    # Subtest: sin resultados y página fuera de rango devuelven metadatos utilizables
+    ok 4 - sin resultados y página fuera de rango devuelven metadatos utilizables
+      ---
+      duration_ms: 9.171314
+      type: 'test'
+      ...
+    # Subtest: orden ascendente global y suma decimal independiente de la página
+    ok 5 - orden ascendente global y suma decimal independiente de la página
+      ---
+      duration_ms: 26.922721
+      type: 'test'
+      ...
+    # Subtest: borrar la única fila de la última página retorna a una página existente
+    ok 6 - borrar la única fila de la última página retorna a una página existente
+      ---
+      duration_ms: 15.345471
+      type: 'test'
+      ...
+    1..6
+ok 41 - PostgreSQL A07: historial completo, filtros, suma global, orden y cambios de página
+  ---
+  duration_ms: 765.751986
+  type: 'test'
+  ...
+1..41
+# tests 47
+# suites 0
+# pass 47
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2364.003414

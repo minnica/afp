@@ -35,7 +35,7 @@ function fixture({ empty = false } = {}) {
       const found = present(rows[model]).filter(row => matches(row, args.where));
       if (method === "findMany") return found;
       if (method === "findFirst" || method === "findUnique") return found[0] || null;
-      if (method === "aggregate") return { _sum: { amount: 0 } };
+      if (method === "aggregate") return { _sum: { amount: 0 }, _count: { _all: found.length } };
       if (["update", "delete"].includes(method) && !found.length) throw Object.assign(new Error("missing"), { code: "P2025" });
       writes.push({ model, method, args: plain(args) });
       if (method === "delete") { rows[model] = present(rows[model]).filter(row => row !== found[0]); return found[0]; }

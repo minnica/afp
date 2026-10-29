@@ -9,6 +9,7 @@ import { uiFetch as apiFetch } from "@/lib/uiClient";
 
 import { useCreationDraft } from "@/hooks/use-creation-draft";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useIncomeHistory } from "@/hooks/use-income-history";
 
 import CreateRecordSurface,{ useCreateDialogMode } from "@/components/ui/create-record-surface";
 
@@ -57,7 +58,8 @@ DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { RecordActions, RecordCard, RecordField, RecordListCard, RecordListToolbar, RecordNote } from "@/components/ui/record-card";
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { RecordActions, RecordCard, RecordField, RecordListCard, RecordNote } from "@/components/ui/record-card";
 import { Textarea } from "@/components/ui/textarea";
 
 import { TableCell, TableRow } from "@/components/ui/table";
@@ -92,9 +94,11 @@ export default function IngresosContent() {
   const [createError, setCreateError] = useState<CreateError | null>(null);
 
   const [user, setUser] = useState<User | null>(null);
+  const history = useIncomeHistory(user?.id);
+  const { reload: loadIncomes, query: historyQuery, setQuery: setHistoryQuery } = history;
   const [incomeTypes, setIncomeTypes] = useState<NamedRecord[]>([]);
   const [receivables, setReceivables] = useState<Receivable[]>([]);
-  const [incomes, setIncomes] = useState<Income[]>([]);
+  const incomes = history.result?.incomes || [];
 
   const [date, setDate] = useState(getTodayInputValue());
   const [incomeTypeId, setIncomeTypeId] = useState("");
@@ -160,22 +164,7 @@ export default function IngresosContent() {
       );
     }
 
-    const activeReceivables = (data.receivables || []).filter(
-      (item) => item.status === "ACTIVE",
-    );
-
     setReceivables(data.receivables || []);
-  }
-
-  async function loadIncomes(userId: string, { mutationCompleted = false } = {}) {
-    const response = await apiFetch(`/api/incomes?userId=${userId}`, { mutationCompleted });
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.error || "No se pudieron cargar ingresos.");
-    }
-
-    setIncomes(data.incomes || []);
   }
 
   useEffect(() => {
@@ -190,14 +179,12 @@ export default function IngresosContent() {
           return;
         }
 
-        setUser(session.user);
-
         await ensureUserSetup(session.user);
+        setUser(session.user);
 
         await Promise.all([
           loadSettings(session.user.id),
           loadReceivables(session.user.id),
-          loadIncomes(session.user.id),
         ]);
       } catch (err) {
         setError(errorMessage(err) || "Ocurrió un error.");
@@ -362,11 +349,11 @@ export default function IngresosContent() {
     }
   }
 
-  const totalIncome = useMemo(() => {
-    return incomes.reduce((sum, income) => {
-      return sum + Number(income.amount || 0);
-    }, 0);
-  }, [incomes]);
+  const historySummary = history.isLoading ? null : history.result;
+  const totalIncome = historySummary ? formatMoney(historySummary.total) : "—";
+  const changeHistoryFilter = (key: "incomeTypeId" | "startDate" | "endDate", value: string) => {
+    setHistoryQuery(previous => ({ ...previous, [key]: value, pagination: { ...previous.pagination, pageIndex: 0 } }));
+  };
 
   const incomeMobileView: Pick<import("@/components/ui/data-table").DataTableProps<RowModel>, "mobileListLabel" | "mobileRowSeparator" | "renderMobileRow" | "mobileToolbar"> = {
     mobileListLabel: "Ingresos registrados",
@@ -389,7 +376,7 @@ export default function IngresosContent() {
         <RecordNote>{income.notes}</RecordNote>
       </RecordCard>
     ),
-    mobileToolbar: (table) => <RecordListToolbar table={table} label="ingresos" totals={[{ key: "amount", label: "Total filtrado" }]} />,
+    mobileToolbar: () => <p className="mb-3 text-sm text-muted-foreground">Total filtrado: <strong className="tabular-nums">{totalIncome}</strong></p>,
   };
 
   const incomeColumns = useMemo<ColumnDef<RowModel>[]>(
@@ -520,9 +507,9 @@ export default function IngresosContent() {
         <div className="mb-6 grid gap-4 md:grid-cols-3">
           <Card className="rounded-2xl border-border bg-card">
             <CardHeader className="pb-2">
-              <CardDescription>Total mostrado</CardDescription>
+              <CardDescription>Total filtrado</CardDescription>
               <CardTitle className="text-2xl">
-                {formatMoney(totalIncome)}
+                {totalIncome}
               </CardTitle>
             </CardHeader>
           </Card>
@@ -530,7 +517,7 @@ export default function IngresosContent() {
           <Card className="rounded-2xl border-border bg-card">
             <CardHeader className="pb-2">
               <CardDescription>Ingresos registrados</CardDescription>
-              <CardTitle className="text-2xl">{incomes.length}</CardTitle>
+              <CardTitle className="text-2xl">{historySummary?.totalCount ?? "—"}</CardTitle>
             </CardHeader>
           </Card>
 
@@ -655,6 +642,37 @@ export default function IngresosContent() {
               </CardHeader>
 
               <CardContent>
+                <FieldGroup className="mb-4 md:flex-row md:items-end">
+                  <Field>
+                    <FieldLabel htmlFor="income-history-type">Tipo de ingreso</FieldLabel>
+                    <ResponsiveSelect
+                      id="income-history-type" title="Filtrar por tipo de ingreso" aria-label="Filtrar por tipo de ingreso"
+                      className="h-11 md:h-7"
+                      value={historyQuery.incomeTypeId || "ALL"}
+                      onValueChange={value => changeHistoryFilter("incomeTypeId", value === "ALL" ? "" : value)}
+                      options={[{ value: "ALL", label: "Todos los tipos" }, ...incomeTypes.map(type => ({ value: type.id, label: type.name }))]}
+                    />
+                  </Field>
+                  <Field>
+                    <FieldLabel htmlFor="income-history-start">Desde</FieldLabel>
+                    <DatePicker id="income-history-start" aria-label="Ingresos desde" clearable className="h-11 text-base md:h-7 md:text-xs" value={historyQuery.startDate} onChange={value => changeHistoryFilter("startDate", value)} />
+                  </Field>
+                  <Field>
+                    <FieldLabel htmlFor="income-history-end">Hasta</FieldLabel>
+                    <DatePicker id="income-history-end" aria-label="Ingresos hasta" clearable className="h-11 text-base md:h-7 md:text-xs" value={historyQuery.endDate} onChange={value => changeHistoryFilter("endDate", value)} />
+                  </Field>
+                </FieldGroup>
+                {historyQuery.globalFilter || historyQuery.incomeTypeId || historyQuery.startDate || historyQuery.endDate ? (
+                  <Button type="button" variant="outline" className="mb-4" onClick={() => setHistoryQuery(previous => ({ ...previous, globalFilter: "", incomeTypeId: "", startDate: "", endDate: "", pagination: { ...previous.pagination, pageIndex: 0 } }))}>Limpiar filtros</Button>
+                ) : null}
+                {history.error ? (
+                  <Alert variant="destructive" className="mb-4">
+                    <AlertDescription>
+                      {history.error}
+                      <Button type="button" variant="outline" onClick={() => { if (user) void loadIncomes(user.id).catch(() => {}); }}>Reintentar</Button>
+                    </AlertDescription>
+                  </Alert>
+                ) : null}
                 <DataTable
                   {...incomeMobileView}
                   columns={incomeColumns}
@@ -663,18 +681,23 @@ export default function IngresosContent() {
                   filterPlaceholder="Buscar ingreso..."
                   pageSize={10}
                   pageSizeOptions={[5, 10, 25, 50]}
-                  footerRow={(table) => {
-                    const rows = table.getFilteredRowModel().rows;
-                    const total = rows.reduce(
-                      (sum, row) => sum + Number(row.original.amount || 0),
-                      0,
-                    );
-
+                  serverState={{
+                    ...historyQuery,
+                    rowCount: history.result?.totalCount || 0,
+                    isLoading: history.isLoading,
+                    onPaginationChange: updater => setHistoryQuery(previous => {
+                      const next = typeof updater === "function" ? updater(previous.pagination) : updater;
+                      return { ...previous, pagination: { ...next, pageIndex: next.pageSize !== previous.pagination.pageSize ? 0 : next.pageIndex } };
+                    }),
+                    onSortingChange: updater => setHistoryQuery(previous => ({ ...previous, sorting: typeof updater === "function" ? updater(previous.sorting) : updater, pagination: { ...previous.pagination, pageIndex: 0 } })),
+                    onGlobalFilterChange: value => setHistoryQuery(previous => ({ ...previous, globalFilter: value, pagination: { ...previous.pagination, pageIndex: 0 } })),
+                  }}
+                  footerRow={() => {
                     return (
                       <TableRow>
                         <TableCell colSpan={4}>Total filtrado</TableCell>
                         <TableCell className="font-semibold tabular-nums">
-                          {formatMoney(total)}
+                          {totalIncome}
                         </TableCell>
                         <TableCell />
                       </TableRow>

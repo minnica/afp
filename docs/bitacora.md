@@ -6,6 +6,16 @@ Consolidado el **27 de octubre de 2026** a partir del README del commit `4562aa0
 
 ## 2026-10-29
 
+### A07: historial completo de ingresos y agregados por filtro
+
+**Implementación local completada** sobre `eead77a`. La API de ingresos añade paginación, búsqueda, tipo, fechas inclusivas y orden de servidor. Conserva `incomes`/`total` y añade conteo y metadatos de página; la suma Decimal y las filas comparten filtros, propietario y una instantánea `RepeatableRead`. El orden incluye desempate por ID. Las páginas fuera de rango se ajustan a la última existente.
+
+La pantalla usa esos agregados en resumen y pie, también en móvil; conserva sus formularios y borradores. Cambiar filtros, orden o tamaño vuelve a la primera página. Las lecturas sustituidas se cancelan y sus respuestas/errores se descartan; las mutaciones recargan la consulta vigente y corrigen la página si desaparece su última fila. `DataTable` incorpora un modo de servidor opcional; los otros módulos conservan el modo local.
+
+**891 escenarios correctos, cero fallos y cero omisiones** en PostgreSQL local: 882 anteriores y nueve nuevos. Tipos web/pruebas, contratos negativos, lint y build Webpack correctos. Permanecen dos advertencias previas de lint. El build Turbopack encuentra la restricción de puertos del entorno incluso fuera del sandbox. Navegador con Auth ficticia y PostgreSQL real: escritorio/móvil, ingreso 101, total $1,010 entre páginas, búsqueda/estado vacío, respuestas y errores antiguos, y borrado de la última página. [Evidencias, reproducción y límites](../artifacts/auditoria-2026-10-15/a07-2026-10-29/README.md).
+
+README e informe de auditoría actualizados. Sin migraciones nuevas ni publicación; quedan pendientes el despliegue y la aceptación con Supabase Auth real. A08 y la carrera de Gastos A09 conservan su alcance independiente.
+
 ### A04: día financiero compartido de México
 
 **Implementación local completada** sobre `ec11d0f`. Los vencimientos conservan el día bancario UTC registrado y comparan el instante actual con `America/Mexico_City`. Tarjetas, Dashboard, estado guardado, avisos, mes de ocultación, consumo vigente y textos de presentación comparten la política. Mi dinero y Calendar reutilizan el helper. El navegador envía `clientDate` como día México válido y actualiza a medianoche de esa zona; Android conserva el instante real y la zona del teléfono no desplaza vencimientos.

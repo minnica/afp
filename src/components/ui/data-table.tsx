@@ -3,7 +3,7 @@ import type * as React from "react";
 
 import { ResponsiveSelect } from "@/components/ui/responsive-select";
 
-import type { ColumnDef, ColumnFiltersState, FilterFnOption, Row, SortingState, Table as TanTable } from "@tanstack/react-table";
+import type { ColumnDef, ColumnFiltersState, FilterFnOption, OnChangeFn, PaginationState, Row, SortingState, Table as TanTable } from "@tanstack/react-table";
 import {
 flexRender,
 getCoreRowModel,
@@ -38,7 +38,18 @@ function SortIcon({ isSorted }: { isSorted: false | "asc" | "desc" }) {
   return <ChevronsUpDown className="ml-1 inline h-3.5 w-3.5 opacity-40" />;
 }
 
-export type DataTableProps<TData, TValue = unknown> = { columns: ColumnDef<TData, TValue>[]; data: TData[]; filterColumn?: string; filterGlobal?: boolean; globalFilterFn?: FilterFnOption<TData>; filterPlaceholder?: string; pageSize?: number; pageSizeOptions?: number[]; initialSorting?: SortingState; toolbarStart?: React.ReactNode | ((table: TanTable<TData>) => React.ReactNode); footerRow?: (table: TanTable<TData>) => React.ReactNode; renderMobileRow?: (row: Row<TData>) => React.ReactNode; mobileToolbar?: (table: TanTable<TData>) => React.ReactNode; mobileListLabel?: string; mobileRowSeparator?: boolean };
+export type DataTableServerState = {
+  pagination: PaginationState;
+  sorting: SortingState;
+  globalFilter: string;
+  rowCount: number;
+  isLoading: boolean;
+  onPaginationChange: OnChangeFn<PaginationState>;
+  onSortingChange: OnChangeFn<SortingState>;
+  onGlobalFilterChange: (value: string) => void;
+};
+
+export type DataTableProps<TData, TValue = unknown> = { columns: ColumnDef<TData, TValue>[]; data: TData[]; filterColumn?: string; filterGlobal?: boolean; globalFilterFn?: FilterFnOption<TData>; filterPlaceholder?: string; pageSize?: number; pageSizeOptions?: number[]; initialSorting?: SortingState; toolbarStart?: React.ReactNode | ((table: TanTable<TData>) => React.ReactNode); footerRow?: (table: TanTable<TData>) => React.ReactNode; renderMobileRow?: (row: Row<TData>) => React.ReactNode; mobileToolbar?: (table: TanTable<TData>) => React.ReactNode; mobileListLabel?: string; mobileRowSeparator?: boolean; serverState?: DataTableServerState };
 
 export function DataTable<TData, TValue = unknown>({
   columns,
@@ -56,6 +67,7 @@ export function DataTable<TData, TValue = unknown>({
   mobileToolbar,
   mobileListLabel = "Registros",
   mobileRowSeparator = true,
+  serverState,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState(initialSorting);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -65,11 +77,17 @@ export function DataTable<TData, TValue = unknown>({
   const table = useReactTable({
     data,
     columns,
-    state: { sorting, columnFilters, globalFilter, pagination },
-    onSortingChange: setSorting,
+    state: { sorting: serverState?.sorting ?? sorting, columnFilters, globalFilter: serverState?.globalFilter ?? globalFilter, pagination: serverState?.pagination ?? pagination },
+    onSortingChange: serverState?.onSortingChange ?? setSorting,
     onColumnFiltersChange: setColumnFilters,
-    onGlobalFilterChange: setGlobalFilter,
-    onPaginationChange: setPagination,
+    onGlobalFilterChange: serverState?.onGlobalFilterChange ?? setGlobalFilter,
+    onPaginationChange: serverState?.onPaginationChange ?? setPagination,
+    manualPagination: Boolean(serverState),
+    manualFiltering: Boolean(serverState),
+    manualSorting: Boolean(serverState),
+    enableSortingRemoval: !serverState,
+    enableMultiSort: !serverState,
+    rowCount: serverState?.rowCount,
     globalFilterFn,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -94,10 +112,10 @@ export function DataTable<TData, TValue = unknown>({
               <Input
                 aria-label={filterPlaceholder}
                 placeholder={filterPlaceholder}
-                value={filterGlobal ? globalFilter : String(columnFilterValue)}
+                value={filterGlobal ? String(table.getState().globalFilter) : String(columnFilterValue)}
                 onChange={(e) => {
                   if (filterGlobal) {
-                    setGlobalFilter(e.target.value);
+                    table.setGlobalFilter(e.target.value);
                   } else {
                     table
                       .getColumn(filterColumn!)
@@ -116,7 +134,7 @@ export function DataTable<TData, TValue = unknown>({
                 value={String(table.getState().pagination.pageSize)}
                 onValueChange={value => {
                   table.setPageSize(Number(value));
-                  table.setPageIndex(0);
+                  if (!serverState) table.setPageIndex(0);
                 }}
                 aria-label="Registros por página"
                 className="h-9 w-[70px] text-xs"
@@ -135,7 +153,7 @@ export function DataTable<TData, TValue = unknown>({
       {renderMobileRow ? (
         <div className="md:hidden">
           {mobileToolbar?.(table)}
-          {table.getRowModel().rows.length ? (
+          {serverState?.isLoading ? <p role="status" className="py-8 text-center text-muted-foreground">Cargando registros…</p> : table.getRowModel().rows.length ? (
             <ItemGroup className={mobileRowSeparator ? "gap-0" : "gap-3"} aria-label={mobileListLabel}>
               {table.getRowModel().rows.map((row, index) => (
                 <Fragment key={row.id}>
@@ -178,6 +196,7 @@ export function DataTable<TData, TValue = unknown>({
                         size="sm"
                         className="-ml-2"
                         onClick={header.column.getToggleSortingHandler()}
+                        disabled={serverState?.isLoading}
                       >
                         {flexRender(
                           header.column.columnDef.header,
@@ -195,7 +214,9 @@ export function DataTable<TData, TValue = unknown>({
           </TableHeader>
 
           <TableBody>
-            {table.getRowModel().rows.length ? (
+            {serverState?.isLoading ? (
+              <TableRow><TableCell colSpan={columns.length} className="py-8 text-center text-muted-foreground" role="status">Cargando registros…</TableCell></TableRow>
+            ) : table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => (
@@ -222,13 +243,13 @@ export function DataTable<TData, TValue = unknown>({
             )}
           </TableBody>
 
-          {footerRow ? <TableFooter>{footerRow(table)}</TableFooter> : null}
+          {footerRow && !serverState?.isLoading ? <TableFooter>{footerRow(table)}</TableFooter> : null}
         </Table>
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-4 text-sm text-muted-foreground">
-        <span>
-          {table.getFilteredRowModel().rows.length} registro(s)
+        <span aria-live="polite" aria-atomic="true">
+          {serverState ? serverState.rowCount : table.getFilteredRowModel().rows.length} registro(s)
           {table.getPageCount() > 1
             ? ` · página ${table.getState().pagination.pageIndex + 1} de ${table.getPageCount()}`
             : null}
@@ -239,7 +260,7 @@ export function DataTable<TData, TValue = unknown>({
             <span className="text-xs">Mostrar</span>
             <ResponsiveSelect
               value={String(table.getState().pagination.pageSize)}
-              onValueChange={(value) => { table.setPageSize(Number(value)); table.setPageIndex(0); }}
+              onValueChange={(value) => { table.setPageSize(Number(value)); if (!serverState) table.setPageIndex(0); }}
               aria-label="Registros por página"
               className="h-11 w-[70px] text-sm"
               title="Registros por página"
@@ -255,7 +276,7 @@ export function DataTable<TData, TValue = unknown>({
               size="sm"
               className={renderMobileRow ? "h-11 px-3 md:h-6 md:px-2" : undefined}
               onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
+              disabled={serverState?.isLoading || !table.getCanPreviousPage()}
             >
               Anterior
             </Button>
@@ -264,7 +285,7 @@ export function DataTable<TData, TValue = unknown>({
               size="sm"
               className={renderMobileRow ? "h-11 px-3 md:h-6 md:px-2" : undefined}
               onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
+              disabled={serverState?.isLoading || !table.getCanNextPage()}
             >
               Siguiente
             </Button>

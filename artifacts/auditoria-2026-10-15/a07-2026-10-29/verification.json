@@ -1,0 +1,175 @@
+{
+  "date": "2026-10-29",
+  "finding": "A07",
+  "status": "implemented-locally",
+  "sourceBase": "eead77a1f345b4e75463a7ff207035fb43e31c6a",
+  "environment": {
+    "node": "22.23.2",
+    "pnpm": "10.33.0",
+    "database": "PostgreSQL 16 local disposable afp_test_a07",
+    "auth": "simulated",
+    "migrationsApplied": 42
+  },
+  "checks": {
+    "fullSuite": {
+      "command": "pnpm test",
+      "tests": 891,
+      "pass": 891,
+      "fail": 0,
+      "skipped": 0,
+      "log": "tests.log"
+    },
+    "finalFocusedSuite": {
+      "command": "pnpm test income-history.test.ts api-authorization.test.ts",
+      "tests": 47,
+      "pass": 47,
+      "fail": 0,
+      "skipped": 0,
+      "log": "focused-tests.log"
+    },
+    "typecheck": {
+      "status": "passed",
+      "log": "typecheck.log"
+    },
+    "typecheckTests": {
+      "status": "passed",
+      "log": "typecheck-tests.log"
+    },
+    "negativeTypeContracts": {
+      "status": "passed",
+      "log": "test-types.log"
+    },
+    "lint": {
+      "errors": 0,
+      "warnings": 2,
+      "preexistingWarnings": [
+        "Gastos loadSubscriptions unused",
+        "TanStack useReactTable React Compiler incompatibility"
+      ],
+      "log": "lint.log"
+    },
+    "defaultBuild": {
+      "status": "environment-blocked",
+      "error": "Turbopack creating process / binding port: Operation not permitted",
+      "escalatedRetry": "same failure",
+      "log": "build.log"
+    },
+    "webpackBuild": {
+      "status": "passed",
+      "typecheckIncluded": true,
+      "log": "build-webpack.log"
+    },
+    "designDetector": {
+      "findings": 0,
+      "log": "design-detector.json"
+    },
+    "diffCheck": "passed"
+  },
+  "browser": {
+    "tool": "agent-browser",
+    "data": "101 fictitious incomes, MXN 10 each",
+    "development": {
+      "origin": "http://127.0.0.1:4217",
+      "transientIncidents": [
+        "React update before mount during hot reload",
+        "HTTP 500 with incomplete JSON during recompilation"
+      ],
+      "recovery": "reload completed API and interface"
+    },
+    "compiled": {
+      "origin": "http://127.0.0.1:4218",
+      "fixture": "tests/helpers/money-browser-server.ts with AFP_CAPTURE_TEST_PRODUCTION=1 and AFP_UI_TEST_REAL_SETTINGS=1",
+      "desktopViewport": [
+        1440,
+        1050
+      ],
+      "mobileViewport": [
+        390,
+        844
+      ],
+      "desktopScrollWidth": 1440,
+      "mobileScrollWidth": 390,
+      "consoleMessages": [],
+      "pageErrors": [],
+      "initial": {
+        "totalCount": 101,
+        "total": 1010,
+        "page": 1,
+        "pageSize": 10,
+        "pageCount": 11
+      },
+      "pagination": {
+        "visitedPages": [
+          1,
+          2,
+          3
+        ],
+        "pageSize": 50,
+        "totalCount": 101,
+        "total": 1010,
+        "lastPageContains": "Ingreso de prueba 101"
+      },
+      "staleSuccess": {
+        "delayMs": 1500,
+        "transportIgnoresAbort": true,
+        "oldQuery": "Ingreso de prueba 1",
+        "newQuery": "Ingreso de prueba 101",
+        "finalTotalCount": 1,
+        "finalTotal": 10,
+        "oldResponseApplied": false
+      },
+      "staleError": {
+        "delayMs": 1500,
+        "transportIgnoresAbort": true,
+        "oldQuery": "__a07_error",
+        "newQuery": "sin coincidencias A07",
+        "finalTotalCount": 0,
+        "finalTotal": 0,
+        "oldErrorApplied": false
+      },
+      "deleteLastPage": {
+        "before": {
+          "page": 3,
+          "pageCount": 3,
+          "totalCount": 101,
+          "total": 1010
+        },
+        "after": {
+          "page": 2,
+          "pageCount": 2,
+          "totalCount": 100,
+          "total": 1000
+        },
+        "deletedIncomeStillVisible": false
+      },
+      "screenshots": [
+        "desktop.png",
+        "mobile.png"
+      ]
+    }
+  },
+  "scope": {
+    "deployed": false,
+    "newMigrations": false,
+    "realSupabaseAcceptance": "pending",
+    "A08": "unchanged",
+    "A09Gastos": "unchanged",
+    "financialRemoteReads": false,
+    "financialRemoteWrites": false
+  },
+  "sourceSha256": {
+    "src/app/api/incomes/route.ts": "fe921db8a67b19df570ca96c803e74dcd5f33a9067f8302796a2aff8417abd66",
+    "src/hooks/use-income-history.ts": "26905a4de5112b2d884885fa521a5b7017ab0f6d85c6678ecb89f70a3c614bb7",
+    "src/components/ingresos/IngresosContent.tsx": "49215ed35c96752a3ca24d28f553fa48e9db87e77adb83fb67c78cc41f7b5576",
+    "src/components/ui/data-table.tsx": "909cc4589aab45824d1cb89c12aee1097a971d919335229cb5e442c268541560",
+    "src/lib/uiResponseSchemas.ts": "1041a0e4d16b89a392b98f5c8c5031f9c2c4903dbac9eaf9655fcaeccefc38f9",
+    "tests/income-history.test.ts": "5c9e5460299f8aef4480380d1b1adf3edce12fa92589e4cb4b3930f41e415668",
+    "tests/api-authorization.test.ts": "a974c76f2ad5c3137ccc783fd8973f696aa84c8bf9e174915afea2cfb7f8e3a6"
+  },
+  "cleanup": {
+    "testServers": "closed",
+    "temporaryFixtureDirectories": "removed",
+    "browserSessions": "closed",
+    "disposableDatabaseContainer": "stopped and removed"
+  }
+}

@@ -1,4 +1,6 @@
 import type { Prisma } from "@prisma/client";
+import { z } from "zod";
+import { validDay } from "@/lib/money/dates";
 import { readFinancialInput } from "@/lib/financialContracts";
 import { apiResponse as NextResponse, requireApiUser, apiAccessErrorResponse, requireOwnedReferences } from "@/lib/apiAuth";
 import { runDebtAccountOperation, refreshDebtAccount } from "@/lib/debtAccountService";
@@ -41,23 +43,71 @@ function parseDateInput(dateValue: string | null | undefined) {
   return new Date(`${dateValue}T12:00:00.000Z`);
 }
 
+const queryInteger = (maximum: number) => z.string().regex(/^[1-9]\d*$/, "Indica un entero mayor a cero.")
+  .transform(Number).pipe(z.number().int("Indica un entero válido.").max(maximum, `Usa un valor de hasta ${maximum}.`));
+const queryDay = z.string().refine(value => value === "" || validDay(value), "Indica una fecha válida.").default("");
+const historyQuery = z.object({
+  page: queryInteger(2147483647).default(1),
+  pageSize: queryInteger(100).default(100),
+  q: z.string().trim().max(200, "Usa hasta 200 caracteres en la búsqueda.").default(""),
+  incomeTypeId: z.string().trim().max(100, "Tipo de ingreso no válido.").default(""),
+  startDate: queryDay,
+  endDate: queryDay,
+  sortBy: z.enum(["date", "incomeType", "concept", "receivableAccount", "amount"], { error: "Orden no válido." }).default("date"),
+  sortDirection: z.enum(["asc", "desc"], { error: "Dirección de orden no válida." }).default("desc"),
+}).refine(value => !value.startDate || !value.endDate || value.startDate <= value.endDate,
+  { message: "La fecha final debe ser igual o posterior a la inicial." });
+
 export async function GET(request: Request) {
   try {
     const user = await requireApiUser(request);
     const userId = user.id;
 
-    const incomes = await prisma.income.findMany({
-      where: { userId },
-      select: incomeSelect,
-      orderBy: [{ date: "desc" }, { createdAt: "desc" }],
-      take: 100,
-    });
+    const parsed = historyQuery.safeParse(Object.fromEntries(new URL(request.url).searchParams));
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.issues[0]?.message || "Filtros no válidos." }, { status: 400 });
+    }
+    const { page: requestedPage, pageSize, q, incomeTypeId, startDate, endDate, sortBy, sortDirection } = parsed.data;
+    const where: Prisma.IncomeWhereInput = {
+      userId,
+      ...(incomeTypeId ? { incomeTypeId } : {}),
+      ...(startDate || endDate ? { date: {
+        ...(startDate ? { gte: new Date(`${startDate}T00:00:00.000Z`) } : {}),
+        ...(endDate ? { lte: new Date(`${endDate}T23:59:59.999Z`) } : {}),
+      } } : {}),
+      ...(q ? { OR: [
+        { concept: { contains: q, mode: "insensitive" } },
+        { source: { contains: q, mode: "insensitive" } },
+        { notes: { contains: q, mode: "insensitive" } },
+        { incomeType: { name: { contains: q, mode: "insensitive" } } },
+        { receivableAccount: { concept: { contains: q, mode: "insensitive" } } },
+        { receivableAccount: { person: { name: { contains: q, mode: "insensitive" } } } },
+      ] } : {}),
+    };
+    const sortOrders: Record<typeof sortBy, Prisma.IncomeOrderByWithRelationInput[]> = {
+      date: [{ date: sortDirection }],
+      incomeType: [{ incomeType: { name: sortDirection } }],
+      concept: [{ concept: sortDirection }],
+      receivableAccount: [{ receivableAccount: { person: { name: sortDirection } } }, { receivableAccount: { concept: sortDirection } }],
+      amount: [{ amount: sortDirection }],
+    };
+    // One snapshot keeps the page, count and SQL Decimal sum consistent during writes.
+    const result = await prisma.$transaction(async tx => {
+      const summary = await tx.income.aggregate({ where, _count: { _all: true }, _sum: { amount: true } });
+      const totalCount = summary._count._all;
+      const pageCount = Math.max(1, Math.ceil(totalCount / pageSize));
+      const page = Math.min(requestedPage, pageCount);
+      const incomes = await tx.income.findMany({
+        where,
+        select: incomeSelect,
+        orderBy: [...sortOrders[sortBy], ...(sortBy === "date" ? [] : [{ date: "desc" as const }]), { createdAt: "desc" }, { id: "desc" }],
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+      });
+      return { incomes, total: Number(summary._sum.amount || 0), totalCount, page, pageSize, pageCount };
+    }, { isolationLevel: "RepeatableRead" });
 
-    const total = incomes.reduce((sum, income) => {
-      return sum + Number(income.amount || 0);
-    }, 0);
-
-    return NextResponse.json({ incomes, total });
+    return NextResponse.json(result);
   } catch (error) {
     const accessResponse = apiAccessErrorResponse(error);
     if (accessResponse) return accessResponse;

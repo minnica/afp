@@ -503,7 +503,11 @@ const incomesIncomesItemSchema = z.object({
 
 const incomesSchema = z.object({
   "incomes": z.array(incomesIncomesItemSchema),
-  "total": z.number()
+  "total": z.number(),
+  "totalCount": z.number().int().nonnegative(),
+  "page": z.number().int().positive(),
+  "pageSize": z.number().int().min(1).max(100),
+  "pageCount": z.number().int().positive()
 }).passthrough();
 
 const subscriptionsSubscriptionsItemCardSchema = z.object({
