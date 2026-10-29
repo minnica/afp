@@ -6,6 +6,12 @@ Consolidado el **27 de octubre de 2026** a partir del README del commit `4562aa0
 
 ## 2026-10-29
 
+### Estados de cuenta locales organizados por año y mes
+
+Los PDF se trasladan a `estados_cuenta/<año>/<MM-mes>/`, dejando únicamente documentos PDF dentro de los meses. Se añade un índice privado del año y se reúnen conciliaciones, aclaraciones, SQL, respaldos y revisiones en `_soporte/`. El script de preparación de marcas y su registro de fuentes apuntan a la nueva ubicación de las referencias de tarjetas.
+
+El traslado conserva íntegros los archivos históricos, sus hashes y sus permisos; un mapa privado resuelve las rutas anteriores. Se ajusta la skill local de conciliación para usar la nueva estructura y resolver las referencias históricas sin alterar autorizaciones ni respaldos. Inventario, copia de la configuración anterior y verificaciones en `estados_cuenta/_soporte/reorganizacion-2026-10-29/`. Cambio local de archivos y documentación, sin escrituras en la BD ni publicación.
+
 ### Identificación visual de los tipos de aviso
 
 Avisos importantes distingue pagos de tarjeta, cuentas por pagar, cobros programados, suscripciones y cortes mediante una etiqueta con icono y un color estable por tipo. A petición del propietario, el tinte inicial al 5% se sustituye por fondos opacos con mayor presencia de color y tonos propios para claro y oscuro; las etiquetas Vencido, Hoy y Próximo comunican la urgencia por separado. Se conservan títulos, importes, fechas, orden, enlaces y preferencias de ocultación. La misma identificación se utiliza en móvil, en los avisos ocultos y en la confirmación de ocultación. [Verificación de los fondos sólidos](../artifacts/notice-solid-backgrounds-2026-10-29/README.md).

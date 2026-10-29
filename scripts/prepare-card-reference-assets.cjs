@@ -4,7 +4,7 @@ const path = require("node:path");
 const sharp = require("sharp");
 
 const root = path.resolve(__dirname, "..");
-const references = path.join(root, "estados_cuenta/referencias_tarjetas");
+const references = path.join(root, "estados_cuenta/_soporte/referencias_tarjetas");
 const output = path.join(root, "public/card-brands");
 
 async function crop(source, name, bounds) {

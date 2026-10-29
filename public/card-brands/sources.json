@@ -53,7 +53,7 @@
     "https://http2.mlstatic.com/frontend-assets/credit-card-landings/tarjeta-de-credito/lista-de-espera/landing/new-card-hero.webp"
   ],
   "scope": "Los frentes móviles usan las referencias del propietario, importes HTML accesibles y las marcas de red confirmadas en sus imágenes. LikeU, Santander, su llama, su trama y las redes son SVG sin imágenes incrustadas. Los WebP anteriores de LikeU/Santander se conservan solo como antecedentes y no se regeneran ni se usan en el frente. No se publican capturas completas, terminaciones, vencimientos, CVV ni datos de titular; usagePolicy conserva sus valores.",
-  "referenceSet": "estados_cuenta/referencias_tarjetas",
+  "referenceSet": "estados_cuenta/_soporte/referencias_tarjetas",
   "preparationScript": "scripts/prepare-card-reference-assets.cjs",
   "referenceAssets": [
     {
@@ -122,7 +122,7 @@
     {
       "file": "likeu-pearl-pattern.svg",
       "source": "scripts/generate-likeu-pattern.cjs",
-      "reference": "estados_cuenta/referencias_tarjetas/santander.jpeg",
+      "reference": "estados_cuenta/_soporte/referencias_tarjetas/santander.jpeg",
       "note": "110 contornos vectoriales a distancia constante de la llama oficial, con curva suave y tonos iridiscentes. Sin mapas de bits."
     },
     {

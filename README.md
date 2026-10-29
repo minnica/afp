@@ -84,6 +84,29 @@ docs/                    Guías técnicas
 artifacts/               Informes y evidencias de verificaciones anteriores
 ```
 
+### Estados de cuenta locales
+
+Los PDF privados se organizan por **año y mes de corte bancario**, con el número del mes como prefijo: `estados_cuenta/2026/08-agosto/bbva.pdf`. Cada carpeta mensual contiene solamente PDF. El índice privado de cada año, `estados_cuenta/<año>/INDICE.md`, muestra los documentos agregados; su presencia no acredita que ya se hayan conciliado o cargado en AFP. Actualizar el índice al agregar documentos.
+
+```text
+estados_cuenta/
+  2026/
+    INDICE.md
+    07-julio/
+    08-agosto/
+    09-septiembre/
+    10-octubre/
+  _soporte/
+    conciliaciones/<año>/<MM-mes>/
+    respaldos-y-revisiones/
+    referencias_tarjetas/
+    rutas_anteriores.json
+```
+
+Guardar JSON, aclaraciones, esquemas, SQL y archivos de trabajo bancarios en `_soporte/conciliaciones/<año>/<MM-mes>/`; los respaldos y revisiones privados de otras tareas, en `_soporte/respaldos-y-revisiones/`. Las imágenes utilizadas para preparar las marcas de tarjetas permanecen en `_soporte/referencias_tarjetas/`. Crear los nuevos archivos técnicos en estas ubicaciones para mantener visibles los PDF.
+
+La reorganización local del 29 de octubre de 2026 conservó los archivos históricos sin modificar su contenido ni sus permisos. El mapa privado `_soporte/rutas_anteriores.json` relaciona cada ruta anterior con su ubicación actual; el inventario y la verificación del traslado están en `_soporte/reorganizacion-2026-10-29/`. Las referencias antiguas en bitácoras, respaldos y lotes autorizados conservan su valor histórico: consultar el mapa al abrirlas. El validador de la skill local `conciliar-estados-cuenta` resuelve las rutas anteriores de las conciliaciones y sus PDF mediante ese mapa. Las revisiones nuevas deben registrar las rutas actuales. Todo `estados_cuenta/` continúa excluido de Git.
+
 ## Desarrollo local
 
 ### Requisitos
