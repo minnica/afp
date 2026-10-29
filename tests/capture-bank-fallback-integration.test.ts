@@ -110,6 +110,45 @@ test('Wallet principal y respaldo bancario persistente: API y PostgreSQL', { ski
       });
     }
     const c = cards[0], nu = cards[2], santander = cards[3];
+    await t.test('sin hora bancaria de operación, un aviso del día siguiente conserva revisión frente a Wallet', async () => {
+      const a = amount(), before = await count(), wallet = input(present(nu).wallet, a), bank = input(present(nu).bank, a);
+      wallet.postedAt = '2026-10-23T18:00:00Z'; wallet.receivedAt = '2026-10-23T18:00:01Z';
+      bank.postedAt = '2026-10-24T18:00:00Z'; bank.receivedAt = '2026-10-24T18:00:01Z';
+      assert.equal(present(await send(wallet)).status, 'REGISTERED');
+      const b = present(await send(bank)); assert.equal(b.reason, 'POSSIBLE_DUPLICATE');
+      assert.equal(objectValue(b.proposal).dateSource, 'NOTIFICATION_POSTED_AT');
+      assert.equal(b.expenseId, null); assert.equal(await count(), before + 1);
+    });
+    await t.test('compras diarias iguales con ambos avisos no se bloquean por el banco pendiente del día anterior', async () => {
+      const a = amount(), before = await count();
+      for (const day of ['23', '24', '25']) {
+        const bank = input(present(c).bank, a), wallet = input(present(c).wallet, a);
+        bank.fields = Object.fromEntries(Object.entries(bank.fields).map(([key, value]) => [key,
+          value.replace('20/10/26 08:28:47 PM', `${day}/10/26 12:00:00 PM`)]));
+        bank.postedAt = `2026-10-${day}T18:00:01Z`; bank.receivedAt = `2026-10-${day}T18:00:02Z`;
+        wallet.postedAt = `2026-10-${day}T18:00:05Z`; wallet.receivedAt = `2026-10-${day}T18:00:06Z`;
+        const b = present(await send(bank)); assert.equal(b.reason, 'BANK_FALLBACK_WAIT');
+        assert.equal(present(await send(wallet)).status, 'REGISTERED');
+        await due(b); assert.equal(present(await read(b.id)).reason, 'POSSIBLE_DUPLICATE');
+      }
+      assert.equal(await count(), before + 3);
+    });
+    await t.test('banco y Wallet a ambos lados de medianoche conservan un gasto en cualquier orden', async () => {
+      for (const order of ['bank', 'wallet'] as const) {
+        const a = amount(), before = await count(), bank = input(present(c).bank, a), wallet = input(present(c).wallet, a);
+        bank.fields = Object.fromEntries(Object.entries(bank.fields).map(([key, value]) => [key,
+          value.replace('20/10/26 08:28:47 PM', '20/10/26 11:59:00 PM')]));
+        bank.postedAt = '2026-10-21T05:59:01Z'; bank.receivedAt = '2026-10-21T05:59:02Z';
+        wallet.postedAt = '2026-10-21T06:01:00Z'; wallet.receivedAt = '2026-10-21T06:01:01Z';
+        let b: import('@prisma/client').CaptureMovement | null, w: import('@prisma/client').CaptureMovement | null;
+        if (order === 'bank') { b = await send(bank); w = await send(wallet); }
+        else { w = await send(wallet); b = await send(bank); }
+        assert.equal(present(w).status, 'REGISTERED');
+        if (present(b).fallbackDueAt) await due(b);
+        assert.equal(present((await read(present(b).id))).reason, 'POSSIBLE_DUPLICATE');
+        assert.equal(await count(), before + 1);
+      }
+    });
     await t.test('Wallet tardío conserva fecha, concepto, notas y monto editados; vinculación explícita no suma gasto', async () => {
       const a = amount(), before = await count(), b = await send(input(present(c).bank, a)); await due(b);
       const registered = await read(present(b).id), expense = await db.dailyExpense.update({ where: { id: present(present(registered).expenseId) }, data: { concept: 'Mi concepto corregido', notes: 'Mi nota personal', date: new Date('2026-10-19T12:00:00Z') } });

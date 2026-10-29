@@ -30,11 +30,16 @@ export async function archiveCapturedExpense(tx: Prisma.TransactionClient, expen
 }
 
 function dateWindow(date: string) {
-  const value = new Date(`${date}T12:00:00.000Z`).getTime();
-  return { gte: new Date(value - 3 * 86400000), lte: new Date(value + 3 * 86400000) };
+  const value = new Date(`${date}T00:00:00.000Z`).getTime();
+  return { gte: new Date(value), lt: new Date(value + 86400000) };
 }
 
-export async function captureCandidates(tx: CaptureDb, userId: string, proposal: CaptureProposal) {
+function purchaseTime(proposal: CaptureProposal) {
+  const value = new Date(proposal.operationAt || proposal.notificationAt || "").getTime();
+  return Number.isFinite(value) ? value : null;
+}
+
+export async function captureCandidates(tx: CaptureDb, userId: string, proposal: CaptureProposal, parserKey?: string | null) {
   if (["MONEY_TRANSFER", "CASH_WITHDRAWAL", "CARD_PAYMENT", "ACCOUNT_DEBIT", "REFUND"].includes(proposal.movementType ?? "")) return [];
   if (!proposal.cardId || !proposal.amount || !proposal.date) return [];
   const where = { userId, cardId: proposal.cardId, amount: proposal.amount, date: dateWindow(proposal.date) };
@@ -42,11 +47,30 @@ export async function captureCandidates(tx: CaptureDb, userId: string, proposal:
   const expenses = await tx.dailyExpense.findMany({ where, select: { id: true, concept: true, date: true, amount: true } });
   const installments = await tx.installmentPurchase.findMany({ where: { userId, cardId: proposal.cardId, totalAmount: proposal.amount, purchaseDate: where.date }, select: { id: true, concept: true } });
   const deleted = await tx.expenseTombstone.findMany({ where, select: { expenseId: true, concept: true, date: true, amount: true } });
-  const movements = await tx.captureMovement.findMany({ where: { userId, cardId: proposal.cardId, amount: proposal.amount, operationDate: where.date },
-    select: { id: true, expenseId: true, originalExpenseId: true, installmentPurchaseId: true, status: true, reason: true, parserKey: true, correction: true, proposal: true } });
+  const movements = await tx.captureMovement.findMany({ where: { userId, cardId: proposal.cardId, amount: proposal.amount,
+    operationDate: { gte: new Date(where.date.gte.getTime() - 86400000), lt: new Date(where.date.lt.getTime() + 86400000) } },
+    select: { id: true, expenseId: true, originalExpenseId: true, installmentPurchaseId: true, status: true, reason: true, parserKey: true, correction: true, proposal: true, operationDate: true } });
+  const time = purchaseTime(proposal), source = captureParsers.find(parser => parser.key === parserKey)?.sourcePackage;
+  const nearbyMovements = movements.filter(row => {
+    if (row.operationDate && row.operationDate >= where.date.gte && row.operationDate < where.date.lt) return true;
+    const previous = captureProposal(row.proposal), previousTime = purchaseTime(previous);
+    // Avisos a ambos lados de medianoche siguen siendo candidatos si sus horas
+    // distan como máximo 15 minutos; repetir una compra al día siguiente no basta.
+    if (time !== null && previousTime !== null && Math.abs(time - previousTime) <= 15 * 60000) return true;
+    // Banco y Wallet pueden asignar días distintos a la misma compra. Si una
+    // fuente ya registró el gasto, el otro canal conserva revisión un día contiguo.
+    // Una operación bancaria posterior al aviso Wallet de ayer es una compra nueva.
+    const previousSource = captureParsers.find(parser => parser.key === row.parserKey)?.sourcePackage;
+    if (row.status !== "REGISTERED" || !source || !previousSource
+      || (source === "com.google.android.apps.walletnfcrel") === (previousSource === "com.google.android.apps.walletnfcrel")) return false;
+    const bankProposal = source === "com.google.android.apps.walletnfcrel" ? previous : proposal;
+    if (bankProposal.dateSource !== "BANK_OPERATION") return true;
+    return time === null || previousTime === null
+      || (source === "com.google.android.apps.walletnfcrel" ? previousTime <= time : time <= previousTime);
+  });
   // La evidencia parcial y Wallet de respaldo en observación no bloquean al
   // banco. Una corrección personal o una resolución financiera sí bloquean.
-  const financialMovements = movements.filter(row => !paymentCaptureKind(row) && !refundCaptureKind(row)
+  const financialMovements = nearbyMovements.filter(row => !paymentCaptureKind(row) && !refundCaptureKind(row)
     && !(["BANK_FALLBACK_WAIT", "BANK_FALLBACK_PAUSED"].includes(row.reason) && captureProposal(row.proposal)?.bankFallback?.walletParserKey === proposal.primaryWalletParserKey
       && !row.correction && !row.expenseId && !row.originalExpenseId && !row.installmentPurchaseId)
     && !(["REVIEW", "OBSERVED"].includes(row.status)
@@ -118,7 +142,7 @@ export async function processCaptureEvent(tx: Prisma.TransactionClient, event: C
       sourcePackage: event.sourcePackage, notificationKeyHash: event.notificationKeyHash, id: { not: event.id },
     } });
     if (["PURCHASE", "BANK_FALLBACK_WAIT"].includes(reason) && revision) reason = "NOTIFICATION_REVISION";
-    const candidates = await captureCandidates(tx, event.userId, proposal);
+    const candidates = await captureCandidates(tx, event.userId, proposal, parserKey);
     if (candidates.length) {
       proposal = { ...proposal, candidates };
       if (["PURCHASE", "BANK_FALLBACK_WAIT"].includes(reason)) reason = "POSSIBLE_DUPLICATE";
@@ -254,7 +278,7 @@ export async function registerCaptureMovement(tx: Prisma.TransactionClient, move
   if (paymentCaptureKind(movement)) throw new ApiAccessError("Este aviso corresponde a un pago o cargo de cuenta. Usa la revisión de pagos de tarjeta.", 409);
   const p = effectiveCapture(movement);
   if (!p.cardId || !p.amount || !p.date || p.currency !== "MXN") throw new ApiAccessError("El aviso necesita tarjeta, importe, moneda y fecha verificados.", 409);
-  if (!distinct && (await captureCandidates(tx, movement.userId, p)).some(candidate => candidate.type !== "MOVEMENT" || candidate.id !== movement.id)) {
+  if (!distinct && (await captureCandidates(tx, movement.userId, p, movement.parserKey)).some(candidate => candidate.type !== "MOVEMENT" || candidate.id !== movement.id)) {
     return tx.captureMovement.update({ where: { id: movement.id }, data: { reason: "POSSIBLE_DUPLICATE" } });
   }
   const { data, reason } = await captureExpenseData(tx, movement);

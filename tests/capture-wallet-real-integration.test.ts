@@ -32,7 +32,8 @@ test('Wallet/Banamex reales anonimizados: observación, fecha aceptada y un gast
   const credential = { id: device.id, secretHash: device.secretHash };
   const parserKey = 'wallet.banamex-purchase.es.v1';
   const mode = (value: string, datePolicy?: string) => configuration.configureCapture(db, user.id, { action: 'automation', cardId: card.id, parserKey, mode: value, ...(datePolicy ? { datePolicy } : {}) });
-  const makeEvent = (fixture: NoticeSample, amount = '123.45', suffix?: string) => protocol.validateCaptureEvent({ ...fixture.event, contractVersion: 1 as const, eventId: randomUUID(),
+  const makeEvent = (fixture: NoticeSample, amount = '123.45', suffix?: string, postedAt?: string) => protocol.validateCaptureEvent({ ...fixture.event,
+    ...(postedAt ? { postedAt, receivedAt: new Date(new Date(postedAt).getTime() + 1000).toISOString() } : {}), contractVersion: 1 as const, eventId: randomUUID(),
     notificationKeyHash: protocol.captureHash(randomUUID()), fields: Object.fromEntries(Object.entries(fixture.event.fields).map(([key, value]) => [key,
       value.replaceAll('123.45', amount).replaceAll('••0123', suffix ? `••${suffix}` : '••0123')])) });
   const read = (event: Pick<CaptureInput, 'eventId'>) => db.captureEvent.findUnique({ where: { deviceId_eventId: { deviceId: device.id, eventId: event.eventId } }, include: { movement: true } });
@@ -115,6 +116,48 @@ test('Wallet/Banamex reales anonimizados: observación, fecha aceptada y un gast
       assert.equal(present(first).status, 'REGISTERED'); assert.equal(present(second).reason, 'POSSIBLE_DUPLICATE');
       const distinct = await processing.resolveCaptureMovement(db, user.id, { id: present(second).id, action: 'distinct' });
       assert.notEqual(present(distinct).expenseId, present(first).expenseId);
+    });
+    await t.test('compras diarias del mismo comercio, tarjeta e importe se registran por separado', async () => {
+      const before = await db.dailyExpense.count({ where: { userId: user.id } }), ids = new Set<string>();
+      for (const [day, hour] of [['23', '20'], ['24', '18'], ['25', '17'], ['26', '18']]) {
+        const movement = present(await send(makeEvent(walletFixture, '451.25', undefined, `2026-10-${day}T${hour}:00:00Z`)));
+        assert.equal(movement.status, 'REGISTERED'); ids.add(present(movement.expenseId));
+      }
+      assert.equal(ids.size, 4); assert.equal(await db.dailyExpense.count({ where: { userId: user.id } }), before + 4);
+      const repeat = present(await send(makeEvent(walletFixture, '451.25', undefined, '2026-10-26T19:00:00Z')));
+      assert.equal(repeat.reason, 'POSSIBLE_DUPLICATE'); assert.equal(repeat.expenseId, null);
+    });
+    await t.test('gastos manuales a cualquier hora del mismo día bloquean; los del día anterior permiten otra compra', async () => {
+      for (const [index, hour] of ['00:00:00.000', '23:59:59.999'].entries()) {
+        const amount = `${452 + index}.25`;
+        await db.dailyExpense.create({ data: { userId: user.id, cardId: card.id, categoryId: category.id,
+          concept: 'Compra manual ficticia', amount, paymentMethod: 'CARD', date: new Date(`2026-10-23T${hour}Z`) } });
+        const sameDay = present(await send(makeEvent(walletFixture, amount, undefined, '2026-10-23T18:00:00Z')));
+        assert.equal(sameDay.reason, 'POSSIBLE_DUPLICATE'); assert.equal(sameDay.expenseId, null);
+        const nextDay = present(await send(makeEvent(walletFixture, amount, undefined, '2026-10-24T18:00:00Z')));
+        assert.equal(nextDay.status, 'REGISTERED');
+      }
+    });
+    await t.test('al cruzar medianoche se revisan avisos hasta 15 minutos; fuera del margen se permite otra compra', async () => {
+      for (const [amount, time, expected] of [
+        ['454.25', '06:14:00.000', 'POSSIBLE_DUPLICATE'],
+        ['455.25', '06:14:00.001', 'AUTOMATIC'],
+      ]) {
+        const first = present(await send(makeEvent(walletFixture, amount, undefined, '2026-10-24T05:59:00Z')));
+        assert.equal(first.status, 'REGISTERED');
+        const second = present(await send(makeEvent(walletFixture, amount, undefined, `2026-10-24T${time}Z`)));
+        assert.equal(second.reason, expected);
+        assert.equal(second.expenseId === null, expected === 'POSSIBLE_DUPLICATE');
+      }
+    });
+    await t.test('borrar una compra previa no impide registrar otra del día siguiente', async () => {
+      const first = present(await send(makeEvent(walletFixture, '456.25', undefined, '2026-10-23T18:00:00Z')));
+      const expense = present(await db.dailyExpense.findUnique({ where: { id: present(first.expenseId) } }));
+      await db.expenseTombstone.create({ data: { expenseId: expense.id, userId: user.id, cardId: card.id,
+        amount: expense.amount, date: expense.date, concept: expense.concept } });
+      await db.dailyExpense.delete({ where: { id: expense.id } });
+      const nextDay = present(await send(makeEvent(walletFixture, '456.25', undefined, '2026-10-24T18:00:00Z')));
+      assert.equal(nextDay.status, 'REGISTERED'); assert.notEqual(nextDay.expenseId, expense.id);
     });
     await t.test('colisiones entre tipos y sufijos abreviados, tarjetas hermanas y otra cuenta no heredan activación', async () => {
       const collision = await db.captureCardAlias.create({ data: { userId: user.id, cardId: sibling.id, sourcePackage: bankFixture.event.sourcePackage, kind: 'PHYSICAL', value: '0123' } });

@@ -6,6 +6,12 @@ Consolidado el **27 de octubre de 2026** a partir del README del commit `4562aa0
 
 ## 2026-10-29
 
+### Compras diarias del mismo importe y revisión de duplicados
+
+Se sustituye la búsqueda automática de compras con la misma tarjeta e importe en ±3 días por el mismo día financiero. Las compras habituales de días distintos pueden registrarse por separado. Se conserva la revisión entre propuestas de días contiguos si sus horas conocidas distan hasta 15 minutos; banco y Wallet mantienen una excepción de un día cuando una fuente ya creó el gasto. Las coincidencias del mismo día siguen requiriendo decisión.
+
+Siete escenarios nuevos de integración cubren compras diarias, límites del día, medianoche, borrados, orden banco/Wallet y avisos sin hora bancaria de operación. La suite detectó una regresión del banco tardío Santander y la prueba diaria completa exigió distinguir el orden temporal: las excepciones entre canales conservan la protección de compras ya registradas sin frenar una operación bancaria nueva posterior al aviso Wallet anterior. Pasan las 81 pruebas enfocadas finales y **972 escenarios de la suite completa, sin fallos ni omisiones con PostgreSQL local**. Los seis controles del README pasan; lint conserva dos advertencias previas. Implementación local, pendiente de publicación, sin migraciones ni APK nueva. Los avisos históricos mantienen su estado. [Evidencia, resultados y límites](../artifacts/capture-daily-purchases-2026-10-29/README.md).
+
 ### Inicio móvil en Gastos y formularios por acción explícita
 
 La entrada `/` y el acceso después del login llevan a Gastos con ancho menor de 768 px y a Dashboard en escritorio. La PWA usa esa entrada, conserva su identificador anterior y renueva la caché del shell. La configuración de la APK abre `/gastos`; requiere una APK actualizada para aplicar esa ruta.

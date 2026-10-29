@@ -1,0 +1,427 @@
+
+> afp@0.1.0 test /home/garatachia/projects/afp
+> node --import tsx tests/run-tests.ts capture-wallet-real-integration.test.ts capture-bank-fallback-integration.test.ts capture-processing-integration.test.ts
+
+TAP version 13
+# Subtest: Wallet principal y respaldo bancario persistente: API y PostgreSQL
+    # Subtest: activación por tarjeta exige Wallet, alias inequívoco y muestra bancaria cotejada propia
+    ok 1 - activación por tarjeta exige Wallet, alias inequívoco y muestra bancaria cotejada propia
+      ---
+      duration_ms: 489.852379
+      type: 'test'
+      ...
+    # Subtest: Banamex A ficticia: antes de 15 minutos no registra; al vencer crea un solo gasto pendiente
+    ok 2 - Banamex A ficticia: antes de 15 minutos no registra; al vencer crea un solo gasto pendiente
+      ---
+      duration_ms: 220.215987
+      type: 'test'
+      ...
+    # Subtest: Banamex A ficticia: banco antes, después y simultáneo con Wallet conserva prioridad y un gasto
+    ok 3 - Banamex A ficticia: banco antes, después y simultáneo con Wallet conserva prioridad y un gasto
+      ---
+      duration_ms: 178.598659
+      type: 'test'
+      ...
+    # Subtest: Banamex B ficticia: antes de 15 minutos no registra; al vencer crea un solo gasto pendiente
+    ok 4 - Banamex B ficticia: antes de 15 minutos no registra; al vencer crea un solo gasto pendiente
+      ---
+      duration_ms: 148.098407
+      type: 'test'
+      ...
+    # Subtest: Banamex B ficticia: banco antes, después y simultáneo con Wallet conserva prioridad y un gasto
+    ok 5 - Banamex B ficticia: banco antes, después y simultáneo con Wallet conserva prioridad y un gasto
+      ---
+      duration_ms: 167.563702
+      type: 'test'
+      ...
+    # Subtest: Nu ficticia: antes de 15 minutos no registra; al vencer crea un solo gasto pendiente
+    ok 6 - Nu ficticia: antes de 15 minutos no registra; al vencer crea un solo gasto pendiente
+      ---
+      duration_ms: 148.024838
+      type: 'test'
+      ...
+    # Subtest: Nu ficticia: banco antes, después y simultáneo con Wallet conserva prioridad y un gasto
+    ok 7 - Nu ficticia: banco antes, después y simultáneo con Wallet conserva prioridad y un gasto
+      ---
+      duration_ms: 164.406133
+      type: 'test'
+      ...
+    # Subtest: Santander ficticia: antes de 15 minutos no registra; al vencer crea un solo gasto pendiente
+    ok 8 - Santander ficticia: antes de 15 minutos no registra; al vencer crea un solo gasto pendiente
+      ---
+      duration_ms: 144.437148
+      type: 'test'
+      ...
+    # Subtest: Santander ficticia: banco antes, después y simultáneo con Wallet conserva prioridad y un gasto
+    ok 9 - Santander ficticia: banco antes, después y simultáneo con Wallet conserva prioridad y un gasto
+      ---
+      duration_ms: 159.818554
+      type: 'test'
+      ...
+    # Subtest: banco y Wallet a ambos lados de medianoche conservan un gasto en cualquier orden
+    ok 10 - banco y Wallet a ambos lados de medianoche conservan un gasto en cualquier orden
+      ---
+      duration_ms: 99.626002
+      type: 'test'
+      ...
+    # Subtest: Wallet tardío conserva fecha, concepto, notas y monto editados; vinculación explícita no suma gasto
+    ok 11 - Wallet tardío conserva fecha, concepto, notas y monto editados; vinculación explícita no suma gasto
+      ---
+      duration_ms: 116.447056
+      type: 'test'
+      ...
+    # Subtest: Nu usa día de publicación en México; el retraso de entrega no desplaza el día
+    ok 12 - Nu usa día de publicación en México; el retraso de entrega no desplaza el día
+      ---
+      duration_ms: 40.686609
+      type: 'test'
+      ...
+    # Subtest: Santander no permite saltarse el respaldo activando de nuevo el banco inmediato
+    ok 13 - Santander no permite saltarse el respaldo activando de nuevo el banco inmediato
+      ---
+      duration_ms: 2.214269
+      type: 'test'
+      ...
+    # Subtest: pausar cancela pendientes; reactivar no procesa avisos antiguos ni reinicia su espera
+    ok 14 - pausar cancela pendientes; reactivar no procesa avisos antiguos ni reinicia su espera
+      ---
+      duration_ms: 56.888044
+      type: 'test'
+      ...
+    # Subtest: pausa del teléfono, fuente, Wallet o revocación impide el respaldo pendiente
+    ok 15 - pausa del teléfono, fuente, Wallet o revocación impide el respaldo pendiente
+      ---
+      duration_ms: 162.121823
+      type: 'test'
+      ...
+    # Subtest: corregir o descartar durante la espera detiene el registro automático
+    ok 16 - corregir o descartar durante la espera detiene el registro automático
+      ---
+      duration_ms: 51.109266
+      type: 'test'
+      ...
+    # Subtest: alias nuevo ambiguo, moneda contradictoria, retiro explícito y formato distinto requieren revisión
+    ok 17 - alias nuevo ambiguo, moneda contradictoria, retiro explícito y formato distinto requieren revisión
+      ---
+      duration_ms: 176.018879
+      type: 'test'
+      ...
+    # Subtest: dos compras bancarias iguales quedan en revisión sin elegir una por importe
+    ok 18 - dos compras bancarias iguales quedan en revisión sin elegir una por importe
+      ---
+      duration_ms: 46.493837
+      type: 'test'
+      ...
+    # Subtest: revisión del mismo aviso durante la espera detiene el original aunque cambie el importe
+    ok 19 - revisión del mismo aviso durante la espera detiene el original aunque cambie el importe
+      ---
+      duration_ms: 43.166067
+      type: 'test'
+      ...
+    # Subtest: Wallet sigue registrando con respaldo pausado aunque el banco llegue primero
+    ok 20 - Wallet sigue registrando con respaldo pausado aunque el banco llegue primero
+      ---
+      duration_ms: 54.151265
+      type: 'test'
+      ...
+    # Subtest: Wallet y el trabajador concurrentes conservan exactamente un gasto
+    ok 21 - Wallet y el trabajador concurrentes conservan exactamente un gasto
+      ---
+      duration_ms: 56.168694
+      type: 'test'
+      ...
+    # Subtest: fallo transitorio conserva vencimiento y el siguiente proceso recupera sin duplicar
+    ok 22 - fallo transitorio conserva vencimiento y el siguiente proceso recupera sin duplicar
+      ---
+      duration_ms: 34.5012
+      type: 'test'
+      ...
+    # Subtest: fallo después de crear el gasto revierte toda la transacción y permite reintento
+    ok 23 - fallo después de crear el gasto revierte toda la transacción y permite reintento
+      ---
+      duration_ms: 46.036457
+      type: 'test'
+      ...
+    # Subtest: gasto borrado no resucita al llegar Wallet; otras cuentas y reglas se conservan
+    ok 24 - gasto borrado no resucita al llegar Wallet; otras cuentas y reglas se conservan
+      ---
+      duration_ms: 60.427642
+      type: 'test'
+      ...
+    # Subtest: endpoint del programador exige secreto, no filtra usuarios y devuelve fallo recuperable
+    ok 25 - endpoint del programador exige secreto, no filtra usuarios y devuelve fallo recuperable
+      ---
+      duration_ms: 108.110949
+      type: 'test'
+      ...
+    1..25
+ok 1 - Wallet principal y respaldo bancario persistente: API y PostgreSQL
+  ---
+  duration_ms: 3319.289669
+  type: 'test'
+  ...
+# Subtest: Fase 4 PostgreSQL: interpretación, resoluciones y escritura financiera atómica
+    # Subtest: rutas administrativas rechazan anónimos y credencial nativa antes de leer el cuerpo
+    ok 1 - rutas administrativas rechazan anónimos y credencial nativa antes de leer el cuerpo
+      ---
+      duration_ms: 106.60869
+      type: 'test'
+      ...
+    # Subtest: importación por nombres existentes, sin renombrar, conserva ceros y separa física/digital/Wallet
+    ok 2 - importación por nombres existentes, sin renombrar, conserva ceros y separa física/digital/Wallet
+      ---
+      duration_ms: 25.340802
+      type: 'test'
+      ...
+    # Subtest: registro real bloquea activación sin muestras verificadas y queda en observación aun con alias conocidos
+    ok 3 - registro real bloquea activación sin muestras verificadas y queda en observación aun con alias conocidos
+      ---
+      duration_ms: 33.56822
+      type: 'test'
+      ...
+(node:275250) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+    # Subtest: formato habilitado solo para tarjeta concreta crea gasto MXN Por conciliar y Por clasificar
+    ok 4 - formato habilitado solo para tarjeta concreta crea gasto MXN Por conciliar y Por clasificar
+      ---
+      duration_ms: 140.69418
+      type: 'test'
+      ...
+    # Subtest: diez entregas simultáneas y respuesta perdida mantienen evento, movimiento y gasto únicos
+    ok 5 - diez entregas simultáneas y respuesta perdida mantienen evento, movimiento y gasto únicos
+      ---
+      duration_ms: 109.965329
+      type: 'test'
+      ...
+    # Subtest: dos compras legítimas iguales requieren decisión explícita y conservan multiplicidad
+    ok 6 - dos compras legítimas iguales requieren decisión explícita y conservan multiplicidad
+      ---
+      duration_ms: 57.402403
+      type: 'test'
+      ...
+    # Subtest: BBVA y Wallet solo se unen automáticamente con referencia bancaria inequívoca
+    ok 7 - BBVA y Wallet solo se unen automáticamente con referencia bancaria inequívoca
+      ---
+      duration_ms: 133.894292
+      type: 'test'
+      ...
+    # Subtest: alias ausente, ambiguo y sin verificar bloquean registros; otra tarjeta del mismo banco no se habilita
+    ok 8 - alias ausente, ambiguo y sin verificar bloquean registros; otra tarjeta del mismo banco no se habilita
+      ---
+      duration_ms: 61.976282
+      type: 'test'
+      ...
+    # Subtest: regla exacta asigna categoría; cambiar el nombre del comercio no genera vínculos aproximados
+    ok 9 - regla exacta asigna categoría; cambiar el nombre del comercio no genera vínculos aproximados
+      ---
+      duration_ms: 49.182596
+      type: 'test'
+      ...
+    # Subtest: manual seguido de aviso permite vincular sin cambiar notas, categoría ni aportaciones
+    ok 10 - manual seguido de aviso permite vincular sin cambiar notas, categoría ni aportaciones
+      ---
+      duration_ms: 37.200869
+      type: 'test'
+      ...
+    # Subtest: aviso seguido de alta manual identifica posible duplicado sin perder el UUID offline
+    ok 11 - aviso seguido de alta manual identifica posible duplicado sin perder el UUID offline
+      ---
+      duration_ms: 14.865576
+      type: 'test'
+      ...
+    # Subtest: eliminación manual conserva huella y un aviso tardío permanece en revisión
+    ok 12 - eliminación manual conserva huella y un aviso tardío permanece en revisión
+      ---
+      duration_ms: 31.842161
+      type: 'test'
+      ...
+    # Subtest: reeditar o borrar un gasto nunca se revierte por reentrega ni por otra evidencia exacta
+    ok 13 - reeditar o borrar un gasto nunca se revierte por reentrega ni por otra evidencia exacta
+      ---
+      duration_ms: 79.278967
+      type: 'test'
+      ...
+    # Subtest: actualizar una notificación no crea otra compra y requiere resolución
+    ok 14 - actualizar una notificación no crea otra compra y requiere resolución
+      ---
+      duration_ms: 38.160749
+      type: 'test'
+      ...
+    # Subtest: suscripción explícita reutiliza su unicidad mensual y no duplica una ocurrencia existente u omitida
+    ok 15 - suscripción explícita reutiliza su unicidad mensual y no duplica una ocurrencia existente u omitida
+      ---
+      duration_ms: 67.320751
+      type: 'test'
+      ...
+    # Subtest: movimientos especiales, moneda extranjera y formatos desconocidos quedan visibles sin alterar gastos
+    ok 16 - movimientos especiales, moneda extranjera y formatos desconocidos quedan visibles sin alterar gastos
+      ---
+      duration_ms: 35.941
+      type: 'test'
+      ...
+    # Subtest: fallo después del gasto revierte evento, movimiento y todos los efectos financieros
+    ok 17 - fallo después del gasto revierte evento, movimiento y todos los efectos financieros
+      ---
+      duration_ms: 19.082105
+      type: 'test'
+      ...
+    # Subtest: conversión a MSI sustituye gasto en una transacción, conserva correcciones y es idempotente
+    ok 18 - conversión a MSI sustituye gasto en una transacción, conserva correcciones y es idempotente
+      ---
+      duration_ms: 60.843923
+      type: 'test'
+      ...
+    # Subtest: rollback de conversión MSI restaura gasto, movimiento y ausencia de compra
+    ok 19 - rollback de conversión MSI restaura gasto, movimiento y ausencia de compra
+      ---
+      duration_ms: 38.318428
+      type: 'test'
+      ...
+    # Subtest: MSI no convierte gastos con aportaciones o vínculos personales
+    ok 20 - MSI no convierte gastos con aportaciones o vínculos personales
+      ---
+      duration_ms: 25.958543
+      type: 'test'
+      ...
+    # Subtest: volver a observación detiene solo la automatización de ese formato
+    ok 21 - volver a observación detiene solo la automatización de ese formato
+      ---
+      duration_ms: 49.300216
+      type: 'test'
+      ...
+    # Subtest: categoría eliminada de una regla queda en revisión sin rechazar la recepción
+    ok 22 - categoría eliminada de una regla queda en revisión sin rechazar la recepción
+      ---
+      duration_ms: 40.792118
+      type: 'test'
+      ...
+    # Subtest: suscripción omitida y evidencia bancaria impiden crear otro cargo
+    ok 23 - suscripción omitida y evidencia bancaria impiden crear otro cargo
+      ---
+      duration_ms: 81.373337
+      type: 'test'
+      ...
+    # Subtest: consumo mínimo excluye capturas y MSI por conciliar pero el cálculo de corte sí los incluye
+    ok 24 - consumo mínimo excluye capturas y MSI por conciliar pero el cálculo de corte sí los incluye
+      ---
+      duration_ms: 7.292938
+      type: 'test'
+      ...
+    # Subtest: dos cuentas no comparten alias, reglas, resoluciones, páginas ni datos financieros
+    ok 25 - dos cuentas no comparten alias, reglas, resoluciones, páginas ni datos financieros
+      ---
+      duration_ms: 31.912361
+      type: 'test'
+      ...
+    1..25
+ok 2 - Fase 4 PostgreSQL: interpretación, resoluciones y escritura financiera atómica
+  ---
+  duration_ms: 1609.438049
+  type: 'test'
+  ...
+# Subtest: Wallet/Banamex reales anonimizados: observación, fecha aceptada y un gasto por compra
+    # Subtest: un modo forzado sin aceptar la fecha no crea gastos ni anuncia automatización activa
+    ok 1 - un modo forzado sin aceptar la fecha no crea gastos ni anuncia automatización activa
+      ---
+      duration_ms: 31.231151
+      type: 'test'
+      ...
+    # Subtest: banco primero y Wallet después: tarjeta resuelta por alias bancario, sin copiar el token NFC ni crear gastos
+    ok 2 - banco primero y Wallet después: tarjeta resuelta por alias bancario, sin copiar el token NFC ni crear gastos
+      ---
+      duration_ms: 21.116524
+      type: 'test'
+      ...
+    # Subtest: una revisión crea un gasto; cotejo y aceptación explícita permiten habilitar solo esta tarjeta
+    ok 3 - una revisión crea un gasto; cotejo y aceptación explícita permiten habilitar solo esta tarjeta
+      ---
+      duration_ms: 91.699884
+      type: 'test'
+      ...
+    # Subtest: nuevas compras con los dos avisos en cualquier orden crean un gasto; la evidencia bancaria queda para cotejo
+    ok 4 - nuevas compras con los dos avisos en cualquier orden crean un gasto; la evidencia bancaria queda para cotejo
+      ---
+      duration_ms: 67.064641
+      type: 'test'
+      ...
+    # Subtest: ocho entregas concurrentes y una respuesta perdida conservan un único gasto y recibo
+    ok 5 - ocho entregas concurrentes y una respuesta perdida conservan un único gasto y recibo
+      ---
+      duration_ms: 54.290144
+      type: 'test'
+      ...
+    # Subtest: dos compras iguales no se fusionan y una revisión explícita conserva su multiplicidad
+    ok 6 - dos compras iguales no se fusionan y una revisión explícita conserva su multiplicidad
+      ---
+      duration_ms: 50.134546
+      type: 'test'
+      ...
+    # Subtest: compras diarias del mismo comercio, tarjeta e importe se registran por separado
+    ok 7 - compras diarias del mismo comercio, tarjeta e importe se registran por separado
+      ---
+      duration_ms: 77.572347
+      type: 'test'
+      ...
+    # Subtest: gastos manuales a cualquier hora del mismo día bloquean; los del día anterior permiten otra compra
+    ok 8 - gastos manuales a cualquier hora del mismo día bloquean; los del día anterior permiten otra compra
+      ---
+      duration_ms: 59.015884
+      type: 'test'
+      ...
+    # Subtest: al cruzar medianoche se revisan avisos hasta 15 minutos; fuera del margen se permite otra compra
+    ok 9 - al cruzar medianoche se revisan avisos hasta 15 minutos; fuera del margen se permite otra compra
+      ---
+      duration_ms: 63.338131
+      type: 'test'
+      ...
+    # Subtest: borrar una compra previa no impide registrar otra del día siguiente
+    ok 10 - borrar una compra previa no impide registrar otra del día siguiente
+      ---
+      duration_ms: 42.416388
+      type: 'test'
+      ...
+    # Subtest: colisiones entre tipos y sufijos abreviados, tarjetas hermanas y otra cuenta no heredan activación
+    ok 11 - colisiones entre tipos y sufijos abreviados, tarjetas hermanas y otra cuenta no heredan activación
+      ---
+      duration_ms: 49.207336
+      type: 'test'
+      ...
+    # Subtest: el cargo bancario incompleto no crea gastos aunque se fuerce su modo automático
+    ok 12 - el cargo bancario incompleto no crea gastos aunque se fuerce su modo automático
+      ---
+      duration_ms: 11.736327
+      type: 'test'
+      ...
+    # Subtest: una corrección personal pendiente en el banco conserva la revisión antes de registrar el aviso Wallet coincidente
+    ok 13 - una corrección personal pendiente en el banco conserva la revisión antes de registrar el aviso Wallet coincidente
+      ---
+      duration_ms: 24.993803
+      type: 'test'
+      ...
+    # Subtest: reintentar un recibo antiguo no reinterpreta; solicitarlo conserva originales, no crea gastos y es idempotente
+    ok 14 - reintentar un recibo antiguo no reinterpreta; solicitarlo conserva originales, no crea gastos y es idempotente
+      ---
+      duration_ms: 603.121788
+      type: 'test'
+      ...
+    # Subtest: la reinterpretación no reemplaza una corrección personal
+    ok 15 - la reinterpretación no reemplaza una corrección personal
+      ---
+      duration_ms: 20.960234
+      type: 'test'
+      ...
+    1..15
+ok 3 - Wallet/Banamex reales anonimizados: observación, fecha aceptada y un gasto por compra
+  ---
+  duration_ms: 1463.531791
+  type: 'test'
+  ...
+1..3
+# tests 68
+# suites 0
+# pass 68
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 6674.993947
