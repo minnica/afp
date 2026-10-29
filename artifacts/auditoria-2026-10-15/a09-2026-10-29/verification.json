@@ -1,0 +1,99 @@
+{
+  "finding": "A09",
+  "date": "2026-10-29",
+  "baseline": "be596435d41e4c20c774819367b1dd1f61f616f7",
+  "status": "implemented-locally",
+  "published": false,
+  "environment": {
+    "node": "22.23.2",
+    "pnpm": "10.33.0",
+    "postgres": "16",
+    "database": "afp_test_a09",
+    "auth": "fake"
+  },
+  "checks": {
+    "typecheck": {
+      "exitCode": 0,
+      "log": "typecheck.log"
+    },
+    "typecheckTests": {
+      "exitCode": 0,
+      "log": "typecheck-tests.log"
+    },
+    "typeContracts": {
+      "exitCode": 0,
+      "log": "test-types.log"
+    },
+    "lint": {
+      "exitCode": 0,
+      "errors": 0,
+      "existingWarnings": 2,
+      "log": "lint.log"
+    },
+    "tests": {
+      "exitCode": 0,
+      "pass": 934,
+      "fail": 0,
+      "skip": 0,
+      "newA09": 11,
+      "log": "tests-local.log"
+    },
+    "focused": {
+      "exitCode": 0,
+      "pass": 11,
+      "log": "focused.log"
+    },
+    "build": {
+      "exitCode": 1,
+      "bundler": "Turbopack",
+      "reason": "process/port Operation not permitted, including escalated retry",
+      "log": "build-escalated.log"
+    },
+    "alternativeBuild": {
+      "exitCode": 0,
+      "bundler": "Webpack",
+      "log": "build-webpack-escalated.log"
+    },
+    "migrationDeploy": {
+      "exitCode": 0,
+      "existingMigrations": 42,
+      "newMigrations": 0,
+      "log": "migrations-local.log"
+    },
+    "diffCheck": {
+      "exitCode": 0
+    }
+  },
+  "browser": {
+    "desktop": {
+      "viewport": [
+        1280,
+        633
+      ],
+      "evidence": "browser-desktop.json"
+    },
+    "mobile": {
+      "viewport": [
+        390,
+        844
+      ],
+      "evidence": "browser-mobile.json"
+    },
+    "offlineBootstrap": {
+      "simulatedNavigatorOffline": true,
+      "evidence": "browser-offline.json"
+    },
+    "transport": "Real local API/PostgreSQL. Deferred fetch ignores abort for race acceptance.",
+    "limits": "Fake Supabase Auth; no service worker end-to-end acceptance or remote deployment."
+  },
+  "sources": {
+    "src/components/gastos/GastosContent.tsx": "0587bd6fc5cd4b289160d800ee04f67de1a7eafee13b191f42f66446b1408ac8",
+    "src/lib/expenseReader.ts": "a6224c145a5e7a613f77df4c6d81b4dce950b49c6f64d5c4a99bc3696c9fac53",
+    "tests/expense-reader.test.ts": "d4500dd97403c9800a97bca061cbe724036fa1796440f150cc38f998d6ba10a2",
+    "tests/helpers/source-contracts.ts": "8f9b0378397df08fc4baaf3c88dfb3254017a1b22eebd3868e21f98ce0d4ae4c",
+    "tests/helpers/source-exports.ts": "c6d6fa105cde656b78780cb85ed2e800ceb71d179d07edc911cde0fb1f6c4e50",
+    "README.md": "be056792c15d09fc936b1aafd83d47d51acd71f1888fca1e3a62f07c0667527d",
+    "docs/bitacora.md": "5b5db3c97f8bbc2b228c89a5388988b9a728949fc0eefe14c78cddf42947ccb7",
+    "artifacts/auditoria-2026-10-15/informe.md": "1ab77e650c06a869243a74d3e97e39feee20975887cf0bbfbfb3199fc19b189f"
+  }
+}

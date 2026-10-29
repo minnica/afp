@@ -31,6 +31,7 @@ import { ResponsiveSelect } from "@/components/ui/responsive-select";
 import { ExpenseFilterCombobox } from "@/components/ui/expense-filter-combobox";
 import { SearchableSelect } from "@/components/ui/searchable-select";
 import { matchesExpenseFilters } from "@/lib/expenseFilters";
+import { createExpenseReader, type ExpensesUrl } from "@/lib/expenseReader";
 
 import { useDialogFocus } from "@/hooks/use-dialog-focus";
 
@@ -199,6 +200,7 @@ export default function GastosContent() {
   const [moneyAccounts, setMoneyAccounts] = useState<NamedRecord[]>([]);
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [availableMonths, setAvailableMonths] = useState<string[]>([]);
+  const [initialExpenses, setInitialExpenses] = useState<({ url: ExpensesUrl } & Pick<UiResponse<"gastos/bootstrap">, "expenses" | "availableMonths">) | null>(null);
 
   const [date, setDate] = useState(getTodayInputValue());
   const [paymentMethod, setPaymentMethod] = useState("CASH");
@@ -219,6 +221,7 @@ export default function GastosContent() {
     useState(false);
   const [pendingOfflineExpenses, setPendingOfflineExpenses] = useState<OfflineExpense[]>([]);
   const [error, setError] = useState("");
+  const [expensesError, setExpensesError] = useState("");
   const [createError, setCreateError] = useState<CreateError | null>(null);
 
   const [people, setPeople] = useState<NamedRecord[]>([]);
@@ -272,9 +275,26 @@ export default function GastosContent() {
   const [mobileFilters, setMobileFilters] = useState<ExpenseFilter[]>([]);
   const [mobileFilterResetKey, setMobileFilterResetKey] = useState(0);
   const didLoadInitialExpensesRef = useRef(false);
-  const lastExpensesUrlRef = useRef("");
+  const [expenseReader] = useState(() => createExpenseReader({
+    onData: data => { setExpenses(data.expenses || []); setAvailableMonths(data.availableMonths || []); },
+    onInvalidate: () => setExpenses([]),
+    onLoading: setIsExpensesLoading,
+    onError: setExpensesError,
+  }));
+  const expensesUrl = user ? buildExpensesUrl(user.id) : null;
 
-  async function loadInitialData(userId: string) {
+  useEffect(() => {
+    expenseReader.select(expensesUrl);
+    return () => expenseReader.select(null);
+  }, [expenseReader, expensesUrl]);
+
+  useEffect(() => {
+    // También si Auth y el respaldo offline resuelven dentro del mismo lote de React:
+    // seleccionar primero la URL y después aplicar el snapshot de esa selección.
+    if (initialExpenses) expenseReader.prime(initialExpenses.url, initialExpenses);
+  }, [expenseReader, initialExpenses]);
+
+  async function loadInitialData(userId: string, signal: AbortSignal) {
     const today = getTodayInputValue();
     const params = new URLSearchParams({
       userId,
@@ -284,9 +304,11 @@ export default function GastosContent() {
 
     try {
       const response = await apiFetch(`/api/gastos/bootstrap?${params.toString()}`, {
+        signal, expectedUserId: userId,
         errorMode: readCachedBootstrap(userId) ? "inline" : "dialog",
       });
       const data = await response.json();
+      if (signal.aborted) return;
 
       if (!response.ok) {
         throw new Error(data.error || "No se pudieron cargar datos iniciales.");
@@ -298,12 +320,12 @@ export default function GastosContent() {
       setPeople(data.people || []);
       setCards(data.cards || []);
       setMoneyAccounts(data.moneyAccounts || []);
-      setExpenses(data.expenses || []);
-      setAvailableMonths(data.availableMonths || []);
+      setInitialExpenses({ url: `/api/expenses?${params.toString()}`, expenses: data.expenses, availableMonths: data.availableMonths });
       setReceivables(data.receivables || []);
       setPayables(data.payables || []);
       setSubscriptions(data.subscriptions || []);
     } catch (err) {
+      if (signal.aborted) return;
       const cachedData = readCachedBootstrap(userId);
 
       if (!cachedData) {
@@ -314,15 +336,13 @@ export default function GastosContent() {
       setPeople(cachedData.people || []);
       setCards(cachedData.cards || []);
       setMoneyAccounts(cachedData.moneyAccounts || []);
-      setExpenses(cachedData.expenses || []);
-      setAvailableMonths(cachedData.availableMonths || []);
+      setInitialExpenses({ url: `/api/expenses?${params.toString()}`, expenses: cachedData.expenses, availableMonths: cachedData.availableMonths });
       setReceivables(cachedData.receivables || []);
       setPayables(cachedData.payables || []);
       setSubscriptions(cachedData.subscriptions || []);
       toast.warning("Sin conexión. Usando datos guardados en este dispositivo.");
     }
 
-    lastExpensesUrlRef.current = buildExpensesUrl(userId);
     didLoadInitialExpensesRef.current = true;
   }
 
@@ -362,31 +382,7 @@ export default function GastosContent() {
     return `/api/expenses?${params.toString()}`;
   }
 
-  async function loadExpenses(userId: string, { force = false, errorMode = "dialog", mutationCompleted = false }: { force?: boolean; errorMode?: "dialog" | "inline"; mutationCompleted?: boolean } = {}) {
-    const url = buildExpensesUrl(userId);
-
-    if (!force && url === lastExpensesUrlRef.current) return;
-
-    setIsExpensesLoading(true);
-
-    try {
-      const response = await apiFetch(url, {
-        mutationCompleted,
-        errorMode: typeof navigator !== "undefined" && !navigator.onLine ? "inline" : errorMode,
-      });
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "No se pudieron cargar gastos.");
-      }
-
-      setExpenses(data.expenses || []);
-      setAvailableMonths(data.availableMonths || []);
-      lastExpensesUrlRef.current = url;
-    } finally {
-      setIsExpensesLoading(false);
-    }
-  }
+  const loadExpenses = expenseReader.load;
 
   async function loadReceivables(userId: string, { mutationCompleted = false, errorMode = "dialog" }: { errorMode?: "dialog" | "inline"; mutationCompleted?: boolean } = {}) {
     const response = await apiFetch(`/api/receivables?userId=${userId}`, { mutationCompleted, errorMode });
@@ -504,11 +500,13 @@ export default function GastosContent() {
   }
 
   useEffect(() => {
+    const controller = new AbortController();
     async function checkSession() {
       try {
         const {
           data: { session },
         } = await supabase.auth.getSession();
+        if (controller.signal.aborted) return;
 
         if (!session) {
           router.replace("/login");
@@ -518,16 +516,19 @@ export default function GastosContent() {
         setUser(session.user);
 
         await ensureUserSetup(session.user);
+        if (controller.signal.aborted) return;
 
-        await loadInitialData(session.user.id);
+        await loadInitialData(session.user.id, controller.signal);
       } catch (err) {
+        if (controller.signal.aborted) return;
         setError(errorMessage(err) || "Ocurrió un error.");
       } finally {
-        setIsCheckingSession(false);
+        if (!controller.signal.aborted) setIsCheckingSession(false);
       }
     }
 
     checkSession();
+    return () => controller.abort();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router]);
 
@@ -576,9 +577,8 @@ export default function GastosContent() {
     if (!user || isCheckingSession || !didLoadInitialExpensesRef.current) return;
 
     const timeoutId = window.setTimeout(() => {
-      loadExpenses(user.id).catch((err) => {
-        setError(errorMessage(err) || "No se pudieron cargar gastos.");
-      });
+      // El lector publica únicamente el error de la selección vigente.
+      void loadExpenses(user.id).catch(() => {});
     }, 250);
 
     return () => window.clearTimeout(timeoutId);
@@ -1601,9 +1601,9 @@ export default function GastosContent() {
       <div onClickCapture={captureFocus}>
         <section className={`mx-auto flex w-full max-w-full flex-col px-4 py-5 md:py-8 ${compactEntry ? "pb-28!" : ""}`}>
           <AutomaticRecordingLink />
-          {error ? (
+          {error || expensesError ? (
             <Alert variant="destructive" className="mb-6">
-              <AlertDescription>{error}</AlertDescription>
+              <AlertDescription>{error || expensesError}</AlertDescription>
             </Alert>
           ) : null}
 

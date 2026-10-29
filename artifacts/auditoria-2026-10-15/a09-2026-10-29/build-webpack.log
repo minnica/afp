@@ -1,0 +1,11 @@
+▲ Next.js 16.3.8 (webpack)
+- Environments: .env.local, .env
+✓ Running next.config.mjs took 11ms
+
+  Creating an optimized production build ...
+
+> Build error occurred
+Error: Could not parse output from TypeScript's --showConfig.
+    at ignore-listed frames {
+  type: 'Error'
+}

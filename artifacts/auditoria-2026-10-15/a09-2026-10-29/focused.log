@@ -1,0 +1,80 @@
+
+> afp@0.1.0 test /home/garatachia/projects/afp
+> node --import tsx tests/run-tests.ts expense-reader.test.ts
+
+TAP version 13
+# Subtest: A09: B responde antes que A y conserva filas, meses, error y carga
+ok 1 - A09: B responde antes que A y conserva filas, meses, error y carga
+  ---
+  duration_ms: 69.300362
+  type: 'test'
+  ...
+# Subtest: A09: A termina mientras B sigue pendiente sin apagar su carga
+ok 2 - A09: A termina mientras B sigue pendiente sin apagar su carga
+  ---
+  duration_ms: 5.711462
+  type: 'test'
+  ...
+# Subtest: A09: un error antiguo se descarta antes y después de la respuesta vigente
+ok 3 - A09: un error antiguo se descarta antes y después de la respuesta vigente
+  ---
+  duration_ms: 9.364747
+  type: 'test'
+  ...
+# Subtest: A09: cambiar selección cancela inmediatamente, antes de iniciar el debounce siguiente
+ok 4 - A09: cambiar selección cancela inmediatamente, antes de iniciar el debounce siguiente
+  ---
+  duration_ms: 5.009552
+  type: 'test'
+  ...
+# Subtest: A09: cancelar durante la lectura JSON impide aplicar la respuesta
+ok 5 - A09: cancelar durante la lectura JSON impide aplicar la respuesta
+  ---
+  duration_ms: 3.516685
+  type: 'test'
+  ...
+# Subtest: A09: volver a A cancela B aunque A se hubiera cargado previamente
+ok 6 - A09: volver a A cancela B aunque A se hubiera cargado previamente
+  ---
+  duration_ms: 4.414754
+  type: 'test'
+  ...
+# Subtest: A09: una recarga tras mutación usa los filtros actuales y sustituye incluso la misma URL
+ok 7 - A09: una recarga tras mutación usa los filtros actuales y sustituye incluso la misma URL
+  ---
+  duration_ms: 3.826064
+  type: 'test'
+  ...
+# Subtest: A09: salir o cambiar propietario impide datos, errores y callbacks tardíos
+ok 8 - A09: salir o cambiar propietario impide datos, errores y callbacks tardíos
+  ---
+  duration_ms: 4.038935
+  type: 'test'
+  ...
+# Subtest: A09: bootstrap online/offline solo inicia la selección correspondiente y no sustituye una recarga
+ok 9 - A09: bootstrap online/offline solo inicia la selección correspondiente y no sustituye una recarga
+  ---
+  duration_ms: 4.277554
+  type: 'test'
+  ...
+# Subtest: A09: un error vigente se muestra, permite reintentar y no marca la URL como cargada
+ok 10 - A09: un error vigente se muestra, permite reintentar y no marca la URL como cargada
+  ---
+  duration_ms: 5.453852
+  type: 'test'
+  ...
+# Subtest: A09: la misma lectura pendiente se comparte sin reutilizarla al forzar una recarga
+ok 11 - A09: la misma lectura pendiente se comparte sin reutilizarla al forzar una recarga
+  ---
+  duration_ms: 4.297914
+  type: 'test'
+  ...
+1..11
+# tests 11
+# suites 0
+# pass 11
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 298.919985

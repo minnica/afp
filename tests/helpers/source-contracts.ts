@@ -4,6 +4,7 @@ import type { EditorInput,EditorOutput } from '../../src/components/mi-dinero/ed
 
 // Ampliar por lote: siempre exports públicos derivados de la fuente real.
 export interface SourceModules {
+  'src/lib/expenseReader.ts': typeof import('../../src/lib/expenseReader');
   'src/lib/financialContracts.ts': typeof import('../../src/lib/financialContracts');
   'src/lib/money/transferContracts.ts': typeof import('../../src/lib/money/transferContracts');
   'src/lib/captureReview.ts': typeof import('../../src/lib/captureReview');

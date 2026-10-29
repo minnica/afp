@@ -6,6 +6,12 @@ Consolidado el **27 de octubre de 2026** a partir del README del commit `4562aa0
 
 ## 2026-10-29
 
+### A09: lecturas de Gastos limitadas a la selección vigente
+
+**Implementación local completada** sobre `be59643`. Un lector con AbortController e identidad por generación protege filas, meses disponibles, errores y carga. Cambiar filtros invalida inmediatamente la consulta anterior, antes del debounce; las respuestas y errores tardíos se descartan incluso cuando el transporte ignora la cancelación. Las recargas tras mutaciones y sincronización consultan la selección vigente. La carga inicial, incluido el respaldo offline, no sustituye una lectura posterior; salir de la pantalla cancela también su petición.
+
+**934 escenarios correctos, cero fallos y cero omisiones** con PostgreSQL desechable: 923 anteriores y once A09. Tipos web/pruebas, contratos negativos y lint correctos; permanecen dos advertencias previas. Navegador con Auth ficticia y API/PostgreSQL reales: escritorio con respuestas/errores inversos y carga pendiente; móvil con períodos inversos y estado vacío. Webpack correcto; Turbopack conserva la restricción de puertos incluso fuera del sandbox. README e informe actualizados; sin migraciones nuevas ni publicación. [Evidencias y reproducción](../artifacts/auditoria-2026-10-15/a09-2026-10-29/README.md).
+
 ### A08: validación semántica compartida en entradas manuales
 
 **Implementación local completada** sobre `5d4683c`. Las fechas bancarias deben existir y conservar su día al interpretarse; los importes admiten hasta dos decimales y valor absoluto máximo de $9,999,999,999.99; nombre, concepto y fuente deben tener contenido tras `trim`. El contrato financiero aplica estas reglas a altas y ediciones manuales; Mi dinero, saldos y revisión/conciliación de Captura reutilizan las mismas comprobaciones básicas. Se conservan los campos opcionales, el cero y los signos permitidos por cada operación, y el instante ISO de desactivación de suscripciones.

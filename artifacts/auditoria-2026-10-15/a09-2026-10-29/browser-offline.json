@@ -1,0 +1,7 @@
+{
+  "alpha": true,
+  "beta": true,
+  "offline": true,
+  "scenario": "Bootstrap desde respaldo local con navegador sin conexión",
+  "skeletons": 0
+}

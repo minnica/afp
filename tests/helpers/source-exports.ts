@@ -96,6 +96,7 @@ export const sourceExports = {
   'src/lib/subscriptionChargeService.ts': { 'loadSubscriptionCharges': 'function', 'applySubscriptionCharge': 'function', 'SubscriptionChargeError': 'function', 'subscriptionChargeInclude': 'object' },
   'src/lib/subscriptionCharges.ts': { 'validChargeDay': 'function', 'validChargeMonth': 'function', 'subscriptionChargeDate': 'function', 'isSubscriptionChargeResolved': 'function', 'getSubscriptionReceipts': 'function', 'buildSubscriptionCharges': 'function' },
   'src/lib/uiClient.ts': { 'uiFetch': 'function' },
+  'src/lib/expenseReader.ts': { 'createExpenseReader': 'function' },
   'src/lib/uiResponseSchemas.ts': { 'uiResponseSchemas': 'object', 'subscriptionChargeResultSchema': 'object', 'captureDeviceResultSchema': 'object' },
   'src/lib/money/transferClient.ts': { 'sendTransfer': 'function' },
   'src/lib/money/client.ts': { 'errorMessage': 'function', 'loadMoney': 'function', 'sendMoney': 'function' },

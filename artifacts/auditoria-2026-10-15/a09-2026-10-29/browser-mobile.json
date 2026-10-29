@@ -1,0 +1,20 @@
+{
+  "events": [
+    {
+      "aborted": false,
+      "error": false,
+      "tag": "2026-10-28"
+    },
+    {
+      "aborted": true,
+      "error": false,
+      "tag": "all"
+    }
+  ],
+  "results": [
+    {
+      "passed": true,
+      "scenario": "Período actual vacío antes de respuesta anterior con filas"
+    }
+  ]
+}

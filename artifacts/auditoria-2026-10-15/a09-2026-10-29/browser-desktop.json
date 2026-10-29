@@ -1,0 +1,48 @@
+{
+  "events": [
+    {
+      "aborted": false,
+      "error": false,
+      "tag": "Beta"
+    },
+    {
+      "aborted": true,
+      "error": false,
+      "tag": "Alpha"
+    },
+    {
+      "aborted": false,
+      "error": false,
+      "tag": "Beta"
+    },
+    {
+      "aborted": true,
+      "error": true,
+      "tag": "__a09_error"
+    },
+    {
+      "aborted": true,
+      "error": false,
+      "tag": "Alpha"
+    },
+    {
+      "aborted": false,
+      "error": false,
+      "tag": "Beta"
+    }
+  ],
+  "results": [
+    {
+      "passed": true,
+      "scenario": "B antes de A"
+    },
+    {
+      "passed": true,
+      "scenario": "Error antiguo después de B"
+    },
+    {
+      "passed": true,
+      "scenario": "A termina con B pendiente"
+    }
+  ]
+}
