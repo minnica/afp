@@ -484,7 +484,7 @@ export async function loadDashboard(request: Request, summary = false) {
     });
     const windows = [window, dashboardWindow(new Date(mexicoDayNumber(now)), true), ...cardCycles.map(cycle => monthWindow(cycle.startDate, cycle.cutDate))];
     const noticeMonthStart = getMonthStart(new Date(mexicoDayNumber(now)));
-    const noticeMonthEnd = getMonthEnd(new Date(mexicoDayNumber(now)));
+    const noticeMonthEnd = getMonthEnd(new Date(mexicoDayNumber(now) + 2 * 86400000));
     const monthRanges = windows.map(item => ({ month: { gte: item.start.toISOString().slice(0, 7), lt: item.end.toISOString().slice(0, 7) } }));
     const purchaseIds = await relevantPurchaseIds(prisma, userId, windows);
     const [
@@ -505,7 +505,8 @@ export async function loadDashboard(request: Request, summary = false) {
         select: { ...dashboardSubscriptionSelect,
           charges: { ...dashboardSubscriptionSelect.charges, where: { OR: monthRanges } },
           dailyExpenses: { ...dashboardSubscriptionSelect.dailyExpenses, where: { OR: [
-            { date: { gte: noticeMonthStart, lte: noticeMonthEnd } }, { subscriptionCharge: { month: noticeMonthStart.toISOString().slice(0, 7) } },
+            { date: { gte: noticeMonthStart, lte: noticeMonthEnd } },
+            { subscriptionCharge: { month: { gte: noticeMonthStart.toISOString().slice(0, 7), lte: noticeMonthEnd.toISOString().slice(0, 7) } } },
           ] } },
         },
       }),

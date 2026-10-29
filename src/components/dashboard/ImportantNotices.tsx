@@ -7,6 +7,7 @@ import { FINANCIAL_TIME_ZONE, mexicoDayNumber } from '@/lib/financialDates';
 import type * as React from "react";
 
 import { ImportantNoticesCard } from "@/components/dashboard/DashboardPanels";
+import { NoticeCategoryBadge } from "@/components/dashboard/NoticeCategory";
 import { useDashboard } from "@/components/dashboard/DashboardProvider";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
@@ -139,6 +140,7 @@ export default function ImportantNotices({ inDialog = false, view: controlledVie
               {hiddenNotices.map((notice) => (
                 <Item key={notice.id} variant="muted" size="sm">
                   <ItemContent className="min-w-0">
+                    <NoticeCategoryBadge type={notice.type} />
                     <p className="break-words font-medium">{notice.title}</p>
                     <ItemDescription>{formatPaymentDeadline(notice.date, today)}</ItemDescription>
                     <ItemDescription>{formatMoney(notice.amount)}</ItemDescription>
@@ -195,6 +197,7 @@ export default function ImportantNotices({ inDialog = false, view: controlledVie
           {pending ? (
             <Item variant="muted" size="sm">
               <ItemContent className="min-w-0">
+                <NoticeCategoryBadge type={pending.notice.type} />
                 <p className="break-words font-medium">{pending.notice.title}</p>
                 <ItemDescription>{formatPaymentDeadline(pending.notice.date, today)}</ItemDescription>
                 {pending.notice.description.split("\n").slice(1).map((line) => <ItemDescription key={line}>{line}</ItemDescription>)}

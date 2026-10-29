@@ -28,7 +28,7 @@ export function isSubscriptionChargeResolved(subscription: Pick<FinancialSubscri
     && (charge.status === "SKIPPED" || (charge.status === "CONFIRMED" && charge.expenseId)));
 }
 
-export function getSubscriptionReceipts(subscription: FinancialSubscription, month: string, cycles: StatementCycle[] = []) {
+export function getSubscriptionReceipts(subscription: Pick<FinancialSubscription, 'id' | 'cardId'>, month: string, cycles: StatementCycle[] = []) {
   return cycles.flatMap(cycle => {
     const evidence = usageEvidence(cycle.usageReconciliation);
     if (cycle.cardId !== subscription.cardId || !evidence || evidence.version !== 1

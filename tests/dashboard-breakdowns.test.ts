@@ -184,6 +184,6 @@ test("omitir o confirmar por período retira la previsión y el aviso de efectiv
     const sub = { ...subscription, charges: [{ ...decision, month: "2024-07" }] };
     assert.equal(ctx.getMonthlySubscriptions([sub], [], [], 2024, 7).length, 0);
     assert.equal(ctx.getMonthlySubscriptions([sub], [], [], 2024, 8).length, 1);
-    assert.equal(ctx.buildCashSubscriptionNotices([sub], new Date("2024-07-21T12:00:00Z")).length, 0);
+    assert.equal(ctx.buildSubscriptionNotices([sub], new Date("2024-07-21T12:00:00Z")).length, 0);
   }
 });

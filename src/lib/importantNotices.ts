@@ -1,4 +1,4 @@
-import type { FinancialSubscription, FinancialCycle, DateValue, MoneyValue, DebtAccount, DebtPayment } from './calculations/types';
+import type { FinancialSubscription, FinancialCycle, StatementCycle, DateValue, MoneyValue, DebtAccount, DebtPayment } from './calculations/types';
 export type NoticeCycle = FinancialCycle & { isSettled?: boolean; paymentStatus?: string; calculatedAmount?: number };
 type NoticeCard = { id: string; name: string };
 type NoticeSubscription = Omit<FinancialSubscription, 'dailyExpenses'> & { dailyExpenses?: { date: DateValue; subscriptionCharge?: { month: string } | null }[] };
@@ -8,7 +8,7 @@ type Payment = { card: NoticeCard; currentPayment?: NoticeCycle | null };
 export interface ImportantNotice { id: string; type: string; group: string; title: string; description: string; date: DateValue; amount: number }
 import { getCyclePaymentState } from "@/lib/calculations/cardCyclePayments";
 import { getDebtAccountState } from "@/lib/calculations/debtAccounts";
-import { isSubscriptionChargeResolved } from "@/lib/subscriptionCharges";
+import { getSubscriptionReceipts, isSubscriptionChargeResolved } from "@/lib/subscriptionCharges";
 import { bankDay, daysUntilBankDate, mexicoDayNumber, todayInMexico } from './financialDates';
 
 export function shouldIncludeSubscriptionInMonth(subscription: Pick<FinancialSubscription, "frequencyMonths" | "startMonth" | "startYear">, year: number, month: number) {
@@ -113,58 +113,39 @@ function formatMoneyForNotice(value: MoneyValue) {
   }).format(numberValue);
 }
 
-export function buildCashSubscriptionNotices(subscriptions: NoticeSubscription[], now: Date) {
+export function buildSubscriptionNotices(subscriptions: NoticeSubscription[], now: Date, cycles: StatementCycle[] = []) {
   const notices = [];
-
-  const date = new Date(mexicoDayNumber(now));
-  const currentYear = date.getUTCFullYear();
-  const currentMonth = date.getUTCMonth() + 1;
+  const today = mexicoDayNumber(now);
+  // Include the next occurrence even when its two-day notice crosses a month/year.
+  const months = new Set([today, today + 2 * 86400000].map(day => new Date(day).toISOString().slice(0, 7)));
 
   for (const subscription of subscriptions) {
-    if (subscription.paymentMethod !== "CASH") continue;
     if (!subscription.isActive) continue;
-    if (isSubscriptionChargeResolved(subscription, `${currentYear}-${String(currentMonth).padStart(2, "0")}`)) continue;
+    for (const month of months) {
+      const [year, monthNumber] = month.split("-").map(Number) as [number, number];
+      if (!shouldIncludeSubscriptionInMonth(subscription, year, monthNumber)) continue;
+      if (isSubscriptionChargeResolved(subscription, month)) continue;
+      if (hasExpenseForSubscriptionInMonth(subscription, month)) continue;
+      if (getSubscriptionReceipts(subscription, month, cycles).length) continue;
 
-    if (
-      !shouldIncludeSubscriptionInMonth(subscription, currentYear, currentMonth)
-    ) {
-      continue;
-    }
+      const dueDate = buildDateFromDay(year, monthNumber, Number(subscription.chargeDay));
+      const diffDays = getDaysDifference(dueDate, now);
+      if (diffDays > 2) continue;
 
-    const dueDate = buildDateFromDay(
-      currentYear,
-      currentMonth,
-      Number(subscription.chargeDay),
-    );
-
-    const diffDays = getDaysDifference(dueDate, now);
-
-    if (diffDays > 2) continue;
-
-    const alreadyPaid = hasExpenseForSubscriptionFromDate(
-      subscription,
-      dueDate,
-      now,
-    );
-
-    if (alreadyPaid) continue;
-
-    const timing = getNoticeTiming(diffDays);
-
-    notices.push({
-      id: `subscription-${subscription.id}-${currentYear}-${currentMonth}`,
-      type: "CASH_SUBSCRIPTION",
-      group: timing.group,
-      title:
-        timing.group === "overdue"
+      const timing = getNoticeTiming(diffDays);
+      const cash = subscription.paymentMethod === "CASH";
+      notices.push({
+        id: `subscription-${subscription.id}-${year}-${monthNumber}`,
+        type: cash ? "CASH_SUBSCRIPTION" : "CARD_SUBSCRIPTION",
+        group: timing.group,
+        title: timing.group === "overdue"
           ? `Suscripción pendiente: ${subscription.name}`
-          : `Suscripción en efectivo: ${subscription.name}`,
-      description: `${timing.label}\nPago estimado: ${formatMoneyForNotice(
-        subscription.amount,
-      )}`,
-      date: dueDate,
-      amount: Number(subscription.amount || 0),
-    });
+          : `Suscripción ${cash ? "en efectivo" : "con tarjeta"}: ${subscription.name}`,
+        description: `${timing.label}\nPago estimado: ${formatMoneyForNotice(subscription.amount)}`,
+        date: dueDate,
+        amount: Number(subscription.amount || 0),
+      });
+    }
   }
 
   return notices;
@@ -184,15 +165,10 @@ function hasIncomeForReceivableFromDate(receivable: NoticeReceivable, chargeDate
   });
 }
 
-function hasExpenseForSubscriptionFromDate(subscription: NoticeSubscription, chargeDate: DateValue, now: Date) {
-  // Start from the 1st of the charge month to catch payments made before the charge day.
-  const endStr = todayInMexico(now);
-  const monthStartStr = `${endStr.slice(0, 7)}-01`;
-
+function hasExpenseForSubscriptionInMonth(subscription: NoticeSubscription, month: string) {
   return (subscription.dailyExpenses || []).some((expense) => {
-    if (expense.subscriptionCharge) return expense.subscriptionCharge.month === monthStartStr.slice(0, 7);
-    const expenseStr = toUtcDateStr(expense.date);
-    return expenseStr >= monthStartStr && expenseStr <= endStr;
+    if (expense.subscriptionCharge) return expense.subscriptionCharge.month === month;
+    return toUtcDateStr(expense.date).startsWith(month);
   });
 }
 
@@ -438,7 +414,7 @@ export function buildImportantNotices({ payments, subscriptions, activeReceivabl
   const priority: Record<string, number> = { overdue: 0, today: 1, upcoming: 2, cut: 3 };
   return [
     ...buildCardPaymentNotices(payments, now),
-    ...buildCashSubscriptionNotices(subscriptions, now),
+    ...buildSubscriptionNotices(subscriptions, now, cyclesWithAmounts),
     ...buildReceivableNotices(activeReceivables, now),
     ...buildPayableNotices(payables, now),
     ...buildCutCycleNotices(cyclesWithAmounts, cards, now),

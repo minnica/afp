@@ -6,6 +6,20 @@ Consolidado el **27 de octubre de 2026** a partir del README del commit `4562aa0
 
 ## 2026-10-29
 
+### Identificación visual de los tipos de aviso
+
+Avisos importantes distingue pagos de tarjeta, cuentas por pagar, cobros programados, suscripciones y cortes mediante una etiqueta con icono y un color estable por tipo. A petición del propietario, el tinte inicial al 5% se sustituye por fondos opacos con mayor presencia de color y tonos propios para claro y oscuro; las etiquetas Vencido, Hoy y Próximo comunican la urgencia por separado. Se conservan títulos, importes, fechas, orden, enlaces y preferencias de ocultación. La misma identificación se utiliza en móvil, en los avisos ocultos y en la confirmación de ocultación. [Verificación de los fondos sólidos](../artifacts/notice-solid-backgrounds-2026-10-29/README.md).
+
+Se reutilizan Alert y Badge de shadcn con variantes optativas y tokens para ambos temas; los iconos pertenecen a Hugeicons, la biblioteca configurada del proyecto. Cambio de presentación local, sin cambios financieros, migraciones ni publicación. [Verificaciones y capturas](../artifacts/notice-categories-2026-10-29/README.md).
+
+### Avisos de suscripciones activas y borde de nómina en Dashboard
+
+Avisos importantes incluye las suscripciones activas en efectivo y con tarjeta desde dos días antes de su cobro, incluso al cambiar de mes o año, con el día financiero de México. Respeta recurrencia e inicio y retira los cobros confirmados, omitidos o acreditados con comprobantes bancarios válidos. Conserva las claves de ocultación existentes de efectivo e incorpora las de tarjeta, con acceso a Gastos y paridad entre Dashboard, resumen móvil y Android. La consulta acotada recupera también los gastos que resuelven las ocurrencias anticipadas del mes siguiente.
+
+En Pagos de tarjetas de escritorio, el borde de nómina se aplica a la primera celda. La regla compartida que elimina los bordes de la última fila ya no borra el indicador de BBVA; conserva los colores Q15 y Q30 del dashboard.
+
+Pasan los seis controles del README y **999 escenarios sin fallos ni omisiones con PostgreSQL local**; lint conserva sus dos advertencias previas. Implementación local, sin migraciones ni publicación. [Evidencia y alcance](../artifacts/dashboard-subscription-notices-2026-10-29/README.md).
+
 ### Pagos de tarjeta identificados desde cargos BBVA por pendiente y vencimiento
 
 Se añade prioridad de pago a la regla automática de cargos genéricos BBVA. Busca estados capturados del propietario, con pendiente positivo, diferencia de hasta $1.00 y vencimiento en ±1 día respecto al día del aviso en México. Una coincidencia registra un abono con la cuenta de salida y el importe real, sin crear gasto; varias coincidencias permanecen por revisar. No se confunde la inferencia con una confirmación bancaria del destinatario. El pendiente incorpora pagos parciales y devoluciones aplicadas; un faltante permanece pendiente y el excedente permitido conserva su importe.

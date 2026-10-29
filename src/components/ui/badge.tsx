@@ -13,6 +13,10 @@ const badgeVariants = cva(
         default: "bg-primary text-primary-foreground [a]:hover:bg-primary/80",
         secondary:
           "bg-secondary text-secondary-foreground [a]:hover:bg-secondary/80",
+        notice:
+          "h-auto min-h-6 gap-1.5 rounded-md border-notice-category/25 bg-notice-category/10 px-2 text-xs text-notice-category [&>svg]:size-3.5!",
+        "notice-urgency":
+          "min-h-6 border-notice-urgency/30 bg-notice-urgency/10 text-foreground [&>svg]:text-notice-urgency",
         warning:
           "bg-warning/10 text-warning",
         success:

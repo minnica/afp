@@ -1,7 +1,7 @@
 import type { DateValue } from './calculations/types';
 import { todayInMexico } from './financialDates';
 const dismissibleTypes = new Set([
-  "CARD_PAYMENT", "CUT_CYCLE", "CUT_CYCLE_UPCOMING", "RECEIVABLE", "CASH_SUBSCRIPTION", "PAYABLE",
+  "CARD_PAYMENT", "CUT_CYCLE", "CUT_CYCLE_UPCOMING", "RECEIVABLE", "CASH_SUBSCRIPTION", "CARD_SUBSCRIPTION", "PAYABLE",
 ]);
 
 export function getNoticeMonth(date = new Date()) {

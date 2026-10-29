@@ -11,7 +11,7 @@ import { FINANCIAL_TIME_ZONE } from './financialDates';
 
 const noticePaths: Record<string, string> = {
   CARD_PAYMENT: "/tarjetas", CUT_CYCLE: "/tarjetas", CUT_CYCLE_UPCOMING: "/tarjetas",
-  CASH_SUBSCRIPTION: "/gastos", RECEIVABLE: "/ingresos", PAYABLE: "/gastos",
+  CASH_SUBSCRIPTION: "/gastos", CARD_SUBSCRIPTION: "/gastos", RECEIVABLE: "/ingresos", PAYABLE: "/gastos",
 };
 
 export function noticeLocalDate(timeZone = FINANCIAL_TIME_ZONE, now = new Date()) {

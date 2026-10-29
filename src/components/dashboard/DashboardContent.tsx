@@ -374,8 +374,8 @@ function PaymentsTable({ items, today }: { items: { card: Dashboard["cycles"][nu
           </TableHeader>
           <TableBody>
             {payments.map(({ card, cycle, payment }) => (
-              <TableRow key={cycle.id} className={getPayrollAccentClass(cycle.dueDate)}>
-                <TableCell className="font-medium">{card.name}</TableCell>
+              <TableRow key={cycle.id}>
+                <TableCell className={cn("font-medium", getPayrollAccentClass(cycle.dueDate))}>{card.name}</TableCell>
                 <TableCell>
                   <p className="text-base font-semibold tabular-nums">{formatMoney(payment.amount)}</p>
                   <p className="mt-1 text-xs text-muted-foreground">{payment.isStatement ? Number(cycle.postCutCreditAmount) > 0 ? "Estado de cuenta menos devoluciones" : "Estado de cuenta" : "Estimado"}</p>

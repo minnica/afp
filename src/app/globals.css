@@ -208,6 +208,9 @@ body:has([data-slot="record-create-panel"]) [data-sonner-toaster][data-y-positio
   --color-destructive: var(--destructive);
   --color-warning: var(--warning);
   --color-success: var(--success);
+  --color-notice-category: var(--notice-category, var(--muted-foreground));
+  --color-notice-surface: var(--notice-category-surface, var(--card));
+  --color-notice-urgency: var(--notice-urgency, var(--warning));
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
@@ -254,6 +257,16 @@ body:has([data-slot="record-create-panel"]) [data-sonner-toaster][data-y-positio
   --destructive-foreground: oklch(0.985 0 0);
   --warning: oklch(0.555 0.163 48.998);
   --success: oklch(0.508 0.118 165.612);
+  --notice-card: oklch(0.49 0.15 250);
+  --notice-payable: oklch(0.49 0.16 15);
+  --notice-receivable: oklch(0.46 0.1 165);
+  --notice-subscription: oklch(0.49 0.14 300);
+  --notice-cut: oklch(0.49 0.11 65);
+  --notice-card-surface: oklch(0.95 0.025 250);
+  --notice-payable-surface: oklch(0.95 0.025 15);
+  --notice-receivable-surface: oklch(0.95 0.025 165);
+  --notice-subscription-surface: oklch(0.95 0.025 300);
+  --notice-cut-surface: oklch(0.95 0.025 75);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
@@ -297,6 +310,16 @@ body:has([data-slot="record-create-panel"]) [data-sonner-toaster][data-y-positio
   --destructive-foreground: oklch(0.985 0 0);
   --warning: oklch(0.828 0.189 84.429);
   --success: oklch(0.765 0.177 163.223);
+  --notice-card: oklch(0.8 0.1 250);
+  --notice-payable: oklch(0.79 0.12 15);
+  --notice-receivable: oklch(0.8 0.12 165);
+  --notice-subscription: oklch(0.8 0.11 300);
+  --notice-cut: oklch(0.83 0.12 75);
+  --notice-card-surface: oklch(0.32 0.055 250);
+  --notice-payable-surface: oklch(0.32 0.055 15);
+  --notice-receivable-surface: oklch(0.32 0.055 165);
+  --notice-subscription-surface: oklch(0.32 0.055 300);
+  --notice-cut-surface: oklch(0.32 0.055 75);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.556 0 0);
@@ -314,6 +337,16 @@ body:has([data-slot="record-create-panel"]) [data-sonner-toaster][data-y-positio
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
 }
+
+/* La categoría conserva su color; la urgencia se muestra en una etiqueta aparte. */
+[data-notice-category="card"] { --notice-category: var(--notice-card); --notice-category-surface: var(--notice-card-surface); }
+[data-notice-category="payable"] { --notice-category: var(--notice-payable); --notice-category-surface: var(--notice-payable-surface); }
+[data-notice-category="receivable"] { --notice-category: var(--notice-receivable); --notice-category-surface: var(--notice-receivable-surface); }
+[data-notice-category="subscription"] { --notice-category: var(--notice-subscription); --notice-category-surface: var(--notice-subscription-surface); }
+[data-notice-category="cut"] { --notice-category: var(--notice-cut); --notice-category-surface: var(--notice-cut-surface); }
+[data-notice-urgency="overdue"] { --notice-urgency: var(--destructive); }
+[data-notice-urgency="today"],
+[data-notice-urgency="upcoming"] { --notice-urgency: var(--warning); }
 
 @layer base {
   * {

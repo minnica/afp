@@ -4,13 +4,15 @@ import type { Notice } from "@/lib/uiTypes";
 
 import type * as React from "react";
 
+import { getNoticeCategory, NoticeCategoryBadge, NoticeUrgencyBadge } from "@/components/dashboard/NoticeCategory";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DialogClose } from "@/components/ui/dialog";
 import { Empty, EmptyDescription } from "@/components/ui/empty";
 import { formatPaymentDeadline } from "@/lib/cardPaymentPresentation";
 import { cn } from "@/lib/utils";
-import { AlertTriangle, Bell, CalendarClock, ChevronRight, Scissors } from "lucide-react";
+import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import Link from "next/link";
 
 const NOTICE_DESTINATIONS: Record<string, { href: string; label: string }> = {
@@ -19,30 +21,11 @@ const NOTICE_DESTINATIONS: Record<string, { href: string; label: string }> = {
   CUT_CYCLE_UPCOMING: { href: "/tarjetas", label: "Tarjetas" },
   RECEIVABLE: { href: "/ingresos", label: "Ingresos" },
   CASH_SUBSCRIPTION: { href: "/gastos", label: "Gastos" },
+  CARD_SUBSCRIPTION: { href: "/gastos", label: "Gastos" },
   PAYABLE: { href: "/gastos", label: "Gastos" },
 };
 
 export { default as CardUsageWaiverProgress,CardUsageWaiverTabs } from "./CardUsageWaiverProgress";
-
-function getNoticeAlertClass(group: string) {
-  const classes: Record<string, string> = {
-    overdue: "border-red-500/60 bg-red-500/15 text-red-400 dark:text-red-300",
-    today:
-      "border-orange-500/60 bg-orange-500/15 text-orange-400 dark:text-orange-300",
-    upcoming:
-      "border-amber-500/50 bg-amber-500/12 text-amber-500 dark:text-amber-400",
-    cut: "border-blue-500/25 bg-blue-500/8 text-blue-500 dark:text-blue-400",
-  };
-
-  return classes[group] || "border-border bg-muted/30";
-}
-
-function getNoticeIcon(group: string) {
-  if (group === "overdue") return AlertTriangle;
-  if (group === "today") return CalendarClock;
-  if (group === "cut") return Scissors;
-  return Bell;
-}
 
 export function ImportantNoticesCard({ notices, today, inDialog = false, embedded = false, renderNoticeActions, emptyDescription = "No tienes avisos importantes por ahora." }: { notices: Notice[]; today: Date; inDialog?: boolean; embedded?: boolean; renderNoticeActions?: (notice: Notice) => React.ReactNode; emptyDescription?: string }) {
   const content = notices.length === 0 ? (
@@ -52,16 +35,20 @@ export function ImportantNoticesCard({ notices, today, inDialog = false, embedde
   ) : (
     <div className="grid gap-3">
       {notices.map((notice) => {
-        const Icon = getNoticeIcon(notice.group);
+        const category = getNoticeCategory(notice.type);
         const destination = NOTICE_DESTINATIONS[notice.type];
         const actions = renderNoticeActions?.(notice);
 
         const alert = (
-          <Alert key={notice.id} className={cn(getNoticeAlertClass(notice.group), destination && "min-h-11 transition-colors hover:border-current motion-reduce:transition-none")}>
-            <Icon aria-hidden="true" />
-            <AlertTitle className="flex items-start justify-between gap-3">
-              <span className="min-w-0">{notice.title}</span>
-              {destination ? <ChevronRight className="size-3.5 shrink-0" aria-hidden="true" /> : null}
+          <Alert key={notice.id} variant="notice" data-notice-category={category.key} data-notice-type={notice.type}
+            className={cn("gap-2 px-3 py-3", destination && "min-h-11 transition-colors hover:border-notice-category/60 motion-reduce:transition-none")}>
+            <AlertTitle className="flex min-w-0 flex-col gap-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <NoticeCategoryBadge type={notice.type} />
+                <NoticeUrgencyBadge group={notice.group} />
+                {destination ? <HugeiconsIcon icon={ArrowRight01Icon} className="ml-auto shrink-0" data-notice-link aria-hidden="true" /> : null}
+              </div>
+              <span className="min-w-0 break-words">{notice.title}</span>
             </AlertTitle>
             <AlertDescription className={cn(actions && "min-h-11 pr-12")}>
               <div className="flex flex-col gap-1">

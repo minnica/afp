@@ -132,6 +132,39 @@ test("avisos Android: fecha local de México, cambio de mes y zonas inválidas",
   assert.throws(() => noticeLocalDate("not-a-zone"), error => objectValue(error).status === 400);
 });
 
+test("suscripciones con tarjeta: Dashboard, resumen y Android comparten aviso, destino y ocultación", async () => {
+  const { load, db, rows, cycle, card } = fixture();
+  cycle.paidAmount = 1000;
+  const subscription: NoticeRows['subscription'][number] = { userId: 'a', id: 'card-service', name: 'Servicio con tarjeta',
+    paymentMethod: 'CARD', cardId: card.id, chargeDay: 28, amount: 199, isActive: true,
+    startYear: 2026, startMonth: 1, frequencyMonths: 1, dailyExpenses: [], charges: [] };
+  rows.subscription.push(subscription, { ...subscription, id: 'foreign-service', userId: 'b' });
+  const request = { url: 'http://localhost/api/dashboard?clientDate=2026-10-26', headers: new Headers({ authorization: 'Bearer test' }) };
+  const full = await load('src/app/api/dashboard/route.ts').GET(request);
+  const summary = await load('src/app/api/dashboard/summary/route.ts').GET(request);
+  assert.equal(full.status, 200);
+  assert.equal(summary.status, 200);
+  const notices = array(full.body.importantNotices);
+  assert.equal(notices.length, 1);
+  assert.deepEqual(summary.body.importantNotices, notices);
+  const notice = objectValue(notices[0]);
+  assert.equal(notice.type, 'CARD_SUBSCRIPTION');
+  assert.equal(notice.group, 'upcoming');
+  const native = await withFixtureDb(load('src/lib/androidNotices.ts').loadAndroidNotices, db, 'a', today);
+  assert.equal(native.length, 1);
+  assert.equal(native[0]?.path, '/gastos');
+  assert.equal(native[0]?.title, notice.title);
+  assert.equal(native[0]?.body, notice.description);
+  const key = load('src/lib/noticeDismissals.ts').getNoticeKey({
+    type: stringValue(notice.type), id: stringValue(notice.id), date: stringValue(notice.date),
+  });
+  rows.noticeDismissal.push({ userId: 'a', month: '2026-10', noticeKey: key });
+  assert.equal((await withFixtureDb(load('src/lib/androidNotices.ts').loadAndroidNotices, db, 'a', today)).length, 0);
+  rows.noticeDismissal.length = 0;
+  present(subscription.charges).push({ month: '2026-10', status: 'SKIPPED' });
+  assert.equal(array((await load('src/app/api/dashboard/route.ts').GET(request)).body.importantNotices).length, 0);
+});
+
 test("cuentas por pagar: Dashboard y Android comparten saldo, fecha, aislamiento y liquidación", async () => {
   const { load, request, rows, cycle, db } = fixture();
   cycle.paidAmount = 1000;

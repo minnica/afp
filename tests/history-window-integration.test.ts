@@ -121,6 +121,33 @@ test('A13 PostgreSQL: ventanas, páginas, referencias y resumen', { skip: !conne
       const usage = array(summary.body.cardUsageWaiversCurrent).map(record).find(row => record(row.card).id === nu.id)!;
       assert.equal(record(usage.lastPurchase).date, '2021-01-15');
     });
+    await t.test('suscripciones anticipadas: conserva gastos del mes siguiente y decisiones fuera de ventana', async () => {
+      const subscription = await db.subscription.create({ data: { userId: user.id, categoryId: category.id,
+        cardId: card.id, name: 'Suscripción anticipada ficticia', paymentMethod: 'CARD', amount: 99,
+        chargeDay: 1, startYear: 2026, startMonth: 11 } });
+      const notices = async (summary: boolean) => {
+        const route = summary ? 'dashboard/summary' : 'dashboard';
+        const response = await testHandler(record(load(`src/app/api/${route}/route.ts`)).GET)({
+          url: `http://localhost/api/${route}?clientDate=2026-10-30&year=2001`,
+          headers: new Headers({ authorization: `Bearer ${user.id}` }),
+        });
+        assert.equal(response.status, 200);
+        return array(response.body.importantNotices).map(record).filter(notice => notice.id === `subscription-${subscription.id}-2026-11`);
+      };
+      assert.equal((await notices(false)).length, 1);
+      assert.equal((await notices(true)).length, 1);
+      const expense = await db.dailyExpense.create({ data: { userId: user.id, categoryId: category.id, cardId: card.id,
+        subscriptionId: subscription.id, paymentMethod: 'CARD', amount: 99, concept: 'Cobro anticipado ficticio', date: new Date('2026-11-01') } });
+      assert.equal((await notices(false)).length, 0);
+      assert.equal((await notices(true)).length, 0);
+      await db.dailyExpense.update({ where: { id: expense.id }, data: { date: new Date('2029-01-01') } });
+      await db.subscriptionCharge.create({ data: { userId: user.id, subscriptionId: subscription.id, month: '2026-11', status: 'CONFIRMED', expenseId: expense.id } });
+      assert.equal((await notices(false)).length, 0);
+      assert.equal((await notices(true)).length, 0);
+      await db.dailyExpense.delete({ where: { id: expense.id } });
+      assert.equal((await notices(false)).length, 1);
+      assert.equal((await notices(true)).length, 1);
+    });
     await t.test('rechaza parámetros inválidos y autenticación ausente', async () => {
       for (const query of ['page=0', 'pageSize=101', 'startDate=2026-02-30', 'startDate=2026-10-10&endDate=2026-01-01', 'sortBy=unknown']) assert.equal((await call('expenses', query)).status, 400);
       for (const query of ['year=0', 'pageSize=101', 'page=-1']) assert.equal((await call('card-cycles', query)).status, 400);
