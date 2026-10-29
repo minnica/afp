@@ -5,6 +5,7 @@ import type { Dashboard } from "@/lib/uiTypes";
 
 import CyclePeriodHelp from "@/components/dashboard/CyclePeriodHelp";
 import { CardUsageWaiverProgress } from "@/components/dashboard/DashboardPanels";
+import { HistoryYear } from "@/components/ui/history-year";
 import { useDashboard } from "@/components/dashboard/DashboardProvider";
 import ImportantNotices from "@/components/dashboard/ImportantNotices";
 import PageSkeleton from "@/components/layout/PageSkeleton";
@@ -147,11 +148,11 @@ function getStatusBadgeClass(status: string) {
 
 
 export default function DashboardContent() {
-  const { dashboard, isLoading, error, today: now, usageHistoryPeriod, setUsageHistoryPeriod } = useDashboard();
+  const { dashboard, isLoading, error, today: now, usageHistoryPeriod, setUsageHistoryPeriod, analysisYear, setAnalysisYear } = useDashboard();
   const mobile = useIsMobile();
 
   const financialDate = new Date(mexicoDayNumber(now));
-  const currentYear = financialDate.getUTCFullYear();
+  const currentYear = analysisYear;
   const currentMonthIndex = financialDate.getUTCMonth(); // 0-11
 
   const [activeMonthTab, setActiveMonthTab] = useState(String(currentMonthIndex));
@@ -196,6 +197,7 @@ export default function DashboardContent() {
         ) : null}
 
         <div className="flex flex-col gap-6">
+          <HistoryYear year={analysisYear} onChange={setAnalysisYear} disabled={isLoading} />
           {!mobile ? (
             hasCardUsageWaivers ? (
               <div className="grid gap-6 lg:grid-cols-2">

@@ -4,6 +4,12 @@ type ExportKind<T> = T extends (...args: never[]) => unknown ? 'function'
   : T extends abstract new (...args: never[]) => unknown ? 'function'
   : T extends number ? 'number' : T extends string ? 'string' : T extends boolean ? 'boolean' : 'object';
 export const sourceExports = {
+  'src/lib/dashboardDebts.ts': { dashboardReceivables: 'function', dashboardPayables: 'function' },
+  'src/lib/historyWindow.ts': { subscriptionHistoryWhere: 'function', monthWindow: 'function', dashboardWindow: 'function', readPage: 'function', readYear: 'function', readDateRange: 'function', availableExpenseMonths: 'function', dashboardCycleIds: 'function', cycleExpenseWhere: 'function', relevantPurchaseIds: 'function', previousCycleReferences: 'function' },
+  'src/lib/expenseHistory.ts': { expenseHistoryQuery: 'function', readExpenseHistory: 'function' },
+  'src/lib/nuHistory.ts': { nuHistoryReferences: 'function' },
+  'src/lib/dashboardReader.ts': { GET: 'function', loadDashboard: 'function' },
+  'src/app/api/dashboard/summary/route.ts': { GET: 'function' },
   'src/lib/financialContracts.ts': { financialInputSchema: 'object', readFinancialInput: 'function', isPrismaError: 'function', expenseCommandSchema: 'object' },
   'src/lib/money/transferContracts.ts': { transferSchema: 'object', transferCommandSchema: 'object', reverseTransferCommandSchema: 'object', transferMutationSchema: 'object', transferResponseSchema: 'object', reverseTransferResponseSchema: 'object', transferErrorSchema: 'object', parseTransferResponse: 'function' },
   'src/lib/captureReview.ts': { captureDate: 'object', captureAmount: 'object', correctionSchema: 'object', effectiveCapture: 'function', correctCapture: 'function', captureInboxWhere: 'function', captureInboxState: 'function' },
@@ -70,7 +76,7 @@ export const sourceExports = {
   'src/lib/apiAuth.ts': { 'requireApiUser': 'function', 'apiAccessErrorResponse': 'function', 'requireOwnedReferences': 'function', 'ApiAccessError': 'function', 'apiResponse': 'object' },
   'src/lib/calculations/cardCyclePayments.ts': { 'getCyclePaymentAmounts': 'function', 'getCyclePaymentState': 'function', 'getStoredCycleStatus': 'function', 'parseCycleMoney': 'function' },
   'src/lib/calculations/cardCycles.ts': { 'getMonthlyPaymentUsed': 'function', 'getPurchaseCycleNumber': 'function', 'shouldIncludePurchaseInCycle': 'function', 'getSubscriptionChargeDatesInsideCycle': 'function', 'calculateCycleAmount': 'function' },
-  'src/lib/calculations/cardUsageWaivers.ts': { 'getUsageExclusion': 'function', 'buildCurrentCardUsageWaivers': 'function', 'buildCardUsageWaiverHistory': 'function', 'buildCardUsageWaivers': 'function', 'CARD_USAGE_PRODUCTS': 'object' },
+  'src/lib/calculations/cardUsageWaivers.ts': { usageExclusionPattern: 'object', nuNonPurchasePattern: 'object', 'getUsageExclusion': 'function', 'buildCurrentCardUsageWaivers': 'function', 'buildCardUsageWaiverHistory': 'function', 'buildCardUsageWaivers': 'function', 'CARD_USAGE_PRODUCTS': 'object' },
   'src/lib/calculations/debtAccounts.ts': { 'getDebtAccountState': 'function' },
   'src/lib/captureProtocol.ts': { 'captureHash': 'function', 'validSecret': 'function', 'pairingCode': 'function', 'normalizePairingCode': 'function', 'deviceState': 'function', 'deviceCredential': 'function', 'sameHash': 'function', 'validateCaptureEvent': 'function', 'readCaptureJson': 'function', 'capturePackages': 'object', 'pairingLifetimeMs': 'number', 'deviceSelect': 'object' },
   'src/lib/cardBalanceTracking.ts': { 'isBalanceTrackingValid': 'function', 'getCardExposureCents': 'function', 'createBalanceTracking': 'function', 'getTrackedCard': 'function', 'loadBalanceMovements': 'function', 'runBalanceSnapshot': 'function' },

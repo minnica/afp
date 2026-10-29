@@ -1,0 +1,397 @@
+
+> afp@0.1.0 test /home/garatachia/projects/afp
+> node --import tsx tests/run-tests.ts android-notices.test.ts nu-turbo-usage.test.ts financial-day-integration.test.ts financial-validation.test.ts history-window-integration.test.ts
+
+TAP version 13
+# Subtest: avisos Android: mismo pago y saldo del Dashboard, sin exponer registros financieros
+ok 1 - avisos Android: mismo pago y saldo del Dashboard, sin exponer registros financieros
+  ---
+  duration_ms: 84.713109
+  type: 'test'
+  ...
+# Subtest: avisos Android: oculta por mes, retira liquidaciones y vuelve a avisar si cambia el saldo
+ok 2 - avisos Android: oculta por mes, retira liquidaciones y vuelve a avisar si cambia el saldo
+  ---
+  duration_ms: 26.426556
+  type: 'test'
+  ...
+# Subtest: avisos Android: identidad estable entre consultas, cambia al vencer y al mes siguiente
+ok 3 - avisos Android: identidad estable entre consultas, cambia al vencer y al mes siguiente
+  ---
+  duration_ms: 29.233981
+  type: 'test'
+  ...
+# Subtest: avisos Android: cálculo sin estado conserva las bonificaciones documentadas del corte
+ok 4 - avisos Android: cálculo sin estado conserva las bonificaciones documentadas del corte
+  ---
+  duration_ms: 24.02369
+  type: 'test'
+  ...
+# Subtest: avisos Android: suscripciones, cobros y cortes conservan destino y reglas compartidas
+ok 5 - avisos Android: suscripciones, cobros y cortes conservan destino y reglas compartidas
+  ---
+  duration_ms: 27.658064
+  type: 'test'
+  ...
+# Subtest: avisos Android: fecha local de México, cambio de mes y zonas inválidas
+ok 6 - avisos Android: fecha local de México, cambio de mes y zonas inválidas
+  ---
+  duration_ms: 25.787357
+  type: 'test'
+  ...
+# Subtest: cuentas por pagar: Dashboard y Android comparten saldo, fecha, aislamiento y liquidación
+ok 7 - cuentas por pagar: Dashboard y Android comparten saldo, fecha, aislamiento y liquidación
+  ---
+  duration_ms: 68.506925
+  type: 'test'
+  ...
+# Subtest: avisos Android: credencial, pausa y revocación se comprueban antes de leer finanzas
+ok 8 - avisos Android: credencial, pausa y revocación se comprueban antes de leer finanzas
+  ---
+  duration_ms: 175.556746
+  type: 'test'
+  ...
+# Subtest: avisos Android: un fallo de lectura nunca se presenta como una lista vacía válida
+ok 9 - avisos Android: un fallo de lectura nunca se presenta como una lista vacía válida
+  ---
+  duration_ms: 44.357636
+  type: 'test'
+  ...
+# Subtest: avisos Android: zona inválida y límite de consultas no consultan registros financieros
+ok 10 - avisos Android: zona inválida y límite de consultas no consultan registros financieros
+  ---
+  duration_ms: 76.987681
+  type: 'test'
+  ...
+# Subtest: PostgreSQL A04: el estado guardado coincide con Tarjetas y Dashboard al cambiar día, mes y año en México
+ok 11 - PostgreSQL A04: el estado guardado coincide con Tarjetas y Dashboard al cambiar día, mes y año en México
+  ---
+  duration_ms: 1132.493234
+  type: 'test'
+  ...
+# Subtest: A08: fechas reales, bisiestos y formato bancario estricto
+ok 12 - A08: fechas reales, bisiestos y formato bancario estricto
+  ---
+  duration_ms: 0.738689
+  type: 'test'
+  ...
+# Subtest: A08: centavos y límites sin redondear, convertir ni recortar la entrada
+ok 13 - A08: centavos y límites sin redondear, convertir ni recortar la entrada
+  ---
+  duration_ms: 0.784719
+  type: 'test'
+  ...
+# Subtest: A08: el contrato conserva el cuerpo original y acepta ausencias de acciones parciales
+ok 14 - A08: el contrato conserva el cuerpo original y acepta ausencias de acciones parciales
+  ---
+  duration_ms: 8.908625
+  type: 'test'
+  ...
+# Subtest: A08: todas las rutas manuales rechazan entradas inválidas antes de acceder a persistencia
+    # Subtest: POST /api/expenses
+    ok 1 - POST /api/expenses
+      ---
+      duration_ms: 123.985923
+      type: 'test'
+      ...
+    # Subtest: PATCH /api/expenses
+    ok 2 - PATCH /api/expenses
+      ---
+      duration_ms: 3.513114
+      type: 'test'
+      ...
+    # Subtest: POST /api/incomes
+    ok 3 - POST /api/incomes
+      ---
+      duration_ms: 6.685848
+      type: 'test'
+      ...
+    # Subtest: PATCH /api/incomes
+    ok 4 - PATCH /api/incomes
+      ---
+      duration_ms: 2.781156
+      type: 'test'
+      ...
+    # Subtest: POST /api/receivables
+    ok 5 - POST /api/receivables
+      ---
+      duration_ms: 6.474519
+      type: 'test'
+      ...
+    # Subtest: PATCH /api/receivables
+    ok 6 - PATCH /api/receivables
+      ---
+      duration_ms: 3.407244
+      type: 'test'
+      ...
+    # Subtest: POST /api/payables
+    ok 7 - POST /api/payables
+      ---
+      duration_ms: 6.775859
+      type: 'test'
+      ...
+    # Subtest: PATCH /api/payables
+    ok 8 - PATCH /api/payables
+      ---
+      duration_ms: 4.530372
+      type: 'test'
+      ...
+    # Subtest: POST /api/installment-purchases
+    ok 9 - POST /api/installment-purchases
+      ---
+      duration_ms: 9.643224
+      type: 'test'
+      ...
+    # Subtest: PATCH /api/installment-purchases
+    ok 10 - PATCH /api/installment-purchases
+      ---
+      duration_ms: 3.380654
+      type: 'test'
+      ...
+    # Subtest: POST /api/subscriptions
+    ok 11 - POST /api/subscriptions
+      ---
+      duration_ms: 5.74013
+      type: 'test'
+      ...
+    # Subtest: PATCH /api/subscriptions
+    ok 12 - PATCH /api/subscriptions
+      ---
+      duration_ms: 2.421036
+      type: 'test'
+      ...
+    # Subtest: POST /api/cards
+    ok 13 - POST /api/cards
+      ---
+      duration_ms: 7.412708
+      type: 'test'
+      ...
+    # Subtest: PATCH /api/cards
+    ok 14 - PATCH /api/cards
+      ---
+      duration_ms: 0.515039
+      type: 'test'
+      ...
+    # Subtest: PATCH /api/card-cycles
+    ok 15 - PATCH /api/card-cycles
+      ---
+      duration_ms: 12.976468
+      type: 'test'
+      ...
+    # Subtest: POST /api/subscription-charges
+    ok 16 - POST /api/subscription-charges
+      ---
+      duration_ms: 5.51455
+      type: 'test'
+      ...
+    # Subtest: POST /api/settings
+    ok 17 - POST /api/settings
+      ---
+      duration_ms: 2.854816
+      type: 'test'
+      ...
+    1..17
+ok 15 - A08: todas las rutas manuales rechazan entradas inválidas antes de acceder a persistencia
+  ---
+  duration_ms: 209.778499
+  type: 'test'
+  ...
+# Subtest: A08: Mi dinero, saldos y revisión de Captura comparten los límites monetarios
+ok 16 - A08: Mi dinero, saldos y revisión de Captura comparten los límites monetarios
+  ---
+  duration_ms: 23.95224
+  type: 'test'
+  ...
+(node:67757) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+# Subtest: PostgreSQL A08: altas, ediciones y reintentos conservan fechas, centavos y registros
+    # Subtest: expenses: crea y edita; rechaza sin alterar lo guardado
+    ok 1 - expenses: crea y edita; rechaza sin alterar lo guardado
+      ---
+      duration_ms: 157.549726
+      type: 'test'
+      ...
+    # Subtest: incomes: crea y edita; rechaza sin alterar lo guardado
+    ok 2 - incomes: crea y edita; rechaza sin alterar lo guardado
+      ---
+      duration_ms: 33.684733
+      type: 'test'
+      ...
+    # Subtest: receivables: crea y edita; rechaza sin alterar lo guardado
+    ok 3 - receivables: crea y edita; rechaza sin alterar lo guardado
+      ---
+      duration_ms: 27.666164
+      type: 'test'
+      ...
+    # Subtest: payables: crea y edita; rechaza sin alterar lo guardado
+    ok 4 - payables: crea y edita; rechaza sin alterar lo guardado
+      ---
+      duration_ms: 29.482651
+      type: 'test'
+      ...
+    # Subtest: installment-purchases: crea y edita; rechaza sin alterar lo guardado
+    ok 5 - installment-purchases: crea y edita; rechaza sin alterar lo guardado
+      ---
+      duration_ms: 32.327915
+      type: 'test'
+      ...
+    # Subtest: subscriptions: crea y edita; rechaza sin alterar lo guardado
+    ok 6 - subscriptions: crea y edita; rechaza sin alterar lo guardado
+      ---
+      duration_ms: 28.844322
+      type: 'test'
+      ...
+    # Subtest: gastos: fecha bisiesta, máximo monetario, trim e idempotencia sin normalizar el recibo
+    ok 7 - gastos: fecha bisiesta, máximo monetario, trim e idempotencia sin normalizar el recibo
+      ---
+      duration_ms: 26.871525
+      type: 'test'
+      ...
+    # Subtest: ciclos: fechas válidas, estado cero y ausencia de pago conservan sus contratos
+    ok 8 - ciclos: fechas válidas, estado cero y ausencia de pago conservan sus contratos
+      ---
+      duration_ms: 31.847486
+      type: 'test'
+      ...
+    # Subtest: conciliación de Captura: total máximo, cero y null; entrada inválida revierte la transacción
+    ok 9 - conciliación de Captura: total máximo, cero y null; entrada inválida revierte la transacción
+      ---
+      duration_ms: 41.015022
+      type: 'test'
+      ...
+    1..9
+ok 17 - PostgreSQL A08: altas, ediciones y reintentos conservan fechas, centavos y registros
+  ---
+  duration_ms: 490.23043
+  type: 'test'
+  ...
+# Subtest: A13 PostgreSQL: ventanas, páginas, referencias y resumen
+    # Subtest: páginas deterministas, Decimal y agregados de todo el filtro
+    ok 1 - páginas deterministas, Decimal y agregados de todo el filtro
+      ---
+      duration_ms: 173.545159
+      type: 'test'
+      ...
+    # Subtest: filtros móviles alternativos, acentos y sumas
+    ok 2 - filtros móviles alternativos, acentos y sumas
+      ---
+      duration_ms: 20.138126
+      type: 'test'
+      ...
+    # Subtest: bootstrap mantiene una página y los catálogos agrupados
+    ok 3 - bootstrap mantiene una página y los catálogos agrupados
+      ---
+      duration_ms: 27.581964
+      type: 'test'
+      ...
+    # Subtest: ciclos históricos paginados, detalle aislado y dueño
+    ok 4 - ciclos históricos paginados, detalle aislado y dueño
+      ---
+      duration_ms: 67.764696
+      type: 'test'
+      ...
+    # Subtest: conserva parciales antiguos y excluye el historial liquidado
+    ok 5 - conserva parciales antiguos y excluye el historial liquidado
+      ---
+      duration_ms: 87.370384
+      type: 'test'
+      ...
+    # Subtest: MSI antigua con ancla posterior conserva cuota verificada
+    ok 6 - MSI antigua con ancla posterior conserva cuota verificada
+      ---
+      duration_ms: 14.279046
+      type: 'test'
+      ...
+    # Subtest: resumen conserva avisos y consumo sin los comparativos anuales
+    ok 7 - resumen conserva avisos y consumo sin los comparativos anuales
+      ---
+      duration_ms: 61.241417
+      type: 'test'
+      ...
+    # Subtest: Turbo conserva la compra válida fuera de ventana y omite comisiones
+    ok 8 - Turbo conserva la compra válida fuera de ventana y omite comisiones
+      ---
+      duration_ms: 62.205986
+      type: 'test'
+      ...
+    # Subtest: rechaza parámetros inválidos y autenticación ausente
+    ok 9 - rechaza parámetros inválidos y autenticación ausente
+      ---
+      duration_ms: 1.217788
+      type: 'test'
+      ...
+    1..9
+ok 18 - A13 PostgreSQL: ventanas, páginas, referencias y resumen
+  ---
+  duration_ms: 664.791557
+  type: 'test'
+  ...
+# Subtest: Nu aparece por producto verificado aunque no haya ciclo y no inventa una meta monetaria
+ok 19 - Nu aparece por producto verificado aunque no haya ciclo y no inventa una meta monetaria
+  ---
+  duration_ms: 0.378059
+  type: 'test'
+  ...
+# Subtest: cualquier importe positivo renueva 30 días, sin depender del mes ni del corte
+ok 20 - cualquier importe positivo renueva 30 días, sin depender del mes ni del corte
+  ---
+  duration_ms: 0.48529
+  type: 'test'
+  ...
+# Subtest: el día 30 pide comprar hoy; el plazo conserva todo el día y cambia al siguiente
+ok 21 - el día 30 pide comprar hoy; el plazo conserva todo el día y cambia al siguiente
+  ---
+  duration_ms: 1.424747
+  type: 'test'
+  ...
+# Subtest: futuros, capturas pendientes, efectivo, otra tarjeta e importes inválidos no acreditan compras
+ok 22 - futuros, capturas pendientes, efectivo, otra tarjeta e importes inválidos no acreditan compras
+  ---
+  duration_ms: 0.402029
+  type: 'test'
+  ...
+# Subtest: comisiones, impuestos bancarios, intereses y disposiciones no son compras
+ok 23 - comisiones, impuestos bancarios, intereses y disposiciones no son compras
+  ---
+  duration_ms: 0.46464
+  type: 'test'
+  ...
+# Subtest: MSI cuenta solo en la fecha original, incluso liquidada; sus mensualidades no renuevan
+ok 24 - MSI cuenta solo en la fecha original, incluso liquidada; sus mensualidades no renuevan
+  ---
+  duration_ms: 0.262329
+  type: 'test'
+  ...
+# Subtest: suscripciones cuentan por gasto o evidencia verificada una vez, nunca por previsión
+ok 25 - suscripciones cuentan por gasto o evidencia verificada una vez, nunca por previsión
+  ---
+  duration_ms: 0.472929
+  type: 'test'
+  ...
+# Subtest: la última compra determina la renovación; las antiguas quedan fuera del listado reciente
+ok 26 - la última compra determina la renovación; las antiguas quedan fuera del listado reciente
+  ---
+  duration_ms: 0.17477
+  type: 'test'
+  ...
+# Subtest: Turbo no crea cortes históricos ni una posible comisión por falta de compras
+ok 27 - Turbo no crea cortes históricos ni una posible comisión por falta de compras
+  ---
+  duration_ms: 0.15942
+  type: 'test'
+  ...
+# Subtest: Dashboard entrega Nu con fecha local del cliente y conserva el aislamiento del usuario
+ok 28 - Dashboard entrega Nu con fecha local del cliente y conserva el aislamiento del usuario
+  ---
+  duration_ms: 39.169394
+  type: 'test'
+  ...
+1..28
+# tests 63
+# suites 0
+# pass 63
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3437.825666

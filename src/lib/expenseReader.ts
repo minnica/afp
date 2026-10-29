@@ -4,7 +4,7 @@ import { errorMessage } from './uiTypes';
 
 export type ExpensesUrl = `/api/expenses?${string}`;
 type ReadOptions = { force?: boolean; errorMode?: 'dialog' | 'inline'; mutationCompleted?: boolean };
-type ExpenseSnapshot = Pick<UiResponse<'expenses'>, 'expenses' | 'availableMonths'>;
+type ExpenseSnapshot = Pick<UiResponse<'expenses'>, 'expenses' | 'availableMonths' | 'page' | 'pageSize' | 'pageCount' | 'totalCount'> & Partial<Pick<UiResponse<'expenses'>, 'total' | 'personalTotal'>>;
 
 // Una selección invalida la generación anterior antes del debounce. El transporte
 // recibe signal, pero también comprobamos identidad por si ya estaba leyendo JSON.

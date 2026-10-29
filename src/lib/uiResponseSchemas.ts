@@ -156,10 +156,12 @@ const cardCyclesCycleSchema = z.object({
 }).passthrough();
 
 const cardCyclesSchema = z.object({
+ totalCount: z.number().optional(), page: z.number().optional(), pageSize: z.number().optional(), pageCount: z.number().optional(), year: z.number().optional(),
   "cycle": z.union([z.null(), cardCyclesCycleSchema])
 }).passthrough();
 
 const cardCyclesSchema2 = z.object({
+ totalCount: z.number().optional(), page: z.number().optional(), pageSize: z.number().optional(), pageCount: z.number().optional(), year: z.number().optional(),
   "cycles": z.array(cardCyclesCycleSchema)
 }).passthrough();
 
@@ -239,6 +241,7 @@ const expensesExpensesItemSchema = z.object({
 }).passthrough();
 
 const expensesSchema = z.object({
+  totalCount: z.number().optional(), page: z.number().optional(), pageSize: z.number().optional(), pageCount: z.number().optional(),
   "expenses": z.array(expensesExpensesItemSchema),
   "total": z.number(),
   "personalTotal": z.number(),
@@ -458,6 +461,7 @@ const gastosBootstrapMoneyAccountsItemSchema = z.object({
 }).passthrough();
 
 const gastosBootstrapSchema = z.object({
+  totalCount: z.number().optional(), page: z.number().optional(), pageSize: z.number().optional(), pageCount: z.number().optional(), total: z.number().optional(), personalTotal: z.number().optional(),
   "categories": z.array(gastosBootstrapCategoriesItemSchema),
   "people": z.array(gastosBootstrapPeopleItemSchema),
   "cards": z.array(gastosBootstrapCardsItemSchema),
@@ -1689,6 +1693,7 @@ export const uiResponseSchemas = {
 "receivables": receivablesSchema,
 "payables": payablesSchema,
 "dashboard": dashboardSchema,
+"dashboard/summary": dashboardSchema.pick({ importantNotices: true, cardUsageWaiversCurrent: true, cardUsageWaiverHistory: true }),
 "settings": settingsSchema,
 "captures/devices": z.union([capturesDevicesSchema, capturesDevicesSchema2, capturesDevicesSchema3, capturesDevicesSchema4, capturesDevicesSchema5, capturesDevicesSchema6]),
 "captures/configuration": capturesConfigurationSchema,

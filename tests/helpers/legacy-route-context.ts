@@ -1,3 +1,4 @@
+import { historyFixtureMocks } from "./history-fixture";
 import { sourceLoader as rawLoader } from './load-source';
 // Adaptación de pruebas históricas: dependencias reales, adaptadores explícitos.
 // Solo expone los helpers privados que ya comprobaban esos escenarios.
@@ -40,7 +41,7 @@ export function routeContext(route: RouteName, globals: Globals = {}): unknown {
       ApiAccessError: class extends Error {},
     },
   };
-  const load = rawLoader(mocks);
+  const load = rawLoader(historyFixtureMocks(mocks));
   const sourceLoaderForPrivate = load;
   const helpers = sparseCalculations({
     ...load('src/lib/sharedExpenses.ts'),
@@ -58,7 +59,7 @@ export function routeContext(route: RouteName, globals: Globals = {}): unknown {
     'buildWeeklyComparison', 'buildCategoryBreakdown', 'buildCardMonthlyComparison',
     'shouldIncludePurchaseInMonth', 'isSubscriptionChargeableInMonth', 'getMonthlySubscriptions',
   ] : route === 'installment-purchases' ? ['formatPurchase'] : [];
-  const exports = record(sourceLoaderForPrivate(`src/app/api/${route}/route`, exposed));
+  const exports = record(sourceLoaderForPrivate(route === "dashboard" ? "src/lib/dashboardReader.ts" : `src/app/api/${route}/route`, exposed));
   for (const name of exposed) if (typeof exports[name] !== 'function') throw new Error(`Export privado inválido: ${route}#${name}`);
   // Lista cerrada por ruta. vm no permite demostrar la firma privada: se
   // concentra aquí la conversión y los escenarios verifican su comportamiento.

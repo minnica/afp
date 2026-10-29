@@ -8,6 +8,7 @@ import { useNoticeDismissals } from "@/hooks/use-notice-dismissals";
 import { navItems } from "@/lib/navigation";
 import { getNoticeMonth, partitionNotices } from "@/lib/noticeDismissals";
 import { supabase } from "@/lib/supabase";
+import type { UiResponse } from "@/lib/uiResponseSchemas";
 import type { Dashboard } from "@/lib/uiTypes";
 import { errorMessage } from "@/lib/uiTypes";
 import { ensureUserSetup } from "@/lib/userSetup";
@@ -18,9 +19,9 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 
 const DashboardContext = createContext<ReturnType<typeof useDashboardState> | null>(null);
 const appRoutes = new Set(navItems.map((item) => item.href));
-type DashboardState = { dashboard: Dashboard | null; userId: string | null; isLoading: boolean; error: string };
-type DashboardRequest = { userId: string; controller: AbortController; promise: Promise<void> | null };
-const initialState: DashboardState = { dashboard: null, userId: null, isLoading: true, error: "" };
+type DashboardState = { dashboard: Dashboard | null; summary: UiResponse<"dashboard/summary"> | null; userId: string | null; isLoading: boolean; error: string };
+type DashboardRequest = { userId: string; mode: string; controller: AbortController; promise: Promise<void> | null };
+const initialState: DashboardState = { dashboard: null, summary: null, userId: null, isLoading: true, error: "" };
 
 function useDashboardState() {
   const pathname = usePathname();
@@ -28,19 +29,22 @@ function useDashboardState() {
   const mobile = useIsMobile();
   const [state, setState] = useState(initialState);
   const [today, setToday] = useState(() => new Date());
+  const [analysisYear, setAnalysisYear] = useState(() => Number(todayInMexico().slice(0, 4)));
   const [usageHistoryPeriod, setUsageHistoryPeriod] = useState("");
   const requestRef = useRef<DashboardRequest | null>(null);
   const loadedRouteRef = useRef<string | null>(null);
   const userIdRef = useRef<string | null>(null);
   const generationRef = useRef(0);
+  const fullYearRef = useRef<number | null>(null);
   const noticePreferences = useNoticeDismissals({
     userId: state.userId,
     month: getNoticeMonth(today),
     enabled: appRoutes.has(pathname) && (mobile || pathname === "/dashboard" || pathname === "/analisis"),
   });
-  const notices = partitionNotices(state.dashboard?.importantNotices || [], noticePreferences.entries, noticePreferences.month);
+  const notices = partitionNotices(state.summary?.importantNotices || [], noticePreferences.entries, noticePreferences.month);
 
   const refresh = useCallback(async (options: { force?: boolean; silent?: boolean } = {}) => {
+    const mode = pathname === "/dashboard" || pathname === "/analisis" ? `full:${analysisYear}` : "summary";
     const generation = generationRef.current;
     try {
       const { data: { session }, error } = await supabase.auth.getSession();
@@ -52,17 +56,18 @@ function useDashboardState() {
         return;
       }
       const userId = session.user.id;
-      if (!options.force && requestRef.current?.userId === userId) return requestRef.current.promise;
+      if (!options.force && requestRef.current?.userId === userId && requestRef.current.mode === mode) return requestRef.current.promise;
 
-      const request: DashboardRequest = { userId, controller: new AbortController(), promise: null };
+      const request: DashboardRequest = { userId, mode, controller: new AbortController(), promise: null };
       requestRef.current?.controller.abort();
       requestRef.current = request;
       const sameUser = userIdRef.current === userId;
       userIdRef.current = userId;
       setState((previous) => ({
         userId,
-        dashboard: sameUser ? previous.dashboard : null,
-        isLoading: !sameUser || !previous.dashboard,
+        dashboard: sameUser && fullYearRef.current === analysisYear ? previous.dashboard : null,
+        summary: sameUser ? previous.summary : null,
+        isLoading: !sameUser || (mode !== "summary" && fullYearRef.current !== analysisYear) || !(mode !== "summary" ? previous.dashboard : previous.summary),
         error: "",
       }));
 
@@ -73,15 +78,24 @@ function useDashboardState() {
           if (request.controller.signal.aborted) return;
           const requestDate = new Date();
           const params = new URLSearchParams({ userId, clientDate: todayInMexico(requestDate) });
-          const response = await apiFetch(`/api/dashboard?${params}`, {
-            signal: request.controller.signal,
-            errorMode,
-          });
-          const dashboard = await response.json();
-          if (!response.ok) throw new Error(dashboard.error || "No se pudo cargar la información.");
-          if (!request.controller.signal.aborted) {
-            setState({ dashboard, userId, isLoading: false, error: "" });
-            setToday(requestDate);
+          if (mode !== "summary") params.set("year", String(analysisYear));
+          if (mode === "summary") {
+            const response = await apiFetch(`/api/dashboard/summary?${params}`, { signal: request.controller.signal, expectedUserId: userId, errorMode });
+            const summary = await response.json();
+            if (!response.ok) throw new Error(summary.error || "No se pudo cargar la información.");
+            if (!request.controller.signal.aborted) {
+              setState(previous => ({ ...previous, dashboard: sameUser ? previous.dashboard : null, summary, userId, isLoading: false, error: "" }));
+              setToday(requestDate);
+            }
+          } else {
+            const response = await apiFetch(`/api/dashboard?${params}`, { signal: request.controller.signal, expectedUserId: userId, errorMode });
+            const dashboard = await response.json();
+            if (!response.ok) throw new Error(dashboard.error || "No se pudo cargar la información.");
+            if (!request.controller.signal.aborted) {
+              fullYearRef.current = analysisYear;
+              setState({ dashboard, summary: dashboard, userId, isLoading: false, error: "" });
+              setToday(requestDate);
+            }
           }
         } catch (err) {
           if (!request.controller.signal.aborted) {
@@ -97,7 +111,7 @@ function useDashboardState() {
         setState((previous) => ({ ...previous, isLoading: false, error: errorMessage(err) || "No se pudo cargar la información." }));
       }
     }
-  }, [router, pathname]);
+  }, [router, pathname, analysisYear]);
 
   useEffect(() => {
     if (!appRoutes.has(pathname) || (!mobile && pathname !== "/dashboard" && pathname !== "/analisis")) return;
@@ -111,8 +125,11 @@ function useDashboardState() {
 
   useEffect(() => {
     if (!appRoutes.has(pathname) || (!mobile && pathname !== "/dashboard" && pathname !== "/analisis")) return;
-    if (loadedRouteRef.current !== pathname) {
-      loadedRouteRef.current = pathname;
+    if (loadedRouteRef.current !== `${pathname}:${analysisYear}`) {
+      generationRef.current += 1;
+      requestRef.current?.controller.abort();
+      requestRef.current = null;
+      loadedRouteRef.current = `${pathname}:${analysisYear}`;
       refresh();
     }
     const onFocus = () => { if (document.visibilityState === "visible") refresh({ silent: true }); };
@@ -124,7 +141,7 @@ function useDashboardState() {
       window.removeEventListener("online", onFocus);
       document.removeEventListener("visibilitychange", onFocus);
     };
-  }, [pathname, mobile, refresh]);
+  }, [pathname, mobile, refresh, analysisYear]);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
@@ -133,6 +150,7 @@ function useDashboardState() {
         requestRef.current?.controller.abort();
         requestRef.current = null;
         userIdRef.current = null;
+        fullYearRef.current = null;
         loadedRouteRef.current = null;
         setState(initialState);
         setUsageHistoryPeriod("");
@@ -149,10 +167,10 @@ function useDashboardState() {
   }, [router]);
 
   const value = useMemo(() => ({
-    ...state, refresh, retry: refresh, today,
+    ...state, refresh, retry: refresh, today, analysisYear, setAnalysisYear,
     usageHistoryPeriod, setUsageHistoryPeriod,
     noticePreferences, visibleNotices: notices.visible, hiddenNotices: notices.hidden,
-  }), [state, refresh, today, usageHistoryPeriod, noticePreferences, notices.visible, notices.hidden]);
+  }), [state, refresh, today, analysisYear, usageHistoryPeriod, noticePreferences, notices.visible, notices.hidden]);
 
   return value;
 }

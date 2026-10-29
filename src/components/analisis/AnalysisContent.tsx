@@ -1,6 +1,8 @@
 "use client";
 
 
+import { HistoryYear } from "@/components/ui/history-year";
+import { useDashboard } from "@/components/dashboard/DashboardProvider";
 import AnalysisError from "@/components/analisis/AnalysisError";
 import AnalysisSkeleton from "@/components/analisis/AnalysisSkeleton";
 import MonthSelector from "@/components/analisis/MonthSelector";
@@ -24,7 +26,7 @@ function AnalysisViews({ dashboard, today }: { dashboard: import("@/lib/uiTypes"
   const financialDate = new Date(mexicoDayNumber(today));
   const [monthIndex, setMonthIndex] = useState(financialDate.getUTCMonth());
   const [categoryId, setCategoryId] = useState("all");
-  const year = financialDate.getUTCFullYear();
+  const { analysisYear: year } = useDashboard();
   return (
     <Tabs defaultValue="weeks" className="gap-5" data-analysis-views>
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
@@ -48,10 +50,12 @@ function AnalysisViews({ dashboard, today }: { dashboard: import("@/lib/uiTypes"
 
 export default function AnalysisContent() {
   const { dashboard, isLoading, error, retry, today } = useAnalysis();
+  const { analysisYear, setAnalysisYear } = useDashboard();
   if (isLoading) return <AnalysisSkeleton />;
   return (
     <main className="analysis-page">
       <section className="mx-auto flex w-full max-w-4xl flex-col gap-5 px-4 py-5 md:gap-6 md:py-8">
+        <HistoryYear year={analysisYear} onChange={setAnalysisYear} disabled={isLoading} />
         {error ? <AnalysisError error={error} retry={retry} /> : null}
         {dashboard ? <AnalysisViews dashboard={dashboard} today={today} /> : null}
       </section>

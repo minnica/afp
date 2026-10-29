@@ -1,0 +1,88 @@
+{
+  "changed_sources": {
+    "src/app/api/card-cycles/route.ts": "b9b95c7ea7f5195c5b9faf4ed231cb26bddab57dd50911d6e6e956176d9d8cc8",
+    "src/app/api/dashboard/route.ts": "43285332490c95bcf84bf94c0e0695da4ca03031c7667a69519435b1108dbac6",
+    "src/app/api/dashboard/summary/route.ts": "e58deb8f0395a7f48a83440fb6e6c76dd2ec64b64099201a6119d02288f24b71",
+    "src/app/api/expenses/route.ts": "53dd586cc2c241f739a4d55cae79dd8f90f8b78becd3e472200e42a34e9a0b2b",
+    "src/app/api/gastos/bootstrap/route.ts": "9f6d0abeca4d4d9d39230bb8721a9be8d3cd35cd46aa3e771ae812ea3d960e08",
+    "src/components/analisis/AnalysisContent.tsx": "26c3b9b43d1ddb42e78582c0734669c5cf05ebcbd49997b3734730bedc55c9a5",
+    "src/components/dashboard/DashboardContent.tsx": "9025e05ebb8cb7cfb64df1dd2cedd34a1641163f473315b421eec09a848e12ea",
+    "src/components/dashboard/DashboardProvider.tsx": "1304e0dd1a27ac138110bd1f2b4bb3b31d90a4789b319c6ba29b105965d318a1",
+    "src/components/gastos/GastosContent.tsx": "0d0f5b1ea9147fd1007e20c466338c464bb505796fb030aad10d529cc04ddf39",
+    "src/components/layout/AppHeaderActions.tsx": "0bb4f4015461a4beed6ed63cafdb3129017a889346244c7ac18a38083fb810fc",
+    "src/components/tarjetas/TarjetasContent.tsx": "40f6553a6d102205ae565c1c64417d9e4185214eeba0e6838fdba38e35793115",
+    "src/components/ui/history-year.tsx": "0b4bd910f78af602d2c94eb48c69e89def427eb845e3da73d96478466181cbb4",
+    "src/lib/calculations/cardUsageWaivers.ts": "c54b50ab10749e1081d23278e46e05027867262b5ec34309206c768929f0a781",
+    "src/lib/dashboardDebts.ts": "c29b820fc58e8427d4a6da49dd96164fef436d1d08981759f30065b71fc8f085",
+    "src/lib/dashboardReader.ts": "e2aa8f853f543beb74900374a550151d642cf4a5a7417b89226be84579b941b1",
+    "src/lib/expenseHistory.ts": "340fb3a4a2cd23b36846e837f4ee6bd7197306636629570a1f424c079d5dad38",
+    "src/lib/expenseReader.ts": "680e3e544fffa1e553b6141dae12f48989760a4a12c732eb6fcc74bb82c4a39e",
+    "src/lib/financialResponses.ts": "26b8e43a8a7b4da0e9e1689f5a18e5a19649eaec10c21d69783c47e78f46eb8f",
+    "src/lib/historyWindow.ts": "6712bd3cc72b543eae83a504b49c4a2b10f1d4bf08e92835b1908e6d1aa0a50e",
+    "src/lib/nuHistory.ts": "dad96eaff4cd1880147ac6b9fbbc596a6789f5c5d5edd21dffcd62fa6ff65498",
+    "src/lib/uiResponseSchemas.ts": "add0cd2321db0dbf92c8ce1396d8c108c3c5480ca954e9ed8b8e732f5fed83ec",
+    "tests/helpers/benchmark-history.ts": "19de55cd43e14c6f5a796268d6ebde1718eb9aa77e83fab44282ec2dc64d3c28",
+    "tests/helpers/financial-fixtures.ts": "414c4ad6cfeac1f51d5886295f7c4fd137bfaa74f2592fa042417b4f75411c2b",
+    "tests/helpers/history-fixture.ts": "336516ec18df8908d042d620c54c1f256bc99c0abe38f7a91571db60e22811fa",
+    "tests/helpers/integration-fixtures.ts": "faf19215300ca43a0cf2e021849516804b1655476644b5d65254378453c25cc3",
+    "tests/helpers/legacy-route-context.ts": "28df63c653cfbdd948ec74a297af0443f2a9780e597276d4fdd2704b21114190",
+    "tests/helpers/source-contracts.ts": "fcd46373b8bfcfad0a6b2a6ba39b43b3cbfa5f417d7548dc6d7940fa6b76c742",
+    "tests/helpers/source-exports.ts": "d7c52c0536ea99a3acd4db4251473dea546eb91302bda1b97f596bfd8350f67b",
+    "tests/history-window-integration.test.ts": "d1237bf539a289bbbfb4e3d1ccf9aab0e70d4a55aa69e758253e8e7f63a8697a"
+  },
+  "baseline_commit": "948bc319a9c55d5dcc75852994662611cf36f6f5",
+  "scope": "Implementación local; sin publicación ni cambios remotos, esquema o dependencias.",
+  "postgres": "16 local, afp_test_a13, 42 migraciones existentes",
+  "suite": {
+    "passed": 965,
+    "failed": 0,
+    "skipped": 0
+  },
+  "benchmark": {
+    "source": "benchmark-final.json",
+    "historical_expenses": [
+      1000,
+      10000,
+      100000
+    ],
+    "samples_per_variant": 5,
+    "baseline_source": "benchmark.json"
+  },
+  "browser": {
+    "auth": "ficticia",
+    "api": "rutas reales",
+    "database": "PostgreSQL local",
+    "desktop": [
+      1280,
+      900
+    ],
+    "mobile": [
+      390,
+      844
+    ],
+    "evidence": [
+      "browser-final-desktop.json",
+      "browser-mobile-page2.json",
+      "browser-header-dialog.json",
+      "browser-cycles-previous.json",
+      "browser-analysis-year.json"
+    ]
+  },
+  "limitations": [
+    "No aceptación con Supabase Auth real ni rendimiento de producción.",
+    "p95 de cinco muestras: máximo observado; bytes de BD aproximados mediante JSON de resultados.",
+    "Heap muestreado en fronteras, no pico absoluto; RSS incluye runtime/calentamiento.",
+    "Los agregados exactos y pendientes legítimos aún requieren trabajo proporcional en SQL o a sus datos relevantes."
+  ],
+  "checks": {
+    "pnpm typecheck": "passed",
+    "pnpm typecheck:tests": "passed",
+    "pnpm test:types": "passed",
+    "pnpm lint": "passed",
+    "pnpm test": "passed",
+    "pnpm build": "passed",
+    "git diff --check": "passed"
+  },
+  "lint_warnings": 2,
+  "test_resources": "Servidor, tres sesiones de navegador y contenedor PostgreSQL cerrados."
+}

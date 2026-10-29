@@ -1,3 +1,4 @@
+import { expenseHistoryQuery, readExpenseHistory } from "@/lib/expenseHistory";
 import type { Prisma } from "@prisma/client";
 import { readFinancialInput } from "@/lib/financialContracts";
 import { createExpenseInTransaction } from "@/lib/expenseService";
@@ -8,7 +9,7 @@ import { prisma } from "@/lib/prisma";
 import { SubscriptionChargeError } from "@/lib/subscriptionChargeService";
 
 import { runExpenseOperation } from "@/lib/expenseOperations";
-import { getCashContributionError, sumPersonalExpenses } from "@/lib/sharedExpenses";
+import { getCashContributionError } from "@/lib/sharedExpenses";
 import { assertRefundExpenseEdit } from "@/lib/captureRefunds";
 
 const expenseSelect = {
@@ -77,115 +78,16 @@ function parseDateInput(dateValue: string | null | undefined) {
   return new Date(`${dateValue}T12:00:00.000Z`);
 }
 
-function parseStartDate(dateValue: string) {
-  if (!dateValue) return null;
-  return new Date(`${dateValue}T00:00:00.000Z`);
-}
-
-function parseEndDate(dateValue: string) {
-  if (!dateValue) return null;
-  return new Date(`${dateValue}T23:59:59.999Z`);
-}
-
-function getAvailableMonths(expenseDates: { date: Date }[]) {
-  const months = new Set<string>();
-
-  expenseDates.forEach((expense) => {
-    const date = new Date(expense.date);
-
-    if (Number.isNaN(date.getTime())) return;
-
-    const year = date.getUTCFullYear();
-    const month = String(date.getUTCMonth() + 1).padStart(2, "0");
-    months.add(`${year}-${month}`);
-  });
-
-  return Array.from(months).sort().reverse();
-}
-
 export async function GET(request: Request) {
   try {
     const user = await requireApiUser(request);
     const userId = user.id;
     const { searchParams } = new URL(request.url);
 
-    const startDate = searchParams.get("startDate");
-    const endDate = searchParams.get("endDate");
-    const categoryId = searchParams.get("categoryId");
-    const paymentMethod = searchParams.get("paymentMethod");
-    const cardId = searchParams.get("cardId");
-    const debitAccountId = searchParams.get("debitAccountId");
-    const concept = searchParams.get("concept");
-    const amount = searchParams.get("amount");
-
-
-    const where: Prisma.DailyExpenseWhereInput = { userId };
-
-    if (startDate || endDate) {
-      where.date = {};
-
-      if (startDate) {
-        where.date.gte = parseStartDate(startDate)!;
-      }
-
-      if (endDate) {
-        where.date.lte = parseEndDate(endDate)!;
-      }
-    }
-
-    if (categoryId && categoryId !== "ALL") {
-      where.categoryId = categoryId;
-    }
-
-    if (paymentMethod && paymentMethod !== "ALL") {
-      where.paymentMethod = paymentMethod as Prisma.EnumPaymentMethodFilter["equals"];
-    }
-
-    if (debitAccountId) where.debitAccountId = debitAccountId;
-    if (cardId && cardId !== "ALL") {
-      where.cardId = cardId;
-    }
-
-    if (concept?.trim()) {
-      where.concept = {
-        contains: concept.trim(),
-        mode: "insensitive",
-      };
-    }
-
-    if (amount?.trim()) {
-      const numericAmount = Number(amount);
-
-      if (Number.isFinite(numericAmount) && numericAmount >= 0) {
-        where.amount = numericAmount;
-      }
-    }
-
-    const [expenses, expenseDates] = await Promise.all([
-      prisma.dailyExpense.findMany({
-        where,
-        select: expenseSelect,
-        orderBy: [{ date: "desc" }, { createdAt: "desc" }],
-      }),
-      prisma.dailyExpense.findMany({
-        where: { userId },
-        select: {
-          date: true,
-        },
-        orderBy: [{ date: "desc" }],
-      }),
-    ]);
-
-    const total = expenses.reduce((sum, expense) => {
-      return sum + Number(expense.amount || 0);
-    }, 0);
-
-    return NextResponse.json({
-      expenses,
-      total,
-      personalTotal: sumPersonalExpenses(expenses),
-      availableMonths: getAvailableMonths(expenseDates),
-    });
+    let query;
+    try { query = expenseHistoryQuery(searchParams); }
+    catch { return NextResponse.json({ error: "Filtros o paginación no válidos." }, { status: 400 }); }
+    return NextResponse.json(await readExpenseHistory(prisma, userId, query, expenseSelect));
   } catch (error) {
     const accessResponse = apiAccessErrorResponse(error);
     if (accessResponse) return accessResponse;

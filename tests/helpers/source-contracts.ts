@@ -4,6 +4,12 @@ import type { EditorInput,EditorOutput } from '../../src/components/mi-dinero/ed
 
 // Ampliar por lote: siempre exports públicos derivados de la fuente real.
 export interface SourceModules {
+  'src/lib/dashboardDebts.ts': typeof import('../../src/lib/dashboardDebts');
+  'src/lib/historyWindow.ts': typeof import('../../src/lib/historyWindow');
+  'src/lib/expenseHistory.ts': typeof import('../../src/lib/expenseHistory');
+  'src/lib/nuHistory.ts': typeof import('../../src/lib/nuHistory');
+  'src/lib/dashboardReader.ts': typeof import('../../src/lib/dashboardReader');
+  'src/app/api/dashboard/summary/route.ts': typeof import('../../src/app/api/dashboard/summary/route');
   'src/lib/expenseReader.ts': typeof import('../../src/lib/expenseReader');
   'src/lib/financialContracts.ts': typeof import('../../src/lib/financialContracts');
   'src/lib/money/transferContracts.ts': typeof import('../../src/lib/money/transferContracts');

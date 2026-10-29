@@ -1,3 +1,4 @@
+import { historyFixtureMocks } from "./history-fixture";
 import type { Prisma } from '@prisma/client';
 import assert from 'node:assert/strict';
 
@@ -35,7 +36,7 @@ export function testReply(body: unknown, init: ResponseInit = {}): TestReply {
 // adaptador comprueba la respuesta del doble sin hacerla pasar por NextResponse.
 // Los exports de librerías conservan los tipos reales del cargador principal.
 export function financialLoader(mocks: Record<string, unknown> = {}, globals: SourceGlobals = {}) {
-  const load = sourceLoader(mocks, globals);
+  const load = sourceLoader(historyFixtureMocks(mocks), globals);
   function financialLoad<P extends keyof SourceModules>(file: P): AdaptedModule<P>;
   function financialLoad(file: string): unknown;
   function financialLoad(file: string): unknown {

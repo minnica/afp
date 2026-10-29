@@ -1,3 +1,4 @@
+import { historyFixtureMocks } from "./history-fixture";
 import assert from 'node:assert/strict';
 import { record } from './dynamic-values';
 import type { Sparse,TestRequest } from './financial-fixtures';
@@ -38,7 +39,7 @@ export interface IntegrationGlobals extends Omit<SourceGlobals, 'fetch'> { fetch
 // firmas reales; rutas dinámicas conservan unknown y requieren inspección.
 export function integrationLoader(mocks: IntegrationMocks = {}, globals: IntegrationGlobals = {}) {
   // El cargador vm acepta globals de prueba, incluidos transportes incompletos.
-  const load = fixtureSourceLoader(mocks, globals);
+  const load = fixtureSourceLoader(historyFixtureMocks(mocks), globals);
   function integrationLoad<P extends keyof SourceModules>(file: P): IntegrationModule<P>;
   function integrationLoad(file: string): unknown;
   function integrationLoad(file: string): unknown {

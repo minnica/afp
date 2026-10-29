@@ -1,0 +1,22 @@
+
+> afp@0.1.0 test /home/garatachia/projects/afp
+> node --import tsx tests/run-tests.ts financial-contracts-integration.test.ts
+
+TAP version 13
+(node:85953) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+# Subtest: PostgreSQL: contratos JSON de todos los flujos financieros, variantes y pago parcial
+ok 1 - PostgreSQL: contratos JSON de todos los flujos financieros, variantes y pago parcial
+  ---
+  duration_ms: 967.073229
+  type: 'test'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1168.349837

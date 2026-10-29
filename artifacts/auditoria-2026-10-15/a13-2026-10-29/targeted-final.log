@@ -1,0 +1,101 @@
+
+> afp@0.1.0 test /home/garatachia/projects/afp
+> node --import tsx tests/run-tests.ts history-window-integration.test.ts financial-contracts-integration.test.ts
+
+TAP version 13
+(node:111088) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+# Subtest: PostgreSQL: contratos JSON de todos los flujos financieros, variantes y pago parcial
+ok 1 - PostgreSQL: contratos JSON de todos los flujos financieros, variantes y pago parcial
+  ---
+  duration_ms: 956.013073
+  type: 'test'
+  ...
+# Subtest: A13 PostgreSQL: ventanas, páginas, referencias y resumen
+    # Subtest: páginas deterministas, Decimal y agregados de todo el filtro
+    ok 1 - páginas deterministas, Decimal y agregados de todo el filtro
+      ---
+      duration_ms: 169.950265
+      type: 'test'
+      ...
+    # Subtest: filtros móviles alternativos, acentos y sumas
+    ok 2 - filtros móviles alternativos, acentos y sumas
+      ---
+      duration_ms: 18.218292
+      type: 'test'
+      ...
+    # Subtest: bootstrap mantiene una página y los catálogos agrupados
+    ok 3 - bootstrap mantiene una página y los catálogos agrupados
+      ---
+      duration_ms: 26.002225
+      type: 'test'
+      ...
+    # Subtest: ciclos históricos paginados, detalle aislado y dueño
+    ok 4 - ciclos históricos paginados, detalle aislado y dueño
+      ---
+      duration_ms: 68.092858
+      type: 'test'
+      ...
+    # Subtest: conserva parciales antiguos y excluye el historial liquidado
+    ok 5 - conserva parciales antiguos y excluye el historial liquidado
+      ---
+      duration_ms: 136.967674
+      type: 'test'
+      ...
+    # Subtest: batch antiguo conserva la tarjeta ya pagada del mismo mes
+    ok 6 - batch antiguo conserva la tarjeta ya pagada del mismo mes
+      ---
+      duration_ms: 53.201929
+      type: 'test'
+      ...
+    # Subtest: ocurrencia confirmada fuera de ventana sustituye previsión sin duplicar
+    ok 7 - ocurrencia confirmada fuera de ventana sustituye previsión sin duplicar
+      ---
+      duration_ms: 54.784295
+      type: 'test'
+      ...
+    # Subtest: MSI antigua con ancla posterior conserva cuota verificada
+    ok 8 - MSI antigua con ancla posterior conserva cuota verificada
+      ---
+      duration_ms: 13.236862
+      type: 'test'
+      ...
+    # Subtest: resumen conserva avisos y consumo sin los comparativos anuales
+    ok 9 - resumen conserva avisos y consumo sin los comparativos anuales
+      ---
+      duration_ms: 62.993698
+      type: 'test'
+      ...
+    # Subtest: Turbo conserva la compra válida fuera de ventana y omite comisiones
+    ok 10 - Turbo conserva la compra válida fuera de ventana y omite comisiones
+      ---
+      duration_ms: 62.913698
+      type: 'test'
+      ...
+    # Subtest: Turbo conserva comprobante verificado antiguo sin descargar todos los estados
+    ok 11 - Turbo conserva comprobante verificado antiguo sin descargar todos los estados
+      ---
+      duration_ms: 34.059019
+      type: 'test'
+      ...
+    # Subtest: rechaza parámetros inválidos y autenticación ausente
+    ok 12 - rechaza parámetros inválidos y autenticación ausente
+      ---
+      duration_ms: 1.380177
+      type: 'test'
+      ...
+    1..12
+ok 2 - A13 PostgreSQL: ventanas, páginas, referencias y resumen
+  ---
+  duration_ms: 850.477383
+  type: 'test'
+  ...
+1..2
+# tests 14
+# suites 0
+# pass 14
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2060.109756

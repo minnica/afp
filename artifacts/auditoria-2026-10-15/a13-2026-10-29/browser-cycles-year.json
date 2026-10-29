@@ -1,0 +1,9 @@
+{
+  "apis": [
+    {
+      "status": 200,
+      "url": "?userId=00000000-0000-4000-8000-000000000094&year=2026&page=1"
+    }
+  ],
+  "year": "Anterior2026Siguiente"
+}

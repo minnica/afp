@@ -1,3 +1,4 @@
+import { expenseHistoryQuery, readExpenseHistory } from "@/lib/expenseHistory";
 import type { Prisma } from "@prisma/client";
 import { getDebtAccountState } from "@/lib/calculations/debtAccounts";
 import { apiResponse as NextResponse, requireApiUser, apiAccessErrorResponse } from "@/lib/apiAuth";
@@ -163,32 +164,6 @@ const subscriptionSelect = {
   },
 } satisfies Prisma.SubscriptionSelect;
 
-function parseStartDate(dateValue: string) {
-  if (!dateValue) return null;
-  return new Date(`${dateValue}T00:00:00.000Z`);
-}
-
-function parseEndDate(dateValue: string) {
-  if (!dateValue) return null;
-  return new Date(`${dateValue}T23:59:59.999Z`);
-}
-
-function getAvailableMonths(expenseDates: { date: Date }[]) {
-  const months = new Set<string>();
-
-  expenseDates.forEach((expense) => {
-    const date = new Date(expense.date);
-
-    if (Number.isNaN(date.getTime())) return;
-
-    const year = date.getUTCFullYear();
-    const month = String(date.getUTCMonth() + 1).padStart(2, "0");
-    months.add(`${year}-${month}`);
-  });
-
-  return Array.from(months).sort().reverse();
-}
-
 function formatReceivable(item: Prisma.ReceivableAccountGetPayload<{ select: typeof receivableSelect }>) {
   return { ...item, ...getDebtAccountState(item, item.incomes) };
 }
@@ -202,30 +177,14 @@ export async function GET(request: Request) {
     const user = await requireApiUser(request);
     const userId = user.id;
     const { searchParams } = new URL(request.url);
-    const startDate = searchParams.get("startDate");
-    const endDate = searchParams.get("endDate");
-
-
-    const expensesWhere: Prisma.DailyExpenseWhereInput = { userId };
-
-    if (startDate || endDate) {
-      expensesWhere.date = {};
-
-      if (startDate) {
-        expensesWhere.date.gte = parseStartDate(startDate)!;
-      }
-
-      if (endDate) {
-        expensesWhere.date.lte = parseEndDate(endDate)!;
-      }
-    }
-
+    let query;
+    try { query = expenseHistoryQuery(searchParams); }
+    catch { return NextResponse.json({ error: "Filtros o paginación no válidos." }, { status: 400 }); }
     const [
       categories,
       people,
       cards,
-      expenses,
-      expenseDates,
+      history,
       receivables,
       payables,
       subscriptions,
@@ -266,18 +225,7 @@ export async function GET(request: Request) {
         },
         orderBy: { name: "asc" },
       }),
-      prisma.dailyExpense.findMany({
-        where: expensesWhere,
-        select: expenseSelect,
-        orderBy: [{ date: "desc" }, { createdAt: "desc" }],
-      }),
-      prisma.dailyExpense.findMany({
-        where: { userId },
-        select: {
-          date: true,
-        },
-        orderBy: [{ date: "desc" }],
-      }),
+      readExpenseHistory(prisma, userId, query, expenseSelect),
       prisma.receivableAccount.findMany({
         where: { userId },
         select: receivableSelect,
@@ -309,8 +257,7 @@ export async function GET(request: Request) {
       categories,
       people,
       cards,
-      expenses,
-      availableMonths: getAvailableMonths(expenseDates),
+      ...history,
       receivables: receivables.map(formatReceivable),
       payables: payables.map(formatPayable),
       subscriptions,

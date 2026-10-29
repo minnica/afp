@@ -1,0 +1,17 @@
+{
+  "footer": "Total del filtro$357.05",
+  "requests": [
+    {
+      "status": 200,
+      "url": "/api/gastos/bootstrap?userId=00000000-0000-4000-8000-000000000094&startDate=2026-10-29&endDate=2026-10-29&page=1&pageSize=100"
+    },
+    {
+      "status": 200,
+      "url": "/api/subscription-charges?month=2026-10&today=2026-10-29"
+    }
+  ],
+  "rows": 100,
+  "summary": [
+    "208 gastos guardados · Total del filtro $357.05 · Tu parte $357.05"
+  ]
+}

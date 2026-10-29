@@ -1,0 +1,26 @@
+{
+  "apis": [
+    {
+      "status": 200,
+      "url": "/api/gastos/bootstrap?userId=00000000-0000-4000-8000-000000000094&startDate=2026-10-29&endDate=2026-10-29&page=1&pageSize=100"
+    },
+    {
+      "status": 200,
+      "url": "/api/dashboard/summary?userId=00000000-0000-4000-8000-000000000094&clientDate=2026-10-29"
+    },
+    {
+      "status": 200,
+      "url": "/api/notice-dismissals?month=2026-10"
+    },
+    {
+      "status": 200,
+      "url": "/api/subscription-charges?month=2026-10&today=2026-10-29"
+    }
+  ],
+  "text": "2026\nMétodo de pago\nEfectivo\nTarjeta\nDébito\nGasto compartido\nEfectivo\nActiva si ya te aportaron efectivo para este gasto.\nNotas (opcional)\nMás opciones\nMostrar\nCerrar\nGuardar gasto",
+  "viewport": {
+    "height": 844,
+    "overflow": false,
+    "width": 390
+  }
+}

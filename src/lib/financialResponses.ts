@@ -41,6 +41,7 @@ export const financialReadSchemas = {
   payables: z.object({ payables: z.array(payableResponseSchema) }),
   'gastos/bootstrap': z.object({ categories: z.array(named), people: z.array(named), cards: z.array(cardResponseSchema), expenses: z.array(expenseResponseSchema), availableMonths: z.array(z.string()), receivables: z.array(receivableResponseSchema), payables: z.array(payableResponseSchema), subscriptions: z.array(subscriptionResponseSchema), moneyAccounts: z.array(named) }),
   dashboard: dashboardResponseSchema,
+  "dashboard/summary": dashboardResponseSchema.pick({ importantNotices: true, cardUsageWaiversCurrent: true, cardUsageWaiverHistory: true }),
   'notice-dismissals': z.object({ dismissals: z.array(z.object({ month: z.string(), noticeKey: z.string() })) }),
 };
 export type FinancialResource = keyof typeof financialReadSchemas;

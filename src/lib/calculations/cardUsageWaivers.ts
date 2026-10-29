@@ -50,11 +50,14 @@ function normalizeUsageText(value: unknown) {
   return String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase().trim();
 }
 
+export const usageExclusionPattern = /^(?:IVA\b.*(?:COMISION|INTERES)|COMISION(?:ES)?\b.*(?:ADMINISTRACION|TARJETA|INACTIVIDAD|PAGO TARDIO|PENALIZACION|BANCARIA|HSBC|BANAMEX|SANTANDER)|ADMINISTRACION (?:DE )?(?:LA )?TARJETA\b|PENALIZACION (?:POR )?(?:PAGO TARDIO|INACTIVIDAD)|INTERESES?(?:\s+(?:HSBC|BANAMEX|SANTANDER|ORDINARIOS|MORATORIOS)|$)|ANUALIDAD\b|GASTOS DE COBRANZA\b)/;
+export const nuNonPurchasePattern = /^(?:IVA\b|COMISION(?:ES)?\b|INTERESES?\b|(?:RETIRO|DISPOSICION)\b.*EFECTIVO)/;
+
 export function getUsageExclusion(expense: { notes?: string | null; concept?: unknown }) {
   // La descripción bancaria de la nota conserva la clasificación al renombrar el gasto.
   const original = String(expense.notes || "").match(/concepto bancario(?: original)?\s*:\s*([^;\n]+)/i)?.[1];
   const concept = normalizeUsageText(original || expense.concept);
-  if ((original && /^COMISION(?:ES)?\b/.test(concept)) || /^(?:IVA\b.*(?:COMISION|INTERES)|COMISION(?:ES)?\b.*(?:ADMINISTRACION|TARJETA|INACTIVIDAD|PAGO TARDIO|PENALIZACION|BANCARIA|HSBC|BANAMEX|SANTANDER)|ADMINISTRACION (?:DE )?(?:LA )?TARJETA\b|PENALIZACION (?:POR )?(?:PAGO TARDIO|INACTIVIDAD)|INTERESES?(?:\s+(?:HSBC|BANAMEX|SANTANDER|ORDINARIOS|MORATORIOS)|$)|ANUALIDAD\b|GASTOS DE COBRANZA\b)/.test(concept)) {
+  if ((original && /^COMISION(?:ES)?\b/.test(concept)) || usageExclusionPattern.test(concept)) {
     return "Comisión, interés o impuesto bancario";
   }
   return null;
@@ -87,7 +90,7 @@ function buildNuTurboUsage({ card, cyclesWithAmounts, expenses, subscriptions, p
     .map(verifiedUsageStatement).filter((item): item is NonNullable<typeof item> => Boolean(item));
   const excludedIds = new Set(statements.flatMap((statement) => statement.excludedExpenseIds || []));
   const isPurchase = (entry: { concept?: unknown; notes?: string | null }) => !getUsageExclusion(entry)
-    && !/^(?:IVA\b|COMISION(?:ES)?\b|INTERESES?\b|(?:RETIRO|DISPOSICION)\b.*EFECTIVO)/.test(normalizeUsageText(entry.concept));
+    && !nuNonPurchasePattern.test(normalizeUsageText(entry.concept));
   const add = (entry: { id: string; concept: string; amount: unknown; date: DateValue }) => {
     const date = entry.date && usageDay(entry.date);
     if (!date || date > today || !Number.isFinite(Number(entry.amount)) || Number(entry.amount) <= 0) return;

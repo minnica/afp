@@ -1,0 +1,293 @@
+
+> afp@0.1.0 test /home/garatachia/projects/afp
+> node --import tsx tests/run-tests.ts history-window-integration.test.ts dashboard-breakdowns.test.ts card-cycle-payments.test.ts
+
+TAP version 13
+# Subtest: el detalle de captura calcula el saldo con importes sin necesitar fechas del corte
+ok 1 - el detalle de captura calcula el saldo con importes sin necesitar fechas del corte
+  ---
+  duration_ms: 1.459318
+  type: 'test'
+  ...
+# Subtest: las fechas reales se confirman al guardar, incluso sin cambiarlas; importe y pago no las confirman
+ok 2 - las fechas reales se confirman al guardar, incluso sin cambiarlas; importe y pago no las confirman
+  ---
+  duration_ms: 47.334533
+  type: 'test'
+  ...
+# Subtest: fechas inválidas o un guardado fallido no registran confirmación
+ok 3 - fechas inválidas o un guardado fallido no registran confirmación
+  ---
+  duration_ms: 35.770215
+  type: 'test'
+  ...
+# Subtest: un peso de mil conserva 999 pendientes, aun con PAID/paidAt históricos
+ok 4 - un peso de mil conserva 999 pendientes, aun con PAID/paidAt históricos
+  ---
+  duration_ms: 0.21078
+  type: 'test'
+  ...
+# Subtest: el pago sigue vigente todo el día bancario de vencimiento
+ok 5 - el pago sigue vigente todo el día bancario de vencimiento
+  ---
+  duration_ms: 0.47494
+  type: 'test'
+  ...
+# Subtest: solo vence al empezar el día de México siguiente, incluidos cambios de mes y año
+ok 6 - solo vence al empezar el día de México siguiente, incluidos cambios de mes y año
+  ---
+  duration_ms: 0.29571
+  type: 'test'
+  ...
+# Subtest: el corte se presenta desde el inicio de su día bancario
+ok 7 - el corte se presenta desde el inicio de su día bancario
+  ---
+  duration_ms: 0.17698
+  type: 'test'
+  ...
+# Subtest: Dashboard usa la fecha del cliente para el estado y el aviso de vencimiento
+ok 8 - Dashboard usa la fecha del cliente para el estado y el aviso de vencimiento
+  ---
+  duration_ms: 45.303306
+  type: 'test'
+  ...
+# Subtest: A04: listado, Dashboard sin clientDate y PATCH conservan el mismo día de México
+ok 9 - A04: listado, Dashboard sin clientDate y PATCH conservan el mismo día de México
+  ---
+  duration_ms: 375.534283
+  type: 'test'
+  ...
+# Subtest: Dashboard rechaza clientDate vacío, imposible o con hora antes de consultar datos
+ok 10 - Dashboard rechaza clientDate vacío, imposible o con hora antes de consultar datos
+  ---
+  duration_ms: 40.3871
+  type: 'test'
+  ...
+# Subtest: centavos, excedente, cero y falta de estado tienen situaciones distintas
+ok 11 - centavos, excedente, cero y falta de estado tienen situaciones distintas
+  ---
+  duration_ms: 0.26561
+  type: 'test'
+  ...
+# Subtest: PATCH, listado, Dashboard y avisos comparten saldo sin reducir el total mensual
+ok 12 - PATCH, listado, Dashboard y avisos comparten saldo sin reducir el total mensual
+  ---
+  duration_ms: 54.522287
+  type: 'test'
+  ...
+# Subtest: lecturas corrigen PAID antiguo sin escribir ni ocultar avisos parciales
+ok 13 - lecturas corrigen PAID antiguo sin escribir ni ocultar avisos parciales
+  ---
+  duration_ms: 36.795014
+  type: 'test'
+  ...
+# Subtest: cero numérico y texto cierran sin pago ficticio y sin avisos de vencimiento
+ok 14 - cero numérico y texto cierran sin pago ficticio y sin avisos de vencimiento
+  ---
+  duration_ms: 101.103891
+  type: 'test'
+  ...
+# Subtest: editar el estado recalcula pago completo, parcial, excedente y cero; deshacer reabre
+ok 15 - editar el estado recalcula pago completo, parcial, excedente y cero; deshacer reabre
+  ---
+  duration_ms: 37.447473
+  type: 'test'
+  ...
+# Subtest: guardar total reemplaza el anterior; repetir no acumula y disminuir reabre
+ok 16 - guardar total reemplaza el anterior; repetir no acumula y disminuir reabre
+  ---
+  duration_ms: 34.051447
+  type: 'test'
+  ...
+# Subtest: rechaza importes ambiguos, fechas imposibles y pago sin estado capturado
+ok 17 - rechaza importes ambiguos, fechas imposibles y pago sin estado capturado
+  ---
+  duration_ms: 71.61748
+  type: 'test'
+  ...
+# Subtest: fallo de escritura revierte el cambio y el estado dentro de la transacción
+ok 18 - fallo de escritura revierte el cambio y el estado dentro de la transacción
+  ---
+  duration_ms: 32.371068
+  type: 'test'
+  ...
+# Subtest: BBVA: devolución posterior liquida septiembre sin modificar estado, pago ni cálculo de cargos
+ok 19 - BBVA: devolución posterior liquida septiembre sin modificar estado, pago ni cálculo de cargos
+  ---
+  duration_ms: 49.963751
+  type: 'test'
+  ...
+# Subtest: reducir o retirar devolución reabre el saldo y los avisos; deshacer pago conserva la devolución
+ok 20 - reducir o retirar devolución reabre el saldo y los avisos; deshacer pago conserva la devolución
+  ---
+  duration_ms: 52.967588
+  type: 'test'
+  ...
+# Subtest: devolución total cubre sin pago ficticio; parcial sin pago conserva avisos; excedente se informa
+ok 21 - devolución total cubre sin pago ficticio; parcial sin pago conserva avisos; excedente se informa
+  ---
+  duration_ms: 65.521726
+  type: 'test'
+  ...
+# Subtest: bonificaciones de cargos y otro corte no descuentan de nuevo una devolución del pago
+ok 22 - bonificaciones de cargos y otro corte no descuentan de nuevo una devolución del pago
+  ---
+  duration_ms: 0.22413
+  type: 'test'
+  ...
+# Subtest: devoluciones: validación de importe, evidencia, fecha, corte y propietario sin escrituras
+ok 23 - devoluciones: validación de importe, evidencia, fecha, corte y propietario sin escrituras
+  ---
+  duration_ms: 68.177473
+  type: 'test'
+  ...
+# Subtest: editar estado o fechas conserva coherencia de la devolución y rollback conserva evidencia
+ok 24 - editar estado o fechas conserva coherencia de la devolución y rollback conserva evidencia
+  ---
+  duration_ms: 32.515908
+  type: 'test'
+  ...
+# Subtest: gastos compartidos: semanas, categorías y tarjetas usan la parte personal y el banco conserva el cargo
+ok 25 - gastos compartidos: semanas, categorías y tarjetas usan la parte personal y el banco conserva el cargo
+  ---
+  duration_ms: 2.159038
+  type: 'test'
+  ...
+# Subtest: aportaciones: respeta el día UTC del corte, el estado cero y la cobertura completa
+ok 26 - aportaciones: respeta el día UTC del corte, el estado cero y la cobertura completa
+  ---
+  duration_ms: 0.3201
+  type: 'test'
+  ...
+# Subtest: cero bancario prevalece sobre estimación y no genera aviso de pago
+ok 27 - cero bancario prevalece sobre estimación y no genera aviso de pago
+  ---
+  duration_ms: 0.16149
+  type: 'test'
+  ...
+# Subtest: cuotas mensuales no se acortan con pagos previos ni siguen fuera del plazo
+ok 28 - cuotas mensuales no se acortan con pagos previos ni siguen fuera del plazo
+  ---
+  duration_ms: 0.305779
+  type: 'test'
+  ...
+# Subtest: gasto vinculado sustituye previsión también al cambiar categoría o método
+ok 29 - gasto vinculado sustituye previsión también al cambiar categoría o método
+  ---
+  duration_ms: 0.48522
+  type: 'test'
+  ...
+# Subtest: baja en el mismo día conserva cargo en resúmenes y desglose
+ok 30 - baja en el mismo día conserva cargo en resúmenes y desglose
+  ---
+  duration_ms: 0.09305
+  type: 'test'
+  ...
+# Subtest: descuento conciliado conserva importe en categorías, semanas y ciclo
+ok 31 - descuento conciliado conserva importe en categorías, semanas y ciclo
+  ---
+  duration_ms: 0.768299
+  type: 'test'
+  ...
+# Subtest: fechas consecutivas, solapadas y con huecos se distinguen sin mutar ciclos
+ok 32 - fechas consecutivas, solapadas y con huecos se distinguen sin mutar ciclos
+  ---
+  duration_ms: 0.13363
+  type: 'test'
+  ...
+# Subtest: API listado/detalle devuelve mismos importes y obtiene vínculos de gastos
+ok 33 - API listado/detalle devuelve mismos importes y obtiene vínculos de gastos
+  ---
+  duration_ms: 63.442668
+  type: 'test'
+  ...
+# Subtest: API conserva diciembre anterior para enero sin mezclar diciembre futuro
+ok 34 - API conserva diciembre anterior para enero sin mezclar diciembre futuro
+  ---
+  duration_ms: 31.114799
+  type: 'test'
+  ...
+# Subtest: API separa consumo vigente e historial sin cambiar los cortes financieros
+ok 35 - API separa consumo vigente e historial sin cambiar los cortes financieros
+  ---
+  duration_ms: 32.682849
+  type: 'test'
+  ...
+# Subtest: omitir o confirmar por período retira la previsión y el aviso de efectivo
+ok 36 - omitir o confirmar por período retira la previsión y el aviso de efectivo
+  ---
+  duration_ms: 0.22157
+  type: 'test'
+  ...
+(node:64059) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+# Subtest: A13 PostgreSQL: ventanas, páginas, referencias y resumen
+    # Subtest: páginas deterministas, Decimal y agregados de todo el filtro
+    ok 1 - páginas deterministas, Decimal y agregados de todo el filtro
+      ---
+      duration_ms: 201.981943
+      type: 'test'
+      ...
+    # Subtest: filtros móviles alternativos, acentos y sumas
+    ok 2 - filtros móviles alternativos, acentos y sumas
+      ---
+      duration_ms: 18.516442
+      type: 'test'
+      ...
+    # Subtest: bootstrap mantiene una página y los catálogos agrupados
+    ok 3 - bootstrap mantiene una página y los catálogos agrupados
+      ---
+      duration_ms: 32.223509
+      type: 'test'
+      ...
+    # Subtest: ciclos históricos paginados, detalle aislado y dueño
+    ok 4 - ciclos históricos paginados, detalle aislado y dueño
+      ---
+      duration_ms: 54.836606
+      type: 'test'
+      ...
+    # Subtest: conserva parciales antiguos y excluye el historial liquidado
+    ok 5 - conserva parciales antiguos y excluye el historial liquidado
+      ---
+      duration_ms: 86.474126
+      type: 'test'
+      ...
+    # Subtest: MSI antigua con ancla posterior conserva cuota verificada
+    ok 6 - MSI antigua con ancla posterior conserva cuota verificada
+      ---
+      duration_ms: 24.446556
+      type: 'test'
+      ...
+    # Subtest: resumen conserva avisos y consumo sin los comparativos anuales
+    ok 7 - resumen conserva avisos y consumo sin los comparativos anuales
+      ---
+      duration_ms: 53.142638
+      type: 'test'
+      ...
+    # Subtest: Turbo conserva la compra válida fuera de ventana y omite comisiones
+    ok 8 - Turbo conserva la compra válida fuera de ventana y omite comisiones
+      ---
+      duration_ms: 64.682777
+      type: 'test'
+      ...
+    # Subtest: rechaza parámetros inválidos y autenticación ausente
+    ok 9 - rechaza parámetros inválidos y autenticación ausente
+      ---
+      duration_ms: 1.231889
+      type: 'test'
+      ...
+    1..9
+ok 37 - A13 PostgreSQL: ventanas, páginas, referencias y resumen
+  ---
+  duration_ms: 872.019828
+  type: 'test'
+  ...
+1..37
+# tests 46
+# suites 0
+# pass 46
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2491.463784

@@ -1,0 +1,2065 @@
+{
+  "baselineCommit": "948bc319a9c55d5dcc75852994662611cf36f6f5",
+  "node": "v22.23.2",
+  "postgres": "16 (contenedor local)",
+  "measuredAt": "2026-10-29T17:41:41.879Z",
+  "baselineMeasuredAt": "2026-10-29T17:37:11.138Z",
+  "methodology": "Procesos independientes, un calentamiento y cinco repeticiones; p95 nearest-rank. Bytes JSON sin compresión. SQL contado por eventos Prisma; bytes devueltos por operaciones superiores, relaciones incluidas. Heap observado en fronteras de consultas/respuesta, no máximo absoluto. RSS máximo del proceso completo. Auth simulada; sin red HTTP ni navegador.",
+  "results": [
+    {
+      "historicalExpenses": 1000,
+      "mode": "dashboard",
+      "variant": "before",
+      "repetitions": 5,
+      "p50Ms": 372.910394,
+      "p95Ms": 569.5137179999999,
+      "queries": [
+        24
+      ],
+      "responseBytes": 138511,
+      "databaseBytes": 637956,
+      "p95ObservedHeapGrowthBytes": 17916976,
+      "maxRssKiB": 301564,
+      "samples": [
+        {
+          "ms": 369.8029180000001,
+          "queries": 24,
+          "responseBytes": 138511,
+          "databaseBytes": 637956,
+          "retainedHeapBytes": 18066600,
+          "observedHeapGrowthBytes": 17916976
+        },
+        {
+          "ms": 569.5137179999999,
+          "queries": 24,
+          "responseBytes": 138511,
+          "databaseBytes": 637956,
+          "retainedHeapBytes": 11519360,
+          "observedHeapGrowthBytes": 12010960
+        },
+        {
+          "ms": 372.910394,
+          "queries": 24,
+          "responseBytes": 138511,
+          "databaseBytes": 637956,
+          "retainedHeapBytes": 10981024,
+          "observedHeapGrowthBytes": 15381256
+        },
+        {
+          "ms": 378.56000600000016,
+          "queries": 24,
+          "responseBytes": 138511,
+          "databaseBytes": 637956,
+          "retainedHeapBytes": 15013192,
+          "observedHeapGrowthBytes": 15672656
+        },
+        {
+          "ms": 351.860901,
+          "queries": 24,
+          "responseBytes": 138511,
+          "databaseBytes": 637956,
+          "retainedHeapBytes": 10177024,
+          "observedHeapGrowthBytes": 13937568
+        }
+      ]
+    },
+    {
+      "historicalExpenses": 1000,
+      "mode": "dashboard",
+      "variant": "after",
+      "repetitions": 5,
+      "p50Ms": 57.954908000000046,
+      "p95Ms": 61.076213999999936,
+      "queries": [
+        27
+      ],
+      "responseBytes": 31457,
+      "databaseBytes": 52128,
+      "p95ObservedHeapGrowthBytes": 9233048,
+      "maxRssKiB": 329204,
+      "samples": [
+        {
+          "ms": 57.954908000000046,
+          "queries": 27,
+          "responseBytes": 31457,
+          "databaseBytes": 52128,
+          "retainedHeapBytes": 9282912,
+          "observedHeapGrowthBytes": 9233048
+        },
+        {
+          "ms": 61.076213999999936,
+          "queries": 27,
+          "responseBytes": 31457,
+          "databaseBytes": 52128,
+          "retainedHeapBytes": 8365288,
+          "observedHeapGrowthBytes": 8331264
+        },
+        {
+          "ms": 59.1574260000001,
+          "queries": 27,
+          "responseBytes": 31457,
+          "databaseBytes": 52128,
+          "retainedHeapBytes": 8388336,
+          "observedHeapGrowthBytes": 8354312
+        },
+        {
+          "ms": 50.956709000000046,
+          "queries": 27,
+          "responseBytes": 31457,
+          "databaseBytes": 52128,
+          "retainedHeapBytes": 8895528,
+          "observedHeapGrowthBytes": 8830296
+        },
+        {
+          "ms": 57.05644900000004,
+          "queries": 27,
+          "responseBytes": 31457,
+          "databaseBytes": 52128,
+          "retainedHeapBytes": 8247648,
+          "observedHeapGrowthBytes": 8213624
+        }
+      ]
+    },
+    {
+      "historicalExpenses": 1000,
+      "mode": "header",
+      "variant": "before",
+      "repetitions": 5,
+      "p50Ms": 372.910394,
+      "p95Ms": 569.5137179999999,
+      "queries": [
+        24
+      ],
+      "responseBytes": 138511,
+      "databaseBytes": 637956,
+      "p95ObservedHeapGrowthBytes": 17916976,
+      "maxRssKiB": 301564,
+      "samples": [
+        {
+          "ms": 369.8029180000001,
+          "queries": 24,
+          "responseBytes": 138511,
+          "databaseBytes": 637956,
+          "retainedHeapBytes": 18066600,
+          "observedHeapGrowthBytes": 17916976
+        },
+        {
+          "ms": 569.5137179999999,
+          "queries": 24,
+          "responseBytes": 138511,
+          "databaseBytes": 637956,
+          "retainedHeapBytes": 11519360,
+          "observedHeapGrowthBytes": 12010960
+        },
+        {
+          "ms": 372.910394,
+          "queries": 24,
+          "responseBytes": 138511,
+          "databaseBytes": 637956,
+          "retainedHeapBytes": 10981024,
+          "observedHeapGrowthBytes": 15381256
+        },
+        {
+          "ms": 378.56000600000016,
+          "queries": 24,
+          "responseBytes": 138511,
+          "databaseBytes": 637956,
+          "retainedHeapBytes": 15013192,
+          "observedHeapGrowthBytes": 15672656
+        },
+        {
+          "ms": 351.860901,
+          "queries": 24,
+          "responseBytes": 138511,
+          "databaseBytes": 637956,
+          "retainedHeapBytes": 10177024,
+          "observedHeapGrowthBytes": 13937568
+        }
+      ],
+      "reusedDashboardBaseline": true
+    },
+    {
+      "historicalExpenses": 1000,
+      "mode": "header",
+      "variant": "after",
+      "repetitions": 5,
+      "p50Ms": 34.03400199999999,
+      "p95Ms": 41.89903099999992,
+      "queries": [
+        25
+      ],
+      "responseBytes": 80,
+      "databaseBytes": 46148,
+      "p95ObservedHeapGrowthBytes": 4589600,
+      "maxRssKiB": 302480,
+      "samples": [
+        {
+          "ms": 41.89903099999992,
+          "queries": 25,
+          "responseBytes": 80,
+          "databaseBytes": 46148,
+          "retainedHeapBytes": 4594128,
+          "observedHeapGrowthBytes": 4589600
+        },
+        {
+          "ms": 36.82140800000002,
+          "queries": 25,
+          "responseBytes": 80,
+          "databaseBytes": 46148,
+          "retainedHeapBytes": 4091632,
+          "observedHeapGrowthBytes": 4091048
+        },
+        {
+          "ms": 32.064404999999965,
+          "queries": 25,
+          "responseBytes": 80,
+          "databaseBytes": 46148,
+          "retainedHeapBytes": 3944384,
+          "observedHeapGrowthBytes": 3943800
+        },
+        {
+          "ms": 34.03400199999999,
+          "queries": 25,
+          "responseBytes": 80,
+          "databaseBytes": 46148,
+          "retainedHeapBytes": 3835176,
+          "observedHeapGrowthBytes": 3834592
+        },
+        {
+          "ms": 32.777653999999984,
+          "queries": 25,
+          "responseBytes": 80,
+          "databaseBytes": 46148,
+          "retainedHeapBytes": 3841992,
+          "observedHeapGrowthBytes": 3841408
+        }
+      ]
+    },
+    {
+      "historicalExpenses": 1000,
+      "mode": "cycles",
+      "variant": "before",
+      "repetitions": 5,
+      "p50Ms": 369.14577899999995,
+      "p95Ms": 392.742878,
+      "queries": [
+        16
+      ],
+      "responseBytes": 121712,
+      "databaseBytes": 612688,
+      "p95ObservedHeapGrowthBytes": 16771984,
+      "maxRssKiB": 298700,
+      "samples": [
+        {
+          "ms": 376.72633900000005,
+          "queries": 16,
+          "responseBytes": 121712,
+          "databaseBytes": 612688,
+          "retainedHeapBytes": 8056928,
+          "observedHeapGrowthBytes": 16771984
+        },
+        {
+          "ms": 369.14577899999995,
+          "queries": 16,
+          "responseBytes": 121712,
+          "databaseBytes": 612688,
+          "retainedHeapBytes": 7356576,
+          "observedHeapGrowthBytes": 13033824
+        },
+        {
+          "ms": 392.742878,
+          "queries": 16,
+          "responseBytes": 121712,
+          "databaseBytes": 612688,
+          "retainedHeapBytes": 9761336,
+          "observedHeapGrowthBytes": 10363840
+        },
+        {
+          "ms": 335.9833819999999,
+          "queries": 16,
+          "responseBytes": 121712,
+          "databaseBytes": 612688,
+          "retainedHeapBytes": 6455736,
+          "observedHeapGrowthBytes": 12516784
+        },
+        {
+          "ms": 340.8411460000002,
+          "queries": 16,
+          "responseBytes": 121712,
+          "databaseBytes": 612688,
+          "retainedHeapBytes": 6596296,
+          "observedHeapGrowthBytes": 15519344
+        }
+      ]
+    },
+    {
+      "historicalExpenses": 1000,
+      "mode": "cycles",
+      "variant": "after",
+      "repetitions": 5,
+      "p50Ms": 49.63220000000001,
+      "p95Ms": 55.10719300000005,
+      "queries": [
+        20
+      ],
+      "responseBytes": 12178,
+      "databaseBytes": 49204,
+      "p95ObservedHeapGrowthBytes": 5693504,
+      "maxRssKiB": 321824,
+      "samples": [
+        {
+          "ms": 52.59069599999998,
+          "queries": 20,
+          "responseBytes": 12178,
+          "databaseBytes": 49204,
+          "retainedHeapBytes": 5707920,
+          "observedHeapGrowthBytes": 5693504
+        },
+        {
+          "ms": 43.80075799999997,
+          "queries": 20,
+          "responseBytes": 12178,
+          "databaseBytes": 49204,
+          "retainedHeapBytes": 4774568,
+          "observedHeapGrowthBytes": 4761896
+        },
+        {
+          "ms": 49.23658999999998,
+          "queries": 20,
+          "responseBytes": 12178,
+          "databaseBytes": 49204,
+          "retainedHeapBytes": 4810008,
+          "observedHeapGrowthBytes": 4797336
+        },
+        {
+          "ms": 49.63220000000001,
+          "queries": 20,
+          "responseBytes": 12178,
+          "databaseBytes": 49204,
+          "retainedHeapBytes": 4908936,
+          "observedHeapGrowthBytes": 4896264
+        },
+        {
+          "ms": 55.10719300000005,
+          "queries": 20,
+          "responseBytes": 12178,
+          "databaseBytes": 49204,
+          "retainedHeapBytes": 4925960,
+          "observedHeapGrowthBytes": 4913288
+        }
+      ]
+    },
+    {
+      "historicalExpenses": 1000,
+      "mode": "detail",
+      "variant": "before",
+      "repetitions": 5,
+      "p50Ms": 34.35201500000005,
+      "p95Ms": 46.85705900000005,
+      "queries": [
+        16
+      ],
+      "responseBytes": 27612,
+      "databaseBytes": 612688,
+      "p95ObservedHeapGrowthBytes": 17272080,
+      "maxRssKiB": 299500,
+      "samples": [
+        {
+          "ms": 39.66451899999993,
+          "queries": 16,
+          "responseBytes": 27612,
+          "databaseBytes": 612688,
+          "retainedHeapBytes": 3619224,
+          "observedHeapGrowthBytes": 16737472
+        },
+        {
+          "ms": 34.35201500000005,
+          "queries": 16,
+          "responseBytes": 27612,
+          "databaseBytes": 612688,
+          "retainedHeapBytes": 17301696,
+          "observedHeapGrowthBytes": 17272080
+        },
+        {
+          "ms": 46.85705900000005,
+          "queries": 16,
+          "responseBytes": 27612,
+          "databaseBytes": 612688,
+          "retainedHeapBytes": 5726672,
+          "observedHeapGrowthBytes": 10483920
+        },
+        {
+          "ms": 32.590208000000075,
+          "queries": 16,
+          "responseBytes": 27612,
+          "databaseBytes": 612688,
+          "retainedHeapBytes": 17045496,
+          "observedHeapGrowthBytes": 17015880
+        },
+        {
+          "ms": 31.26226900000006,
+          "queries": 16,
+          "responseBytes": 27612,
+          "databaseBytes": 612688,
+          "retainedHeapBytes": 17116088,
+          "observedHeapGrowthBytes": 17086472
+        }
+      ]
+    },
+    {
+      "historicalExpenses": 1000,
+      "mode": "detail",
+      "variant": "after",
+      "repetitions": 5,
+      "p50Ms": 28.464439999999968,
+      "p95Ms": 30.70440599999995,
+      "queries": [
+        20
+      ],
+      "responseBytes": 27612,
+      "databaseBytes": 40126,
+      "p95ObservedHeapGrowthBytes": 3597624,
+      "maxRssKiB": 310328,
+      "samples": [
+        {
+          "ms": 30.70440599999995,
+          "queries": 20,
+          "responseBytes": 27612,
+          "databaseBytes": 40126,
+          "retainedHeapBytes": 3628984,
+          "observedHeapGrowthBytes": 3597624
+        },
+        {
+          "ms": 29.477007999999955,
+          "queries": 20,
+          "responseBytes": 27612,
+          "databaseBytes": 40126,
+          "retainedHeapBytes": 3433984,
+          "observedHeapGrowthBytes": 3404368
+        },
+        {
+          "ms": 19.006754,
+          "queries": 20,
+          "responseBytes": 27612,
+          "databaseBytes": 40126,
+          "retainedHeapBytes": 3004576,
+          "observedHeapGrowthBytes": 2974960
+        },
+        {
+          "ms": 28.464439999999968,
+          "queries": 20,
+          "responseBytes": 27612,
+          "databaseBytes": 40126,
+          "retainedHeapBytes": 3034144,
+          "observedHeapGrowthBytes": 3002144
+        },
+        {
+          "ms": 15.271148999999923,
+          "queries": 20,
+          "responseBytes": 27612,
+          "databaseBytes": 40126,
+          "retainedHeapBytes": 2916368,
+          "observedHeapGrowthBytes": 2886752
+        }
+      ]
+    },
+    {
+      "historicalExpenses": 1000,
+      "mode": "expenses",
+      "variant": "before",
+      "repetitions": 5,
+      "p50Ms": 19.47329400000001,
+      "p95Ms": 24.979967999999985,
+      "queries": [
+        11
+      ],
+      "responseBytes": 90512,
+      "databaseBytes": 129692,
+      "p95ObservedHeapGrowthBytes": 7904504,
+      "maxRssKiB": 302400,
+      "samples": [
+        {
+          "ms": 22.52437000000009,
+          "queries": 11,
+          "responseBytes": 90512,
+          "databaseBytes": 129692,
+          "retainedHeapBytes": 8003952,
+          "observedHeapGrowthBytes": 7904504
+        },
+        {
+          "ms": 16.178008999999975,
+          "queries": 11,
+          "responseBytes": 90512,
+          "databaseBytes": 129692,
+          "retainedHeapBytes": 7254304,
+          "observedHeapGrowthBytes": 7163152
+        },
+        {
+          "ms": 24.979967999999985,
+          "queries": 11,
+          "responseBytes": 90512,
+          "databaseBytes": 129692,
+          "retainedHeapBytes": 7010696,
+          "observedHeapGrowthBytes": 6839464
+        },
+        {
+          "ms": 19.47329400000001,
+          "queries": 11,
+          "responseBytes": 90512,
+          "databaseBytes": 129692,
+          "retainedHeapBytes": 7042008,
+          "observedHeapGrowthBytes": 6884744
+        },
+        {
+          "ms": 14.80292099999997,
+          "queries": 11,
+          "responseBytes": 90512,
+          "databaseBytes": 129692,
+          "retainedHeapBytes": 6938664,
+          "observedHeapGrowthBytes": 6781176
+        }
+      ]
+    },
+    {
+      "historicalExpenses": 1000,
+      "mode": "expenses",
+      "variant": "after",
+      "repetitions": 5,
+      "p50Ms": 27.454031999999984,
+      "p95Ms": 30.585317000000032,
+      "queries": [
+        14
+      ],
+      "responseBytes": 90553,
+      "databaseBytes": 95428,
+      "p95ObservedHeapGrowthBytes": 8912672,
+      "maxRssKiB": 312140,
+      "samples": [
+        {
+          "ms": 30.52960699999994,
+          "queries": 14,
+          "responseBytes": 90553,
+          "databaseBytes": 95428,
+          "retainedHeapBytes": 9070976,
+          "observedHeapGrowthBytes": 8912672
+        },
+        {
+          "ms": 30.585317000000032,
+          "queries": 14,
+          "responseBytes": 90553,
+          "databaseBytes": 95428,
+          "retainedHeapBytes": 8386312,
+          "observedHeapGrowthBytes": 8230320
+        },
+        {
+          "ms": 27.454031999999984,
+          "queries": 14,
+          "responseBytes": 90553,
+          "databaseBytes": 95428,
+          "retainedHeapBytes": 8009904,
+          "observedHeapGrowthBytes": 7914912
+        },
+        {
+          "ms": 26.831542000000013,
+          "queries": 14,
+          "responseBytes": 90553,
+          "databaseBytes": 95428,
+          "retainedHeapBytes": 7511992,
+          "observedHeapGrowthBytes": 7355496
+        },
+        {
+          "ms": 21.961730000000102,
+          "queries": 14,
+          "responseBytes": 90553,
+          "databaseBytes": 95428,
+          "retainedHeapBytes": 7486704,
+          "observedHeapGrowthBytes": 7330208
+        }
+      ]
+    },
+    {
+      "historicalExpenses": 1000,
+      "mode": "bootstrap",
+      "variant": "before",
+      "repetitions": 5,
+      "p50Ms": 21.52961199999993,
+      "p95Ms": 24.35179800000003,
+      "queries": [
+        24
+      ],
+      "responseBytes": 90977,
+      "databaseBytes": 130111,
+      "p95ObservedHeapGrowthBytes": 8525248,
+      "maxRssKiB": 285468,
+      "samples": [
+        {
+          "ms": 24.35179800000003,
+          "queries": 24,
+          "responseBytes": 90977,
+          "databaseBytes": 130111,
+          "retainedHeapBytes": 8618272,
+          "observedHeapGrowthBytes": 8525248
+        },
+        {
+          "ms": 21.52961199999993,
+          "queries": 24,
+          "responseBytes": 90977,
+          "databaseBytes": 130111,
+          "retainedHeapBytes": 7853944,
+          "observedHeapGrowthBytes": 7762664
+        },
+        {
+          "ms": 22.052861000000007,
+          "queries": 24,
+          "responseBytes": 90977,
+          "databaseBytes": 130111,
+          "retainedHeapBytes": 7524120,
+          "observedHeapGrowthBytes": 7410216
+        },
+        {
+          "ms": 17.404598000000078,
+          "queries": 24,
+          "responseBytes": 90977,
+          "databaseBytes": 130111,
+          "retainedHeapBytes": 7437496,
+          "observedHeapGrowthBytes": 7306528
+        },
+        {
+          "ms": 17.009147999999982,
+          "queries": 24,
+          "responseBytes": 90977,
+          "databaseBytes": 130111,
+          "retainedHeapBytes": 7461592,
+          "observedHeapGrowthBytes": 7334088
+        }
+      ]
+    },
+    {
+      "historicalExpenses": 1000,
+      "mode": "bootstrap",
+      "variant": "after",
+      "repetitions": 5,
+      "p50Ms": 29.449778000000038,
+      "p95Ms": 33.33646400000009,
+      "queries": [
+        27
+      ],
+      "responseBytes": 91066,
+      "databaseBytes": 95847,
+      "p95ObservedHeapGrowthBytes": 9618208,
+      "maxRssKiB": 308436,
+      "samples": [
+        {
+          "ms": 33.33646400000009,
+          "queries": 27,
+          "responseBytes": 91066,
+          "databaseBytes": 95847,
+          "retainedHeapBytes": 9711320,
+          "observedHeapGrowthBytes": 9618208
+        },
+        {
+          "ms": 31.96034499999996,
+          "queries": 27,
+          "responseBytes": 91066,
+          "databaseBytes": 95847,
+          "retainedHeapBytes": 8820336,
+          "observedHeapGrowthBytes": 8728968
+        },
+        {
+          "ms": 29.449778000000038,
+          "queries": 27,
+          "responseBytes": 91066,
+          "databaseBytes": 95847,
+          "retainedHeapBytes": 8816448,
+          "observedHeapGrowthBytes": 8662592
+        },
+        {
+          "ms": 25.17580499999997,
+          "queries": 27,
+          "responseBytes": 91066,
+          "databaseBytes": 95847,
+          "retainedHeapBytes": 8072896,
+          "observedHeapGrowthBytes": 7981528
+        },
+        {
+          "ms": 27.373512000000005,
+          "queries": 27,
+          "responseBytes": 91066,
+          "databaseBytes": 95847,
+          "retainedHeapBytes": 8773384,
+          "observedHeapGrowthBytes": 8619728
+        }
+      ]
+    },
+    {
+      "historicalExpenses": 10000,
+      "mode": "dashboard",
+      "variant": "before",
+      "repetitions": 5,
+      "p50Ms": 3604.7100520000004,
+      "p95Ms": 3667.1562699999995,
+      "queries": [
+        24
+      ],
+      "responseBytes": 139751,
+      "databaseBytes": 5268997,
+      "p95ObservedHeapGrowthBytes": 40178504,
+      "maxRssKiB": 331848,
+      "samples": [
+        {
+          "ms": 3515.534707,
+          "queries": 24,
+          "responseBytes": 139751,
+          "databaseBytes": 5268997,
+          "retainedHeapBytes": 32519160,
+          "observedHeapGrowthBytes": 34171456
+        },
+        {
+          "ms": 3667.1562699999995,
+          "queries": 24,
+          "responseBytes": 139751,
+          "databaseBytes": 5268997,
+          "retainedHeapBytes": 35396408,
+          "observedHeapGrowthBytes": 38625920
+        },
+        {
+          "ms": 3604.7100520000004,
+          "queries": 24,
+          "responseBytes": 139751,
+          "databaseBytes": 5268997,
+          "retainedHeapBytes": 35063416,
+          "observedHeapGrowthBytes": 39648856
+        },
+        {
+          "ms": 3616.3929050000006,
+          "queries": 24,
+          "responseBytes": 139751,
+          "databaseBytes": 5268997,
+          "retainedHeapBytes": 36386960,
+          "observedHeapGrowthBytes": 40178504
+        },
+        {
+          "ms": 3455.569295000001,
+          "queries": 24,
+          "responseBytes": 139751,
+          "databaseBytes": 5268997,
+          "retainedHeapBytes": 35420488,
+          "observedHeapGrowthBytes": 35271368
+        }
+      ]
+    },
+    {
+      "historicalExpenses": 10000,
+      "mode": "dashboard",
+      "variant": "after",
+      "repetitions": 5,
+      "p50Ms": 173.58440599999994,
+      "p95Ms": 181.18409499999996,
+      "queries": [
+        27
+      ],
+      "responseBytes": 31457,
+      "databaseBytes": 52128,
+      "p95ObservedHeapGrowthBytes": 9221032,
+      "maxRssKiB": 323588,
+      "samples": [
+        {
+          "ms": 181.18409499999996,
+          "queries": 27,
+          "responseBytes": 31457,
+          "databaseBytes": 52128,
+          "retainedHeapBytes": 9281296,
+          "observedHeapGrowthBytes": 9221032
+        },
+        {
+          "ms": 172.62047700000005,
+          "queries": 27,
+          "responseBytes": 31457,
+          "databaseBytes": 52128,
+          "retainedHeapBytes": 8366224,
+          "observedHeapGrowthBytes": 8332200
+        },
+        {
+          "ms": 173.89027599999986,
+          "queries": 27,
+          "responseBytes": 31457,
+          "databaseBytes": 52128,
+          "retainedHeapBytes": 8387584,
+          "observedHeapGrowthBytes": 8353560
+        },
+        {
+          "ms": 173.58440599999994,
+          "queries": 27,
+          "responseBytes": 31457,
+          "databaseBytes": 52128,
+          "retainedHeapBytes": 8598568,
+          "observedHeapGrowthBytes": 8564544
+        },
+        {
+          "ms": 172.16950800000018,
+          "queries": 27,
+          "responseBytes": 31457,
+          "databaseBytes": 52128,
+          "retainedHeapBytes": 8249080,
+          "observedHeapGrowthBytes": 8215056
+        }
+      ]
+    },
+    {
+      "historicalExpenses": 10000,
+      "mode": "header",
+      "variant": "before",
+      "repetitions": 5,
+      "p50Ms": 3604.7100520000004,
+      "p95Ms": 3667.1562699999995,
+      "queries": [
+        24
+      ],
+      "responseBytes": 139751,
+      "databaseBytes": 5268997,
+      "p95ObservedHeapGrowthBytes": 40178504,
+      "maxRssKiB": 331848,
+      "samples": [
+        {
+          "ms": 3515.534707,
+          "queries": 24,
+          "responseBytes": 139751,
+          "databaseBytes": 5268997,
+          "retainedHeapBytes": 32519160,
+          "observedHeapGrowthBytes": 34171456
+        },
+        {
+          "ms": 3667.1562699999995,
+          "queries": 24,
+          "responseBytes": 139751,
+          "databaseBytes": 5268997,
+          "retainedHeapBytes": 35396408,
+          "observedHeapGrowthBytes": 38625920
+        },
+        {
+          "ms": 3604.7100520000004,
+          "queries": 24,
+          "responseBytes": 139751,
+          "databaseBytes": 5268997,
+          "retainedHeapBytes": 35063416,
+          "observedHeapGrowthBytes": 39648856
+        },
+        {
+          "ms": 3616.3929050000006,
+          "queries": 24,
+          "responseBytes": 139751,
+          "databaseBytes": 5268997,
+          "retainedHeapBytes": 36386960,
+          "observedHeapGrowthBytes": 40178504
+        },
+        {
+          "ms": 3455.569295000001,
+          "queries": 24,
+          "responseBytes": 139751,
+          "databaseBytes": 5268997,
+          "retainedHeapBytes": 35420488,
+          "observedHeapGrowthBytes": 35271368
+        }
+      ],
+      "reusedDashboardBaseline": true
+    },
+    {
+      "historicalExpenses": 10000,
+      "mode": "header",
+      "variant": "after",
+      "repetitions": 5,
+      "p50Ms": 95.52983599999993,
+      "p95Ms": 99.55127000000005,
+      "queries": [
+        25
+      ],
+      "responseBytes": 80,
+      "databaseBytes": 46148,
+      "p95ObservedHeapGrowthBytes": 4591752,
+      "maxRssKiB": 311344,
+      "samples": [
+        {
+          "ms": 99.39586999999995,
+          "queries": 25,
+          "responseBytes": 80,
+          "databaseBytes": 46148,
+          "retainedHeapBytes": 4594080,
+          "observedHeapGrowthBytes": 4591752
+        },
+        {
+          "ms": 99.55127000000005,
+          "queries": 25,
+          "responseBytes": 80,
+          "databaseBytes": 46148,
+          "retainedHeapBytes": 4104792,
+          "observedHeapGrowthBytes": 4104208
+        },
+        {
+          "ms": 92.42455999999993,
+          "queries": 25,
+          "responseBytes": 80,
+          "databaseBytes": 46148,
+          "retainedHeapBytes": 3945344,
+          "observedHeapGrowthBytes": 3944760
+        },
+        {
+          "ms": 88.55546500000014,
+          "queries": 25,
+          "responseBytes": 80,
+          "databaseBytes": 46148,
+          "retainedHeapBytes": 3833784,
+          "observedHeapGrowthBytes": 3833200
+        },
+        {
+          "ms": 95.52983599999993,
+          "queries": 25,
+          "responseBytes": 80,
+          "databaseBytes": 46148,
+          "retainedHeapBytes": 3837472,
+          "observedHeapGrowthBytes": 3836888
+        }
+      ]
+    },
+    {
+      "historicalExpenses": 10000,
+      "mode": "cycles",
+      "variant": "before",
+      "repetitions": 5,
+      "p50Ms": 3443.788201000003,
+      "p95Ms": 3587.3763440000002,
+      "queries": [
+        16
+      ],
+      "responseBytes": 122952,
+      "databaseBytes": 5033489,
+      "p95ObservedHeapGrowthBytes": 41796296,
+      "maxRssKiB": 353312,
+      "samples": [
+        {
+          "ms": 3376.1032689999993,
+          "queries": 16,
+          "responseBytes": 122952,
+          "databaseBytes": 5033489,
+          "retainedHeapBytes": 27999368,
+          "observedHeapGrowthBytes": 37680552
+        },
+        {
+          "ms": 3587.3763440000002,
+          "queries": 16,
+          "responseBytes": 122952,
+          "databaseBytes": 5033489,
+          "retainedHeapBytes": 41926544,
+          "observedHeapGrowthBytes": 41796296
+        },
+        {
+          "ms": 3492.688268,
+          "queries": 16,
+          "responseBytes": 122952,
+          "databaseBytes": 5033489,
+          "retainedHeapBytes": 31597616,
+          "observedHeapGrowthBytes": 41643048
+        },
+        {
+          "ms": 3326.505943,
+          "queries": 16,
+          "responseBytes": 122952,
+          "databaseBytes": 5033489,
+          "retainedHeapBytes": 39190264,
+          "observedHeapGrowthBytes": 39060016
+        },
+        {
+          "ms": 3443.788201000003,
+          "queries": 16,
+          "responseBytes": 122952,
+          "databaseBytes": 5033489,
+          "retainedHeapBytes": 39126240,
+          "observedHeapGrowthBytes": 38995992
+        }
+      ]
+    },
+    {
+      "historicalExpenses": 10000,
+      "mode": "cycles",
+      "variant": "after",
+      "repetitions": 5,
+      "p50Ms": 135.51675899999987,
+      "p95Ms": 144.563756,
+      "queries": [
+        20
+      ],
+      "responseBytes": 12178,
+      "databaseBytes": 49204,
+      "p95ObservedHeapGrowthBytes": 5817432,
+      "maxRssKiB": 304984,
+      "samples": [
+        {
+          "ms": 144.563756,
+          "queries": 20,
+          "responseBytes": 12178,
+          "databaseBytes": 49204,
+          "retainedHeapBytes": 5831848,
+          "observedHeapGrowthBytes": 5817432
+        },
+        {
+          "ms": 131.97516500000006,
+          "queries": 20,
+          "responseBytes": 12178,
+          "databaseBytes": 49204,
+          "retainedHeapBytes": 4732064,
+          "observedHeapGrowthBytes": 4719392
+        },
+        {
+          "ms": 135.51675899999987,
+          "queries": 20,
+          "responseBytes": 12178,
+          "databaseBytes": 49204,
+          "retainedHeapBytes": 4666416,
+          "observedHeapGrowthBytes": 4653744
+        },
+        {
+          "ms": 137.61452699999995,
+          "queries": 20,
+          "responseBytes": 12178,
+          "databaseBytes": 49204,
+          "retainedHeapBytes": 4911800,
+          "observedHeapGrowthBytes": 4899128
+        },
+        {
+          "ms": 130.65957600000002,
+          "queries": 20,
+          "responseBytes": 12178,
+          "databaseBytes": 49204,
+          "retainedHeapBytes": 4934280,
+          "observedHeapGrowthBytes": 4921608
+        }
+      ]
+    },
+    {
+      "historicalExpenses": 10000,
+      "mode": "detail",
+      "variant": "before",
+      "repetitions": 5,
+      "p50Ms": 239.65185799999995,
+      "p95Ms": 266.54969299999993,
+      "queries": [
+        16
+      ],
+      "responseBytes": 27612,
+      "databaseBytes": 5033489,
+      "p95ObservedHeapGrowthBytes": 36297352,
+      "maxRssKiB": 351784,
+      "samples": [
+        {
+          "ms": 239.65185799999995,
+          "queries": 16,
+          "responseBytes": 27612,
+          "databaseBytes": 5033489,
+          "retainedHeapBytes": 34537704,
+          "observedHeapGrowthBytes": 34506120
+        },
+        {
+          "ms": 260.5740699999999,
+          "queries": 16,
+          "responseBytes": 27612,
+          "databaseBytes": 5033489,
+          "retainedHeapBytes": 31293144,
+          "observedHeapGrowthBytes": 36297352
+        },
+        {
+          "ms": 266.54969299999993,
+          "queries": 16,
+          "responseBytes": 27612,
+          "databaseBytes": 5033489,
+          "retainedHeapBytes": 31485936,
+          "observedHeapGrowthBytes": 36230192
+        },
+        {
+          "ms": 227.60669400000006,
+          "queries": 16,
+          "responseBytes": 27612,
+          "databaseBytes": 5033489,
+          "retainedHeapBytes": 30465704,
+          "observedHeapGrowthBytes": 35668024
+        },
+        {
+          "ms": 227.69782399999986,
+          "queries": 16,
+          "responseBytes": 27612,
+          "databaseBytes": 5033489,
+          "retainedHeapBytes": 31390824,
+          "observedHeapGrowthBytes": 36248224
+        }
+      ]
+    },
+    {
+      "historicalExpenses": 10000,
+      "mode": "detail",
+      "variant": "after",
+      "repetitions": 5,
+      "p50Ms": 38.20043599999997,
+      "p95Ms": 45.909536,
+      "queries": [
+        20
+      ],
+      "responseBytes": 27612,
+      "databaseBytes": 40126,
+      "p95ObservedHeapGrowthBytes": 3565648,
+      "maxRssKiB": 302336,
+      "samples": [
+        {
+          "ms": 43.78491900000006,
+          "queries": 20,
+          "responseBytes": 27612,
+          "databaseBytes": 40126,
+          "retainedHeapBytes": 3487520,
+          "observedHeapGrowthBytes": 3456160
+        },
+        {
+          "ms": 45.909536,
+          "queries": 20,
+          "responseBytes": 27612,
+          "databaseBytes": 40126,
+          "retainedHeapBytes": 3595264,
+          "observedHeapGrowthBytes": 3565648
+        },
+        {
+          "ms": 38.20043599999997,
+          "queries": 20,
+          "responseBytes": 27612,
+          "databaseBytes": 40126,
+          "retainedHeapBytes": 2987696,
+          "observedHeapGrowthBytes": 2953000
+        },
+        {
+          "ms": 37.81991700000003,
+          "queries": 20,
+          "responseBytes": 27612,
+          "databaseBytes": 40126,
+          "retainedHeapBytes": 3023704,
+          "observedHeapGrowthBytes": 2990512
+        },
+        {
+          "ms": 25.645804,
+          "queries": 20,
+          "responseBytes": 27612,
+          "databaseBytes": 40126,
+          "retainedHeapBytes": 2916624,
+          "observedHeapGrowthBytes": 2887008
+        }
+      ]
+    },
+    {
+      "historicalExpenses": 10000,
+      "mode": "expenses",
+      "variant": "before",
+      "repetitions": 5,
+      "p50Ms": 70.70462799999996,
+      "p95Ms": 135.05117399999995,
+      "queries": [
+        11
+      ],
+      "responseBytes": 90912,
+      "databaseBytes": 453692,
+      "p95ObservedHeapGrowthBytes": 17118616,
+      "maxRssKiB": 312892,
+      "samples": [
+        {
+          "ms": 79.05561699999998,
+          "queries": 11,
+          "responseBytes": 90912,
+          "databaseBytes": 453692,
+          "retainedHeapBytes": 17211576,
+          "observedHeapGrowthBytes": 17118616
+        },
+        {
+          "ms": 70.70462799999996,
+          "queries": 11,
+          "responseBytes": 90912,
+          "databaseBytes": 453692,
+          "retainedHeapBytes": 14873384,
+          "observedHeapGrowthBytes": 16548824
+        },
+        {
+          "ms": 135.05117399999995,
+          "queries": 11,
+          "responseBytes": 90912,
+          "databaseBytes": 453692,
+          "retainedHeapBytes": 14563320,
+          "observedHeapGrowthBytes": 16406936
+        },
+        {
+          "ms": 62.03124899999989,
+          "queries": 11,
+          "responseBytes": 90912,
+          "databaseBytes": 453692,
+          "retainedHeapBytes": 15549136,
+          "observedHeapGrowthBytes": 15457904
+        },
+        {
+          "ms": 53.809369999999944,
+          "queries": 11,
+          "responseBytes": 90912,
+          "databaseBytes": 453692,
+          "retainedHeapBytes": 14004368,
+          "observedHeapGrowthBytes": 16541240
+        }
+      ]
+    },
+    {
+      "historicalExpenses": 10000,
+      "mode": "expenses",
+      "variant": "after",
+      "repetitions": 5,
+      "p50Ms": 36.599658999999974,
+      "p95Ms": 38.8203860000001,
+      "queries": [
+        14
+      ],
+      "responseBytes": 90953,
+      "databaseBytes": 96228,
+      "p95ObservedHeapGrowthBytes": 8953592,
+      "maxRssKiB": 304852,
+      "samples": [
+        {
+          "ms": 35.64386900000011,
+          "queries": 14,
+          "responseBytes": 90953,
+          "databaseBytes": 96228,
+          "retainedHeapBytes": 9072336,
+          "observedHeapGrowthBytes": 8953592
+        },
+        {
+          "ms": 38.331046000000015,
+          "queries": 14,
+          "responseBytes": 90953,
+          "databaseBytes": 96228,
+          "retainedHeapBytes": 8385160,
+          "observedHeapGrowthBytes": 8230280
+        },
+        {
+          "ms": 36.599658999999974,
+          "queries": 14,
+          "responseBytes": 90953,
+          "databaseBytes": 96228,
+          "retainedHeapBytes": 8073432,
+          "observedHeapGrowthBytes": 7982168
+        },
+        {
+          "ms": 38.8203860000001,
+          "queries": 14,
+          "responseBytes": 90953,
+          "databaseBytes": 96228,
+          "retainedHeapBytes": 7508784,
+          "observedHeapGrowthBytes": 7352608
+        },
+        {
+          "ms": 33.73705200000006,
+          "queries": 14,
+          "responseBytes": 90953,
+          "databaseBytes": 96228,
+          "retainedHeapBytes": 8852544,
+          "observedHeapGrowthBytes": 8761280
+        }
+      ]
+    },
+    {
+      "historicalExpenses": 10000,
+      "mode": "bootstrap",
+      "variant": "before",
+      "repetitions": 5,
+      "p50Ms": 56.66421600000001,
+      "p95Ms": 60.59820100000002,
+      "queries": [
+        24
+      ],
+      "responseBytes": 91377,
+      "databaseBytes": 454111,
+      "p95ObservedHeapGrowthBytes": 17057528,
+      "maxRssKiB": 296648,
+      "samples": [
+        {
+          "ms": 60.565980999999965,
+          "queries": 24,
+          "responseBytes": 91377,
+          "databaseBytes": 454111,
+          "retainedHeapBytes": 6380488,
+          "observedHeapGrowthBytes": 10113528
+        },
+        {
+          "ms": 60.59820100000002,
+          "queries": 24,
+          "responseBytes": 91377,
+          "databaseBytes": 454111,
+          "retainedHeapBytes": 15583304,
+          "observedHeapGrowthBytes": 17057528
+        },
+        {
+          "ms": 56.66421600000001,
+          "queries": 24,
+          "responseBytes": 91377,
+          "databaseBytes": 454111,
+          "retainedHeapBytes": 15786448,
+          "observedHeapGrowthBytes": 15694768
+        },
+        {
+          "ms": 54.49996900000008,
+          "queries": 24,
+          "responseBytes": 91377,
+          "databaseBytes": 454111,
+          "retainedHeapBytes": 15047736,
+          "observedHeapGrowthBytes": 17052056
+        },
+        {
+          "ms": 51.89871199999993,
+          "queries": 24,
+          "responseBytes": 91377,
+          "databaseBytes": 454111,
+          "retainedHeapBytes": 15048480,
+          "observedHeapGrowthBytes": 17057352
+        }
+      ]
+    },
+    {
+      "historicalExpenses": 10000,
+      "mode": "bootstrap",
+      "variant": "after",
+      "repetitions": 5,
+      "p50Ms": 37.73384699999997,
+      "p95Ms": 48.072483000000034,
+      "queries": [
+        27
+      ],
+      "responseBytes": 91466,
+      "databaseBytes": 96647,
+      "p95ObservedHeapGrowthBytes": 9662480,
+      "maxRssKiB": 313220,
+      "samples": [
+        {
+          "ms": 43.38385900000003,
+          "queries": 27,
+          "responseBytes": 91466,
+          "databaseBytes": 96647,
+          "retainedHeapBytes": 9755992,
+          "observedHeapGrowthBytes": 9662480
+        },
+        {
+          "ms": 36.12657899999999,
+          "queries": 27,
+          "responseBytes": 91466,
+          "databaseBytes": 96647,
+          "retainedHeapBytes": 8840688,
+          "observedHeapGrowthBytes": 8748920
+        },
+        {
+          "ms": 37.73384699999997,
+          "queries": 27,
+          "responseBytes": 91466,
+          "databaseBytes": 96647,
+          "retainedHeapBytes": 8838976,
+          "observedHeapGrowthBytes": 8689616
+        },
+        {
+          "ms": 36.18303900000001,
+          "queries": 27,
+          "responseBytes": 91466,
+          "databaseBytes": 96647,
+          "retainedHeapBytes": 8396768,
+          "observedHeapGrowthBytes": 8243376
+        },
+        {
+          "ms": 48.072483000000034,
+          "queries": 27,
+          "responseBytes": 91466,
+          "databaseBytes": 96647,
+          "retainedHeapBytes": 8749704,
+          "observedHeapGrowthBytes": 8596312
+        }
+      ]
+    },
+    {
+      "historicalExpenses": 100000,
+      "mode": "dashboard",
+      "variant": "before",
+      "repetitions": 5,
+      "p50Ms": 29319.642441000004,
+      "p95Ms": 30079.377791000006,
+      "queries": [
+        32
+      ],
+      "responseBytes": 140055,
+      "databaseBytes": 51670298,
+      "p95ObservedHeapGrowthBytes": 391797760,
+      "maxRssKiB": 779020,
+      "samples": [
+        {
+          "ms": 29319.642441000004,
+          "queries": 32,
+          "responseBytes": 140055,
+          "databaseBytes": 51670298,
+          "retainedHeapBytes": 313400584,
+          "observedHeapGrowthBytes": 313246872
+        },
+        {
+          "ms": 29270.775724999992,
+          "queries": 32,
+          "responseBytes": 140055,
+          "databaseBytes": 51670298,
+          "retainedHeapBytes": 391949728,
+          "observedHeapGrowthBytes": 391797760
+        },
+        {
+          "ms": 29562.347104999993,
+          "queries": 32,
+          "responseBytes": 140055,
+          "databaseBytes": 51670298,
+          "retainedHeapBytes": 378008768,
+          "observedHeapGrowthBytes": 377856800
+        },
+        {
+          "ms": 29248.296814,
+          "queries": 32,
+          "responseBytes": 140055,
+          "databaseBytes": 51670298,
+          "retainedHeapBytes": 353581408,
+          "observedHeapGrowthBytes": 353429440
+        },
+        {
+          "ms": 30079.377791000006,
+          "queries": 32,
+          "responseBytes": 140055,
+          "databaseBytes": 51670298,
+          "retainedHeapBytes": 361157744,
+          "observedHeapGrowthBytes": 361005776
+        }
+      ]
+    },
+    {
+      "historicalExpenses": 100000,
+      "mode": "dashboard",
+      "variant": "after",
+      "repetitions": 5,
+      "p50Ms": 204.22052299999996,
+      "p95Ms": 231.28493500000013,
+      "queries": [
+        27
+      ],
+      "responseBytes": 31457,
+      "databaseBytes": 52128,
+      "p95ObservedHeapGrowthBytes": 9478280,
+      "maxRssKiB": 322812,
+      "samples": [
+        {
+          "ms": 231.28493500000013,
+          "queries": 27,
+          "responseBytes": 31457,
+          "databaseBytes": 52128,
+          "retainedHeapBytes": 9514048,
+          "observedHeapGrowthBytes": 9478280
+        },
+        {
+          "ms": 225.93668200000002,
+          "queries": 27,
+          "responseBytes": 31457,
+          "databaseBytes": 52128,
+          "retainedHeapBytes": 8368976,
+          "observedHeapGrowthBytes": 8334952
+        },
+        {
+          "ms": 204.22052299999996,
+          "queries": 27,
+          "responseBytes": 31457,
+          "databaseBytes": 52128,
+          "retainedHeapBytes": 8380584,
+          "observedHeapGrowthBytes": 8346560
+        },
+        {
+          "ms": 192.49723900000004,
+          "queries": 27,
+          "responseBytes": 31457,
+          "databaseBytes": 52128,
+          "retainedHeapBytes": 8597168,
+          "observedHeapGrowthBytes": 8563144
+        },
+        {
+          "ms": 191.89285999999993,
+          "queries": 27,
+          "responseBytes": 31457,
+          "databaseBytes": 52128,
+          "retainedHeapBytes": 8245968,
+          "observedHeapGrowthBytes": 8211944
+        }
+      ]
+    },
+    {
+      "historicalExpenses": 100000,
+      "mode": "header",
+      "variant": "before",
+      "repetitions": 5,
+      "p50Ms": 29319.642441000004,
+      "p95Ms": 30079.377791000006,
+      "queries": [
+        32
+      ],
+      "responseBytes": 140055,
+      "databaseBytes": 51670298,
+      "p95ObservedHeapGrowthBytes": 391797760,
+      "maxRssKiB": 779020,
+      "samples": [
+        {
+          "ms": 29319.642441000004,
+          "queries": 32,
+          "responseBytes": 140055,
+          "databaseBytes": 51670298,
+          "retainedHeapBytes": 313400584,
+          "observedHeapGrowthBytes": 313246872
+        },
+        {
+          "ms": 29270.775724999992,
+          "queries": 32,
+          "responseBytes": 140055,
+          "databaseBytes": 51670298,
+          "retainedHeapBytes": 391949728,
+          "observedHeapGrowthBytes": 391797760
+        },
+        {
+          "ms": 29562.347104999993,
+          "queries": 32,
+          "responseBytes": 140055,
+          "databaseBytes": 51670298,
+          "retainedHeapBytes": 378008768,
+          "observedHeapGrowthBytes": 377856800
+        },
+        {
+          "ms": 29248.296814,
+          "queries": 32,
+          "responseBytes": 140055,
+          "databaseBytes": 51670298,
+          "retainedHeapBytes": 353581408,
+          "observedHeapGrowthBytes": 353429440
+        },
+        {
+          "ms": 30079.377791000006,
+          "queries": 32,
+          "responseBytes": 140055,
+          "databaseBytes": 51670298,
+          "retainedHeapBytes": 361157744,
+          "observedHeapGrowthBytes": 361005776
+        }
+      ],
+      "reusedDashboardBaseline": true
+    },
+    {
+      "historicalExpenses": 100000,
+      "mode": "header",
+      "variant": "after",
+      "repetitions": 5,
+      "p50Ms": 124.25137500000005,
+      "p95Ms": 130.03892699999983,
+      "queries": [
+        25
+      ],
+      "responseBytes": 80,
+      "databaseBytes": 46148,
+      "p95ObservedHeapGrowthBytes": 4719520,
+      "maxRssKiB": 312668,
+      "samples": [
+        {
+          "ms": 119.94584099999997,
+          "queries": 25,
+          "responseBytes": 80,
+          "databaseBytes": 46148,
+          "retainedHeapBytes": 4721848,
+          "observedHeapGrowthBytes": 4719520
+        },
+        {
+          "ms": 124.25137500000005,
+          "queries": 25,
+          "responseBytes": 80,
+          "databaseBytes": 46148,
+          "retainedHeapBytes": 4058248,
+          "observedHeapGrowthBytes": 4057664
+        },
+        {
+          "ms": 119.56390199999987,
+          "queries": 25,
+          "responseBytes": 80,
+          "databaseBytes": 46148,
+          "retainedHeapBytes": 3942144,
+          "observedHeapGrowthBytes": 3941560
+        },
+        {
+          "ms": 130.03892699999983,
+          "queries": 25,
+          "responseBytes": 80,
+          "databaseBytes": 46148,
+          "retainedHeapBytes": 4102488,
+          "observedHeapGrowthBytes": 4101904
+        },
+        {
+          "ms": 130.0365069999998,
+          "queries": 25,
+          "responseBytes": 80,
+          "databaseBytes": 46148,
+          "retainedHeapBytes": 3838864,
+          "observedHeapGrowthBytes": 3838280
+        }
+      ]
+    },
+    {
+      "historicalExpenses": 100000,
+      "mode": "cycles",
+      "variant": "before",
+      "repetitions": 5,
+      "p50Ms": 30122.643203999993,
+      "p95Ms": 30682.359124999988,
+      "queries": [
+        28
+      ],
+      "responseBytes": 123256,
+      "databaseBytes": 49332390,
+      "p95ObservedHeapGrowthBytes": 455587840,
+      "maxRssKiB": 890556,
+      "samples": [
+        {
+          "ms": 29372.611122,
+          "queries": 28,
+          "responseBytes": 123256,
+          "databaseBytes": 49332390,
+          "retainedHeapBytes": 455420040,
+          "observedHeapGrowthBytes": 455284016
+        },
+        {
+          "ms": 30221.879254999993,
+          "queries": 28,
+          "responseBytes": 123256,
+          "databaseBytes": 49332390,
+          "retainedHeapBytes": 455720960,
+          "observedHeapGrowthBytes": 455587840
+        },
+        {
+          "ms": 30122.643203999993,
+          "queries": 28,
+          "responseBytes": 123256,
+          "databaseBytes": 49332390,
+          "retainedHeapBytes": 439983680,
+          "observedHeapGrowthBytes": 439850552
+        },
+        {
+          "ms": 30682.359124999988,
+          "queries": 28,
+          "responseBytes": 123256,
+          "databaseBytes": 49332390,
+          "retainedHeapBytes": 444276440,
+          "observedHeapGrowthBytes": 444143320
+        },
+        {
+          "ms": 28993.031176999997,
+          "queries": 28,
+          "responseBytes": 123256,
+          "databaseBytes": 49332390,
+          "retainedHeapBytes": 438864240,
+          "observedHeapGrowthBytes": 438731112
+        }
+      ]
+    },
+    {
+      "historicalExpenses": 100000,
+      "mode": "cycles",
+      "variant": "after",
+      "repetitions": 5,
+      "p50Ms": 142.52612999999997,
+      "p95Ms": 170.78038000000004,
+      "queries": [
+        20
+      ],
+      "responseBytes": 12178,
+      "databaseBytes": 49204,
+      "p95ObservedHeapGrowthBytes": 5549208,
+      "maxRssKiB": 321148,
+      "samples": [
+        {
+          "ms": 170.78038000000004,
+          "queries": 20,
+          "responseBytes": 12178,
+          "databaseBytes": 49204,
+          "retainedHeapBytes": 5563624,
+          "observedHeapGrowthBytes": 5549208
+        },
+        {
+          "ms": 135.74954900000012,
+          "queries": 20,
+          "responseBytes": 12178,
+          "databaseBytes": 49204,
+          "retainedHeapBytes": 4861720,
+          "observedHeapGrowthBytes": 4842024
+        },
+        {
+          "ms": 142.52612999999997,
+          "queries": 20,
+          "responseBytes": 12178,
+          "databaseBytes": 49204,
+          "retainedHeapBytes": 4671952,
+          "observedHeapGrowthBytes": 4659280
+        },
+        {
+          "ms": 166.16406600000005,
+          "queries": 20,
+          "responseBytes": 12178,
+          "databaseBytes": 49204,
+          "retainedHeapBytes": 4909424,
+          "observedHeapGrowthBytes": 4896752
+        },
+        {
+          "ms": 127.839021,
+          "queries": 20,
+          "responseBytes": 12178,
+          "databaseBytes": 49204,
+          "retainedHeapBytes": 4618560,
+          "observedHeapGrowthBytes": 4605888
+        }
+      ]
+    },
+    {
+      "historicalExpenses": 100000,
+      "mode": "detail",
+      "variant": "before",
+      "repetitions": 5,
+      "p50Ms": 1797.5715260000002,
+      "p95Ms": 1836.480606000001,
+      "queries": [
+        28
+      ],
+      "responseBytes": 27612,
+      "databaseBytes": 49332390,
+      "p95ObservedHeapGrowthBytes": 393610384,
+      "maxRssKiB": 867332,
+      "samples": [
+        {
+          "ms": 1797.5715260000002,
+          "queries": 28,
+          "responseBytes": 27612,
+          "databaseBytes": 49332390,
+          "retainedHeapBytes": 351748064,
+          "observedHeapGrowthBytes": 393610384
+        },
+        {
+          "ms": 1747.0666929999998,
+          "queries": 28,
+          "responseBytes": 27612,
+          "databaseBytes": 49332390,
+          "retainedHeapBytes": 343244072,
+          "observedHeapGrowthBytes": 382279216
+        },
+        {
+          "ms": 1787.0411910000003,
+          "queries": 28,
+          "responseBytes": 27612,
+          "databaseBytes": 49332390,
+          "retainedHeapBytes": 330523896,
+          "observedHeapGrowthBytes": 373253752
+        },
+        {
+          "ms": 1812.6559669999997,
+          "queries": 28,
+          "responseBytes": 27612,
+          "databaseBytes": 49332390,
+          "retainedHeapBytes": 325570072,
+          "observedHeapGrowthBytes": 368553520
+        },
+        {
+          "ms": 1836.480606000001,
+          "queries": 28,
+          "responseBytes": 27612,
+          "databaseBytes": 49332390,
+          "retainedHeapBytes": 320648176,
+          "observedHeapGrowthBytes": 363429704
+        }
+      ]
+    },
+    {
+      "historicalExpenses": 100000,
+      "mode": "detail",
+      "variant": "after",
+      "repetitions": 5,
+      "p50Ms": 51.446666999999934,
+      "p95Ms": 62.66296199999999,
+      "queries": [
+        20
+      ],
+      "responseBytes": 27612,
+      "databaseBytes": 40126,
+      "p95ObservedHeapGrowthBytes": 3525680,
+      "maxRssKiB": 308200,
+      "samples": [
+        {
+          "ms": 62.66296199999999,
+          "queries": 20,
+          "responseBytes": 27612,
+          "databaseBytes": 40126,
+          "retainedHeapBytes": 3490472,
+          "observedHeapGrowthBytes": 3459112
+        },
+        {
+          "ms": 59.150356999999985,
+          "queries": 20,
+          "responseBytes": 27612,
+          "databaseBytes": 40126,
+          "retainedHeapBytes": 3574712,
+          "observedHeapGrowthBytes": 3525680
+        },
+        {
+          "ms": 51.006259,
+          "queries": 20,
+          "responseBytes": 27612,
+          "databaseBytes": 40126,
+          "retainedHeapBytes": 3005248,
+          "observedHeapGrowthBytes": 2975632
+        },
+        {
+          "ms": 50.08451000000002,
+          "queries": 20,
+          "responseBytes": 27612,
+          "databaseBytes": 40126,
+          "retainedHeapBytes": 3034464,
+          "observedHeapGrowthBytes": 3003576
+        },
+        {
+          "ms": 51.446666999999934,
+          "queries": 20,
+          "responseBytes": 27612,
+          "databaseBytes": 40126,
+          "retainedHeapBytes": 2917680,
+          "observedHeapGrowthBytes": 2888064
+        }
+      ]
+    },
+    {
+      "historicalExpenses": 100000,
+      "mode": "expenses",
+      "variant": "before",
+      "repetitions": 5,
+      "p50Ms": 327.99579200000016,
+      "p95Ms": 337.0227010000001,
+      "queries": [
+        11
+      ],
+      "responseBytes": 90912,
+      "databaseBytes": 3693692,
+      "p95ObservedHeapGrowthBytes": 84014304,
+      "maxRssKiB": 403712,
+      "samples": [
+        {
+          "ms": 337.0227010000001,
+          "queries": 11,
+          "responseBytes": 90912,
+          "databaseBytes": 3693692,
+          "retainedHeapBytes": 35269272,
+          "observedHeapGrowthBytes": 35108312
+        },
+        {
+          "ms": 323.25173799999993,
+          "queries": 11,
+          "responseBytes": 90912,
+          "databaseBytes": 3693692,
+          "retainedHeapBytes": 71932456,
+          "observedHeapGrowthBytes": 78405184
+        },
+        {
+          "ms": 325.64770599999997,
+          "queries": 11,
+          "responseBytes": 90912,
+          "databaseBytes": 3693692,
+          "retainedHeapBytes": 83536496,
+          "observedHeapGrowthBytes": 83399344
+        },
+        {
+          "ms": 327.99579200000016,
+          "queries": 11,
+          "responseBytes": 90912,
+          "databaseBytes": 3693692,
+          "retainedHeapBytes": 84173528,
+          "observedHeapGrowthBytes": 84014304
+        },
+        {
+          "ms": 328.379402,
+          "queries": 11,
+          "responseBytes": 90912,
+          "databaseBytes": 3693692,
+          "retainedHeapBytes": 83858176,
+          "observedHeapGrowthBytes": 83764856
+        }
+      ]
+    },
+    {
+      "historicalExpenses": 100000,
+      "mode": "expenses",
+      "variant": "after",
+      "repetitions": 5,
+      "p50Ms": 58.09057800000005,
+      "p95Ms": 65.99562800000001,
+      "queries": [
+        14
+      ],
+      "responseBytes": 90953,
+      "databaseBytes": 96228,
+      "p95ObservedHeapGrowthBytes": 8920232,
+      "maxRssKiB": 307436,
+      "samples": [
+        {
+          "ms": 65.32589899999994,
+          "queries": 14,
+          "responseBytes": 90953,
+          "databaseBytes": 96228,
+          "retainedHeapBytes": 9084728,
+          "observedHeapGrowthBytes": 8920232
+        },
+        {
+          "ms": 65.99562800000001,
+          "queries": 14,
+          "responseBytes": 90953,
+          "databaseBytes": 96228,
+          "retainedHeapBytes": 8385048,
+          "observedHeapGrowthBytes": 8229376
+        },
+        {
+          "ms": 57.54866900000002,
+          "queries": 14,
+          "responseBytes": 90953,
+          "databaseBytes": 96228,
+          "retainedHeapBytes": 8059288,
+          "observedHeapGrowthBytes": 7954632
+        },
+        {
+          "ms": 58.09057800000005,
+          "queries": 14,
+          "responseBytes": 90953,
+          "databaseBytes": 96228,
+          "retainedHeapBytes": 8891840,
+          "observedHeapGrowthBytes": 8784304
+        },
+        {
+          "ms": 56.55318999999986,
+          "queries": 14,
+          "responseBytes": 90953,
+          "databaseBytes": 96228,
+          "retainedHeapBytes": 8261680,
+          "observedHeapGrowthBytes": 8105504
+        }
+      ]
+    },
+    {
+      "historicalExpenses": 100000,
+      "mode": "bootstrap",
+      "variant": "before",
+      "repetitions": 5,
+      "p50Ms": 328.700292,
+      "p95Ms": 337.64133000000004,
+      "queries": [
+        24
+      ],
+      "responseBytes": 91377,
+      "databaseBytes": 3694111,
+      "p95ObservedHeapGrowthBytes": 86659816,
+      "maxRssKiB": 391256,
+      "samples": [
+        {
+          "ms": 337.64133000000004,
+          "queries": 24,
+          "responseBytes": 91377,
+          "databaseBytes": 3694111,
+          "retainedHeapBytes": 73492640,
+          "observedHeapGrowthBytes": 86145816
+        },
+        {
+          "ms": 328.700292,
+          "queries": 24,
+          "responseBytes": 91377,
+          "databaseBytes": 3694111,
+          "retainedHeapBytes": 84607744,
+          "observedHeapGrowthBytes": 84451800
+        },
+        {
+          "ms": 325.3625259999999,
+          "queries": 24,
+          "responseBytes": 91377,
+          "databaseBytes": 3694111,
+          "retainedHeapBytes": 83970800,
+          "observedHeapGrowthBytes": 83877032
+        },
+        {
+          "ms": 326.90216399999986,
+          "queries": 24,
+          "responseBytes": 91377,
+          "databaseBytes": 3694111,
+          "retainedHeapBytes": 84355096,
+          "observedHeapGrowthBytes": 84198648
+        },
+        {
+          "ms": 337.5793099999996,
+          "queries": 24,
+          "responseBytes": 91377,
+          "databaseBytes": 3694111,
+          "retainedHeapBytes": 86753584,
+          "observedHeapGrowthBytes": 86659816
+        }
+      ]
+    },
+    {
+      "historicalExpenses": 100000,
+      "mode": "bootstrap",
+      "variant": "after",
+      "repetitions": 5,
+      "p50Ms": 61.047834999999964,
+      "p95Ms": 63.49296100000004,
+      "queries": [
+        27
+      ],
+      "responseBytes": 91466,
+      "databaseBytes": 96647,
+      "p95ObservedHeapGrowthBytes": 9646576,
+      "maxRssKiB": 307972,
+      "samples": [
+        {
+          "ms": 63.466970999999944,
+          "queries": 27,
+          "responseBytes": 91466,
+          "databaseBytes": 96647,
+          "retainedHeapBytes": 9740088,
+          "observedHeapGrowthBytes": 9646576
+        },
+        {
+          "ms": 59.58859600000005,
+          "queries": 27,
+          "responseBytes": 91466,
+          "databaseBytes": 96647,
+          "retainedHeapBytes": 8859488,
+          "observedHeapGrowthBytes": 8767720
+        },
+        {
+          "ms": 61.047834999999964,
+          "queries": 27,
+          "responseBytes": 91466,
+          "databaseBytes": 96647,
+          "retainedHeapBytes": 8837280,
+          "observedHeapGrowthBytes": 8670624
+        },
+        {
+          "ms": 54.746863000000076,
+          "queries": 27,
+          "responseBytes": 91466,
+          "databaseBytes": 96647,
+          "retainedHeapBytes": 8081680,
+          "observedHeapGrowthBytes": 7989912
+        },
+        {
+          "ms": 63.49296100000004,
+          "queries": 27,
+          "responseBytes": 91466,
+          "databaseBytes": 96647,
+          "retainedHeapBytes": 8743616,
+          "observedHeapGrowthBytes": 8590224
+        }
+      ]
+    }
+  ]
+}

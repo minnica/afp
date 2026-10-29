@@ -6,6 +6,14 @@ Consolidado el **27 de octubre de 2026** a partir del README del commit `4562aa0
 
 ## 2026-10-29
 
+### A13: consultas acotadas y resumen de cabecera
+
+**Implementación local verificada**, sin publicación, migraciones ni cambios de dependencias. Dashboard y Análisis leen el año elegido y sus bordes; otras secciones móviles consultan un resumen sin matrices anuales. Gastos y su bootstrap comparten páginas, meses agrupados y totales SQL del filtro completo en `RepeatableRead`. Ciclos pagina por año y carga un detalle por ID, con sus advertencias y desglose bajo demanda. Se conservan pendientes históricos, el batch de pago, anclas MSI, ocurrencias contabilizadas fuera de mes y referencias de Turbo. Ingresos del mes y abonos de deudas se suman en SQL.
+
+La interfaz conserva la carga compartida, el respaldo y los pendientes offline. Cambiar página, filtros, orden, tamaño o año invalida y recarga la selección vigente. La aceptación de navegador detectó y corrigió una dependencia ausente en la recarga paginada. Se verifican **965 escenarios sin fallos ni omisiones** con PostgreSQL local, tipos, contratos, lint y build predeterminado. Las mediciones comparan el código anterior y el nuevo con 1,000, 10,000 y 100,000 gastos sintéticos; registran consultas, bytes, p95 y memoria. No son un SLO ni una medición de producción.
+
+README e informe de auditoría actualizados. [Evidencias, reproducción y límites A13](../artifacts/auditoria-2026-10-15/a13-2026-10-29/README.md). Resta publicar y aceptar con Supabase Auth real.
+
 ### A12: política de datos locales y pendientes al cerrar sesión
 
 **Implementación local verificada**, sin publicación, migraciones ni cambios de dependencias. Escritorio y móvil comparten la salida: elimina el respaldo sincronizado de Gastos y los borradores financieros del propietario, y retira respuestas API de cachés antiguas. Conserva el shell público y las preferencias. Una generación por usuario impide que respuestas anteriores vuelvan a persistir datos después de salir; los listeners de Auth permiten terminar la limpieza antes de redirigir.

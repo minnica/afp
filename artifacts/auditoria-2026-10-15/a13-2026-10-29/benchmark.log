@@ -1,0 +1,45 @@
+1000 dashboard before: 569.5137179999999 ms
+1000 dashboard after: 69.877159 ms
+1000 header after: 39.131268999999975 ms
+1000 cycles before: 392.742878 ms
+1000 cycles after: 42.98545300000001 ms
+1000 detail before: 46.85705900000005 ms
+1000 detail after: 32.47211699999991 ms
+1000 expenses before: 24.979967999999985 ms
+(node:78784) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+1000 expenses after: 30.02011099999993 ms
+1000 bootstrap before: 24.35179800000003 ms
+(node:78927) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+1000 bootstrap after: 29.38037099999997 ms
+10000 dashboard before: 3667.1562699999995 ms
+10000 dashboard after: 194.62789599999985 ms
+10000 header after: 133.28245600000002 ms
+10000 cycles before: 3587.3763440000002 ms
+10000 cycles after: 160.16279099999997 ms
+10000 detail before: 266.54969299999993 ms
+10000 detail after: 32.16789800000004 ms
+10000 expenses before: 135.05117399999995 ms
+(node:81623) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+10000 expenses after: 34.05059600000004 ms
+10000 bootstrap before: 60.59820100000002 ms
+(node:81875) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+10000 bootstrap after: 40.00030800000002 ms
+100000 dashboard before: 30079.377791000006 ms
+100000 dashboard after: 359.64225099999976 ms
+100000 header after: 225.2995860000001 ms
+100000 cycles before: 30682.359124999988 ms
+100000 cycles after: 237.83672 ms
+100000 detail before: 1836.480606000001 ms
+100000 detail after: 54.39211899999998 ms
+100000 expenses before: 337.0227010000001 ms
+(node:94661) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+100000 expenses after: 50.421695 ms
+100000 bootstrap before: 337.64133000000004 ms
+(node:94781) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+100000 bootstrap after: 53.59313000000009 ms

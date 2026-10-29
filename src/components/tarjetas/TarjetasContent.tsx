@@ -1,4 +1,6 @@
 "use client";
+import { HistoryYear } from "@/components/ui/history-year";
+import { mexicoDayNumber } from "@/lib/financialDates";
 import AutomaticRecordingLink from "@/components/configuracion/AutomaticRecordingLink";
 import type { CreateError, Cycle, Card as FinancialCard } from "@/lib/uiTypes";
 import { errorMessage } from "@/lib/uiTypes";
@@ -64,6 +66,12 @@ export default function TarjetasContent() {
   const [user, setUser] = useState<User | null>(null);
   const [cards, setCards] = useState<FinancialCard[]>([]);
   const cardsRequest = useRef<AbortController | null>(null);
+  const [currentYear, setCurrentYear] = useState(() => new Date(mexicoDayNumber()).getUTCFullYear());
+  const cyclesYearRef = useRef(currentYear);
+  const cyclesRequest = useRef<AbortController | null>(null);
+  const [cyclesPage, setCyclesPage] = useState(1);
+  const [cyclesPageCount, setCyclesPageCount] = useState(1);
+  const [cyclesLoading, setCyclesLoading] = useState(false);
   const [cycles, setCycles] = useState<Cycle[]>([]);
 
   const [name, setName] = useState("");
@@ -100,11 +108,27 @@ export default function TarjetasContent() {
     }
   }, []);
 
-  async function loadCycles(userId: string, { mutationCompleted = false } = {}) {
-    const response = await apiFetch(`/api/card-cycles?userId=${userId}`, { mutationCompleted });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || "No se pudieron cargar los ciclos.");
-    setCycles(data.cycles || []);
+  const loadCycles = useCallback(async (userId: string, { mutationCompleted = false, page = 1 } = {}) => {
+    cyclesRequest.current?.abort();
+    const controller = new AbortController();
+    cyclesRequest.current = controller;
+    setCyclesLoading(true);
+    try {
+      const response = await apiFetch(`/api/card-cycles?userId=${userId}&year=${cyclesYearRef.current}&page=${page}`, { mutationCompleted, expectedUserId: userId, signal: controller.signal });
+      const data = await response.json();
+      if (controller.signal.aborted) return;
+      if (!response.ok) throw new Error(data.error || "No se pudieron cargar los ciclos.");
+      setCycles(data.cycles || []);
+      setCyclesPage(data.page || 1); setCyclesPageCount(data.pageCount || 1);
+    } catch (cause) { if (!controller.signal.aborted) throw cause; }
+    finally { if (!controller.signal.aborted) setCyclesLoading(false); }
+  }, []);
+  useEffect(() => () => cyclesRequest.current?.abort(), []);
+  function changeCyclesYear(year: number) {
+    cyclesRequest.current?.abort();
+    cyclesYearRef.current = year;
+    setCurrentYear(year); setCycles([]);
+    if (user) void loadCycles(user.id).catch(cause => setError(errorMessage(cause)));
   }
 
   async function loadCycleBreakdown(cycleId: string) {
@@ -148,7 +172,7 @@ export default function TarjetasContent() {
 
     init();
     return () => cardsRequest.current?.abort();
-  }, [router, loadCards]);
+  }, [router, loadCards, loadCycles]);
 
   async function createCard() {
     if (!user || isSaving) return false;
@@ -296,7 +320,6 @@ export default function TarjetasContent() {
     }
   }
 
-  const currentYear = useMemo(() => new Date().getFullYear(), []);
 
   const [activeMonthTab, setActiveMonthTab] = useState(
     String(new Date().getMonth()),
@@ -433,6 +456,14 @@ export default function TarjetasContent() {
             </Button>
           </CardHeader>
           <CardContent>
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+              <HistoryYear year={currentYear} onChange={changeCyclesYear} disabled={cyclesLoading} />
+              {cyclesPageCount > 1 ? <div className="flex items-center gap-2">
+                <Button variant="outline" disabled={cyclesLoading || cyclesPage <= 1} onClick={() => user && void loadCycles(user.id, { page: cyclesPage - 1 }).catch(cause => setError(errorMessage(cause)))}>Página anterior</Button>
+                <span>{cyclesPage} / {cyclesPageCount}</span>
+                <Button variant="outline" disabled={cyclesLoading || cyclesPage >= cyclesPageCount} onClick={() => user && void loadCycles(user.id, { page: cyclesPage + 1 }).catch(cause => setError(errorMessage(cause)))}>Página siguiente</Button>
+              </div> : null}
+            </div>
             <CyclesDataTable
               cycles={cyclesByMonthIndex[Number(activeMonthTab)] || []}
               month={activeMonthTab}

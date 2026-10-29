@@ -11,7 +11,7 @@ import { uiResponseSchemas, type UiResponse } from "@/lib/uiResponseSchemas";
 import type { CreateError, Expense, ExpenseRow, Card as FinancialCard, NamedRecord } from "@/lib/uiTypes";
 import { errorMessage } from "@/lib/uiTypes";
 import type { User } from "@supabase/supabase-js";
-import type { ColumnDef } from "@tanstack/react-table";
+import type { ColumnDef, SortingState } from "@tanstack/react-table";
 import type * as React from "react";
 
 import { RequestError } from "@/lib/requestErrors";
@@ -199,8 +199,12 @@ export default function GastosContent() {
   const [cards, setCards] = useState<FinancialCard[]>([]);
   const [moneyAccounts, setMoneyAccounts] = useState<NamedRecord[]>([]);
   const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [historySize, setHistorySize] = useState(100);
+  const [historySorting, setHistorySorting] = useState<SortingState>([{ id: "date", desc: true }]);
+  const [historySelection, setHistorySelection] = useState({ key: "", page: 1 });
+  const [historyInfo, setHistoryInfo] = useState({ page: 1, pageSize: 100, pageCount: 1, totalCount: 0, total: 0, personalTotal: 0 });
   const [availableMonths, setAvailableMonths] = useState<string[]>([]);
-  const [initialExpenses, setInitialExpenses] = useState<({ url: ExpensesUrl } & Pick<UiResponse<"gastos/bootstrap">, "expenses" | "availableMonths">) | null>(null);
+  const [initialExpenses, setInitialExpenses] = useState<({ url: ExpensesUrl } & Pick<UiResponse<"gastos/bootstrap">, "expenses" | "availableMonths" | "page" | "pageSize" | "pageCount" | "totalCount" | "total" | "personalTotal">) | null>(null);
 
   const [date, setDate] = useState(getTodayInputValue());
   const [paymentMethod, setPaymentMethod] = useState("CASH");
@@ -276,7 +280,10 @@ export default function GastosContent() {
   const [mobileFilterResetKey, setMobileFilterResetKey] = useState(0);
   const didLoadInitialExpensesRef = useRef(false);
   const [expenseReader] = useState(() => createExpenseReader({
-    onData: data => { setExpenses(data.expenses || []); setAvailableMonths(data.availableMonths || []); },
+    onData: data => { setExpenses(data.expenses || []); setAvailableMonths(data.availableMonths || []);
+      setHistoryInfo({ page: data.page || 1, pageSize: data.pageSize || 100, pageCount: data.pageCount || 1, totalCount: data.totalCount ?? data.expenses.length,
+        total: data.total ?? data.expenses.reduce((sum, row) => sum + Number(row.amount), 0), personalTotal: data.personalTotal ?? sumPersonalExpenses(data.expenses) });
+    },
     onInvalidate: () => setExpenses([]),
     onLoading: setIsExpensesLoading,
     onError: setExpensesError,
@@ -301,6 +308,7 @@ export default function GastosContent() {
       userId,
       startDate: today,
       endDate: today,
+      page: "1", pageSize: "100",
     });
 
     try {
@@ -321,7 +329,7 @@ export default function GastosContent() {
       setPeople(data.people || []);
       setCards(data.cards || []);
       setMoneyAccounts(data.moneyAccounts || []);
-      setInitialExpenses({ url: `/api/expenses?${params.toString()}`, expenses: data.expenses, availableMonths: data.availableMonths });
+      setInitialExpenses({ url: `/api/expenses?${params.toString()}`, ...data });
       setReceivables(data.receivables || []);
       setPayables(data.payables || []);
       setSubscriptions(data.subscriptions || []);
@@ -337,7 +345,7 @@ export default function GastosContent() {
       setPeople(cachedData.people || []);
       setCards(cachedData.cards || []);
       setMoneyAccounts(cachedData.moneyAccounts || []);
-      setInitialExpenses({ url: `/api/expenses?${params.toString()}`, expenses: cachedData.expenses, availableMonths: cachedData.availableMonths });
+      setInitialExpenses({ url: `/api/expenses?${params.toString()}`, ...cachedData });
       setReceivables(cachedData.receivables || []);
       setPayables(cachedData.payables || []);
       setSubscriptions(cachedData.subscriptions || []);
@@ -359,8 +367,16 @@ export default function GastosContent() {
       params.set("endDate", range.endDate);
     }
 
-    // En móvil se consulta el período completo para combinar alternativas por campo.
-    if (mobileNavigation) return `/api/expenses?${params.toString()}`;
+    const selectionKey = JSON.stringify([filterDate, filterMonth, mobileNavigation, mobileFilters, filterCategoryId, filterConcept, filterCardId, filterAmount, historySize, historySorting]);
+    params.set("page", String(historySelection.key === selectionKey ? historySelection.page : 1));
+    params.set("pageSize", String(historySize));
+    if (!mobileNavigation && historySorting[0] && (historySorting[0].id !== "date" || !historySorting[0].desc)) {
+      params.set("sortBy", historySorting[0].id); params.set("sortDirection", historySorting[0].desc ? "desc" : "asc");
+    }
+    if (mobileNavigation) {
+      if (mobileFilters.length) params.set("filters", JSON.stringify(mobileFilters.map(({ type, value }) => ({ type, value }))));
+      return `/api/expenses?${params.toString()}`;
+    }
 
     if (filterCategoryId) params.set("categoryId", filterCategoryId);
 
@@ -383,6 +399,9 @@ export default function GastosContent() {
     return `/api/expenses?${params.toString()}`;
   }
 
+  function changeHistoryPage(page: number) {
+    setHistorySelection({ key: JSON.stringify([filterDate, filterMonth, mobileNavigation, mobileFilters, filterCategoryId, filterConcept, filterCardId, filterAmount, historySize, historySorting]), page });
+  }
   const loadExpenses = expenseReader.load;
 
   async function loadReceivables(userId: string, { mutationCompleted = false, errorMode = "dialog" }: { errorMode?: "dialog" | "inline"; mutationCompleted?: boolean } = {}) {
@@ -582,18 +601,7 @@ export default function GastosContent() {
     }, 250);
 
     return () => window.clearTimeout(timeoutId);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    user,
-    isCheckingSession,
-    filterMonth,
-    filterDate,
-    filterCategoryId,
-    filterConcept,
-    filterCardId,
-    filterAmount,
-    mobileNavigation,
-  ]);
+  }, [user, isCheckingSession, expensesUrl, loadExpenses]);
 
   async function createExpense() {
     if (!user || isSaving) return false;
@@ -1814,6 +1822,20 @@ export default function GastosContent() {
                     />
                   ) : null}
 
+                  <div className="flex flex-wrap items-center justify-between gap-2" aria-label="Paginación del historial">
+                    <p className="text-sm text-muted-foreground" role="status">{historyInfo.totalCount} gastos guardados · Total del filtro {formatMoney(historyInfo.total)} · Tu parte {formatMoney(historyInfo.personalTotal)}</p>
+                    <div className="flex items-center gap-2 md:hidden">
+                      <Button variant="outline" disabled={isExpensesLoading || historyInfo.page <= 1} onClick={() => changeHistoryPage(historyInfo.page - 1)}>Anterior</Button>
+                      <span className="text-sm">Página {historyInfo.page} de {historyInfo.pageCount}</span>
+                      <Button variant="outline" disabled={isExpensesLoading || historyInfo.page >= historyInfo.pageCount} onClick={() => changeHistoryPage(historyInfo.page + 1)}>Siguiente</Button>
+                    </div>
+                  </div>
+                  {mobileNavigation && historyInfo.pageCount > 1 ? <p className="text-sm text-muted-foreground">Los importes por día corresponden a esta página. El total del filtro incluye todos los gastos guardados de la selección.</p> : null}
+                  {!mobileNavigation && filteredExpenses.some(row => row._offlineStatus === "pending") ? (
+                    <div className="flex flex-col gap-2"><p className="text-sm text-muted-foreground">Pendientes en este dispositivo</p>
+                      <DailyExpenseCards expenses={filteredExpenses.filter(row => row._offlineStatus === "pending")} isOnline={isOnline} onEdit={startEditingExpense} onDelete={setExpenseToDelete} />
+                    </div>
+                  ) : null}
                   {isExpensesLoading ? (
                     <ExpensesResultsSkeleton />
                   ) : mobileNavigation ? (
@@ -1827,22 +1849,26 @@ export default function GastosContent() {
                   ) : (
                     <DataTable
                       columns={expenseColumns}
-                      data={filteredExpenses}
-                      pageSize={15}
+                      data={filteredExpenses.filter(row => row._offlineStatus !== "pending")}
+                      pageSize={historySize}
                       pageSizeOptions={[15, 25, 50, 100]}
+                      serverState={{ pagination: { pageIndex: historyInfo.page - 1, pageSize: historySize }, sorting: historySorting, globalFilter: "", rowCount: historyInfo.totalCount, isLoading: isExpensesLoading,
+                        onPaginationChange: update => {
+                          const next = typeof update === "function" ? update({ pageIndex: historyInfo.page - 1, pageSize: historySize }) : update;
+                          if (next.pageSize !== historySize) { setHistorySize(next.pageSize); }
+                          else changeHistoryPage(next.pageIndex + 1);
+                        }, onSortingChange: setHistorySorting, onGlobalFilterChange: () => {},
+                      }}
                       footerRow={(table) => {
-                        const total = table.getFilteredRowModel().rows.reduce(
-                          (sum, row) => sum + Number(row.original.amount || 0),
-                          0,
-                        );
+                        const total = historyInfo.total;
                         return (
                           <TableRow>
                             <TableCell colSpan={4} className="text-right text-sm font-medium text-muted-foreground">
-                              {table.getFilteredRowModel().rows.some(row => row.original.refundOriginalAmount != null) ? "Gasto neto" : "Total pagado"}
+                              {table.getFilteredRowModel().rows.some(row => row.original.refundOriginalAmount != null) ? "Gasto neto" : "Total del filtro"}
                             </TableCell>
                             <TableCell className="font-semibold tabular-nums">
                               {formatMoney(total)}
-                              {table.getFilteredRowModel().rows.some(row => Number(row.original.cashContributionAmount) > 0) ? <p className="text-xs font-normal">Tu parte {formatMoney(sumPersonalExpenses(table.getFilteredRowModel().rows.map(row => row.original)))}</p> : null}
+                              {table.getFilteredRowModel().rows.some(row => Number(row.original.cashContributionAmount) > 0) ? <p className="text-xs font-normal">Tu parte {formatMoney(historyInfo.personalTotal)}</p> : null}
                             </TableCell>
                             <TableCell />
                           </TableRow>

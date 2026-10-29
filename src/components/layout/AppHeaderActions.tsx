@@ -13,7 +13,7 @@ import { ArrowLeft01Icon, Notification03Icon, Target02Icon } from "@hugeicons/co
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useRef, useState } from "react";
 
-function DashboardStatus({ isLoading, error, dashboard, retry }: Pick<ReturnType<typeof useDashboard>, "isLoading" | "error" | "dashboard" | "retry">) {
+function DashboardStatus({ isLoading, error, summary, retry }: Pick<ReturnType<typeof useDashboard>, "isLoading" | "error" | "summary" | "retry">) {
   if (isLoading) {
     return (
       <div className="flex flex-col gap-3" role="status" aria-label="Cargando información">
@@ -26,7 +26,7 @@ function DashboardStatus({ isLoading, error, dashboard, retry }: Pick<ReturnType
   return (
     <Alert variant="destructive">
       <AlertDescription className="flex flex-col items-start gap-2">
-        <p>{error}{dashboard ? " Se muestra la última información cargada." : ""}</p>
+        <p>{error}{summary ? " Se muestra la última información cargada." : ""}</p>
         <Button type="button" variant="outline" className="h-11" onClick={() => retry()}>Reintentar</Button>
       </AlertDescription>
     </Alert>
@@ -35,7 +35,7 @@ function DashboardStatus({ isLoading, error, dashboard, retry }: Pick<ReturnType
 
 export default function AppHeaderActions({ disabled = false }: { disabled?: boolean }) {
   const data = useDashboard();
-  const { dashboard, refresh, today, usageHistoryPeriod, setUsageHistoryPeriod, noticePreferences } = data;
+  const { summary: dashboard, refresh, today, usageHistoryPeriod, setUsageHistoryPeriod, noticePreferences } = data;
   const [usageView, setUsageView] = useState("current");
   const [noticeView, setNoticeView] = useState("active");
   const noticesScrollRef = useRef<HTMLDivElement | null>(null);

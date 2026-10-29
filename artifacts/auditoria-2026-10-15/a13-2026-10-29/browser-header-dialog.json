@@ -1,0 +1,15 @@
+{
+  "apis": [
+    {
+      "status": 200,
+      "url": "/api/dashboard/summary?userId=00000000-0000-4000-8000-000000000094&clientDate=2026-10-29"
+    },
+    {
+      "status": 200,
+      "url": "/api/dashboard/summary?userId=00000000-0000-4000-8000-000000000094&clientDate=2026-10-29"
+    }
+  ],
+  "dialog": [
+    "Avisos importantesTodos tus avisos de pagos, vencimientos y cortes.Cuenta por pagar: Deuda ficticiaVence: Es hoy [29 octubre]Saldo pendiente: $700.00Acreedor: Persona ficticiaCobro programado: Persona ficticiaVence: Es en 2 días [31 octubre]Cuenta: Cobro ficticio"
+  ]
+}

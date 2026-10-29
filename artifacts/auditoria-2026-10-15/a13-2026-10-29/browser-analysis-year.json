@@ -1,0 +1,14 @@
+{
+  "apis": [
+    {
+      "status": 200,
+      "url": "?userId=00000000-0000-4000-8000-000000000094&clientDate=2026-10-29&year=2026"
+    },
+    {
+      "status": 200,
+      "url": "?userId=00000000-0000-4000-8000-000000000094&clientDate=2026-10-29&year=2025"
+    }
+  ],
+  "overflow": false,
+  "year": "Anterior2025Siguiente"
+}

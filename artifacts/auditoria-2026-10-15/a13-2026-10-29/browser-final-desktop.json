@@ -1,0 +1,10 @@
+{
+  "page": "185\n\n\tCategoría ficticia\tEfectivo\t\n$1.01\n\t\n\nTotal del filtro\t$357.05\t\n208 registro(s) · página 2 de 3\nAnterior\nSiguiente",
+  "requests": [
+    {
+      "status": 200,
+      "url": "?userId=00000000-0000-4000-8000-000000000094&startDate=2026-10-29&endDate=2026-10-29&page=2&pageSize=100"
+    }
+  ],
+  "rows": 100
+}

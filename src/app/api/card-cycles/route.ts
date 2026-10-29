@@ -1,3 +1,4 @@
+import { readPage, readYear, cycleExpenseWhere, monthWindow, relevantPurchaseIds, previousCycleReferences, dashboardCycleIds, dashboardWindow, subscriptionHistoryWhere } from "@/lib/historyWindow";
 import type { Prisma } from "@prisma/client";
 import { readFinancialInput } from "@/lib/financialContracts";
 import { getCyclePaymentState, getStoredCycleStatus, parseCycleMoney } from "@/lib/calculations/cardCyclePayments";
@@ -170,35 +171,50 @@ function getTargetMonths() {
   }));
 }
 
-export async function GET(request: Request) {
+async function loadCycles(request: Request, generated = false, owner?: string) {
   try {
-    const user = await requireApiUser(request);
-    const userId = user.id;
-    const { searchParams } = new URL(request.url);
+    const userId = owner ?? (await requireApiUser(request)).id;
+    const url = new URL(request.url);
+    if (generated) { url.search = ""; url.searchParams.set("year", String(new Date(mexicoDayNumber()).getUTCFullYear())); }
+    const searchParams = url.searchParams;
     const cycleId = searchParams.get("cycleId");
     const includeBreakdown =
       Boolean(cycleId) || searchParams.get("includeBreakdown") === "true";
 
 
-    const [cycles, expenses, subscriptions, purchases] = await Promise.all([
-      prisma.cardCycle.findMany({
-        where: { userId },
-        select: cycleSelect,
-        orderBy: [{ year: "asc" }, { month: "asc" }, { card: { name: "asc" } }],
-      }),
-      prisma.dailyExpense.findMany({
-        where: { userId },
-        select: cycleExpenseSelect,
-      }),
-      prisma.subscription.findMany({
-        where: { userId },
-        select: cycleSubscriptionSelect,
-      }),
-      prisma.installmentPurchase.findMany({
-        where: { userId },
-        select: cyclePurchaseSelect,
-      }),
+    let pagination;
+    let year: number;
+    try {
+      pagination = readPage(searchParams);
+      year = readYear(searchParams.get("year"), new Date(mexicoDayNumber()).getUTCFullYear());
+    } catch (error) {
+      return NextResponse.json({ error: error instanceof Error ? error.message : "Filtros no válidos." }, { status: 400 });
+    }
+    const extra = !cycleId && !searchParams.has("year") ? await dashboardCycleIds(prisma, userId,
+      dashboardWindow(new Date(mexicoDayNumber()), false), new Date(mexicoDayNumber() + 86400000)) : [];
+    const where = { userId, ...(cycleId ? { id: cycleId } : searchParams.has("year") ? { year } : { OR: [{ year }, { id: { in: extra.map(item => item.id) } }] }) };
+    const { cycles, totalCount, page, pageCount } = await prisma.$transaction(async tx => {
+      const totalCount = await tx.cardCycle.count({ where });
+      const pageCount = Math.max(1, Math.ceil(totalCount / pagination.pageSize));
+      const page = Math.min(pagination.page, pageCount);
+      const cycles = await tx.cardCycle.findMany({ where, select: cycleSelect,
+        orderBy: [{ year: "asc" }, { month: "asc" }, { card: { name: "asc" } }, { id: "asc" }],
+        take: cycleId ? 1 : pagination.pageSize, skip: cycleId ? 0 : (page - 1) * pagination.pageSize,
+      });
+      return { cycles, totalCount, page, pageCount };
+    }, { isolationLevel: "RepeatableRead" });
+    if (!cycles.length) return NextResponse.json(cycleId ? { cycle: null } : { cycles: [], totalCount, page, pageCount, pageSize: pagination.pageSize, year });
+    const windows = cycles.map(cycle => monthWindow(cycle.startDate, cycle.cutDate));
+    const monthRanges = windows.map(item => ({ month: { gte: item.start.toISOString().slice(0, 7), lt: item.end.toISOString().slice(0, 7) } }));
+    const purchaseIds = await relevantPurchaseIds(prisma, userId, windows);
+    const [expenses, subscriptions, purchases, previous] = await Promise.all([
+      prisma.dailyExpense.findMany({ where: cycleExpenseWhere(userId, cycles), select: cycleExpenseSelect }),
+      prisma.subscription.findMany({ where: { ...subscriptionHistoryWhere(userId, windows), cardId: { in: cycles.map(cycle => cycle.cardId) } }, select: { ...cycleSubscriptionSelect, charges: { ...cycleSubscriptionSelect.charges, where: { OR: monthRanges } } } }),
+      prisma.installmentPurchase.findMany({ where: { userId, id: { in: purchaseIds.map(item => item.id) } }, select: cyclePurchaseSelect }),
+      // Una consulta para los predecesores de toda la página, sin N+1.
+      previousCycleReferences(prisma, userId, cycles.map(cycle => cycle.id)),
     ]);
+    const context = [...cycles, ...previous.map(item => ({ ...cycles.find(cycle => cycle.cardId === item.cardId)!, ...item }))];
 
     const expensesByCardId = groupBy(expenses, (expense) => expense.cardId);
     const subscriptionsByCardId = groupBy(
@@ -223,7 +239,7 @@ export async function GET(request: Request) {
       return {
         ...cycle,
         ...getCyclePaymentState(cycle),
-        dataWarnings: getCyclePeriodWarnings(cycle, cycles),
+        dataWarnings: getCyclePeriodWarnings(cycle, context),
         ...amounts,
       };
     });
@@ -232,7 +248,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ cycle: cyclesWithAmounts[0] || null });
     }
 
-    return NextResponse.json({ cycles: cyclesWithAmounts });
+    return NextResponse.json({ ...(generated ? { ok: true } : {}), cycles: cyclesWithAmounts, totalCount, page, pageCount, pageSize: pagination.pageSize, year });
   } catch (error) {
     const accessResponse = apiAccessErrorResponse(error);
     if (accessResponse) return accessResponse;
@@ -290,57 +306,7 @@ export async function POST(request: Request) {
       }
     }
 
-    const [cycles, expenses, subscriptions, purchases] = await Promise.all([
-      prisma.cardCycle.findMany({
-        where: { userId },
-        select: cycleSelect,
-        orderBy: [{ year: "asc" }, { month: "asc" }, { card: { name: "asc" } }],
-      }),
-      prisma.dailyExpense.findMany({
-        where: { userId },
-        select: cycleExpenseSelect,
-      }),
-      prisma.subscription.findMany({
-        where: { userId },
-        select: cycleSubscriptionSelect,
-      }),
-      prisma.installmentPurchase.findMany({
-        where: { userId },
-        select: cyclePurchaseSelect,
-      }),
-    ]);
-
-    const expensesByCardId = groupBy(expenses, (expense) => expense.cardId);
-    const subscriptionsByCardId = groupBy(
-      subscriptions.filter((subscription) => subscription.cardId),
-      (subscription) => subscription.cardId,
-    );
-    const purchasesByCardId = groupBy(purchases, (purchase) => purchase.cardId);
-
-    const cyclesWithAmounts = cycles.map((cycle) => {
-      const amounts = calculateCycleAmount({
-        cycle,
-        expenses,
-        subscriptions,
-        purchases,
-        expensesByCardId,
-        subscriptionsByCardId,
-        purchasesByCardId,
-        includeBreakdown: false,
-      });
-
-      return {
-        ...cycle,
-        ...getCyclePaymentState(cycle),
-        dataWarnings: getCyclePeriodWarnings(cycle, cycles),
-        ...amounts,
-      };
-    });
-
-    return NextResponse.json({
-      ok: true,
-      cycles: cyclesWithAmounts,
-    });
+    return loadCycles(request, true, userId);
   } catch (error) {
     const accessResponse = apiAccessErrorResponse(error);
     if (accessResponse) return accessResponse;
@@ -524,3 +490,5 @@ export async function PATCH(request: Request) {
     );
   }
 }
+
+export async function GET(request: Request) { return loadCycles(request); }
