@@ -47,6 +47,8 @@ export interface SourceModules {
   'src/app/api/captures/payment-receipts/route.ts': typeof import('../../src/app/api/captures/payment-receipts/route');
   'src/lib/paymentReceipts.ts': typeof import('../../src/lib/paymentReceipts');
   'src/lib/captureService.ts': typeof import('../../src/lib/captureService');
+  'src/lib/localFinancialData.ts': typeof import('../../src/lib/localFinancialData');
+  'src/lib/logout.ts': typeof import('../../src/lib/logout');
   'src/lib/offlineExpenses.ts': typeof import('../../src/lib/offlineExpenses');
   'src/lib/apiFetch.ts': typeof import('../../src/lib/apiFetch');
   'src/lib/androidNotices.ts': typeof import('../../src/lib/androidNotices');

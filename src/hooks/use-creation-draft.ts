@@ -1,5 +1,6 @@
 "use client"
 
+import { isLocalDataClosed, LOCAL_DATA_EVENT } from "@/lib/localFinancialData"
 import { useEffect, useRef, useState } from "react"
 
 // El respaldo en memoria conserva la captura si sessionStorage no está disponible.
@@ -31,11 +32,23 @@ export function useCreationDraft<T extends DraftValues>({ name, userId, enabled,
   const [restoredKey, setRestoredKey] = useState<string | null>(null)
 
   useEffect(() => {
+    if (!userId) return
+    const clear = () => {
+      if (isLocalDataClosed(userId)) {
+        for (const draftKey of drafts.keys()) if (draftKey.startsWith(`afp:create-draft:v1:${userId}:`)) drafts.delete(draftKey)
+      }
+    }
+    window.addEventListener(LOCAL_DATA_EVENT, clear)
+    window.addEventListener("storage", clear)
+    return () => { window.removeEventListener(LOCAL_DATA_EVENT, clear); window.removeEventListener("storage", clear) }
+  }, [userId])
+
+  useEffect(() => {
     latest.current = { values, setters }
   })
 
   useEffect(() => {
-    if (!enabled || !key) return
+    if (!enabled || !key || (userId && isLocalDataClosed(userId))) return
     let cancelled = false
     queueMicrotask(() => {
       if (cancelled) return
@@ -53,9 +66,9 @@ export function useCreationDraft<T extends DraftValues>({ name, userId, enabled,
       setRestoredKey(key)
     })
     return () => { cancelled = true }
-  }, [enabled, key])
+  }, [enabled, key, userId])
 
   useEffect(() => {
-    if (enabled && key && restoredKey === key) writeDraft(key, values)
-  }, [enabled, key, restoredKey, values])
+    if (enabled && key && userId && !isLocalDataClosed(userId) && restoredKey === key) writeDraft(key, values)
+  }, [enabled, key, restoredKey, userId, values])
 }

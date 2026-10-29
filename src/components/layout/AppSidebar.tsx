@@ -4,9 +4,9 @@
 import { navItems } from "@/lib/navigation";
 import { LogOut } from "lucide-react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 
-import { supabase } from "@/lib/supabase";
+import { useLogout } from "./LogoutProvider";
 
 import {
 Sidebar,
@@ -23,12 +23,7 @@ SidebarRail,
 
 export default function AppSidebar() {
   const pathname = usePathname();
-  const router = useRouter();
-
-  async function handleLogout() {
-    await supabase.auth.signOut();
-    router.replace("/login");
-  }
+  const handleLogout = useLogout();
 
   return (
     <Sidebar collapsible="icon">

@@ -5,6 +5,8 @@ import type { OfflineExpenseDraft } from './offlineExpenseContracts';
 import type { ApiFetchOptions } from './apiFetch';
 import { apiFetch } from "@/lib/apiFetch";
 
+import { assertLocalDataOpen, isLocalDataClosed } from "./localFinancialData";
+
 const STORAGE_PREFIX = "afp:offline-expenses:";
 const DATABASE = "afp-offline-expenses";
 const CHANGE_EVENT = "afp:offline-expenses-changed";
@@ -79,12 +81,14 @@ export function subscribeOfflineExpenses(userId: string, listener: (change?: Off
 async function migrateLegacyExpenses(userId: string) {
   // La copia antigua se conserva. Marcador y alta se confirman juntos por entrada.
   // Dos pestañas o una recarga no reimportan gastos ya sincronizados.
+  if (isLocalDataClosed(userId)) return;
   const raw = window.localStorage.getItem(`${STORAGE_PREFIX}${userId}`);
   if (!raw) return;
   let entries: unknown;
   try { entries = JSON.parse(raw); } catch { throw new Error("La cola anterior no se puede leer. Se conserva para recuperarla."); }
   const legacy = readLegacyEntries(entries);
   await transaction(["expenses", "legacyImports"], "readwrite", tx => {
+    if (isLocalDataClosed(userId)) return;
     for (const entry of legacy) {
       const imports = tx.objectStore("legacyImports");
       const request = imports.get([userId, entry.clientId]);
@@ -107,7 +111,8 @@ export async function readOfflineExpenses(userId: string | null | undefined): Pr
     request.onsuccess = () => {
       const stored: unknown = request.result;
       if (!Array.isArray(stored)) throw new Error("No se pudo leer la cola local.");
-      done((stored as unknown[]).map(readOfflineEntry).sort((a, b) => b.createdAt.localeCompare(a.createdAt)));
+      try { done((stored as unknown[]).map(readOfflineEntry).sort((a, b) => b.createdAt.localeCompare(a.createdAt))); }
+      catch { tx.abort(); }
     };
   });
 }
@@ -117,7 +122,7 @@ export async function addOfflineExpense<P extends OfflineExpenseDraft>(userId: s
   const operationId = crypto.randomUUID();
   const expense = { userId, clientId: operationId, createdAt: new Date().toISOString(),
     payload: { ...payload, operationId } };
-  await transaction(["expenses"], "readwrite", tx => { tx.objectStore("expenses").add(expense); });
+  await transaction(["expenses"], "readwrite", tx => { assertLocalDataOpen(userId); tx.objectStore("expenses").add(expense); });
   notifyChanges(userId);
   return expense;
 }
@@ -164,7 +169,13 @@ async function synchronize(userId: string, onlyClientId: string | undefined, err
 }
 
 export async function syncOfflineExpenses(userId: string, { onlyClientId, errorMode = "inline" }: { onlyClientId?: string; errorMode?: ApiFetchOptions['errorMode'] } = {}): Promise<OfflineSyncResult> {
-  const run = () => synchronize(userId, onlyClientId, errorMode);
+  return withOfflineExpenseLock(userId, () => {
+    assertLocalDataOpen(userId);
+    return synchronize(userId, onlyClientId, errorMode);
+  });
+}
+
+export async function withOfflineExpenseLock<T>(userId: string, run: () => Promise<T>): Promise<T> {
   if (typeof navigator !== "undefined" && navigator.locks) {
     return navigator.locks.request(`${DATABASE}:${userId}`, run);
   }
@@ -179,7 +190,9 @@ export async function syncOfflineExpenses(userId: string, { onlyClientId, errorM
 export async function resolveOfflineCapture(userId: string, clientId: string, distinct: boolean) {
   if (!userId) throw new Error("Inicia sesión para resolver el pendiente.");
   const run = async () => {
+    assertLocalDataOpen(userId);
     await transaction(["expenses"], "readwrite", tx => {
+      assertLocalDataOpen(userId);
       const store = tx.objectStore("expenses");
       const request = store.get([userId, clientId]);
       request.onsuccess = () => {
@@ -196,4 +209,131 @@ export async function resolveOfflineCapture(userId: string, clientId: string, di
   const previous = localSyncs.get(userId) || Promise.resolve();
   const current = previous.catch(() => {}).then(run); localSyncs.set(userId, current);
   try { return await current; } finally { if (localSyncs.get(userId) === current) localSyncs.delete(userId); }
+}
+
+export interface OfflineExpenseBackup {
+  format: "afp-offline-expenses";
+  version: 1;
+  userId: string;
+  expenses: unknown[];
+  legacyImports: unknown[];
+  legacy: string | null;
+}
+
+// Incluye datos sin normalizar: incluso una cola dañada se puede rescatar.
+export async function backupOfflineExpenses(userId: string): Promise<OfflineExpenseBackup> {
+  const legacy = window.localStorage.getItem(`${STORAGE_PREFIX}${userId}`) ?? null;
+  return transaction<OfflineExpenseBackup>(["expenses", "legacyImports"], "readonly", (tx, done) => {
+    const expenses = tx.objectStore("expenses").index("userId").getAll(userId);
+    const imports = tx.objectStore("legacyImports").getAll();
+    imports.onsuccess = () => {
+      const entries: unknown[] = imports.result;
+      done({ format: "afp-offline-expenses", version: 1, userId, expenses: expenses.result,
+        legacyImports: entries.filter(row => isRecord(row) && row.userId === userId), legacy });
+    };
+  });
+}
+
+export function hasOfflineData(backup: OfflineExpenseBackup) {
+  if (backup.expenses.length > 0) return true;
+  if (backup.legacy === null) return false;
+  try {
+    const parsed: unknown = JSON.parse(backup.legacy);
+    const legacy = readLegacyEntries(parsed);
+    return legacy.some(entry => !backup.legacyImports.some(marker => isRecord(marker) && marker.clientId === entry.clientId));
+  } catch { return true; }
+}
+
+export async function removeOfflineExpenses(userId: string, expected: OfflineExpenseBackup) {
+  if (expected.userId !== userId) throw new Error("El respaldo pertenece a otra cuenta.");
+  if ((window.localStorage.getItem(`${STORAGE_PREFIX}${userId}`) ?? null) !== expected.legacy) {
+    throw new Error("La cola anterior cambió. Exporta una copia actual antes de salir.");
+  }
+  await transaction(["expenses", "legacyImports"], "readwrite", tx => {
+    const expenses = tx.objectStore("expenses").index("userId").getAll(userId);
+    const imports = tx.objectStore("legacyImports").getAll();
+    imports.onsuccess = () => {
+      const rows: unknown[] = imports.result;
+      const current = { ...expected, expenses: expenses.result,
+        legacyImports: rows.filter(row => isRecord(row) && row.userId === userId) };
+      if (JSON.stringify(current) !== JSON.stringify(expected)) { tx.abort(); return; }
+      for (const name of ["expenses", "legacyImports"]) {
+        const request = tx.objectStore(name).openCursor();
+        request.onsuccess = () => {
+          const cursor = request.result;
+          if (!cursor) return;
+          const row: unknown = cursor.value;
+          if (isRecord(row) && row.userId === userId) cursor.delete();
+          cursor.continue();
+        };
+      }
+    };
+  });
+  window.localStorage.removeItem(`${STORAGE_PREFIX}${userId}`);
+  notifyChanges(userId);
+}
+
+export async function restoreOfflineExpenses(userId: string, value: unknown) {
+  if (!isRecord(value) || value.format !== "afp-offline-expenses" || value.version !== 1 || value.userId !== userId
+    || !Array.isArray(value.expenses) || !Array.isArray(value.legacyImports)
+    || (value.legacy !== null && typeof value.legacy !== "string")) {
+    throw new Error("El respaldo no es válido o pertenece a otra cuenta. Inicia sesión con la cuenta que lo exportó.");
+  }
+  const expenses: unknown[] = value.expenses, imports: unknown[] = value.legacyImports;
+  // No reasigna propietarios, cuerpos ni UUID. No sobrescribe una captura local.
+  for (const row of expenses) {
+    const entry = readOfflineEntry(row);
+    if (entry.userId !== userId || entry.payload.operationId !== entry.clientId) throw new Error("El respaldo contiene una operación no válida.");
+  }
+  for (const row of imports) {
+    if (!isRecord(row) || row.userId !== userId || !["string", "number"].includes(typeof row.clientId)
+      || typeof row.operationId !== "string") throw new Error("El respaldo contiene una referencia no válida.");
+  }
+  const legacy = value.legacy;
+  // Copias antiguas sanas ya se migran antes de exportar; las dañadas se
+  // conservan literalmente y requieren revisión antes de sincronizar.
+  return withOfflineExpenseLock(userId, async () => {
+    assertLocalDataOpen(userId);
+    const currentLegacy = window.localStorage.getItem(`${STORAGE_PREFIX}${userId}`) ?? null;
+    if (legacy !== null && currentLegacy !== null && currentLegacy !== legacy) throw new Error("Ya existe otra cola anterior en este dispositivo. Consérvala antes de restaurar.");
+    await transaction(["expenses", "legacyImports"], "readwrite", tx => {
+      assertLocalDataOpen(userId);
+      for (const [name, rows] of [["expenses", expenses], ["legacyImports", imports]] as const) {
+        const store = tx.objectStore(name);
+        for (const row of rows) {
+          if (!isRecord(row)) throw new Error("Entrada no válida.");
+          const request = store.get([userId, row.clientId as IDBValidKey]);
+          request.onsuccess = () => {
+            const existing: unknown = request.result;
+            if (!existing) store.add(row);
+            else {
+              const same = name === "expenses" && isRecord(existing)
+                ? JSON.stringify(existing.payload) === JSON.stringify(row.payload)
+                : JSON.stringify(existing) === JSON.stringify(row);
+              if (!same) tx.abort();
+            }
+          };
+        }
+      }
+    });
+    assertLocalDataOpen(userId);
+    if (legacy !== null) window.localStorage.setItem(`${STORAGE_PREFIX}${userId}`, legacy);
+    notifyChanges(userId);
+    return expenses.length;
+  });
+}
+
+// Después de migrar correctamente, el respaldo legado es redundante: la cola
+// durable y sus marcadores ya conservan los pendientes y evitan reimportarlos.
+export function clearMigratedLegacyExpenses(backup: OfflineExpenseBackup) {
+  if (backup.legacy === null) return;
+  let migrated: boolean;
+  try {
+    const parsed: unknown = JSON.parse(backup.legacy);
+    const legacy = readLegacyEntries(parsed);
+    migrated = legacy.every(entry => backup.legacyImports.some(marker => isRecord(marker) && marker.clientId === entry.clientId));
+  } catch { return; } // Una copia ilegible solo se elimina después de exportarla.
+  // Un fallo al limpiar no se confunde con una copia ilegible: llega al diálogo
+  // aunque Auth ya haya terminado, para permitir reintentar la limpieza.
+  if (migrated) window.localStorage.removeItem(`${STORAGE_PREFIX}${backup.userId}`);
 }

@@ -1,4 +1,5 @@
 'use client';
+import { localLogoutRunning } from '@/lib/logout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
@@ -83,7 +84,7 @@ export default function MoneyContent() {
     void initialize();
     const { data: subscription } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_OUT' || (actorRef.current && session?.user.id && session.user.id !== actorRef.current)) {
-        actorRef.current = null; requestRef.current!.cancel(); setData(null); setEditor(null); router.replace('/login');
+        actorRef.current = null; requestRef.current!.cancel(); setData(null); setEditor(null); if (!localLogoutRunning) router.replace('/login');
       }
     });
     return () => { cancelled = true; requestRef.current!.cancel(); subscription.subscription.unsubscribe(); };

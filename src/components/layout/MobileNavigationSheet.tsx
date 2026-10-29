@@ -1,26 +1,22 @@
 "use client"
 
 
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Spinner } from "@/components/ui/spinner";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { mobileNavItems } from "@/lib/navigation";
-import { supabase } from "@/lib/supabase";
+import { useLogout } from "./LogoutProvider";
 import { cn } from "@/lib/utils";
 import { Check, LogOut, Menu, X } from "lucide-react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 export default function MobileNavigationSheet({ disabled = false, onNavigate, className }: { disabled?: boolean; onNavigate?: () => void; className?: string }) {
   const mobile = useIsMobile()
   const pathname = usePathname()
-  const router = useRouter()
+  const openLogout = useLogout()
   const [open, setOpen] = useState(false)
-  const [isLoggingOut, setIsLoggingOut] = useState(false)
-  const [logoutError, setLogoutError] = useState("")
   const navigatingRef = useRef(false)
   const contentRef = useRef<HTMLDivElement | null>(null)
   const titleRef = useRef<HTMLDivElement | null>(null)
@@ -59,32 +55,18 @@ export default function MobileNavigationSheet({ disabled = false, onNavigate, cl
     }
   }, [mobile, open, updateViewport])
 
-  async function handleLogout() {
-    if (isLoggingOut) return
-    setIsLoggingOut(true)
-    setLogoutError("")
-    try {
-      const { error } = await supabase.auth.signOut()
-      if (error) throw error
-      navigatingRef.current = true
-      onNavigate?.()
-      setOpen(false)
-      router.replace("/login")
-    } catch {
-      setLogoutError("No se pudo cerrar la sesión. Intenta de nuevo.")
-    } finally {
-      setIsLoggingOut(false)
-    }
+  function handleLogout() {
+    navigatingRef.current = true
+    setOpen(false)
+    openLogout()
   }
 
   if (!mobile) return null
 
   return (
     <Sheet open={open} onOpenChange={nextOpen => {
-      if (isLoggingOut) return
       if (nextOpen) {
         navigatingRef.current = false
-        setLogoutError("")
       }
       setOpen(nextOpen)
     }}>
@@ -107,8 +89,6 @@ export default function MobileNavigationSheet({ disabled = false, onNavigate, cl
         onCloseAutoFocus={event => {
           if (navigatingRef.current) event.preventDefault()
         }}
-        onInteractOutside={event => { if (isLoggingOut) event.preventDefault() }}
-        onEscapeKeyDown={event => { if (isLoggingOut) event.preventDefault() }}
       >
         <SheetHeader className="sr-only p-0">
           <SheetTitle ref={titleRef} tabIndex={-1} className="outline-none">Cambiar sección</SheetTitle>
@@ -122,13 +102,8 @@ export default function MobileNavigationSheet({ disabled = false, onNavigate, cl
                 <Link
                   href={href}
                   aria-current={active ? "page" : undefined}
-                  aria-disabled={isLoggingOut || undefined}
                   className={cn("flex min-h-12 items-center gap-3 rounded-md px-3 py-2 text-sm outline-none hover:bg-muted focus-visible:bg-muted focus-visible:ring-2 focus-visible:ring-ring", active && "bg-muted font-medium")}
                   onClick={event => {
-                    if (isLoggingOut) {
-                      event.preventDefault()
-                      return
-                    }
                     // Conserva la navegación nativa de enlaces con modificadores.
                     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
                     if (active) {
@@ -149,14 +124,13 @@ export default function MobileNavigationSheet({ disabled = false, onNavigate, cl
           })}
         </nav>
         <SheetFooter className="shrink-0 border-t border-border px-2 py-2">
-          {logoutError ? <Alert variant="destructive" role="alert"><AlertDescription>{logoutError}</AlertDescription></Alert> : null}
           <div className="flex items-center gap-2">
-            <Button type="button" variant="ghost" disabled={isLoggingOut} onClick={handleLogout} className="h-12 min-w-0 flex-1 justify-start gap-3 px-3 text-sm text-muted-foreground">
-              {isLoggingOut ? <Spinner className="size-5" /> : <LogOut className="size-5" aria-hidden="true" />}
-              <span className="truncate">{isLoggingOut ? "Cerrando sesión…" : "Cerrar sesión"}</span>
+            <Button type="button" variant="ghost" onClick={handleLogout} className="h-12 min-w-0 flex-1 justify-start gap-3 px-3 text-sm text-muted-foreground">
+              <LogOut aria-hidden="true" />
+              <span className="truncate">Cerrar sesión</span>
             </Button>
             <SheetClose asChild>
-              <Button type="button" variant="ghost" disabled={isLoggingOut} className="h-12 gap-2 px-3 text-sm text-muted-foreground">
+              <Button type="button" variant="ghost" className="h-12 gap-2 px-3 text-sm text-muted-foreground">
                 <X className="size-4" aria-hidden="true" />
                 Cerrar menú
               </Button>

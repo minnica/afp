@@ -1,0 +1,118 @@
+{
+  "date": "2026-10-29T17:07:02.078626+00:00",
+  "baseCommit": "7c958bf54d806f5eb32243cee7fc0408df45aa94",
+  "status": "implemented-locally",
+  "deployed": false,
+  "databaseMigrationsAdded": 0,
+  "dependenciesChanged": false,
+  "environment": {
+    "node": "22.23.2",
+    "pnpm": "10.33.0",
+    "postgres": "16.15",
+    "database": "afp_test_a12",
+    "auth": "fictional local Supabase endpoints"
+  },
+  "checks": {
+    "pnpm typecheck": {
+      "exitCode": 0,
+      "log": "typecheck.log"
+    },
+    "pnpm typecheck:tests": {
+      "exitCode": 0,
+      "log": "typecheck-tests.log"
+    },
+    "pnpm test:types": {
+      "exitCode": 0,
+      "log": "test-types.log"
+    },
+    "pnpm lint": {
+      "exitCode": 0,
+      "log": "lint.log"
+    },
+    "pnpm test": {
+      "exitCode": 0,
+      "log": "tests-local.log"
+    },
+    "pnpm build": {
+      "exitCode": 0,
+      "log": "build.log"
+    }
+  },
+  "suite": {
+    "tests": 951,
+    "passed": 951,
+    "failed": 0,
+    "skipped": 0,
+    "addedA12": 17
+  },
+  "targetedPassed": 33,
+  "lintExistingWarnings": 2,
+  "browser": {
+    "fixture": "production Next build, real local PostgreSQL, fictional Auth",
+    "desktopViewport": [
+      1280,
+      633
+    ],
+    "mobileViewport": [
+      390,
+      844
+    ],
+    "exportDownloadVerified": true,
+    "restoreRepeatedWithoutDuplicate": true,
+    "postgres": {
+      "restored_expenses": 1,
+      "trusted_expenses": 1,
+      "receipts": 2
+    },
+    "trustedQueueRetainedAcrossTwoTabs": true,
+    "sameOwnerRecoveredAndSynced": true,
+    "finalLogoutState": {
+      "authPresent": false,
+      "bootstrapPresent": false,
+      "closed": "yes",
+      "drafts": [],
+      "operationIds": [],
+      "url": "/login"
+    },
+    "escapeFocus": {
+      "dialogOpen": false,
+      "focusedTag": "BUTTON",
+      "focusedText": "Cambiar sección",
+      "overflow": false
+    },
+    "finalPageErrors": [],
+    "axeViolations": 0,
+    "axeIncomplete": 1
+  },
+  "scopeLimits": [
+    "Not deployed",
+    "No real Supabase Auth or physical Android acceptance",
+    "Other-owner isolation covered by unit regressions; browser uses one fictional owner in two tabs",
+    "Unreadable backups preserved literally; invalid entries require manual recovery",
+    "No dependency audit repeated because lockfile did not change"
+  ],
+  "sourceSha256": {
+    "README.md": "15961e526fc76a752e39fadd4e5920eed31837d44943a5d488728d6b6164aa09",
+    "artifacts/auditoria-2026-10-15/informe.md": "927d799b374175627c56944bad4c5a6dcd5d70c7c9d669cd14e45568c666e298",
+    "docs/bitacora.md": "0444610ea6d1bc810f506f24e3390b75aa26b648083e74a9bc9ad651fdf4a15a",
+    "src/app/layout.tsx": "e7f9495072ef6096f7d804b6c84db8f0360f4e0a63c3d1ec3b72231590c69ac3",
+    "src/app/login/page.tsx": "72daaf7bb72583992d9cecc5c113d97117e911f9574d8787ddb1d4afe7ea7ff8",
+    "src/app/privacidad/page.tsx": "bed391e68d809bb69bd923b595da64cb504d5ef2d0d707b056a03143ecd743b1",
+    "src/components/configuracion/AutomaticRecordingContent.tsx": "8da756937cd467ca3d74fbc248d6e7f402b51cb112c9e708109f258497f7ff24",
+    "src/components/configuracion/CaptureReconciliation.tsx": "04f15d4c987e3802b2574f0fd68043681354c7f3b17d1099f711022bbbfb84b7",
+    "src/components/dashboard/DashboardProvider.tsx": "586dc0b7cfc995a0804c29b719ca55447e44bb95ba0ce2d875d8a3f27de90a46",
+    "src/components/gastos/GastosContent.tsx": "4dc2129a99091cebea12e189708b5ebf876226a50ca5758faba486114f1eb425",
+    "src/components/gastos/OfflineExpenseRestore.tsx": "1131a0f7bb05ba2bad4e5901d050904a1f0411d6bded62f3e473ec38033c8aa6",
+    "src/components/layout/AppSidebar.tsx": "80051d62d424dbbe48a06f0dad437016fb92bce1364a281d190ad04dd4a41c17",
+    "src/components/layout/LogoutProvider.tsx": "80716b5d237be2206a148e722b190cf6a0f80f73c96421a694a3c027934c2bc2",
+    "src/components/layout/MobileNavigationSheet.tsx": "e9f268194e274b1868fa229430875288aaafad8009c79c9db4f9ab0358242d20",
+    "src/components/mi-dinero/MoneyContent.tsx": "b960cb8c412fb83a820ede01aa8bae0b63b256a40fe81c848da2c16a0bf0ea50",
+    "src/hooks/use-creation-draft.ts": "2d06ce020fc5967b178985a2de7611e543c2d210f5106c23cf392a3ddba02fdb",
+    "src/lib/localFinancialData.ts": "329856627876973bcba66e6de11c71e463beaafaa0c52f468fc4a33b803a12aa",
+    "src/lib/logout.ts": "1596fdb466e0873f63c90906da96fbfd0fbb6c85dc1b3b3d07e1ea4c27d4dd10",
+    "src/lib/offlineExpenses.ts": "67c17d9225d725ff1455086a76f3ee42f2e53e32c9f62cd831b930d15b357df7",
+    "tests/helpers/source-contracts.ts": "5086cfdade47f35fae66aad5246a7e7e707c26e2325f8159b49bdd3980c86a37",
+    "tests/helpers/source-exports.ts": "bce090e515d90b2651ddbf273cd83fdc27d03c120c18292715eb7cfd96181403",
+    "tests/local-data-logout.test.ts": "033d9871bd6e61305870bbbae8e4ead1c8cb6a8d475135370dd1de66c916e911"
+  }
+}

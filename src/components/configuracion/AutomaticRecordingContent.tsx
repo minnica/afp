@@ -1,4 +1,5 @@
 "use client";
+import { localLogoutRunning } from "@/lib/logout";
 
 import CaptureReview from "@/components/configuracion/CaptureReview";
 import PageSkeleton from "@/components/layout/PageSkeleton";
@@ -17,7 +18,7 @@ export default function AutomaticRecordingContent() {
       else setUser(data.user);
     });
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (mounted) { setUser(session?.user || null); if (!session?.user) router.replace("/"); }
+      if (mounted) { setUser(session?.user || null); if (!session?.user && !localLogoutRunning) router.replace("/"); }
     });
     return () => { mounted = false; subscription.unsubscribe(); };
   }, [router]);

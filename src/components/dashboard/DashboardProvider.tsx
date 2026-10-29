@@ -1,4 +1,5 @@
 "use client";
+import { localLogoutRunning } from "@/lib/logout";
 
 import { uiFetch as apiFetch } from "@/lib/uiClient";
 
@@ -135,7 +136,7 @@ function useDashboardState() {
         loadedRouteRef.current = null;
         setState(initialState);
         setUsageHistoryPeriod("");
-        if (event === "SIGNED_OUT") router.replace("/login");
+        if (event === "SIGNED_OUT" && !localLogoutRunning) router.replace("/login");
       }
     });
     return () => {

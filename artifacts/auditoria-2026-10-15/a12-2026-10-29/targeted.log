@@ -1,0 +1,212 @@
+
+> afp@0.1.0 test /home/garatachia/projects/afp
+> node --import tsx tests/run-tests.ts local-data-logout.test.ts offline-expenses.test.ts api-fetch.test.ts
+
+TAP version 13
+# Subtest: apiFetch usa el token vigente, preserva headers y signal, y bloquea otros orígenes
+ok 1 - apiFetch usa el token vigente, preserva headers y signal, y bloquea otros orígenes
+  ---
+  duration_ms: 27.248819
+  type: 'test'
+  ...
+# Subtest: apiFetch no envía nada sin sesión ni con una cuenta distinta de la pantalla
+ok 2 - apiFetch no envía nada sin sesión ni con una cuenta distinta de la pantalla
+  ---
+  duration_ms: 7.088014
+  type: 'test'
+  ...
+# Subtest: la cola conserva los pendientes si cambia la cuenta y los sincroniza con su propietario
+ok 3 - la cola conserva los pendientes si cambia la cuenta y los sincroniza con su propietario
+  ---
+  duration_ms: 28.042067
+  type: 'test'
+  ...
+# Subtest: el service worker no intercepta API ni siquiera como navegación; elimina caché anterior
+ok 4 - el service worker no intercepta API ni siquiera como navegación; elimina caché anterior
+  ---
+  duration_ms: 1.215187
+  type: 'test'
+  ...
+# Subtest: A12: salida sin pendientes limpia solo el propietario y las API antiguas; conserva shell y preferencias
+ok 5 - A12: salida sin pendientes limpia solo el propietario y las API antiguas; conserva shell y preferencias
+  ---
+  duration_ms: 13.211576
+  type: 'test'
+  ...
+# Subtest: A12: pendientes sin copia bloquean logout y no se borran ni cierran Auth
+ok 6 - A12: pendientes sin copia bloquean logout y no se borran ni cierran Auth
+  ---
+  duration_ms: 11.139853
+  type: 'test'
+  ...
+# Subtest: A12: exportar, borrar y restaurar conserva UUID, cuerpo, notas, aportación y metadatos
+ok 7 - A12: exportar, borrar y restaurar conserva UUID, cuerpo, notas, aportación y metadatos
+  ---
+  duration_ms: 10.619777
+  type: 'test'
+  ...
+# Subtest: A12: conservar en dispositivo confiable retiene pendientes y retira la caché sincronizada
+ok 8 - A12: conservar en dispositivo confiable retiene pendientes y retira la caché sincronizada
+  ---
+  duration_ms: 10.803002
+  type: 'test'
+  ...
+# Subtest: A12: fallo de Auth conserva pendientes y permite reintentar sin navegar
+ok 9 - A12: fallo de Auth conserva pendientes y permite reintentar sin navegar
+  ---
+  duration_ms: 10.330035
+  type: 'test'
+  ...
+# Subtest: A12: captura de otra pestaña posterior a exportar impide borrar ambos pendientes
+ok 10 - A12: captura de otra pestaña posterior a exportar impide borrar ambos pendientes
+  ---
+  duration_ms: 15.616049
+  type: 'test'
+  ...
+# Subtest: A12: una respuesta antigua no recrea bootstrap después de logout ni de entrar de nuevo
+ok 11 - A12: una respuesta antigua no recrea bootstrap después de logout ni de entrar de nuevo
+  ---
+  duration_ms: 8.236143
+  type: 'test'
+  ...
+# Subtest: A12: respaldo legado migrado conserva UUID; trusted retira copia redundante y no resucita confirmados
+ok 12 - A12: respaldo legado migrado conserva UUID; trusted retira copia redundante y no resucita confirmados
+  ---
+  duration_ms: 10.690505
+  type: 'test'
+  ...
+# Subtest: A12: cola legada ilegible se exporta literalmente y solo se elimina con copia actual
+ok 13 - A12: cola legada ilegible se exporta literalmente y solo se elimina con copia actual
+  ---
+  duration_ms: 8.470297
+  type: 'test'
+  ...
+# Subtest: A12: respaldo de otra cuenta o con propietario mezclado se rechaza antes de escribir
+ok 14 - A12: respaldo de otra cuenta o con propietario mezclado se rechaza antes de escribir
+  ---
+  duration_ms: 8.600433
+  type: 'test'
+  ...
+# Subtest: A12: conflicto de UUID al restaurar aborta el lote entero sin sobrescribir
+ok 15 - A12: conflicto de UUID al restaurar aborta el lote entero sin sobrescribir
+  ---
+  duration_ms: 8.441287
+  type: 'test'
+  ...
+# Subtest: A12: versión desconocida y operationId alterado se rechazan sin altas
+ok 16 - A12: versión desconocida y operationId alterado se rechazan sin altas
+  ---
+  duration_ms: 9.676473
+  type: 'test'
+  ...
+# Subtest: A12: fallo de limpieza de caché no cierra Auth ni borra la cola
+ok 17 - A12: fallo de limpieza de caché no cierra Auth ni borra la cola
+  ---
+  duration_ms: 8.545844
+  type: 'test'
+  ...
+# Subtest: A12: salida espera el envío en curso y bloquea nuevas altas antes de borrar
+ok 18 - A12: salida espera el envío en curso y bloquea nuevas altas antes de borrar
+  ---
+  duration_ms: 8.957413
+  type: 'test'
+  ...
+# Subtest: A12: borrado con snapshot cambiado o propietario ajeno aborta sin eliminar filas
+ok 19 - A12: borrado con snapshot cambiado o propietario ajeno aborta sin eliminar filas
+  ---
+  duration_ms: 8.477597
+  type: 'test'
+  ...
+# Subtest: A12: entrada IndexedDB dañada rechaza la lectura y sigue disponible en el rescate
+ok 20 - A12: entrada IndexedDB dañada rechaza la lectura y sigue disponible en el rescate
+  ---
+  duration_ms: 9.087659
+  type: 'test'
+  ...
+# Subtest: A12: fallo al retirar legado después de Auth mantiene recuperación y permite repetir limpieza
+ok 21 - A12: fallo al retirar legado después de Auth mantiene recuperación y permite repetir limpieza
+  ---
+  duration_ms: 9.339342
+  type: 'test'
+  ...
+# Subtest: IndexedDB v1 anterior: respuesta perdida, cambio de cuenta y dos pestañas conservan recibo y metadatos
+ok 22 - IndexedDB v1 anterior: respuesta perdida, cambio de cuenta y dos pestañas conservan recibo y metadatos
+  ---
+  duration_ms: 17.007972
+  type: 'test'
+  ...
+# Subtest: conflicto con captura: decisión explícita conserva UUID, notas y aportación al registrar otra compra
+ok 23 - conflicto con captura: decisión explícita conserva UUID, notas y aportación al registrar otra compra
+  ---
+  duration_ms: 14.482971
+  type: 'test'
+  ...
+# Subtest: conservar gasto existente solo retira un conflicto confirmado, sin borrar otros pendientes
+ok 24 - conservar gasto existente solo retira un conflicto confirmado, sin borrar otros pendientes
+  ---
+  duration_ms: 7.832114
+  type: 'test'
+  ...
+# Subtest: aportación offline: recarga, error y reintento conservan el importe y UUID
+ok 25 - aportación offline: recarga, error y reintento conservan el importe y UUID
+  ---
+  duration_ms: 14.823662
+  type: 'test'
+  ...
+# Subtest: respuesta perdida después de guardar: recargar y reintentar conserva el UUID
+ok 26 - respuesta perdida después de guardar: recargar y reintentar conserva el UUID
+  ---
+  duration_ms: 16.67567
+  type: 'test'
+  ...
+# Subtest: dos pestañas sin Web Locks: conservan un mismo UUID y no resucitan un error tardío
+ok 27 - dos pestañas sin Web Locks: conservan un mismo UUID y no resucitan un error tardío
+  ---
+  duration_ms: 14.15352
+  type: 'test'
+  ...
+# Subtest: capturar en otra pestaña durante sync no pierde la nueva entrada ni la de otro usuario
+ok 28 - capturar en otra pestaña durante sync no pierde la nueva entrada ni la de otro usuario
+  ---
+  duration_ms: 13.903677
+  type: 'test'
+  ...
+# Subtest: cerrar tras persistir y antes del POST permite recuperar y sincronizar
+ok 29 - cerrar tras persistir y antes del POST permite recuperar y sincronizar
+  ---
+  duration_ms: 13.336722
+  type: 'test'
+  ...
+# Subtest: migración concurrente conserva la copia local y no reimporta confirmados
+ok 30 - migración concurrente conserva la copia local y no reimporta confirmados
+  ---
+  duration_ms: 13.375491
+  type: 'test'
+  ...
+# Subtest: JSON corrupto, validación y confirmación incompleta nunca eliminan pendientes
+ok 31 - JSON corrupto, validación y confirmación incompleta nunca eliminan pendientes
+  ---
+  duration_ms: 8.554075
+  type: 'test'
+  ...
+# Subtest: fallo de almacenamiento no confirma una captura ni envía un POST
+ok 32 - fallo de almacenamiento no confirma una captura ni envía un POST
+  ---
+  duration_ms: 6.368214
+  type: 'test'
+  ...
+# Subtest: Web Locks serializa dos pestañas y la segunda relee la cola al obtener el bloqueo
+ok 33 - Web Locks serializa dos pestañas y la segunda relee la cola al obtener el bloqueo
+  ---
+  duration_ms: 14.792882
+  type: 'test'
+  ...
+1..33
+# tests 33
+# suites 0
+# pass 33
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 593.906831

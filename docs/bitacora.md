@@ -6,6 +6,14 @@ Consolidado el **27 de octubre de 2026** a partir del README del commit `4562aa0
 
 ## 2026-10-29
 
+### A12: política de datos locales y pendientes al cerrar sesión
+
+**Implementación local verificada**, sin publicación, migraciones ni cambios de dependencias. Escritorio y móvil comparten la salida: elimina el respaldo sincronizado de Gastos y los borradores financieros del propietario, y retira respuestas API de cachés antiguas. Conserva el shell público y las preferencias. Una generación por usuario impide que respuestas anteriores vuelvan a persistir datos después de salir; los listeners de Auth permiten terminar la limpieza antes de redirigir.
+
+La cola solo se elimina después de sincronizar o exportar una copia actual y verificar la descarga. Conservar pendientes exige declarar que el dispositivo es de confianza en cada salida. Gastos puede restaurar el JSON con la misma cuenta, manteniendo UUID, cuerpos y marcadores de migración. Los fallos y cambios concurrentes conservan recuperabilidad; las sesiones terminadas externamente no borran pendientes sin decisión expresa. Las copias dañadas se rescatan literalmente y sus entradas inválidas requieren revisión manual. Se documenta que los datos locales y exportados no tienen cifrado propio de AFP y que la identidad nativa Android se revoca por separado.
+
+README, Privacidad e informe reflejan la política y distinguen el cierre local de una publicación. [Resultados, pruebas y reproducción A12](../artifacts/auditoria-2026-10-15/a12-2026-10-29/README.md).
+
 ### Publicación confirmada de A04/A07/A08/A09 y la actualización A10
 
 **Cotejo remoto de solo lectura.** Vercel confirma el commit `08aee7c1de08533fc19124e3842c454f59cf743f` de `master`, idéntico a HEAD y `origin/master` al consultar, en el despliegue de producción `dpl_DMUG88ufc6cqJheyt8khaRwVUvxM`. Estado **READY**, dominio `finanzas.garatachia.com` asignado y sin error de alias; listo el 29/10 a las **09:33:52 UTC / 03:33:52 México**. Incluye los commits de A04, A07, A08, A09 y A10, además de la migración web a TypeScript.

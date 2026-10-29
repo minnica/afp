@@ -1,4 +1,5 @@
 "use client";
+import { assertLocalDataOpen } from "@/lib/localFinancialData";
 import type { UiResponse } from "@/lib/uiResponseSchemas";
 import type { CaptureConfiguration } from "@/lib/uiTypes";
 import { errorMessage } from "@/lib/uiTypes";
@@ -46,6 +47,7 @@ function StatementResult({ data, configuration, userId, refresh, onChanged }: { 
     setBusy(true); setError(""); setNotice("");
     let saved = false;
     try {
+      assertLocalDataOpen(userId);
       if (action.action === "missing") sessionStorage.setItem(draftKey, JSON.stringify({ operationId, expense: action.expense }));
       const response = await apiFetch("/api/captures/reconciliation", { method: "PATCH", expectedUserId: userId, errorMode: "inline", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...data.period, ...action }) });
       const result = await response.json(); saved = true;

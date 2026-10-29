@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import { ServiceWorkerRegistration } from "@/components/pwa/ServiceWorkerRegistration";
 import { DashboardProvider } from "@/components/dashboard/DashboardProvider";
+import LogoutProvider from "@/components/layout/LogoutProvider";
 import { RequestErrorDialog } from "@/components/ui/request-error-dialog";
 import "./globals.css";
 
@@ -46,7 +47,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     >
       <body className="min-h-full flex flex-col">
         <ServiceWorkerRegistration />
-        <DashboardProvider>{children}</DashboardProvider>
+        <LogoutProvider>
+          <DashboardProvider>{children}</DashboardProvider>
+        </LogoutProvider>
         <RequestErrorDialog />
         <Toaster richColors position="bottom-center" />
       </body>

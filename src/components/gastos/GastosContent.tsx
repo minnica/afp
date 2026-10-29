@@ -1,6 +1,8 @@
 "use client";
+import { isLocalDataClosed, localDataGeneration, writeFinancialBootstrap } from "@/lib/localFinancialData";
 import AutomaticRecordingLink from "@/components/configuracion/AutomaticRecordingLink";
 import CaptureStatus from "@/components/gastos/CaptureStatus";
+import OfflineExpenseRestore from "./OfflineExpenseRestore";
 import OfflineCaptureConflicts from "@/components/gastos/OfflineCaptureConflicts";
 import type { ExpenseFilter } from "@/lib/expenseFilters";
 import type { OfflineExpense } from "@/lib/offlineExpenseContracts";
@@ -109,6 +111,7 @@ function readCachedBootstrap(userId: string) {
   if (typeof window === "undefined" || !userId) return null;
 
   try {
+    if (isLocalDataClosed(userId)) return null;
     const rawValue = window.localStorage.getItem(getBootstrapCacheKey(userId));
     return rawValue ? uiResponseSchemas["gastos/bootstrap"].parse(JSON.parse(rawValue)) : null;
   } catch {
@@ -116,16 +119,13 @@ function readCachedBootstrap(userId: string) {
   }
 }
 
-function writeCachedBootstrap(userId: string, data: UiResponse<"gastos/bootstrap">) {
+function writeCachedBootstrap(userId: string, data: UiResponse<"gastos/bootstrap">, generation: string) {
   if (typeof window === "undefined" || !userId) return;
 
-  window.localStorage.setItem(
-    getBootstrapCacheKey(userId),
-    JSON.stringify({
+  writeFinancialBootstrap(userId, {
       ...data,
       cachedAt: new Date().toISOString(),
-    }),
-  );
+    }, generation);
 }
 
 function getExpenseMonth(expense: { payload?: { date?: unknown }; date?: unknown }) {
@@ -295,6 +295,7 @@ export default function GastosContent() {
   }, [expenseReader, initialExpenses]);
 
   async function loadInitialData(userId: string, signal: AbortSignal) {
+    const generation = localDataGeneration(userId);
     const today = getTodayInputValue();
     const params = new URLSearchParams({
       userId,
@@ -314,7 +315,7 @@ export default function GastosContent() {
         throw new Error(data.error || "No se pudieron cargar datos iniciales.");
       }
 
-      writeCachedBootstrap(userId, data);
+      writeCachedBootstrap(userId, data, generation);
 
       setCategories(data.categories || []);
       setPeople(data.people || []);
@@ -1642,6 +1643,7 @@ export default function GastosContent() {
             </Alert>
           ) : null}
 
+          {user && <OfflineExpenseRestore userId={user.id} onRestored={() => refreshPendingOfflineExpenses(user.id)} />}
           {user && <OfflineCaptureConflicts userId={user!.id} pending={pendingOfflineExpenses} disabled={!isOnline || isSyncingOfflineExpenses} onResolved={async () => { await refreshPendingOfflineExpenses(user!.id); await syncPendingExpenses({ silent: true }); }} />}
           <div className={`grid min-w-0 gap-5 ${compactEntry ? "" : "xl:grid-cols-[360px_1fr]"}`}>
             <ExpenseCreateSurface compact={compactEntry} error={createError} isSaving={isSaving} isOnline={isOnline} onSubmit={createExpense}>

@@ -1,5 +1,6 @@
 "use client";
 
+import { reopenLocalData } from "@/lib/localFinancialData";
 import type { FormEvent } from "react";
 import { errorMessage } from "@/lib/uiTypes";
 import { useState } from "react";
@@ -59,6 +60,7 @@ export default function LoginPage() {
         }
         const { data } = result;
 
+        reopenLocalData(data.user.id);
         await ensureUserSetup(data.user);
 
         router.push("/dashboard");
