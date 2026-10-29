@@ -6,6 +6,14 @@ Consolidado el **27 de octubre de 2026** a partir del README del commit `4562aa0
 
 ## 2026-10-29
 
+### A08: validación semántica compartida en entradas manuales
+
+**Implementación local completada** sobre `5d4683c`. Las fechas bancarias deben existir y conservar su día al interpretarse; los importes admiten hasta dos decimales y valor absoluto máximo de $9,999,999,999.99; nombre, concepto y fuente deben tener contenido tras `trim`. El contrato financiero aplica estas reglas a altas y ediciones manuales; Mi dinero, saldos y revisión/conciliación de Captura reutilizan las mismas comprobaciones básicas. Se conservan los campos opcionales, el cero y los signos permitidos por cada operación, y el instante ISO de desactivación de suscripciones.
+
+El cuerpo validado conserva valores, campos adicionales y orden para los recibos; recortar el texto para guardarlo ocurre después. Las entradas inválidas devuelven 400 sin modificar registros; el cotejo de Captura revierte su transacción. No se normalizan fechas imposibles ni se redondean importes inválidos para aceptarlos.
+
+**923 escenarios correctos, cero fallos y cero omisiones** con PostgreSQL desechable: los 891 anteriores y 32 A08, incluidos 17 subcasos POST/PATCH y nueve de persistencia. Tipos web/pruebas, contratos negativos y lint correctos, con las dos advertencias previas. Turbopack vuelve a encontrar la restricción de apertura de puertos incluso fuera del sandbox. Webpack compila correctamente fuera del sandbox, tras un primer fallo al leer la salida del subproceso de TypeScript. README e informe actualizados; sin migración nueva ni publicación. [Evidencias, reproducción y límites](../artifacts/auditoria-2026-10-15/a08-2026-10-29/README.md).
+
 ### A07: historial completo de ingresos y agregados por filtro
 
 **Implementación local completada** sobre `eead77a`. La API de ingresos añade paginación, búsqueda, tipo, fechas inclusivas y orden de servidor. Conserva `incomes`/`total` y añade conteo y metadatos de página; la suma Decimal y las filas comparten filtros, propietario y una instantánea `RepeatableRead`. El orden incluye desempate por ID. Las páginas fuera de rango se ajustan a la última existente.

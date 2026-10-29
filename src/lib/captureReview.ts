@@ -2,14 +2,12 @@ import type { Movement } from '@/lib/captureTypes';
 import { captureInput } from '@/lib/captureJson';
 import { captureCorrection, captureProposal } from '@/lib/captureJson';
 import { z } from "zod";
-import { Prisma } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
 import { ApiAccessError, requireOwnedReferences } from "@/lib/apiAuth";
+import { calendarDaySchema, moneyInputSchema } from './financialValidation';
 
-export const captureDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/).refine(value => {
-  const date = new Date(`${value}T12:00:00Z`);
-  return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
-});
-export const captureAmount = z.string().regex(/^\d{1,12}(?:\.\d{1,2})?$/).refine(value => new Prisma.Decimal(value).greaterThan(0));
+export const captureDate = calendarDaySchema;
+export const captureAmount = z.string().refine(value => moneyInputSchema.safeParse(value).success).refine(value => Number(value) > 0);
 export const correctionSchema = z.object({ cardId: z.string().min(1), date: captureDate, amount: captureAmount,
   merchant: z.string().trim().min(1).max(200), categoryId: z.string().min(1), currency: z.literal("MXN"),
 }).strict();

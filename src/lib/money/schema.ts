@@ -1,7 +1,8 @@
 import { z } from 'zod';
 import { validDay } from '@/lib/money/dates';
+import { moneyInputSchema } from '@/lib/financialValidation';
 const text = z.string().trim().min(1, 'Completa este campo.').max(160, 'Usa hasta 160 caracteres.');
-const money = z.union([z.string(), z.number()]).refine(v => /^-?\d{1,10}(\.\d{1,2})?$/.test(String(v)), 'Indica un importe con hasta dos decimales.').transform(Number);
+const money = moneyInputSchema.transform(Number);
 const positive = money.refine(v => v > 0, 'El importe debe ser mayor a cero.');
 const date = z.string().refine(validDay, 'Indica una fecha válida.');
 export const accountSchema = z.object({

@@ -1,0 +1,61 @@
+{
+  "finding": "A08",
+  "date": "2026-10-29",
+  "status": "implemented_locally",
+  "baseCommit": "5d4683cf39c5daca21107a6db3f0cdacef471e1e",
+  "environment": {
+    "node": "v22.23.2",
+    "pnpm": "10.33.0",
+    "database": "PostgreSQL 16 local disposable afp_test_a08",
+    "auth": "simulated"
+  },
+  "suite": {
+    "tests": 923,
+    "pass": 923,
+    "fail": 0,
+    "skipped": 0
+  },
+  "focused": {
+    "tests": 32,
+    "pass": 32,
+    "fail": 0,
+    "skipped": 0
+  },
+  "focusedBreakdown": {
+    "topLevel": 6,
+    "manualRouteSubcases": 17,
+    "postgresSubcases": 9
+  },
+  "checks": {
+    "typecheck": "passed",
+    "typecheckTests": "passed",
+    "testTypes": "passed",
+    "lint": {
+      "errors": 0,
+      "existingWarnings": 2
+    },
+    "defaultBuild": "blocked_by_environment_port_restriction_inside_and_outside_sandbox",
+    "webpackBuild": "passed_outside_sandbox",
+    "migrations": {
+      "existingApplied": 42,
+      "new": 0
+    }
+  },
+  "productionAccess": false,
+  "deployment": false,
+  "sourceSha256": {
+    "src/lib/captureReconciliation.ts": "a343c33bb7dcd2ac55845ce960ca1f476e12f56a17cb69c4fbb5f71aa23656ae",
+    "src/lib/captureReview.ts": "4b5c57af436abe32bf874d785a9ce56b381f93876192d0f8e1c1d4073ef10d0c",
+    "src/lib/cardBalances.ts": "22e6c2181c4ab8fedf8d0f55c7c595f8d37ba5f93fbe4a9b74affe973e95382e",
+    "src/lib/financialContracts.ts": "19ce7e2218a7fefc8074a4a661cf8e8e880b0c285b6e1767c7cb34b73a8a34cf",
+    "src/lib/financialValidation.ts": "d7c9bc85d7c3fbe0c5eda60c0c5e81e281797d159b89ede0f451334e0474f87a",
+    "src/lib/money/dates.ts": "ca3577cba8ec5a82f158c2942006c1956f97a9b3ac9d96ba9c0588da53073b29",
+    "src/lib/money/schema.ts": "f795719501a017c0a1f1bee734c8d9b78a08dcdb2f3aaa81f58a58a02fa3fb23",
+    "src/lib/money/transferContracts.ts": "6663bc43e33b81c93b1864e77f58c5c1e0f9f5022bec5537a7b94f4ba5b9b497",
+    "src/lib/subscriptionChargeService.ts": "dcb2cbd554c4bb455a4690c09a535909eb6bc688d40ca7e258b3ecdb504fb2df",
+    "src/lib/subscriptionCharges.ts": "90dae458d8240389c688f40b7b71c6227fd6175f1493a5b2919aeb83820bce67",
+    "tests/financial-validation.test.ts": "5f4070834e925213d67412fa531559b017972df57102353254646a34f98d6355",
+    "tests/helpers/source-contracts.ts": "eb5b71143f538b3b66f79936bcc981feba4448ec0956f9cceabf92d1067b71b1",
+    "tests/helpers/source-exports.ts": "ea504ee6afc55dda717eeea2c0f1273e5ddfc85b4df5ef6259fc85e228f26009"
+  }
+}

@@ -1,9 +1,10 @@
 import type { DateValue } from './types';
+import { isCalendarDay } from '../financialValidation';
 export { todayInMexico } from '../financialDates';
 export function day(value: DateValue): string;
 export function day(value: DateValue | null | undefined): string | null;
 export function day(value: DateValue | null | undefined) { return value ? new Date(value).toISOString().slice(0, 10) : null; }
-export function validDay(value: unknown): value is string { return typeof value === 'string' && /^20\d{2}-\d{2}-\d{2}$/.test(value) && Number.isFinite(Date.parse(value)) && day(value) === value; }
+export function validDay(value: unknown): value is string { return typeof value === 'string' && /^20\d{2}-\d{2}-\d{2}$/.test(value) && isCalendarDay(value); }
 export function addDays(value: string, n: number) { return day(new Date(Date.parse(`${value}T12:00:00Z`) + n * 86400000)); }
 export function monthDay(month: string, n: number) {
   const [year = 0, number = 0] = month.split('-').map(Number);

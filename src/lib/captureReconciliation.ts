@@ -4,6 +4,7 @@ import type { PrismaClient, DailyExpense, InstallmentPurchase } from '@prisma/cl
 import { captureInput } from '@/lib/captureJson';
 import { captureStatementOperations } from '@/lib/captureJson';
 import { z } from "zod";
+import { moneyInputSchema } from './financialValidation';
 import { Prisma } from "@prisma/client";
 import { ApiAccessError, requireOwnedReferences } from "@/lib/apiAuth";
 import { lockDebtAccounts } from "@/lib/debtAccountService";
@@ -77,9 +78,10 @@ export async function reconcileCaptureStatement(db: PrismaClient, userId: string
     if (input.action === "save" && input.expectedMetadata !== undefined && input.expectedMetadata !== JSON.stringify([prior?.chargesTotal == null ? null : String(prior.chargesTotal), prior?.notes || ""])) throw new ApiAccessError("La explicación o el total cambiaron en otra pantalla. Vuelve a consultar el período.", 409);
     let statement = await tx.captureStatement.upsert({ where: { userId_cardId_startDate_endDate: key }, create: key, update: {} });
     if (input.action === "save") {
-      if (!(input.chargesTotal === null || z.string().regex(/^\d{1,12}(?:\.\d{1,2})?$/).safeParse(input.chargesTotal).success)
+      const total = z.string().refine(value => moneyInputSchema.safeParse(value).success && Number(value) >= 0).nullable().safeParse(input.chargesTotal);
+      if (!total.success
         || typeof input.notes !== "string" || input.notes.length > 4000) throw new ApiAccessError("Revisa el total de cargos y la explicación de diferencias.", 400);
-      return tx.captureStatement.update({ where: { id: statement.id }, data: { chargesTotal: input.chargesTotal as string | null, notes: input.notes } });
+      return tx.captureStatement.update({ where: { id: statement.id }, data: { chargesTotal: total.data, notes: input.notes } });
     }
     if (input.action === "missing") {
       const parsed = correctionSchema.safeParse(input.expense);

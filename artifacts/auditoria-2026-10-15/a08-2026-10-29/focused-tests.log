@@ -1,0 +1,210 @@
+
+> afp@0.1.0 test /home/garatachia/projects/afp
+> node --import tsx tests/run-tests.ts financial-validation.test.ts
+
+TAP version 13
+# Subtest: A08: fechas reales, bisiestos y formato bancario estricto
+ok 1 - A08: fechas reales, bisiestos y formato bancario estricto
+  ---
+  duration_ms: 1.394958
+  type: 'test'
+  ...
+# Subtest: A08: centavos y límites sin redondear, convertir ni recortar la entrada
+ok 2 - A08: centavos y límites sin redondear, convertir ni recortar la entrada
+  ---
+  duration_ms: 0.702319
+  type: 'test'
+  ...
+# Subtest: A08: el contrato conserva el cuerpo original y acepta ausencias de acciones parciales
+ok 3 - A08: el contrato conserva el cuerpo original y acepta ausencias de acciones parciales
+  ---
+  duration_ms: 30.930116
+  type: 'test'
+  ...
+# Subtest: A08: todas las rutas manuales rechazan entradas inválidas antes de acceder a persistencia
+    # Subtest: POST /api/expenses
+    ok 1 - POST /api/expenses
+      ---
+      duration_ms: 177.725638
+      type: 'test'
+      ...
+    # Subtest: PATCH /api/expenses
+    ok 2 - PATCH /api/expenses
+      ---
+      duration_ms: 4.476912
+      type: 'test'
+      ...
+    # Subtest: POST /api/incomes
+    ok 3 - POST /api/incomes
+      ---
+      duration_ms: 9.235154
+      type: 'test'
+      ...
+    # Subtest: PATCH /api/incomes
+    ok 4 - PATCH /api/incomes
+      ---
+      duration_ms: 2.838885
+      type: 'test'
+      ...
+    # Subtest: POST /api/receivables
+    ok 5 - POST /api/receivables
+      ---
+      duration_ms: 7.701197
+      type: 'test'
+      ...
+    # Subtest: PATCH /api/receivables
+    ok 6 - PATCH /api/receivables
+      ---
+      duration_ms: 3.425114
+      type: 'test'
+      ...
+    # Subtest: POST /api/payables
+    ok 7 - POST /api/payables
+      ---
+      duration_ms: 6.254639
+      type: 'test'
+      ...
+    # Subtest: PATCH /api/payables
+    ok 8 - PATCH /api/payables
+      ---
+      duration_ms: 3.728123
+      type: 'test'
+      ...
+    # Subtest: POST /api/installment-purchases
+    ok 9 - POST /api/installment-purchases
+      ---
+      duration_ms: 6.658499
+      type: 'test'
+      ...
+    # Subtest: PATCH /api/installment-purchases
+    ok 10 - PATCH /api/installment-purchases
+      ---
+      duration_ms: 4.349182
+      type: 'test'
+      ...
+    # Subtest: POST /api/subscriptions
+    ok 11 - POST /api/subscriptions
+      ---
+      duration_ms: 5.58728
+      type: 'test'
+      ...
+    # Subtest: PATCH /api/subscriptions
+    ok 12 - PATCH /api/subscriptions
+      ---
+      duration_ms: 2.890155
+      type: 'test'
+      ...
+    # Subtest: POST /api/cards
+    ok 13 - POST /api/cards
+      ---
+      duration_ms: 7.170027
+      type: 'test'
+      ...
+    # Subtest: PATCH /api/cards
+    ok 14 - PATCH /api/cards
+      ---
+      duration_ms: 0.511619
+      type: 'test'
+      ...
+    # Subtest: PATCH /api/card-cycles
+    ok 15 - PATCH /api/card-cycles
+      ---
+      duration_ms: 14.023165
+      type: 'test'
+      ...
+    # Subtest: POST /api/subscription-charges
+    ok 16 - POST /api/subscription-charges
+      ---
+      duration_ms: 6.329239
+      type: 'test'
+      ...
+    # Subtest: POST /api/settings
+    ok 17 - POST /api/settings
+      ---
+      duration_ms: 4.820992
+      type: 'test'
+      ...
+    1..17
+ok 4 - A08: todas las rutas manuales rechazan entradas inválidas antes de acceder a persistencia
+  ---
+  duration_ms: 269.275816
+  type: 'test'
+  ...
+# Subtest: A08: Mi dinero, saldos y revisión de Captura comparten los límites monetarios
+ok 5 - A08: Mi dinero, saldos y revisión de Captura comparten los límites monetarios
+  ---
+  duration_ms: 25.160506
+  type: 'test'
+  ...
+(node:202762) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+# Subtest: PostgreSQL A08: altas, ediciones y reintentos conservan fechas, centavos y registros
+    # Subtest: expenses: crea y edita; rechaza sin alterar lo guardado
+    ok 1 - expenses: crea y edita; rechaza sin alterar lo guardado
+      ---
+      duration_ms: 182.28353
+      type: 'test'
+      ...
+    # Subtest: incomes: crea y edita; rechaza sin alterar lo guardado
+    ok 2 - incomes: crea y edita; rechaza sin alterar lo guardado
+      ---
+      duration_ms: 51.3022
+      type: 'test'
+      ...
+    # Subtest: receivables: crea y edita; rechaza sin alterar lo guardado
+    ok 3 - receivables: crea y edita; rechaza sin alterar lo guardado
+      ---
+      duration_ms: 45.790179
+      type: 'test'
+      ...
+    # Subtest: payables: crea y edita; rechaza sin alterar lo guardado
+    ok 4 - payables: crea y edita; rechaza sin alterar lo guardado
+      ---
+      duration_ms: 37.894013
+      type: 'test'
+      ...
+    # Subtest: installment-purchases: crea y edita; rechaza sin alterar lo guardado
+    ok 5 - installment-purchases: crea y edita; rechaza sin alterar lo guardado
+      ---
+      duration_ms: 240.171288
+      type: 'test'
+      ...
+    # Subtest: subscriptions: crea y edita; rechaza sin alterar lo guardado
+    ok 6 - subscriptions: crea y edita; rechaza sin alterar lo guardado
+      ---
+      duration_ms: 20.572414
+      type: 'test'
+      ...
+    # Subtest: gastos: fecha bisiesta, máximo monetario, trim e idempotencia sin normalizar el recibo
+    ok 7 - gastos: fecha bisiesta, máximo monetario, trim e idempotencia sin normalizar el recibo
+      ---
+      duration_ms: 22.960559
+      type: 'test'
+      ...
+    # Subtest: ciclos: fechas válidas, estado cero y ausencia de pago conservan sus contratos
+    ok 8 - ciclos: fechas válidas, estado cero y ausencia de pago conservan sus contratos
+      ---
+      duration_ms: 33.377202
+      type: 'test'
+      ...
+    # Subtest: conciliación de Captura: total máximo, cero y null; entrada inválida revierte la transacción
+    ok 9 - conciliación de Captura: total máximo, cero y null; entrada inválida revierte la transacción
+      ---
+      duration_ms: 38.428933
+      type: 'test'
+      ...
+    1..9
+ok 6 - PostgreSQL A08: altas, ediciones y reintentos conservan fechas, centavos y registros
+  ---
+  duration_ms: 905.940788
+  type: 'test'
+  ...
+1..6
+# tests 32
+# suites 0
+# pass 32
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1423.981837

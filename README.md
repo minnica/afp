@@ -148,7 +148,7 @@ La [migración de pruebas a TypeScript](docs/plan-migracion-tests-typescript.md)
 
 El cierre de la migración conserva los 854 escenarios originales y añade diecisiete de infraestructura: 871 en total, comprobados con PostgreSQL local sin omisiones. Las 109 pruebas ejecutables de ese cierre y todos los helpers activos usan TS. La [fase 5](artifacts/typescript-tests-migration/phase-5/README.md) convierte los siete helpers restantes de navegador, seeds y preparación de Next; comparte la validación de PostgreSQL desechable y el cierre de recursos. Añade tres regresiones de aislamiento/configuración y seis casos negativos de tipos. La fase 6 retira los puentes: web y pruebas usan `allowJs: false`, con 131 módulos activos de pruebas/helpers/ejecutor incluidos en TypeScript y ESLint. Los trece archivos de contratos negativos permanecen separados. La auditoría documenta las conversiones locales y confirma los contratos públicos derivados de 97 módulos reales; las rutas dinámicas siguen devolviendo `unknown`. Los tres scripts CJS externos al alcance tienen declaraciones específicas adyacentes `.d.cts`, comprobadas por TypeScript y ESLint.
 
-La suite actual tiene **891 escenarios correctos, sin omisiones con PostgreSQL local**: los 882 del cierre de A04 y nueve escenarios A07 de paginación, filtros, contratos y agregados de ingresos. [Resultados A04](artifacts/auditoria-2026-10-15/a04-2026-10-29/README.md) · [Resultados y límites del cierre local de A07](artifacts/auditoria-2026-10-15/a07-2026-10-29/README.md).
+La suite actual tiene **923 escenarios correctos, sin omisiones con PostgreSQL local**: los 891 del cierre de A07 y 32 escenarios A08 de validación semántica, persistencia e idempotencia. [Resultados A04](artifacts/auditoria-2026-10-15/a04-2026-10-29/README.md) · [Resultados A07](artifacts/auditoria-2026-10-15/a07-2026-10-29/README.md) · [Resultados y límites del cierre local de A08](artifacts/auditoria-2026-10-15/a08-2026-10-29/README.md).
 
 [tests/run-tests.ts](tests/run-tests.ts) comparte descubrimiento y ejecución entre `pnpm test` y las regresiones de `db:verify`: solo archivos `.test.ts` del primer nivel, ordenados. Rechaza entradas `.test.cjs`/`.test.js`/`.test.mjs`/`.test.jsx`, incluso al seleccionar otra prueba, y detecta nombres base duplicados. Los contratos negativos, helpers y seeds no se ejecutan por descubrimiento. Sin argumentos se ejecuta la suite completa; la selección exacta sirve para desarrollo y falla ante archivos inexistentes, repetidos o ajenos a la suite:
 
@@ -254,6 +254,14 @@ Los handlers están en [src/app/api/](src/app/api/). Las rutas financieras exige
 - Las respuestas privadas usan `Cache-Control: private, no-store` y `Vary: Authorization`. RLS no sustituye la autorización del servidor.
 - El cliente usa [apiFetch.ts](src/lib/apiFetch.ts) para enviar el token vigente y comprobar la cuenta esperada. El diálogo compartido de recuperación conserva borradores y distingue errores de validación, sesión y conexión.
 - Un alta sin garantía idempotente no se reenvía automáticamente cuando se desconoce si se guardó. Si el guardado terminó y solo falló la recarga, se reintenta la lectura.
+
+### Validación de entradas manuales
+
+[financialValidation.ts](src/lib/financialValidation.ts) comparte la validación de días bancarios reales e importes con hasta dos decimales y valor absoluto máximo de **$9,999,999,999.99**. Las fechas usan `YYYY-MM-DD`: `2024-02-29` es válida; `2026-02-30` se rechaza sin convertirla a marzo. Los importes admiten números JSON o cadenas decimales; las cadenas con comas, espacios o notación científica se rechazan. No se redondea una entrada como `10.123` para aceptarla.
+
+[financialContracts.ts](src/lib/financialContracts.ts) aplica estas comprobaciones a Gastos, Ingresos, deudas, MSI, suscripciones y ciclos; nombre, concepto y fuente presentes deben tener contenido después de `trim`. Tarjetas y catálogos usan también este contrato. Mi dinero, saldos y la revisión/conciliación de Captura reutilizan las mismas comprobaciones básicas. El contrato financiero devuelve `400` con un mensaje en español ante entradas inválidas. Cada operación conserva sus reglas de obligatoriedad, signo, cero, campos opcionales y fechas futuras; desactivar una suscripción admite además el instante ISO que envía la interfaz.
+
+La validación del cuerpo financiero conserva sus valores, campos adicionales y orden; el `trim` para persistir ocurre después. No altera el contenido usado por los recibos idempotentes. No se modifican registros históricos ni se requiere una migración de BD. [Regresiones A08](tests/financial-validation.test.ts).
 
 ### Rutas financieras
 

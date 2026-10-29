@@ -1,5 +1,6 @@
 import type { Prisma, PrismaClient } from '@prisma/client';
 import type { FinancialInput } from './financialContracts';
+import { moneyInputSchema } from './financialValidation';
 export type SubscriptionChargeInput = Partial<Pick<FinancialInput, 'subscriptionId' | 'month' | 'action' | 'today' | 'date' | 'amount' | 'paymentMethod' | 'cardId' | 'createReceivable'>> & { expenseData?: Partial<Omit<Prisma.DailyExpenseUncheckedCreateInput, 'userId' | 'date' | 'amount' | 'categoryId' | 'concept'>> & { categoryId?: string; concept?: string } };
 export type SubscriptionChargeResult = { expenseId: string; alreadyConfirmed: boolean; restored?: never; skipped?: never } | { restored: true; expenseId?: never; alreadyConfirmed?: never; skipped?: never } | { skipped: true; expenseId?: never; alreadyConfirmed?: never; restored?: never };
 import { buildSubscriptionCharges, getSubscriptionReceipts, subscriptionChargeDate, validChargeDay, validChargeMonth } from "./subscriptionCharges";
@@ -65,8 +66,7 @@ export async function applySubscriptionCharge(tx: Prisma.TransactionClient, user
   const date = input.date ?? scheduledDate;
   const amount = input.amount ?? String(subscription.amount);
   if (!validChargeDay(date) || date > today) throw new SubscriptionChargeError("La fecha del cobro debe ser válida y no posterior a hoy.");
-  if (!["number", "string"].includes(typeof amount) || !/^\d+(?:\.\d{1,2})?$/.test(String(amount))
-    || Number(amount) <= 0 || !Number.isSafeInteger(Math.round(Number(amount) * 100))) throw new SubscriptionChargeError("Ingresa un importe positivo con hasta dos decimales.");
+  if (!moneyInputSchema.safeParse(amount).success || Number(amount) <= 0) throw new SubscriptionChargeError("Ingresa un importe positivo con hasta dos decimales y no mayor a $9,999,999,999.99.");
   const extra: NonNullable<SubscriptionChargeInput["expenseData"]> = input.expenseData || {};
   const paymentMethod = input.paymentMethod !== undefined ? input.paymentMethod : extra.paymentMethod ?? subscription.paymentMethod;
   if (!["CASH", "CARD"].includes(paymentMethod ?? "")) throw new SubscriptionChargeError("Selecciona un método de pago válido.");

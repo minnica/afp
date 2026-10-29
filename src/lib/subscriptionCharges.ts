@@ -1,9 +1,9 @@
 import { usageEvidence } from './calculations/usageEvidence';
 import type { FinancialSubscription, StatementCycle } from './calculations/types';
+import { isCalendarDay } from './financialValidation';
 // Días bancarios YYYY-MM-DD; el día actual se calcula en la zona del usuario.
 export function validChargeDay(day: unknown): day is string {
-  return typeof day === "string" && /^\d{4}-\d{2}-\d{2}$/.test(day)
-    && Number.isFinite(Date.parse(day)) && new Date(day).toISOString().slice(0, 10) === day;
+  return isCalendarDay(day);
 }
 
 export function validChargeMonth(month: unknown): month is string {

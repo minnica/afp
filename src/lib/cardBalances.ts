@@ -1,7 +1,6 @@
 import type { MoneyValue, DateValue } from './calculations/types';
 import { z } from "zod";
-
-const MAX_AMOUNT = 9999999999.99;
+import { isCalendarDay, moneyInputSchema } from './financialValidation';
 
 export function getBalanceToday() {
   return new Intl.DateTimeFormat("en-CA", {
@@ -10,12 +9,8 @@ export function getBalanceToday() {
 }
 
 function moneyField({ signed = false } = {}) {
-  return z.union([z.string(), z.number()])
-    .refine((value) => (signed ? /^-?\d+(?:\.\d{1,2})?$/ : /^\d+(?:\.\d{1,2})?$/).test(String(value).trim()), {
-      message: signed ? "Ingresa un importe con hasta dos decimales." : "Ingresa un importe de cero o mayor, con hasta dos decimales.",
-    })
-    .transform(Number)
-    .refine((value) => Number.isFinite(value) && Math.abs(value) <= MAX_AMOUNT, "El importe es demasiado grande.");
+  return moneyInputSchema.transform(Number)
+    .refine(value => signed || value >= 0, "Ingresa un importe de cero o mayor, con hasta dos decimales.");
 }
 
 export function creditBalanceSchema(today = getBalanceToday()) {
@@ -23,9 +18,7 @@ export function creditBalanceSchema(today = getBalanceToday()) {
     creditLimit: moneyField(),
     usedBalance: moneyField({ signed: true }),
     balanceAsOf: z.string().refine((value) => {
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(value) || value < "1900-01-01" || value > today) return false;
-      const date = new Date(`${value}T00:00:00.000Z`);
-      return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === value;
+      return isCalendarDay(value) && value >= "1900-01-01" && value <= today;
     }, "Elige una fecha válida que no sea futura."),
   });
 }
