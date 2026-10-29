@@ -16,6 +16,8 @@ import { buildCardUsageWaivers, buildCurrentCardUsageWaivers, buildCardUsageWaiv
 import { cycleCreditSelect } from "@/lib/calculations/cardCredits";
 import { getSubscriptionStatementAmount } from "@/lib/calculations/subscriptionStatements";
 import { isSubscriptionChargeResolved } from "@/lib/subscriptionCharges";
+import { mexicoDayNumber } from '@/lib/financialDates';
+import { validDay } from '@/lib/money/dates';
 import { getCyclePeriodWarnings } from "@/lib/calculations/cycleDataQuality";
 import {
   calculateCycleAmount,
@@ -151,12 +153,12 @@ function getMonthKey(year: number, month: number) {
 }
 
 function getMonthStart(date: Date) {
-  return new Date(Date.UTC(date.getFullYear(), date.getMonth(), 1, 0, 0, 0));
+  return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), 1, 0, 0, 0));
 }
 
 function getMonthEnd(date: Date) {
   return new Date(
-    Date.UTC(date.getFullYear(), date.getMonth() + 1, 0, 23, 59, 59),
+    Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 0, 23, 59, 59),
   );
 }
 
@@ -455,11 +457,15 @@ export async function GET(request: Request) {
 
 
     const clientDate = searchParams.get("clientDate");
+    if (clientDate !== null && !validDay(clientDate)) {
+      return NextResponse.json({ error: 'Fecha del cliente no válida.' }, { status: 400 });
+    }
     const now = clientDate ? new Date(`${clientDate}T12:00:00Z`) : new Date();
-    const monthStart = getMonthStart(now);
-    const monthEnd = getMonthEnd(now);
-    const currentYear = now.getFullYear();
-    const currentMonth = now.getMonth() + 1;
+    const financialDate = new Date(mexicoDayNumber(now));
+    const monthStart = getMonthStart(financialDate);
+    const monthEnd = getMonthEnd(financialDate);
+    const currentYear = financialDate.getUTCFullYear();
+    const currentMonth = financialDate.getUTCMonth() + 1;
 
     const [
       cards,

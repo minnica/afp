@@ -1,0 +1,92 @@
+
+> afp@0.1.0 test /home/garatachia/projects/afp
+> node --import tsx tests/run-tests.ts financial-dates.test.ts payable-notices.test.ts
+
+TAP version 13
+# Subtest: A04: el mismo instante conserva día, estado, aviso y leyenda hasta medianoche México
+ok 1 - A04: el mismo instante conserva día, estado, aviso y leyenda hasta medianoche México
+  ---
+  duration_ms: 7.238574
+  type: 'test'
+  ...
+# Subtest: A04: mes y año cambian en México y el vencimiento conserva el día UTC almacenado
+ok 2 - A04: mes y año cambian en México y el vencimiento conserva el día UTC almacenado
+  ---
+  duration_ms: 0.906108
+  type: 'test'
+  ...
+# Subtest: A04: corte, importe y agrupación del Dashboard cambian juntos al empezar el día en México
+ok 3 - A04: corte, importe y agrupación del Dashboard cambian juntos al empezar el día en México
+  ---
+  duration_ms: 0.437159
+  type: 'test'
+  ...
+# Subtest: A04: próxima actualización usa medianoche México, incluidos cambios históricos de offset
+ok 4 - A04: próxima actualización usa medianoche México, incluidos cambios históricos de offset
+  ---
+  duration_ms: 0.550999
+  type: 'test'
+  ...
+# Subtest: A04: regresiones de API, persistencia y presentación bajo TZ=UTC
+ok 5 - A04: regresiones de API, persistencia y presentación bajo TZ=UTC
+  ---
+  duration_ms: 3513.157066
+  type: 'test'
+  ...
+# Subtest: A04: regresiones de API, persistencia y presentación bajo TZ=America/Mexico_City
+ok 6 - A04: regresiones de API, persistencia y presentación bajo TZ=America/Mexico_City
+  ---
+  duration_ms: 3554.687519
+  type: 'test'
+  ...
+# Subtest: A04: regresiones de API, persistencia y presentación bajo TZ=Asia/Tokyo
+ok 7 - A04: regresiones de API, persistencia y presentación bajo TZ=Asia/Tokyo
+  ---
+  duration_ms: 3632.562965
+  type: 'test'
+  ...
+# Subtest: A04: regresiones de API, persistencia y presentación bajo TZ=Pacific/Kiritimati
+ok 8 - A04: regresiones de API, persistencia y presentación bajo TZ=Pacific/Kiritimati
+  ---
+  duration_ms: 3488.047419
+  type: 'test'
+  ...
+# Subtest: avisos por pagar: desde dos días antes, hoy y vencidos de meses anteriores
+ok 9 - avisos por pagar: desde dos días antes, hoy y vencidos de meses anteriores
+  ---
+  duration_ms: 3.006824
+  type: 'test'
+  ...
+# Subtest: avisos por pagar: el saldo a centavos decide la liquidación y conserva cancelaciones
+ok 10 - avisos por pagar: el saldo a centavos decide la liquidación y conserva cancelaciones
+  ---
+  duration_ms: 1.030757
+  type: 'test'
+  ...
+# Subtest: avisos por pagar: préstamos usan saldo bancario o capital abonado y fecha contractual
+ok 11 - avisos por pagar: préstamos usan saldo bancario o capital abonado y fecha contractual
+  ---
+  duration_ms: 0.387859
+  type: 'test'
+  ...
+# Subtest: avisos por pagar: prioridad por vencimiento y fecha junto a otros avisos
+ok 12 - avisos por pagar: prioridad por vencimiento y fecha junto a otros avisos
+  ---
+  duration_ms: 1.188708
+  type: 'test'
+  ...
+# Subtest: avisos por pagar: conserva el día bancario UTC y todo el día de México de vencimiento
+ok 13 - avisos por pagar: conserva el día bancario UTC y todo el día de México de vencimiento
+  ---
+  duration_ms: 665.321402
+  type: 'test'
+  ...
+1..13
+# tests 13
+# suites 0
+# pass 13
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 15152.482254

@@ -65,7 +65,7 @@ test("avisos por pagar: prioridad por vencimiento y fecha junto a otros avisos",
   assert.deepEqual(Array.from(notices, notice => notice.id), ["payable-overdue", "payable-purchase", "payable-next"]);
 });
 
-test("avisos por pagar: conserva el día bancario UTC y todo el día local de vencimiento", () => {
+test("avisos por pagar: conserva el día bancario UTC y todo el día de México de vencimiento", () => {
   const script = `
     const assert = require('node:assert/strict');
     const { sourceLoader } = require('./tests/helpers/load-source.ts');
@@ -73,9 +73,9 @@ test("avisos por pagar: conserva el día bancario UTC y todo el día local de ve
     const account = { id: 'date', concept: 'Fecha', originalAmount: 10, status: 'ACTIVE', dailyExpenses: [] };
     for (const time of ['00:00:00Z', '23:59:59Z']) {
       account.expectedDate = '2026-11-01T' + time;
-      assert.equal(buildPayableNotices([account], new Date(2026, 9, 30, 23, 59))[0].group, 'upcoming');
-      assert.equal(buildPayableNotices([account], new Date(2026, 10, 1, 23, 59))[0].group, 'today');
-      assert.equal(buildPayableNotices([account], new Date(2026, 10, 2, 0, 1))[0].group, 'overdue');
+      assert.equal(buildPayableNotices([account], new Date('2026-10-31T05:59:00Z'))[0].group, 'upcoming');
+      assert.equal(buildPayableNotices([account], new Date('2026-11-02T05:59:00Z'))[0].group, 'today');
+      assert.equal(buildPayableNotices([account], new Date('2026-11-02T06:01:00Z'))[0].group, 'overdue');
     }
   `;
   for (const TZ of ["UTC", "America/Mexico_City", "Asia/Tokyo"]) {

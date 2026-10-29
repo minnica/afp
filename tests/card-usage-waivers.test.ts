@@ -31,8 +31,8 @@ test("en curso reúne octubre y noviembre según el período de cada tarjeta", (
 test("el día de corte completo sigue vigente y al día siguiente cambia de período", () => {
   const next = { ...cycle, id: "nov", month: 11, startDate: "2026-10-11", cutDate: "2026-11-10" };
   const cyclesWithAmounts = [cycle, next];
-  assert.equal(present(branch(present(current({ cyclesWithAmounts, now: new Date("2026-10-10T23:59:59Z") })[0]), 'selectedCycle').selectedCycle).id, "oct");
-  assert.equal(present(branch(present(current({ cyclesWithAmounts, now: new Date("2026-10-11T00:00:00Z") })[0]), 'selectedCycle').selectedCycle).id, "nov");
+  assert.equal(present(branch(present(current({ cyclesWithAmounts, now: new Date("2026-10-11T05:59:59Z") })[0]), 'selectedCycle').selectedCycle).id, "oct");
+  assert.equal(present(branch(present(current({ cyclesWithAmounts, now: new Date("2026-10-11T06:00:00Z") })[0]), 'selectedCycle').selectedCycle).id, "nov");
 });
 
 test("cortes terminados salen de en curso aunque hayan cumplido o tengan cargos por confirmar", () => {

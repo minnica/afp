@@ -10,6 +10,7 @@ import { supabase } from "@/lib/supabase";
 import type { Dashboard } from "@/lib/uiTypes";
 import { errorMessage } from "@/lib/uiTypes";
 import { ensureUserSetup } from "@/lib/userSetup";
+import { nextMexicoMidnight, todayInMexico } from '@/lib/financialDates';
 import { usePathname, useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
@@ -70,7 +71,7 @@ function useDashboardState() {
           await ensureUserSetup(session.user, { errorMode });
           if (request.controller.signal.aborted) return;
           const requestDate = new Date();
-          const params = new URLSearchParams({ userId, clientDate: requestDate.toLocaleDateString("en-CA") });
+          const params = new URLSearchParams({ userId, clientDate: todayInMexico(requestDate) });
           const response = await apiFetch(`/api/dashboard?${params}`, {
             signal: request.controller.signal,
             errorMode,
@@ -99,8 +100,7 @@ function useDashboardState() {
 
   useEffect(() => {
     if (!appRoutes.has(pathname) || (!mobile && pathname !== "/dashboard" && pathname !== "/analisis")) return;
-    const nextDay = new Date();
-    nextDay.setHours(24, 0, 0, 0);
+    const nextDay = nextMexicoMidnight();
     const timer = window.setTimeout(() => {
       setToday(new Date());
       refresh({ silent: true });

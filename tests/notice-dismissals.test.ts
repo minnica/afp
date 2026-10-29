@@ -13,8 +13,8 @@ test("solo oculta la ocurrencia seleccionada durante el mes de confirmación", (
   assert.deepEqual(plain(ctx.partitionNotices([notice, next, nextMonth], entries, "2026-10")), { visible: [next, nextMonth], hidden: [notice] });
   assert.equal(ctx.partitionNotices([notice, nextMonth], entries, "2026-11").visible.length, 2);
   assert.equal(ctx.partitionNotices([notice], [], "2026-10").visible.length, 1);
-  assert.equal(ctx.getNoticeMonth(new Date(2026, 11, 31, 23, 59)), "2026-12");
-  assert.equal(ctx.getNoticeMonth(new Date(2027, 0, 1)), "2027-01");
+  assert.equal(ctx.getNoticeMonth(new Date('2027-01-01T05:59:00Z')), "2026-12");
+  assert.equal(ctx.getNoticeMonth(new Date('2027-01-01T06:00:00Z')), "2027-01");
 });
 
 test("un corte oculto no oculta el pago y los cambios de importe/fecha lo hacen reaparecer", () => {

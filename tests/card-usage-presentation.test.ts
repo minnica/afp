@@ -27,7 +27,7 @@ test("renovaciones de Turbo se ordenan junto a los cortes por su fecha límite",
 });
 
 test("fecha de corte respeta el día almacenado y hoy, mañana y días restantes", () => {
-  const today = new Date(2026, 9, 13, 23, 45);
+  const today = new Date(Date.UTC(2026, 9, 13, 23, 45) + 6 * 3600000);
   assert.equal(uncheckedFixture(helpers.formatUsageCutDate, row("A", "2026-10-13T00:00:00Z"), today), "Corte: 13 oct · hoy");
   assert.equal(uncheckedFixture(helpers.formatUsageCutDate, row("A", "2026-10-14T00:00:00Z"), today), "Corte: 14 oct · mañana");
   assert.equal(uncheckedFixture(helpers.formatUsageCutDate, row("A", "2026-10-18T00:00:00Z"), today), "Corte: 18 oct · en 5 días");

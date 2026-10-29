@@ -1,3 +1,4 @@
+import { daysUntilBankDate } from './financialDates';
 type SortableUsage = { renewBy?: string | null; selectedCycle?: { cutDate: string; year: number; month: number } | null; card?: { name: string } };
 function dateValue(value: string | null | undefined) {
   if (!value) return null;
@@ -38,8 +39,7 @@ export function formatUsageCutDate(item: SortableUsage, today: Date, historical 
   const date = new Intl.DateTimeFormat("es-MX", { day: "numeric", month: "short", timeZone: "UTC" })
     .format(new Date(cut));
   if (historical) return `Corte: ${date}`;
-  const localDay = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
-  const days = Math.round((cut - localDay) / 86400000);
+  const days = daysUntilBankDate(new Date(cut), today);
   const timing = days === 0 ? "hoy" : days === 1 ? "mañana" : `en ${days} días`;
   return `Corte: ${date} · ${timing}`;
 }

@@ -8,6 +8,7 @@ import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAnalysis } from "@/hooks/use-analysis";
+import { mexicoDayNumber } from '@/lib/financialDates';
 import dynamic from "next/dynamic";
 import { useId, useState } from "react";
 
@@ -20,9 +21,10 @@ const CategoryComparison = dynamic(() => import("./AnalysisCharts").then((module
 
 function AnalysisViews({ dashboard, today }: { dashboard: import("@/lib/uiTypes").Dashboard; today: Date }) {
   const monthId = useId();
-  const [monthIndex, setMonthIndex] = useState(today.getMonth());
+  const financialDate = new Date(mexicoDayNumber(today));
+  const [monthIndex, setMonthIndex] = useState(financialDate.getUTCMonth());
   const [categoryId, setCategoryId] = useState("all");
-  const year = today.getFullYear();
+  const year = financialDate.getUTCFullYear();
   return (
     <Tabs defaultValue="weeks" className="gap-5" data-analysis-views>
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">

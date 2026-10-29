@@ -1,0 +1,68 @@
+{
+  "finding": "A04",
+  "date": "2026-10-29",
+  "baseCommit": "ec11d0f07f28efc0a14ebaf02b82695934141401",
+  "status": "implemented_locally",
+  "financialTimeZone": "America/Mexico_City",
+  "bankingDatePolicy": "preserve_stored_utc_calendar_day",
+  "checks": {
+    "typecheck": {
+      "exitCode": 0,
+      "log": "typecheck.log"
+    },
+    "typecheckTests": {
+      "exitCode": 0,
+      "log": "typecheck-tests.log"
+    },
+    "typeContracts": {
+      "exitCode": 0,
+      "log": "test-types.log"
+    },
+    "lint": {
+      "exitCode": 0,
+      "errors": 0,
+      "preexistingWarnings": 3,
+      "log": "lint.log"
+    },
+    "tests": {
+      "exitCode": 0,
+      "passed": 882,
+      "failed": 0,
+      "skipped": 0,
+      "postgresql": "local_disposable_16",
+      "log": "tests.log"
+    },
+    "timeZones": {
+      "exitCode": 0,
+      "zones": [
+        "UTC",
+        "America/Mexico_City",
+        "Asia/Tokyo",
+        "Pacific/Kiritimati"
+      ],
+      "realPostgresqlInEachZone": true,
+      "log": "timezones.log"
+    },
+    "build": {
+      "exitCode": 1,
+      "reason": "Turbopack process/port permission denied, including escalated attempt",
+      "log": "build.log"
+    },
+    "webpackBuild": {
+      "exitCode": 0,
+      "log": "build-webpack.log"
+    },
+    "existingMigrationsAppliedLocally": {
+      "exitCode": 0,
+      "count": 42,
+      "log": "migrations.log"
+    }
+  },
+  "newMigrations": 0,
+  "deployed": false,
+  "remoteWrites": false,
+  "remainingAcceptance": [
+    "default_build_in_unrestricted_environment",
+    "published_environment_with_real_auth"
+  ]
+}

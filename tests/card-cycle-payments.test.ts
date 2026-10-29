@@ -22,7 +22,7 @@ test("el detalle de captura calcula el saldo con importes sin necesitar fechas d
 });
 
 type Cycle = Omit<typeof base, 'statementAmount' | 'paidAmount' | 'paidAt' | 'status'> & { statementAmount: MoneyValue; paidAmount: MoneyValue; paidAt: DateValue | null; status: string; datesConfirmedAt?: DateValue; postCutCreditAmount?: MoneyValue; postCutCreditDate?: DateValue | null; postCutCreditNotes?: string | null };
-function fixture(initial: Partial<Cycle> = {}) {
+function fixture(initial: Partial<Cycle> = {}, instant = now) {
   let cycle: Cycle = { ...base, ...initial }, writes = 0, fail = false;
   const reads: boolean[] = [], locks: { id: string; userId: string }[] = [];
   let inTransaction = false;
@@ -67,7 +67,7 @@ function fixture(initial: Partial<Cycle> = {}) {
     "@/lib/prisma": { prisma },
     "next/server": { NextResponse: { json: testReply } },
     "@supabase/supabase-js": { createClient: () => ({ auth: { getUser: async () => ({ data: { user: { id: "owner" } } }) } }) },
-  }, { Date: fixedDate(now), console: { error() {} } });
+  }, { Date: fixedDate(instant), console: { error() {} } });
   const request = (body?: Record<string, unknown>) => ({ url: "http://localhost/api/test", headers: new Headers({ authorization: "Bearer test" }), json: async () => body });
   return {
     patch: (body: Record<string, unknown>) => load("src/app/api/card-cycles/route.ts").PATCH(request({ id: "cycle", ...body })),
@@ -108,7 +108,7 @@ test("un peso de mil conserva 999 pendientes, aun con PAID/paidAt históricos", 
   assert.equal(result.pendingAmount, 999);
   assert.equal(result.paymentStatus, "PARTIALLY_PAID");
   assert.equal(result.displayStatus, "PARTIALLY_PAID");
-  assert.equal(getCyclePaymentState(partial, new Date(2026, 9, 26)).displayStatus, "OVERDUE");
+  assert.equal(getCyclePaymentState(partial, new Date(Date.UTC(2026, 9, 26) + 6 * 3600000)).displayStatus, "OVERDUE");
   assert.equal(result.isSettled, false);
   assert.equal(getCyclePaymentState(partial, new Date("2026-10-20")).displayStatus, "PARTIALLY_PAID");
   assert.equal(getCyclePaymentState({ ...base, paidAt: "2026-10-20", status: "PAID" as const }, now).pendingAmount, 1000);
@@ -117,7 +117,7 @@ test("un peso de mil conserva 999 pendientes, aun con PAID/paidAt históricos", 
 test("el pago sigue vigente todo el día bancario de vencimiento", () => {
   for (const dueDate of ["2026-10-21T00:00:00Z", "2026-10-21T12:00:00Z"]) {
     for (const hour of [0, 6, 12, 23]) {
-      const today = new Date(2026, 9, 21, hour, 59, 59, 999);
+      const today = new Date(Date.UTC(2026, 9, 21, hour, 59, 59, 999) + 6 * 3600000);
       for (const [overrides, expected] of [
         [{}, "PAYMENT_PENDING"],
         [{ paidAmount: 1 }, "PARTIALLY_PAID"],
@@ -130,13 +130,13 @@ test("el pago sigue vigente todo el día bancario de vencimiento", () => {
   }
 });
 
-test("solo vence al empezar el día local siguiente, incluidos cambios de mes y año", () => {
+test("solo vence al empezar el día de México siguiente, incluidos cambios de mes y año", () => {
   for (const [year, month, day] of [[2026, 9, 21], [2026, 9, 31], [2026, 11, 31]] as const) {
     const dueDate = new Date(Date.UTC(year, month, day));
     const cycle = { ...base, dueDate };
-    assert.equal(getCyclePaymentState(cycle, new Date(year, month, present(day) - 1, 23, 59)).displayStatus, "PAYMENT_PENDING");
-    assert.equal(getCyclePaymentState(cycle, new Date(year, month, day, 23, 59, 59, 999)).displayStatus, "PAYMENT_PENDING");
-    const nextDay = new Date(year, month, present(day) + 1);
+    assert.equal(getCyclePaymentState(cycle, new Date(Date.UTC(year, month, present(day) - 1, 23, 59) + 6 * 3600000)).displayStatus, "PAYMENT_PENDING");
+    assert.equal(getCyclePaymentState(cycle, new Date(Date.UTC(year, month, day, 23, 59, 59, 999) + 6 * 3600000)).displayStatus, "PAYMENT_PENDING");
+    const nextDay = new Date(Date.UTC(year, month, present(day) + 1) + 6 * 3600000);
     assert.equal(getCyclePaymentState(cycle, nextDay).displayStatus, "OVERDUE");
     assert.equal(getCyclePaymentState({ ...cycle, paidAmount: 1 }, nextDay).displayStatus, "OVERDUE");
     assert.equal(getCyclePaymentState({ ...cycle, paidAmount: 1000 }, nextDay).displayStatus, "PAID");
@@ -145,9 +145,9 @@ test("solo vence al empezar el día local siguiente, incluidos cambios de mes y 
 });
 
 test("el corte se presenta desde el inicio de su día bancario", () => {
-  assert.equal(getCyclePaymentState(base, new Date(2026, 9, 9, 23, 59)).displayStatus, "OPEN");
-  assert.equal(getCyclePaymentState(base, new Date(2026, 9, 10)).displayStatus, "PAYMENT_PENDING");
-  assert.equal(getCyclePaymentState({ ...base, statementAmount: null }, new Date(2026, 9, 10)).displayStatus, "CUT");
+  assert.equal(getCyclePaymentState(base, new Date(Date.UTC(2026, 9, 9, 23, 59) + 6 * 3600000)).displayStatus, "OPEN");
+  assert.equal(getCyclePaymentState(base, new Date(Date.UTC(2026, 9, 10) + 6 * 3600000)).displayStatus, "PAYMENT_PENDING");
+  assert.equal(getCyclePaymentState({ ...base, statementAmount: null }, new Date(Date.UTC(2026, 9, 10) + 6 * 3600000)).displayStatus, "CUT");
 });
 
 test("Dashboard usa la fecha del cliente para el estado y el aviso de vencimiento", async () => {
@@ -163,6 +163,41 @@ test("Dashboard usa la fecha del cliente para el estado y el aviso de vencimient
     const notice = array(response.body.importantNotices).find(n => record(n).type === "CARD_PAYMENT");
     assert.equal(record(notice).group, group);
     assert.equal(record(notice).amount, 1000);
+  }
+  assert.equal(f.writes(), 0);
+});
+
+test('A04: listado, Dashboard sin clientDate y PATCH conservan el mismo día de México', async () => {
+  for (const [dueDate, instant, expected, group] of [
+    ['2026-10-15', '2026-10-16T00:01:00Z', 'PAYMENT_PENDING', 'today'],
+    ['2026-10-15', '2026-10-16T05:59:59.999Z', 'PAYMENT_PENDING', 'today'],
+    ['2026-10-15', '2026-10-16T06:00:00Z', 'OVERDUE', 'overdue'],
+    ['2026-10-31', '2026-11-01T05:59:59.999Z', 'PAYMENT_PENDING', 'today'],
+    ['2026-10-31', '2026-11-01T06:00:00Z', 'OVERDUE', 'overdue'],
+    ['2026-12-31', '2027-01-01T05:59:59.999Z', 'PAYMENT_PENDING', 'today'],
+    ['2026-12-31', '2027-01-01T06:00:00Z', 'OVERDUE', 'overdue'],
+  ] as const) {
+    const f = fixture({ dueDate, status: 'OVERDUE' }, new Date(instant));
+    const listed = await f.get('card-cycles');
+    const dashboard = await f.get('dashboard');
+    assert.equal(listed.status, 200);
+    assert.equal(dashboard.status, 200);
+    assert.equal(record(array(listed.body.cycles)[0]).displayStatus, expected);
+    assert.equal(record(array(dashboard.body.cycles)[0]).displayStatus, expected);
+    const notice = array(dashboard.body.importantNotices).find(n => record(n).type === 'CARD_PAYMENT');
+    assert.equal(record(notice).group, group);
+    assert.equal(f.writes(), 0);
+    const saved = await f.patch({ action: 'UPDATE_STATEMENT', statementAmount: 1000 });
+    assert.equal(saved.status, 200);
+    assert.equal(record(saved.body.cycle).displayStatus, expected);
+    assert.equal(f.state().status, expected);
+  }
+});
+
+test('Dashboard rechaza clientDate vacío, imposible o con hora antes de consultar datos', async () => {
+  const f = fixture();
+  for (const clientDate of ['', '2026-02-30', '2026-13-01', '2026-10-15T12:00:00Z', 'invalid']) {
+    assert.equal((await f.get('dashboard', { clientDate })).status, 400);
   }
   assert.equal(f.writes(), 0);
 });

@@ -1,6 +1,7 @@
 "use client";
 import type { Notice } from "@/lib/uiTypes";
 import { errorMessage } from "@/lib/uiTypes";
+import { FINANCIAL_TIME_ZONE, mexicoDayNumber } from '@/lib/financialDates';
 
 
 import type * as React from "react";
@@ -62,8 +63,10 @@ export default function ImportantNotices({ inDialog = false, view: controlledVie
   const checkboxId = useId();
   const hiddenPayments = hiddenNotices.filter((notice) => notice.type === "CARD_PAYMENT").length;
   const isPayment = pending?.notice.type === "CARD_PAYMENT";
-  const monthName = today.toLocaleDateString("es-MX", { month: "long", year: "numeric" });
-  const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).toLocaleDateString("es-MX", { day: "numeric", month: "long" });
+  const financialDate = new Date(mexicoDayNumber(today));
+  const monthName = today.toLocaleDateString("es-MX", { month: "long", year: "numeric", timeZone: FINANCIAL_TIME_ZONE });
+  const endOfMonth = new Date(Date.UTC(financialDate.getUTCFullYear(), financialDate.getUTCMonth() + 1, 0))
+    .toLocaleDateString("es-MX", { day: "numeric", month: "long", timeZone: 'UTC' });
 
   function changeView(nextView: string) {
     setActionError("");

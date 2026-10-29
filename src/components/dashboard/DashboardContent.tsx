@@ -21,6 +21,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { formatPaymentDeadline, getDashboardPayment } from "@/lib/cardPaymentPresentation";
 import { MONTH_NAMES, formatCompactDate, formatMoney } from "@/lib/dashboardPresentation";
 import { cn } from "@/lib/utils";
+import { mexicoDayNumber } from '@/lib/financialDates';
 import { useMemo, useState } from "react";
 
 function getLastDayOfMonthUtc(year: number, monthIndex: number) {
@@ -149,8 +150,9 @@ export default function DashboardContent() {
   const { dashboard, isLoading, error, today: now, usageHistoryPeriod, setUsageHistoryPeriod } = useDashboard();
   const mobile = useIsMobile();
 
-  const currentYear = now.getFullYear();
-  const currentMonthIndex = now.getMonth(); // 0-11
+  const financialDate = new Date(mexicoDayNumber(now));
+  const currentYear = financialDate.getUTCFullYear();
+  const currentMonthIndex = financialDate.getUTCMonth(); // 0-11
 
   const [activeMonthTab, setActiveMonthTab] = useState(String(currentMonthIndex));
 

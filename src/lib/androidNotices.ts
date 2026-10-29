@@ -7,18 +7,20 @@ import { cycleCreditSelect } from "@/lib/calculations/cardCredits";
 import { getDebtAccountState } from "@/lib/calculations/debtAccounts";
 import { buildDashboardPayments, buildImportantNotices } from "@/lib/importantNotices";
 import { getNoticeKey, getNoticeMonth, partitionNotices } from "@/lib/noticeDismissals";
+import { FINANCIAL_TIME_ZONE } from './financialDates';
 
 const noticePaths: Record<string, string> = {
   CARD_PAYMENT: "/tarjetas", CUT_CYCLE: "/tarjetas", CUT_CYCLE_UPCOMING: "/tarjetas",
   CASH_SUBSCRIPTION: "/gastos", RECEIVABLE: "/ingresos", PAYABLE: "/gastos",
 };
 
-export function noticeLocalDate(timeZone = "America/Mexico_City", now = new Date()) {
+export function noticeLocalDate(timeZone = FINANCIAL_TIME_ZONE, now = new Date()) {
   if (typeof timeZone !== "string" || timeZone.length > 100) throw new ApiAccessError("Zona horaria no válida.", 400);
   try {
-    const parts = new Intl.DateTimeFormat("en-CA", { timeZone, year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(now);
-    const value = Object.fromEntries(parts.map(part => [part.type, part.value]));
-    return new Date(Number(value.year), Number(value.month) - 1, Number(value.day), 12);
+    // Conserva la validación del parámetro legado. El teléfono no cambia el día
+    // financiero: todos los cálculos interpretan este instante en México.
+    new Intl.DateTimeFormat('en-CA', { timeZone }).format(now);
+    return now;
   } catch {
     throw new ApiAccessError("Zona horaria no válida.", 400);
   }

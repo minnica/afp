@@ -10,6 +10,7 @@ import { array,record as objectValue } from './helpers/dynamic-values';
 import assert from "node:assert/strict";
 import { createHash,randomBytes,randomUUID } from 'node:crypto';
 import { test } from 'node:test';
+import { todayInMexico } from '../src/lib/financialDates';
 
 const today = new Date("2026-10-26T12:00:00Z");
 class Clock extends fixedDate(today) { static now() { return today.getTime(); } }
@@ -126,8 +127,8 @@ test("avisos Android: suscripciones, cobros y cortes conservan destino y reglas 
 test("avisos Android: fecha local de México, cambio de mes y zonas inválidas", () => {
   const { load } = fixture();
   const { noticeLocalDate } = load("src/lib/androidNotices.ts");
-  assert.equal(noticeLocalDate("America/Mexico_City", new Date("2026-11-01T05:59:00Z")).getMonth(), 9);
-  assert.equal(noticeLocalDate("America/Mexico_City", new Date("2026-11-01T06:00:00Z")).getMonth(), 10);
+  assert.equal(todayInMexico(noticeLocalDate("America/Mexico_City", new Date("2026-11-01T05:59:00Z"))), '2026-10-31');
+  assert.equal(todayInMexico(noticeLocalDate("Asia/Tokyo", new Date("2026-11-01T06:00:00Z"))), '2026-11-01');
   assert.throws(() => noticeLocalDate("not-a-zone"), error => objectValue(error).status === 400);
 });
 

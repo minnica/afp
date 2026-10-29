@@ -3,15 +3,12 @@ import type { CalendarData, CalendarEvent } from './types';
 import { getCyclePaymentState } from "@/lib/calculations/cardCyclePayments";
 import { getDebtAccountState } from "@/lib/calculations/debtAccounts";
 import { buildSubscriptionCharges } from "@/lib/subscriptionCharges";
-import { preferences, CALENDAR_TIME_ZONE } from "@/lib/calendar/config";
+import { preferences } from "@/lib/calendar/config";
 import { calendarEventLabel } from "@/lib/calendar/palette";
+import { todayInMexico } from '@/lib/financialDates';
 
 export function bankDate(value: Date | string | null | undefined) { return value ? new Date(value).toISOString().slice(0, 10) : null; }
-export function mexicoDay(now = new Date()) {
-  const parts = new Intl.DateTimeFormat("en-CA", { timeZone: CALENDAR_TIME_ZONE, year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(now);
-  const part = (name: Intl.DateTimeFormatPartTypes) => parts.find(item => item.type === name)!.value;
-  return `${part("year")}-${part("month")}-${part("day")}`;
-}
+export const mexicoDay = todayInMexico;
 export function addDays(day: string, count: number) { return new Date(Date.parse(`${day}T12:00:00Z`) + count * 86400000).toISOString().slice(0, 10); }
 function dayInMonth(month: string, day: number) {
   const [year, number] = month.split("-").map(Number);
@@ -50,7 +47,7 @@ export function buildCalendarEvents(data: CalendarData, rawPreferences: unknown,
       candidates.set(month, { cardId: card.id, cutDate, dueDate, projected: true });
     }
     for (const [month, cycle] of candidates) {
-      const state = getCyclePaymentState(cycle);
+      const state = getCyclePaymentState(cycle, now);
       // dueDate existe incluso en ciclos generados: requiere confirmación manual.
       // Cero es un importe capturado; un pago por sí solo no confirma las fechas.
       const reviewed = !cycle.projected && Boolean(cycle.datesConfirmedAt && cycle.dueDate)

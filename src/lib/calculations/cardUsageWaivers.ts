@@ -6,6 +6,7 @@ import type { FinancialCycle, FinancialExpense, FinancialPurchase, FinancialSubs
 interface UsageArgs { cycles?: unknown; cards: UsageCard[]; cyclesWithAmounts: FinancialCycle[]; expenses: FinancialExpense[]; subscriptions: FinancialSubscription[]; purchases: FinancialPurchase[]; year: number; month: number; now?: Date }
 interface UsageEntry { id: string; concept?: string; name?: string; amount: number; date?: DateValue; chargeDate?: string; purchaseDate?: DateValue; months?: number; categoryName?: string | null; source?: string; reason?: string; subscriptionProjection?: string }
 import { isSubscriptionChargeResolved } from "../subscriptionCharges";
+import { todayInMexico } from '../financialDates';
 
 // Reglas por producto, nunca inferidas del nombre editable de la tarjeta.
 export const CARD_USAGE_PRODUCTS = {
@@ -79,7 +80,7 @@ function usagePeriod(cycle: FinancialCycle) {
 // Turbo exige una compra cada 30 días, independientemente del corte de crédito.
 // AFP solo observa los movimientos de crédito registrados, no la activación en Nu.
 function buildNuTurboUsage({ card, cyclesWithAmounts, expenses, subscriptions, purchases, now }: Omit<UsageArgs, "year" | "month"> & { card: UsageCard; now: DateValue }) {
-  const today = usageDay(now)!;
+  const today = todayInMexico(new Date(now));
   const entries: { id: string; concept: string; amount: number; date: string }[] = [];
   const cardExpenses = expenses.filter((expense) => expense.cardId === card.id && expense.paymentMethod === "CARD");
   const statements = cyclesWithAmounts.filter((cycle) => cycle.cardId === card.id)
@@ -138,7 +139,7 @@ function buildNuTurboUsage({ card, cyclesWithAmounts, expenses, subscriptions, p
 // El período vigente depende de sus fechas bancarias, no del mes ni del pago.
 export function buildCurrentCardUsageWaivers(args: Omit<UsageArgs, "year" | "month">) {
   const now = args.now || new Date();
-  const today = usageDay(now)!;
+  const today = todayInMexico(now);
   return args.cards.flatMap<ReturnType<typeof buildNuTurboUsage> | (ReturnType<typeof buildCardUsageWaivers>[number] & { periodSelectionPending: boolean })>((card) => {
     if (productKey(card.usagePolicy) === "NU") return [buildNuTurboUsage({ ...args, card, now })];
     if (!CARD_USAGE_PRODUCTS[productKey(card.usagePolicy) as keyof typeof CARD_USAGE_PRODUCTS]) return [];
@@ -152,8 +153,8 @@ export function buildCurrentCardUsageWaivers(args: Omit<UsageArgs, "year" | "mon
     const selected = candidates[0]?.cycle;
     const [item] = buildCardUsageWaivers({
       ...args, now, cards: [card], cyclesWithAmounts: selected ? [selected] : [],
-      year: selected?.year ?? now.getUTCFullYear(),
-      month: selected?.month ?? now.getUTCMonth() + 1,
+      year: selected?.year ?? Number(today.slice(0, 4)),
+      month: selected?.month ?? Number(today.slice(5, 7)),
     });
     // No se acredita una meta cuando dos períodos compiten por los movimientos.
     return [{ ...item!, periodSelectionPending: candidates.length > 1,
@@ -164,7 +165,7 @@ export function buildCurrentCardUsageWaivers(args: Omit<UsageArgs, "year" | "mon
 
 export function buildCardUsageWaiverHistory(args: Omit<UsageArgs, "year" | "month">) {
   const now = args.now || new Date();
-  const today = usageDay(now)!;
+  const today = todayInMexico(now);
   const cards = new Map(args.cards.map((card) => [card.id, card]));
   return args.cyclesWithAmounts.flatMap((cycle) => {
     const card = cards.get(cycle.cardId);
@@ -197,7 +198,7 @@ function usageScheduledCharges(subscription: FinancialSubscription, cycle: Finan
 }
 
 export function buildCardUsageWaivers({ cards, cyclesWithAmounts, expenses, subscriptions, purchases, year, month, now = new Date() }: UsageArgs) {
-  const today = usageDay(now)!;
+  const today = todayInMexico(now);
   return cards.flatMap((card) => {
     const rule = CARD_USAGE_PRODUCTS[productKey(card.usagePolicy) as keyof typeof CARD_USAGE_PRODUCTS];
     if (!rule) return [];

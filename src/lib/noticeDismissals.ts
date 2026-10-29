@@ -1,10 +1,11 @@
 import type { DateValue } from './calculations/types';
+import { todayInMexico } from './financialDates';
 const dismissibleTypes = new Set([
   "CARD_PAYMENT", "CUT_CYCLE", "CUT_CYCLE_UPCOMING", "RECEIVABLE", "CASH_SUBSCRIPTION", "PAYABLE",
 ]);
 
 export function getNoticeMonth(date = new Date()) {
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+  return todayInMexico(date).slice(0, 7);
 }
 
 // El identificador distingue cada vencimiento. Un cambio del importe de un pago

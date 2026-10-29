@@ -1,6 +1,7 @@
 import type { Prisma } from "@prisma/client";
 import { readFinancialInput } from "@/lib/financialContracts";
 import { getCyclePaymentState, getStoredCycleStatus, parseCycleMoney } from "@/lib/calculations/cardCyclePayments";
+import { mexicoDayNumber } from '@/lib/financialDates';
 import { apiResponse as NextResponse, requireApiUser, apiAccessErrorResponse, requireOwnedReferences, ApiAccessError } from "@/lib/apiAuth";
 import { prisma } from "@/lib/prisma";
 import { cycleCreditSelect } from "@/lib/calculations/cardCredits";
@@ -160,8 +161,7 @@ function getCycleDates(year: number, monthIndex: number, cutDay: number, dueDay:
 }
 
 function getTargetMonths() {
-  const now = new Date();
-  const year = now.getFullYear();
+  const year = new Date(mexicoDayNumber()).getUTCFullYear();
 
   return Array.from({ length: 12 }, (_, monthIndex) => ({
     month: monthIndex + 1,
@@ -371,11 +371,12 @@ async function updateCycle(userId: string, id: string, getData: (current: Prisma
         throw new ApiAccessError("La fecha de aplicación debe ser posterior al corte; los créditos incluidos en el estado de cuenta no se descuentan de nuevo.", 409);
       }
     }
-    const status = getStoredCycleStatus({ ...current, ...data });
+    const now = new Date();
+    const status = getStoredCycleStatus({ ...current, ...data }, now);
     const cycle = await tx.cardCycle.update({
       where: { id, userId }, data: { ...data, status }, select: cycleSelect,
     });
-    return { ...cycle, ...getCyclePaymentState(cycle) };
+    return { ...cycle, ...getCyclePaymentState(cycle, now) };
   });
 }
 

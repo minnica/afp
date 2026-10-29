@@ -3,11 +3,12 @@ import type { CalendarEventType } from './types';
 import type { CalendarPreferences } from './types';
 import { createHash, randomBytes, createCipheriv, createDecipheriv, timingSafeEqual } from "node:crypto";
 import { Buffer } from "node:buffer";
+import { FINANCIAL_TIME_ZONE } from '../financialDates';
 
 export const CALENDAR_SCOPE = "https://www.googleapis.com/auth/calendar.app.created";
 export const CALENDAR_LIST_SCOPE = "https://www.googleapis.com/auth/calendar.calendarlist.readonly";
 export const CALENDAR_SCOPES = ["openid", "email", CALENDAR_SCOPE, CALENDAR_LIST_SCOPE];
-export const CALENDAR_TIME_ZONE = "America/Mexico_City";
+export const CALENDAR_TIME_ZONE = FINANCIAL_TIME_ZONE;
 export const CALENDAR_COOKIE = "afp_calendar_oauth";
 export const EVENT_TYPES: CalendarEventType[] = ["cuts", "cardPayments", "subscriptions", "receivables", "payables"];
 export const DEFAULT_PREFERENCES = { types: EVENT_TYPES, showAmounts: false, reminders: true };

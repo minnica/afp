@@ -1,11 +1,8 @@
-import type { DateValue, PaymentCycle, CycleDisplayStatus } from './types';
+import type { PaymentCycle, CycleDisplayStatus } from './types';
+import { bankDay, mexicoDayNumber } from '../financialDates';
 
 export type CyclePaymentStatus = 'UNCONFIRMED' | 'NO_PAYMENT_DUE' | 'PAID' | 'PARTIALLY_PAID' | 'PENDING';
 export interface CyclePaymentState { paymentStatus: CyclePaymentStatus; paymentDueAmount: number | null; pendingAmount: number | null; excessAmount: number; isSettled: boolean; displayStatus: CycleDisplayStatus }
-function getBankDay(value: DateValue) {
-  const date = new Date(value);
-  return Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
-}
 
 // Capture's payment detail has amounts but no dates. Keep that calculation
 // separate from the calendar status, without inventing dates in the UI.
@@ -33,22 +30,22 @@ export function getCyclePaymentState(cycle: PaymentCycle, today = new Date()): C
   const amounts = getCyclePaymentAmounts(cycle);
   const { paymentStatus } = amounts;
   const hasStatement = cycle.statementAmount !== null && cycle.statementAmount !== undefined;
-  // Las fechas bancarias guardan su día UTC; hoy corresponde al día local.
+  // Las fechas bancarias guardan su día UTC; hoy corresponde al día de México.
   // El pago vence al terminar ese día, independientemente de la hora guardada.
-  const localDay = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
+  const localDay = mexicoDayNumber(today);
   let displayStatus: CycleDisplayStatus;
   if (paymentStatus === "PAID" || paymentStatus === "NO_PAYMENT_DUE") displayStatus = paymentStatus;
-  else if (localDay > getBankDay(cycle.dueDate)) displayStatus = "OVERDUE";
+  else if (localDay > bankDay(cycle.dueDate)) displayStatus = "OVERDUE";
   else if (paymentStatus === "PARTIALLY_PAID") displayStatus = "PARTIALLY_PAID";
-  else if (localDay >= getBankDay(cycle.cutDate)) displayStatus = hasStatement ? "PAYMENT_PENDING" : "CUT";
+  else if (localDay >= bankDay(cycle.cutDate)) displayStatus = hasStatement ? "PAYMENT_PENDING" : "CUT";
   else displayStatus = "OPEN";
 
   return { ...amounts, displayStatus };
 }
 
 // Conserva el enum existente. La distinción financiera se deriva en cada lectura.
-export function getStoredCycleStatus(cycle: PaymentCycle) {
-  const state = getCyclePaymentState(cycle);
+export function getStoredCycleStatus(cycle: PaymentCycle, now = new Date()) {
+  const state = getCyclePaymentState(cycle, now);
   if (state.isSettled) return "PAID";
   return state.displayStatus === "PARTIALLY_PAID" ? "PAYMENT_PENDING" : state.displayStatus as Exclude<CycleDisplayStatus, "NO_PAYMENT_DUE" | "PARTIALLY_PAID">;
 }

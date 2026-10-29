@@ -9,6 +9,7 @@ export interface ImportantNotice { id: string; type: string; group: string; titl
 import { getCyclePaymentState } from "@/lib/calculations/cardCyclePayments";
 import { getDebtAccountState } from "@/lib/calculations/debtAccounts";
 import { isSubscriptionChargeResolved } from "@/lib/subscriptionCharges";
+import { bankDay, daysUntilBankDate, mexicoDayNumber, todayInMexico } from './financialDates';
 
 export function shouldIncludeSubscriptionInMonth(subscription: Pick<FinancialSubscription, "frequencyMonths" | "startMonth" | "startYear">, year: number, month: number) {
   const frequencyMonths = Number(subscription.frequencyMonths || 1);
@@ -25,16 +26,7 @@ export function shouldIncludeSubscriptionInMonth(subscription: Pick<FinancialSub
   return diffMonths % frequencyMonths === 0;
 }
 
-function startOfLocalDay(date: Date) {
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
-}
-
-function getDaysDifference(targetDate: DateValue, baseDate: DateValue) {
-  const target = startOfLocalDay(new Date(targetDate));
-  const base = startOfLocalDay(new Date(baseDate));
-
-  return Math.round((target.getTime() - base.getTime()) / 86400000);
-}
+const getDaysDifference = daysUntilBankDate;
 
 function getNoticeTiming(diffDays: number) {
   if (diffDays < 0) {
@@ -68,10 +60,10 @@ function getNoticeTiming(diffDays: number) {
 }
 
 export function buildDateFromDay(year: number, month: number, day: number) {
-  const maxDay = new Date(year, month, 0).getDate();
+  const maxDay = new Date(Date.UTC(year, month, 0)).getUTCDate();
   const safeDay = Math.min(day, maxDay);
 
-  return new Date(year, month - 1, safeDay, 12, 0, 0);
+  return new Date(Date.UTC(year, month - 1, safeDay, 12));
 }
 
 export function buildCardPaymentNotices(payments: Payment[], now: Date) {
@@ -124,8 +116,9 @@ function formatMoneyForNotice(value: MoneyValue) {
 export function buildCashSubscriptionNotices(subscriptions: NoticeSubscription[], now: Date) {
   const notices = [];
 
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth() + 1;
+  const date = new Date(mexicoDayNumber(now));
+  const currentYear = date.getUTCFullYear();
+  const currentMonth = date.getUTCMonth() + 1;
 
   for (const subscription of subscriptions) {
     if (subscription.paymentMethod !== "CASH") continue;
@@ -183,7 +176,7 @@ function toUtcDateStr(d: DateValue) {
 
 function hasIncomeForReceivableFromDate(receivable: NoticeReceivable, chargeDate: DateValue, now: Date) {
   const startStr = toUtcDateStr(chargeDate);
-  const endStr = toUtcDateStr(now);
+  const endStr = todayInMexico(now);
 
   return (receivable.incomes || []).some((income) => {
     const incomeStr = toUtcDateStr(income.date);
@@ -193,9 +186,8 @@ function hasIncomeForReceivableFromDate(receivable: NoticeReceivable, chargeDate
 
 function hasExpenseForSubscriptionFromDate(subscription: NoticeSubscription, chargeDate: DateValue, now: Date) {
   // Start from the 1st of the charge month to catch payments made before the charge day.
-  const n = new Date(now);
-  const monthStartStr = `${n.getUTCFullYear()}-${String(n.getUTCMonth() + 1).padStart(2, "0")}-01`;
-  const endStr = toUtcDateStr(now);
+  const endStr = todayInMexico(now);
+  const monthStartStr = `${endStr.slice(0, 7)}-01`;
 
   return (subscription.dailyExpenses || []).some((expense) => {
     if (expense.subscriptionCharge) return expense.subscriptionCharge.month === monthStartStr.slice(0, 7);
@@ -212,7 +204,7 @@ export function buildPayableNotices(payables: NoticePayable[], now: Date) {
     const expectedDate = new Date(payable.expectedDate);
     if (!Number.isFinite(expectedDate.getTime())) continue;
 
-    // La fecha bancaria conserva su día UTC, comparado con el día local actual.
+    // La fecha bancaria conserva su día UTC, comparado con el día de México.
     const dueDate = buildDateFromDay(
       expectedDate.getUTCFullYear(),
       expectedDate.getUTCMonth() + 1,
@@ -246,8 +238,9 @@ export function buildPayableNotices(payables: NoticePayable[], now: Date) {
 export function buildReceivableNotices(receivables: NoticeReceivable[], now: Date) {
   const notices = [];
 
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth() + 1;
+  const date = new Date(mexicoDayNumber(now));
+  const currentYear = date.getUTCFullYear();
+  const currentMonth = date.getUTCMonth() + 1;
 
   for (const receivable of receivables) {
     if (receivable.status !== "ACTIVE") continue;
@@ -257,7 +250,7 @@ export function buildReceivableNotices(receivables: NoticeReceivable[], now: Dat
     if (expectedChargeDays.length === 0) continue;
 
     const originDate = receivable.originDate
-      ? startOfLocalDay(new Date(receivable.originDate))
+      ? new Date(bankDay(receivable.originDate))
       : null;
 
     for (const day of expectedChargeDays) {
@@ -323,7 +316,7 @@ export function buildCutCycleNotices(cyclesWithAmounts: NoticeCycle[], cards: No
     const diffDaysToCut = getDaysDifference(cycle.cutDate, now);
 
     if (cycle.displayStatus === "CUT") {
-      const daysSinceCut = getDaysDifference(now, cycle.cutDate);
+      const daysSinceCut = -diffDaysToCut;
       const cutAgoLabel =
         daysSinceCut === 0
           ? "hoy"
@@ -363,6 +356,7 @@ export function buildCutCycleNotices(cyclesWithAmounts: NoticeCycle[], cards: No
 }
 
 export function buildDashboardPayments<C extends NoticeCard, T extends NoticeCycle>(cards: C[], cyclesWithAmounts: T[], now: Date) {
+  const today = mexicoDayNumber(now);
   // Batch activo: mes más antiguo (por cutDate) que tenga al menos un ciclo sin pagar.
   // Todos los ciclos sin pagar de ese mes se muestran en "Este pago".
   // Solo se avanza al mes actual cuando todos los ciclos del batch anterior están pagados.
@@ -371,7 +365,7 @@ export function buildDashboardPayments<C extends NoticeCard, T extends NoticeCyc
 
   for (const cycle of cyclesWithAmounts) {
     const cutDate = new Date(cycle.cutDate);
-    if (cutDate > now) continue;
+    if (bankDay(cutDate) > today) continue;
     if (cycle.isSettled) continue;
 
     if (
@@ -402,7 +396,7 @@ export function buildDashboardPayments<C extends NoticeCard, T extends NoticeCyc
         return (
           cutDate.getUTCFullYear() === activeBatchYear &&
           cutDate.getUTCMonth() === activeBatchMonth &&
-          cutDate <= now
+          bankDay(cutDate) <= today
         );
       });
 
@@ -416,7 +410,7 @@ export function buildDashboardPayments<C extends NoticeCard, T extends NoticeCyc
     // previousPayment / nextPayment usando el ciclo más reciente cortado.
     if (anchorIndex === -1) {
       for (let i = cyclesForCard.length - 1; i >= 0; i--) {
-        if (new Date(cyclesForCard[i]!.cutDate) <= now) {
+        if (bankDay(cyclesForCard[i]!.cutDate) <= today) {
           anchorIndex = i;
           break;
         }

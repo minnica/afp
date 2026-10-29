@@ -40,7 +40,7 @@ test("cualquier importe positivo renueva 30 días, sin depender del mes ni del c
 test("el día 30 pide comprar hoy; el plazo conserva todo el día y cambia al siguiente", () => {
   for (const [day, status, remaining] of [["2026-11-19", "MET", 1], ["2026-11-20", "DUE_TODAY", 0], ["2026-11-21", "NOT_MET", -1]]) {
     for (const time of ["00:00:00", "23:59:59"]) {
-      const item = run({ expenses: [expense()], now: new Date(`${day}T${time}Z`) });
+      const item = run({ expenses: [expense()], now: new Date(`${day}T${time}-06:00`) });
       assert.equal(present(item).status, status);
       assert.equal(branch(present(item), 'daysRemaining').daysRemaining, remaining);
       assert.equal(present(item).isExempt, status !== "NOT_MET");

@@ -1,9 +1,9 @@
 import type { DateValue, MoneyValue } from './calculations/types';
+import { bankDay, daysUntilBankDate, mexicoDayNumber } from './financialDates';
 /** Usa el estado de cuenta desde el día de corte; antes, conserva la estimación. */
 export function getDashboardPayment(cycle: { cutDate?: DateValue; statementAmount?: MoneyValue; postCutCreditAmount?: MoneyValue; calculatedAmount?: MoneyValue }, today: Date) {
-  const cutDate = new Date(cycle.cutDate ?? NaN);
-  const cutDay = Date.UTC(cutDate.getUTCFullYear(), cutDate.getUTCMonth(), cutDate.getUTCDate());
-  const localDay = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
+  const cutDay = bankDay(cycle.cutDate ?? new Date(NaN));
+  const localDay = mexicoDayNumber(today);
   const isStatement = localDay >= cutDay && cycle.statementAmount != null;
   // El total del período descuenta devoluciones confirmadas, pero no los pagos.
   const amount = isStatement
@@ -18,9 +18,7 @@ export function formatPaymentDeadline(dateString: DateValue | null | undefined, 
   const date = new Date(dateString);
   if (!Number.isFinite(date.getTime())) return "-";
 
-  const targetDay = Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
-  const localDay = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
-  const days = Math.round((targetDay - localDay) / 86400000);
+  const days = daysUntilBankDate(date, today);
   let timing;
   if (days === 0) timing = "Es hoy";
   else if (days === 1) timing = "Es mañana";

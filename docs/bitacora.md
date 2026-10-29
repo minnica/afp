@@ -4,6 +4,16 @@ Historial resumido de decisiones, cambios, migraciones e incidencias que ayudan 
 
 Consolidado el **27 de octubre de 2026** a partir del README del commit `4562aa0cec0a46d8b482fdfef96116d1d3040282` y sus evidencias. «Publicado», «aplicado» y «pendiente» describen lo documentado en cada fecha; esta consolidación no incluye una comprobación remota nueva. Se conservan las fechas de los registros originales, que pueden usar hora local o UTC. El nombre de una migración identifica su versión, no demuestra cuándo se aplicó.
 
+## 2026-10-29
+
+### A04: día financiero compartido de México
+
+**Implementación local completada** sobre `ec11d0f`. Los vencimientos conservan el día bancario UTC registrado y comparan el instante actual con `America/Mexico_City`. Tarjetas, Dashboard, estado guardado, avisos, mes de ocultación, consumo vigente y textos de presentación comparten la política. Mi dinero y Calendar reutilizan el helper. El navegador envía `clientDate` como día México válido y actualiza a medianoche de esa zona; Android conserva el instante real y la zona del teléfono no desplaza vencimientos.
+
+La suite completa pasa con **882 escenarios, cero fallos y cero omisiones** en PostgreSQL desechable: 871 anteriores y once nuevos. La matriz ejecuta los mismos instantes UTC en UTC, México, Tokio y UTC+14, incluida la integración PATCH → PostgreSQL → Tarjetas → Dashboard. Se verifican todo el día límite, cambios de mes/año, parciales, cero, liquidaciones y las reglas históricas de horario de verano. Tipos de web/pruebas, contratos negativos y lint correctos; se conservan las tres advertencias previas. El build Turbopack encuentra una restricción de permisos del entorno al abrir un puerto; la alternativa Webpack termina correctamente y los logs están en el [cierre A04](../artifacts/auditoria-2026-10-15/a04-2026-10-29/README.md).
+
+README, guía Android e informe de auditoría reflejan la política y el cierre local. Sin nueva migración ni cambios remotos o publicación; la aceptación autenticada del entorno publicado permanece pendiente.
+
 ## 2026-10-28
 
 ### Cierre de la migración de pruebas y helpers a TypeScript
