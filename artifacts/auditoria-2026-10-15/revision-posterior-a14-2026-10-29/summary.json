@@ -1,0 +1,93 @@
+{
+  "date": "2026-10-29",
+  "scope": "Documentation review, current deployment metadata, anonymous HTTP reads and fresh local dependency audits. No implementation, deployment or database writes.",
+  "commit": "834b2f75805da8e406538d898914970647516cb3",
+  "findingCounts": {
+    "covered": 13,
+    "partial": 1,
+    "localOnly": 0,
+    "unimplemented": 0
+  },
+  "newlyConfirmedPublishedFindings": [
+    "A12",
+    "A13",
+    "A14"
+  ],
+  "remainingPartialFinding": "A10",
+  "dependencyAudits": {
+    "production": {
+      "exitCode": 0,
+      "vulnerabilities": {
+        "info": 0,
+        "low": 0,
+        "moderate": 0,
+        "high": 0,
+        "critical": 0
+      }
+    },
+    "all": {
+      "exitCode": 1,
+      "vulnerabilities": {
+        "info": 0,
+        "low": 1,
+        "moderate": 0,
+        "high": 0,
+        "critical": 0
+      }
+    },
+    "remainingAdvisory": "GHSA-gcqx-w48m-w2h4",
+    "chain": "devDependency shadcn -> deepmerge@4.3.1",
+    "patchedVersionAvailable": false,
+    "registryLatest": {
+      "deepmerge": "4.3.1",
+      "shadcn": "4.23.0",
+      "shadcnDeepmergeRange": "^4.3.1"
+    }
+  },
+  "implementationEvidence": {
+    "sourceFilesCompared": 46,
+    "allLatestHashesMatch": true,
+    "latestFullChecks": "../a14-2026-10-29/checks.json",
+    "suite": {
+      "tests": 965,
+      "passed": 965,
+      "failed": 0,
+      "skipped": 0
+    },
+    "database": "PostgreSQL 16 disposable local instance in A14 validation",
+    "auth": "Fake local fixture in A14 validation",
+    "checksRerunInThisReview": false,
+    "existingLintWarnings": 2
+  },
+  "openVerificationIssue": {
+    "test": "tests/capture-rollout-integration.test.ts:99",
+    "assertion": "!JSON.stringify(data.rollout).includes('1000')",
+    "initialSuite": "../a14-2026-10-29/tests-local-initial.log",
+    "initialPassed": 963,
+    "initialFailed": 2,
+    "isolatedRepeatPassed": 26,
+    "finalFullSuitePassed": 965,
+    "causeEstablished": false,
+    "testModified": false
+  },
+  "remainingAcceptance": [
+    "Two real Supabase accounts: UI -> API -> PostgreSQL isolation, offline queue, logout and financial workflows.",
+    "A13: real authentication and performance under production workload.",
+    "A14: physical phones, virtual keyboard, password manager and Safari/iOS zoom.",
+    "Android phases 1, 4, 6 and 7: locked-screen capture, missing sources/HSBC, future automatic purchases and full statement reconciliation.",
+    "Android important notices: permission, activation and real delivery remain unverified after their recorded publication."
+  ],
+  "additionalImprovementBacklog": [
+    "Password recovery/change flow.",
+    "Versioned CI and confirmation of remote environment separation.",
+    "Shared observability/error boundaries.",
+    "Optional product proposals remain outside A01-A14."
+  ],
+  "notReverified": [
+    "Production database schema and data.",
+    "Authenticated financial writes.",
+    "Google integration acceptance.",
+    "Phone state and Android rules.",
+    "Physical phone interaction."
+  ]
+}

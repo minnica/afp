@@ -1,0 +1,17 @@
+{
+  "checkedAt": "2026-10-29T19:03:18.456786+00:00",
+  "report": "artifacts/auditoria-2026-10-15/informe.md",
+  "reportSha256": "7fc63b3e20da3eea4c852447eea031acd9dbe717c6a414d51047e1b3a9c0e6cf",
+  "relativeFileTargetsAndInternalAnchorsChecked": 227,
+  "missingTargets": [],
+  "duplicateExplicitAnchors": [],
+  "findingCounts": {
+    "covered": 13,
+    "partial": 1
+  },
+  "findingRows": 14,
+  "newEvidenceJsonFilesValidated": 9,
+  "gitDiffCheckExitCode": 0,
+  "functionalChecksRerun": false,
+  "reason": "Only documentation and review evidence changed; existing implementation hashes match the latest A12-A14 validations."
+}

@@ -6,6 +6,14 @@ Consolidado el **27 de octubre de 2026** a partir del README del commit `4562aa0
 
 ## 2026-10-29
 
+### Revisión posterior a A14: publicación y pendientes vigentes
+
+Vercel confirma el commit `834b2f75805da8e406538d898914970647516cb3` de `master` en producción, despliegue `dpl_B1T1UmSsmF9CryKibZ8if5fYhf7g`, **READY** desde las 18:42:44 UTC / 12:42:44 México y asociado a `finanzas.garatachia.com`. Coincide con HEAD y `master` remoto e incluye A12/A13/A14. El informe queda en **13 hallazgos cubiertos y A10 parcial**; las menciones de publicación pendiente en los cierres anteriores son históricas.
+
+Las auditorías repetidas mantienen cero avisos de producción y uno bajo de desarrollo en deepmerge, aún sin parche. HTTP anónimo confirma el login actualizado y tres API protegidas con 401 y cabeceras privadas. Coinciden las 46 huellas de código/pruebas más recientes de A12/A13/A14; se conservan los seis controles y 965 casos correctos del cierre A14, sin repetirlos en esta revisión documental.
+
+Restan la aceptación con dos cuentas reales, dispositivos físicos, carga de producción y fases Android parciales. Se añade el seguimiento del fallo intermitente de Captura registrado durante A14, cuya causa sigue sin establecerse; contraseña, CI, observabilidad y funciones propuestas conservan alcance adicional. Solo se actualizaron documentación y evidencias, sin publicar ni modificar datos remotos. [Informe vigente](../artifacts/auditoria-2026-10-15/informe.md) · [Resumen verificable](../artifacts/auditoria-2026-10-15/revision-posterior-a14-2026-10-29/summary.json).
+
 ### A14: controles táctiles y legibilidad del login
 
 **Implementación local verificada.** Acceso y registro usan campos y botones con altura mínima de 48 px, incluidos envío y cambio de modo. Los campos mantienen texto de 16 px y declaran teclado/autocompletado de correo y contraseña según la operación. Input y Button incorporan opciones explícitas; sus tamaños predeterminados se conservan. El formulario permite desplazamiento en pantallas bajas y reacomoda el pie y los botones al ampliar el texto.

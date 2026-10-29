@@ -1,0 +1,72 @@
+{
+  "scope": "Anonymous read-only GET requests; no share link, login or financial writes.",
+  "requests": [
+    {
+      "path": "/login",
+      "url": "https://finanzas.garatachia.com/login",
+      "checkedAt": "2026-10-29T18:58:34.335876+00:00",
+      "status": 200,
+      "finalUrl": "https://finanzas.garatachia.com/login",
+      "headers": {
+        "Content-Type": "text/html; charset=utf-8",
+        "Cache-Control": "public, max-age=0, must-revalidate",
+        "Vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+        "X-Vercel-Cache": "PRERENDER"
+      },
+      "bodySha256": "4035cdfc5a25e367252735b97f8cb3a4677469cfb966ffcec936e2bb4845c89e",
+      "htmlMarkers": {
+        "min-h-dvh": true,
+        "min-h-12": true,
+        "min-w-12": true,
+        "autoComplete=\"username\"": true,
+        "autoComplete=\"current-password\"": true,
+        "inputMode=\"email\"": true
+      }
+    },
+    {
+      "path": "/api/dashboard/summary",
+      "url": "https://finanzas.garatachia.com/api/dashboard/summary",
+      "checkedAt": "2026-10-29T18:58:34.336314+00:00",
+      "status": 401,
+      "finalUrl": "https://finanzas.garatachia.com/api/dashboard/summary",
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "private, no-store",
+        "Vary": "Authorization",
+        "X-Vercel-Cache": "MISS"
+      },
+      "bodySha256": "d4d0d056d2626cb3642614774db52ad0b00c8fbccfde2409954b2622f2b3cf70",
+      "body": "{\"error\":\"Inicia sesión para continuar.\"}"
+    },
+    {
+      "path": "/api/gastos/bootstrap",
+      "url": "https://finanzas.garatachia.com/api/gastos/bootstrap",
+      "checkedAt": "2026-10-29T18:58:34.336597+00:00",
+      "status": 401,
+      "finalUrl": "https://finanzas.garatachia.com/api/gastos/bootstrap",
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "private, no-store",
+        "Vary": "Authorization",
+        "X-Vercel-Cache": "MISS"
+      },
+      "bodySha256": "d4d0d056d2626cb3642614774db52ad0b00c8fbccfde2409954b2622f2b3cf70",
+      "body": "{\"error\":\"Inicia sesión para continuar.\"}"
+    },
+    {
+      "path": "/api/expenses",
+      "url": "https://finanzas.garatachia.com/api/expenses",
+      "checkedAt": "2026-10-29T18:58:34.336874+00:00",
+      "status": 401,
+      "finalUrl": "https://finanzas.garatachia.com/api/expenses",
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "private, no-store",
+        "Vary": "Authorization",
+        "X-Vercel-Cache": "MISS"
+      },
+      "bodySha256": "d4d0d056d2626cb3642614774db52ad0b00c8fbccfde2409954b2622f2b3cf70",
+      "body": "{\"error\":\"Inicia sesión para continuar.\"}"
+    }
+  ]
+}

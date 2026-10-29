@@ -1,0 +1,308 @@
+{
+  "head": "834b2f75805da8e406538d898914970647516cb3",
+  "commits": {
+    "A10": {
+      "sha": "08aee7c1de08533fc19124e3842c454f59cf743f",
+      "isAncestorOfHead": true
+    },
+    "A12": {
+      "sha": "948bc319a9c55d5dcc75852994662611cf36f6f5",
+      "isAncestorOfHead": true
+    },
+    "A13": {
+      "sha": "b701fb4882caa2d7defd6faf002cb1a5a9af179b",
+      "isAncestorOfHead": true
+    },
+    "A14": {
+      "sha": "834b2f75805da8e406538d898914970647516cb3",
+      "isAncestorOfHead": true
+    }
+  },
+  "dependencyOrMigrationChangesSinceA10": [],
+  "sources": {
+    "src/app/layout.tsx": {
+      "evidence": "artifacts/auditoria-2026-10-15/a12-2026-10-29/verification.json",
+      "expectedSha256": "e7f9495072ef6096f7d804b6c84db8f0360f4e0a63c3d1ec3b72231590c69ac3",
+      "actualSha256": "e7f9495072ef6096f7d804b6c84db8f0360f4e0a63c3d1ec3b72231590c69ac3",
+      "matches": true
+    },
+    "src/app/login/page.tsx": {
+      "evidence": "artifacts/auditoria-2026-10-15/a14-2026-10-29/verification.json",
+      "expectedSha256": "fb0c52fec8c30552105b21bd2d5f967298605f032fbaa51ebea0dd9805fdc94c",
+      "actualSha256": "fb0c52fec8c30552105b21bd2d5f967298605f032fbaa51ebea0dd9805fdc94c",
+      "matches": true
+    },
+    "src/app/privacidad/page.tsx": {
+      "evidence": "artifacts/auditoria-2026-10-15/a12-2026-10-29/verification.json",
+      "expectedSha256": "bed391e68d809bb69bd923b595da64cb504d5ef2d0d707b056a03143ecd743b1",
+      "actualSha256": "bed391e68d809bb69bd923b595da64cb504d5ef2d0d707b056a03143ecd743b1",
+      "matches": true
+    },
+    "src/components/configuracion/AutomaticRecordingContent.tsx": {
+      "evidence": "artifacts/auditoria-2026-10-15/a12-2026-10-29/verification.json",
+      "expectedSha256": "8da756937cd467ca3d74fbc248d6e7f402b51cb112c9e708109f258497f7ff24",
+      "actualSha256": "8da756937cd467ca3d74fbc248d6e7f402b51cb112c9e708109f258497f7ff24",
+      "matches": true
+    },
+    "src/components/configuracion/CaptureReconciliation.tsx": {
+      "evidence": "artifacts/auditoria-2026-10-15/a12-2026-10-29/verification.json",
+      "expectedSha256": "04f15d4c987e3802b2574f0fd68043681354c7f3b17d1099f711022bbbfb84b7",
+      "actualSha256": "04f15d4c987e3802b2574f0fd68043681354c7f3b17d1099f711022bbbfb84b7",
+      "matches": true
+    },
+    "src/components/dashboard/DashboardProvider.tsx": {
+      "evidence": "artifacts/auditoria-2026-10-15/a13-2026-10-29/verification.json",
+      "expectedSha256": "1304e0dd1a27ac138110bd1f2b4bb3b31d90a4789b319c6ba29b105965d318a1",
+      "actualSha256": "1304e0dd1a27ac138110bd1f2b4bb3b31d90a4789b319c6ba29b105965d318a1",
+      "matches": true
+    },
+    "src/components/gastos/GastosContent.tsx": {
+      "evidence": "artifacts/auditoria-2026-10-15/a13-2026-10-29/verification.json",
+      "expectedSha256": "0d0f5b1ea9147fd1007e20c466338c464bb505796fb030aad10d529cc04ddf39",
+      "actualSha256": "0d0f5b1ea9147fd1007e20c466338c464bb505796fb030aad10d529cc04ddf39",
+      "matches": true
+    },
+    "src/components/gastos/OfflineExpenseRestore.tsx": {
+      "evidence": "artifacts/auditoria-2026-10-15/a12-2026-10-29/verification.json",
+      "expectedSha256": "1131a0f7bb05ba2bad4e5901d050904a1f0411d6bded62f3e473ec38033c8aa6",
+      "actualSha256": "1131a0f7bb05ba2bad4e5901d050904a1f0411d6bded62f3e473ec38033c8aa6",
+      "matches": true
+    },
+    "src/components/layout/AppSidebar.tsx": {
+      "evidence": "artifacts/auditoria-2026-10-15/a12-2026-10-29/verification.json",
+      "expectedSha256": "80051d62d424dbbe48a06f0dad437016fb92bce1364a281d190ad04dd4a41c17",
+      "actualSha256": "80051d62d424dbbe48a06f0dad437016fb92bce1364a281d190ad04dd4a41c17",
+      "matches": true
+    },
+    "src/components/layout/LogoutProvider.tsx": {
+      "evidence": "artifacts/auditoria-2026-10-15/a12-2026-10-29/verification.json",
+      "expectedSha256": "80716b5d237be2206a148e722b190cf6a0f80f73c96421a694a3c027934c2bc2",
+      "actualSha256": "80716b5d237be2206a148e722b190cf6a0f80f73c96421a694a3c027934c2bc2",
+      "matches": true
+    },
+    "src/components/layout/MobileNavigationSheet.tsx": {
+      "evidence": "artifacts/auditoria-2026-10-15/a12-2026-10-29/verification.json",
+      "expectedSha256": "e9f268194e274b1868fa229430875288aaafad8009c79c9db4f9ab0358242d20",
+      "actualSha256": "e9f268194e274b1868fa229430875288aaafad8009c79c9db4f9ab0358242d20",
+      "matches": true
+    },
+    "src/components/mi-dinero/MoneyContent.tsx": {
+      "evidence": "artifacts/auditoria-2026-10-15/a12-2026-10-29/verification.json",
+      "expectedSha256": "b960cb8c412fb83a820ede01aa8bae0b63b256a40fe81c848da2c16a0bf0ea50",
+      "actualSha256": "b960cb8c412fb83a820ede01aa8bae0b63b256a40fe81c848da2c16a0bf0ea50",
+      "matches": true
+    },
+    "src/hooks/use-creation-draft.ts": {
+      "evidence": "artifacts/auditoria-2026-10-15/a12-2026-10-29/verification.json",
+      "expectedSha256": "2d06ce020fc5967b178985a2de7611e543c2d210f5106c23cf392a3ddba02fdb",
+      "actualSha256": "2d06ce020fc5967b178985a2de7611e543c2d210f5106c23cf392a3ddba02fdb",
+      "matches": true
+    },
+    "src/lib/localFinancialData.ts": {
+      "evidence": "artifacts/auditoria-2026-10-15/a12-2026-10-29/verification.json",
+      "expectedSha256": "329856627876973bcba66e6de11c71e463beaafaa0c52f468fc4a33b803a12aa",
+      "actualSha256": "329856627876973bcba66e6de11c71e463beaafaa0c52f468fc4a33b803a12aa",
+      "matches": true
+    },
+    "src/lib/logout.ts": {
+      "evidence": "artifacts/auditoria-2026-10-15/a12-2026-10-29/verification.json",
+      "expectedSha256": "1596fdb466e0873f63c90906da96fbfd0fbb6c85dc1b3b3d07e1ea4c27d4dd10",
+      "actualSha256": "1596fdb466e0873f63c90906da96fbfd0fbb6c85dc1b3b3d07e1ea4c27d4dd10",
+      "matches": true
+    },
+    "src/lib/offlineExpenses.ts": {
+      "evidence": "artifacts/auditoria-2026-10-15/a12-2026-10-29/verification.json",
+      "expectedSha256": "67c17d9225d725ff1455086a76f3ee42f2e53e32c9f62cd831b930d15b357df7",
+      "actualSha256": "67c17d9225d725ff1455086a76f3ee42f2e53e32c9f62cd831b930d15b357df7",
+      "matches": true
+    },
+    "tests/helpers/source-contracts.ts": {
+      "evidence": "artifacts/auditoria-2026-10-15/a13-2026-10-29/verification.json",
+      "expectedSha256": "fcd46373b8bfcfad0a6b2a6ba39b43b3cbfa5f417d7548dc6d7940fa6b76c742",
+      "actualSha256": "fcd46373b8bfcfad0a6b2a6ba39b43b3cbfa5f417d7548dc6d7940fa6b76c742",
+      "matches": true
+    },
+    "tests/helpers/source-exports.ts": {
+      "evidence": "artifacts/auditoria-2026-10-15/a13-2026-10-29/verification.json",
+      "expectedSha256": "d7c52c0536ea99a3acd4db4251473dea546eb91302bda1b97f596bfd8350f67b",
+      "actualSha256": "d7c52c0536ea99a3acd4db4251473dea546eb91302bda1b97f596bfd8350f67b",
+      "matches": true
+    },
+    "tests/local-data-logout.test.ts": {
+      "evidence": "artifacts/auditoria-2026-10-15/a12-2026-10-29/verification.json",
+      "expectedSha256": "033d9871bd6e61305870bbbae8e4ead1c8cb6a8d475135370dd1de66c916e911",
+      "actualSha256": "033d9871bd6e61305870bbbae8e4ead1c8cb6a8d475135370dd1de66c916e911",
+      "matches": true
+    },
+    "src/app/api/card-cycles/route.ts": {
+      "evidence": "artifacts/auditoria-2026-10-15/a13-2026-10-29/verification.json",
+      "expectedSha256": "b9b95c7ea7f5195c5b9faf4ed231cb26bddab57dd50911d6e6e956176d9d8cc8",
+      "actualSha256": "b9b95c7ea7f5195c5b9faf4ed231cb26bddab57dd50911d6e6e956176d9d8cc8",
+      "matches": true
+    },
+    "src/app/api/dashboard/route.ts": {
+      "evidence": "artifacts/auditoria-2026-10-15/a13-2026-10-29/verification.json",
+      "expectedSha256": "43285332490c95bcf84bf94c0e0695da4ca03031c7667a69519435b1108dbac6",
+      "actualSha256": "43285332490c95bcf84bf94c0e0695da4ca03031c7667a69519435b1108dbac6",
+      "matches": true
+    },
+    "src/app/api/dashboard/summary/route.ts": {
+      "evidence": "artifacts/auditoria-2026-10-15/a13-2026-10-29/verification.json",
+      "expectedSha256": "e58deb8f0395a7f48a83440fb6e6c76dd2ec64b64099201a6119d02288f24b71",
+      "actualSha256": "e58deb8f0395a7f48a83440fb6e6c76dd2ec64b64099201a6119d02288f24b71",
+      "matches": true
+    },
+    "src/app/api/expenses/route.ts": {
+      "evidence": "artifacts/auditoria-2026-10-15/a13-2026-10-29/verification.json",
+      "expectedSha256": "53dd586cc2c241f739a4d55cae79dd8f90f8b78becd3e472200e42a34e9a0b2b",
+      "actualSha256": "53dd586cc2c241f739a4d55cae79dd8f90f8b78becd3e472200e42a34e9a0b2b",
+      "matches": true
+    },
+    "src/app/api/gastos/bootstrap/route.ts": {
+      "evidence": "artifacts/auditoria-2026-10-15/a13-2026-10-29/verification.json",
+      "expectedSha256": "9f6d0abeca4d4d9d39230bb8721a9be8d3cd35cd46aa3e771ae812ea3d960e08",
+      "actualSha256": "9f6d0abeca4d4d9d39230bb8721a9be8d3cd35cd46aa3e771ae812ea3d960e08",
+      "matches": true
+    },
+    "src/components/analisis/AnalysisContent.tsx": {
+      "evidence": "artifacts/auditoria-2026-10-15/a13-2026-10-29/verification.json",
+      "expectedSha256": "26c3b9b43d1ddb42e78582c0734669c5cf05ebcbd49997b3734730bedc55c9a5",
+      "actualSha256": "26c3b9b43d1ddb42e78582c0734669c5cf05ebcbd49997b3734730bedc55c9a5",
+      "matches": true
+    },
+    "src/components/dashboard/DashboardContent.tsx": {
+      "evidence": "artifacts/auditoria-2026-10-15/a13-2026-10-29/verification.json",
+      "expectedSha256": "9025e05ebb8cb7cfb64df1dd2cedd34a1641163f473315b421eec09a848e12ea",
+      "actualSha256": "9025e05ebb8cb7cfb64df1dd2cedd34a1641163f473315b421eec09a848e12ea",
+      "matches": true
+    },
+    "src/components/layout/AppHeaderActions.tsx": {
+      "evidence": "artifacts/auditoria-2026-10-15/a13-2026-10-29/verification.json",
+      "expectedSha256": "0bb4f4015461a4beed6ed63cafdb3129017a889346244c7ac18a38083fb810fc",
+      "actualSha256": "0bb4f4015461a4beed6ed63cafdb3129017a889346244c7ac18a38083fb810fc",
+      "matches": true
+    },
+    "src/components/tarjetas/TarjetasContent.tsx": {
+      "evidence": "artifacts/auditoria-2026-10-15/a13-2026-10-29/verification.json",
+      "expectedSha256": "40f6553a6d102205ae565c1c64417d9e4185214eeba0e6838fdba38e35793115",
+      "actualSha256": "40f6553a6d102205ae565c1c64417d9e4185214eeba0e6838fdba38e35793115",
+      "matches": true
+    },
+    "src/components/ui/history-year.tsx": {
+      "evidence": "artifacts/auditoria-2026-10-15/a13-2026-10-29/verification.json",
+      "expectedSha256": "0b4bd910f78af602d2c94eb48c69e89def427eb845e3da73d96478466181cbb4",
+      "actualSha256": "0b4bd910f78af602d2c94eb48c69e89def427eb845e3da73d96478466181cbb4",
+      "matches": true
+    },
+    "src/lib/calculations/cardUsageWaivers.ts": {
+      "evidence": "artifacts/auditoria-2026-10-15/a13-2026-10-29/verification.json",
+      "expectedSha256": "c54b50ab10749e1081d23278e46e05027867262b5ec34309206c768929f0a781",
+      "actualSha256": "c54b50ab10749e1081d23278e46e05027867262b5ec34309206c768929f0a781",
+      "matches": true
+    },
+    "src/lib/dashboardDebts.ts": {
+      "evidence": "artifacts/auditoria-2026-10-15/a13-2026-10-29/verification.json",
+      "expectedSha256": "c29b820fc58e8427d4a6da49dd96164fef436d1d08981759f30065b71fc8f085",
+      "actualSha256": "c29b820fc58e8427d4a6da49dd96164fef436d1d08981759f30065b71fc8f085",
+      "matches": true
+    },
+    "src/lib/dashboardReader.ts": {
+      "evidence": "artifacts/auditoria-2026-10-15/a13-2026-10-29/verification.json",
+      "expectedSha256": "e2aa8f853f543beb74900374a550151d642cf4a5a7417b89226be84579b941b1",
+      "actualSha256": "e2aa8f853f543beb74900374a550151d642cf4a5a7417b89226be84579b941b1",
+      "matches": true
+    },
+    "src/lib/expenseHistory.ts": {
+      "evidence": "artifacts/auditoria-2026-10-15/a13-2026-10-29/verification.json",
+      "expectedSha256": "340fb3a4a2cd23b36846e837f4ee6bd7197306636629570a1f424c079d5dad38",
+      "actualSha256": "340fb3a4a2cd23b36846e837f4ee6bd7197306636629570a1f424c079d5dad38",
+      "matches": true
+    },
+    "src/lib/expenseReader.ts": {
+      "evidence": "artifacts/auditoria-2026-10-15/a13-2026-10-29/verification.json",
+      "expectedSha256": "680e3e544fffa1e553b6141dae12f48989760a4a12c732eb6fcc74bb82c4a39e",
+      "actualSha256": "680e3e544fffa1e553b6141dae12f48989760a4a12c732eb6fcc74bb82c4a39e",
+      "matches": true
+    },
+    "src/lib/financialResponses.ts": {
+      "evidence": "artifacts/auditoria-2026-10-15/a13-2026-10-29/verification.json",
+      "expectedSha256": "26b8e43a8a7b4da0e9e1689f5a18e5a19649eaec10c21d69783c47e78f46eb8f",
+      "actualSha256": "26b8e43a8a7b4da0e9e1689f5a18e5a19649eaec10c21d69783c47e78f46eb8f",
+      "matches": true
+    },
+    "src/lib/historyWindow.ts": {
+      "evidence": "artifacts/auditoria-2026-10-15/a13-2026-10-29/verification.json",
+      "expectedSha256": "6712bd3cc72b543eae83a504b49c4a2b10f1d4bf08e92835b1908e6d1aa0a50e",
+      "actualSha256": "6712bd3cc72b543eae83a504b49c4a2b10f1d4bf08e92835b1908e6d1aa0a50e",
+      "matches": true
+    },
+    "src/lib/nuHistory.ts": {
+      "evidence": "artifacts/auditoria-2026-10-15/a13-2026-10-29/verification.json",
+      "expectedSha256": "dad96eaff4cd1880147ac6b9fbbc596a6789f5c5d5edd21dffcd62fa6ff65498",
+      "actualSha256": "dad96eaff4cd1880147ac6b9fbbc596a6789f5c5d5edd21dffcd62fa6ff65498",
+      "matches": true
+    },
+    "src/lib/uiResponseSchemas.ts": {
+      "evidence": "artifacts/auditoria-2026-10-15/a13-2026-10-29/verification.json",
+      "expectedSha256": "add0cd2321db0dbf92c8ce1396d8c108c3c5480ca954e9ed8b8e732f5fed83ec",
+      "actualSha256": "add0cd2321db0dbf92c8ce1396d8c108c3c5480ca954e9ed8b8e732f5fed83ec",
+      "matches": true
+    },
+    "tests/helpers/benchmark-history.ts": {
+      "evidence": "artifacts/auditoria-2026-10-15/a13-2026-10-29/verification.json",
+      "expectedSha256": "19de55cd43e14c6f5a796268d6ebde1718eb9aa77e83fab44282ec2dc64d3c28",
+      "actualSha256": "19de55cd43e14c6f5a796268d6ebde1718eb9aa77e83fab44282ec2dc64d3c28",
+      "matches": true
+    },
+    "tests/helpers/financial-fixtures.ts": {
+      "evidence": "artifacts/auditoria-2026-10-15/a13-2026-10-29/verification.json",
+      "expectedSha256": "414c4ad6cfeac1f51d5886295f7c4fd137bfaa74f2592fa042417b4f75411c2b",
+      "actualSha256": "414c4ad6cfeac1f51d5886295f7c4fd137bfaa74f2592fa042417b4f75411c2b",
+      "matches": true
+    },
+    "tests/helpers/history-fixture.ts": {
+      "evidence": "artifacts/auditoria-2026-10-15/a13-2026-10-29/verification.json",
+      "expectedSha256": "336516ec18df8908d042d620c54c1f256bc99c0abe38f7a91571db60e22811fa",
+      "actualSha256": "336516ec18df8908d042d620c54c1f256bc99c0abe38f7a91571db60e22811fa",
+      "matches": true
+    },
+    "tests/helpers/integration-fixtures.ts": {
+      "evidence": "artifacts/auditoria-2026-10-15/a13-2026-10-29/verification.json",
+      "expectedSha256": "faf19215300ca43a0cf2e021849516804b1655476644b5d65254378453c25cc3",
+      "actualSha256": "faf19215300ca43a0cf2e021849516804b1655476644b5d65254378453c25cc3",
+      "matches": true
+    },
+    "tests/helpers/legacy-route-context.ts": {
+      "evidence": "artifacts/auditoria-2026-10-15/a13-2026-10-29/verification.json",
+      "expectedSha256": "28df63c653cfbdd948ec74a297af0443f2a9780e597276d4fdd2704b21114190",
+      "actualSha256": "28df63c653cfbdd948ec74a297af0443f2a9780e597276d4fdd2704b21114190",
+      "matches": true
+    },
+    "tests/history-window-integration.test.ts": {
+      "evidence": "artifacts/auditoria-2026-10-15/a13-2026-10-29/verification.json",
+      "expectedSha256": "d1237bf539a289bbbfb4e3d1ccf9aab0e70d4a55aa69e758253e8e7f63a8697a",
+      "actualSha256": "d1237bf539a289bbbfb4e3d1ccf9aab0e70d4a55aa69e758253e8e7f63a8697a",
+      "matches": true
+    },
+    "src/components/ui/input.tsx": {
+      "evidence": "artifacts/auditoria-2026-10-15/a14-2026-10-29/verification.json",
+      "expectedSha256": "2fe3f094845766039237e24df771aee26cefdfd7852f03d17290f254ce25c570",
+      "actualSha256": "2fe3f094845766039237e24df771aee26cefdfd7852f03d17290f254ce25c570",
+      "matches": true
+    },
+    "src/components/ui/button.tsx": {
+      "evidence": "artifacts/auditoria-2026-10-15/a14-2026-10-29/verification.json",
+      "expectedSha256": "f768d6f3914832d38094e745f5d55c313270a1cc8215d20f8e13eadda7de24df",
+      "actualSha256": "f768d6f3914832d38094e745f5d55c313270a1cc8215d20f8e13eadda7de24df",
+      "matches": true
+    }
+  },
+  "remoteMaster": {
+    "command": "git ls-remote origin refs/heads/master",
+    "sha": "834b2f75805da8e406538d898914970647516cb3",
+    "matchesHead": true
+  },
+  "comparedAt": "2026-10-29T18:59:52.811567+00:00",
+  "hashSelection": "Latest recorded hash per src/ or tests/ file across A12, A13 and A14 evidence; historical documentation hashes are excluded.",
+  "lockfileSha256": "5065473f5482aed75105c715e4560973f05365747ad2a4bb1ebef8765654f29f"
+}

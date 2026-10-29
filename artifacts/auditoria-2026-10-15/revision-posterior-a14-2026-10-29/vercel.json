@@ -1,0 +1,44 @@
+{
+  "checkedAt": "2026-10-29T18:58:58.199Z",
+  "source": "Vercel MCP get_deployment",
+  "query": {
+    "idOrUrl": "finanzas.garatachia.com",
+    "withGitRepoInfo": true
+  },
+  "scope": "Read-only inspection of an existing deployment; this review did not deploy.",
+  "deployment": {
+    "id": "dpl_B1T1UmSsmF9CryKibZ8if5fYhf7g",
+    "name": "afp",
+    "url": "afp-8wx8zbopt-minnicas-projects.vercel.app",
+    "type": "LAMBDAS",
+    "state": "READY",
+    "createdAt": 1793299261494,
+    "project": {
+      "id": "prj_FUBRDkPPFpOgJG9zuLLhTwm3JHKV",
+      "name": "afp",
+      "framework": "nextjs"
+    },
+    "meta": {
+      "githubCommitRef": "master",
+      "githubCommitSha": "834b2f75805da8e406538d898914970647516cb3",
+      "githubCommitMessage": "feat(*): fase A14 complete audit",
+      "githubRepo": "afp",
+      "githubOrg": "minnica"
+    },
+    "alias": [
+      "afp-virid.vercel.app",
+      "finanzas.garatachia.com",
+      "afp-minnicas-projects.vercel.app",
+      "afp-git-master-minnicas-projects.vercel.app"
+    ],
+    "target": "production",
+    "regions": [
+      "iad1"
+    ],
+    "buildingAt": 1793299263166,
+    "ready": 1793299364073,
+    "readyState": "READY",
+    "source": "git",
+    "aliasError": null
+  }
+}

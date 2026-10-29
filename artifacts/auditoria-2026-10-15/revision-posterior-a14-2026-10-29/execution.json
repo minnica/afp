@@ -1,0 +1,26 @@
+[
+  {
+    "name": "audit-prod",
+    "command": "pnpm audit --prod --json",
+    "exitCode": 0,
+    "checkedAt": "2026-10-29T18:54:33.194342+00:00"
+  },
+  {
+    "name": "audit-all",
+    "command": "pnpm audit --json",
+    "exitCode": 1,
+    "checkedAt": "2026-10-29T18:54:34.038726+00:00"
+  },
+  {
+    "name": "deepmerge-latest",
+    "command": "pnpm view deepmerge version --json",
+    "exitCode": 0,
+    "checkedAt": "2026-10-29T18:54:34.929675+00:00"
+  },
+  {
+    "name": "shadcn-deepmerge",
+    "command": "pnpm view shadcn@latest version dependencies.deepmerge --json",
+    "exitCode": 0,
+    "checkedAt": "2026-10-29T18:54:35.726877+00:00"
+  }
+]
