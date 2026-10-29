@@ -49,6 +49,7 @@ export interface SourceModules {
   'src/lib/captureReconciliation.ts': typeof import('../../src/lib/captureReconciliation');
   'src/lib/captureConfiguration.ts': typeof import('../../src/lib/captureConfiguration');
   'src/lib/captureProcessing.ts': typeof import('../../src/lib/captureProcessing');
+  'src/lib/captureInbox.ts': typeof import('../../src/lib/captureInbox');
   'src/lib/captureSourcePolicy.ts': typeof import('../../src/lib/captureSourcePolicy');
   'src/app/api/captures/payment-receipts/route.ts': typeof import('../../src/app/api/captures/payment-receipts/route');
   'src/lib/paymentReceipts.ts': typeof import('../../src/lib/paymentReceipts');

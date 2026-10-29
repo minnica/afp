@@ -7,7 +7,7 @@ import { captureParsers } from "@/lib/captureParsers";
 const refundKeys = captureParsers.filter(row => row.refundOnly).map(row => row.key);
 const paymentKeys = captureParsers.filter(row => row.paymentOnly).map(row => row.key);
 const moneyKeys = captureParsers.filter(row => row.moneyOnly).map(row => row.key);
-const money: Prisma.CaptureMovementWhereInput = { OR: [{ parserKey: { in: moneyKeys } }, { moneyPosting: { is: { kind: { in: ["TRANSFER", "WITHDRAWAL"] } } } }] };
+const money: Prisma.CaptureMovementWhereInput = { OR: [{ parserKey: { in: moneyKeys } }, { reason: "BBVA_PAYMENT_MATCH_AMBIGUOUS" }, { moneyPosting: { is: { kind: { in: ["TRANSFER", "WITHDRAWAL"] } } } }] };
 const expenseKeys = captureParsers.filter(row => !row.moneyOnly && !row.refundOnly && !row.paymentOnly && row.key !== "bbva.account-charge.es.v1").map(row => row.key);
 const financialKeys = [...moneyKeys, ...refundKeys, ...paymentKeys, ...expenseKeys];
 const unclassified: Prisma.CaptureMovementWhereInput = { OR: [{ parserKey: null }, { parserKey: { notIn: financialKeys } }] };
@@ -16,7 +16,7 @@ const expense: Prisma.CaptureMovementWhereInput = { AND: [
   { OR: [{ moneyPosting: null }, { moneyPosting: { is: { kind: "DEBIT_EXPENSE" } } }] },
   { OR: [{ parserKey: { in: expenseKeys } }, { AND: [unclassified, resolvedExpense] }] },
 ] };
-const other: Prisma.CaptureMovementWhereInput = { AND: [unclassified, { moneyPosting: null }, { expenseId: null, installmentPurchaseId: null, OR: [{ correction: { equals: Prisma.DbNull } }, { correction: { equals: Prisma.JsonNull } }] }] };
+const other: Prisma.CaptureMovementWhereInput = { AND: [unclassified, { reason: { not: "BBVA_PAYMENT_MATCH_AMBIGUOUS" } }, { moneyPosting: null }, { expenseId: null, installmentPurchaseId: null, OR: [{ correction: { equals: Prisma.DbNull } }, { correction: { equals: Prisma.JsonNull } }] }] };
 
 export const captureKinds = ["PENDING", "EXPENSE", "PAYMENT", "REFUND", "MONEY", "OTHER"];
 export function captureKindWhere(kind: string | null): Prisma.CaptureMovementWhereInput {
@@ -29,7 +29,8 @@ export function captureKindWhere(kind: string | null): Prisma.CaptureMovementWhe
   return {};
 }
 
-export function captureMovementKind(row: Pick<Movement, 'parserKey' | 'proposal' | 'expenseId' | 'installmentPurchaseId' | 'correction'>) {
+export function captureMovementKind(row: Pick<Movement, 'parserKey' | 'proposal' | 'expenseId' | 'installmentPurchaseId' | 'correction'> & Partial<Pick<Movement, 'reason'>>) {
+  if (row.reason === "BBVA_PAYMENT_MATCH_AMBIGUOUS") return "MONEY";
   if (captureProposal(row.proposal)?.moneyKind === "CARD_PAYMENT") return "PAYMENT";
   if (moneyKeys.includes(row.parserKey ?? "") || ["TRANSFER", "WITHDRAWAL"].includes(captureProposal(row.proposal)?.moneyKind ?? "")) return "MONEY";
   if (captureProposal(row.proposal)?.moneyKind === "DEBIT_EXPENSE") return "EXPENSE";

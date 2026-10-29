@@ -10,6 +10,9 @@ import { captureAmount, captureDate } from '@/lib/captureReview';
 import { createExpenseInTransaction } from '@/lib/expenseService';
 import { moneyCaptureKind, accountDebitNotice } from '@/lib/captureMoneyParsers';
 import { day, todayInMexico } from '@/lib/money/dates';
+import { getCyclePaymentAmounts } from '@/lib/calculations/cardCyclePayments';
+import { mutateMoney } from '@/lib/money/service';
+import { cents } from '@/lib/money/sources';
 
 const text = z.string().trim().min(1).max(160);
 const inputSchema = z.object({ fromAccountId: text, toAccountId: text.optional(), amount: captureAmount, date: captureDate, concept: text, categoryId: text.optional(), currency: z.literal('MXN'), distinct: z.boolean().default(false) }).strict();
@@ -74,6 +77,41 @@ async function duplicateCandidates(tx: Prisma.TransactionClient, userId: string,
   const payments = await tx.moneyCardPayment.findMany({ where: { userId, accountId: values.fromAccountId, amount: values.amount, date: window, reversedAt: null }, select: { id: true } });
   return [...expenses, ...withdrawals, ...transfers, ...payments];
 }
+
+async function matchCardPayment(tx: Prisma.TransactionClient, movement: Movement, event: CaptureEvent, v: z.output<typeof inputSchema>, from: { id: string; name: string }) {
+  const date = new Date(`${v.date}T00:00:00Z`), dateMs = date.getTime();
+  const cycles = await tx.cardCycle.findMany({ where: { userId: movement.userId, statementAmount: { not: null },
+    cutDate: { lt: new Date(dateMs + 86400000) },
+    dueDate: { gte: new Date(dateMs - 86400000), lt: new Date(dateMs + 2 * 86400000) } },
+    include: { card: { select: { id: true, name: true } } } });
+  const matches = cycles.flatMap(cycle => {
+    const pending = getCyclePaymentAmounts(cycle).pendingAmount;
+    const difference = pending == null ? null : cents(v.amount) - cents(pending);
+    return pending != null && pending > 0 && difference != null && Math.abs(difference) <= 100
+      ? [{ cycleId: cycle.id, cardId: cycle.card.id, cardName: cycle.card.name, dueDate: day(cycle.dueDate),
+        pendingAmount: pending.toFixed(2), difference: (difference / 100).toFixed(2), tolerance: '1.00',
+        dayOffset: Math.round((dateMs - Date.parse(`${day(cycle.dueDate)}T00:00:00Z`)) / 86400000) }] : [];
+  });
+  if (!matches.length) return null;
+  const p = captureProposal(movement.proposal);
+  if (matches.length > 1) return tx.captureMovement.update({ where: { id: movement.id }, data: {
+    reason: 'BBVA_PAYMENT_MATCH_AMBIGUOUS', proposal: { ...p, paymentMatchCandidates: matches },
+  } });
+  const match = matches[0]!;
+  const record = await mutateMoney({ transactionScope: 'existing', $transaction: async fn => fn(tx) }, movement.userId,
+    { action: 'CARD_PAYMENT', operationId: randomUUID(), accountId: from.id, cycleId: match.cycleId,
+      amount: v.amount, date: v.date, additional: true }, todayInMexico(), { matchedPaymentOverage: true });
+  if (!record.id) throw new ApiAccessError('No se pudo registrar el pago identificado. Vuelve a revisar el aviso.', 409);
+  await tx.captureMoneyPosting.create({ data: { id: randomUUID(), userId: movement.userId, movementId: movement.id,
+    sourceKey: sourceKey(event), kind: 'CARD_PAYMENT', cardPaymentId: record.id, originalRecordId: record.id,
+    snapshot: { ...v, kind: 'CARD_PAYMENT', automatic: true, fromName: from.name, toName: match.cardName,
+      destinationSource: 'PENDING_AMOUNT_AND_DUE_DATE', paymentMatch: match } } });
+  return tx.captureMovement.update({ where: { id: movement.id }, data: {
+    status: 'REGISTERED', reason: 'BBVA_PAYMENT_MATCHED', cardId: match.cardId, resolvedAt: new Date(),
+    proposal: { ...p, moneyKind: 'CARD_PAYMENT', cardId: match.cardId, cycleId: match.cycleId,
+      merchant: `Pago de tarjeta ${match.cardName}`, paymentEvidence: 'PENDING_AMOUNT_AND_DUE_DATE', paymentMatch: match },
+  } });
+}
 async function post(tx: Prisma.TransactionClient, movement: Movement, kind: 'TRANSFER' | 'WITHDRAWAL' | 'DEBIT_EXPENSE', rawInput: unknown, automatic: boolean = false, originEvent: CaptureEvent | null = null) {
   const input = captureInput(rawInput);
   const existing = await tx.captureMoneyPosting.findUnique({ where: { movementId: movement.id } });
@@ -102,6 +140,10 @@ async function post(tx: Prisma.TransactionClient, movement: Movement, kind: 'TRA
   if (candidates.length && !v.distinct) {
     if (!automatic) throw new ApiAccessError('Hay un movimiento cercano con el mismo importe y cuentas. Confirma que es otro movimiento.', 409);
     return tx.captureMovement.update({ where: { id: movement.id }, data: { reason: 'MONEY_POSSIBLE_DUPLICATE', proposal: { ...p, moneyCandidates: candidates } } });
+  }
+  if (automatic && kind === 'DEBIT_EXPENSE') {
+    const payment = await matchCardPayment(tx, movement, events[0]!, v, from);
+    if (payment) return payment;
   }
   let record;
   if (kind === 'TRANSFER') record = await tx.moneyTransfer.create({ data: { userId, fromAccountId: from.id, toAccountId: to!.id, amount: v.amount, date: new Date(`${v.date}T12:00:00Z`), concept: v.concept } });

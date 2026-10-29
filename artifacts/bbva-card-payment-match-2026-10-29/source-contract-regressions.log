@@ -1,0 +1,179 @@
+
+> afp@0.1.0 test /home/garatachia/projects/afp
+> node --import tsx tests/run-tests.ts capture-bbva-card-payment-match-integration.test.ts source-loader.test.ts
+
+TAP version 13
+(node:329888) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+# Subtest: BBVA: pagos por saldo pendiente, diferencia máxima de $1 y vencimiento ±1 día
+    # Subtest: pago tardío: prioriza el abono, conserva el aviso y descuenta una sola vez de la cuenta
+    ok 1 - pago tardío: prioriza el abono, conserva el aviso y descuenta una sola vez de la cuenta
+      ---
+      duration_ms: 345.515499
+      type: 'test'
+      ...
+    # Subtest: admite un día antes, el día de vencimiento y un día después
+    ok 2 - admite un día antes, el día de vencimiento y un día después
+      ---
+      duration_ms: 185.127368
+      type: 'test'
+      ...
+    # Subtest: fuera del margen de días conserva el gasto genérico
+    ok 3 - fuera del margen de días conserva el gasto genérico
+      ---
+      duration_ms: 94.590643
+      type: 'test'
+      ...
+    # Subtest: diferencia de $1 exacto: registra el importe real, pendiente o excedente sin redondearlo al estado
+    ok 4 - diferencia de $1 exacto: registra el importe real, pendiente o excedente sin redondearlo al estado
+      ---
+      duration_ms: 146.80676
+      type: 'test'
+      ...
+    # Subtest: una diferencia de $1.01 no identifica un pago
+    ok 5 - una diferencia de $1.01 no identifica un pago
+      ---
+      duration_ms: 73.350896
+      type: 'test'
+      ...
+    # Subtest: compara el pendiente después de abonos parciales y devoluciones aplicadas al corte
+    ok 6 - compara el pendiente después de abonos parciales y devoluciones aplicadas al corte
+      ---
+      duration_ms: 51.730879
+      type: 'test'
+      ...
+    # Subtest: dos tarjetas compatibles quedan por revisar, aunque una coincida exactamente
+    ok 7 - dos tarjetas compatibles quedan por revisar, aunque una coincida exactamente
+      ---
+      duration_ms: 60.089964
+      type: 'test'
+      ...
+    # Subtest: ignora cortes liquidados, sin estado capturado o todavía abiertos
+    ok 8 - ignora cortes liquidados, sin estado capturado o todavía abiertos
+      ---
+      duration_ms: 108.659772
+      type: 'test'
+      ...
+    # Subtest: el estado PAID guardado no sustituye la comprobación del saldo pendiente
+    ok 9 - el estado PAID guardado no sustituye la comprobación del saldo pendiente
+      ---
+      duration_ms: 52.265967
+      type: 'test'
+      ...
+    # Subtest: la tarjeta de otro propietario no interviene en la coincidencia
+    ok 10 - la tarjeta de otro propietario no interviene en la coincidencia
+      ---
+      duration_ms: 62.555707
+      type: 'test'
+      ...
+    # Subtest: regla pausada o terminación desconocida no habilitan pagos
+    ok 11 - regla pausada o terminación desconocida no habilitan pagos
+      ---
+      duration_ms: 55.954966
+      type: 'test'
+      ...
+    # Subtest: usa el día del aviso en México y el día bancario UTC del vencimiento
+    ok 12 - usa el día del aviso en México y el día bancario UTC del vencimiento
+      ---
+      duration_ms: 46.777113
+      type: 'test'
+      ...
+    # Subtest: entregas concurrentes, respuesta repetida y otro UUID no duplican el pago ni crean un gasto
+    ok 13 - entregas concurrentes, respuesta repetida y otro UUID no duplican el pago ni crean un gasto
+      ---
+      duration_ms: 128.582213
+      type: 'test'
+      ...
+    # Subtest: un fallo al guardar la evidencia revierte el abono, la cuenta y la recepción completa
+    ok 14 - un fallo al guardar la evidencia revierte el abono, la cuenta y la recepción completa
+      ---
+      duration_ms: 72.948557
+      type: 'test'
+      ...
+    # Subtest: la API manual no permite excedentes por añadir la opción interna al cuerpo
+    ok 15 - la API manual no permite excedentes por añadir la opción interna al cuerpo
+      ---
+      duration_ms: 43.070963
+      type: 'test'
+      ...
+    # Subtest: revertir el pago restaura el saldo y el recibo anterior no vuelve a aplicarlo
+    ok 16 - revertir el pago restaura el saldo y el recibo anterior no vuelve a aplicarlo
+      ---
+      duration_ms: 81.013233
+      type: 'test'
+      ...
+    1..16
+ok 1 - BBVA: pagos por saldo pendiente, diferencia máxima de $1 y vencimiento ±1 día
+  ---
+  duration_ms: 1907.456465
+  type: 'test'
+  ...
+# Subtest: cargador: JS → TS → JS, tipos, alias, exports/default y reexports
+ok 2 - cargador: JS → TS → JS, tipos, alias, exports/default y reexports
+  ---
+  duration_ms: 9.172523
+  type: 'test'
+  ...
+# Subtest: cargador: mocks tienen prioridad, incluso módulos inexistentes y valores falsy
+ok 3 - cargador: mocks tienen prioridad, incluso módulos inexistentes y valores falsy
+  ---
+  duration_ms: 1.660315
+  type: 'test'
+  ...
+# Subtest: cargador: caché por instancia, imports circulares y reexports vivos
+ok 4 - cargador: caché por instancia, imports circulares y reexports vivos
+  ---
+  duration_ms: 7.208219
+  type: 'test'
+  ...
+# Subtest: cargador: resolución inequívoca, índices y extensiones explícitas sin sustitución
+ok 5 - cargador: resolución inequívoca, índices y extensiones explícitas sin sustitución
+  ---
+  duration_ms: 7.561397
+  type: 'test'
+  ...
+# Subtest: cargador: JSX y TSX se ejecutan con runtime React
+ok 6 - cargador: JSX y TSX se ejecutan con runtime React
+  ---
+  duration_ms: 6.647551
+  type: 'test'
+  ...
+# Subtest: cargador: no hereda credenciales, no carga dotenv ni abre red o BD
+ok 7 - cargador: no hereda credenciales, no carga dotenv ni abre red o BD
+  ---
+  duration_ms: 11.134317
+  type: 'test'
+  ...
+# Subtest: cargador: elimina de la caché evaluaciones fallidas
+ok 8 - cargador: elimina de la caché evaluaciones fallidas
+  ---
+  duration_ms: 2.822072
+  type: 'test'
+  ...
+# Subtest: fixture offline: transforma TS e imports relativos en ESM con API simulada
+ok 9 - fixture offline: transforma TS e imports relativos en ESM con API simulada
+  ---
+  duration_ms: 16.111143
+  type: 'test'
+  ...
+# Subtest: cargador tipado: rutas conocidas, exports públicos y lenguajes admitidos
+ok 10 - cargador tipado: rutas conocidas, exports públicos y lenguajes admitidos
+  ---
+  duration_ms: 5.295334
+  type: 'test'
+  ...
+# Subtest: cargador de integraciones: conserva metadatos de rutas y adapta únicamente métodos HTTP
+ok 11 - cargador de integraciones: conserva metadatos de rutas y adapta únicamente métodos HTTP
+  ---
+  duration_ms: 7.410988
+  type: 'test'
+  ...
+1..11
+# tests 27
+# suites 0
+# pass 27
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2174.444384

@@ -1,4 +1,6 @@
 export const captureReasons: Record<string, string> = {
+  BBVA_PAYMENT_MATCHED: "Pago de tarjeta registrado por coincidencia de saldo pendiente y vencimiento, con hasta $1 de diferencia y un día de margen. Revisa el destino si no corresponde.",
+  BBVA_PAYMENT_MATCH_AMBIGUOUS: "El cargo coincide con varias tarjetas. Selecciona a cuál corresponde; todavía no se registró un gasto ni un pago.",
   MONEY_POLICY_REQUIRED: "Configura qué cuentas corresponden a esta transferencia.",
   MONEY_ACCOUNT_REQUIRED: "La cuenta de la regla ya no está disponible. Revisa el movimiento.",
   MONEY_BEFORE_REFERENCE: "El aviso es anterior al saldo de referencia. Comprueba si ya está incluido.",

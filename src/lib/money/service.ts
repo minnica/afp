@@ -49,7 +49,7 @@ export function routingOptions(data: MoneyData) {
     ...data.subscriptions.filter(s => s.paymentMethod === 'CASH').map(s => ({ key: `subscription:${s.id}`, label: `Suscripción · ${s.name}` })),
   ];
 }
-export async function mutateMoney(db: MoneyTransactionRunner, userId: string, body: unknown, today = todayInMexico()) {
+export async function mutateMoney(db: MoneyTransactionRunner, userId: string, body: unknown, today = todayInMexico(), internal: { matchedPaymentOverage?: boolean } = {}) {
   if (!body || Array.isArray(body) || typeof body !== 'object' || !('operationId' in body) || typeof body.operationId !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(body.operationId || '')) throw new ApiAccessError('La operación necesita un identificador válido.', 400);
   const command: Record<string, unknown> = { ...body };
   const operationId = body.operationId;
@@ -154,7 +154,10 @@ export async function mutateMoney(db: MoneyTransactionRunner, userId: string, bo
       const cycle = await tx.cardCycle.findUnique({ where: { id: values.cycleId, userId } });
       if (!cycle || cycle.statementAmount == null) throw new ApiAccessError('Captura el estado de cuenta antes de registrar un pago.', 409);
       const delta = command.action === 'CARD_PAYMENT' ? cents(values.amount) : -cents(payment!.amount);
-      if (delta > Math.max(0, cents(cycle.statementAmount) - cents(cycle.postCutCreditAmount) - cents(cycle.paidAmount))) throw new ApiAccessError('El abono supera el saldo pendiente de este corte.', 409);
+      // Solo la coincidencia automática puede conservar hasta $1 de excedente.
+      // La API pública no toma esta opción del cuerpo de la solicitud.
+      const overage = internal.matchedPaymentOverage && 'transactionScope' in db && db.transactionScope === 'existing' ? 100 : 0;
+      if (delta > Math.max(0, cents(cycle.statementAmount) - cents(cycle.postCutCreditAmount) - cents(cycle.paidAmount)) + overage) throw new ApiAccessError('El abono supera el saldo pendiente de este corte.', 409);
       const total = cents(cycle.paidAmount) + delta;
       const changes = { paidAmount: amount(total), paidAt: total ? new Date([day(cycle.paidAt) || values.date, values.date].sort().at(-1)!) : null };
       if (payment) await tx.moneyCardPayment.update({ where: { id: payment.id, userId }, data: { reversedAt: new Date() } });

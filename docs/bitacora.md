@@ -6,6 +6,12 @@ Consolidado el **27 de octubre de 2026** a partir del README del commit `4562aa0
 
 ## 2026-10-29
 
+### Pagos de tarjeta identificados desde cargos BBVA por pendiente y vencimiento
+
+Se añade prioridad de pago a la regla automática de cargos genéricos BBVA. Busca estados capturados del propietario, con pendiente positivo, diferencia de hasta $1.00 y vencimiento en ±1 día respecto al día del aviso en México. Una coincidencia registra un abono con la cuenta de salida y el importe real, sin crear gasto; varias coincidencias permanecen por revisar. No se confunde la inferencia con una confirmación bancaria del destinatario. El pendiente incorpora pagos parciales y devoluciones aplicadas; un faltante permanece pendiente y el excedente permitido conserva su importe.
+
+Se añaden dieciséis escenarios de integración, con PostgreSQL local y datos ficticios, sobre fechas, margen monetario, ambigüedad, aislamiento, concurrencia, duplicados, reversión y rollback. La suite completa pasa con **989 escenarios sin fallos ni omisiones** y los seis controles del README son correctos; lint conserva dos advertencias previas. Implementación local, sin migraciones ni APK nueva; publicación pendiente y sin reinterpretación automática del historial. [Evidencia y alcance](../artifacts/bbva-card-payment-match-2026-10-29/README.md).
+
 ### APK 0.8.1 instalada: apertura de la interfaz financiera en Gastos
 
 Con autorización explícita, se compiló e instaló por USB **0.8.1 / versionCode 12** con la firma existente. La APK anterior, 0.8.0 / 11 del 26 de octubre, aún incorporaba `/dashboard`; la nueva incorpora `/gastos`. El cambio web de inicio móvil no actualizaba ese recurso de la instalación nativa.
