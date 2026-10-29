@@ -50,7 +50,7 @@ Este README describe el funcionamiento y los procedimientos del código versiona
 
 | Área | Implementación |
 | --- | --- |
-| Web | Next.js 16.3.8, App Router y React 19.2.4 |
+| Web | Next.js 16.4.3, App Router y React 19.2.4 |
 | Lenguaje | Código web activo en TypeScript/TSX, con comprobación estricta y `allowJs: false`. Alias `@/*` para `src/*` |
 | UI | Componentes shadcn locales, Radix UI y Tailwind CSS 4; Base UI para el Combobox múltiple |
 | Formularios | React Hook Form y Zod |
@@ -148,7 +148,7 @@ La [migración de pruebas a TypeScript](docs/plan-migracion-tests-typescript.md)
 
 El cierre de la migración conserva los 854 escenarios originales y añade diecisiete de infraestructura: 871 en total, comprobados con PostgreSQL local sin omisiones. Las 109 pruebas ejecutables de ese cierre y todos los helpers activos usan TS. La [fase 5](artifacts/typescript-tests-migration/phase-5/README.md) convierte los siete helpers restantes de navegador, seeds y preparación de Next; comparte la validación de PostgreSQL desechable y el cierre de recursos. Añade tres regresiones de aislamiento/configuración y seis casos negativos de tipos. La fase 6 retira los puentes: web y pruebas usan `allowJs: false`, con 131 módulos activos de pruebas/helpers/ejecutor incluidos en TypeScript y ESLint. Los trece archivos de contratos negativos permanecen separados. La auditoría documenta las conversiones locales y confirma los contratos públicos derivados de 97 módulos reales; las rutas dinámicas siguen devolviendo `unknown`. Los tres scripts CJS externos al alcance tienen declaraciones específicas adyacentes `.d.cts`, comprobadas por TypeScript y ESLint.
 
-La suite actual tiene **934 escenarios correctos, sin omisiones con PostgreSQL local**: los 923 del cierre de A08 y once escenarios A09 de concurrencia en lecturas de Gastos. [Resultados A04](artifacts/auditoria-2026-10-15/a04-2026-10-29/README.md) · [Resultados A07](artifacts/auditoria-2026-10-15/a07-2026-10-29/README.md) · [Resultados A08](artifacts/auditoria-2026-10-15/a08-2026-10-29/README.md) · [Resultados y límites del cierre local de A09](artifacts/auditoria-2026-10-15/a09-2026-10-29/README.md).
+La suite actual tiene **934 escenarios correctos, sin omisiones con PostgreSQL local**: los 923 del cierre de A08 y once escenarios A09 de concurrencia en lecturas de Gastos, repetidos tras actualizar las dependencias en A10. [Resultados A04](artifacts/auditoria-2026-10-15/a04-2026-10-29/README.md) · [Resultados A07](artifacts/auditoria-2026-10-15/a07-2026-10-29/README.md) · [Resultados A08](artifacts/auditoria-2026-10-15/a08-2026-10-29/README.md) · [Resultados A09](artifacts/auditoria-2026-10-15/a09-2026-10-29/README.md) · [Resultados y límites de A10](artifacts/auditoria-2026-10-15/a10-2026-10-29/README.md).
 
 [tests/run-tests.ts](tests/run-tests.ts) comparte descubrimiento y ejecución entre `pnpm test` y las regresiones de `db:verify`: solo archivos `.test.ts` del primer nivel, ordenados. Rechaza entradas `.test.cjs`/`.test.js`/`.test.mjs`/`.test.jsx`, incluso al seleccionar otra prueba, y detecta nombres base duplicados. Los contratos negativos, helpers y seeds no se ejecutan por descubrimiento. Sin argumentos se ejecuta la suite completa; la selección exacta sirve para desarrollo y falla ante archivos inexistentes, repetidos o ajenos a la suite:
 
@@ -216,9 +216,13 @@ podman stop afp-test-postgres
 
 <a id="dependencias-y-seguridad-a10"></a>
 
-### Dependencias pendientes de revisión
+### Dependencias y seguridad
 
-La [auditoría registrada el 27 de octubre de 2026](artifacts/mi-dinero/presupuesto-diario/dependency-audit.json) dejó hallazgos pendientes, incluidos críticos en dependencias de producción. Ese archivo es evidencia histórica: repetir `pnpm audit:prod` y `pnpm audit:all` antes de publicar y evaluar los resultados actuales. Una compilación correcta no acredita que las dependencias estén libres de avisos.
+La [actualización local A10 del 29 de octubre de 2026](artifacts/auditoria-2026-10-15/a10-2026-10-29/README.md) fija Next.js y `eslint-config-next` en **16.4.3** y actualiza las transitivas `fast-uri` a **3.1.9**, `body-parser` a **2.4.0** y `systeminformation` a **5.33.18**, dentro de los rangos de sus dependientes. Mantiene React, Prisma, Sharp, la CLI shadcn en desarrollo y la política de scripts de instalación. No utiliza overrides, exclusiones de avisos ni `audit --fix`.
+
+La auditoría de producción devuelve **cero avisos**; el árbol completo conserva **uno bajo**, `GHSA-gcqx-w48m-w2h4` en `deepmerge@4.3.1`, transitiva de shadcn sin parche publicado en el registro consultado. No aparece en el árbol de producción. Hasta disponer de corrección, usar la CLI con configuraciones y registros revisados; el aviso permanece visible y A10 conserva ese seguimiento abierto. La [evidencia](artifacts/auditoria-2026-10-15/a10-2026-10-29/README.md) detalla alcance, reproducción y límites. Estos resultados sustituyen el diagnóstico del 27/10 para este lockfile local; no acreditan una actualización de producción.
+
+Instalar con `pnpm install --frozen-lockfile`, incluidas las dependencias de desarrollo necesarias para compilar. Repetir `pnpm audit:prod` y `pnpm audit:all` antes de publicar y tras cambiar dependencias; un fallo de red no equivale a cero avisos. Una compilación correcta tampoco acredita que el árbol esté libre de avisos.
 
 ## Base de datos
 

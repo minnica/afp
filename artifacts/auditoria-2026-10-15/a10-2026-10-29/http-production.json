@@ -1,0 +1,355 @@
+{
+  "origin": "http://127.0.0.1:4209",
+  "results": [
+    {
+      "route": "expenses",
+      "method": "GET",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Authorization"
+    },
+    {
+      "route": "expenses",
+      "method": "POST",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Authorization"
+    },
+    {
+      "route": "expenses",
+      "method": "DELETE",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Authorization"
+    },
+    {
+      "route": "expenses",
+      "method": "PATCH",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Authorization"
+    },
+    {
+      "route": "gastos/bootstrap",
+      "method": "GET",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Authorization"
+    },
+    {
+      "route": "cards",
+      "method": "GET",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Authorization"
+    },
+    {
+      "route": "cards",
+      "method": "POST",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Authorization"
+    },
+    {
+      "route": "cards",
+      "method": "DELETE",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Authorization"
+    },
+    {
+      "route": "cards",
+      "method": "PATCH",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Authorization"
+    },
+    {
+      "route": "card-cycles",
+      "method": "GET",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Authorization"
+    },
+    {
+      "route": "card-cycles",
+      "method": "POST",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Authorization"
+    },
+    {
+      "route": "card-cycles",
+      "method": "PATCH",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Authorization"
+    },
+    {
+      "route": "incomes",
+      "method": "GET",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Authorization"
+    },
+    {
+      "route": "incomes",
+      "method": "POST",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Authorization"
+    },
+    {
+      "route": "incomes",
+      "method": "DELETE",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Authorization"
+    },
+    {
+      "route": "incomes",
+      "method": "PATCH",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Authorization"
+    },
+    {
+      "route": "money",
+      "method": "GET",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Authorization"
+    },
+    {
+      "route": "money",
+      "method": "POST",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Authorization"
+    },
+    {
+      "route": "installment-purchases",
+      "method": "GET",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Authorization"
+    },
+    {
+      "route": "installment-purchases",
+      "method": "POST",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Authorization"
+    },
+    {
+      "route": "installment-purchases",
+      "method": "DELETE",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Authorization"
+    },
+    {
+      "route": "installment-purchases",
+      "method": "PATCH",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Authorization"
+    },
+    {
+      "route": "subscriptions",
+      "method": "GET",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Authorization"
+    },
+    {
+      "route": "subscriptions",
+      "method": "POST",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Authorization"
+    },
+    {
+      "route": "subscriptions",
+      "method": "DELETE",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Authorization"
+    },
+    {
+      "route": "subscriptions",
+      "method": "PATCH",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Authorization"
+    },
+    {
+      "route": "subscription-charges",
+      "method": "GET",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Authorization"
+    },
+    {
+      "route": "subscription-charges",
+      "method": "POST",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Authorization"
+    },
+    {
+      "route": "receivables",
+      "method": "GET",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Authorization"
+    },
+    {
+      "route": "receivables",
+      "method": "POST",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Authorization"
+    },
+    {
+      "route": "receivables",
+      "method": "DELETE",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Authorization"
+    },
+    {
+      "route": "receivables",
+      "method": "PATCH",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Authorization"
+    },
+    {
+      "route": "payables",
+      "method": "GET",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Authorization"
+    },
+    {
+      "route": "payables",
+      "method": "POST",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Authorization"
+    },
+    {
+      "route": "payables",
+      "method": "PATCH",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Authorization"
+    },
+    {
+      "route": "payables",
+      "method": "DELETE",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Authorization"
+    },
+    {
+      "route": "dashboard",
+      "method": "GET",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Authorization"
+    },
+    {
+      "route": "notice-dismissals",
+      "method": "GET",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Authorization"
+    },
+    {
+      "route": "notice-dismissals",
+      "method": "POST",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Authorization"
+    },
+    {
+      "route": "notice-dismissals",
+      "method": "DELETE",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Authorization"
+    },
+    {
+      "route": "settings",
+      "method": "GET",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Authorization"
+    },
+    {
+      "route": "settings",
+      "method": "POST",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Authorization"
+    },
+    {
+      "route": "settings",
+      "method": "DELETE",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Authorization"
+    },
+    {
+      "route": "setup-user",
+      "method": "POST",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Authorization"
+    },
+    {
+      "route": "calendar/google",
+      "method": "GET",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Authorization"
+    },
+    {
+      "route": "calendar/google",
+      "method": "PATCH",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Authorization"
+    },
+    {
+      "route": "calendar/google/connect",
+      "method": "POST",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Authorization"
+    },
+    {
+      "route": "calendar/google/sync",
+      "method": "POST",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Authorization"
+    },
+    {
+      "route": "calendar/google/disconnect",
+      "method": "POST",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Authorization"
+    }
+  ],
+  "root": {
+    "status": 307,
+    "location": "/dashboard"
+  },
+  "manifest": {
+    "status": 200
+  }
+}

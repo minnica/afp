@@ -1,0 +1,142 @@
+{
+  "date": "2026-10-29",
+  "baseCommit": "ca53e80979df18e94bd989904134347ad0c34cfa",
+  "status": "LOCAL_UPDATE_VERIFIED_WITH_UNPATCHED_DEV_LOW_ADVISORY",
+  "environment": {
+    "node": "v22.23.2",
+    "pnpm": "10.33.0",
+    "database": "PostgreSQL 16, afp_test_a10, localhost only",
+    "auth": "fictitious"
+  },
+  "versions": {
+    "next": "16.4.3",
+    "eslintConfigNext": "16.4.3",
+    "fastUri": "3.1.9",
+    "bodyParser": "2.4.0",
+    "systeminformation": "5.33.18",
+    "react": "19.2.4",
+    "prisma": "7.10.1",
+    "sharp": "0.35.5",
+    "shadcn": "4.22.0"
+  },
+  "audits": {
+    "prod": {
+      "before": {
+        "info": 0,
+        "low": 2,
+        "moderate": 2,
+        "high": 1,
+        "critical": 2
+      },
+      "after": {
+        "info": 0,
+        "low": 0,
+        "moderate": 0,
+        "high": 0,
+        "critical": 0
+      },
+      "exitCode": 0
+    },
+    "all": {
+      "before": {
+        "info": 0,
+        "low": 3,
+        "moderate": 2,
+        "high": 3,
+        "critical": 2
+      },
+      "after": {
+        "info": 0,
+        "low": 1,
+        "moderate": 0,
+        "high": 0,
+        "critical": 0
+      },
+      "exitCode": 1
+    }
+  },
+  "checks": {
+    "cleanFrozenInstall": 0,
+    "inPlaceOfflineFrozenInstall": 0,
+    "typecheck": 0,
+    "typecheckTests": 0,
+    "testTypes": 0,
+    "lint": {
+      "exitCode": 0,
+      "warnings": 2,
+      "errors": 0
+    },
+    "tests": {
+      "exitCode": 0,
+      "total": 934,
+      "pass": 934,
+      "fail": 0,
+      "skipped": 0
+    },
+    "build": {
+      "exitCode": 0,
+      "bundler": "Turbopack",
+      "typescript": true
+    },
+    "http": {
+      "exitCode": 0,
+      "protectedRoutes": 19,
+      "methods": 49,
+      "anonymousStatus": 401,
+      "cacheControl": "private, no-store",
+      "vary": "Authorization"
+    },
+    "browser": {
+      "loginMobile": [
+        390,
+        844
+      ],
+      "loginDesktop": [
+        1440,
+        900
+      ],
+      "productionPageErrors": [],
+      "privateFlow": {
+        "fixtureBundler": "Webpack",
+        "auth": "fictitious",
+        "concept": "Regresión A10",
+        "amount": "21.50",
+        "paymentMethod": "CASH",
+        "databaseRows": 1,
+        "receipts": 1,
+        "readStatus": 200,
+        "renderedTotal": "171.50",
+        "pageErrors": []
+      }
+    }
+  },
+  "remaining": {
+    "advisory": "GHSA-gcqx-w48m-w2h4",
+    "package": "deepmerge",
+    "version": "4.3.1",
+    "severity": "low",
+    "scope": "development only; shadcn and @shadcn/registry",
+    "patchedVersionAvailable": false,
+    "suppressed": false,
+    "publication": "pending",
+    "realAuthAcceptance": "pending"
+  },
+  "limits": [
+    "Initial clean offline install lacked existing tarballs; clean frozen install with network succeeded.",
+    "Development browser fixture had repeated Fast Refresh reloads; private flow accepted with production fixture.",
+    "Existing pg concurrent-query deprecation observed in private fixture.",
+    "No db:verify rerun: no Prisma or schema changes.",
+    "No remote deployment, data mutation, migration or real credentials."
+  ],
+  "sha256": {
+    "package.json": "cd2f41db7be48fd80bf186a7b55863d3722c390573eae5f16d67248923b0dfce",
+    "pnpm-lock.yaml": "5065473f5482aed75105c715e4560973f05365747ad2a4bb1ebef8765654f29f",
+    "pnpm-workspace.yaml": "dd86c36ba952bd86ed1991db3d982b1bf1b7de7471de1880b7a7493ac7eb4526",
+    "next.config.mjs": "f345a66b345633579b8d90bc0c9cf1616e62a661f2c2297cdc9ae6e577a3891e",
+    "src/components/gastos/GastosContent.tsx": "813febe024c5e65c1285cd26e76d003d7a3f6fb531f36d1f539171c71262c03e",
+    "prisma/schema.prisma": "00828cc74e12eb1c555d9e450ab03bcc5f679612531c8ecf26ec1ba810e80a13",
+    "README.md": "a849c5351a566bf4f03b580959e201afb1801bddabcbe19924dc54f67c4f8543",
+    "docs/bitacora.md": "5935ccb56c9fb94dd744b21e59ccb4d31904bdb60d98ab70988acae2380f534e",
+    "artifacts/auditoria-2026-10-15/informe.md": "1804a8e0b849665d2bff71accf56df52ceed8e6701f5823947fead65e9430e42"
+  }
+}

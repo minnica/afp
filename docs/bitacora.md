@@ -6,6 +6,14 @@ Consolidado el **27 de octubre de 2026** a partir del README del commit `4562aa0
 
 ## 2026-10-29
 
+### A10: actualización de dependencias y diagnóstico vigente
+
+**Actualización local verificada** sobre `ca53e80`. Next.js y `eslint-config-next` pasan de 16.3.8 a **16.4.3**; el lockfile actualiza fast-uri a **3.1.9**, body-parser a **2.4.0** y systeminformation a **5.33.18**, dentro de los rangos compatibles. Se conservan React, Prisma, Sharp, shadcn en desarrollo y la política de scripts. Se retira una supresión ESLint de Gastos que las reglas nuevas consideran innecesaria. No se añaden overrides ni se ocultan avisos.
+
+Las auditorías nuevas confirman inicialmente siete avisos de producción y diez en el árbol completo. Después quedan **cero de producción y uno bajo de desarrollo**, en deepmerge 4.3.1 bajo shadcn. El registro consultado no publica parche; A10 conserva ese seguimiento abierto y el uso de configuraciones/registros revisados. El cero histórico de octubre no se usa como diagnóstico vigente.
+
+Instalación limpia con lockfile, los seis controles obligatorios y **934 escenarios con PostgreSQL local sin omisiones**, correctos. El build predeterminado pasa con **Turbopack** y TypeScript sobre Next.js 16.4.3; lint conserva dos advertencias previas. El login móvil/escritorio y las respuestas privadas 401 de 49 métodos en 19 rutas se comprueban contra ese build. El fixture de producción con Auth ficticia verifica crear un gasto, su persistencia con un único recibo y el total actualizado en pantalla. README e informe actualizados; sin migraciones nuevas ni publicación. [Auditorías, verificaciones y límites](../artifacts/auditoria-2026-10-15/a10-2026-10-29/README.md).
+
 ### A09: lecturas de Gastos limitadas a la selección vigente
 
 **Implementación local completada** sobre `be59643`. Un lector con AbortController e identidad por generación protege filas, meses disponibles, errores y carga. Cambiar filtros invalida inmediatamente la consulta anterior, antes del debounce; las respuestas y errores tardíos se descartan incluso cuando el transporte ignora la cancelación. Las recargas tras mutaciones y sincronización consultan la selección vigente. La carga inicial, incluido el respaldo offline, no sustituye una lectura posterior; salir de la pantalla cancela también su petición.
@@ -344,7 +352,7 @@ Estos puntos conservan el estado de la evidencia citada; antes de retomarlos, co
 
 | Tema | Último estado documentado | Evidencia |
 | --- | --- | --- |
-| Dependencias | Hallazgos pendientes al 27 de octubre; repetir las auditorías y evaluar correcciones compatibles | [Auditoría](../artifacts/mi-dinero/presupuesto-diario/dependency-audit.json) |
+| Dependencias | Actualización local A10 del 29/10: cero avisos de producción y uno bajo de desarrollo, deepmerge sin parche publicado; publicación pendiente y ambas auditorías antes de desplegar | [Resultados vigentes](../artifacts/auditoria-2026-10-15/a10-2026-10-29/README.md) |
 | Nómina automática | Solicitada, sin regla implementada ni activa al 27 de octubre. Falta una notificación Android que permita verificar importe real, fecha y terminación; el buzón interno bancario no demuestra esos campos | README histórico, sección «Automatización de nómina solicitada», recuperable con el comando indicado abajo |
 | Avisos importantes Android | Backend publicado y APK instalada; faltaba activar la opción, conceder permiso y confirmar recepción | [Cierre del 26 de octubre](../artifacts/android-important-notices/production.json) |
 | Mi dinero | Publicación pendiente en los cierres locales de carga, capital total y resumen; advertencia de `pg` sin causa demostrada del fallo original | [Carga](../artifacts/mi-dinero/carga-resiliente/verificacion.json), [capital total](../artifacts/mi-dinero/capital-total/verificacion.json), [resumen](../artifacts/mi-dinero/resumen-escritorio/verificacion.json) |

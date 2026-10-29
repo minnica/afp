@@ -529,7 +529,6 @@ export default function GastosContent() {
 
     checkSession();
     return () => controller.abort();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router]);
 
   useEffect(() => {

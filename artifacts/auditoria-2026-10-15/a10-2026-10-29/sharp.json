@@ -1,0 +1,12 @@
+{
+  "version": "0.35.5",
+  "info": {
+    "format": "png",
+    "width": 192,
+    "height": 192,
+    "channels": 4,
+    "premultiplied": false,
+    "hasAlpha": true,
+    "size": 4103
+  }
+}

@@ -1,0 +1,293 @@
+[
+  {
+    "name": "body-parser",
+    "version": "2.3.0",
+    "path": "/home/garatachia/projects/afp/node_modules/.pnpm/body-parser@2.3.0/node_modules/body-parser",
+    "dependents": [
+      {
+        "name": "express",
+        "version": "5.3.0",
+        "dependents": [
+          {
+            "name": "@modelcontextprotocol/sdk",
+            "version": "1.32.1",
+            "peersSuffixHash": "a5b1",
+            "dependents": [
+              {
+                "name": "shadcn",
+                "version": "4.22.0",
+                "dependents": [
+                  {
+                    "name": "afp",
+                    "version": "0.1.0",
+                    "depField": "devDependencies"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "express-rate-limit",
+            "version": "8.7.1",
+            "peersSuffixHash": "fb0e",
+            "dependents": [
+              {
+                "name": "@modelcontextprotocol/sdk",
+                "version": "1.32.1",
+                "peersSuffixHash": "a5b1",
+                "deduped": true
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "braces",
+    "version": "3.0.3",
+    "path": "/home/garatachia/projects/afp/node_modules/.pnpm/braces@3.0.3/node_modules/braces",
+    "dependents": [
+      {
+        "name": "micromatch",
+        "version": "4.0.8",
+        "dependents": [
+          {
+            "name": "fast-glob",
+            "version": "3.3.1",
+            "dependents": [
+              {
+                "name": "@next/eslint-plugin-next",
+                "version": "16.3.8",
+                "peersSuffixHash": "9aff",
+                "dependents": [
+                  {
+                    "name": "eslint-config-next",
+                    "version": "16.3.8",
+                    "peersSuffixHash": "032c",
+                    "dependents": [
+                      {
+                        "name": "afp",
+                        "version": "0.1.0",
+                        "depField": "devDependencies"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "fast-glob",
+            "version": "3.3.3",
+            "dependents": [
+              {
+                "name": "@shadcn/registry",
+                "version": "0.2.0",
+                "dependents": [
+                  {
+                    "name": "shadcn",
+                    "version": "4.22.0",
+                    "dependents": [
+                      {
+                        "name": "afp",
+                        "version": "0.1.0",
+                        "depField": "devDependencies"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "name": "@ts-morph/common",
+                "version": "0.27.0",
+                "dependents": [
+                  {
+                    "name": "ts-morph",
+                    "version": "26.0.0",
+                    "dependents": [
+                      {
+                        "name": "shadcn",
+                        "version": "4.22.0",
+                        "deduped": true
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "name": "shadcn",
+                "version": "4.22.0",
+                "deduped": true
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "fast-uri",
+    "version": "3.1.8",
+    "path": "/home/garatachia/projects/afp/node_modules/.pnpm/fast-uri@3.1.8/node_modules/fast-uri",
+    "dependents": [
+      {
+        "name": "ajv",
+        "version": "8.20.0",
+        "dependents": [
+          {
+            "name": "@hookform/resolvers",
+            "version": "5.9.1",
+            "peersSuffixHash": "02df",
+            "dependents": [
+              {
+                "name": "afp",
+                "version": "0.1.0",
+                "depField": "dependencies"
+              }
+            ]
+          },
+          {
+            "name": "@modelcontextprotocol/sdk",
+            "version": "1.32.1",
+            "peersSuffixHash": "a5b1",
+            "dependents": [
+              {
+                "name": "shadcn",
+                "version": "4.22.0",
+                "dependents": [
+                  {
+                    "name": "afp",
+                    "version": "0.1.0",
+                    "depField": "devDependencies"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "@prisma/streams-local",
+            "version": "0.1.11",
+            "dependents": [
+              {
+                "name": "@prisma/dev",
+                "version": "0.24.17",
+                "peersSuffixHash": "b1ae",
+                "dependents": [
+                  {
+                    "name": "prisma",
+                    "version": "7.10.1",
+                    "peersSuffixHash": "4f6f",
+                    "dependents": [
+                      {
+                        "name": "@prisma/client",
+                        "version": "7.10.1",
+                        "peersSuffixHash": "c754",
+                        "dependents": [
+                          {
+                            "name": "afp",
+                            "version": "0.1.0",
+                            "depField": "dependencies"
+                          }
+                        ]
+                      },
+                      {
+                        "name": "afp",
+                        "version": "0.1.0",
+                        "depField": "dependencies"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "ajv-formats",
+            "version": "2.1.1",
+            "peersSuffixHash": "2cb7",
+            "dependents": [
+              {
+                "name": "@hookform/resolvers",
+                "version": "5.9.1",
+                "peersSuffixHash": "02df",
+                "deduped": true
+              },
+              {
+                "name": "conf",
+                "version": "10.2.0",
+                "dependents": [
+                  {
+                    "name": "@dotenvx/dotenvx",
+                    "version": "1.75.1",
+                    "dependents": [
+                      {
+                        "name": "@shadcn/registry",
+                        "version": "0.2.0",
+                        "dependents": [
+                          {
+                            "name": "shadcn",
+                            "version": "4.22.0",
+                            "deduped": true
+                          }
+                        ]
+                      },
+                      {
+                        "name": "shadcn",
+                        "version": "4.22.0",
+                        "deduped": true
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "ajv-formats",
+            "version": "3.0.1",
+            "peersSuffixHash": "2cb7",
+            "dependents": [
+              {
+                "name": "@modelcontextprotocol/sdk",
+                "version": "1.32.1",
+                "peersSuffixHash": "a5b1",
+                "deduped": true
+              }
+            ]
+          },
+          {
+            "name": "conf",
+            "version": "10.2.0",
+            "deduped": true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "sharp",
+    "version": "0.35.5",
+    "path": "/home/garatachia/projects/afp/node_modules/.pnpm/sharp@0.35.5_@types+node@22.20.5/node_modules/sharp",
+    "peersSuffixHash": "5feb",
+    "dependents": [
+      {
+        "name": "afp",
+        "version": "0.1.0",
+        "depField": "devDependencies"
+      },
+      {
+        "name": "next",
+        "version": "16.3.8",
+        "peersSuffixHash": "419f",
+        "dependents": [
+          {
+            "name": "afp",
+            "version": "0.1.0",
+            "depField": "dependencies"
+          }
+        ]
+      }
+    ]
+  }
+]

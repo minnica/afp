@@ -1,0 +1,10 @@
+
+> afp@0.1.0 start /home/garatachia/projects/afp
+> next start --hostname 127.0.0.1 --port 4209
+
+▲ Next.js 16.4.3
+- Local:         http://127.0.0.1:4209
+- Network:       http://127.0.0.1:4209
+✓ Ready in 100ms
+✓ Running next.config.mjs took 11ms
+ ELIFECYCLE  Command failed with exit code 143.

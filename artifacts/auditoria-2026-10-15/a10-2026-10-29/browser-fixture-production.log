@@ -1,0 +1,6 @@
+✓ Running next.config took 9ms
+Fixture directory: /tmp/afp-money-qa-NS0d2i
+Money/UI QA ready on 4216; real API and local PostgreSQL.
+(node:275704) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+Fixture cerrado y directorio temporal eliminado.

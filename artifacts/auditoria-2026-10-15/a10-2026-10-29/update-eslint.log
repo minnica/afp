@@ -1,0 +1,14 @@
+Progress: resolved 0, reused 1, downloaded 0, added 0
+ WARN  deprecated eslint@9.39.5: This version is no longer supported. Please see https://eslint.org/version-support for other options.
+Progress: resolved 354, reused 286, downloaded 0, added 0
+Progress: resolved 831, reused 730, downloaded 2, added 0
+Progress: resolved 924, reused 824, downloaded 2, added 0
+Packages: +2 -2
+++--
+Progress: resolved 924, reused 824, downloaded 2, added 2, done
+
+devDependencies:
+- eslint-config-next 16.3.8
++ eslint-config-next 16.4.3
+
+Done in 3.6s using pnpm v10.33.0
