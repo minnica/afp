@@ -1,0 +1,15 @@
+{
+  "gastosHeadingVisible": true,
+  "newExpenseActionVisible": true,
+  "browserToolbarVisible": false,
+  "visibleLabels": [
+    {
+      "text": "Gastos",
+      "bounds": "[543,177][723,256]"
+    },
+    {
+      "text": "Nuevo gasto",
+      "bounds": "[60,2712][1383,2896]"
+    }
+  ]
+}

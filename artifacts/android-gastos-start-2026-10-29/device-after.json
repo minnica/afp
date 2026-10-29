@@ -1,0 +1,16 @@
+{
+  "versionName": "0.8.1",
+  "versionCode": "12",
+  "firstInstallTime": "2026-10-20 23:45:31",
+  "lastUpdateTime": "2026-10-29 14:27:27",
+  "notificationAccessGranted": true,
+  "domainVerified": true,
+  "batteryOptimizationExempt": true,
+  "listenerServicePresent": true,
+  "bindingAuthorizedInNativeScreen": true,
+  "queue": {
+    "pending": 0,
+    "review": 0,
+    "sent": 960
+  }
+}

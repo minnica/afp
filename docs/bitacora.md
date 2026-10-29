@@ -6,6 +6,12 @@ Consolidado el **27 de octubre de 2026** a partir del README del commit `4562aa0
 
 ## 2026-10-29
 
+### APK 0.8.1 instalada: apertura de la interfaz financiera en Gastos
+
+Con autorización explícita, se compiló e instaló por USB **0.8.1 / versionCode 12** con la firma existente. La APK anterior, 0.8.0 / 11 del 26 de octubre, aún incorporaba `/dashboard`; la nueva incorpora `/gastos`. El cambio web de inicio móvil no actualizaba ese recurso de la instalación nativa.
+
+Pruebas JVM: 25 correctas y una integración HTTPS local opcional omitida; lint sin errores, con once advertencias; release compilada y firma contrastada contra el dominio. La instalación conservó la fecha inicial, la vinculación, el acceso a notificaciones, el lector conectado, la exención de batería y el dominio verificado. La cola mantiene 0 pendientes, 0 por revisar y 960 entregados. Dos aperturas reales con «Abrir AFP» muestran Gastos y su acción Nuevo gasto, sin barra del navegador. Se respaldaron las firmas y la APK anterior en almacenamiento privado; no se desinstaló ni se borraron datos. Sin despliegue web ni migraciones. [Evidencias y límites](../artifacts/android-gastos-start-2026-10-29/README.md).
+
 ### Compras diarias del mismo importe y revisión de duplicados
 
 Se sustituye la búsqueda automática de compras con la misma tarjeta e importe en ±3 días por el mismo día financiero. Las compras habituales de días distintos pueden registrarse por separado. Se conserva la revisión entre propuestas de días contiguos si sus horas conocidas distan hasta 15 minutos; banco y Wallet mantienen una excepción de un día cuando una fuente ya creó el gasto. Las coincidencias del mismo día siguen requiriendo decisión.

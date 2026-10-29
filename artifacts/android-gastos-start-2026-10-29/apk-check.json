@@ -1,0 +1,14 @@
+{
+  "applicationId": "com.garatachia.afp",
+  "versionName": "0.8.1",
+  "versionCode": 12,
+  "webUrl": "https://finanzas.garatachia.com/gastos",
+  "signerSha256": "503279ba8be28b65beae47aead1b17fdd57ad54344c652327ff3c23928bb5783",
+  "apkSha256": "41bf797d8076bc38ef5fd4bd8e9bc0d68bb81ca6becf2ae43e74298a900f02f9",
+  "jvm": {
+    "tests": 26,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 1
+  }
+}

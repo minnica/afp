@@ -1,0 +1,16 @@
+{
+  "versionName": "0.8.0",
+  "versionCode": "11",
+  "firstInstallTime": "2026-10-20 23:45:31",
+  "lastUpdateTime": "2026-10-26 01:20:54",
+  "notificationAccessGranted": true,
+  "domainVerified": true,
+  "bindingAuthorizedInNativeScreen": true,
+  "queue": {
+    "pending": 0,
+    "review": 0,
+    "sent": 960
+  },
+  "webUrl": "https://finanzas.garatachia.com/dashboard",
+  "apkSha256": "18878ff6afe75efb964fac0a7145c6083be8679a4857cae67b6761031aa8554e"
+}

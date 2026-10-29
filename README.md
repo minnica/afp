@@ -414,6 +414,8 @@ La salida se coordina con los envíos y las otras pestañas mediante Web Locks c
 
 [android/](android/) contiene la APK complementaria. La configuración de versión, SDK y paquetes está en [android/app/build.gradle.kts](android/app/build.gradle.kts); la compilación, firma, instalación, diagnóstico y pruebas se explican en [docs/android-captura.md](docs/android-captura.md). Ese documento conserva antecedentes por fases; la revisión web actual está en `/registro-automatico`.
 
+La APK personal **0.8.1 / versionCode 12**, instalada el 29 de octubre de 2026, abre `/gastos` al pulsar «Abrir AFP». Se verificó en el teléfono conservando vinculación, cola y permisos. Cambiar la URL de entrada Android requiere compilar e instalar una actualización de la APK. [Instalación y comprobaciones](artifacts/android-gastos-start-2026-10-29/README.md).
+
 El teléfono se vincula mediante un código autorizado por la sesión web. Conserva una identidad revocable y una cola Room cifrada, y WorkManager entrega eventos con recibos idempotentes. La sesión de la TWA y la credencial nativa son independientes.
 
 - La automatización exige formato validado, identificación inequívoca y reglas aceptadas por tarjeta o cuenta. Recibir un aviso no implica registrarlo como movimiento.

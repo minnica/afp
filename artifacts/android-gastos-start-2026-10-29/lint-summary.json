@@ -1,0 +1,11 @@
+{
+  "errors": 0,
+  "warnings": 11,
+  "issueCounts": {
+    "OldTargetApi": 1,
+    "AndroidGradlePluginVersion": 1,
+    "GradleDependency": 2,
+    "NewerVersionAvailable": 1,
+    "UseKtx": 6
+  }
+}
