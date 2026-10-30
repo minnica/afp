@@ -1,5 +1,6 @@
 import type { MoneyAccount, MoneyEvent } from './types';
 import { readSnapshot, readYieldHistory, preserveYieldHistory } from './persisted';
+import { yieldIncomeTypeIds } from './yieldIncomeTypes';
 
 type YieldFields = Pick<MoneyAccount, 'autoYield' | 'annualYield' | 'yieldTaxPercent' | 'yieldBasis' | 'yieldCap' | 'yieldStartDate' | 'yieldEndDate' | 'yieldIncomeTypeId' | 'yieldMethod' | 'yieldDailyAmount' | 'yieldExcessRate' | 'yieldPayout' | 'yieldRounding'>;
 type YieldAccount = { [K in keyof YieldFields]?: YieldFields[K] | null };
@@ -82,7 +83,6 @@ export function roundedYieldCents(value: Prisma.Decimal, rule: { yieldRounding?:
   return value.toDecimalPlaces(0, rule.yieldRounding === 'DOWN' ? Prisma.Decimal.ROUND_DOWN : Prisma.Decimal.ROUND_HALF_UP).toNumber();
 }
 export function isRecordedYield(account: YieldReference & { id: string }, events: MoneyEvent[], date: string) {
-  const types = new Set(yieldHistory(account).map(r => r.rule.yieldIncomeTypeId).filter(Boolean));
-  if (account.yieldIncomeTypeId) types.add(account.yieldIncomeTypeId);
-  return events.some(e => !e.automaticYield && !e.excluded && e.accountId === account.id && e.date === date && types.has(e.incomeTypeId));
+  const types = yieldIncomeTypeIds(account);
+  return events.some(e => !e.automaticYield && !e.excluded && e.accountId === account.id && e.date === date && !!e.incomeTypeId && types.has(e.incomeTypeId));
 }

@@ -1,0 +1,176 @@
+
+> afp@0.1.0 test /home/garatachia/projects/afp
+> node --import tsx tests/run-tests.ts money-yield-report.test.ts money-automatic-yields.test.ts
+
+TAP version 13
+# Subtest: automático: recupera días con capitalización y no modifica ni duplica registros
+ok 1 - automático: recupera días con capitalización y no modifica ni duplica registros
+  ---
+  duration_ms: 49.549092
+  type: 'test'
+  ...
+# Subtest: automático: respeta la reserva y permite retiros hasta saldo negativo
+ok 2 - automático: respeta la reserva y permite retiros hasta saldo negativo
+  ---
+  duration_ms: 10.954475
+  type: 'test'
+  ...
+# Subtest: automático: tramos, base 360 y centavos completos con abono agrupado el lunes
+ok 3 - automático: tramos, base 360 y centavos completos con abono agrupado el lunes
+  ---
+  duration_ms: 34.901692
+  type: 'test'
+  ...
+# Subtest: automático: referencia inicial en fin de semana admite un día previo pendiente
+ok 4 - automático: referencia inicial en fin de semana admite un día previo pendiente
+  ---
+  duration_ms: 12.157424
+  type: 'test'
+  ...
+# Subtest: automático: pendientes explícitos en un día hábil no se descartan ni se incluyen en la referencia
+ok 5 - automático: pendientes explícitos en un día hábil no se descartan ni se incluyen en la referencia
+  ---
+  duration_ms: 28.591331
+  type: 'test'
+  ...
+# Subtest: automático: importe observado se prorratea, respeta el tope y agrupa varios días
+ok 6 - automático: importe observado se prorratea, respeta el tope y agrupa varios días
+  ---
+  duration_ms: 25.369825
+  type: 'test'
+  ...
+# Subtest: automático: dos componentes de abono real sustituyen un cálculo agrupado
+ok 7 - automático: dos componentes de abono real sustituyen un cálculo agrupado
+  ---
+  duration_ms: 12.003913
+  type: 'test'
+  ...
+# Subtest: automático: un abono en otra cuenta no sustituye el rendimiento propio
+ok 8 - automático: un abono en otra cuenta no sustituye el rendimiento propio
+  ---
+  duration_ms: 20.189763
+  type: 'test'
+  ...
+# Subtest: automático: conciliar absorbe lo calculado sin volver a sumarlo
+ok 9 - automático: conciliar absorbe lo calculado sin volver a sumarlo
+  ---
+  duration_ms: 52.185809
+  type: 'test'
+  ...
+# Subtest: automático: conciliación durante fin de semana conserva el rendimiento pendiente
+ok 10 - automático: conciliación durante fin de semana conserva el rendimiento pendiente
+  ---
+  duration_ms: 21.79513
+  type: 'test'
+  ...
+# Subtest: automático: cambio de tasa conserva las reglas de los días anteriores
+ok 11 - automático: cambio de tasa conserva las reglas de los días anteriores
+  ---
+  duration_ms: 19.694093
+  type: 'test'
+  ...
+# Subtest: automático: detener nuevos días conserva los rendimientos ya generados
+ok 12 - automático: detener nuevos días conserva los rendimientos ya generados
+  ---
+  duration_ms: 16.683907
+  type: 'test'
+  ...
+# Subtest: automático: días inhábiles bancarios difieren los abonos sin detener el cálculo diario
+ok 13 - automático: días inhábiles bancarios difieren los abonos sin detener el cálculo diario
+  ---
+  duration_ms: 11.817324
+  type: 'test'
+  ...
+# Subtest: automático: no inventa abonos antes de activar el cálculo
+ok 14 - automático: no inventa abonos antes de activar el cálculo
+  ---
+  duration_ms: 12.316493
+  type: 'test'
+  ...
+# Subtest: rendimientos: confirma solo ingresos del tipo configurado, sin inferirlos del concepto
+ok 15 - rendimientos: confirma solo ingresos del tipo configurado, sin inferirlos del concepto
+  ---
+  duration_ms: 0.613399
+  type: 'test'
+  ...
+# Subtest: rendimientos: separa cálculos históricos, pendientes de abono y estimados futuros
+ok 16 - rendimientos: separa cálculos históricos, pendientes de abono y estimados futuros
+  ---
+  duration_ms: 0.19566
+  type: 'test'
+  ...
+# Subtest: rendimientos: ignora exclusiones, fechas desconocidas, días futuros e importes no positivos
+ok 17 - rendimientos: ignora exclusiones, fechas desconocidas, días futuros e importes no positivos
+  ---
+  duration_ms: 0.13303
+  type: 'test'
+  ...
+# Subtest: rendimientos: reconoce tipos anteriores después de cambiar las condiciones de una cuenta
+ok 18 - rendimientos: reconoce tipos anteriores después de cambiar las condiciones de una cuenta
+  ---
+  duration_ms: 1.034328
+  type: 'test'
+  ...
+# Subtest: rendimientos: referencias conciliadas no inventan ganancias ni borran abonos reales previos
+ok 19 - rendimientos: referencias conciliadas no inventan ganancias ni borran abonos reales previos
+  ---
+  duration_ms: 1.093409
+  type: 'test'
+  ...
+# Subtest: rendimientos: el historial explícito prevalece sobre tipos de snapshots antiguos
+ok 20 - rendimientos: el historial explícito prevalece sobre tipos de snapshots antiguos
+  ---
+  duration_ms: 0.16122
+  type: 'test'
+  ...
+# Subtest: rendimientos: inicia en el mes actual y permite año e historial, con límites inclusivos
+ok 21 - rendimientos: inicia en el mes actual y permite año e historial, con límites inclusivos
+  ---
+  duration_ms: 0.415089
+  type: 'test'
+  ...
+# Subtest: rendimientos: filtrar cuenta cambia ambos desgloses; filtrar período mantiene los estimados de hoy
+ok 22 - rendimientos: filtrar cuenta cambia ambos desgloses; filtrar período mantiene los estimados de hoy
+  ---
+  duration_ms: 0.20065
+  type: 'test'
+  ...
+# Subtest: rendimientos: cuenta una sola vez los tipos compartidos y señala los abonos sin cuenta
+ok 23 - rendimientos: cuenta una sola vez los tipos compartidos y señala los abonos sin cuenta
+  ---
+  duration_ms: 0.214809
+  type: 'test'
+  ...
+# Subtest: rendimientos: no atribuye el tipo de otra cuenta a un ingreso ya asignado
+ok 24 - rendimientos: no atribuye el tipo de otra cuenta a un ingreso ya asignado
+  ---
+  duration_ms: 0.16992
+  type: 'test'
+  ...
+# Subtest: rendimientos: agrega a centavos y conserva el orden y los datos originales
+ok 25 - rendimientos: agrega a centavos y conserva el orden y los datos originales
+  ---
+  duration_ms: 0.18801
+  type: 'test'
+  ...
+# Subtest: rendimientos: el acumulado incluye días automáticos sin ingresos ni tipo de ingreso configurado
+ok 26 - rendimientos: el acumulado incluye días automáticos sin ingresos ni tipo de ingreso configurado
+  ---
+  duration_ms: 0.18972
+  type: 'test'
+  ...
+# Subtest: rendimientos: el acumulado mezcla abonos registrados y automáticos a centavos y separa pendientes
+ok 27 - rendimientos: el acumulado mezcla abonos registrados y automáticos a centavos y separa pendientes
+  ---
+  duration_ms: 0.113019
+  type: 'test'
+  ...
+1..27
+# tests 27
+# suites 0
+# pass 27
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 642.458744

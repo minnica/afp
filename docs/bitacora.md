@@ -4,6 +4,16 @@ Historial resumido de decisiones, cambios, migraciones e incidencias que ayudan 
 
 Consolidado el **27 de octubre de 2026** a partir del README del commit `4562aa0cec0a46d8b482fdfef96116d1d3040282` y sus evidencias. «Publicado», «aplicado» y «pendiente» describen lo documentado en cada fecha; esta consolidación no incluye una comprobación remota nueva. Se conservan las fechas de los registros originales, que pueden usar hora local o UTC. El nombre de una migración identifica su versión, no demuestra cuándo se aplicó.
 
+## 2026-10-30
+
+### Mi dinero: rendimientos confirmados y estimados
+
+Se añade la pestaña Rendimientos, con el mes actual como período inicial por elección del propietario. Reúne abonos confirmados y cálculos históricos de AFP en importes separados; permite filtrar cuenta, mes, año actual o historial completo y revisar los movimientos bajo demanda. El desglose por cuenta comparte los estimados actuales a 7 y 30 días con Cuentas, sin capitalización. Los pendientes de acreditación se explican aparte. Las conciliaciones no se interpretan como ganancias y los tipos históricos de rendimiento se reconocen con el mismo criterio que sustituye cálculos automáticos por abonos reales.
+
+Se conserva el sistema Mira y la adaptación a escritorio y móvil. Pasan los tres controles de tipos, build y 1043 pruebas con PostgreSQL local sin omisiones; lint sin errores y con dos advertencias previas fuera del alcance. Cambio local, sin migraciones, escrituras de datos personales ni publicación. [Verificaciones y capturas ficticias](../artifacts/money-yields-2026-10-30/README.md).
+
+Corrección solicitada por el propietario: el indicador principal pasa a Rendimiento acumulado, sumando los cálculos automáticos y los abonos registrados que los sustituyen. Se retiran el indicador Confirmado en cero y la acción de registro manual. El seguimiento funciona sin capturar abonos diarios; los estimados a 7 y 30 días siguen separados y el detalle conserva el origen de cada movimiento. [Verificación de seguimiento automático](../artifacts/money-yields-2026-10-30/automatic/README.md).
+
 ## 2026-10-29
 
 ### Mi dinero: tabla de cuentas en escritorio

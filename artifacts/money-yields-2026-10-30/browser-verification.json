@@ -1,0 +1,29 @@
+{
+  "accountCount": 3,
+  "apiStatus": 200,
+  "confirmedInCurrentMonth": 19.14,
+  "contrast": [
+    {
+      "ratio": 10.21,
+      "text": "$19.14"
+    },
+    {
+      "ratio": 7.66,
+      "text": "Lo que has recibido y lo que puede generar tu dinero. Saldos al 30 oct 2026."
+    },
+    {
+      "ratio": 6.94,
+      "text": "Estimación desde hoy para todas tus cuentas. No depende del período histórico elegido."
+    }
+  ],
+  "documentWidth": 1009,
+  "estimatesMatchApi": true,
+  "historyPagination": "40 de 53 movimientos",
+  "monthly": 439.07,
+  "realDepositsReplaceTodayCalculations": true,
+  "selectedPeriod": "Este mes · octubre de 2026",
+  "source": "Real Next UI and API, fictitious Auth and disposable local PostgreSQL",
+  "viewport": 1024,
+  "visibleTable": true,
+  "weekly": 102.45
+}

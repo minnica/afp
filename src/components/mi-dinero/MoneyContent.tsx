@@ -46,6 +46,7 @@ import { createTransferEditor } from './transferEditor';
 import { sendTransfer } from '@/lib/money/transferClient';
 import { transferMutationSchema } from '@/lib/money/transferContracts';
 import MoneyProjection from './MoneyProjection';
+import MoneyYields from './MoneyYields';
 import { money, dateLabel, monthLabel, accountOptions } from './format';
 
 const optional = (label: string, values: { value: string; label: string }[]) => [{ value: 'NONE', label }, ...values];
@@ -189,8 +190,9 @@ export default function MoneyContent() {
       {error && <Alert><AlertDescription><p>No se pudo actualizar Mi dinero. Se muestran los últimos datos cargados.</p><Button variant="outline" onClick={() => void load(userId).catch(() => {})} className="mt-3 min-h-11">Reintentar actualización</Button></AlertDescription></Alert>}
       <div className="flex flex-wrap items-center justify-between gap-3"><div><h2 className="text-2xl font-semibold">Mi dinero</h2><p className="text-sm text-muted-foreground">Tus cuentas hoy y lo que viene después.</p></div><Button onClick={() => openAccount()} className="min-h-11"><Plus data-icon="inline-start" />Agregar cuenta</Button></div>
       {!accounts.length ? <Empty><EmptyHeader><EmptyMedia variant="icon"><Wallet /></EmptyMedia><EmptyTitle>Empieza con lo que tienes hoy</EmptyTitle><EmptyDescription>Agrega tus cuentas, cajitas y efectivo con un saldo de referencia. Después podrás asignar los movimientos de AFP y proyectar tus próximos meses.</EmptyDescription></EmptyHeader><EmptyContent><Button onClick={() => openAccount()} className="min-h-11">Capturar mi primera cuenta</Button></EmptyContent></Empty> : <Tabs defaultValue="projection" className="flex flex-col gap-5">
-        <div className="overflow-x-auto"><TabsList className="w-max" variant="line">{[['projection', 'Proyección'], ['accounts', 'Cuentas'], ['movements', 'Movimientos'], ['plans', 'Planes'], ['routes', 'Asignación automática']].map(([value, label]) => <TabsTrigger key={value} value={value!} className="min-h-11">{label}</TabsTrigger>)}</TabsList></div>
+        <div className="overflow-x-auto"><TabsList className="w-max" variant="line">{[['projection', 'Proyección'], ['accounts', 'Cuentas'], ['yields', 'Rendimientos'], ['movements', 'Movimientos'], ['plans', 'Planes'], ['routes', 'Asignación automática']].map(([value, label]) => <TabsTrigger key={value} value={value!} className="min-h-11">{label}</TabsTrigger>)}</TabsList></div>
         <TabsContent value="projection"><MoneyProjection data={data} onScenario={openScenario} onResetScenario={() => { scenarioRef.current = null; setScenario(null); void load(userId).catch(() => {}); }} /></TabsContent>
+        <TabsContent value="yields"><MoneyYields forecast={data.forecast} onEditAccount={openAccount} /></TabsContent>
         <TabsContent value="accounts" className="flex min-w-0 flex-col gap-5">
           <div className="flex flex-wrap gap-2"><Button variant="outline" onClick={openTransfer} disabled={accounts.length < 2} className="min-h-11"><ArrowLeftRight data-icon="inline-start" />Transferir</Button><Button variant="outline" onClick={openWithdrawal} disabled={!accounts.length} className="min-h-11"><Wallet data-icon="inline-start" />Registrar retiro</Button><Button variant="outline" onClick={openPayment} className="min-h-11"><CreditCard data-icon="inline-start" />Abonar a tarjeta</Button></div>
           <MoneyAccountsTable accounts={accounts} totals={totals} onReconcile={openReconcile} onEdit={openAccount} />

@@ -1,0 +1,50 @@
+✓ Running next.config took 10ms
+ GET /api/money 401 in 255ms (next.js: 128ms, application-code: 127ms)
+Fixture directory: /tmp/afp-money-qa-Y0hXLy
+Money/UI QA ready on 4216; real API and local PostgreSQL.
+○ Compiling /login/page ...
+ GET /login 200 in 1842ms (next.js: 338ms, application-code: 1504ms)
+ GET / 200 in 152ms (next.js: 111ms, application-code: 41ms)
+ GET / 200 in 20ms (next.js: 1.5ms, application-code: 19ms)
+○ Compiling /mi-dinero/page ...
+ GET /dashboard 200 in 15ms (next.js: 1.7ms, application-code: 14ms)
+ GET /dashboard 200 in 758ms (next.js: 718ms, application-code: 39ms)
+ GET /mi-dinero 200 in 760ms (next.js: 293ms, application-code: 468ms)
+○ Compiling /api/money/route ...
+(node:987799) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ GET /api/money? 200 in 420ms (next.js: 161ms, application-code: 260ms)
+ GET /mi-dinero 200 in 118ms (next.js: 78ms, application-code: 40ms)
+ GET /mi-dinero 200 in 16ms (next.js: 1.3ms, application-code: 15ms)
+ GET /api/money? 200 in 98ms (next.js: 0.8ms, application-code: 98ms)
+ GET /api/money 200 in 54ms (next.js: 0.7ms, application-code: 53ms)
+○ Compiling /api/dashboard/summary/route ...
+ GET /mi-dinero 200 in 102ms (next.js: 64ms, application-code: 37ms)
+ GET /api/dashboard/summary?userId=00000000-0000-4000-8000-000000000094&clientDate=2026-10-30 200 in 324ms (next.js: 36ms, application-code: 288ms)
+ GET /mi-dinero 200 in 15ms (next.js: 1.0ms, application-code: 14ms)
+ GET /api/money? 200 in 103ms (next.js: 7ms, application-code: 96ms)
+ GET /mi-dinero 200 in 18ms (next.js: 1.3ms, application-code: 17ms)
+ GET /mi-dinero 200 in 54ms (next.js: 1.5ms, application-code: 52ms)
+ GET /mi-dinero 200 in 17ms (next.js: 1.2ms, application-code: 16ms)
+ GET /mi-dinero 200 in 17ms (next.js: 4ms, application-code: 12ms)
+ GET /api/money? 200 in 80ms (next.js: 1.0ms, application-code: 79ms)
+ GET /mi-dinero 200 in 86ms (next.js: 1.9ms, application-code: 84ms)
+ GET /mi-dinero 200 in 17ms (next.js: 1.1ms, application-code: 15ms)
+ GET /api/money? 200 in 77ms (next.js: 0.6ms, application-code: 76ms)
+ GET /api/money? 200 in 80ms (next.js: 0.7ms, application-code: 80ms)
+ GET /mi-dinero 200 in 17ms (next.js: 1.1ms, application-code: 16ms)
+ GET /api/money? 200 in 72ms (next.js: 0.6ms, application-code: 71ms)
+ GET /api/money? 200 in 86ms (next.js: 0.6ms, application-code: 85ms)
+ GET /mi-dinero 200 in 98ms (next.js: 13ms, application-code: 85ms)
+ GET /mi-dinero 200 in 13ms (next.js: 1.0ms, application-code: 12ms)
+ GET /api/money? 200 in 71ms (next.js: 0.6ms, application-code: 70ms)
+ GET /mi-dinero 200 in 15ms (next.js: 1.1ms, application-code: 14ms)
+ GET /mi-dinero 200 in 13ms (next.js: 0.9ms, application-code: 12ms)
+ GET /mi-dinero 200 in 13ms (next.js: 1.0ms, application-code: 12ms)
+ GET /api/money 200 in 66ms (next.js: 0.6ms, application-code: 65ms)
+ GET /mi-dinero 200 in 15ms (next.js: 1.0ms, application-code: 14ms)
+ GET /api/money? 200 in 50ms (next.js: 0.7ms, application-code: 49ms)
+ GET /mi-dinero 200 in 17ms (next.js: 0.9ms, application-code: 16ms)
+ GET /api/money? 200 in 69ms (next.js: 0.6ms, application-code: 69ms)
+ GET /mi-dinero 200 in 19ms (next.js: 1.1ms, application-code: 17ms)
+Fixture cerrado y directorio temporal eliminado.
