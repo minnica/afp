@@ -1,0 +1,19 @@
+{
+  "columns": [
+    {
+      "align": "center",
+      "width": 88
+    },
+    {
+      "align": "center",
+      "width": 88
+    },
+    {
+      "align": "center",
+      "width": 88
+    }
+  ],
+  "documentWidth": 320,
+  "noteVisible": true,
+  "width": 320
+}

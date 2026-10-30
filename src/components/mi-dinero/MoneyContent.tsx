@@ -1,10 +1,9 @@
 'use client';
 import { localLogoutRunning } from '@/lib/logout';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyContent, EmptyMedia } from '@/components/ui/empty';
 import { Item, ItemContent, ItemTitle, ItemDescription, ItemActions, ItemGroup, ItemSeparator } from '@/components/ui/item';
@@ -18,7 +17,7 @@ import type { MoneyResponse, AccountResponse, PlanResponse, DisplayEvent } from 
 import { moneyCommandSchema, type MoneyCommand } from '@/lib/money/commands';
 import { loadMoney, sendMoney, errorMessage, type MoneyRequestOptions } from '@/lib/money/client';
 import { routeEditorSchema as routeSchema, field, amountField, type EditorConfiguration, type EditorSubmission } from './editorContracts';
-import { Plus, ArrowLeftRight, Pencil, RefreshCw, CreditCard, Wallet, TrendingUp } from 'lucide-react';
+import { Plus, ArrowLeftRight, CreditCard, Wallet } from 'lucide-react';
 import { createLatestRequest } from '@/lib/latestRequest';
 import { supabase } from '@/lib/supabase';
 import { ensureUserSetup } from '@/lib/userSetup';
@@ -39,6 +38,10 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 import { toast } from '@/components/ui/sonner';
 import MoneyEditor from './MoneyEditor';
+import MoneyAccountsTable from './MoneyAccountsTable';
+import MoneyAccountsMobile from './MoneyAccountsMobile';
+import AccountYieldSummary from './AccountYieldSummary';
+import { accountTotals } from './accountTotals';
 import { createTransferEditor } from './transferEditor';
 import { sendTransfer } from '@/lib/money/transferClient';
 import { transferMutationSchema } from '@/lib/money/transferContracts';
@@ -179,6 +182,7 @@ export default function MoneyContent() {
   function confirmAction(title: string, description: string, payload: ConfirmationInput) { setConfirmation({ title, description, payload: { ...payload, operationId: crypto.randomUUID() } }); }
   async function performConfirmed() { if (!confirmation) return; setConfirming(true); try { await save(confirmation.payload); setConfirmation(null); } catch (failure) { toast.error(errorMessage(failure, 'No se pudo guardar.')); } finally { setConfirming(false); } }
   const accounts = data?.forecast.accounts || [];
+  const totals = accountTotals(accounts);
   const movements = (data?.forecast.actual || []).filter(e => (movementFilter === 'ALL' || (movementFilter === 'PENDING' && e.needsAccount) || (movementFilter === 'EXCLUDED' && e.excluded)) && e.label.toLocaleLowerCase('es').includes(query.toLocaleLowerCase('es'))).sort((a, b) => (b.date || '').localeCompare(a.date || ''));
   return <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-5 md:py-8" onClickCapture={captureFocus}>
     {loading ? <div className="flex flex-col gap-5" role="status" aria-label="Cargando Mi dinero"><Skeleton className="h-8 w-40" /><Skeleton className="h-32 w-full" /><Skeleton className="h-64 w-full" /></div> : error && !data ? <Alert variant="destructive"><AlertDescription><p>{error}</p><Button variant="outline" onClick={() => void load(userId).catch(() => {})} className="mt-3 min-h-11">Reintentar</Button></AlertDescription></Alert> : data && <>
@@ -187,10 +191,20 @@ export default function MoneyContent() {
       {!accounts.length ? <Empty><EmptyHeader><EmptyMedia variant="icon"><Wallet /></EmptyMedia><EmptyTitle>Empieza con lo que tienes hoy</EmptyTitle><EmptyDescription>Agrega tus cuentas, cajitas y efectivo con un saldo de referencia. Después podrás asignar los movimientos de AFP y proyectar tus próximos meses.</EmptyDescription></EmptyHeader><EmptyContent><Button onClick={() => openAccount()} className="min-h-11">Capturar mi primera cuenta</Button></EmptyContent></Empty> : <Tabs defaultValue="projection" className="flex flex-col gap-5">
         <div className="overflow-x-auto"><TabsList className="w-max" variant="line">{[['projection', 'Proyección'], ['accounts', 'Cuentas'], ['movements', 'Movimientos'], ['plans', 'Planes'], ['routes', 'Asignación automática']].map(([value, label]) => <TabsTrigger key={value} value={value!} className="min-h-11">{label}</TabsTrigger>)}</TabsList></div>
         <TabsContent value="projection"><MoneyProjection data={data} onScenario={openScenario} onResetScenario={() => { scenarioRef.current = null; setScenario(null); void load(userId).catch(() => {}); }} /></TabsContent>
-        <TabsContent value="accounts" className="flex flex-col gap-5">
+        <TabsContent value="accounts" className="flex min-w-0 flex-col gap-5">
           <div className="flex flex-wrap gap-2"><Button variant="outline" onClick={openTransfer} disabled={accounts.length < 2} className="min-h-11"><ArrowLeftRight data-icon="inline-start" />Transferir</Button><Button variant="outline" onClick={openWithdrawal} disabled={!accounts.length} className="min-h-11"><Wallet data-icon="inline-start" />Registrar retiro</Button><Button variant="outline" onClick={openPayment} className="min-h-11"><CreditCard data-icon="inline-start" />Abonar a tarjeta</Button></div>
-          <div className="grid gap-4 md:grid-cols-2">{accounts.map(account => <Card key={account.id}><CardHeader><div className="flex items-start justify-between gap-2"><CardTitle>{account.name}</CardTitle><Badge variant="outline">A la vista</Badge></div><CardDescription>Referencia: {dateLabel(day(account.asOf))}</CardDescription></CardHeader><CardContent className="flex flex-col gap-4"><div><p className="text-2xl font-semibold tabular-nums">{money(account.balance)}</p><p className="text-sm text-muted-foreground">Disponible tras tu reserva: {money(account.available)}</p></div>{(Number(account.annualYield) > 0 || Number(account.yieldDailyAmount) > 0 || Number(account.yieldExcessRate) > 0) && <div className="flex items-start gap-2"><TrendingUp className="size-4 shrink-0" /><p className="text-sm">{account.yieldMethod === 'DAILY_AMOUNT' ? `Referencia de ${money(account.yieldDailyAmount)} al día con ${money(account.yieldCap)} remunerados` : `Tasa anual ${Number(account.annualYield)} %${account.yieldCap != null ? ` hasta ${money(account.yieldCap)}` : ''}${Number(account.yieldExcessRate) > 0 ? ` y ${Number(account.yieldExcessRate)} % sobre el excedente` : ''}`}. {account.yieldPayout === 'MX_BUSINESS' ? 'Abonos en días hábiles bancarios.' : 'Abonos diarios.'}</p></div>}<div className="flex flex-col gap-1">{!!account.calculatedYield && <p className="text-sm text-muted-foreground">Incluye {money(account.calculatedYield)} de rendimiento calculado por AFP.</p>}{!!account.pendingYield && <p className="text-sm text-muted-foreground">Rendimiento calculado pendiente de abono: {money(account.pendingYield)}.</p>}{account.autoYield && <p className="text-sm text-muted-foreground">Cálculo automático activo.</p>}</div><div className="flex flex-wrap gap-2"><Button variant="outline" onClick={() => openReconcile(account)} className="min-h-11"><RefreshCw data-icon="inline-start" />Conciliar saldo</Button><Button variant="ghost" onClick={() => openAccount(account)} className="min-h-11"><Pencil data-icon="inline-start" />Editar</Button></div>{!!account.reconciliations.length && <div className="flex flex-col gap-2"><h3 className="text-sm font-medium">Últimas conciliaciones</h3>{account.reconciliations.slice(0, 5).map(r => <p key={r.id} className="text-sm text-muted-foreground">{dateLabel(day(r.date))}: {money(r.previousBalance)} → {money(r.bankBalance)}. {r.reason}</p>)}</div>}</CardContent></Card>)}</div>
-          <p className="text-sm text-muted-foreground">Los rendimientos automáticos se incluyen como cálculos de AFP, sin captura diaria. Los abonos reales del tipo vinculado sustituyen ese cálculo. Conciliar saldo toma el importe del banco como nueva referencia.</p>
+          <MoneyAccountsTable accounts={accounts} totals={totals} onReconcile={openReconcile} onEdit={openAccount} />
+          <MoneyAccountsMobile accounts={accounts} onReconcile={openReconcile} onEdit={openAccount} />
+          <footer className="flex flex-col gap-3 text-center text-sm md:hidden" aria-label="Totales de todas las cuentas">
+            <Separator />
+            <h3 className="font-semibold">Total de cuentas</h3>
+            <dl className="flex flex-col gap-1">
+              <dt className="text-muted-foreground">Saldo actual</dt>
+              <dd className="text-center text-xl font-semibold tabular-nums text-success">{money(totals.balance)}</dd>
+            </dl>
+            <AccountYieldSummary account={totals} />
+          </footer>
+          <p className="text-center text-xs text-muted-foreground md:text-left md:text-sm">Con saldo y condiciones actuales, sin capitalización. Semana: 7 días; mes: 30 días. Abonos según el calendario de cada cuenta.</p>
         </TabsContent>
         <TabsContent value="movements" className="flex flex-col gap-4">
           <div className="flex flex-wrap gap-2"><Button asChild variant="outline" className="min-h-11"><Link href="/ingresos">Registrar ingreso</Link></Button><Button asChild variant="outline" className="min-h-11"><Link href="/gastos">Registrar gasto</Link></Button><Button variant="outline" onClick={openPayment} className="min-h-11">Registrar abono a tarjeta</Button></div>

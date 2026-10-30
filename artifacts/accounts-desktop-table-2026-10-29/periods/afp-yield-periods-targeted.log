@@ -1,0 +1,56 @@
+
+> afp@0.1.0 test /home/garatachia/projects/afp
+> node --import tsx tests/run-tests.ts tests/money-yield-estimates.test.ts
+
+TAP version 13
+# Subtest: rendimientos comparables: equivalentes de 1, 7 y 30 días con saldo actual, sin capitalización
+ok 1 - rendimientos comparables: equivalentes de 1, 7 y 30 días con saldo actual, sin capitalización
+  ---
+  duration_ms: 36.076293
+  type: 'test'
+  ...
+# Subtest: rendimientos comparables: tasa por tramos, base 360 y redondeo al final de cada período
+ok 2 - rendimientos comparables: tasa por tramos, base 360 y redondeo al final de cada período
+  ---
+  duration_ms: 40.442807
+  type: 'test'
+  ...
+# Subtest: rendimientos comparables: importe diario observado se prorratea y respeta el tope
+ok 3 - rendimientos comparables: importe diario observado se prorratea y respeta el tope
+  ---
+  duration_ms: 29.399822
+  type: 'test'
+  ...
+# Subtest: rendimientos comparables: aplica el descuento configurado a los tres períodos
+ok 4 - rendimientos comparables: aplica el descuento configurado a los tres períodos
+  ---
+  duration_ms: 16.104079
+  type: 'test'
+  ...
+# Subtest: rendimientos comparables: cero sin tasa, con saldo negativo o fuera de vigencia
+ok 5 - rendimientos comparables: cero sin tasa, con saldo negativo o fuera de vigencia
+  ---
+  duration_ms: 53.194411
+  type: 'test'
+  ...
+# Subtest: rendimientos comparables: calendario de abono y días acumulados no alteran los equivalentes
+ok 6 - rendimientos comparables: calendario de abono y días acumulados no alteran los equivalentes
+  ---
+  duration_ms: 23.497889
+  type: 'test'
+  ...
+# Subtest: rendimientos comparables: usa la regla vigente y no una tasa futura
+ok 7 - rendimientos comparables: usa la regla vigente y no una tasa futura
+  ---
+  duration_ms: 20.243404
+  type: 'test'
+  ...
+1..7
+# tests 7
+# suites 0
+# pass 7
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 530.419719

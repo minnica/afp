@@ -1,0 +1,17 @@
+{
+  "balanceColor": "lab(75.0771 -60.7313 19.4147)",
+  "balanceFontSize": "20px",
+  "balanceGap": "4px",
+  "centered": true,
+  "columnWidths": [
+    111.328125,
+    111.328125,
+    111.34375
+  ],
+  "documentWidth": 390,
+  "footerGap": "12px",
+  "footerHeight": 153,
+  "noteAlign": "center",
+  "noteFontSize": "12px",
+  "width": 390
+}

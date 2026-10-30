@@ -1,0 +1,42 @@
+✓ Running next.config took 11ms
+ GET /api/money 401 in 263ms (next.js: 134ms, application-code: 129ms)
+Fixture directory: /tmp/afp-money-qa-4Q9qvK
+Money/UI QA ready on 4216; real API and local PostgreSQL.
+
+
+Retrying 1/3...
+
+
+Retrying 1/3...
+
+
+Retrying 1/3...
+
+
+Retrying 1/3...
+
+
+Retrying 1/3...
+
+
+Retrying 1/3...
+○ Compiling /login/page ...
+ GET /login 200 in 819ms (next.js: 395ms, application-code: 424ms)
+ GET / 200 in 169ms (next.js: 127ms, application-code: 41ms)
+ GET / 200 in 34ms (next.js: 4ms, application-code: 30ms)
+ GET / 200 in 33ms (next.js: 18ms, application-code: 15ms)
+○ Compiling /dashboard/page ...
+ GET /dashboard 200 in 277ms (next.js: 227ms, application-code: 50ms)
+ GET /dashboard 200 in 22ms (next.js: 3ms, application-code: 19ms)
+○ Compiling /mi-dinero/page ...
+ GET /dashboard 200 in 51ms (next.js: 22ms, application-code: 29ms)
+ GET /mi-dinero 200 in 712ms (next.js: 161ms, application-code: 551ms)
+(node:857208) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ GET /api/money? 200 in 298ms (next.js: 12ms, application-code: 286ms)
+ GET /api/money 200 in 85ms (next.js: 1.4ms, application-code: 83ms)
+ GET /mi-dinero 200 in 21ms (next.js: 1.6ms, application-code: 19ms)
+ GET /mi-dinero 200 in 104ms (next.js: 62ms, application-code: 42ms)
+ GET /api/dashboard/summary?userId=00000000-0000-4000-8000-000000000094&clientDate=2026-10-29 200 in 324ms (next.js: 38ms, application-code: 287ms)
+ GET /mi-dinero 200 in 17ms (next.js: 1.3ms, application-code: 16ms)
+ GET /api/money? 200 in 123ms (next.js: 7ms, application-code: 116ms)

@@ -1,0 +1,42 @@
+✓ Running next.config took 11ms
+ GET /api/money 401 in 260ms (next.js: 133ms, application-code: 127ms)
+Fixture directory: /tmp/afp-money-qa-iSQssp
+Money/UI QA ready on 4216; real API and local PostgreSQL.
+
+
+Retrying 1/3...
+○ Compiling /login/page ...
+ GET /login 200 in 912ms (next.js: 444ms, application-code: 468ms)
+○ Compiling /mi-dinero/page ...
+ GET /login 200 in 33ms (next.js: 14ms, application-code: 19ms)
+ GET /mi-dinero 200 in 892ms (next.js: 346ms, application-code: 545ms)
+ GET /login 200 in 71ms (next.js: 1.1ms, application-code: 69ms)
+[browser] Can't perform a React state update on a component that hasn't mounted yet. This indicates that you have a side-effect in your render function that asynchronously tries to update the component. Move this work to useEffect instead. 
+[browser] Can't perform a React state update on a component that hasn't mounted yet. This indicates that you have a side-effect in your render function that asynchronously tries to update the component. Move this work to useEffect instead. 
+ GET /login 200 in 159ms (next.js: 2ms, application-code: 157ms)
+ GET /mi-dinero 200 in 146ms (next.js: 8ms, application-code: 138ms)
+ GET /mi-dinero 200 in 32ms (next.js: 2ms, application-code: 30ms)
+ GET /login 200 in 31ms (next.js: 14ms, application-code: 17ms)
+ GET / 200 in 151ms (next.js: 85ms, application-code: 66ms)
+ GET /mi-dinero 200 in 44ms (next.js: 24ms, application-code: 21ms)
+ GET / 200 in 31ms (next.js: 1.2ms, application-code: 30ms)
+ GET / 200 in 18ms (next.js: 1.6ms, application-code: 17ms)
+ GET /dashboard 200 in 143ms (next.js: 90ms, application-code: 53ms)
+ GET /dashboard 200 in 18ms (next.js: 1.6ms, application-code: 17ms)
+ GET /mi-dinero 200 in 368ms (next.js: 26ms, application-code: 342ms)
+ GET /mi-dinero 200 in 33ms (next.js: 0.6ms, application-code: 33ms)
+(node:833612) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ GET /api/money? 200 in 403ms (next.js: 150ms, application-code: 252ms)
+ GET /api/money? 200 in 445ms (next.js: 150ms, application-code: 294ms)
+ GET /mi-dinero 200 in 105ms (next.js: 63ms, application-code: 42ms)
+ GET /mi-dinero 200 in 44ms (next.js: 24ms, application-code: 20ms)
+ GET /mi-dinero 200 in 26ms (next.js: 1.9ms, application-code: 24ms)
+ GET /mi-dinero 200 in 25ms (next.js: 12ms, application-code: 13ms)
+ GET /mi-dinero 200 in 88ms (next.js: 2ms, application-code: 86ms)
+ GET /mi-dinero 200 in 15ms (next.js: 1.0ms, application-code: 14ms)
+ GET /mi-dinero 200 in 163ms (next.js: 63ms, application-code: 100ms)
+ GET /api/dashboard/summary?userId=00000000-0000-4000-8000-000000000094&clientDate=2026-10-29 200 in 377ms (next.js: 34ms, application-code: 343ms)
+ GET /mi-dinero 200 in 14ms (next.js: 1.0ms, application-code: 13ms)
+ GET /api/money 200 in 113ms (next.js: 7ms, application-code: 106ms)
+ GET /api/money? 200 in 54ms (next.js: 0.6ms, application-code: 54ms)

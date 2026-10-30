@@ -11,6 +11,7 @@ export const accountResponseSchema = named.extend({
   yieldExcessRate: monetary, yieldPayout: z.enum(['DAILY', 'MX_BUSINESS']), yieldRounding: z.enum(['ROUND', 'DOWN']), yieldInitialPendingDays: z.number().nullable(),
   yieldHistory: z.array(yieldHistoryEntrySchema), reconciliations: z.array(z.object({ id: z.string(), date: z.string(), previousBalance: monetary, bankBalance: monetary, reason: z.string(), snapshot: z.json() }).passthrough()),
   balance: z.number(), available: z.number(), delta: z.number(), calculatedYield: z.number(), recordedBalance: z.number(), pendingYield: z.number(),
+  yieldEstimate: z.object({ daily: z.number(), weekly: z.number(), monthly: z.number() }),
 });
 export const planResponseSchema = named.extend({
   kind: z.enum(['PAYROLL', 'INCOME', 'EXPENSE', 'VARIABLE']), amount: monetary, accountId: z.string(), cardId: nullableId, incomeTypeId: nullableId, categoryId: nullableId,

@@ -47,7 +47,21 @@ export function buildForecast(data: CalculationData, today: string, options: Par
   const end = monthDay(addMonths(today, 11), 31), months = monthRange(today, end);
   const scenario = { collectionDelay: 0, variablePercent: 100, stopPayrollDate: '', extraAmount: 0, extraDate: '', extraAccountId: '', ...options };
   const { events: actual, issues, pendingYields } = buildSources(data, today);
-  const accounts = accountBalances(data.accounts, actual, today).map(a => ({ ...a, pendingYield: amount(roundedYieldCents(pendingYields[a.id] || new Prisma.Decimal(0), ruleAt(a, today))) }));
+  const accounts = accountBalances(data.accounts, actual, today).map(account => {
+    const rule = ruleAt(account, today);
+    const dailyYield = dailyYieldCents(cents(account.balance), rule, today);
+    // Equivalentes con el capital y las condiciones de hoy, sin movimientos
+    // futuros ni capitalización. No son el acumulado ni el calendario de abonos.
+    return {
+      ...account,
+      pendingYield: amount(roundedYieldCents(pendingYields[account.id] || new Prisma.Decimal(0), rule)),
+      yieldEstimate: {
+        daily: amount(roundedYieldCents(dailyYield, rule)),
+        weekly: amount(roundedYieldCents(dailyYield.mul(7), rule)),
+        monthly: amount(roundedYieldCents(dailyYield.mul(30), rule)),
+      },
+    };
+  });
   const future: DatedEvent[] = actual.filter((e): e is DatedEvent => !e.excluded && e.date !== null && e.date > today && e.date <= end).map(e => ({ ...e, status: 'REGISTERED_FUTURE' }));
   const plannedCardExpenses: { id: string; cardId: string; paymentMethod: 'CARD'; date: string; amount: number; concept: string }[] = [];
   const add = (event: DatedEvent) => { if (event.cents && event.date <= end) future.push({ ...event, date: event.date < today ? today : event.date, originalDate: event.date, status: event.status || 'EXPECTED' }); };

@@ -6,6 +6,24 @@ Consolidado el **27 de octubre de 2026** a partir del README del commit `4562aa0
 
 ## 2026-10-29
 
+### Mi dinero: tabla de cuentas en escritorio
+
+La pestaña Cuentas usa la tabla shadcn local desde 768 px, con cuenta y fecha de referencia, saldo actual, disponible tras la reserva, rendimiento y acciones. Las últimas cinco conciliaciones se despliegan por cuenta. Se conservan las tarjetas de móvil y los formularios existentes, sin cambios a cálculos ni API.
+
+Verificación visual en 1440, 1280, 1024, 390 y 320 px con datos ficticios; importes cotejados con la API local y retorno del foco comprobado. Pasan los tres controles de tipos, 1025 pruebas con PostgreSQL local sin omisiones y build. Lint sin errores, con dos advertencias previas fuera del alcance; detector vacío. Cambio local, pendiente de publicación. [Evidencias](../artifacts/accounts-desktop-table-2026-10-29/README.md).
+
+Refinamiento posterior solicitado: se retira del listado el disponible tras la reserva, tanto en tabla como en cards. Rendimiento comparte un resumen breve en ambas vistas: tasa o importe diario, tope, calendario e importes estimados incluidos o pendientes cuando aplican. Se omite el aviso de cálculo automático y se acorta la nota general. La tabla queda en cuatro columnas y cabe completa a 1024 px. [Verificación del refinamiento](../artifacts/accounts-desktop-table-2026-10-29/refinement/README.md).
+
+Estandarización posterior solicitada: todas las cuentas muestran Diario, Semanal y Mensual en escritorio y móvil. La API añade `yieldEstimate`, con equivalentes de 1, 7 y 30 días sobre el saldo y condiciones vigentes, sin movimientos futuros ni capitalización. Se reutiliza el motor de rendimientos para topes, tramos, base anual, descuentos y redondeo. Se retira de esa celda el acumulado histórico que podía confundirse con un período. Siete regresiones nuevas; suite completa de 1032 pruebas sin omisiones, tipos y build correctos. Verificación visual y cotejo con la API local en [rendimientos por período](../artifacts/accounts-desktop-table-2026-10-29/periods/README.md). Pendiente de publicación.
+
+Se añade después «Total de cuentas»: footer de tabla en escritorio y resumen al pie de las cards en móvil. Suma el saldo actual y cada columna de rendimiento en centavos, con un único cálculo compartido que se actualiza al recargar las cuentas. Se verifica el cotejo contra las filas y su actualización tras conciliar desde la interfaz. Pasan tipos, build y 1032 pruebas sin omisiones; lint sin errores con dos advertencias previas y detector vacío. [Verificación de totales](../artifacts/accounts-desktop-table-2026-10-29/totals/README.md). Pendiente de publicación.
+
+La vista móvil se refina después con acordeones shadcn, inicialmente cerrados y con una cuenta abierta a la vez. El encabezado conserva nombre, saldo y los tres rendimientos; el detalle muestra referencia, tipo, saldo de referencia, acciones y hasta cinco conciliaciones. Los totales siguen al pie y escritorio conserva su tabla. Se verifican 320/390 px, teclado, marcado válido dentro del botón, apertura de formularios y retorno del foco; conciliar mantiene abierta la cuenta y actualiza los totales. Pasan 1032 pruebas sin omisiones, tipos y build; lint del alcance y detector vacíos. [Verificación móvil](../artifacts/accounts-desktop-table-2026-10-29/mobile-accordion/README.md). Pendiente de publicación.
+
+Por petición posterior, el importe de saldo actual del footer móvil queda centrado bajo su etiqueta, en verde semántico y a 20 px. Se verifican 320/390 px con el fragmento real y CSS compilado; lint y build correctos, detector vacío. [Capturas y alcance](../artifacts/accounts-desktop-table-2026-10-29/balance-emphasis/README.md).
+
+Se afina después la simetría del footer: título, etiqueta y cifras centrados; rendimientos en tres columnas iguales; separación entre grupos de 12 px y entre etiqueta/saldo de 4 px. La nota usa 12 px en móvil y conserva su formato de escritorio. Se verifican 320/390 px sin desbordamiento, lint y build correctos y detector vacío. [Alineación compacta](../artifacts/accounts-desktop-table-2026-10-29/totals-alignment/README.md).
+
 ### Recibos Uber desde notificaciones de Gmail: publicados e instalados
 
 Se añade Gmail como fuente optativa de Android, limitada a notificaciones de Recibos de Uber y sin consultar el buzón. El teléfono filtra antes de almacenar/enviar y retira la identificación de la cuenta. La interpretación conserva fecha del viaje, total MXN y terminación bancaria cuando están visibles; los recibos recortados requieren revisión. Se reutilizan los alias bancarios existentes y la activación por tarjeta tras una muestra propia cotejada.
