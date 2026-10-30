@@ -2,14 +2,16 @@ import type { Prisma, CaptureCardAlias, CaptureEvent } from '@prisma/client';
 import type { CaptureInterpretation, CaptureParser } from '@/lib/captureTypes';
 import { completeCaptureFormat } from "@/lib/captureFormatPolicy";
 
-export function captureAliasScope(parser: Pick<CaptureParser, 'sourcePackage' | 'aliasSourcePackage' | 'aliasKinds'>) {
+export function captureAliasScope(parser: Pick<CaptureParser, 'sourcePackage' | 'aliasSourcePackage' | 'aliasSourcePackages' | 'aliasKinds'>) {
   return { sourcePackage: parser.aliasSourcePackage || parser.sourcePackage,
+    sourcePackages: parser.aliasSourcePackages,
     kinds: parser.aliasKinds || null };
 }
 
 export function aliasSupportsParser(alias: CaptureCardAlias, parser: CaptureParser) {
   const scope = captureAliasScope(parser);
-  return alias.sourcePackage === scope.sourcePackage && (!scope.kinds || scope.kinds.includes(alias.kind));
+  return (scope.sourcePackages ? scope.sourcePackages.includes(alias.sourcePackage) : alias.sourcePackage === scope.sourcePackage)
+    && (!scope.kinds || scope.kinds.includes(alias.kind));
 }
 
 export async function resolveCaptureIdentity(tx: Prisma.TransactionClient, event: CaptureEvent, interpretation: CaptureInterpretation, parser: CaptureParser | undefined): Promise<CaptureInterpretation> {
@@ -20,7 +22,7 @@ export async function resolveCaptureIdentity(tx: Prisma.TransactionClient, event
   const scope = captureAliasScope(parser || { sourcePackage: event.sourcePackage });
   if (printed && (!scope.kinds || !/^\d{3,4}$/.test(printed.value) || printed.digits !== printed.value.length)) return interpretation;
   const aliases = await tx.captureCardAlias.findMany({ where: {
-    userId: event.userId, sourcePackage: scope.sourcePackage,
+    userId: event.userId, sourcePackage: scope.sourcePackages ? { in: scope.sourcePackages } : scope.sourcePackage,
     kind: scope.kinds ? { in: scope.kinds } : proposal.alias!.kind,
     value: printed ? { endsWith: printed.value } : proposal.alias!.value,
   }, orderBy: [{ kind: "asc" }, { value: "asc" }] });
@@ -36,6 +38,6 @@ export async function resolveCaptureIdentity(tx: Prisma.TransactionClient, event
   } })) return { ...interpretation, reason: "AMBIGUOUS_CARD" };
   if (!await tx.card.findFirst({ where: { id: cards[0]!, userId: event.userId } })) return { ...interpretation, reason: "UNKNOWN_CARD" };
   return { ...interpretation, proposal: { ...proposal, cardId: cards[0]!,
-    ...(printed ? { alias: { kind: alias.kind, value: alias.value }, aliasSourcePackage: scope.sourcePackage } : {}),
+    ...(printed ? { alias: { kind: alias.kind, value: alias.value }, aliasSourcePackage: alias.sourcePackage } : {}),
   } };
 }

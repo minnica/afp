@@ -31,7 +31,7 @@ class CapturePolicyTest {
     }
 
     @Test fun everySourceRequiresItsOwnSelection() {
-        assertEquals(11, CapturePolicy.sources.size)
+        assertEquals(12, CapturePolicy.sources.size)
         for (source in CapturePolicy.sources.keys) {
             assertTrue(CapturePolicy.accepts(source, true, setOf(source), false))
             assertFalse(CapturePolicy.accepts(source, true, CapturePolicy.sources.keys - source, false))

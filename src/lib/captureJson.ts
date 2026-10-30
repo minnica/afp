@@ -13,6 +13,7 @@ const text = z.string().nullable().optional();
 const number = z.number().nullable().optional();
 export const captureProposalSchema = z.object({
   amount: text, date: text, currency: text, merchant: text, cardId: text,
+  expenseVersion: text,
   operationAt: text, notificationAt: text, timeZone: text, dateSource: text,
   alias: z.object({ kind: z.string(), value: z.string() }).optional(),
   printedAlias: z.object({ value: z.string(), digits: z.number() }).optional(),
@@ -26,6 +27,8 @@ export const captureProposalSchema = z.object({
   fromAccountId: text, toAccountId: text, moneyPolicyId: text, moneyKind: text,
   paymentPolicyId: text, paymentEvidence: text, paymentCoverage: text,
   statementMonth: number, statementYear: number, statementConcept: text,
+  uberReceipt: z.object({ tripAt: z.string(), updated: z.boolean(), tipAmount: z.string().optional(),
+    expenseVersion: z.string().optional() }).optional(),
   destinationLast4: text, destinationHash: text, sourceAccountHash: text, transferReference: text,
   appliedAt: text, refundKind: text,
 }).catchall(z.json().optional());

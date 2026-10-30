@@ -1,4 +1,11 @@
 export const captureReasons: Record<string, string> = {
+  UBER_RECEIPT_INCOMPLETE: 'El recibo de Uber está recortado o contiene varios viajes. Revisa el correo completo.',
+  UBER_RECEIPT_CARD_REQUIRED: 'El recibo indica fecha e importe del viaje, pero falta la tarjeta. Completa ese dato o vincula el cargo bancario.',
+  UBER_RECEIPT_CHANGED: 'El recibo modifica un viaje registrado. Revisa el total y la propina antes de actualizarlo.',
+  UBER_RECEIPT_LINKED: 'Recibo de Uber vinculado al gasto existente, con la fecha del viaje.',
+  UBER_RECEIPT_UPDATED: 'Total del viaje actualizado desde el recibo de Uber, incluida la propina.',
+  UBER_RECEIPT_OLDER: 'Este recibo es anterior al total actualizado del viaje. Se conservó el importe más reciente.',
+  UBER_BANK_LINKED: 'Cargo bancario vinculado al viaje registrado desde el recibo de Uber.',
   BBVA_PAYMENT_MATCHED: "Pago de tarjeta registrado por coincidencia de saldo pendiente y vencimiento, con hasta $1 de diferencia y un día de margen. Revisa el destino si no corresponde.",
   BBVA_PAYMENT_MATCH_AMBIGUOUS: "El cargo coincide con varias tarjetas. Selecciona a cuál corresponde; todavía no se registró un gasto ni un pago.",
   MONEY_POLICY_REQUIRED: "Configura qué cuentas corresponden a esta transferencia.",
@@ -59,6 +66,7 @@ export const captureReasons: Record<string, string> = {
 export const captureStatuses: Record<string, string> = { REVIEW: "Por revisar", OBSERVED: "Observación", REGISTERED: "Registrado", LINKED: "Vinculado", DISCARDED: "Descartado", CONVERTED: "A meses" };
 export const captureInboxStatuses: Record<string, string> = { REVIEW: "Por revisar", REGISTERED: "Registrado", RECONCILED: "Conciliado", DISCARDED: "Descartado" };
 export const captureSources: Record<string, string> = {
+  'com.google.android.gm': 'Gmail · recibos de Uber',
   "com.garatachia.afp.paymentreceipts": "Comprobante compartido",
   "com.bancomer.mbanking": "BBVA", "com.google.android.apps.walletnfcrel": "Google Wallet", "mx.hsbc.hsbcmexico": "HSBC",
   "com.citibanamex.banamexmobile": "Banamex", "mx.bancosantander.supermovil": "Santander", "com.nu.production": "Nu",

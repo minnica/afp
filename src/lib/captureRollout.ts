@@ -85,6 +85,8 @@ export function buildCaptureRollout(cards: { id: string }[], aliases: CaptureCar
     // Las fuentes proceden de alias explícitos, nunca del nombre editable.
     // Wallet se muestra también sin alias para hacer visible esa limitación.
     const sources = capturePackages.filter(sourcePackage => sourcePackage === "com.google.android.apps.walletnfcrel"
+      || formats.some(parser => parser.sourcePackage === sourcePackage && parser.aliasSourcePackages
+        && aliases.some(alias => alias.cardId === card.id && aliasSupportsParser(alias, parser)))
       || aliases.some(alias => alias.cardId === card.id && alias.sourcePackage === sourcePackage)
       || automations.some(mode => mode.cardId === card.id && formats.some(parser => parser.key === mode.parserKey && parser.sourcePackage === sourcePackage)));
     sources.sort((a, b) => Number(a === "com.google.android.apps.walletnfcrel") - Number(b === "com.google.android.apps.walletnfcrel"));

@@ -6,11 +6,13 @@ import { Buffer } from "node:buffer";
 import { z } from "zod";
 import { ApiAccessError } from "@/lib/apiAuth";
 import { reviewOnlyCapturePackages } from "@/lib/captureSourcePolicy";
+import { gmailCapturePackage } from './captureSourcePolicy';
+import { isUberGmailNotice } from './gmailUberReceipts';
 
 export const capturePackages = [
   "com.bancomer.mbanking", "com.google.android.apps.walletnfcrel", "mx.hsbc.hsbcmexico",
   "com.citibanamex.banamexmobile", "mx.bancosantander.supermovil", "com.nu.production",
-  "com.didiglobal.cashloan", "com.mercadopago.wallet", ...reviewOnlyCapturePackages,
+  "com.didiglobal.cashloan", "com.mercadopago.wallet", ...reviewOnlyCapturePackages, gmailCapturePackage,
 ];
 export const pairingLifetimeMs = 5 * 60 * 1000;
 export const deviceSelect = { id: true, name: true, createdAt: true, approvedAt: true, pausedAt: true, revokedAt: true, lastSeenAt: true, pausedPackages: true, reportedState: true, reportedAt: true };
@@ -51,6 +53,10 @@ export function validateCaptureEvent(rawInput: unknown) {
   const result = eventSchema.safeParse(input);
   if (!result.success) throw new ApiAccessError("El evento o su versión no son válidos.", 400);
   const event = result.data;
+  if (event.sourcePackage === gmailCapturePackage && (!isUberGmailNotice(event.fields)
+    || Object.keys(event.fields).some(key => !['android.title', 'android.title.big', 'android.text', 'android.bigText'].includes(key)))) {
+    throw new ApiAccessError('Solo se admiten recibos de Uber de Gmail, sin datos de la cuenta de correo.', 400);
+  }
   // La misma representación semántica produce el mismo recibo, aunque cambie el orden JSON.
   return { ...event, eventId: event.eventId.toLowerCase(),
     postedAt: new Date(event.postedAt).toISOString(), receivedAt: new Date(event.receivedAt).toISOString(),

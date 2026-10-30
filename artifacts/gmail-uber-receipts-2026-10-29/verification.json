@@ -1,0 +1,55 @@
+{
+  "versionName": "0.9.0",
+  "versionCode": 13,
+  "apkSha256": "7c12767123950ed49e8c307324915a44f680d15bae95e603c5d94cd12e64c2cf",
+  "certificateSha256": "503279ba8be28b65beae47aead1b17fdd57ad54344c652327ff3c23928bb5783",
+  "matchesLocalAssetLinks": true,
+  "personalInstallationUpdated": true,
+  "deviceInstrumentedTests": {
+    "passed": 2,
+    "failed": 0
+  },
+  "jvmTests": {
+    "passed": 28,
+    "failed": 0,
+    "skipped": 1
+  },
+  "nodeTests": {
+    "passed": 1025,
+    "failed": 0,
+    "skipped": 0
+  },
+  "migrationCount": 43,
+  "rlsTables": 45,
+  "checks": {
+    "pnpm typecheck": "passed",
+    "pnpm typecheck:tests": "passed",
+    "pnpm test:types": "passed",
+    "pnpm lint": "passed",
+    "pnpm test": "passed",
+    "pnpm build": "passed",
+    "pnpm db:verify": "passed"
+  },
+  "lintExistingWarnings": 2,
+  "sharedDatabaseMigrated": true,
+  "published": true,
+  "gmailSourceEnabledOnPersonalPhone": true,
+  "browserVerified": true,
+  "dependencyAudit": {
+    "production": 0,
+    "developmentLow": 1,
+    "existing": "GHSA-gcqx-w48m-w2h4"
+  },
+  "sourceHashes": {
+    "android/app/src/main/java/com/garatachia/afp/CaptureApplication.kt": "a7b65466f06a335c606d6bf69c2e72be4fd5924eb36a7f39342059430ba04719",
+    "android/app/src/main/java/com/garatachia/afp/GmailReceiptPolicy.kt": "c5ecc3a7b5e86d59b862d8a7f88556289fa4557dd7907bd7104be2039dd4e5d3",
+    "prisma/migrations/20261029010000_capture_receipt_date_policy/migration.sql": "33993d99038e0b2dfb94512bb407e4a141f954c789b53c7b6aef94deadef3ac5",
+    "src/lib/captureProcessing.ts": "1d97409279697bc814eb2d2c07005d2ddf7d0c5b2e069b4c4025fd47e71c2e47",
+    "src/lib/captureProtocol.ts": "472533cb394973f074df804b100f0c26f2c110583efb992d57e8bac613e7eeeb",
+    "src/lib/gmailUberReceipts.ts": "320967af5a22c3a4902cb8a4eb728d9b2ad1367ae91421fc9d6cae293339dd29",
+    "src/lib/uberCapture.ts": "b00df189754968b63a817cd81e2247b6b18d953b7a9a33ddd00299bb073638df"
+  },
+  "productionEvidence": "production.json",
+  "gmailPerCardAutomationEnabled": false,
+  "previousTripsImportedOrCorrected": false
+}

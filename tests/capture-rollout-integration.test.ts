@@ -90,7 +90,8 @@ test('Fase 7 PostgreSQL: activación gradual, evidencia propia y recuperación d
       assert.equal(data.rollout.length, 9);
       for (const card of cards) {
         const coverage = data.rollout.find(row => row.cardId === card.id);
-        assert.equal(present(coverage).sources.length, 2);
+        assert.equal(present(coverage).sources.length, 3);
+        assert.ok(present(coverage).sources.some(source => source.sourcePackage === 'com.google.android.gm'));
         assert.ok(present(coverage).sources.some(source => source.sourcePackage === card.sourcePackage));
         for (const source of present(coverage).sources) for (const format of source.formats) assert.equal(format.canEnable, false);
         await assert.rejects(real.configureCapture(db, user.id, { action: 'automation', cardId: card.id, parserKey: 'wallet.purchase.es.v1', mode: 'AUTOMATIC' }), error => objectValue(error).status === 409);

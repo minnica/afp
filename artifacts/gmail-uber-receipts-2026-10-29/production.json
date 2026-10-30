@@ -1,0 +1,82 @@
+{
+  "releaseDateMexico": "2026-10-29",
+  "verificationTimeUtc": "2026-10-30T02:56:35.705Z",
+  "authorization": "Propietario autorizó publicación web, migración e instalación personal.",
+  "deployment": {
+    "id": "dpl_G4R1V1GR2uYK2pa9rMXgKBihWeaG",
+    "state": "READY",
+    "url": "afp-busgm2zae-minnicas-projects.vercel.app",
+    "productionOrigin": "https://finanzas.garatachia.com",
+    "customDomainAssigned": true,
+    "readyAtUtc": "2026-10-30T02:53:23.034Z",
+    "baseGitCommit": "1157e942868901eefa262f3c1a081f597b21966c",
+    "includesUncommittedWorkspaceChanges": true,
+    "commitCreated": false,
+    "pushPerformed": false,
+    "workspaceFileCount": 408,
+    "workspaceManifestSha256": "785c545d558a33544b436d27903f8a8e0dcf30cb51032bb51aff14b441144d29"
+  },
+  "sourceVerification": {
+    "visibleFiles": 156,
+    "matched": 156,
+    "mismatched": [],
+    "truncatedDirectories": 237,
+    "manifestFiles": 408,
+    "verifiedAt": "2026-10-30T02:53:30.648Z",
+    "captureModulesMatched": 29,
+    "scope": "156 visible source files compared by SHA-1. Remaining source tree depth and UI file content are truncated by the MCP API. Uploaded files were supplied using content digests.",
+    "entireRemoteTreeIndependentlyVerified": false
+  },
+  "database": {
+    "backupCreatedPrivately": true,
+    "migration": "20261029010000_capture_receipt_date_policy",
+    "appliedMigrations": 43,
+    "pendingMigrations": 0,
+    "historicalChecksumsPreserved": true,
+    "rlsTables": 45,
+    "financialAndConfigurationTablesCompared": 37,
+    "financialAndConfigurationTablesUnchanged": true
+  },
+  "phone": {
+    "versionName": "0.9.0",
+    "versionCode": 13,
+    "installedApkSha256": "7c12767123950ed49e8c307324915a44f680d15bae95e603c5d94cd12e64c2cf",
+    "matchesTestedRelease": true,
+    "firstInstallationPreserved": true,
+    "credentialOwnerAndApprovalPreserved": true,
+    "notificationAccessPreserved": true,
+    "gmailInitiallySelectedOnUpgrade": false,
+    "gmailExplicitlyEnabled": true,
+    "sourceSelectionPreservedWithGmailAdded": true,
+    "selectedSources": 12,
+    "authenticatedReportAccepted": true,
+    "active": true,
+    "listenerConnected": true,
+    "deliveryPaused": false,
+    "pausedSources": 0,
+    "queue": {
+      "pending": 0,
+      "review": 0,
+      "sent": 992
+    }
+  },
+  "http": {
+    "login": 200,
+    "unauthenticatedCaptureDevice": 401,
+    "unauthenticatedCaptureEvents": 401,
+    "unauthenticatedCaptureConfiguration": 401,
+    "apiCacheControl": "private, no-store"
+  },
+  "runtimeObservation": {
+    "sinceUtc": "2026-10-30T02:53:00Z",
+    "captureRoutesErrorClusters": 0,
+    "deploymentErrorFatalLogGroups": 0,
+    "scope": "Brief deployment verification window; does not establish ongoing production reliability."
+  },
+  "rollout": {
+    "gmailPerCardAutomations": 0,
+    "realCompleteGmailNotificationVerified": false,
+    "previousTripsImportedOrCorrected": false,
+    "pending": "Observe a complete real Uber receipt notification, review/link and reconcile a sample, then enable the parser per card with RECEIPT_OPERATION."
+  }
+}

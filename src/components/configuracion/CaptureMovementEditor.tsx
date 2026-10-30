@@ -87,6 +87,7 @@ export default function CaptureMovementEditor({ detail, configuration, userId, o
         {error && <Alert variant="destructive"><AlertDescription>{error}</AlertDescription></Alert>}
         {notice && <p role="status" className="text-sm">{notice}</p>}
         <p className="text-sm text-muted-foreground">{captureReasons[movement.reason] || "Completa los datos para registrar este gasto."}</p>
+        {proposal.dateSource === "RECEIPT_OPERATION" && <Alert><AlertDescription>Usamos la fecha del viaje del recibo de Uber. El total incluye la propina cuando figura en el recibo actualizado. Si falta la terminación de la tarjeta, revisa el correo completo.</AlertDescription></Alert>}
         {proposal.dateSource === "NOTIFICATION_POSTED_AT" && <Alert><AlertDescription>Usamos la fecha del aviso, en hora de México. Corrígela si el banco indica otra.</AlertDescription></Alert>}
         {proposal.completionPolicy === "NU_CFE_MXN" && <Alert><AlertDescription>Este gasto corresponde a {configuration.subscriptions.find(row => row.id === proposal.subscriptionId)?.name || "tu suscripción CFE"}. Usamos la tarjeta y MXN de tu regla Nu/CFE; al registrar se confirmará el cobro de este mes con el importe del aviso.</AlertDescription></Alert>}
         {proposal.completionPolicy === "MERCADOPAGO_CREDIT_MXN" && <Alert><AlertDescription>Usamos la única tarjeta y MXN que configuraste para Mercado Pago. Si ahora usas otra tarjeta o moneda, pausa esta regla en Ajustes.</AlertDescription></Alert>}

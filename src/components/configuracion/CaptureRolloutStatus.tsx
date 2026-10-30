@@ -14,6 +14,7 @@ const fallbackParserKeys = new Set([
 ]);
 
 const formatLabels: Record<string, string> = {
+  "gmail.uber-receipt.es.v1": "Recibos de Uber en Gmail",
   "bbva.purchase.es.v1": "Compras BBVA",
   "wallet.purchase.es.v1": "Compras de Wallet · formato inicial",
   "nu.cfe-service-payment.es.v1": "Pagos CFE · formato anterior",
@@ -53,6 +54,7 @@ export default function CaptureRolloutStatus({ coverage, cardId, busy, onAutomat
           <Collapsible><CollapsibleTrigger asChild><Button variant="ghost" className="min-h-11 px-0 text-xs">Detalles de este tipo de aviso</Button></CollapsibleTrigger><CollapsibleContent><p className="break-all text-xs text-muted-foreground">{format.parserKey}</p></CollapsibleContent></Collapsible>
           {fallbackPolicy?.bankSourcePackage === source.sourcePackage && fallbackParserKeys.has(format.parserKey) ? <ItemDescription>Compras gestionadas por el respaldo bancario de 15 minutos. Usa sus controles arriba.</ItemDescription> : <div><Badge variant={format.mode === "AUTOMATIC" ? "default" : "secondary"}>{format.mode === "AUTOMATIC" ? "Automático" : format.verified ? "Por activar" : "Por comprobar"}</Badge></div>}
           {format.dateSource === "NOTIFICATION_POSTED_AT" && <ItemDescription className="line-clamp-none">Usa la fecha del aviso de {captureSources[source.sourcePackage]} en hora de México. El aviso no incluye una fecha bancaria de operación.</ItemDescription>}
+          {format.dateSource === 'RECEIPT_OPERATION' && <ItemDescription className="line-clamp-none">Usa la fecha del viaje indicada en el recibo y las terminaciones bancarias verificadas. Los recibos sin tarjeta visible requieren revisión.</ItemDescription>}
           {format.parserKey === "wallet.santander-purchase.es.v2" && <ItemDescription className="line-clamp-none">Puede registrar desde Wallet aunque no llegue el aviso de Santander. Si ya existe un cargo coincidente, el segundo aviso queda por revisar para evitar duplicados; no cambia automáticamente la fecha del gasto existente.</ItemDescription>}
           {format.completionPolicy && <><ItemDescription className="line-clamp-none">{format.policyRequiresSubscription
             ? "La regla asigna los pagos CFE a esta tarjeta, en MXN, y confirma el cobro pendiente de la suscripción elegida. Conserva la configuración habitual de la suscripción."
@@ -67,7 +69,7 @@ export default function CaptureRolloutStatus({ coverage, cardId, busy, onAutomat
           {!(fallbackPolicy?.bankSourcePackage === source.sourcePackage && fallbackParserKeys.has(format.parserKey)) && format.mode !== "AUTOMATIC" && format.blockers.map(reason => <ItemDescription key={reason} className="line-clamp-none">{reasons[reason]}</ItemDescription>)}
           {!(fallbackPolicy?.bankSourcePackage === source.sourcePackage && fallbackParserKeys.has(format.parserKey)) && <ItemActions><Button variant="outline" className="min-h-11" disabled={busy || (format.mode !== "AUTOMATIC" && !format.canEnable)} onClick={() => onAutomation({ action: "automation", cardId, parserKey: format.parserKey,
             mode: format.mode === "AUTOMATIC" ? "OBSERVATION" : "AUTOMATIC",
-            ...(format.dateSource === "NOTIFICATION_POSTED_AT" ? { datePolicy: "NOTIFICATION_POSTED_AT" } : {}),
+            ...(["NOTIFICATION_POSTED_AT", "RECEIPT_OPERATION"].includes(format.dateSource) ? { datePolicy: format.dateSource } : {}),
             label: format.mode === "AUTOMATIC" ? "Pausar registro" : "Activar compras automáticas" })}>
             {format.mode === "AUTOMATIC" ? "Pausar registro" : "Activar"}
           </Button></ItemActions>}

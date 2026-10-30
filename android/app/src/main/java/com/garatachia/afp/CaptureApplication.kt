@@ -90,7 +90,9 @@ class CaptureApplication : Application() {
         }.onFailure { storageError.value = true }
     } }
 
-    fun append(sample: DiagnosticSample) {
+    fun append(received: DiagnosticSample) {
+        val fields = GmailReceiptPolicy.fields(received.packageName, received.fields) ?: return
+        val sample = received.copy(fields = fields)
         // Fijar la identidad al recibir, antes de esperar otras escrituras o una revinculación.
         val binding = runCatching { BindingStore(this).read().lastOrNull() }.getOrElse {
             queueStorageError.value = true
@@ -99,7 +101,7 @@ class CaptureApplication : Application() {
         scope.launch {
         // Se comprueba otra vez después de esperar en la cola de escritura.
         if (!CapturePolicy.accepts(sample.packageName, active, captureSources, false)) return@launch
-        if (CaptureContentFilter.excluded(sample.fields)) return@launch
+        if (sample.packageName != GmailReceiptPolicy.source && CaptureContentFilter.excluded(sample.fields)) return@launch
         if (binding?.ownerId != null && binding.state in setOf("ACTIVE", "PAUSED")) {
             // El commit cifrado de Room sucede antes de programar cualquier entrega.
             runCatching { captureQueue.enqueue(sample, binding) }.onSuccess {

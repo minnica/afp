@@ -13,6 +13,7 @@ object CapturePolicy {
         "com.ubercab" to "Uber · revisión",
         "com.didiglobal.passenger" to "DiDi viajes · revisión",
         "com.ubercab.eats" to "Uber Eats · revisión",
+        "com.google.android.gm" to "Gmail · recibos de Uber",
     )
 
     // No usar sources.keys como valor inicial: una actualización no debe activar fuentes nuevas.

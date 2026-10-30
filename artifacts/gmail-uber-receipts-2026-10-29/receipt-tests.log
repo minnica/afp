@@ -1,0 +1,123 @@
+
+> afp@0.1.0 test /home/garatachia/projects/afp
+> node --import tsx tests/run-tests.ts gmail-uber-integration.test.ts gmail-uber-receipts.test.ts
+
+TAP version 13
+# Subtest: Gmail Uber PostgreSQL: fecha real, banco, propinas, pausas, revisiones e idempotencia
+    # Subtest: banco primero: un gasto con fecha del viaje y originales preservados
+    ok 1 - banco primero: un gasto con fecha del viaje y originales preservados
+      ---
+      duration_ms: 813.253138
+      type: 'test'
+      ...
+    # Subtest: recibo primero: banco tardío vinculado sin segundo gasto
+    ok 2 - recibo primero: banco tardío vinculado sin segundo gasto
+      ---
+      duration_ms: 200.149087
+      type: 'test'
+      ...
+    # Subtest: HSBC sin aviso bancario: recibo completo usa alias verificado del propietario
+    ok 3 - HSBC sin aviso bancario: recibo completo usa alias verificado del propietario
+      ---
+      duration_ms: 133.643897
+      type: 'test'
+      ...
+    # Subtest: propina: reemplaza el total una vez y conserva ambos recibos
+    ok 4 - propina: reemplaza el total una vez y conserva ambos recibos
+      ---
+      duration_ms: 459.513412
+      type: 'test'
+      ...
+    # Subtest: recibo actualizado primero: cargos desglosados y recibo anterior no duplican ni reducen el total
+    ok 5 - recibo actualizado primero: cargos desglosados y recibo anterior no duplican ni reducen el total
+      ---
+      duration_ms: 389.877537
+      type: 'test'
+      ...
+    # Subtest: fuente en observación y aviso recortado no generan gastos
+    ok 6 - fuente en observación y aviso recortado no generan gastos
+      ---
+      duration_ms: 166.800832
+      type: 'test'
+      ...
+    # Subtest: gasto editado conserva la decisión personal y bloquea crear otro por la propina
+    ok 7 - gasto editado conserva la decisión personal y bloquea crear otro por la propina
+      ---
+      duration_ms: 179.724854
+      type: 'test'
+      ...
+    # Subtest: gasto borrado no resucita por una propina posterior
+    ok 8 - gasto borrado no resucita por una propina posterior
+      ---
+      duration_ms: 175.22013
+      type: 'test'
+      ...
+    # Subtest: activación exige fecha del recibo y Gmail no puede usarse como banco en alias
+    ok 9 - activación exige fecha del recibo y Gmail no puede usarse como banco en alias
+      ---
+      duration_ms: 40.723914
+      type: 'test'
+      ...
+    # Subtest: alias en colisión requiere revisión, sin elegir por nombre
+    ok 10 - alias en colisión requiere revisión, sin elegir por nombre
+      ---
+      duration_ms: 80.5507
+      type: 'test'
+      ...
+    # Subtest: varios cargos Uber iguales no eligen el primero ni cambian fechas
+    ok 11 - varios cargos Uber iguales no eligen el primero ni cambian fechas
+      ---
+      duration_ms: 175.167211
+      type: 'test'
+      ...
+    # Subtest: mismo importe en viajes de días distintos conserva dos gastos
+    ok 12 - mismo importe en viajes de días distintos conserva dos gastos
+      ---
+      duration_ms: 164.309726
+      type: 'test'
+      ...
+    1..12
+ok 1 - Gmail Uber PostgreSQL: fecha real, banco, propinas, pausas, revisiones e idempotencia
+  ---
+  duration_ms: 3807.653013
+  type: 'test'
+  ...
+# Subtest: recibo Gmail: fecha del viaje, total MXN y terminación bancaria; no fecha de publicación ni nombre editable
+ok 2 - recibo Gmail: fecha del viaje, total MXN y terminación bancaria; no fecha de publicación ni nombre editable
+  ---
+  duration_ms: 2.030997
+  type: 'test'
+  ...
+# Subtest: recibo Gmail: el total actualizado ya contiene propina; no suma total y pagos de nuevo
+ok 3 - recibo Gmail: el total actualizado ya contiene propina; no suma total y pagos de nuevo
+  ---
+  duration_ms: 0.533839
+  type: 'test'
+  ...
+# Subtest: recibo Gmail recortado: conserva fecha e importe, sin inventar tarjeta
+ok 4 - recibo Gmail recortado: conserva fecha e importe, sin inventar tarjeta
+  ---
+  duration_ms: 0.44961
+  type: 'test'
+  ...
+# Subtest: Gmail: rechaza otros remitentes, promociones, fuente falsa y datos de la cuenta antes de persistir
+ok 5 - Gmail: rechaza otros remitentes, promociones, fuente falsa y datos de la cuenta antes de persistir
+  ---
+  duration_ms: 0.809418
+  type: 'test'
+  ...
+# Subtest: recibo Gmail: varios viajes, tarjetas, total inválido, fecha imposible y futura conservan revisión
+ok 6 - recibo Gmail: varios viajes, tarjetas, total inválido, fecha imposible y futura conservan revisión
+  ---
+  duration_ms: 1.069319
+  type: 'test'
+  ...
+1..6
+# tests 18
+# suites 0
+# pass 18
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4779.239434

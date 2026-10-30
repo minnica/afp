@@ -12,7 +12,7 @@ import { matchesCapturePolicy } from "@/lib/captureFormatPolicy";
 
 import { bankFallbackFormats, bankFallbackOptions, configureBankFallback } from "@/lib/captureBankFallback";
 
-const cardPackages = capturePackages.filter(value => !reviewOnlyCapturePackages.includes(value));
+const cardPackages = capturePackages.filter(value => !reviewOnlyCapturePackages.includes(value) && value !== 'com.google.android.gm');
 const bankPackages = cardPackages.filter(value => value !== "com.google.android.apps.walletnfcrel");
 const lastFour = z.string().regex(/^\d{4}$/);
 export const captureInventorySchema = z.object({ version: z.literal(1), cards: z.array(z.object({
@@ -32,7 +32,7 @@ export const actionSchema = z.discriminatedUnion("action", [
   z.object({ action: z.literal("deleteRule"), id: z.uuid() }).strict(),
   z.object({ action: z.literal("importAliases"), inventory: captureInventorySchema }).strict(),
   z.object({ action: z.literal("automation"), cardId: z.string().min(1), parserKey: z.string(), mode: z.enum(["OBSERVATION", "AUTOMATIC"]),
-    datePolicy: z.enum(["BANK_OPERATION", "NOTIFICATION_POSTED_AT"]).optional() }).strict(),
+    datePolicy: z.enum(["BANK_OPERATION", "NOTIFICATION_POSTED_AT", "RECEIPT_OPERATION"]).optional() }).strict(),
   z.object({ action: z.literal("formatPolicy"), cardId: z.string().min(1), parserKey: z.enum(["nu.cfe-service-payment.es.v2", "mercadopago.card-purchase.es.v1"]),
     completionPolicy: z.enum(["NU_CFE_MXN", "MERCADOPAGO_CREDIT_MXN"]), datePolicy: z.literal("NOTIFICATION_POSTED_AT"), subscriptionId: z.string().min(1).optional() }).strict(),
   z.object({ action: z.literal("rule"), cardId: z.string().min(1), merchant: z.string().trim().min(1).max(200), categoryId: z.string().min(1), subscriptionId: z.string().nullable().optional() }).strict(),
@@ -118,6 +118,9 @@ export async function configureCapture(db: PrismaClient, userId: string, rawInpu
         return tx.captureAutomation.update({ where: { id: existing.id }, data: { mode: "OBSERVATION" } });
       }
       if (data.mode === "AUTOMATIC") {
+        if (parser.dateSource === 'RECEIPT_OPERATION' && data.datePolicy !== 'RECEIPT_OPERATION') {
+          throw new ApiAccessError('Confirma el uso de la fecha del viaje indicada en el recibo de Uber.', 409);
+        }
         if (bankFallbackFormats.some(row => row.keys.includes(data.parserKey)) && await tx.captureBankFallback.findUnique({ where: { userId_cardId: { userId, cardId: data.cardId } } })) {
           throw new ApiAccessError("Esta tarjeta usa Wallet principal y respaldo bancario de 15 minutos. Administra su respaldo en esa sección.", 409);
         }

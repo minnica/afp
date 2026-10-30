@@ -1,0 +1,16 @@
+{
+  "description": "Gramática de recibo Uber observada en Gmail; datos ficticios. No es un correo personal ni prueba de entrega Android.",
+  "event": {
+    "contractVersion": 1,
+    "eventId": "71a90ec9-a2fe-4b55-a78c-0f8b27749a65",
+    "sourcePackage": "com.google.android.gm",
+    "notificationKeyHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "postedAt": "2026-10-15T14:00:00Z",
+    "receivedAt": "2026-10-15T14:00:01Z",
+    "fields": {
+      "android.title": "Recibos de Uber",
+      "android.text": "Tu viaje del miércoles por la noche con Uber",
+      "android.bigText": "Tu viaje del miércoles por la noche con Uber\n14/10/2026\n6:21 p.m.\n14/10/2026 , 6:21 p.m.\nGracias por usar Uber, Persona ficticia\nEsperamos que hayas disfrutado tu viaje de esta noche.\nTotal\nMXN 160.25\nTarifa del viaje\nMXN 130.00\nCuota de solicitud\nMXN 30.25\nPagos\nVisa ••••0123 (Nombre editable)\nMXN 160.25\n14/10/26 6:50 p.m."
+    }
+  }
+}

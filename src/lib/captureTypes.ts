@@ -17,6 +17,7 @@ export interface CaptureParser {
   key: string; sourcePackage: string; verified: boolean; title?: string;
   evidence?: string; moneyOnly?: boolean; refundOnly?: boolean; paymentOnly?: boolean;
   aliasKinds?: string[]; aliasSourcePackage?: string; dateSource?: string;
+  aliasSourcePackages?: string[];
   completionPolicy?: string; policyRequiresSubscription?: boolean;
   rejectCrossBankAliasCollision?: boolean; evidenceOnly?: boolean; nonBlockingInObservation?: boolean;
 }

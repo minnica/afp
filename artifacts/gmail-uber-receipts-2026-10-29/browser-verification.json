@@ -1,0 +1,26 @@
+{
+  "fixture": "Auth ficticia y PostgreSQL local desechable",
+  "desktop": {
+    "width": 1280,
+    "overflow": false,
+    "receiptDateVisible": true,
+    "cardVisible": true
+  },
+  "mobile": {
+    "width": 390,
+    "overflow": false,
+    "receiptDateVisible": true,
+    "cardVisible": true
+  },
+  "registration": {
+    "date": "2026-10-14",
+    "amount": "160.25",
+    "card": "HSBC 1"
+  },
+  "activationAfterReconciliation": {
+    "status": 200,
+    "mode": "AUTOMATIC",
+    "datePolicy": "RECEIPT_OPERATION"
+  },
+  "browserErrors": 0
+}

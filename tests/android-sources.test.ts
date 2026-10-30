@@ -4,7 +4,7 @@ import { resolve } from 'node:path';
 import { test } from 'node:test';
 import { financialLoader as sourceLoader } from './helpers/financial-fixtures';
 
-test('Android and API accept the same eleven exact sources, including three services in review', () => {
+test('Android and API accept the same twelve exact sources, including Gmail receipts', () => {
   const root = resolve(__dirname, '..');
   const policy = readFileSync(resolve(root, 'android/app/src/main/java/com/garatachia/afp/CapturePolicy.kt'), 'utf8');
   const manifest = readFileSync(resolve(root, 'android/app/src/main/AndroidManifest.xml'), 'utf8');
@@ -14,7 +14,7 @@ test('Android and API accept the same eleven exact sources, including three serv
     'com.bancomer.mbanking', 'com.google.android.apps.walletnfcrel', 'mx.hsbc.hsbcmexico',
     'com.citibanamex.banamexmobile', 'mx.bancosantander.supermovil', 'com.nu.production',
     'com.didiglobal.cashloan', 'com.mercadopago.wallet',
-    'com.ubercab', 'com.didiglobal.passenger', 'com.ubercab.eats',
+    'com.ubercab', 'com.didiglobal.passenger', 'com.ubercab.eats', 'com.google.android.gm',
   ].sort();
   assert.deepEqual(allowed, expected);
   assert.deepEqual(visible, expected);

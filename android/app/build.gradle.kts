@@ -18,8 +18,8 @@ android {
         applicationId = "com.garatachia.afp"
         minSdk = 28
         targetSdk = 36
-        versionCode = 12
-        versionName = "0.8.1"
+        versionCode = 13
+        versionName = "0.9.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         manifestPlaceholders["webHost"] = "finanzas.garatachia.com"
         resValue("string", "web_url", "https://finanzas.garatachia.com/gastos")

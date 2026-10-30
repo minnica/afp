@@ -6,6 +6,30 @@ Consolidado el **27 de octubre de 2026** a partir del README del commit `4562aa0
 
 ## 2026-10-29
 
+### Recibos Uber desde notificaciones de Gmail: publicados e instalados
+
+Se añade Gmail como fuente optativa de Android, limitada a notificaciones de Recibos de Uber y sin consultar el buzón. El teléfono filtra antes de almacenar/enviar y retira la identificación de la cuenta. La interpretación conserva fecha del viaje, total MXN y terminación bancaria cuando están visibles; los recibos recortados requieren revisión. Se reutilizan los alias bancarios existentes y la activación por tarjeta tras una muestra propia cotejada.
+
+Al activar el formato se exige aceptar la asociación, que permite vincular un único cargo de Uber de igual tarjeta/importe dentro de 48 horas y usar el día del viaje aunque el banco avise después. Los recibos de propina actualizan un solo total; las dudas, gastos editados/conciliados/borrados y reducciones conservan revisión. La asociación es una inferencia por datos coincidentes, no una referencia bancaria compartida. La migración aditiva amplía la política de fecha sin activar reglas ni reinterpretar el historial.
+
+Pasan 1025 escenarios con PostgreSQL local, sin omisiones, y la reconstrucción/actualización de 43 migraciones conserva checksums, registros y RLS. La APK 0.9.0 / 13 usa la firma existente; pasan 28 pruebas JVM y dos instrumentadas en el teléfono, con una integración HTTPS JVM opcional omitida.
+
+Con autorización explícita se respaldaron la BD, las firmas y la APK anterior, se aplicó la migración y se publicó `dpl_G4R1V1GR2uYK2pa9rMXgKBihWeaG`, `READY` en el dominio AFP. La publicación por API contiene el código del workspace probado, sobre la base `1157e942868901eefa262f3c1a081f597b21966c`; no se atribuye a ese commit el contenido sin confirmar. Coinciden las 156 huellas expuestas por el árbol remoto, incluidos los 29 módulos de captura. La API limita la profundidad y el contenido de archivos; no se presenta esa comprobación parcial como la verificación independiente de los 408 archivos cargados.
+
+Se actualizó la instalación personal por USB sin desinstalar, conservando identidad, autorización, permiso del lector y cola: 0 pendientes, 0 por revisar y 992 entregados. Se seleccionó Gmail expresamente y el reporte autenticado confirmó las doce fuentes, lector conectado y captura/envíos activos. Hay 43 migraciones completas, cero pendientes, 45 tablas con RLS y las 37 tablas financieras/de configuración comprobadas se conservaron. No se activaron reglas Gmail por tarjeta ni se corrigieron/importaron viajes anteriores. Falta observar y cotejar un recibo real completo entregado como notificación. [Evidencia y límites](../artifacts/gmail-uber-receipts-2026-10-29/README.md).
+
+### Google Wallet con BBVA: notificaciones intermitentes o tardías
+
+**Incidencia documentada, causa de la ausencia o demora de avisos sin determinar.** Una compra en la app de Cinemex mediante Google Pay con BBVA, realizada el 28 de octubre, figuraba en el historial de Wallet como «Compra en línea», pero no tenía un aviso del cargo recibido en AFP durante la revisión del 29 de octubre. El propietario confirmó que el cargo aparece en BBVA y que no vio notificación. El teléfono conservaba permisos, lector conectado, captura y envíos activos, sin fuentes pausadas; la regla Wallet de BBVA estaba en Automático.
+
+Otra compra similar con Banamex 2 sí generó avisos tanto del banco como de Wallet. AFP registró automáticamente el gasto desde Wallet unos cinco segundos después de publicarse ese aviso; el bancario quedó como posible duplicado, sin crear otro gasto. La diferencia comprobada es la recepción de notificaciones del cargo; comprar dentro de una app no explica por sí solo que falte un aviso.
+
+**Observación del propietario:** en compras con Google Wallet pagando con BBVA, a veces recibe notificación, a veces no y a veces tarda hasta un día. Esta variabilidad se conserva como reporte de uso, sin una serie medida ni una frecuencia establecida. No se confirmó una notificación posterior para la compra de Cinemex investigada. La ausencia de un evento en AFP no demuestra por sí sola que Google o BBVA nunca emitieran el aviso, ni permite atribuirles la causa concreta.
+
+AFP depende de las notificaciones y no consulta los historiales bancarios o de Wallet. La política BBVA Wallet vigente usa el día de publicación del aviso en México; si se publica al día siguiente, puede proponer ese día como fecha del gasto. Si se retoma el caso, distinguir compra, publicación y recepción antes de atribuir una demora a AFP. [Antecedente y política de fecha](android-captura.md#bbva-platinum-por-wallet--publicada-y-habilitada).
+
+El propietario decidió conservar el comportamiento actual y dejar únicamente este seguimiento, sin programar vigilancia ni cambios de captura. La investigación fue de lectura, sin modificar datos financieros ni reglas. Los importes personales y la cronología detallada quedan fuera de Git en `estados_cuenta/_soporte/respaldos-y-revisiones/captura-wallet-bbva-2026-10-29/incidencia.md`.
+
 ### Compras a meses: destinatario y detalle de pagos recibidos
 
 Los badges de destinatario distinguen ahora las compras propias en azul y las realizadas para otras personas en violeta, conservando texto e iconos. Las variantes de Badge usan tokens propios para claro y oscuro y se comparten entre escritorio y móvil. Se mantiene la revisión visual manual solicitada por el propietario, sin navegador ni capturas. [Alcance y controles técnicos de color](../artifacts/installment-recipient-colors-2026-10-29/README.md).
@@ -444,6 +468,7 @@ Estos puntos conservan el estado de la evidencia citada; antes de retomarlos, co
 
 | Tema | Último estado documentado | Evidencia |
 | --- | --- | --- |
+| Avisos Wallet con BBVA | Incidencia del 29 de octubre: compras con avisos recibidos, ausentes o demorados hasta un día según el propietario. Diferencia de recepción comprobada frente a Banamex 2; causa de la variabilidad sin determinar. Se conserva el comportamiento actual por decisión del propietario | [Caso y límites de la evidencia](#google-wallet-con-bbva-notificaciones-intermitentes-o-tardías) |
 | Dependencias | Actualización A10 publicada en `08aee7c`; últimas auditorías locales: cero avisos del árbol de producción y uno bajo de desarrollo, deepmerge sin parche en la consulta. Seguimiento del aviso y ambas auditorías antes de la siguiente publicación | [Auditorías](../artifacts/auditoria-2026-10-15/a10-2026-10-29/README.md) · [Publicación](../artifacts/auditoria-2026-10-15/publicacion-2026-10-29/README.md) |
 | Nómina automática | Solicitada, sin regla implementada ni activa al 27 de octubre. Falta una notificación Android que permita verificar importe real, fecha y terminación; el buzón interno bancario no demuestra esos campos | README histórico, sección «Automatización de nómina solicitada», recuperable con el comando indicado abajo |
 | Avisos importantes Android | Backend publicado y APK instalada; faltaba activar la opción, conceder permiso y confirmar recepción | [Cierre del 26 de octubre](../artifacts/android-important-notices/production.json) |

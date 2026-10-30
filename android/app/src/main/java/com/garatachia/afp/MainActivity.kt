@@ -227,6 +227,7 @@ class MainActivity : ComponentActivity() {
                         Text("Solo se leen estas fuentes seleccionadas. Se excluyen resúmenes agrupados, códigos de acceso reconocibles y promociones explícitas. Un formato desconocido se conserva para revisión. Una actualización del aviso no representa necesariamente otra compra.")
                         Text("HSBC y Banamex pueden emitir avisos de varias tarjetas; Wallet puede representar tarjetas de varios bancos. Capturar un aviso no identifica todavía cuál se usó ni activa registros automáticos.")
                         Text("Uber, DiDi viajes y Uber Eats: los avisos se guardan para revisar sus formatos. Todavía no registran gastos automáticamente. DiDi viajes es una fuente distinta de DiDi Finanzas.")
+                        Text("Gmail: solo se conservan notificaciones de Recibos de Uber con el asunto del viaje. No se consultan correos anteriores. El registro automático exige fecha, total y terminación verificada de tarjeta visibles, y activar el formato por tarjeta en AFP. Los recibos recortados quedan por revisar.")
                         if (selected.isEmpty()) Text("No hay fuentes seleccionadas. El lector no guardará avisos.")
                     }
                 }

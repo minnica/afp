@@ -21,7 +21,7 @@ class ServiceSourcesScreenTest {
         require(context.packageName.endsWith(".dev"))
         assertTrue(BindingStore(context).read().isEmpty())
         val app = context.applicationContext as CaptureApplication
-        val services = setOf("com.ubercab", "com.didiglobal.passenger", "com.ubercab.eats")
+        val services = setOf("com.ubercab", "com.didiglobal.passenger", "com.ubercab.eats", GmailReceiptPolicy.source)
         val previous = app.selected
         val activeBefore = app.active
         val expected = (CapturePolicy.sources.keys - services).toMutableSet()

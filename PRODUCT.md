@@ -24,6 +24,8 @@ Mi dinero incorpora cuentas, conciliaciones, transferencias, asignación de movi
 
 ## Evidence on Hand
 
+La captura Android incorpora recibos de Uber desde notificaciones de Gmail como fuente optativa, publicada e instalada en la APK 0.9.0. Usa fecha e importe explícitos del recibo y terminaciones bancarias verificadas; los avisos recortados requieren revisión. La asociación con cargos bancarios y las propinas conservan evidencia, controles de duplicidad y decisiones personales. No consulta el buzón ni recupera correos históricos. Gmail está seleccionado en el teléfono personal; falta observar una notificación real completa y cotejarla antes de habilitar el formato por tarjeta.
+
 README.md, prisma/schema.prisma y los módulos financieros existentes. Los datos financieros reales no se sustituyen por ejemplos; las pruebas usan datos ficticios aislados.
 
 ## Product Principles

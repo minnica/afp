@@ -21,6 +21,8 @@ import { completeMoneyCapture, automateMoneyCapture, resolveMoneyCapture } from 
 import { correctDebitCapture } from "@/lib/captureDebitCorrections";
 import { refundCaptureKind } from "@/lib/captureRefundParsers";
 import { completeRefundIdentity, resolveCaptureRefund } from "@/lib/captureRefunds";
+import { uberReceiptParserKey } from './gmailUberReceipts';
+import { rememberUberExpense, settleUberCapture } from './uberCapture';
 
 export async function archiveCapturedExpense(tx: Prisma.TransactionClient, expense: DailyExpense) {
   await tx.expenseTombstone.upsert({ where: { expenseId: expense.id }, update: {}, create: {
@@ -48,12 +50,17 @@ export async function captureCandidates(tx: CaptureDb, userId: string, proposal:
   const installments = await tx.installmentPurchase.findMany({ where: { userId, cardId: proposal.cardId, totalAmount: proposal.amount, purchaseDate: where.date }, select: { id: true, concept: true } });
   const deleted = await tx.expenseTombstone.findMany({ where, select: { expenseId: true, concept: true, date: true, amount: true } });
   const movements = await tx.captureMovement.findMany({ where: { userId, cardId: proposal.cardId, amount: proposal.amount,
-    operationDate: { gte: new Date(where.date.gte.getTime() - 86400000), lt: new Date(where.date.lt.getTime() + 86400000) } },
+    operationDate: { gte: new Date(where.date.gte.getTime() - 2 * 86400000), lt: new Date(where.date.lt.getTime() + 2 * 86400000) } },
     select: { id: true, expenseId: true, originalExpenseId: true, installmentPurchaseId: true, status: true, reason: true, parserKey: true, correction: true, proposal: true, operationDate: true } });
   const time = purchaseTime(proposal), source = captureParsers.find(parser => parser.key === parserKey)?.sourcePackage;
   const nearbyMovements = movements.filter(row => {
-    if (row.operationDate && row.operationDate >= where.date.gte && row.operationDate < where.date.lt) return true;
     const previous = captureProposal(row.proposal), previousTime = purchaseTime(previous);
+    if (parserKey === uberReceiptParserKey && row.parserKey === uberReceiptParserKey
+      && proposal.uberReceipt && previous.uberReceipt && proposal.uberReceipt.tripAt !== previous.uberReceipt.tripAt) return false;
+    if (row.operationDate && row.operationDate >= where.date.gte && row.operationDate < where.date.lt) return true;
+    if ((parserKey === uberReceiptParserKey || row.parserKey === uberReceiptParserKey)
+      && time !== null && previousTime !== null && Math.abs(time - previousTime) <= 48 * 3600000
+      && /(?:^|[^A-Z])UBER(?:[^A-Z]|$)/i.test(`${proposal.merchant} ${previous.merchant}`)) return true;
     // Avisos a ambos lados de medianoche siguen siendo candidatos si sus horas
     // distan como máximo 15 minutos; repetir una compra al día siguiente no basta.
     if (time !== null && previousTime !== null && Math.abs(time - previousTime) <= 15 * 60000) return true;
@@ -112,7 +119,7 @@ async function captureInterpretationState(tx: Prisma.TransactionClient, event: C
     if (observationOnly || !interpretation.verified || automation?.mode !== "AUTOMATIC") {
       status = "OBSERVED";
       reason = interpretation.verified ? "OBSERVATION" : "UNVERIFIED_FORMAT";
-    } else if (parser?.dateSource === "NOTIFICATION_POSTED_AT" && automation.datePolicy !== "NOTIFICATION_POSTED_AT") {
+    } else if (["NOTIFICATION_POSTED_AT", "RECEIPT_OPERATION"].includes(parser?.dateSource || '') && automation.datePolicy !== parser?.dateSource) {
       reason = "DATE_POLICY_REQUIRED";
     }
   }
@@ -141,7 +148,7 @@ export async function processCaptureEvent(tx: Prisma.TransactionClient, event: C
     const revision = await tx.captureEvent.findFirst({ where: { userId: event.userId, deviceId: event.deviceId,
       sourcePackage: event.sourcePackage, notificationKeyHash: event.notificationKeyHash, id: { not: event.id },
     } });
-    if (["PURCHASE", "BANK_FALLBACK_WAIT"].includes(reason) && revision) reason = "NOTIFICATION_REVISION";
+    if (["PURCHASE", "BANK_FALLBACK_WAIT"].includes(reason) && revision && parserKey !== uberReceiptParserKey) reason = "NOTIFICATION_REVISION";
     const candidates = await captureCandidates(tx, event.userId, proposal, parserKey);
     if (candidates.length) {
       proposal = { ...proposal, candidates };
@@ -155,7 +162,11 @@ export async function processCaptureEvent(tx: Prisma.TransactionClient, event: C
     operationDate: proposal.date ? new Date(`${proposal.date}T12:00:00.000Z`) : null,
     resolvedAt: status === "DISCARDED" ? new Date() : null,
   } });
-  if (reason === "PURCHASE") await registerCaptureMovement(tx, movement, false);
+  if (state.reason === 'PURCHASE' && ['PURCHASE', 'POSSIBLE_DUPLICATE'].includes(reason)) {
+    const settled = await settleUberCapture(tx, event, movement);
+    if (settled) movement = settled;
+    else if (reason === 'PURCHASE') movement = await registerCaptureMovement(tx, movement, false);
+  }
   if (paymentCaptureKind(movement)) movement = await automateCapturePayment(tx, event, movement);
   if (moneyCaptureKind(movement) || accountDebitNotice(movement)) movement = await automateMoneyCapture(tx, event, movement);
   await tx.captureEvent.update({ where: { id: event.id }, data: {
@@ -274,6 +285,7 @@ async function captureExpenseData(tx: Prisma.TransactionClient, movement: Moveme
 }
 
 export async function registerCaptureMovement(tx: Prisma.TransactionClient, movement: Movement, distinct: boolean) {
+  if (movement.reason === 'UBER_RECEIPT_CHANGED') throw new ApiAccessError('Este recibo modifica un viaje existente. Revisa y edita ese gasto antes de vincularlo; no crees otro.', 409);
   if (refundCaptureKind(movement)) throw new ApiAccessError("Una devolución se aplica a un gasto existente; no crea otro gasto.", 409);
   if (paymentCaptureKind(movement)) throw new ApiAccessError("Este aviso corresponde a un pago o cargo de cuenta. Usa la revisión de pagos de tarjeta.", 409);
   const p = effectiveCapture(movement);
@@ -284,8 +296,9 @@ export async function registerCaptureMovement(tx: Prisma.TransactionClient, move
   const { data, reason } = await captureExpenseData(tx, movement);
   if (reason) return tx.captureMovement.update({ where: { id: movement.id }, data: { status: "REVIEW", reason } });
   const { expense } = await createExpenseInTransaction(tx, movement.userId, data, { id: true }, "PENDING");
-  return tx.captureMovement.update({ where: { id: movement.id }, data: { status: "REGISTERED", reason: distinct ? "USER_DISTINCT" : "AUTOMATIC",
+  const registered = await tx.captureMovement.update({ where: { id: movement.id }, data: { status: "REGISTERED", reason: distinct ? "USER_DISTINCT" : "AUTOMATIC",
     expenseId: expense!.id, originalExpenseId: expense!.id, fallbackDueAt: null, resolvedAt: new Date() } });
+  return rememberUberExpense(tx, registered);
 }
 
 export async function resolveCaptureMovement(db: PrismaClient, userId: string, rawInput: unknown) {
