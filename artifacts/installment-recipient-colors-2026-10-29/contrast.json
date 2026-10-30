@@ -1,0 +1,33 @@
+{
+  "metodo": "Cálculo numérico de luminancia de los tokens OKLCH; no es una comprobación del render ni una validación visual.",
+  "pares": [
+    {
+      "tema": "claro",
+      "destinatario": "personal",
+      "fondo": "oklch(0.94 0.035 250)",
+      "texto": "oklch(0.49 0.15 250)",
+      "contraste_numerico": 5.22
+    },
+    {
+      "tema": "claro",
+      "destinatario": "other",
+      "fondo": "oklch(0.94 0.035 300)",
+      "texto": "oklch(0.49 0.14 300)",
+      "contraste_numerico": 5.54
+    },
+    {
+      "tema": "oscuro",
+      "destinatario": "personal",
+      "fondo": "oklch(0.32 0.055 250)",
+      "texto": "oklch(0.8 0.1 250)",
+      "contraste_numerico": 6.81
+    },
+    {
+      "tema": "oscuro",
+      "destinatario": "other",
+      "fondo": "oklch(0.32 0.055 300)",
+      "texto": "oklch(0.8 0.11 300)",
+      "contraste_numerico": 6.69
+    }
+  ]
+}

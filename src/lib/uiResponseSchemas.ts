@@ -611,7 +611,8 @@ const installmentPurchasesPurchasesItemPersonSchema = z.object({
 
 const installmentPurchasesPurchasesItemReceivableAccountSchema = z.object({
   "id": z.string(),
-  "concept": z.string()
+  "concept": z.string(),
+  "person": installmentPurchasesPurchasesItemPersonSchema.optional()
 }).passthrough();
 
 const installmentPurchasesPurchasesItemCaptureMovementsItemEventsItemSchema = z.object({
@@ -1690,6 +1691,7 @@ export const uiResponseSchemas = {
 "subscriptions": subscriptionsSchema,
 "subscription-charges": z.union([subscriptionChargesSchema, subscriptionChargesSchema2, subscriptionChargesSchema3, subscriptionChargesSchema4]),
 "installment-purchases": installmentPurchasesSchema,
+"installment-purchases/payments": z.object({ purchase: z.object({ id: z.string(), concept: z.string() }), receivable: receivablesReceivablesItemSchema.nullable() }),
 "receivables": receivablesSchema,
 "payables": payablesSchema,
 "dashboard": dashboardSchema,

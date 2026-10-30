@@ -72,9 +72,9 @@ test('PostgreSQL: contratos JSON de todos los flujos financieros, variantes y pa
     await call('expenses', 'POST', { ...common, paymentMethod: 'DEBIT' as const, debitAccountId: account.id });
     const { subscription } = await call('subscriptions', 'POST', { name: 'Cobro mensual', amount: '25.10', paymentMethod: 'CASH' as const, categoryId: category.id, chargeDay: 1, startMonth: 1, startYear: 2020 });
     await call('subscription-charges', 'POST', { subscriptionId: record(subscription).id, action: 'confirm', month, today });
-    await call('installment-purchases', 'POST', { concept: 'Compra', cardId: record(card).id, categoryId: category.id, purchaseDate: today, totalAmount: '120.60', months: 6 });
+    const { purchase } = await call('installment-purchases', 'POST', { concept: 'Compra', cardId: record(card).id, categoryId: category.id, purchaseDate: today, totalAmount: '120.60', months: 6 });
     for (const resource of Object.keys(financialReadSchemas)) {
-      await call(resource, 'GET', undefined, resource === 'subscription-charges' ? `month=${month}&today=${today}` : resource === 'notice-dismissals' ? `month=${month}` : '');
+      await call(resource, 'GET', undefined, resource === 'subscription-charges' ? `month=${month}&today=${today}` : resource === 'notice-dismissals' ? `month=${month}` : resource === 'installment-purchases/payments' ? `purchaseId=${record(purchase).id}` : '');
     }
     // Reader validation must catch a truncated response before it reaches JSX.
     assert.throws(() => validateFinancialResponse('/api/expenses', 'GET', { expenses: [], total: 0 }));

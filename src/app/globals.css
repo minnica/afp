@@ -208,6 +208,10 @@ body:has([data-slot="record-create-panel"]) [data-sonner-toaster][data-y-positio
   --color-destructive: var(--destructive);
   --color-warning: var(--warning);
   --color-success: var(--success);
+  --color-purchase-personal: var(--purchase-personal);
+  --color-purchase-personal-foreground: var(--purchase-personal-foreground);
+  --color-purchase-other: var(--purchase-other);
+  --color-purchase-other-foreground: var(--purchase-other-foreground);
   --color-notice-category: var(--notice-category, var(--muted-foreground));
   --color-notice-surface: var(--notice-category-surface, var(--card));
   --color-notice-urgency: var(--notice-urgency, var(--warning));
@@ -257,6 +261,10 @@ body:has([data-slot="record-create-panel"]) [data-sonner-toaster][data-y-positio
   --destructive-foreground: oklch(0.985 0 0);
   --warning: oklch(0.555 0.163 48.998);
   --success: oklch(0.508 0.118 165.612);
+  --purchase-personal: oklch(0.94 0.035 250);
+  --purchase-personal-foreground: oklch(0.49 0.15 250);
+  --purchase-other: oklch(0.94 0.035 300);
+  --purchase-other-foreground: oklch(0.49 0.14 300);
   --notice-card: oklch(0.49 0.15 250);
   --notice-payable: oklch(0.49 0.16 15);
   --notice-receivable: oklch(0.46 0.1 165);
@@ -310,6 +318,10 @@ body:has([data-slot="record-create-panel"]) [data-sonner-toaster][data-y-positio
   --destructive-foreground: oklch(0.985 0 0);
   --warning: oklch(0.828 0.189 84.429);
   --success: oklch(0.765 0.177 163.223);
+  --purchase-personal: oklch(0.32 0.055 250);
+  --purchase-personal-foreground: oklch(0.8 0.1 250);
+  --purchase-other: oklch(0.32 0.055 300);
+  --purchase-other-foreground: oklch(0.8 0.11 300);
   --notice-card: oklch(0.8 0.1 250);
   --notice-payable: oklch(0.79 0.12 15);
   --notice-receivable: oklch(0.8 0.12 165);

@@ -1,44 +1,8 @@
-import type { Prisma } from "@prisma/client";
 import { readFinancialInput } from "@/lib/financialContracts";
 import { apiResponse as NextResponse, requireApiUser, apiAccessErrorResponse, requireOwnedReferences } from "@/lib/apiAuth";
 import { runDebtAccountOperation, refreshDebtAccount } from "@/lib/debtAccountService";
-import { getDebtAccountState } from "@/lib/calculations/debtAccounts";
+import { formatReceivable, receivableSelect } from "@/lib/receivableAccounts";
 import { prisma } from "@/lib/prisma";
-
-const receivableSelect = {
-  id: true,
-  userId: true,
-  personId: true,
-  concept: true,
-  originalAmount: true,
-  balanceAdjustment: true,
-  balanceAdjustmentNotes: true,
-  originDate: true,
-  expectedMonthlyPayment: true,
-  expectedChargeDays: true,
-  notes: true,
-  status: true,
-  originType: true,
-  originId: true,
-  createdAt: true,
-  updatedAt: true,
-  person: {
-    select: {
-      id: true,
-      name: true,
-    },
-  },
-  incomes: {
-    select: {
-      id: true,
-      date: true,
-      source: true,
-      concept: true,
-      amount: true,
-      notes: true,
-    },
-  },
-} satisfies Prisma.ReceivableAccountSelect;
 
 function parseDateInput(dateValue: string | null | undefined) {
   if (!dateValue) return null;
@@ -72,10 +36,6 @@ function parseExpectedChargeDays(value: unknown) {
     days: uniqueDays,
     error: "",
   };
-}
-
-function formatReceivable(item: Prisma.ReceivableAccountGetPayload<{ select: typeof receivableSelect }>) {
-  return { ...item, ...getDebtAccountState(item, item.incomes) };
 }
 
 export async function GET(request: Request) {

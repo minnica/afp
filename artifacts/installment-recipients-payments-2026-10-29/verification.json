@@ -1,0 +1,26 @@
+{
+  "status": "VERIFICADO_TECNICAMENTE",
+  "tests": {
+    "passed": 1007,
+    "failed": 0,
+    "skipped": 0,
+    "database": "PostgreSQL local desechable"
+  },
+  "checks": {
+    "typecheck": 0,
+    "typecheckTests": 0,
+    "typeContracts": 0,
+    "lint": 0,
+    "tests": 0,
+    "build": 0
+  },
+  "priorLintWarnings": 2,
+  "mechanicalDetectorFindings": 0,
+  "visualValidation": false,
+  "screenshots": false,
+  "browserOpened": false,
+  "productionWrites": 0,
+  "newMigrations": 0,
+  "published": false,
+  "testContainerRemoved": true
+}

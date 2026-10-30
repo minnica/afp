@@ -23,6 +23,13 @@ test('una respuesta incompleta entra en recuperación antes de entregarse a la p
   const { uiFetch } = client({ categories: [] });
   await assert.rejects(uiFetch('/api/settings?userId=owner', { errorMode: 'inline' }), error => objectValue(error).kind === 'invalid');
 });
+test('el cliente valida el detalle de pagos MSI y conserva una cuenta no vinculada', async () => {
+  const body = { purchase: { id: 'purchase', concept: 'Equipo ficticio' }, receivable: null, metadata: { version: 1 } };
+  const valid = client(body);
+  assert.deepEqual(await (await valid.uiFetch('/api/installment-purchases/payments?purchaseId=purchase', { errorMode: 'inline' })).json(), body);
+  const invalid = client({ ...body, receivable: { incomes: [] } });
+  await assert.rejects(invalid.uiFetch('/api/installment-purchases/payments?purchaseId=purchase', { errorMode: 'inline' }), error => objectValue(error).kind === 'invalid');
+});
 test('el contrato de interfaz acepta propuestas históricas parciales y rechaza importes estructurados', () => {
   const { schemas } = client({});
   assert.deepEqual(schemas['captures/movements'].parse({ movements: [], pendingCounts: {}, nextCursor: null }).movements, []);

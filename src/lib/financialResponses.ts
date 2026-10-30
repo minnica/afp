@@ -37,6 +37,7 @@ export const financialReadSchemas = {
   subscriptions: z.object({ subscriptions: z.array(subscriptionResponseSchema), total: z.number() }),
   'subscription-charges': z.object({ charges: z.array(charge) }),
   'installment-purchases': z.object({ purchases: z.array(purchaseResponseSchema) }),
+  'installment-purchases/payments': z.object({ purchase: z.object({ id, concept: z.string() }), receivable: receivableResponseSchema.nullable() }),
   receivables: z.object({ receivables: z.array(receivableResponseSchema) }),
   payables: z.object({ payables: z.array(payableResponseSchema) }),
   'gastos/bootstrap': z.object({ categories: z.array(named), people: z.array(named), cards: z.array(cardResponseSchema), expenses: z.array(expenseResponseSchema), availableMonths: z.array(z.string()), receivables: z.array(receivableResponseSchema), payables: z.array(payableResponseSchema), subscriptions: z.array(subscriptionResponseSchema), moneyAccounts: z.array(named) }),

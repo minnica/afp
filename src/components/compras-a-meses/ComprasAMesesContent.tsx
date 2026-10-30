@@ -22,11 +22,15 @@ import { useDialogFocus } from "@/hooks/use-dialog-focus";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 import { getLatestInstallmentStatement } from "@/lib/calculations/installmentStatements";
+import { getInstallmentRecipient, matchesInstallmentRecipient } from "@/lib/installmentRecipients";
+import PurchaseRecipient from "@/components/compras-a-meses/PurchaseRecipient";
+import PurchasePaymentsSheet from "@/components/compras-a-meses/PurchasePaymentsSheet";
 import { supabase } from "@/lib/supabase";
 import { ensureUserSetup } from "@/lib/userSetup";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { Pencil, Trash2 } from "lucide-react";
+import { Delete02Icon, Invoice01Icon, PencilEdit01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
@@ -45,6 +49,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
 CardContent,
+CardDescription,
 CardHeader,
 CardTitle
 } from "@/components/ui/card";
@@ -147,6 +152,8 @@ export default function ComprasAMesesContent() {
   const [categories, setCategories] = useState<NamedRecord[]>([]);
   const [people, setPeople] = useState<NamedRecord[]>([]);
   const [purchases, setPurchases] = useState<Purchase[]>([]);
+  const [recipientFilter, setRecipientFilter] = useState("all");
+  const [paymentsPurchase, setPaymentsPurchase] = useState<Purchase | null>(null);
 
   const [cardId, setCardId] = useState("");
   const [purchaseDate, setPurchaseDate] = useState(getTodayInputValue());
@@ -429,13 +436,29 @@ export default function ComprasAMesesContent() {
     }
   }
 
-  const activePurchases = useMemo(() => {
-    return purchases.filter((purchase) => purchase.status === "ACTIVE");
+  const filteredPurchases = useMemo(() => purchases.filter(purchase => matchesInstallmentRecipient(purchase, recipientFilter)), [purchases, recipientFilter]);
+
+  const recipientOptions = useMemo(() => {
+    const recipients = new Map<string, string>();
+    for (const purchase of purchases) {
+      const recipient = getInstallmentRecipient(purchase);
+      if (!recipient.isPersonal && recipient.personId) recipients.set(`person:${recipient.personId}`, recipient.label);
+    }
+    return [
+      { value: "all", label: "Todas las compras" },
+      { value: "personal", label: "Para mí" },
+      { value: "others", label: "Para otras personas" },
+      ...Array.from(recipients, ([value, label]) => ({ value, label })).sort((a, b) => a.label.localeCompare(b.label, "es")),
+    ];
   }, [purchases]);
 
+  const activePurchases = useMemo(() => {
+    return filteredPurchases.filter((purchase) => purchase.status === "ACTIVE");
+  }, [filteredPurchases]);
+
   const paidOffPurchases = useMemo(() => {
-    return purchases.filter((purchase) => purchase.status === "PAID_OFF");
-  }, [purchases]);
+    return filteredPurchases.filter((purchase) => purchase.status === "PAID_OFF");
+  }, [filteredPurchases]);
 
   const calculatedMonthlyPayment = useMemo(() => {
     const numericTotal = Number(totalAmount || 0);
@@ -455,15 +478,24 @@ export default function ComprasAMesesContent() {
       return (
         <RecordCard
           title={purchase.concept}
-          subtitle={purchase.card?.name}
+          subtitle={<span className="flex flex-wrap items-center gap-2"><PurchaseRecipient purchase={purchase} /><span>{purchase.card?.name}</span></span>}
           badges={<><Badge variant="outline">{statusLabel}</Badge><CaptureStatus record={purchase} /></>}
           amount={formatMoney(purchase.monthlyPaymentUsed)}
-          amountLabel="Mensualidad"
-          actions={<RecordActions label={`compra: ${purchase.concept}`} onEdit={() => startEditingPurchase(purchase)} onDelete={() => setPurchaseToDelete(purchase)} />}
+          amountLabel="Mensualidad bancaria"
+          actions={
+            <RecordActions label={`compra: ${purchase.concept}`} onEdit={() => startEditingPurchase(purchase)} onDelete={() => setPurchaseToDelete(purchase)}>
+              {!getInstallmentRecipient(purchase).isPersonal ? (
+                <Button type="button" variant="outline" className="h-11" aria-label={`Ver pagos recibidos de ${purchase.concept}: ${getInstallmentRecipient(purchase).label}`} onClick={() => setPaymentsPurchase(purchase)}>
+                  <HugeiconsIcon icon={Invoice01Icon} data-icon="inline-start" aria-hidden="true" />
+                  Ver pagos
+                </Button>
+              ) : null}
+            </RecordActions>
+          }
         >
           {purchase.category?.name ? <Badge variant="secondary" className="h-auto max-w-full whitespace-normal break-words">{purchase.category.name}</Badge> : null}
           <dl className="grid grid-cols-2 gap-3">
-            <RecordField label="Saldo pendiente">{formatMoney(purchase.remainingBalance)}</RecordField>
+            <RecordField label="Pendiente en tarjeta">{formatMoney(purchase.remainingBalance)}</RecordField>
             <RecordField label="Próximo pago">{nextPayment ? format(nextPayment, "d MMM yyyy", { locale: es }) : "Sin próximo pago"}</RecordField>
             <RecordField label="Total de la compra">{formatMoney(purchase.totalAmount)}</RecordField>
             <RecordField label="Fecha de compra">{formatDate(purchase.purchaseDate)}</RecordField>
@@ -473,12 +505,11 @@ export default function ComprasAMesesContent() {
             <Progress value={Math.min(100, Math.max(0, Number(purchase.currentMonth || 0) / Math.max(1, Number(purchase.months)) * 100))} aria-label={`Avance de cuotas: ${purchase.concept}`} aria-valuetext={`Cuota ${purchase.currentMonth} de ${purchase.months}`} />
           </div>
           {purchase.verifiedStatementDate ? <RecordNote>Estado de cuenta: {format(new Date(purchase.verifiedStatementDate + "-01T12:00:00Z"), "MMM yyyy", { locale: es })}</RecordNote> : null}
-          {purchase.person?.name ? <RecordNote>Por cobrar a {purchase.person.name}</RecordNote> : null}
           <RecordNote>{purchase.notes}</RecordNote>
         </RecordCard>
       );
     },
-    mobileToolbar: (table) => <RecordListToolbar table={table} label="compras" totals={[{ key: "monthlyPaymentUsed", label: "Mensualidades" }, { key: "totalAmount", label: "Total de compras" }, { key: "remainingBalance", label: "Saldo pendiente" }]} />,
+    mobileToolbar: (table) => <RecordListToolbar table={table} label="compras" totals={[{ key: "monthlyPaymentUsed", label: "Cuotas bancarias" }, { key: "totalAmount", label: "Total de compras" }, { key: "remainingBalance", label: "Pendiente en tarjeta" }]} />,
   };
 
   const purchaseColumns = useMemo<ColumnDef<RowModel>[]>(
@@ -497,13 +528,23 @@ export default function ComprasAMesesContent() {
         ),
       },
       {
-        accessorKey: "concept",
+        id: "concept",
+        accessorFn: purchase => `${purchase.concept} ${getInstallmentRecipient(purchase).label}`,
         header: "Concepto",
         cell: ({ row }) => {
           const purchase = row.original;
           return (
-            <div className="min-w-0">
-              <p className="font-medium">{purchase.concept}</p>
+            <div className="flex min-w-0 flex-col items-start gap-1">
+              <p className="break-words font-medium">{purchase.concept}</p>
+              <div className="flex flex-wrap items-center gap-2">
+                <PurchaseRecipient purchase={purchase} />
+                {!getInstallmentRecipient(purchase).isPersonal ? (
+                  <Button type="button" variant="link" className="h-9 px-0" aria-label={`Ver pagos recibidos de ${purchase.concept}: ${getInstallmentRecipient(purchase).label}`} onClick={() => setPaymentsPurchase(purchase)}>
+                    <HugeiconsIcon icon={Invoice01Icon} data-icon="inline-start" aria-hidden="true" />
+                    Ver pagos
+                  </Button>
+                ) : null}
+              </div>
               <CaptureStatus record={purchase} />
               {purchase.verifiedStatementDate ? (
                 <p className="text-xs text-muted-foreground">
@@ -516,11 +557,6 @@ export default function ComprasAMesesContent() {
               ) : null}
               {purchase.notes ? (
                 <p className="text-xs text-muted-foreground">{purchase.notes}</p>
-              ) : null}
-              {purchase.person ? (
-                <p className="text-xs text-muted-foreground">
-                  {purchase.person.name}
-                </p>
               ) : null}
             </div>
           );
@@ -585,7 +621,7 @@ export default function ComprasAMesesContent() {
       },
       {
         accessorKey: "monthlyPaymentUsed",
-        header: "Mensualidad",
+        header: "Cuota bancaria",
         cell: ({ row }) => (
           <span className="whitespace-nowrap font-semibold tabular-nums">
             {formatMoney(row.original.monthlyPaymentUsed)}
@@ -603,7 +639,7 @@ export default function ComprasAMesesContent() {
       },
       {
         accessorKey: "remainingBalance",
-        header: "Pendiente",
+        header: "Pendiente en tarjeta",
         cell: ({ row }) => (
           <span className="whitespace-nowrap font-semibold tabular-nums">
             {formatMoney(row.original.remainingBalance)}
@@ -622,7 +658,7 @@ export default function ComprasAMesesContent() {
               size="icon"
               onClick={() => startEditingPurchase(row.original)}
             >
-              <Pencil className="h-4 w-4" />
+              <HugeiconsIcon icon={PencilEdit01Icon} aria-hidden="true" />
             </Button>
             <Button aria-label="Eliminar"
               type="button"
@@ -630,7 +666,7 @@ export default function ComprasAMesesContent() {
               size="icon"
               onClick={() => setPurchaseToDelete(row.original)}
             >
-              <Trash2 className="h-4 w-4" />
+              <HugeiconsIcon icon={Delete02Icon} aria-hidden="true" />
             </Button>
           </div>
         ),
@@ -682,6 +718,15 @@ export default function ComprasAMesesContent() {
 
   return (
     <>
+      {paymentsPurchase && user ? (
+        <PurchasePaymentsSheet
+          key={`${user.id}:${paymentsPurchase.id}`}
+          purchase={paymentsPurchase}
+          userId={user.id}
+          onClose={() => setPaymentsPurchase(null)}
+          onCloseAutoFocus={restoreFocus}
+        />
+      ) : null}
       <AlertDialog
         open={Boolean(purchaseToDelete)}
         onOpenChange={(open) => {
@@ -1013,16 +1058,28 @@ export default function ComprasAMesesContent() {
               </div>
             </CreateRecordSurface>
 
-            <RecordListCard>
+            <RecordListCard className="min-w-0">
               <CardHeader>
-                <CardTitle className="text-lg font-semibold uppercase text-center">
-                  Compras registradas
-                </CardTitle>
+                <CardTitle>Compras registradas</CardTitle>
+                <CardDescription>Identifica para quién es cada compra y consulta los pagos que has recibido.</CardDescription>
               </CardHeader>
 
               <CardContent>
+                <div className="mb-4 flex w-full flex-col gap-2 md:max-w-xs">
+                  <Label htmlFor="installment-recipient">Compras de</Label>
+                  <ResponsiveSelect
+                    id="installment-recipient"
+                    value={recipientFilter}
+                    onValueChange={setRecipientFilter}
+                    title="¿Para quién es la compra?"
+                    options={recipientOptions}
+                    searchable="auto"
+                    searchPlaceholder="Buscar persona…"
+                    className="h-11"
+                  />
+                </div>
                 <Tabs defaultValue="active" className="w-full">
-                  <TabsList className="mb-6">
+                  <TabsList className="mb-4 w-full group-data-horizontal/tabs:h-11 md:w-fit">
                     <TabsTrigger value="active">
                       Activas ({activePurchases.length})
                     </TabsTrigger>
@@ -1030,7 +1087,7 @@ export default function ComprasAMesesContent() {
                       Liquidadas ({paidOffPurchases.length})
                     </TabsTrigger>
                     <TabsTrigger value="all">
-                      Todas ({purchases.length})
+                      Todas ({filteredPurchases.length})
                     </TabsTrigger>
                   </TabsList>
 
@@ -1040,7 +1097,7 @@ export default function ComprasAMesesContent() {
                       columns={purchaseColumns}
                       data={activePurchases}
                       filterGlobal
-                      filterPlaceholder="Buscar compra..."
+                      filterPlaceholder="Buscar compra o persona…"
                       pageSize={15}
                       pageSizeOptions={[15, 25, 50, 100]}
                       footerRow={purchasesFooterRow}
@@ -1053,7 +1110,7 @@ export default function ComprasAMesesContent() {
                       columns={purchaseColumns}
                       data={paidOffPurchases}
                       filterGlobal
-                      filterPlaceholder="Buscar compra..."
+                      filterPlaceholder="Buscar compra o persona…"
                       pageSize={15}
                       pageSizeOptions={[15, 25, 50, 100]}
                       footerRow={purchasesFooterRow}
@@ -1064,9 +1121,9 @@ export default function ComprasAMesesContent() {
                     <DataTable
                       {...purchaseMobileView}
                       columns={purchaseColumns}
-                      data={purchases}
+                      data={filteredPurchases}
                       filterGlobal
-                      filterPlaceholder="Buscar compra..."
+                      filterPlaceholder="Buscar compra o persona…"
                       pageSize={15}
                       pageSizeOptions={[15, 25, 50, 100]}
                       footerRow={purchasesFooterRow}

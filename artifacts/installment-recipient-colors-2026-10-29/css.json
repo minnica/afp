@@ -1,0 +1,9 @@
+{
+  "compiledSelectors": [
+    ".bg-purchase-personal",
+    ".text-purchase-personal-foreground",
+    ".bg-purchase-other",
+    ".text-purchase-other-foreground"
+  ],
+  "allPresent": true
+}

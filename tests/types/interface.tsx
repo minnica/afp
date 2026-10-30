@@ -37,6 +37,16 @@ export async function responseContract() {
   const incomes: unknown[] = data.incomes;
   void incomes;
 }
+export async function installmentPaymentsContract() {
+  const data = await (await uiFetch('/api/installment-purchases/payments?purchaseId=example')).json();
+  if (data.receivable) {
+    const balance: number = data.receivable.pendingBalance;
+    const amount: string | number = data.receivable.originalAmount;
+    void [balance, amount];
+  }
+  // @ts-expect-error El detalle de pagos contiene una compra y su cuenta, no el listado de compras.
+  void data.purchases;
+}
 // @ts-expect-error Resolver un pago exige el corte y la evidencia del pago, no solo la acción.
 export const incompletePayment: CaptureAction = { action: 'registerPayment' };
 export const captureBalance = getCyclePaymentAmounts({ statementAmount: '1000', paidAmount: '250' });

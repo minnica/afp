@@ -1,0 +1,153 @@
+
+> afp@0.1.0 test /home/garatachia/projects/afp
+> node --import tsx tests/run-tests.ts installment-payments.test.ts interface-contracts.test.ts installment-transactions.test.ts installment-statements.test.ts receivable-adjustments.test.ts
+
+TAP version 13
+# Subtest: pagos MSI: exige sesión y conserva las cabeceras privadas
+ok 1 - pagos MSI: exige sesión y conserva las cabeceras privadas
+  ---
+  duration_ms: 17.917594
+  type: 'test'
+  ...
+# Subtest: pagos MSI: rechaza una selección vacía o excesiva antes de consultar
+ok 2 - pagos MSI: rechaza una selección vacía o excesiva antes de consultar
+  ---
+  duration_ms: 4.318174
+  type: 'test'
+  ...
+# Subtest: PostgreSQL pagos MSI: historial, ajuste, aislamiento por compra y propietario
+    # Subtest: la bonificación reduce el saldo y conserva abonos idénticos, fechas y orden
+    ok 1 - la bonificación reduce el saldo y conserva abonos idénticos, fechas y orden
+      ---
+      duration_ms: 19.810581
+      type: 'test'
+      ...
+    # Subtest: una compra personal no se confunde con una cuenta sin abonos
+    ok 2 - una compra personal no se confunde con una cuenta sin abonos
+      ---
+      duration_ms: 14.09186
+      type: 'test'
+      ...
+    # Subtest: una compra ajena, inexistente o vinculada a una cuenta ajena no expone datos
+    ok 3 - una compra ajena, inexistente o vinculada a una cuenta ajena no expone datos
+      ---
+      duration_ms: 17.267615
+      type: 'test'
+      ...
+    1..3
+ok 3 - PostgreSQL pagos MSI: historial, ajuste, aislamiento por compra y propietario
+  ---
+  duration_ms: 340.926739
+  type: 'test'
+  ...
+# Subtest: el corte bancario prevalece en tarjetas y dashboard, sin cambiar fecha de compra
+ok 4 - el corte bancario prevalece en tarjetas y dashboard, sin cambiar fecha de compra
+  ---
+  duration_ms: 108.283394
+  type: 'test'
+  ...
+# Subtest: la manta conserva 9/12 aunque falte el primer ciclo en la base
+ok 5 - la manta conserva 9/12 aunque falte el primer ciclo en la base
+  ---
+  duration_ms: 46.649923
+  type: 'test'
+  ...
+# Subtest: la lista de compras muestra saldo y progreso del último documento verificado
+ok 6 - la lista de compras muestra saldo y progreso del último documento verificado
+  ---
+  duration_ms: 36.656377
+  type: 'test'
+  ...
+# Subtest: los resúmenes mensuales usan la cuota verificada y terminan en el ciclo 12
+ok 7 - los resúmenes mensuales usan la cuota verificada y terminan en el ciclo 12
+  ---
+  duration_ms: 34.9644
+  type: 'test'
+  ...
+# Subtest: referencias inválidas se ignoran; varios cortes siguen la referencia más reciente
+ok 8 - referencias inválidas se ignoran; varios cortes siguen la referencia más reciente
+  ---
+  duration_ms: 43.631407
+  type: 'test'
+  ...
+# Subtest: MSI: fallo después de cada escritura revierte cuenta, compra y origen; reintentar crea solo un par
+ok 9 - MSI: fallo después de cada escritura revierte cuenta, compra y origen; reintentar crea solo un par
+  ---
+  duration_ms: 59.076795
+  type: 'test'
+  ...
+# Subtest: MSI: valida propietarios antes de escribir, ignora userId del cuerpo y admite compra propia sin cuenta
+ok 10 - MSI: valida propietarios antes de escribir, ignora userId del cuerpo y admite compra propia sin cuenta
+  ---
+  duration_ms: 19.751792
+  type: 'test'
+  ...
+# Subtest: MSI: editar valida en transacción y revierte el cambio ante un fallo
+ok 11 - MSI: editar valida en transacción y revierte el cambio ante un fallo
+  ---
+  duration_ms: 19.723491
+  type: 'test'
+  ...
+# Subtest: cliente UI valida el recurso y conserva los metadatos y los valores serializados
+ok 12 - cliente UI valida el recurso y conserva los metadatos y los valores serializados
+  ---
+  duration_ms: 36.701637
+  type: 'test'
+  ...
+# Subtest: una respuesta incompleta entra en recuperación antes de entregarse a la pantalla
+ok 13 - una respuesta incompleta entra en recuperación antes de entregarse a la pantalla
+  ---
+  duration_ms: 29.266398
+  type: 'test'
+  ...
+# Subtest: el cliente valida el detalle de pagos MSI y conserva una cuenta no vinculada
+ok 14 - el cliente valida el detalle de pagos MSI y conserva una cuenta no vinculada
+  ---
+  duration_ms: 69.066921
+  type: 'test'
+  ...
+# Subtest: el contrato de interfaz acepta propuestas históricas parciales y rechaza importes estructurados
+ok 15 - el contrato de interfaz acepta propuestas históricas parciales y rechaza importes estructurados
+  ---
+  duration_ms: 32.382353
+  type: 'test'
+  ...
+# Subtest: el cliente conserva el orden de la corrección usado por el control optimista
+ok 16 - el cliente conserva el orden de la corrección usado por el control optimista
+  ---
+  duration_ms: 35.946518
+  type: 'test'
+  ...
+# Subtest: conciliación: conserva 38 pagos completos, principal original y saldo separado
+ok 17 - conciliación: conserva 38 pagos completos, principal original y saldo separado
+  ---
+  duration_ms: 0.661209
+  type: 'test'
+  ...
+# Subtest: conciliación: cero, ajustes negativos, centavos, cancelación y excedentes
+ok 18 - conciliación: cero, ajustes negativos, centavos, cancelación y excedentes
+  ---
+  duration_ms: 0.30119
+  type: 'test'
+  ...
+# Subtest: conciliación: ingresos y edición del principal conservan el ajuste sin crear dinero
+ok 19 - conciliación: ingresos y edición del principal conservan el ajuste sin crear dinero
+  ---
+  duration_ms: 26.692751
+  type: 'test'
+  ...
+# Subtest: conciliación: cuenta vinculada, resumen y banco usan el saldo correcto
+ok 20 - conciliación: cuenta vinculada, resumen y banco usan el saldo correcto
+  ---
+  duration_ms: 21.26922
+  type: 'test'
+  ...
+1..20
+# tests 23
+# suites 0
+# pass 23
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1290.090033

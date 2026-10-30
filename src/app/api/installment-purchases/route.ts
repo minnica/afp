@@ -50,6 +50,7 @@ const purchaseSelect = {
     select: {
       id: true,
       concept: true,
+      person: { select: { id: true, name: true } },
     },
   },
 } satisfies Prisma.InstallmentPurchaseSelect;

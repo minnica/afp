@@ -6,6 +6,14 @@ Consolidado el **27 de octubre de 2026** a partir del README del commit `4562aa0
 
 ## 2026-10-29
 
+### Compras a meses: destinatario y detalle de pagos recibidos
+
+Los badges de destinatario distinguen ahora las compras propias en azul y las realizadas para otras personas en violeta, conservando texto e iconos. Las variantes de Badge usan tokens propios para claro y oscuro y se comparten entre escritorio y móvil. Se mantiene la revisión visual manual solicitada por el propietario, sin navegador ni capturas. [Alcance y controles técnicos de color](../artifacts/installment-recipient-colors-2026-10-29/README.md).
+
+El listado identifica las compras propias y las realizadas para otras personas, permite filtrar por destinatario y buscar por nombre. Las compras para terceros ofrecen «Ver pagos» desde el propio listado. Por elección del propietario, el detalle se abre en un panel lateral en escritorio e inferior en móvil, con resumen de cobros, ajustes separados e historial de abonos.
+
+La consulta bajo demanda exige sesión y valida la propiedad tanto de la compra como de su cuenta por cobrar. Reutiliza el cálculo de deudas existente y conserva las cuotas bancarias. Los seis controles del README pasan, con **1007 escenarios sin fallos ni omisiones con PostgreSQL local** y las dos advertencias previas de lint. Cambio local sin migraciones, escrituras de datos reales ni publicación. La validación visual se deja al propietario por instrucción expresa, sin navegador ni capturas. [Verificaciones técnicas y alcance](../artifacts/installment-recipients-payments-2026-10-29/README.md).
+
 ### Estados de cuenta locales organizados por año y mes
 
 Los PDF se trasladan a `estados_cuenta/<año>/<MM-mes>/`, dejando únicamente documentos PDF dentro de los meses. Se añade un índice privado del año y se reúnen conciliaciones, aclaraciones, SQL, respaldos y revisiones en `_soporte/`. El script de preparación de marcas y su registro de fuentes apuntan a la nueva ubicación de las referencias de tarjetas.
