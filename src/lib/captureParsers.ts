@@ -1,3 +1,4 @@
+import { interpretIncomeNotice } from './captureIncomeParsers';
 import { captureFields } from './captureJson';
 import type { CaptureInterpretation, CaptureParser, CaptureNotice } from '@/lib/captureTypes';
 // Los formatos de arranque son SINTÉTICOS. verified acredita la gramática real
@@ -12,6 +13,8 @@ import { interpretMoneyNotice, interpretBbvaAccountCharge } from "@/lib/captureM
 import { interpretRefundNotice } from "@/lib/captureRefundParsers";
 
 export const captureParsers: CaptureParser[] = [
+  { key: "bbva.payroll.es.v1", sourcePackage: "com.bancomer.mbanking", verified: true, evidence: "REAL_REVIEWED_PARTIAL", incomeOnly: true },
+  { key: "bbva.account-deposit.es.v1", sourcePackage: "com.bancomer.mbanking", verified: false, evidence: "AWAITING_REAL_NOTICE", incomeOnly: true },
   { key: uberReceiptParserKey, sourcePackage: gmailCapturePackage, verified: true, evidence: 'REAL_REVIEWED',
     aliasSourcePackages: bankCapturePackages, aliasKinds: ['PHYSICAL', 'DIGITAL'], dateSource: 'RECEIPT_OPERATION' },
   { key: "nu.account-transfer.es.v1", sourcePackage: "com.nu.production", verified: true, evidence: "REAL_REVIEWED", moneyOnly: true },
@@ -227,6 +230,8 @@ export function interpretCapture(event: CaptureNotice): CaptureInterpretation {
   // Fuente habilitada para reunir evidencia real. Un aviso de viaje no acredita
   // un cobro final ni su tarjeta; no aplicar gramáticas bancarias a este paquete.
   if (reviewOnlyCapturePackages.includes(event.sourcePackage)) return { reason: "SERVICE_NOTICE_REVIEW", proposal: {} };
+  const income = interpretIncomeNotice(event, captureAmount, captureNotificationDate);
+  if (income) return income;
   const money = interpretMoneyNotice(event, captureAmount, captureNotificationDate);
   if (money) return money;
   const refund = interpretRefundNotice(event, captureAmount, captureNotificationDate, captureOperationTime);

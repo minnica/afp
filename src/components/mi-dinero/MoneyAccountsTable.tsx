@@ -66,6 +66,7 @@ export default function MoneyAccountsTable({ accounts, totals, onReconcile, onEd
               </TableHead>
               <TableCell className="py-4 text-right align-top tabular-nums">
                 <span className="text-sm font-semibold">{money(account.balance)}</span>
+                {!!account.estimatedIncomeAmount && <span className="text-xs text-warning">Incluye {money(account.estimatedIncomeAmount)} de nómina estimada</span>}
               </TableCell>
               <TableCell className="w-1/3 py-4 align-top whitespace-normal">
                 <AccountYieldSummary account={account} />

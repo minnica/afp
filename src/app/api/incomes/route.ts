@@ -14,6 +14,7 @@ const incomeSelect = {
   source: true,
   concept: true,
   amount: true,
+  isEstimated: true,
   receivableAccountId: true,
   notes: true,
   createdAt: true,
@@ -326,10 +327,15 @@ export async function PATCH(request: Request) {
           source: source.trim(),
           concept: concept.trim(),
           amount: numericAmount,
+          isEstimated: false,
           receivableAccountId: nextReceivableAccountId,
           notes: notes?.trim() || null,
         },
         select: incomeSelect,
+      });
+
+      if (existingIncome.isEstimated) await tx.captureMovement.updateMany({
+        where: { userId, moneyPosting: { is: { kind: 'INCOME', incomeId: id } } }, data: { reason: 'INCOME_REGISTERED' },
       });
 
       for (const accountId of new Set([previousReceivableAccountId, nextReceivableAccountId].filter(Boolean))) {

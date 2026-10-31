@@ -21,7 +21,7 @@ function rawSources(data: CalculationData) {
     const nonCash = data.cycles.flatMap(c => c.credits || []).filter(c => c.incomeId === income.id).reduce((sum, c) => sum + cents(c.amount), 0);
     if (nonCash > cents(income.amount)) issues.push({ key: `credit:${income.id}`, message: `Revisa las bonificaciones de ${income.concept}.` });
     const value = Math.max(0, cents(income.amount) - nonCash);
-    if (value) add({ key: `income:${income.id}`, date: day(income.date), cents: value, label: income.concept, kind: income.receivableAccountId ? 'COLLECTION' : 'INCOME', incomeTypeId: income.incomeTypeId, receivableId: income.receivableAccountId, route: '/ingresos' }, [income.receivableAccountId && `receivable:${income.receivableAccountId}`, `incomeType:${income.incomeTypeId}`, 'default:income'].filter(Boolean));
+    if (value) add({ key: `income:${income.id}`, date: day(income.date), cents: value, label: income.isEstimated ? `${income.concept} (estimado)` : income.concept, estimatedIncome: income.isEstimated, kind: income.receivableAccountId ? 'COLLECTION' : 'INCOME', incomeTypeId: income.incomeTypeId, receivableId: income.receivableAccountId, route: '/ingresos' }, [income.receivableAccountId && `receivable:${income.receivableAccountId}`, `incomeType:${income.incomeTypeId}`, 'default:income'].filter(Boolean));
   }
   for (const expense of data.expenses) {
     if (['CASH', 'DEBIT'].includes(expense.paymentMethod)) {
@@ -50,6 +50,7 @@ function rawSources(data: CalculationData) {
     for (const [suffix, accountId, sign] of [['out', transfer.fromAccountId, -1], ['in', transfer.toAccountId, 1]] as const) events.push({ key: `transfer:${transfer.id}:${suffix}`, date: day(transfer.date), cents: sign * cents(transfer.amount), label: transfer.concept, kind: 'TRANSFER', accountId, transferId: transfer.id, excluded: false, status: 'ACTUAL' });
   }
   for (const withdrawal of (data.withdrawals || []).filter(t => !t.reversedAt)) events.push({ key: `withdrawal:${withdrawal.id}`, date: day(withdrawal.date), cents: -cents(withdrawal.amount), label: withdrawal.concept, kind: 'WITHDRAWAL', accountId: withdrawal.accountId, withdrawalId: withdrawal.id, excluded: false, status: 'ACTUAL', route: '/mi-dinero' });
+  for (const e of events.filter(e => e.estimatedIncome && !e.excluded)) issues.push({ key: `estimated:${e.key}`, message: `${e.label}: el saldo incluye una cantidad aproximada. Confirma el importe real en Ingresos o Registro automático.` });
   return { events, issues };
 }
 
@@ -123,6 +124,7 @@ export function accountBalances<T extends BalanceReference>(accounts: T[], event
     }
     const balance = cents(account.openingBalance) + delta;
     const calculatedYield = applicable.filter(e => e.automaticYield && e.accountId === account.id && e.date !== null && e.date <= today && !e.excluded).reduce((sum, e) => sum + e.cents, 0);
-    return { ...account, balance: amount(balance), available: amount(balance - cents(account.reservedAmount)), delta: amount(delta), calculatedYield: amount(calculatedYield), recordedBalance: amount(balance - calculatedYield) };
+    const estimatedIncomeAmount = applicable.filter(e => e.estimatedIncome && e.accountId === account.id && e.date !== null && e.date >= day(account.asOf) && e.date <= today && !e.excluded).reduce((sum, e) => sum + Math.max(0, e.cents - (base[e.key]?.[account.id] || 0)), 0);
+    return { ...account, estimatedIncomeAmount: amount(estimatedIncomeAmount), balance: amount(balance), available: amount(balance - cents(account.reservedAmount)), delta: amount(delta), calculatedYield: amount(calculatedYield), recordedBalance: amount(balance - calculatedYield) };
   });
 }

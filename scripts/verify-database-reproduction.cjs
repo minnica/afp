@@ -81,13 +81,17 @@ function runRegressions(url) {
 }
 
 function assertCatalog(actual) {
+  const estimated = actual.columns.find(row => row.table_name === 'incomes' && row.column_name === 'isEstimated');
+  assert.equal(estimated?.column_default, 'false'); assert.equal(estimated?.is_nullable, 'NO');
+  assert.match(actual.constraints.find(row => row.name === 'capture_income_policy_sample_check')?.definition || '', /AUTOMATIC.*verifiedMovementId/s);
+  assert.match(actual.constraints.find(row => row.name === 'capture_money_postings_kind_check')?.definition || '', /INCOME/s);
   const paymentMix = actual.columns.find(row => row.table_name === 'money_plans' && row.column_name === 'paymentMix');
   assert.equal(paymentMix?.data_type, 'jsonb'); assert.equal(paymentMix?.is_nullable, 'YES');
   assert.match(actual.constraints.find(row => row.name === 'money_plans_payment_mix_check')?.definition || '', /VARIABLE.*version/s);
   const debit = actual.columns.find(row => row.table_name === 'daily_expenses' && row.column_name === 'debitAccountId');
   assert.equal(debit?.is_nullable, 'YES'); assert.equal(debit?.data_type, 'text');
   assert.match(actual.constraints.find(row => row.name === 'daily_expenses_debit_account_check')?.definition || '', /DEBIT.*debitAccountId/s);
-  for (const table of ['money_withdrawals', 'capture_money_policies', 'capture_money_postings']) assert.ok(actual.security.some(row => row.table_name === table && row.rls));
+  for (const table of ['capture_income_policies', 'money_withdrawals', 'capture_money_policies', 'capture_money_postings']) assert.ok(actual.security.some(row => row.table_name === table && row.rls));
   assert.match(actual.constraints.find(row => row.name === 'money_withdrawals_amount_check')?.definition || '', /amount.*0/);
   assert.match(actual.constraints.find(row => row.name === 'capture_money_postings_kind_check')?.definition || '', /TRANSFER.*WITHDRAWAL.*DEBIT_EXPENSE/s);
   const refundColumn = actual.columns.filter(row => row.table_name === 'daily_expenses' && row.column_name === 'refundOriginalAmount');
@@ -160,10 +164,11 @@ function assertCatalog(actual) {
   }
   for (const section of ['columns', 'constraints', 'indexes', 'enums']) {
     let rows = actual[section].filter(row => (row.table_name || row.tablename) !== 'expense_operations'
-      && !['money_withdrawals', 'capture_money_policies', 'capture_money_postings', 'money_accounts', 'money_reconciliations', 'money_routes', 'money_plans', 'money_occurrences', 'money_transfers', 'money_card_payments', 'money_operations'].includes(row.table_name || row.tablename)
+      && !['capture_income_policies', 'money_withdrawals', 'capture_money_policies', 'capture_money_postings', 'money_accounts', 'money_reconciliations', 'money_routes', 'money_plans', 'money_occurrences', 'money_transfers', 'money_card_payments', 'money_operations'].includes(row.table_name || row.tablename)
       && !['capture_devices', 'capture_pairings', 'capture_events', 'capture_rate_limits', 'capture_card_aliases',
         'capture_automations', 'capture_merchant_rules', 'capture_movements', 'expense_tombstones', 'capture_statements',
         'google_calendar_connections', 'calendar_oauth_states', 'google_calendar_events', 'card_cycle_payments', 'capture_payment_policies', 'capture_bank_fallbacks', 'expense_refunds'].includes(row.table_name || row.tablename)
+      && !(section === 'columns' && row.table_name === 'incomes' && row.column_name === 'isEstimated')
       && !(section === 'columns' && row.table_name === 'card_cycles' && creditColumns.includes(row.column_name))
       && !(section === 'columns' && row.table_name === 'card_cycles' && row.column_name === 'datesConfirmedAt')
       && !(section === 'columns' && row.table_name === 'cards' && balanceColumns.includes(row.column_name))
@@ -192,7 +197,7 @@ function assertCatalog(actual) {
   assert.ok(actual.constraints.some(row => row.name === 'money_accounts_yield_check'));
   assert.ok(actual.constraints.some(row => row.name === 'money_accounts_automatic_yield_check'));
   assert.ok(actual.constraints.some(row => row.name === 'money_transfers_values_check'));
-  assert.equal(actual.security.length, before.security.length + 29);
+  assert.equal(actual.security.length, before.security.length + 30);
   for (const row of actual.security) {
     assert.equal(row.rls, true, `RLS desactivado: ${row.table_name}`);
     assert.equal(row.force_rls, false);
@@ -385,7 +390,7 @@ async function main() {
         console.log(`OK ${i ? 'actualización desde las 13 migraciones aplicadas' : 'base vacía'}: catálogo equivalente, diff vacío, checksums, deploy repetible, registros intactos y RLS.`);
       } finally { await db.$disconnect(); }
     }
-    console.log(`Reconstrucción y actualización verificadas; ${localMigrations().length} migraciones y ${before.security.length + 29} tablas con RLS, incluido el historial.`);
+    console.log(`Reconstrucción y actualización verificadas; ${localMigrations().length} migraciones y ${before.security.length + 30} tablas con RLS, incluido el historial.`);
   } finally {
     // Solo elimina bases/roles con sufijo aleatorio creados por esta ejecución.
     for (const name of createdDatabases.reverse()) await admin.$executeRawUnsafe(`DROP DATABASE "${name}" WITH (FORCE)`);

@@ -490,6 +490,7 @@ const incomesIncomesItemReceivableAccountSchema = z.object({
 }).passthrough();
 
 const incomesIncomesItemSchema = z.object({
+  isEstimated: z.boolean().optional(),
   "id": z.string(),
   "createdAt": z.string().optional(),
   "userId": z.string().optional(),
@@ -1285,7 +1286,12 @@ const capturesConfigurationParsersItemSchema = z.object({
   "dateSource": z.string()
 }).passthrough();
 
+const incomePolicyResponseSchema = z.object({ id: z.string(), parserKey: z.string(), accountSuffix: z.string(), accountId: z.string(), incomeTypeId: z.string(), mode: z.string(), verifiedMovementId: z.string().nullable(), estimatedFirstHalfAmount: z.string().nullable(), estimatedSecondHalfAmount: z.string().nullable() }).passthrough();
+const incomeRecordSchema = z.object({ id: z.string(), amount: z.string(), date: z.string(), concept: z.string(), isEstimated: z.boolean(), updatedAt: z.string().optional() }).passthrough();
 const capturesConfigurationSchema = z.object({
+  incomePolicies: z.array(incomePolicyResponseSchema).optional(),
+  incomeTypes: z.array(z.object({ id: z.string(), name: z.string() }).passthrough()).optional(),
+  incomeSamples: z.array(z.object({ id: z.string(), parserKey: z.string().nullable(), proposal: captureProposalSchema, reason: z.string() }).passthrough()).optional(),
   "moneyWithdrawalSamples": z.array(capturesConfigurationMoneyWithdrawalSamplesItemSchema),
   "moneyAccounts": z.array(capturesConfigurationMoneyAccountsItemSchema),
   "moneyPolicies": z.array(capturesConfigurationMoneyPoliciesItemSchema),
@@ -1510,6 +1516,7 @@ const capturesMovementsCandidatesItemSchema2 = z.object({
 }).passthrough();
 
 const capturesMovementsSchema = z.object({
+  incomeDetail: z.object({ posting: z.object({ incomeId: z.string().nullable(), originalRecordId: z.string(), income: incomeRecordSchema.nullable(), snapshot: z.record(z.string(), z.json()) }).passthrough().nullable(), candidates: z.array(incomeRecordSchema) }).optional(),
   "paymentDetail": z.union([z.undefined(), capturesMovementsPaymentDetailSchema]).optional(),
   "refundDetail": z.union([z.undefined(), capturesMovementsRefundDetailSchema]).optional(),
   "moneyDetail": z.union([z.undefined(), capturesMovementsMoneyDetailSchema]).optional(),

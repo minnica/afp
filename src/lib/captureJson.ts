@@ -12,6 +12,7 @@ function checked<S extends z.ZodType>(schema: S, value: unknown): z.output<S> {
 const text = z.string().nullable().optional();
 const number = z.number().nullable().optional();
 export const captureProposalSchema = z.object({
+  estimatedAmount: text, incomeKind: text, incomeTypeId: text, incomeAccountId: text, incomePolicyId: text,
   amount: text, date: text, currency: text, merchant: text, cardId: text,
   expenseVersion: text,
   operationAt: text, notificationAt: text, timeZone: text, dateSource: text,

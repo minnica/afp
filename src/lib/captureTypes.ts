@@ -15,7 +15,7 @@ export type CaptureInterpretation = {
 }
 export interface CaptureParser {
   key: string; sourcePackage: string; verified: boolean; title?: string;
-  evidence?: string; moneyOnly?: boolean; refundOnly?: boolean; paymentOnly?: boolean;
+  evidence?: string; incomeOnly?: boolean; moneyOnly?: boolean; refundOnly?: boolean; paymentOnly?: boolean;
   aliasKinds?: string[]; aliasSourcePackage?: string; dateSource?: string;
   aliasSourcePackages?: string[];
   completionPolicy?: string; policyRequiresSubscription?: boolean;
@@ -34,6 +34,8 @@ export type NotificationDate = (event: CaptureNotice) => { date: string; notific
 export type OperationTime = (value: string | undefined) => { operationAt: string; date: string; timeZone: string } | null;
 export type CaptureDeviceState = 'PENDING' | 'EXPIRED' | 'ACTIVE' | 'PAUSED' | 'REVOKED';
 export type CaptureResolution = { id: string } & (
+  | { action: 'confirmIncome'; income: { amount: string; expectedUpdatedAt: string; confirmedReceived: true } }
+  | { action: 'registerIncome' | 'linkIncome'; income: { accountId: string; incomeTypeId: string; amount: string; date: string; concept: string; currency: 'MXN'; confirmedReceived: true; incomeId?: string; distinct?: boolean } }
   | { action: 'link'; expenseId: string }
   | { action: 'linkInstallment'; installmentPurchaseId: string }
   | { action: 'convertToInstallments'; months: number }

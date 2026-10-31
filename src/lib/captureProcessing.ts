@@ -1,3 +1,5 @@
+import { completeIncomeCapture, automateIncomeCapture, resolveIncomeCapture } from './captureIncome';
+import { incomeCaptureKind } from './captureIncomeParsers';
 import type { PrismaClient, DailyExpense, CaptureEvent } from '@prisma/client';
 import type { CaptureDb, CaptureProposal, CaptureInterpretation, Movement } from '@/lib/captureTypes';
 import { captureInput } from '@/lib/captureJson';
@@ -42,7 +44,7 @@ function purchaseTime(proposal: CaptureProposal) {
 }
 
 export async function captureCandidates(tx: CaptureDb, userId: string, proposal: CaptureProposal, parserKey?: string | null) {
-  if (["MONEY_TRANSFER", "CASH_WITHDRAWAL", "CARD_PAYMENT", "ACCOUNT_DEBIT", "REFUND"].includes(proposal.movementType ?? "")) return [];
+  if (["INCOME", "MONEY_TRANSFER", "CASH_WITHDRAWAL", "CARD_PAYMENT", "ACCOUNT_DEBIT", "REFUND"].includes(proposal.movementType ?? "")) return [];
   if (!proposal.cardId || !proposal.amount || !proposal.date) return [];
   const where = { userId, cardId: proposal.cardId, amount: proposal.amount, date: dateWindow(proposal.date) };
   // Una transacción usa una conexión: no iniciar consultas simultáneas sobre ella.
@@ -96,6 +98,8 @@ export async function captureCandidates(tx: CaptureDb, userId: string, proposal:
 // compartido con las altas, ediciones y borrados manuales del mismo usuario.
 async function captureInterpretationState(tx: Prisma.TransactionClient, event: CaptureEvent, observationOnly: boolean = false): Promise<{ interpretation: CaptureInterpretation; parserKey: string | null | undefined; reason: string; proposal: CaptureProposal; status: string; fallbackDueAt?: Date }> {
   const decoded = interpretCapture(event);
+  const income = await completeIncomeCapture(tx, event, decoded, observationOnly);
+  if (income) return { interpretation: income, parserKey: income.parserKey, reason: income.reason, proposal: income.proposal, status: "REVIEW" };
   const money = await completeMoneyCapture(tx, event, decoded, observationOnly);
   if (money) return { interpretation: money, parserKey: money.parserKey, reason: money.reason, proposal: money.proposal, status: "REVIEW" };
   const parser = captureParsers.find(parser => parser.key === decoded.parserKey);
@@ -167,6 +171,7 @@ export async function processCaptureEvent(tx: Prisma.TransactionClient, event: C
     if (settled) movement = settled;
     else if (reason === 'PURCHASE') movement = await registerCaptureMovement(tx, movement, false);
   }
+  if (incomeCaptureKind(movement)) movement = await automateIncomeCapture(tx, event, movement);
   if (paymentCaptureKind(movement)) movement = await automateCapturePayment(tx, event, movement);
   if (moneyCaptureKind(movement) || accountDebitNotice(movement)) movement = await automateMoneyCapture(tx, event, movement);
   await tx.captureEvent.update({ where: { id: event.id }, data: {
@@ -304,7 +309,7 @@ export async function registerCaptureMovement(tx: Prisma.TransactionClient, move
 export async function resolveCaptureMovement(db: PrismaClient, userId: string, rawInput: unknown) {
   const input = captureInput(rawInput);
   if (!input || typeof input.id !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(input.id)
-    || typeof input.action !== 'string' || !["link", "linkInstallment", "distinct", "discard", "convertToInstallments", "correct", "register", "reinterpret", "validateWalletBackup", "registerPayment", "linkPayment", "reversePayment", "applyRefund", "reverseRefund", "registerMoneyTransfer", "registerMoneyWithdrawal", "registerDebitExpense", "correctDebitType"].includes(String(input.action))) {
+    || typeof input.action !== 'string' || !["link", "linkInstallment", "distinct", "discard", "convertToInstallments", "correct", "register", "reinterpret", "validateWalletBackup", "registerPayment", "linkPayment", "reversePayment", "applyRefund", "reverseRefund", "registerMoneyTransfer", "registerMoneyWithdrawal", "registerDebitExpense", "correctDebitType", "registerIncome", "linkIncome", "confirmIncome"].includes(String(input.action))) {
     throw new ApiAccessError("Resolución no válida.", 400);
   }
   const id = input.id;
@@ -312,6 +317,8 @@ export async function resolveCaptureMovement(db: PrismaClient, userId: string, r
     await lockDebtAccounts(tx, userId);
     const movement = await tx.captureMovement.findFirst({ where: { id, userId } });
     if (!movement) throw new ApiAccessError("Aviso no encontrado.", 404);
+    if (["registerIncome", "linkIncome", "confirmIncome"].includes(String(input.action))) return resolveIncomeCapture(tx, movement, input);
+    if (incomeCaptureKind(movement) && !["reinterpret", "discard"].includes(String(input.action))) throw new ApiAccessError("Revisa este aviso como ingreso.", 409);
     if (input.action === "correctDebitType") return correctDebitCapture(tx, movement, input);
     if (["registerMoneyTransfer", "registerMoneyWithdrawal", "registerDebitExpense"].includes(String(input.action))) return resolveMoneyCapture(tx, movement, input);
     if (moneyCaptureKind(movement) && !["discard", "reinterpret"].includes(String(input.action))) throw new ApiAccessError("Revisa este aviso como movimiento entre cuentas.", 409);

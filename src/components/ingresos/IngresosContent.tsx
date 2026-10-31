@@ -363,7 +363,7 @@ export default function IngresosContent() {
         title={income.concept}
         subtitle={formatDate(income.date)}
         amount={formatMoney(income.amount)}
-        amountLabel="Ingreso registrado"
+        amountLabel={income.isEstimated ? "Ingreso estimado · confirma el importe" : "Ingreso registrado"}
         actions={<RecordActions label={`ingreso: ${income.concept}`} onEdit={() => startEditingIncome(income)} onDelete={() => setIncomeToDelete(income)} />}
       >
         {income.incomeType?.name ? <Badge variant="secondary" className="h-auto max-w-full whitespace-normal break-words">{income.incomeType.name}</Badge> : null}
@@ -405,7 +405,7 @@ export default function IngresosContent() {
         header: "Concepto",
         cell: ({ row }) => (
           <div className="min-w-0">
-            <p className="font-medium">{row.original.concept}</p>
+            <p className="font-medium">{row.original.concept}{row.original.isEstimated && <span className="ml-2 text-xs text-warning">Estimado · confirma el importe</span>}</p>
             <p className="text-sm text-muted-foreground">
               Fuente: {row.original.source}
             </p>
@@ -718,7 +718,7 @@ export default function IngresosContent() {
           <DialogContent onCloseAutoFocus={restoreFocus} className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
             <DialogHeader>
               <DialogTitle>Editar ingreso</DialogTitle>
-              <DialogDescription className="sr-only">Actualiza los datos y guarda los cambios.</DialogDescription>
+              <DialogDescription>Actualiza los datos y confirma el importe recibido. Guardar una nómina estimada la marca como confirmada.</DialogDescription>
             </DialogHeader>
 
             <div className="grid gap-4 md:grid-cols-2">

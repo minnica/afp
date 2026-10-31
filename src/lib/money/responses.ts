@@ -10,6 +10,7 @@ export const accountResponseSchema = named.extend({
   yieldIncomeTypeId: nullableId, autoYield: z.boolean(), yieldMethod: z.enum(['NOMINAL', 'DAILY_AMOUNT']), yieldDailyAmount: monetary.nullable(),
   yieldExcessRate: monetary, yieldPayout: z.enum(['DAILY', 'MX_BUSINESS']), yieldRounding: z.enum(['ROUND', 'DOWN']), yieldInitialPendingDays: z.number().nullable(),
   yieldHistory: z.array(yieldHistoryEntrySchema), reconciliations: z.array(z.object({ id: z.string(), date: z.string(), previousBalance: monetary, bankBalance: monetary, reason: z.string(), snapshot: z.json() }).passthrough()),
+  estimatedIncomeAmount: z.number().optional(),
   balance: z.number(), available: z.number(), delta: z.number(), calculatedYield: z.number(), recordedBalance: z.number(), pendingYield: z.number(),
   yieldEstimate: z.object({ daily: z.number(), weekly: z.number(), monthly: z.number() }),
 });
@@ -23,6 +24,7 @@ const eventSchema = z.object({
   status: z.enum(['ACTUAL', 'CALCULATED', 'REGISTERED_FUTURE', 'EXPECTED', 'ESTIMATED', 'COMMITTED']).optional(),
   planId: nullableId.optional(), occurrenceDate: nullableId.optional(), incomeTypeId: nullableId.optional(), receivableId: nullableId.optional(), payableId: nullableId.optional(), subscriptionId: nullableId.optional(),
   categoryId: nullableId.optional(), cardId: nullableId.optional(), route: z.string().optional(), transferId: z.string().optional(), withdrawalId: z.string().optional(), debitExpenseId: z.string().optional(), ownPaymentId: nullableId.optional(),
+  estimatedIncome: z.boolean().optional(),
   paymentGroup: z.string().optional(), approximateDate: z.boolean().optional(), automaticYield: z.boolean().optional(), originalDate: z.string().optional(), includedInReference: z.boolean().optional(), needsAccount: z.boolean().optional(),
 });
 export const dailySchema = z.object({ date: z.string(), balance: z.number(), available: z.number(), incoming: z.number(), outgoing: z.number(), accounts: z.record(z.string(), z.number()) });

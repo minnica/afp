@@ -97,7 +97,7 @@ export default function MoneyContent() {
     if (!userId) return;
     const refresh = () => { if (!savingRef.current && document.visibilityState === 'visible') void load(userId, { errorMode: 'inline' }).catch(() => {}); };
     window.addEventListener('focus', refresh); window.addEventListener('online', refresh); document.addEventListener('visibilitychange', refresh);
-    const timer = window.setInterval(refresh, 60000);
+    const timer = window.setInterval(refresh, 15000);
     return () => { window.removeEventListener('focus', refresh); window.removeEventListener('online', refresh); document.removeEventListener('visibilitychange', refresh); clearInterval(timer); };
   }, [userId, load]);
   async function save(payload: EditorSubmission | MoneyCommand) {

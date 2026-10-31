@@ -30,6 +30,7 @@ export default function MoneyAccountsMobile({ accounts, onReconcile, onEdit }: M
               <span className="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-1">
                 <span className="font-normal text-muted-foreground">Saldo actual</span>
                 <span className="text-lg font-semibold tabular-nums [overflow-wrap:anywhere]">{money(account.balance)}</span>
+                {!!account.estimatedIncomeAmount && <span className="text-xs text-warning">Incluye {money(account.estimatedIncomeAmount)} de nómina estimada</span>}
               </span>
             </span>
             <span className="col-span-full min-w-0 text-sm">

@@ -1,0 +1,16 @@
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma/schema.prisma.
+Datasource "db": PostgreSQL database "postgres", schema "public" at "aws-1-us-west-1.pooler.supabase.com:5432"
+
+44 migrations found in prisma/migrations
+
+Applying migration `20261031010000_capture_income`
+
+The following migration(s) have been applied:
+
+migrations/
+  └─ 20261031010000_capture_income/
+    └─ migration.sql
+
+All migrations have been successfully applied.

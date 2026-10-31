@@ -1,0 +1,39 @@
+
+> afp@0.1.0 audit:all /home/garatachia/projects/afp
+> pnpm audit
+
+┌─────────────────────┬────────────────────────────────────────────────────────┐
+│ moderate            │ minimatch has potential denial of service via          │
+│                     │ globparts amplification                                │
+├─────────────────────┼────────────────────────────────────────────────────────┤
+│ Package             │ minimatch                                              │
+├─────────────────────┼────────────────────────────────────────────────────────┤
+│ Vulnerable versions │ <11.0.1                                                │
+├─────────────────────┼────────────────────────────────────────────────────────┤
+│ Patched versions    │ >=11.0.1                                               │
+├─────────────────────┼────────────────────────────────────────────────────────┤
+│ Paths               │ .>eslint>minimatch                                     │
+│                     │                                                        │
+│                     │ .>eslint-config-next>eslint-plugin-import>@typescript- │
+│                     │ eslint/parser>@typescript-eslint/typescript-           │
+│                     │ estree>minimatch                                       │
+├─────────────────────┼────────────────────────────────────────────────────────┤
+│ More info           │ https://github.com/advisories/GHSA-g3hv-75wg-m249      │
+└─────────────────────┴────────────────────────────────────────────────────────┘
+┌─────────────────────┬────────────────────────────────────────────────────────┐
+│ low                 │ deepmerge mergeObject() allows prototype poisoning of  │
+│                     │ returned objects                                       │
+├─────────────────────┼────────────────────────────────────────────────────────┤
+│ Package             │ deepmerge                                              │
+├─────────────────────┼────────────────────────────────────────────────────────┤
+│ Vulnerable versions │ >=4.2.0 <=4.3.1                                        │
+├─────────────────────┼────────────────────────────────────────────────────────┤
+│ Patched versions    │ <0.0.0                                                 │
+├─────────────────────┼────────────────────────────────────────────────────────┤
+│ Paths               │ .>shadcn>deepmerge                                     │
+├─────────────────────┼────────────────────────────────────────────────────────┤
+│ More info           │ https://github.com/advisories/GHSA-gcqx-w48m-w2h4      │
+└─────────────────────┴────────────────────────────────────────────────────────┘
+3 vulnerabilities found
+Severity: 1 low | 2 moderate
+ ELIFECYCLE  Command failed with exit code 1.

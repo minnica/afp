@@ -517,3 +517,13 @@ El texto anterior a la reorganización puede consultarse desde la raíz sin sobr
 ```bash
 git show 4562aa0cec0a46d8b482fdfef96116d1d3040282:README.md
 ```
+
+
+### 2026-10-31 — Ingresos BBVA y nómina estimada
+
+Implementado localmente el reconocimiento del aviso de nómina sin importe, reglas por cuenta y quincena, ingreso estimado que suma a Mi dinero, confirmación sobre el mismo registro y revisión de depósitos. La captura conserva evidencia, recibos, posibles duplicados y decisiones históricas; requiere una migración aditiva sin activaciones automáticas. Los importes personales derivados de comprobantes y la regla preparada permanecen en archivos privados excluidos de Git. No se modificaron datos ni reglas de producción. Ver [alcance y validación](../artifacts/capture-income-2026-10-31/README.md). Por instrucción del propietario no se hicieron validaciones visuales con agent-browser ni capturas de pantalla.
+
+
+### 2026-10-31 — Publicación y activación autorizadas de nómina estimada
+
+Tras «autorizo» del propietario se creó y validó el respaldo privado, se aplicó `20261031010000_capture_income` y se publicó la web en Vercel (`dpl_9mCyRA2CAXqZDt3EzrXVZwUKxvjL`, production/READY). Cotejo completo de 419 archivos remoto/local y de 1434 registros anteriores de 38 tablas, sin alteraciones financieras por la migración. La regla personal de BBVA CUENTA quedó en automático con las estimaciones netas por quincena extraídas de sus comprobantes. Una reinterpretación explícita conserva el original y no crea ingresos; la comprobación de solo lectura devuelve `INCOME_READY`. Cero ingresos históricos creados. Sin APK nueva, validaciones visuales ni capturas. [Publicación, auditorías y límites](../artifacts/capture-income-2026-10-31/README.md#publicación-autorizada).

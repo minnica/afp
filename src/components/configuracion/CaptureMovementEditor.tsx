@@ -2,6 +2,8 @@
 import { errorMessage } from "@/lib/uiTypes";
 import type { CaptureAction, CaptureEditorProps } from "./captureUiTypes";
 
+import CaptureIncomeEditor from './CaptureIncomeEditor';
+import { incomeCaptureKind } from '@/lib/captureIncomeParsers';
 import CaptureFields from "@/components/configuracion/CaptureFields";
 import CaptureMoneyEditor from "@/components/configuracion/CaptureMoneyEditor";
 import CaptureNotificationDetails from "@/components/configuracion/CaptureNotificationDetails";
@@ -76,6 +78,7 @@ export default function CaptureMovementEditor({ detail, configuration, userId, o
     }
     finally { setBusy(false); }
   }
+  if (incomeCaptureKind(movement)) return <CaptureIncomeEditor detail={current} configuration={configuration} userId={userId} onClose={onClose} onSaved={onSaved} restoreFocus={restoreFocus} />;
   if (moneyCaptureKind(movement) || accountDebitNotice(movement)) return <CaptureMoneyEditor detail={current} configuration={configuration} userId={userId} onClose={onClose} onSaved={onSaved} restoreFocus={restoreFocus} />;
   if (paymentCaptureKind(movement)) return <CapturePaymentEditor detail={current} configuration={configuration} userId={userId} onClose={onClose} onSaved={onSaved} restoreFocus={restoreFocus} />;
   if (refundCaptureKind(movement)) return <CaptureRefundEditor detail={current} configuration={configuration} userId={userId} onClose={onClose} onSaved={onSaved} restoreFocus={restoreFocus} />;

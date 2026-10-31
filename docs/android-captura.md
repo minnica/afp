@@ -762,3 +762,14 @@ pnpm lint
 ```
 
 Las pruebas de servidor usan Auth/persistencia ficticias y ejecutan las funciones reales de Dashboard, avisos y autorización nativa. Cubren el saldo parcial de HSBC 1, liquidación, ocultaciones, cambios de fase/importe/mes, cobros, suscripciones omitidas, cortes, medianoche de México, identidad, pausas/revocación, límites y fallos sin vaciar avisos. Las pruebas JVM verifican contrato, destinos, separación de propietarios/dispositivos y deduplicación, incluida la actualización de avisos aún visibles. Con el backend publicado y la APK instalada, queda pendiente conceder el permiso, activar la opción y confirmar la recepción en el teléfono. [Publicación y alcance](../artifacts/android-important-notices/production.json).
+
+
+## Ingresos BBVA y nómina estimada — implementación del 31/10/2026
+
+La APK 0.9.0 ya entrega el aviso de nómina observado. El nuevo flujo se implementa en el servidor y la web, sin cambiar la APK. `bbva.payroll.es.v1` reconoce la gramática real anonimizada, la cuenta y el período, manteniendo ausente el importe. Una regla expresa de ingreso acepta cuenta, tipo, MXN, fecha del aviso e importes estimados por quincena; en modo automático los nuevos avisos suman un ingreso con `isEstimated = true` y una ruta individual a la cuenta. La propuesta bancaria no se completa con el importe estimado; el recibo financiero explica su origen.
+
+El candidato `bbva.account-deposit.es.v1` permanece sin acreditación global de formato real. Una muestra completa propia, registrada sin alterar la propuesta y aún válida, permite aceptar la regla de ese propietario y cuenta. Campos contradictorios, muestras editadas o eliminadas, fechas fuera de referencia y posibles duplicados conservan revisión. La comparación por importe produce candidatos, no una asociación silenciosa. Los avisos repetidos de nómina del mismo período tampoco crean otra entrada por cambiar su importe o desaparecer el ingreso original.
+
+Registro automático añade Ingresos y un editor para registrar, vincular y confirmar estimaciones. Confirmar modifica el mismo ingreso; editar desde Ingresos también lo confirma. Mi dinero señala el importe estimado dentro del saldo y consulta cada 15 segundos cuando está visible, además de al recuperar foco/conexión. La entrega sigue dependiendo de una notificación accesible y del envío nativo.
+
+La migración aditiva `20261031010000_capture_income` añade reglas privadas con RLS, la marca de ingreso estimado y el vínculo idempotente desde `CaptureMoneyPosting`. No activa reglas ni procesa históricos. Reinterpretar conserva el original y el historial sin registrar. La publicación, migración productiva y activación personal se autorizan por separado conforme al README. [Verificación y límites](../artifacts/capture-income-2026-10-31/README.md).

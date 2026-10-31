@@ -21,6 +21,7 @@ export interface MoneyEvent {
   categoryId?: string | null; cardId?: string | null; route?: string;
   transferId?: string; withdrawalId?: string; debitExpenseId?: string; ownPaymentId?: string | null;
   paymentGroup?: string; approximateDate?: boolean; automaticYield?: boolean;
+  estimatedIncome?: boolean;
   originalDate?: string; includedInReference?: boolean; needsAccount?: boolean;
 }
 export type DatedEvent = MoneyEvent & { date: string };

@@ -80,7 +80,7 @@ export async function captureRolloutMovements(db: CaptureDb, userId: string, fil
 }
 
 export function buildCaptureRollout(cards: { id: string }[], aliases: CaptureCardAlias[], automations: CaptureAutomation[], parsers: CaptureParser[], movements: RolloutMovement[]) {
-  const formats = parsers.filter(parser => parser.evidence !== "REAL_OUT_OF_SCOPE" && !parser.moneyOnly && !parser.paymentOnly && !parser.refundOnly);
+  const formats = parsers.filter(parser => parser.evidence !== "REAL_OUT_OF_SCOPE" && !parser.incomeOnly && !parser.moneyOnly && !parser.paymentOnly && !parser.refundOnly);
   return cards.map(card => {
     // Las fuentes proceden de alias explícitos, nunca del nombre editable.
     // Wallet se muestra también sin alias para hacer visible esa limitación.

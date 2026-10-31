@@ -1,0 +1,54 @@
+{
+  "status": "READY",
+  "target": "production",
+  "url": "https://finanzas.garatachia.com",
+  "projectId": "prj_FUBRDkPPFpOgJG9zuLLhTwm3JHKV",
+  "deploymentId": "dpl_9mCyRA2CAXqZDt3EzrXVZwUKxvjL",
+  "deploymentUrl": "https://afp-o3ivbyoj0-minnicas-projects.vercel.app",
+  "baseGitCommit": "f472a5d2b90aaa68357d2273cbe209f9f0a77c99",
+  "includesUncommittedWorkspaceChanges": true,
+  "gitCommitOrPushCreated": false,
+  "filesUploaded": 419,
+  "filesIndependentlyMatched": 419,
+  "sourceMismatches": [],
+  "migration": {
+    "name": "20261031010000_capture_income",
+    "applied": true,
+    "activeMigrations": 44,
+    "checksumErrors": 0,
+    "pending": 0,
+    "backupCreatedPrivately": true,
+    "backupCatalogValidated": true,
+    "existingRecordsCompared": 1434,
+    "tablesCompared": 38,
+    "existingRecordsChangedDuringMigration": 0
+  },
+  "activation": {
+    "mode": "AUTOMATIC",
+    "ownerAndAccountVerified": true,
+    "estimatesFromPrivatePayrollReceipts": true,
+    "originalBankAmountRemainsAbsent": true,
+    "readOnlyDryRunReason": "INCOME_READY",
+    "historicalIncomesCreated": 0
+  },
+  "checks": {
+    "login": 200,
+    "anonymousCaptureConfiguration": 401,
+    "anonymousIncomeCaptures": 401,
+    "anonymousIncomes": 401,
+    "anonymousMoney": 401,
+    "privateApiCacheControl": "private, no-store",
+    "recentRuntimeErrorGroups": 0,
+    "productionDependencyAdvisories": 0,
+    "developmentDependencyAdvisories": {
+      "low": 1,
+      "moderate": 2
+    }
+  },
+  "limitations": [
+    "No new live bank notification was generated or observed during this deployment.",
+    "Authenticated data checks used the application services against production PostgreSQL; no authenticated browser session was used.",
+    "Rule applies to new incoming notices; historical reinterpretation did not register income.",
+    "No visual validation or screenshots were performed."
+  ]
+}

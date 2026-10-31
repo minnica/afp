@@ -1,0 +1,2097 @@
+[
+  {
+    "file": "components.json",
+    "sha": "4e6428d53ad2d8b5683153d4fcc796eeb567a2ec",
+    "size": 524
+  },
+  {
+    "file": "eslint.config.mjs",
+    "sha": "371d71de616e6e9acc7bb5f03fa08830de1c4381",
+    "size": 1920
+  },
+  {
+    "file": "next.config.mjs",
+    "sha": "b6602e5627ba732b0c03ec06edd019a961206960",
+    "size": 213
+  },
+  {
+    "file": "package.json",
+    "sha": "181c3ff9adb55f2df4a0ea57c54744e0100e8e29",
+    "size": 2185
+  },
+  {
+    "file": "pnpm-lock.yaml",
+    "sha": "78eec87b3e8a51afcf0d549552f64fff2f3d71a1",
+    "size": 349697
+  },
+  {
+    "file": "pnpm-workspace.yaml",
+    "sha": "4e675a98a9646ca2c012bea50e57ccfe271b0844",
+    "size": 121
+  },
+  {
+    "file": "postcss.config.mjs",
+    "sha": "8f8be689e9af58f80351df6e6b551146822f42a4",
+    "size": 94
+  },
+  {
+    "file": "prisma/migrations/20260509070227_init/migration.sql",
+    "sha": "d3472cf1fe2af07e6af63870e66c2455c11a2b9d",
+    "size": 11802
+  },
+  {
+    "file": "prisma/migrations/20260517045000_add_payable_accounts/migration.sql",
+    "sha": "d9f66e5d07f42df4e377ddcb0170da47bdce1088",
+    "size": 1772
+  },
+  {
+    "file": "prisma/migrations/20260517222440_add_subscription_frequency/migration.sql",
+    "sha": "84eda35c8a722d59df209a668d03b5f4b57bc352",
+    "size": 217
+  },
+  {
+    "file": "prisma/migrations/20260517235633_replace_receivable_expected_date_with_charge_day/migration.sql",
+    "sha": "1fdbc7e15770e038832f37b12650e028282734f3",
+    "size": 269
+  },
+  {
+    "file": "prisma/migrations/20260518002802_replace_receivable_charge_day_with_charge_days/migration.sql",
+    "sha": "7d36424664fea2e116246aa882a7ace2b6b0aa63",
+    "size": 303
+  },
+  {
+    "file": "prisma/migrations/20260518041110_add_expense_subscription_relation/migration.sql",
+    "sha": "ca6362c0fbee5b37a09323ebbee2dd4042ddd2c5",
+    "size": 282
+  },
+  {
+    "file": "prisma/migrations/20260518234708_add_payable_loan_support/migration.sql",
+    "sha": "27977b021b4a2505676caeef90898788053fcb02",
+    "size": 1261
+  },
+  {
+    "file": "prisma/migrations/20260604000000_add_subscription_active_fields/migration.sql",
+    "sha": "5af908e27901d10cf6130140f89d6db552605fe2",
+    "size": 164
+  },
+  {
+    "file": "prisma/migrations/20261009000000_add_installment_statement_reconciliations/migration.sql",
+    "sha": "b04646fef252eeb3a90c145ecf29fffa1d199b7d",
+    "size": 99
+  },
+  {
+    "file": "prisma/migrations/20261010000000_add_card_cycle_credits/migration.sql",
+    "sha": "c36ac5e910784c1e14ebe5dc8139f02c560c2fb7",
+    "size": 1275
+  },
+  {
+    "file": "prisma/migrations/20261011000000_add_card_usage_verification/migration.sql",
+    "sha": "98a3d1b6415f1ffdbcd7a2f029f4642f8e443a83",
+    "size": 203
+  },
+  {
+    "file": "prisma/migrations/20261015000000_add_notice_dismissals/migration.sql",
+    "sha": "accd7253f28dcc9f0befeafc3c8b95f8bf6b5b2a",
+    "size": 1006
+  },
+  {
+    "file": "prisma/migrations/20261016000000_add_subscription_charges/migration.sql",
+    "sha": "48db9a669b2dfc93f02f30fae1cfd37d84ea641f",
+    "size": 1685
+  },
+  {
+    "file": "prisma/migrations/20261017000000_add_expense_operations/migration.sql",
+    "sha": "785e223c637eed4c0c9a8be6a3b331329d90cd61",
+    "size": 646
+  },
+  {
+    "file": "prisma/migrations/20261017020000_enable_application_rls/migration.sql",
+    "sha": "adc1b84a306a4acaed58caf9a6bd95bb139a374c",
+    "size": 3017
+  },
+  {
+    "file": "prisma/migrations/20261017030000_add_post_cut_credits/migration.sql",
+    "sha": "f60757c82bda8578dbb26ce6ab76d0493fe98714",
+    "size": 329
+  },
+  {
+    "file": "prisma/migrations/20261020000000_add_cash_expense_contributions/migration.sql",
+    "sha": "8342f81eba0f48ecd788732a76baac3655c3f647",
+    "size": 458
+  },
+  {
+    "file": "prisma/migrations/20261021000000_add_android_capture_linking/migration.sql",
+    "sha": "0ba2f4d528959febcfc3d26f63ceac1065c82a27",
+    "size": 4133
+  },
+  {
+    "file": "prisma/migrations/20261021010000_add_capture_processing/migration.sql",
+    "sha": "da9d5d6ee0e77ec8fa5aeb3b512d559ac3182fa4",
+    "size": 6532
+  },
+  {
+    "file": "prisma/migrations/20261021020000_capture_installment_reconciliation/migration.sql",
+    "sha": "8d5ebb0e53b6384ea43674011e6221e6cc58c670",
+    "size": 278
+  },
+  {
+    "file": "prisma/migrations/20261021030000_capture_review_and_reconciliation/migration.sql",
+    "sha": "9dfef021cfbd4c625ea03282fe436d7769302b82",
+    "size": 1401
+  },
+  {
+    "file": "prisma/migrations/20261021040000_add_card_credit_balances/migration.sql",
+    "sha": "3cee9d378809af69b16093d9933e1bbac1122a54",
+    "size": 594
+  },
+  {
+    "file": "prisma/migrations/20261022000000_add_card_balance_tracking/migration.sql",
+    "sha": "b411294bf6c562f9fe745f4d1bd2a28cb3967234",
+    "size": 2529
+  },
+  {
+    "file": "prisma/migrations/20261023000000_add_google_calendar_sync/migration.sql",
+    "sha": "b72503f35f1094f90fdd7a7232018d82941e86b0",
+    "size": 5455
+  },
+  {
+    "file": "prisma/migrations/20261023010000_capture_wallet_date_policy/migration.sql",
+    "sha": "2ba326a635f1e9bf71dc9a9e7ca3b15a43e89d3a",
+    "size": 645
+  },
+  {
+    "file": "prisma/migrations/20261023020000_capture_nu_cfe_policy/migration.sql",
+    "sha": "3829fd262f1985644d30af0b49af0221cf9b6e8f",
+    "size": 1205
+  },
+  {
+    "file": "prisma/migrations/20261023030000_capture_card_payments/migration.sql",
+    "sha": "ff5154faa1ae0ca85838535e2b2f5def41c76d40",
+    "size": 1615
+  },
+  {
+    "file": "prisma/migrations/20261023040000_automatic_payment_receipts/migration.sql",
+    "sha": "c8dc50e919f7b606e782ee9756298a1b7e651b2a",
+    "size": 1987
+  },
+  {
+    "file": "prisma/migrations/20261023050000_receivable_balance_adjustment/migration.sql",
+    "sha": "fd3fb8cd774e5494ec5f5856216f6ac7d192a4a8",
+    "size": 210
+  },
+  {
+    "file": "prisma/migrations/20261023060000_receiver_payment_notices/migration.sql",
+    "sha": "2714d77a0e6a1c04d79dc39b10e81bb90d3b12f8",
+    "size": 862
+  },
+  {
+    "file": "prisma/migrations/20261024010000_capture_mercadopago_purchase_policy/migration.sql",
+    "sha": "421b6bc164da44145c19fea637a9f29acce4e164",
+    "size": 924
+  },
+  {
+    "file": "prisma/migrations/20261024020000_capture_bank_fallback/migration.sql",
+    "sha": "8f5accb44ca75d00a68faa54a9d05514e58009cd",
+    "size": 2064
+  },
+  {
+    "file": "prisma/migrations/20261025000000_add_money_accounts/migration.sql",
+    "sha": "e7b27cc10307541437c74b12163c99eb36f8550e",
+    "size": 9976
+  },
+  {
+    "file": "prisma/migrations/20261025010000_money_account_yields/migration.sql",
+    "sha": "425d6b4ba25d7262507930f84247012351c08639",
+    "size": 827
+  },
+  {
+    "file": "prisma/migrations/20261025020000_automatic_money_yields/migration.sql",
+    "sha": "08cc14744393b7038f8be88683e3c8e650026f90",
+    "size": 1166
+  },
+  {
+    "file": "prisma/migrations/20261025030000_payroll_business_days/migration.sql",
+    "sha": "5b7ad112d91dcce3a494e72e3ee9de5bcdbc2e37",
+    "size": 165
+  },
+  {
+    "file": "prisma/migrations/20261026000000_expense_refunds/migration.sql",
+    "sha": "692a056a25c125f5a05b1e700cb73c666e922416",
+    "size": 1532
+  },
+  {
+    "file": "prisma/migrations/20261026010000_debit_payment_method/migration.sql",
+    "sha": "a50839b69dfc0211b7ee141c300ac94857b16406",
+    "size": 122
+  },
+  {
+    "file": "prisma/migrations/20261026020000_capture_account_movements/migration.sql",
+    "sha": "a3af5197642d688e19bc7a8f526a9fa0d92a4e0f",
+    "size": 6134
+  },
+  {
+    "file": "prisma/migrations/20261026030000_card_cycle_dates_confirmation/migration.sql",
+    "sha": "9e53ceee09974ba1885e385d3fa2edda4632abce",
+    "size": 236
+  },
+  {
+    "file": "prisma/migrations/20261027000000_variable_budget_payment_mix/migration.sql",
+    "sha": "f2dda0796c560c0397d521c1c66c609628cdc086",
+    "size": 343
+  },
+  {
+    "file": "prisma/migrations/20261027010000_bbva_debit_automation/migration.sql",
+    "sha": "5901c0b369e2aa4d06d91a64a2b2cd22bcdabfbe",
+    "size": 2092
+  },
+  {
+    "file": "prisma/migrations/20261029010000_capture_receipt_date_policy/migration.sql",
+    "sha": "2421c2f71a7733e5735e7902d03d03aa771c8521",
+    "size": 348
+  },
+  {
+    "file": "prisma/migrations/20261031010000_capture_income/migration.sql",
+    "sha": "76eb2245c4a4ef17e6baf3ffd3412eb91f59dc73",
+    "size": 2676
+  },
+  {
+    "file": "prisma/migrations/migration_lock.toml",
+    "sha": "7abbf1b5bc2ed90d381336ef493ef3a44c488e3d",
+    "size": 128
+  },
+  {
+    "file": "prisma/schema.prisma",
+    "sha": "dd542fab161d92d15af36fcd1ad56b618b5436fe",
+    "size": 36598
+  },
+  {
+    "file": "prisma.config.ts",
+    "sha": "870e21fc22bf01ad64653745c1fead3ee361719d",
+    "size": 192
+  },
+  {
+    "file": "public/.well-known/assetlinks.json",
+    "sha": "83ec07e1c907014c459be789267fe9510a8727f6",
+    "size": 338
+  },
+  {
+    "file": "public/card-brands/banamex-wordmark.webp",
+    "sha": "135428908c6b8c7c3f5b4fe2e641beff11729911",
+    "size": 1692
+  },
+  {
+    "file": "public/card-brands/bbva-platinum-motif.webp",
+    "sha": "bf2b4c5dd74634c9eb5e909d15ab95fb7b04bd94",
+    "size": 1666
+  },
+  {
+    "file": "public/card-brands/bbva.svg",
+    "sha": "8326877fcdd733026ef4e87a424f38e13ebbe91f",
+    "size": 1917
+  },
+  {
+    "file": "public/card-brands/didi-card-wordmark.webp",
+    "sha": "fb4944e4b5fb312f5fef9f952346f65ef51bbf95",
+    "size": 1924
+  },
+  {
+    "file": "public/card-brands/didi.svg",
+    "sha": "eb4c8de0b634db2f9283fbb536e6f2b1888ddf2d",
+    "size": 17094
+  },
+  {
+    "file": "public/card-brands/hsbc-zero-motif.webp",
+    "sha": "c8b40f462b142466e2b2165410865a8aacecc896",
+    "size": 2228
+  },
+  {
+    "file": "public/card-brands/hsbc.svg",
+    "sha": "376a66328c052d4398e827814bc99b0d2ed62d92",
+    "size": 5004
+  },
+  {
+    "file": "public/card-brands/joy-petals.svg",
+    "sha": "8cf7394368538aadf34738fd4fc3e87112962d90",
+    "size": 2704
+  },
+  {
+    "file": "public/card-brands/joy-reference-petals.webp",
+    "sha": "942938482c081af47e77b2714365cb457f0c5700",
+    "size": 7890
+  },
+  {
+    "file": "public/card-brands/joy.png",
+    "sha": "2e63fa779778fcd223a43ba3f60b26e4e4185f79",
+    "size": 29641
+  },
+  {
+    "file": "public/card-brands/likeu-pearl-motif.webp",
+    "sha": "731dbe7ad00022920378bebc7f1053b8c27bb4d1",
+    "size": 26542
+  },
+  {
+    "file": "public/card-brands/likeu-pearl-pattern.svg",
+    "sha": "ddfa293e65f7e415c203d4d4fd22ce93490b071b",
+    "size": 89227
+  },
+  {
+    "file": "public/card-brands/likeu-red.webp",
+    "sha": "54fcf140eda2e1246212eb257dcdb85aa6ad05eb",
+    "size": 739058
+  },
+  {
+    "file": "public/card-brands/likeu-wordmark.svg",
+    "sha": "b72a96680ca871c63f310e6b3f15bf75624d37c4",
+    "size": 3190
+  },
+  {
+    "file": "public/card-brands/likeu-wordmark.webp",
+    "sha": "5f71f6b861b4e87ad83529644c01606d41ede9f3",
+    "size": 1940
+  },
+  {
+    "file": "public/card-brands/mastercard.svg",
+    "sha": "d85f9f0d2363285b7e4b9dc7da916fdfa0069acb",
+    "size": 263
+  },
+  {
+    "file": "public/card-brands/mercado-pago-motif.webp",
+    "sha": "92cd3eded4e7b362f304a60ee6dd8af06a1533c7",
+    "size": 3812
+  },
+  {
+    "file": "public/card-brands/nu.png",
+    "sha": "ba54cfb13560a3a27686a10b19b9dfe7d699045c",
+    "size": 811
+  },
+  {
+    "file": "public/card-brands/nu.svg",
+    "sha": "5a382ce7c12b9e7029c5653b3c29768c5beab381",
+    "size": 1362
+  },
+  {
+    "file": "public/card-brands/santander-flame.svg",
+    "sha": "b162049824741e475d6f9410ae83e673fee1750d",
+    "size": 1392
+  },
+  {
+    "file": "public/card-brands/santander-wordmark.webp",
+    "sha": "780067a907716069dff1d0f8f026174e9614b83d",
+    "size": 3738
+  },
+  {
+    "file": "public/card-brands/santander.svg",
+    "sha": "1e2df30a3d6b9845f6ef5da734ac422f67f5b46e",
+    "size": 7430
+  },
+  {
+    "file": "public/card-brands/sources.json",
+    "sha": "36a9d8223bf1af577f87ba57640a4f6060c6c894",
+    "size": 7557
+  },
+  {
+    "file": "public/card-brands/visa.svg",
+    "sha": "b791d4456f47e6c84c5f2a46cae0cd253263b079",
+    "size": 852
+  },
+  {
+    "file": "public/file.svg",
+    "sha": "fb380eeffe87d50b597383664c02982964d0d28c",
+    "size": 391
+  },
+  {
+    "file": "public/globe.svg",
+    "sha": "2eba23b01a46733bb8423e6d38ebf5f7e95abec5",
+    "size": 1035
+  },
+  {
+    "file": "public/icons/app-icon-v3-1024.png",
+    "sha": "4800e97915f00211507b42e2558ec1c91241bbf8",
+    "size": 21381
+  },
+  {
+    "file": "public/icons/app-icon-v3-192.png",
+    "sha": "e3e36c6b2df2267a9366872b0e9dff465da068e7",
+    "size": 3151
+  },
+  {
+    "file": "public/icons/app-icon-v3-512.png",
+    "sha": "f85335996016f4c4ed3dfb9c93aa609fb3224f65",
+    "size": 9576
+  },
+  {
+    "file": "public/icons/app-icon-v3-maskable-512.png",
+    "sha": "a0f576ea0c97dfcb89523e841fb47cac4a6e8774",
+    "size": 8110
+  },
+  {
+    "file": "public/icons/app-icon.svg",
+    "sha": "ee660ccc61ae642401b79cb4c917945fea4e298f",
+    "size": 803
+  },
+  {
+    "file": "public/icons/apple-touch-icon-v3.png",
+    "sha": "2f8cef4995036b5269a630aaa4c1e8268c461cdf",
+    "size": 2999
+  },
+  {
+    "file": "public/manifest.webmanifest",
+    "sha": "4bf4ab5bd48725021054f65e2a8a23d139557b4b",
+    "size": 844
+  },
+  {
+    "file": "public/next.svg",
+    "sha": "3f3e95622612b989c5bd6a03299a308c6f3c7e6b",
+    "size": 1375
+  },
+  {
+    "file": "public/sw.js",
+    "sha": "e3eb08cad834c267f1e87169cba0b4c545fcc304",
+    "size": 2473
+  },
+  {
+    "file": "public/vercel.svg",
+    "sha": "cebb8852d58c8886be3e9051a26957f42bb82f1a",
+    "size": 128
+  },
+  {
+    "file": "public/window.svg",
+    "sha": "54c48e0daa6caa317fe1b4c419007fd93e948db9",
+    "size": 385
+  },
+  {
+    "file": "scripts/android-assetlinks.cjs",
+    "sha": "cf46b040e93a08df7bb01562b0b971402326d9e5",
+    "size": 3513
+  },
+  {
+    "file": "scripts/android-assetlinks.d.cts",
+    "sha": "3db53462398016e509e24f61bd0752ad62ec8a92",
+    "size": 364
+  },
+  {
+    "file": "scripts/audit-card-breakdowns.py",
+    "sha": "fcf37e05853ba05fe62835196edafd8e7d961e76",
+    "size": 10028
+  },
+  {
+    "file": "scripts/audit-migration-history.cjs",
+    "sha": "69a9b635190791f30e242487095216b7508d5db6",
+    "size": 2718
+  },
+  {
+    "file": "scripts/audit-migration-history.d.cts",
+    "sha": "eb6b01f1d3f1b7a3c493b04ca79e85a6e3dda3fc",
+    "size": 369
+  },
+  {
+    "file": "scripts/configure-calendar-cron.cjs",
+    "sha": "95ee468ad390cc177a772b47d527684b4a0e626e",
+    "size": 1300
+  },
+  {
+    "file": "scripts/configure-capture-bank-fallback-cron.cjs",
+    "sha": "482a8ecc57166b60c347c21fee986abe5f397f8b",
+    "size": 3043
+  },
+  {
+    "file": "scripts/configure-capture-bank-fallback-cron.d.cts",
+    "sha": "c2a2cd4d8e5546578df329867930f7b63a89c4a7",
+    "size": 265
+  },
+  {
+    "file": "scripts/database-automation.sql",
+    "sha": "80da04e0e42ee97779bb0af7261ce6b9d675127f",
+    "size": 693
+  },
+  {
+    "file": "scripts/database-metadata.sql",
+    "sha": "f3ab5d32cee3fba352b30f428e859b791537a9dd",
+    "size": 1685
+  },
+  {
+    "file": "scripts/generate-icons.mjs",
+    "sha": "3d395164148e1b53b0d949045dc884f92deeb879",
+    "size": 2169
+  },
+  {
+    "file": "scripts/generate-likeu-pattern.cjs",
+    "sha": "b93e3a7f77309391ae70c551afe9cff131d240b2",
+    "size": 7050
+  },
+  {
+    "file": "scripts/prepare-card-reference-assets.cjs",
+    "sha": "e2aba907dc14a83144acdddc5547b0a46c85f919",
+    "size": 2934
+  },
+  {
+    "file": "scripts/verify-database-reproduction.cjs",
+    "sha": "b706d9a6bc8bbbff1066592aeeeea45d44ffa730",
+    "size": 31622
+  },
+  {
+    "file": "src/app/acerca/page.tsx",
+    "sha": "e6dcff035d02cb5858a367e19cb288aeb51191ff",
+    "size": 1544
+  },
+  {
+    "file": "src/app/analisis/page.tsx",
+    "sha": "de0371e05ff5d2a4310e0828966a250337d56ba6",
+    "size": 217
+  },
+  {
+    "file": "src/app/api/calendar/google/callback/route.ts",
+    "sha": "315dea89ba63f9cc8c9332d670ee5d44d35c2b67",
+    "size": 1318
+  },
+  {
+    "file": "src/app/api/calendar/google/connect/route.ts",
+    "sha": "0834a6a7c20325bbcf5e0818157462e5ec6136ae",
+    "size": 1064
+  },
+  {
+    "file": "src/app/api/calendar/google/disconnect/route.ts",
+    "sha": "de943c22037c44adecc237fbec3ba6198dc50b10",
+    "size": 946
+  },
+  {
+    "file": "src/app/api/calendar/google/route.ts",
+    "sha": "c8c01eee483a9948e33f3933775ce0ecb3488176",
+    "size": 1455
+  },
+  {
+    "file": "src/app/api/calendar/google/sync/route.ts",
+    "sha": "2452b75225ca65814dbb7dbee170039374693453",
+    "size": 1625
+  },
+  {
+    "file": "src/app/api/captures/configuration/route.ts",
+    "sha": "4fbc12f434b96e925395e01f480be70a88699083",
+    "size": 983
+  },
+  {
+    "file": "src/app/api/captures/device/route.ts",
+    "sha": "10be4bc3ebcaaf7d68293bc9822b415032b0beef",
+    "size": 315
+  },
+  {
+    "file": "src/app/api/captures/devices/route.ts",
+    "sha": "5c55442d3213684f105de05d91a8b269965bb67c",
+    "size": 220
+  },
+  {
+    "file": "src/app/api/captures/events/route.ts",
+    "sha": "9a604e0ec950d6604c20bb6c7685cc731bd24af6",
+    "size": 136
+  },
+  {
+    "file": "src/app/api/captures/movements/route.ts",
+    "sha": "17d3da17d7f5477d52c2886d1ef402fb6ef864d7",
+    "size": 5035
+  },
+  {
+    "file": "src/app/api/captures/notices/route.ts",
+    "sha": "fc67b9edaec9017720db049d09d89020a86fc5ca",
+    "size": 1373
+  },
+  {
+    "file": "src/app/api/captures/pairings/route.ts",
+    "sha": "5560bb0ff0cdcb93f5c9848413c64c76bb40c82d",
+    "size": 223
+  },
+  {
+    "file": "src/app/api/captures/payment-receipts/route.ts",
+    "sha": "03e2b8fbe7bf399d07fddd9b6a834f93de250e43",
+    "size": 3468
+  },
+  {
+    "file": "src/app/api/captures/reconciliation/route.ts",
+    "sha": "8bb7fe79a6dd3ae2cb7eca1c3b92ad92feed13b5",
+    "size": 1038
+  },
+  {
+    "file": "src/app/api/card-cycles/route.ts",
+    "sha": "4d17ff2029633e487722d8ef3103c2321c18579a",
+    "size": 18425
+  },
+  {
+    "file": "src/app/api/cards/route.ts",
+    "sha": "c66f53840612b9e2ee12610b51d48f5c5b83fc54",
+    "size": 8871
+  },
+  {
+    "file": "src/app/api/cron/calendar-sync/route.ts",
+    "sha": "e65c24e83be7eaaf5e17d03babd0f32ea9ec86d7",
+    "size": 1454
+  },
+  {
+    "file": "src/app/api/cron/capture-bank-fallback/route.ts",
+    "sha": "ddcda709d9254d245fccf00a4dc43f8c34359bae",
+    "size": 968
+  },
+  {
+    "file": "src/app/api/dashboard/route.ts",
+    "sha": "13618b94d11fd089b0362ebcfd266c210a3620ec",
+    "size": 45
+  },
+  {
+    "file": "src/app/api/dashboard/summary/route.ts",
+    "sha": "80bfb3353bbdb70045c4b5f50027bea93541fde5",
+    "size": 140
+  },
+  {
+    "file": "src/app/api/expenses/route.ts",
+    "sha": "0e06553348150fe959bf4d22603b226f47bb99e5",
+    "size": 11166
+  },
+  {
+    "file": "src/app/api/gastos/bootstrap/route.ts",
+    "sha": "9b71ff0d2144551b3f16b633345d648a2a44c49d",
+    "size": 6284
+  },
+  {
+    "file": "src/app/api/incomes/route.ts",
+    "sha": "91b258f8730f8e5350c99fcc9186d21afec552c3",
+    "size": 12011
+  },
+  {
+    "file": "src/app/api/installment-purchases/payments/route.ts",
+    "sha": "9acd67127e384ac908407f2544d500c484803b6e",
+    "size": 2024
+  },
+  {
+    "file": "src/app/api/installment-purchases/route.ts",
+    "sha": "19b2a473f3a35d04937a39501020e94828c1330c",
+    "size": 13312
+  },
+  {
+    "file": "src/app/api/money/route.ts",
+    "sha": "36a0469653f799b9fc8b89cb29bed6a5ebd6de11",
+    "size": 3917
+  },
+  {
+    "file": "src/app/api/notice-dismissals/route.ts",
+    "sha": "a787bf097d75a55076bc33d76cd6b19fb247a090",
+    "size": 2094
+  },
+  {
+    "file": "src/app/api/payables/route.ts",
+    "sha": "a1670dd5a7b70af7bbee85c5948a4a95510c1331",
+    "size": 9846
+  },
+  {
+    "file": "src/app/api/receivables/route.ts",
+    "sha": "65569006cb069ebec49fd89d2a18b5fdb9ddab0d",
+    "size": 8774
+  },
+  {
+    "file": "src/app/api/settings/route.ts",
+    "sha": "7682603a3c37471c6a220e47bc3f8c555b2e18ec",
+    "size": 5062
+  },
+  {
+    "file": "src/app/api/setup-user/route.ts",
+    "sha": "a1fce87ae0693b8cd60650bbb9b4fe1dbad83f74",
+    "size": 1695
+  },
+  {
+    "file": "src/app/api/subscription-charges/route.ts",
+    "sha": "3a971898843453aa5913f3c6ad9c2e64ab4177f6",
+    "size": 2315
+  },
+  {
+    "file": "src/app/api/subscriptions/route.ts",
+    "sha": "f74908a401c6c473347f64b630a05d84a4928b49",
+    "size": 9602
+  },
+  {
+    "file": "src/app/compras-a-meses/page.tsx",
+    "sha": "b9b56bbdbeb35d61ba863ee8f7ff20a4e57f733e",
+    "size": 266
+  },
+  {
+    "file": "src/app/configuracion/page.tsx",
+    "sha": "1681dd21427a48613359e253051133c6604dc15c",
+    "size": 249
+  },
+  {
+    "file": "src/app/credito-y-deuda/page.tsx",
+    "sha": "2905c222c759b1a8f58e6814a7733a74b91fe83d",
+    "size": 248
+  },
+  {
+    "file": "src/app/cuentas-por-cobrar/page.tsx",
+    "sha": "25d5e20ec72c71f3f7d443b4e163ee887d7f4c20",
+    "size": 281
+  },
+  {
+    "file": "src/app/cuentas-por-pagar/page.tsx",
+    "sha": "2709249e782db3367d835a2a6f4a06f587dece76",
+    "size": 276
+  },
+  {
+    "file": "src/app/dashboard/page.tsx",
+    "sha": "0676ab2edac4ad9c5e9515b37676ea2e1827c29b",
+    "size": 244
+  },
+  {
+    "file": "src/app/favicon.ico",
+    "sha": "23e3df23f3c2a53edd4d3c9092b2452514a095ab",
+    "size": 10294
+  },
+  {
+    "file": "src/app/gastos/page.tsx",
+    "sha": "6a970f564b7356f5f66cc189f5724f09c4a7f500",
+    "size": 229
+  },
+  {
+    "file": "src/app/globals.css",
+    "sha": "b35b57b35e85ef3b965c9a1bc58782ffea886f86",
+    "size": 31097
+  },
+  {
+    "file": "src/app/ingresos/page.tsx",
+    "sha": "3470dfd342ffad68d0a2194e2a431bbc8a830096",
+    "size": 239
+  },
+  {
+    "file": "src/app/layout.tsx",
+    "sha": "c7e5858e77262387d82e83b9f98ba1ef60efd119",
+    "size": 1823
+  },
+  {
+    "file": "src/app/login/page.tsx",
+    "sha": "76ea1e4cd95c374da6e5a889c1824d825b078c67",
+    "size": 6582
+  },
+  {
+    "file": "src/app/mi-dinero/page.tsx",
+    "sha": "c1c51861dbde786120737c97906580731ab2e126",
+    "size": 205
+  },
+  {
+    "file": "src/app/page.tsx",
+    "sha": "d15cd84d285ef312681218b033bbf08fcc655f2a",
+    "size": 550
+  },
+  {
+    "file": "src/app/privacidad/page.tsx",
+    "sha": "4636dc43b07fc54fbf7681e27de537fb50363db4",
+    "size": 5851
+  },
+  {
+    "file": "src/app/registro-automatico/page.tsx",
+    "sha": "b95d9683d43ccac4845c70646ac6e675f07fe6dc",
+    "size": 406
+  },
+  {
+    "file": "src/app/suscripciones/page.tsx",
+    "sha": "74123d2f38f204e2ff33c9493b3f4d8f285dd53a",
+    "size": 264
+  },
+  {
+    "file": "src/app/tarjetas/page.tsx",
+    "sha": "5580fa72f8aab6c1a3f8c0b4e02e7af2714a9471",
+    "size": 239
+  },
+  {
+    "file": "src/components/PublicInfoPage.tsx",
+    "sha": "42e3d0ce59fd6118ccc79efba6624823b30c235e",
+    "size": 1257
+  },
+  {
+    "file": "src/components/analisis/AnalysisCharts.tsx",
+    "sha": "491bdfff1e5a6d4a4c34d1d1c305c74838e45f4d",
+    "size": 11228
+  },
+  {
+    "file": "src/components/analisis/AnalysisContent.tsx",
+    "sha": "cb68cb7390b7d29207167cc64ed4cd16660328d5",
+    "size": 3850
+  },
+  {
+    "file": "src/components/analisis/AnalysisError.tsx",
+    "sha": "6a8944a774d9e46bd87b8ee71384270b4054ee02",
+    "size": 563
+  },
+  {
+    "file": "src/components/analisis/AnalysisSkeleton.tsx",
+    "sha": "2f58748c6f83bb3f75fb91d2bf946527961c3138",
+    "size": 467
+  },
+  {
+    "file": "src/components/analisis/MonthSelector.tsx",
+    "sha": "70004ca8840e9e9a32ba1060c34ecdb528a07e1c",
+    "size": 913
+  },
+  {
+    "file": "src/components/compras-a-meses/ComprasAMesesContent.tsx",
+    "sha": "00cfec0500ebc87e7bad382de8455d7b83e5acba",
+    "size": 42832
+  },
+  {
+    "file": "src/components/compras-a-meses/PurchasePaymentsSheet.tsx",
+    "sha": "ea81d446c8d70dbecb4363ae635a3c453828c9a0",
+    "size": 9899
+  },
+  {
+    "file": "src/components/compras-a-meses/PurchaseRecipient.tsx",
+    "sha": "5d541da73d35cb52f8a4b2f97e56e84dbd6817b2",
+    "size": 726
+  },
+  {
+    "file": "src/components/configuracion/AutomaticRecordingContent.tsx",
+    "sha": "1b737a77e17cff039424a2845e12501be760cbb9",
+    "size": 1317
+  },
+  {
+    "file": "src/components/configuracion/AutomaticRecordingLink.tsx",
+    "sha": "f91edbb4a9ab7d7edbc741f505029ebaf5c87c63",
+    "size": 804
+  },
+  {
+    "file": "src/components/configuracion/CaptureConfigurationPanel.tsx",
+    "sha": "df1a3480742e1de0d26134ef0cd8ed2913830ad6",
+    "size": 20575
+  },
+  {
+    "file": "src/components/configuracion/CaptureDebitCorrection.tsx",
+    "sha": "7ad46c65919b78277e1b9ec35095ad1167ba5149",
+    "size": 4125
+  },
+  {
+    "file": "src/components/configuracion/CaptureDevices.tsx",
+    "sha": "cd0b24bbcfc5bd99bf0d4f4683678876f8ffb00d",
+    "size": 13324
+  },
+  {
+    "file": "src/components/configuracion/CaptureFields.tsx",
+    "sha": "f8f3fdc98e26207f252fb789022ffa367d822317",
+    "size": 2240
+  },
+  {
+    "file": "src/components/configuracion/CaptureIncomeEditor.tsx",
+    "sha": "83826a60266dae73044f738f5e5d2b92ffba0a14",
+    "size": 8533
+  },
+  {
+    "file": "src/components/configuracion/CaptureIncomeSettings.tsx",
+    "sha": "e699d3960a59114e3c1497f7f6e7c0d239ebd7b2",
+    "size": 7485
+  },
+  {
+    "file": "src/components/configuracion/CaptureMoneyEditor.tsx",
+    "sha": "1c6e4426e815ecddd7f6bcd0fce8f8ea2e11d7d6",
+    "size": 10525
+  },
+  {
+    "file": "src/components/configuracion/CaptureMoneySettings.tsx",
+    "sha": "d246e7723cf047045c31c66796b9b6b858af0387",
+    "size": 9743
+  },
+  {
+    "file": "src/components/configuracion/CaptureMovementEditor.tsx",
+    "sha": "2bcc081654c60ffaefb7a58a80f10e8d673c5b1d",
+    "size": 16916
+  },
+  {
+    "file": "src/components/configuracion/CaptureNotificationDetails.tsx",
+    "sha": "f601f2f0dd683089109191c62a7fb357b21bd2f6",
+    "size": 1833
+  },
+  {
+    "file": "src/components/configuracion/CapturePaymentEditor.tsx",
+    "sha": "b3d1e454ad48e759a0ea0370a74b286c6a0f1486",
+    "size": 11739
+  },
+  {
+    "file": "src/components/configuracion/CapturePilotSummary.tsx",
+    "sha": "ba0589dd550956a6b939e4d7ff6618e9d7f5534c",
+    "size": 3291
+  },
+  {
+    "file": "src/components/configuracion/CaptureReconciliation.tsx",
+    "sha": "3062b2645cc2a9927ff0e89c228dc2599290bc9b",
+    "size": 12126
+  },
+  {
+    "file": "src/components/configuracion/CaptureRefundEditor.tsx",
+    "sha": "6184963f0f9f0e59ed725568a6903dfd9c4cab40",
+    "size": 9256
+  },
+  {
+    "file": "src/components/configuracion/CaptureReview.tsx",
+    "sha": "760b35c32058eb7fa71915569144241994c96f9c",
+    "size": 18198
+  },
+  {
+    "file": "src/components/configuracion/CaptureRolloutStatus.tsx",
+    "sha": "4c68f9fc7e1508505eecd5a8f74bbe03b160131b",
+    "size": 9670
+  },
+  {
+    "file": "src/components/configuracion/GoogleCalendarSettings.tsx",
+    "sha": "657d9d0afb5bfb3f0be34abd9406b7238c5582cf",
+    "size": 12400
+  },
+  {
+    "file": "src/components/configuracion/SettingsContent.tsx",
+    "sha": "b8941975ecab8503e4ab15d83364b1f0e286f615",
+    "size": 16110
+  },
+  {
+    "file": "src/components/configuracion/captureUiTypes.ts",
+    "sha": "0079db3c26effba90ad7aab8d106828bfd715b41",
+    "size": 615
+  },
+  {
+    "file": "src/components/credito-y-deuda/CardBalances.tsx",
+    "sha": "e619f11b4e8bc9f6e6dd82a04d5eaff57c9aded9",
+    "size": 20280
+  },
+  {
+    "file": "src/components/credito-y-deuda/CreditBalancesContent.tsx",
+    "sha": "c1ac3562d966380b224043d9c4d0b7552d414c62",
+    "size": 5170
+  },
+  {
+    "file": "src/components/credito-y-deuda/MobileCreditCard.tsx",
+    "sha": "942c937fd2ac9da196796cbcbbff41178408eeee",
+    "size": 3894
+  },
+  {
+    "file": "src/components/cuentas-por-cobrar/CuentasPorCobrarContent.tsx",
+    "sha": "70c92ad5aed105f54696bd18e6e1d3936a7a9a31",
+    "size": 36823
+  },
+  {
+    "file": "src/components/cuentas-por-cobrar/ReceivableBalanceAdjustment.tsx",
+    "sha": "f16f2fbd14a1be82a54962df40ea3ba6cdaf1e63",
+    "size": 955
+  },
+  {
+    "file": "src/components/cuentas-por-pagar/CuentasPorPagarContent.tsx",
+    "sha": "a90f4afd351a4aed4b6d1c19e4a37c66461e80c6",
+    "size": 32536
+  },
+  {
+    "file": "src/components/cuentas-por-pagar/PayableDetails.tsx",
+    "sha": "9623d92b1f80e63e88d9153b1a1719e18a8014b2",
+    "size": 13379
+  },
+  {
+    "file": "src/components/cuentas-por-pagar/PayablesSummary.tsx",
+    "sha": "8c873e53bbbdb52a05d5d5bf2e34a42d805bd04a",
+    "size": 7392
+  },
+  {
+    "file": "src/components/dashboard/CardUsageWaiverBreakdown.tsx",
+    "sha": "b80d10ef5de9b06d2da4e0ce02e8e82f62eb39d9",
+    "size": 7041
+  },
+  {
+    "file": "src/components/dashboard/CardUsageWaiverProgress.tsx",
+    "sha": "b85813d64fb36f768dd16d986b0e4af547d8adbb",
+    "size": 17067
+  },
+  {
+    "file": "src/components/dashboard/CyclePeriodHelp.tsx",
+    "sha": "c4e5e6fdd94ecb5c7d2ec2c8fe481dd95ea06a7f",
+    "size": 3132
+  },
+  {
+    "file": "src/components/dashboard/DashboardContent.tsx",
+    "sha": "5405c902db3c1f95c0ebaaed8a582628bd351266",
+    "size": 15927
+  },
+  {
+    "file": "src/components/dashboard/DashboardPanels.tsx",
+    "sha": "95ba924e8aeb9f0a9acef773c680e6ca2c1af195",
+    "size": 4728
+  },
+  {
+    "file": "src/components/dashboard/DashboardProvider.tsx",
+    "sha": "15c1706e5802c4e314932098854ba72d084bae2e",
+    "size": 9062
+  },
+  {
+    "file": "src/components/dashboard/ImportantNotices.tsx",
+    "sha": "b648e3a377084926e0b2b3bf23132e16d0279a29",
+    "size": 13813
+  },
+  {
+    "file": "src/components/dashboard/NoticeCategory.tsx",
+    "sha": "1a35d8b02a4c86539d2ec27f7f31d56d058538e9",
+    "size": 2158
+  },
+  {
+    "file": "src/components/dashboard/NuTurboUsage.tsx",
+    "sha": "ecaaaefa530026691f05a92801c468334bb51dcb",
+    "size": 6127
+  },
+  {
+    "file": "src/components/gastos/CaptureStatus.tsx",
+    "sha": "9d87e8a01e125ea6725691954c01319fb36295a3",
+    "size": 1046
+  },
+  {
+    "file": "src/components/gastos/DailyExpenseCards.tsx",
+    "sha": "8b91b8436f2d8f38a3c6c3ed30f4afd6c3e93007",
+    "size": 10412
+  },
+  {
+    "file": "src/components/gastos/ExpenseCreateSurface.tsx",
+    "sha": "40994a64beee2753a629bf18299692a1f0804031",
+    "size": 817
+  },
+  {
+    "file": "src/components/gastos/GastosContent.tsx",
+    "sha": "df5b16a08d20c57d4f79d9e1cc03246e771eb1f9",
+    "size": 81075
+  },
+  {
+    "file": "src/components/gastos/OfflineCaptureConflicts.tsx",
+    "sha": "20c40b124d20c3603353335ba57e4db31fd5b0e2",
+    "size": 3491
+  },
+  {
+    "file": "src/components/gastos/OfflineExpenseRestore.tsx",
+    "sha": "9cfe9d6422ffe51a1b768186903ba57a3a436cdd",
+    "size": 1795
+  },
+  {
+    "file": "src/components/gastos/SharedExpenseFields.tsx",
+    "sha": "d7d8887c8dface6f3f32e83e404a8f4f1ea4ffd8",
+    "size": 3145
+  },
+  {
+    "file": "src/components/gastos/SubscriptionCharges.tsx",
+    "sha": "545850000b955ff3541a534c644400dee9930b95",
+    "size": 27500
+  },
+  {
+    "file": "src/components/ingresos/IngresosContent.tsx",
+    "sha": "fea8872bd6d435751f0ee6be14e0c44ae3d8e4c8",
+    "size": 31504
+  },
+  {
+    "file": "src/components/layout/AppHeader.tsx",
+    "sha": "e7790cc672feedbe06307ce6f3f8d54b8151060c",
+    "size": 1288
+  },
+  {
+    "file": "src/components/layout/AppHeaderActions.tsx",
+    "sha": "b0ce5924c36e76e8dffc600bace94cd27b32509e",
+    "size": 4984
+  },
+  {
+    "file": "src/components/layout/AppShell.tsx",
+    "sha": "dd40d9b97bd83d26b6c957912cf71024c5156f47",
+    "size": 634
+  },
+  {
+    "file": "src/components/layout/AppSidebar.tsx",
+    "sha": "1ee98c4780346d1e96b6f1797bc0c2609a0bcae0",
+    "size": 1925
+  },
+  {
+    "file": "src/components/layout/LogoutProvider.tsx",
+    "sha": "76a09deb9c0696f0ee004bf050fccbf9e4ad8831",
+    "size": 10758
+  },
+  {
+    "file": "src/components/layout/MobileNavigationSheet.tsx",
+    "sha": "e4781275e8e9c28d60155db2300311de5fc6ef4c",
+    "size": 5849
+  },
+  {
+    "file": "src/components/layout/PageSkeleton.tsx",
+    "sha": "05b202aaef17877ec61806b2abb817752afbfca6",
+    "size": 7239
+  },
+  {
+    "file": "src/components/mi-dinero/AccountYieldSummary.tsx",
+    "sha": "b18707495df4b56938437c365e94d85a82f8b433",
+    "size": 1041
+  },
+  {
+    "file": "src/components/mi-dinero/MoneyAccountsMobile.tsx",
+    "sha": "f8c25d4e8f8b338920f66dbe46d502148613f979",
+    "size": 4791
+  },
+  {
+    "file": "src/components/mi-dinero/MoneyAccountsTable.tsx",
+    "sha": "e976a8076af6463e121fdddef0e41a4f888f5586",
+    "size": 5850
+  },
+  {
+    "file": "src/components/mi-dinero/MoneyContent.tsx",
+    "sha": "0d9f1f5e842b4625dea6ab704b67fad4e1c219f1",
+    "size": 37563
+  },
+  {
+    "file": "src/components/mi-dinero/MoneyEditor.tsx",
+    "sha": "7fd85a839ff90ce12777223f16441d8f5bbd0aad",
+    "size": 8704
+  },
+  {
+    "file": "src/components/mi-dinero/MoneyForecastBreakdown.tsx",
+    "sha": "1f776c6c4e4c6598acefa884b3c96c5cfdda575e",
+    "size": 6222
+  },
+  {
+    "file": "src/components/mi-dinero/MoneyMonthlySummary.tsx",
+    "sha": "6d69b6bc24817fa40f3ceca96b92f9a7f079e013",
+    "size": 9540
+  },
+  {
+    "file": "src/components/mi-dinero/MoneyProjection.tsx",
+    "sha": "ce46edc9266b9ee7ea155ff737ff98f2276eb36e",
+    "size": 8529
+  },
+  {
+    "file": "src/components/mi-dinero/MoneyYields.tsx",
+    "sha": "22abac1d9f3ffdbcd2eb649ec6f30bbac092e374",
+    "size": 12616
+  },
+  {
+    "file": "src/components/mi-dinero/accountTotals.ts",
+    "sha": "de73003eaa27a5dff3da2b4a2969214610201aec",
+    "size": 797
+  },
+  {
+    "file": "src/components/mi-dinero/editorContracts.ts",
+    "sha": "fb867260b7527e01890a6dd7a7609d3a83529ff0",
+    "size": 2555
+  },
+  {
+    "file": "src/components/mi-dinero/format.ts",
+    "sha": "9ef0a02510c14aa7a3807e5214d516c3018d4a4e",
+    "size": 708
+  },
+  {
+    "file": "src/components/mi-dinero/monthlyMinimumPeriod.ts",
+    "sha": "34bc36913974587674615c5c5774a5afec604651",
+    "size": 1656
+  },
+  {
+    "file": "src/components/mi-dinero/monthlySummaryStatus.ts",
+    "sha": "0fdbbc8f5c41b71915c6a71cd66e9a6648c31b79",
+    "size": 1709
+  },
+  {
+    "file": "src/components/mi-dinero/projectionBreakdown.ts",
+    "sha": "098f5ac7c958322af4f6f2ee3f1753814eb13598",
+    "size": 5753
+  },
+  {
+    "file": "src/components/mi-dinero/transferEditor.ts",
+    "sha": "c8ce1cd50d928bcfb6ebc1fc3f31bb7943a0996b",
+    "size": 1246
+  },
+  {
+    "file": "src/components/pwa/ServiceWorkerRegistration.tsx",
+    "sha": "0e4617410351af5665cafd0a13f0adae6fdb8f17",
+    "size": 1204
+  },
+  {
+    "file": "src/components/suscripciones/SuscripcionesContent.tsx",
+    "sha": "f36188e43f56360ef816183a58f593037b846417",
+    "size": 40877
+  },
+  {
+    "file": "src/components/tarjetas/CycleBreakdown.tsx",
+    "sha": "ab50801be020dfe84358469b421f0024a7541e0a",
+    "size": 8901
+  },
+  {
+    "file": "src/components/tarjetas/CyclesDataTable.tsx",
+    "sha": "42a588e9e040e2f59f1eb61127f0eb79772df5f9",
+    "size": 36737
+  },
+  {
+    "file": "src/components/tarjetas/TarjetasContent.tsx",
+    "sha": "8935cf20bb6df63a32d3747ae8d8c1c4edb41b28",
+    "size": 27186
+  },
+  {
+    "file": "src/components/ui/accordion.tsx",
+    "sha": "946ba7bc2964f66c2a55e677c7fe4ced078e87b8",
+    "size": 2863
+  },
+  {
+    "file": "src/components/ui/alert-dialog.tsx",
+    "sha": "7fdfa2e8698bcb03577e34cfd2ee4aeb2c65f0a9",
+    "size": 5967
+  },
+  {
+    "file": "src/components/ui/alert.tsx",
+    "sha": "7835c709443d4030ccdbdc07576157e681ad69a8",
+    "size": 2445
+  },
+  {
+    "file": "src/components/ui/badge.tsx",
+    "sha": "7ba4a70942d5677ef6ef83c78197032b28782582",
+    "size": 2546
+  },
+  {
+    "file": "src/components/ui/button.tsx",
+    "sha": "c2e6513c151c69d0714c991c634314f35fab15fc",
+    "size": 3587
+  },
+  {
+    "file": "src/components/ui/calendar.tsx",
+    "sha": "d867a54afe9e8aa8ce3455a0cd9c8295fa16ba8c",
+    "size": 8219
+  },
+  {
+    "file": "src/components/ui/card.tsx",
+    "sha": "e06d02e1fec999b8cdde05c1cf2d755e82d8aabf",
+    "size": 2489
+  },
+  {
+    "file": "src/components/ui/chart.tsx",
+    "sha": "eded6f190585277c6dd76f23ace4b9ac8a78345e",
+    "size": 10789
+  },
+  {
+    "file": "src/components/ui/checkbox.tsx",
+    "sha": "69000e7473896828e93f2856a41972554776a772",
+    "size": 1675
+  },
+  {
+    "file": "src/components/ui/collapsible.tsx",
+    "sha": "5df79bce4aa2083e5e2543b5e23fc34811744a70",
+    "size": 833
+  },
+  {
+    "file": "src/components/ui/combobox.tsx",
+    "sha": "cfac0b071b55fceb78e96d6e41d2d74a600fab63",
+    "size": 10059
+  },
+  {
+    "file": "src/components/ui/command.tsx",
+    "sha": "2a7f5865d153d6d85622ca17f683671280abffc0",
+    "size": 5153
+  },
+  {
+    "file": "src/components/ui/create-record-surface.tsx",
+    "sha": "8fac92e33c02708ed5441a074470995a3208b57d",
+    "size": 10886
+  },
+  {
+    "file": "src/components/ui/data-table.tsx",
+    "sha": "033193457652bfa14cb90d4a6a00e1c7784fedb6",
+    "size": 12017
+  },
+  {
+    "file": "src/components/ui/date-picker.tsx",
+    "sha": "0cbe8771a8762c2d0259d29bf23e9958461a7b22",
+    "size": 4434
+  },
+  {
+    "file": "src/components/ui/dialog.tsx",
+    "sha": "bf16d89e730bf87b12a027c2573c278adc723710",
+    "size": 4144
+  },
+  {
+    "file": "src/components/ui/dropdown-menu.tsx",
+    "sha": "91bf4b41e60c4b806706ee1dffe493788b088613",
+    "size": 8902
+  },
+  {
+    "file": "src/components/ui/empty.tsx",
+    "sha": "438c24bb6949fcf17847761ab1105cb63d5d6c53",
+    "size": 2470
+  },
+  {
+    "file": "src/components/ui/expense-filter-combobox.tsx",
+    "sha": "9d7e22beb5b0476305d40d73c07f261fd7364396",
+    "size": 6293
+  },
+  {
+    "file": "src/components/ui/field.tsx",
+    "sha": "c32025aa7ba4d69379970cc33d9288ac4fdbb287",
+    "size": 6267
+  },
+  {
+    "file": "src/components/ui/header-dialog.tsx",
+    "sha": "39694a00826e742ec68f41c3259239dc8a60c1b2",
+    "size": 3464
+  },
+  {
+    "file": "src/components/ui/history-year.tsx",
+    "sha": "fae0176742ec3a64d8c8fb43c863fa417a0fbd73",
+    "size": 677
+  },
+  {
+    "file": "src/components/ui/input-group.tsx",
+    "sha": "551a8ded986ca208ee3dec29f088024a799f543e",
+    "size": 5270
+  },
+  {
+    "file": "src/components/ui/input.tsx",
+    "sha": "90f1e3247286bb0f8304de5e8f75b46223858cb6",
+    "size": 1930
+  },
+  {
+    "file": "src/components/ui/item.tsx",
+    "sha": "3c688b626abec802f2fa12e83cab51e55613fec0",
+    "size": 4776
+  },
+  {
+    "file": "src/components/ui/label.tsx",
+    "sha": "c8b62b9474328a11c58316466784d290aa8a6665",
+    "size": 615
+  },
+  {
+    "file": "src/components/ui/number-input.tsx",
+    "sha": "7c652e088c1524393c5faf6f2d924d03fc2e5cf0",
+    "size": 4601
+  },
+  {
+    "file": "src/components/ui/payment-method-selector.tsx",
+    "sha": "8ae3d4127f12833e07147c9f7eca21a8b1b0e453",
+    "size": 1765
+  },
+  {
+    "file": "src/components/ui/popover.tsx",
+    "sha": "949d09ab73748142340e2f7fe3a177b17cf7cc38",
+    "size": 2365
+  },
+  {
+    "file": "src/components/ui/progress.tsx",
+    "sha": "44260c0435fee59c0acbf4e04bbbf45b60672eb0",
+    "size": 927
+  },
+  {
+    "file": "src/components/ui/radio-group.tsx",
+    "sha": "076b50011cab47ea58e0d967324307152606987c",
+    "size": 1810
+  },
+  {
+    "file": "src/components/ui/record-card.tsx",
+    "sha": "f2fe5a6c5f7b17859e0d6fb16d80a703fdd159c1",
+    "size": 6193
+  },
+  {
+    "file": "src/components/ui/request-error-dialog.tsx",
+    "sha": "d01bad77f33a636f9f3870ddf97b3a9f67b771f2",
+    "size": 5406
+  },
+  {
+    "file": "src/components/ui/responsive-breakdown.tsx",
+    "sha": "db0cd0dc93bba34b61a143658e068291b21504ed",
+    "size": 9616
+  },
+  {
+    "file": "src/components/ui/responsive-select.tsx",
+    "sha": "c5dd91f2c81900eaad677719de1abbe3648ec0f2",
+    "size": 16231
+  },
+  {
+    "file": "src/components/ui/searchable-select.tsx",
+    "sha": "3aed53bdac750fa399b0621cd90048d894157646",
+    "size": 385
+  },
+  {
+    "file": "src/components/ui/select.tsx",
+    "sha": "1316281510e16c943d4709831a8be8a853ab4bfc",
+    "size": 6860
+  },
+  {
+    "file": "src/components/ui/separator.tsx",
+    "sha": "2df42cefe0a9197bd7dd4ccba95855d263a82771",
+    "size": 645
+  },
+  {
+    "file": "src/components/ui/sheet.tsx",
+    "sha": "f43031f325d00e9017b447b54e9aafaf7ceaba7d",
+    "size": 4566
+  },
+  {
+    "file": "src/components/ui/sidebar.tsx",
+    "sha": "d010699d1e108a8954837411aa967d0e6e536b94",
+    "size": 21157
+  },
+  {
+    "file": "src/components/ui/skeleton.tsx",
+    "sha": "ce48865eb4730172856ed58d865f8caf890dfa85",
+    "size": 316
+  },
+  {
+    "file": "src/components/ui/sonner.tsx",
+    "sha": "a01c14198e8b4c78b86a11a865253935c565eafe",
+    "size": 1635
+  },
+  {
+    "file": "src/components/ui/spinner.tsx",
+    "sha": "84a39256b71e4da236a05145b148353d65b7d14d",
+    "size": 545
+  },
+  {
+    "file": "src/components/ui/table.tsx",
+    "sha": "8ab64990dce86924a51f5c2cec29710381191040",
+    "size": 2343
+  },
+  {
+    "file": "src/components/ui/tabs.tsx",
+    "sha": "aae6d156f72006e4d841bc9bed602ca23b26bef2",
+    "size": 3669
+  },
+  {
+    "file": "src/components/ui/textarea.tsx",
+    "sha": "eb91c571d223655be6477642bc8fcb6160db16c0",
+    "size": 812
+  },
+  {
+    "file": "src/components/ui/tooltip.tsx",
+    "sha": "8646171afc24bea020d404d2e1d46ca2a95dc9ab",
+    "size": 2089
+  },
+  {
+    "file": "src/hooks/use-analysis.ts",
+    "sha": "36e3edd6b57ad34844b3a74b9511df3b6df4e283",
+    "size": 229
+  },
+  {
+    "file": "src/hooks/use-capture-resource.ts",
+    "sha": "255c86ccd9e56d94b76df4bfa4681f3c84edce7b",
+    "size": 3086
+  },
+  {
+    "file": "src/hooks/use-creation-draft.ts",
+    "sha": "601fe28089ad99cbab41420d72f2647135ca768a",
+    "size": 2936
+  },
+  {
+    "file": "src/hooks/use-dialog-focus.ts",
+    "sha": "a0d58b036350de250d1eab05eef03e44072e1946",
+    "size": 840
+  },
+  {
+    "file": "src/hooks/use-income-history.ts",
+    "sha": "5d3e6b379746a1aaa8b622cac9a6139d6d926d46",
+    "size": 3185
+  },
+  {
+    "file": "src/hooks/use-mobile.ts",
+    "sha": "dc2c5adf55626c5f189617564dbc68e1ed23f481",
+    "size": 767
+  },
+  {
+    "file": "src/hooks/use-notice-dismissals.ts",
+    "sha": "fef3d60521b4444015abe68f2e4670415dcd12e1",
+    "size": 4379
+  },
+  {
+    "file": "src/lib/analysisPresentation.ts",
+    "sha": "84060674ba684030e2e0740bb1398718f95f088f",
+    "size": 1288
+  },
+  {
+    "file": "src/lib/androidNotices.ts",
+    "sha": "4d12b0858c13d95f55ac9245933b9a4707a08373",
+    "size": 4002
+  },
+  {
+    "file": "src/lib/apiAuth.ts",
+    "sha": "22c464259c8233ac8f04a47e68c1ea9334bbe27d",
+    "size": 4793
+  },
+  {
+    "file": "src/lib/apiFetch.ts",
+    "sha": "35b1e59617bef5df1338dd80955d6caa1e4467af",
+    "size": 4928
+  },
+  {
+    "file": "src/lib/calculations/cardCredits.ts",
+    "sha": "44c3c6643c31c7d822545851010c5a221d40b74e",
+    "size": 2168
+  },
+  {
+    "file": "src/lib/calculations/cardCyclePayments.ts",
+    "sha": "254b8eb28942d99b55c62e5d07ad886da51e3e91",
+    "size": 3746
+  },
+  {
+    "file": "src/lib/calculations/cardCycles.ts",
+    "sha": "1e71c8d5cbbf8fd1c19b6d0db82d4dba74ea3e8c",
+    "size": 9105
+  },
+  {
+    "file": "src/lib/calculations/cardUsageWaivers.ts",
+    "sha": "33ea4f13f06a0dc6b24dc5d4343e5baea92b6939",
+    "size": 23297
+  },
+  {
+    "file": "src/lib/calculations/cycleDataQuality.ts",
+    "sha": "03af4238df326f4b7294a817f7d00c3fcb6a1139",
+    "size": 1226
+  },
+  {
+    "file": "src/lib/calculations/debtAccounts.ts",
+    "sha": "d5cf1faad00d3d3adb2f28ad2f135155794813e9",
+    "size": 1636
+  },
+  {
+    "file": "src/lib/calculations/installmentStatements.ts",
+    "sha": "05d455084fcf4a28eb42c5e6df16f4cd567226df",
+    "size": 2553
+  },
+  {
+    "file": "src/lib/calculations/subscriptionStatements.ts",
+    "sha": "2e87f3693117bf97fe46be1cc70b4508e611f210",
+    "size": 2196
+  },
+  {
+    "file": "src/lib/calculations/types.ts",
+    "sha": "ff3ce0e8427aaab016e1e1ab372d6de0b2491c25",
+    "size": 3292
+  },
+  {
+    "file": "src/lib/calculations/usageEvidence.ts",
+    "sha": "0285b65a1e805ebbaf3f93b9aaf325408daf9a21",
+    "size": 1174
+  },
+  {
+    "file": "src/lib/calendar/config.ts",
+    "sha": "b15087ac4b075d72826664707e4fade29fc22807",
+    "size": 5941
+  },
+  {
+    "file": "src/lib/calendar/events.ts",
+    "sha": "0f978c67fb1b1df43237f2fa2e6db798d28fbed7",
+    "size": 11080
+  },
+  {
+    "file": "src/lib/calendar/google.ts",
+    "sha": "75b63c863cb9c7f62e6b28cc311da5f348981cd3",
+    "size": 3672
+  },
+  {
+    "file": "src/lib/calendar/palette.ts",
+    "sha": "00ea53534bb7b9e0a234435a1786f57d9225cb42",
+    "size": 3319
+  },
+  {
+    "file": "src/lib/calendar/pending.ts",
+    "sha": "d85b2c4a9bb6379485694106befcf35bc74c1d88",
+    "size": 1243
+  },
+  {
+    "file": "src/lib/calendar/responses.ts",
+    "sha": "36388f131531eb8dbc53f4ca0a3b4fad63275c35",
+    "size": 1869
+  },
+  {
+    "file": "src/lib/calendar/schedule.ts",
+    "sha": "d546b38e2237707f656f28fb3041674a8afe7b23",
+    "size": 499
+  },
+  {
+    "file": "src/lib/calendar/service.ts",
+    "sha": "edf4bb12b53f4d9473bc83f3d3c631ac5c28373d",
+    "size": 5649
+  },
+  {
+    "file": "src/lib/calendar/sync.ts",
+    "sha": "08523e8e801fcfdd42fe7e5fbe0f8bcbc30c6d7f",
+    "size": 10695
+  },
+  {
+    "file": "src/lib/calendar/types.ts",
+    "sha": "f68fdb788452d88ed1576aaa54beb154de5a0eeb",
+    "size": 1361
+  },
+  {
+    "file": "src/lib/calendar/worker.ts",
+    "sha": "2bba62c189cfeb10fbf668a202bafa1d24675beb",
+    "size": 1707
+  },
+  {
+    "file": "src/lib/captureApi.ts",
+    "sha": "535d5536549f2794f12ea42f57e894bb20b247b8",
+    "size": 5647
+  },
+  {
+    "file": "src/lib/captureBankFallback.ts",
+    "sha": "3842543c4770ed14ba9a319685b9bea492c65695",
+    "size": 10652
+  },
+  {
+    "file": "src/lib/captureBankFallbackWorker.ts",
+    "sha": "758dfb010ab87bda3e6104687b14fbdc1e9a5481",
+    "size": 4620
+  },
+  {
+    "file": "src/lib/captureConfiguration.ts",
+    "sha": "40548ede2c19627f44f5ae6e8eda94d597f6e8d9",
+    "size": 16239
+  },
+  {
+    "file": "src/lib/captureDebitCorrections.ts",
+    "sha": "a5e6d4d6fc3e5d05e2dea1f1386ec25cdaf2ec0b",
+    "size": 6226
+  },
+  {
+    "file": "src/lib/captureFormatPolicy.ts",
+    "sha": "598fe5abbfdba8f26b791b5219e16d72fecbb9fd",
+    "size": 2591
+  },
+  {
+    "file": "src/lib/captureIdentity.ts",
+    "sha": "cf2840ec7218894677f2b5ed322f95b12b33f63f",
+    "size": 3045
+  },
+  {
+    "file": "src/lib/captureInbox.ts",
+    "sha": "9a357f58a6a2e9920e5dcbf139da1d612e43e111",
+    "size": 3845
+  },
+  {
+    "file": "src/lib/captureIncome.ts",
+    "sha": "562191122713d01931cf12eb6c42105a43f65cb8",
+    "size": 15507
+  },
+  {
+    "file": "src/lib/captureIncomeParsers.ts",
+    "sha": "c3cccf52ff816a354cc53e84dfbdf94e4fed90c5",
+    "size": 3314
+  },
+  {
+    "file": "src/lib/captureJson.ts",
+    "sha": "0fe6af3eebb425c1096374a848dd8f9829696f5a",
+    "size": 4582
+  },
+  {
+    "file": "src/lib/captureMoney.ts",
+    "sha": "aac9b5936e8f221d14792e74174313d9a127dc84",
+    "size": 19200
+  },
+  {
+    "file": "src/lib/captureMoneyParsers.ts",
+    "sha": "c13a8bcd674e53c417f0b2ae24ceb26a2678f17c",
+    "size": 4990
+  },
+  {
+    "file": "src/lib/captureParsers.ts",
+    "sha": "5b9c176371175e04ea69a0237f43eb1e438fb4cb",
+    "size": 26285
+  },
+  {
+    "file": "src/lib/capturePaymentAutomation.ts",
+    "sha": "197feab8344f1db55eecc443294e98933af92cf7",
+    "size": 6797
+  },
+  {
+    "file": "src/lib/capturePaymentParsers.ts",
+    "sha": "542f1d4a9653c24b9d7e54fdde8b814f974abf47",
+    "size": 6712
+  },
+  {
+    "file": "src/lib/capturePayments.ts",
+    "sha": "72fa6a1fc8af5895d1c3e8aace136c3d4adefb8b",
+    "size": 9227
+  },
+  {
+    "file": "src/lib/capturePilot.ts",
+    "sha": "505bb3ee790da097aa853afaf2db47836e29a302",
+    "size": 5914
+  },
+  {
+    "file": "src/lib/capturePresentation.ts",
+    "sha": "a3a278605c1194fcee91d0821a3dc36b3c455c2a",
+    "size": 9491
+  },
+  {
+    "file": "src/lib/captureProcessing.ts",
+    "sha": "07003b02a3286d86e4c8a7887eeae7c4f2717922",
+    "size": 32054
+  },
+  {
+    "file": "src/lib/captureProtocol.ts",
+    "sha": "ca7c3f1eeff5ce6e82cb7ea53fa51c132eb47d9c",
+    "size": 4970
+  },
+  {
+    "file": "src/lib/captureReconciliation.ts",
+    "sha": "e1c93c0ade425de78307b714ed50af952fc0ea3a",
+    "size": 9050
+  },
+  {
+    "file": "src/lib/captureRefundParsers.ts",
+    "sha": "b3d568ec9b8702350b35434b7226d05b408ec0ed",
+    "size": 3307
+  },
+  {
+    "file": "src/lib/captureRefunds.ts",
+    "sha": "6c3a92e4747bfa43a56fa918c151969cf4e4e8a4",
+    "size": 12538
+  },
+  {
+    "file": "src/lib/captureReview.ts",
+    "sha": "73d6d743368ef7d74645c1b60149a5980846c262",
+    "size": 3146
+  },
+  {
+    "file": "src/lib/captureRollout.ts",
+    "sha": "e315c8f1eb41c9b0a72c6fb0456655b25327e2bb",
+    "size": 8692
+  },
+  {
+    "file": "src/lib/captureService.ts",
+    "sha": "21a6fb2c23c0d533c10e5f3843072cdc1bc336a5",
+    "size": 9498
+  },
+  {
+    "file": "src/lib/captureSourcePolicy.ts",
+    "sha": "c55077f0812cff2cbfdc2202dbde1d4a768ce79c",
+    "size": 561
+  },
+  {
+    "file": "src/lib/captureTypes.ts",
+    "sha": "54d03eb5487b0b997e062f79c5dd1bb62e329491",
+    "size": 3857
+  },
+  {
+    "file": "src/lib/cardAppearance.ts",
+    "sha": "57f2156dff2e0343672c665dadc67a1e74041a4d",
+    "size": 2549
+  },
+  {
+    "file": "src/lib/cardBalanceTracking.ts",
+    "sha": "e590ba082977f9cfe4e0aa9b398e44891c138968",
+    "size": 6296
+  },
+  {
+    "file": "src/lib/cardBalances.ts",
+    "sha": "7f1fbdcc93deb12061768d810103f9ee40afea28",
+    "size": 3036
+  },
+  {
+    "file": "src/lib/cardPaymentPresentation.ts",
+    "sha": "94905d45b52f2a575d1cd92bccb86bf1765eb914",
+    "size": 1773
+  },
+  {
+    "file": "src/lib/cardUsagePresentation.ts",
+    "sha": "c19d5feb0b4ef989f0c0b6d606bf6ac574f3976b",
+    "size": 2222
+  },
+  {
+    "file": "src/lib/dashboardDebts.ts",
+    "sha": "613439943e1a12bdecf2124e690dad10b7636872",
+    "size": 3011
+  },
+  {
+    "file": "src/lib/dashboardPresentation.ts",
+    "sha": "d31a7e31da643539f02262a52477f7359866bf5f",
+    "size": 1178
+  },
+  {
+    "file": "src/lib/dashboardReader.ts",
+    "sha": "3b607bc18e4690fc852b3736cf9fcbb2074c5124",
+    "size": 29624
+  },
+  {
+    "file": "src/lib/debtAccountService.ts",
+    "sha": "dc0769e3bdcd46591b70f9cbce8ced21346aee9a",
+    "size": 2002
+  },
+  {
+    "file": "src/lib/expenseFilters.ts",
+    "sha": "8fc3b65cbea5c3407a6bc5e2abcc4b0d37b0e213",
+    "size": 1923
+  },
+  {
+    "file": "src/lib/expenseHistory.ts",
+    "sha": "682e82728022e8eeab96948e02398bbb45c06227",
+    "size": 5551
+  },
+  {
+    "file": "src/lib/expenseOperations.ts",
+    "sha": "6bfd049f13b63a019839b5330487a2335a7bc48f",
+    "size": 2623
+  },
+  {
+    "file": "src/lib/expenseReader.ts",
+    "sha": "bf8837b3782d6fc543d7936e3715e3ae7aca2d60",
+    "size": 3420
+  },
+  {
+    "file": "src/lib/expenseService.ts",
+    "sha": "9d8712b81bf9e908f46c8d59b70a68a32c8b9482",
+    "size": 6150
+  },
+  {
+    "file": "src/lib/financialContracts.ts",
+    "sha": "97207afa3c31aadcc7706af59ceb754348bc2e8c",
+    "size": 4660
+  },
+  {
+    "file": "src/lib/financialDates.ts",
+    "sha": "422ef972832c83b4c725433247783fcd32f77aff",
+    "size": 1496
+  },
+  {
+    "file": "src/lib/financialJson.ts",
+    "sha": "d1321401a8dedff1682fdfc36566f139b73960b0",
+    "size": 375
+  },
+  {
+    "file": "src/lib/financialResponses.ts",
+    "sha": "d8554a3b6da824333c6375548295678892c9cb38",
+    "size": 8727
+  },
+  {
+    "file": "src/lib/financialValidation.ts",
+    "sha": "af67c2c40b0861aded934ffd9f51f30c00a19277",
+    "size": 1231
+  },
+  {
+    "file": "src/lib/gmailUberReceipts.ts",
+    "sha": "2bff0d8980978f42f54e81907240415e35f7b266",
+    "size": 3288
+  },
+  {
+    "file": "src/lib/historyWindow.ts",
+    "sha": "f8b434d95751a67f397cd028984b7f4cd679ec51",
+    "size": 8194
+  },
+  {
+    "file": "src/lib/importantNotices.ts",
+    "sha": "1cfd96c317227c36ff71d6b95754f5320959d445",
+    "size": 15215
+  },
+  {
+    "file": "src/lib/installmentRecipients.ts",
+    "sha": "fb50b31e05f6674e6159de5a523702adedb9dd15",
+    "size": 924
+  },
+  {
+    "file": "src/lib/latestRequest.ts",
+    "sha": "a8085f394fa653ddb4a92e977e4ddcf221019247",
+    "size": 1079
+  },
+  {
+    "file": "src/lib/localFinancialData.ts",
+    "sha": "c67be18b7f53d867c171b3a82f43562465a9032d",
+    "size": 2372
+  },
+  {
+    "file": "src/lib/logout.ts",
+    "sha": "262a34470e8907f2951bba897caa2d2db7890b4e",
+    "size": 1732
+  },
+  {
+    "file": "src/lib/money/budgets.ts",
+    "sha": "8e401bd9c6bf4a6f3655f2a05d1691ce6f15a8b1",
+    "size": 4077
+  },
+  {
+    "file": "src/lib/money/client.ts",
+    "sha": "0a88ca8dc1183178a8039224b074db570875949b",
+    "size": 1556
+  },
+  {
+    "file": "src/lib/money/commands.ts",
+    "sha": "8d85c33cf3951817254677d36e788dbb777d979d",
+    "size": 2715
+  },
+  {
+    "file": "src/lib/money/data.ts",
+    "sha": "d6e8ff241a8e439d6aec3929608f4631acb6d4e0",
+    "size": 1726
+  },
+  {
+    "file": "src/lib/money/dates.ts",
+    "sha": "bbaafc2626a25ceebb689c7dc3a6330f711315d7",
+    "size": 1265
+  },
+  {
+    "file": "src/lib/money/forecast.ts",
+    "sha": "04d8b0127aca900224eec3c75569e9d3c4d63247",
+    "size": 22755
+  },
+  {
+    "file": "src/lib/money/persisted.ts",
+    "sha": "726e7302e838ae60c09359eae1138caa7236df55",
+    "size": 2537
+  },
+  {
+    "file": "src/lib/money/responses.ts",
+    "sha": "6766f3c101924de9714b7fb8febad1761ef3ffe6",
+    "size": 5883
+  },
+  {
+    "file": "src/lib/money/schema.ts",
+    "sha": "23c4beea2b7aaec815bf3632fb79603d1c208d94",
+    "size": 5284
+  },
+  {
+    "file": "src/lib/money/service.ts",
+    "sha": "30d7ec3316c00ab48e33d055c3f8864de6c88405",
+    "size": 19649
+  },
+  {
+    "file": "src/lib/money/sources.ts",
+    "sha": "50052cc28ba36094467153077cf8bf6554a7f9bf",
+    "size": 11984
+  },
+  {
+    "file": "src/lib/money/transferClient.ts",
+    "sha": "177ca535ffd3a51f48609494b4ccd97e8c746672",
+    "size": 1475
+  },
+  {
+    "file": "src/lib/money/transferContracts.ts",
+    "sha": "26f2d2e64bc100e11d7ead42c61a38eaee7491f2",
+    "size": 2778
+  },
+  {
+    "file": "src/lib/money/transfers.ts",
+    "sha": "688a9d40414f078e1f33d20e3b26eb5e95e343a3",
+    "size": 2387
+  },
+  {
+    "file": "src/lib/money/types.ts",
+    "sha": "627d6aa60375f7f5a156c20d227fe37c2db15ed8",
+    "size": 1986
+  },
+  {
+    "file": "src/lib/money/yieldIncomeTypes.ts",
+    "sha": "acf6080c819c0ca19680bc2107f8ed1db268285b",
+    "size": 1176
+  },
+  {
+    "file": "src/lib/money/yieldReport.ts",
+    "sha": "34813f81320dc02d532f3979335dfc32031a818d",
+    "size": 3621
+  },
+  {
+    "file": "src/lib/money/yieldRules.ts",
+    "sha": "b7b39252d5d66351edf6156bc338142b10fd0e53",
+    "size": 6661
+  },
+  {
+    "file": "src/lib/navigation.tsx",
+    "sha": "76994c5368ae06dbf560bec9a67befda643b8fdd",
+    "size": 2152
+  },
+  {
+    "file": "src/lib/noticeDismissals.ts",
+    "sha": "a21b441423a7f3d03063118785e9590a24d46fa9",
+    "size": 2618
+  },
+  {
+    "file": "src/lib/nuHistory.ts",
+    "sha": "e8ba101e585b03605f1e2ebb7be8b705ff2c672f",
+    "size": 7431
+  },
+  {
+    "file": "src/lib/offlineExpenseContracts.ts",
+    "sha": "5fd4f4380677ada72d5732e3d040d8146fb0ee83",
+    "size": 2852
+  },
+  {
+    "file": "src/lib/offlineExpenseObserver.ts",
+    "sha": "5e05beca885ad4c206ec9ee86fa14ebe6694015f",
+    "size": 1414
+  },
+  {
+    "file": "src/lib/offlineExpenses.ts",
+    "sha": "eab4b51abaf72ce890b34271d6c4b58063496c37",
+    "size": 17273
+  },
+  {
+    "file": "src/lib/payablesSummary.ts",
+    "sha": "a2a4844fc3db45e269a83891c879529e2c851ead",
+    "size": 2368
+  },
+  {
+    "file": "src/lib/paymentReceipts.ts",
+    "sha": "181bd0d430904e2175d9c36fc284b3e9da081d29",
+    "size": 4195
+  },
+  {
+    "file": "src/lib/prisma.ts",
+    "sha": "2fa8221d3efd1d622d5a4b18b1f5229fc4db1be1",
+    "size": 456
+  },
+  {
+    "file": "src/lib/receivableAccounts.ts",
+    "sha": "d464a092d2917a5190fed89f7a83ebaa8b8b68a3",
+    "size": 913
+  },
+  {
+    "file": "src/lib/requestErrors.ts",
+    "sha": "e47843349a95d82794a841b3b3e603b4c03918ac",
+    "size": 5431
+  },
+  {
+    "file": "src/lib/requestRecovery.ts",
+    "sha": "e96ebaa5ef36493566f7cce3c18364fc90c46609",
+    "size": 3209
+  },
+  {
+    "file": "src/lib/sharedExpenses.ts",
+    "sha": "c3c5d4d0b8c346c4c324ac948195fca58927deb4",
+    "size": 1961
+  },
+  {
+    "file": "src/lib/subscriptionChargeService.ts",
+    "sha": "753d45ac1c140f032e8fab87828bfc5a308e02f8",
+    "size": 8078
+  },
+  {
+    "file": "src/lib/subscriptionCharges.ts",
+    "sha": "846b122a7e7ad817e74b79fbbbb52f2384a1143c",
+    "size": 5089
+  },
+  {
+    "file": "src/lib/supabase.ts",
+    "sha": "4c4db6cdabf032bf1637b6beac5075ec9c528e3a",
+    "size": 250
+  },
+  {
+    "file": "src/lib/uberCapture.ts",
+    "sha": "0dc677ccfea5ced5bd590918000311bf322911b9",
+    "size": 8683
+  },
+  {
+    "file": "src/lib/uiClient.ts",
+    "sha": "c1bf001aefffbbc56c83f8a13c4b0e98c39b1e22",
+    "size": 3599
+  },
+  {
+    "file": "src/lib/uiResponseSchemas.ts",
+    "sha": "c9ba7bc7abb17bbc299648866d418456528bb29c",
+    "size": 69816
+  },
+  {
+    "file": "src/lib/uiTypes.ts",
+    "sha": "c2219c50da48ebc523db9a337d10a6f191bbb00b",
+    "size": 2933
+  },
+  {
+    "file": "src/lib/userSetup.ts",
+    "sha": "3cf0ef321885e1a7bfb670ad3b64716101fc281a",
+    "size": 1453
+  },
+  {
+    "file": "src/lib/utils.ts",
+    "sha": "a9cff3543de9c83a576e78ba7c7dfdb2d39c7614",
+    "size": 168
+  },
+  {
+    "file": "tsconfig.json",
+    "sha": "5f0a518f11573846203f4413ad9fe5ad359e905a",
+    "size": 680
+  },
+  {
+    "file": "vercel.json",
+    "sha": "7193643b5b50da236924a9fea0ca4efe7b753daf",
+    "size": 231
+  }
+]

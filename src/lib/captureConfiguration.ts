@@ -1,3 +1,4 @@
+import { incomePolicySchema, configureIncomeCapture } from './captureIncome';
 import type { PrismaClient } from '@prisma/client';
 import { captureInput } from '@/lib/captureJson';
 import { configureMoneyCapture, moneyPolicySchema } from "@/lib/captureMoney";
@@ -22,6 +23,7 @@ export const captureInventorySchema = z.object({ version: z.literal(1), cards: z
 
 export const actionSchema = z.discriminatedUnion("action", [
   moneyPolicySchema,
+  incomePolicySchema,
   z.object({ action: z.literal("bankFallback"), cardId: z.string().min(1), mode: z.enum(["OBSERVATION", "AUTOMATIC"]),
     bankSourcePackage: z.enum(["com.citibanamex.banamexmobile", "com.nu.production", "mx.bancosantander.supermovil"]),
     bankDatePolicy: z.enum(["BANK_OPERATION", "NOTIFICATION_POSTED_AT"]), currency: z.literal("MXN"),
@@ -45,6 +47,7 @@ export async function configureCapture(db: PrismaClient, userId: string, rawInpu
   const data = parsed.data;
   return db.$transaction(async tx => {
     await lockDebtAccounts(tx, userId);
+    if (data.action === "incomePolicy") return configureIncomeCapture(tx, userId, data);
     if (data.action === "moneyPolicy") return configureMoneyCapture(tx, userId, data);
     if (data.action === "paymentAutomation") {
       const policy = await tx.capturePaymentPolicy.findFirst({ where: { id: data.id, userId } });
@@ -169,9 +172,12 @@ export async function captureConfiguration(db: PrismaClient, userId: string) {
   const moneyAccounts = await db.moneyAccount.findMany({ where: { userId }, select: { id: true, name: true, kind: true, asOf: true } });
   const moneyPolicies = await db.captureMoneyPolicy.findMany({ where: { userId } });
   const moneyWithdrawalSamples = await db.captureMovement.findMany({ where: { userId, parserKey: "bbva.atm-withdrawal.es.v1", status: "REGISTERED", moneyPosting: { is: { kind: "WITHDRAWAL" } } }, select: { id: true, proposal: true, moneyPosting: { select: { snapshot: true, withdrawal: { select: { reversedAt: true } } } } } });
-  return { moneyWithdrawalSamples, moneyAccounts, moneyPolicies, cards, aliases, automations, rules, categories, subscriptions, paymentPolicies, fallbackPolicies, fallbackOptions,
+  const incomePolicies = await db.captureIncomePolicy.findMany({ where: { userId } });
+  const incomeTypes = await db.incomeType.findMany({ where: { userId }, select: { id: true, name: true }, orderBy: { name: 'asc' } });
+  const incomeSamples = await db.captureMovement.findMany({ where: { userId, parserKey: { in: ['bbva.payroll.es.v1', 'bbva.account-deposit.es.v1'] }, status: { not: 'DISCARDED' } }, select: { id: true, parserKey: true, proposal: true, reason: true }, orderBy: { createdAt: 'desc' }, take: 100 });
+  return { incomePolicies, incomeTypes, incomeSamples, moneyWithdrawalSamples, moneyAccounts, moneyPolicies, cards, aliases, automations, rules, categories, subscriptions, paymentPolicies, fallbackPolicies, fallbackOptions,
     rollout: buildCaptureRollout(cards, aliases, automations, captureParsers, movements),
-    parsers: captureParsers.filter(parser => parser.evidence !== "REAL_OUT_OF_SCOPE" && !parser.moneyOnly && !parser.paymentOnly && !parser.refundOnly).map(({ key, sourcePackage, verified, dateSource }) => ({ key, sourcePackage, verified, dateSource: dateSource || "BANK_OPERATION" })) };
+    parsers: captureParsers.filter(parser => parser.evidence !== "REAL_OUT_OF_SCOPE" && !parser.incomeOnly && !parser.moneyOnly && !parser.paymentOnly && !parser.refundOnly).map(({ key, sourcePackage, verified, dateSource }) => ({ key, sourcePackage, verified, dateSource: dateSource || "BANK_OPERATION" })) };
 }
 
 export type CaptureConfigurationInput = z.input<typeof actionSchema>;

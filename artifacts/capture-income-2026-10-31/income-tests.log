@@ -1,0 +1,135 @@
+
+> afp@0.1.0 test /home/garatachia/projects/afp
+> node --import tsx tests/run-tests.ts capture-income.test.ts capture-income-integration.test.ts
+
+TAP version 13
+# Subtest: ingresos BBVA: nómina estimada inmediata, confirmación, duplicidad, aislamiento y rollback
+    # Subtest: sin regla solo propone ingreso y rechaza cuenta ajena o muestra ausente
+    ok 1 - sin regla solo propone ingreso y rechaza cuenta ajena o muestra ausente
+      ---
+      duration_ms: 78.239428
+      type: 'test'
+      ...
+    # Subtest: nueva nómina concurrente suma una vez y marca el saldo aproximado
+    ok 2 - nueva nómina concurrente suma una vez y marca el saldo aproximado
+      ---
+      duration_ms: 108.701807
+      type: 'test'
+      ...
+    # Subtest: confirma el real sobre el mismo ingreso y conserva el importe estimado original
+    ok 3 - confirma el real sobre el mismo ingreso y conserva el importe estimado original
+      ---
+      duration_ms: 36.758422
+      type: 'test'
+      ...
+    # Subtest: nómina idéntica o revisión posterior queda pendiente
+    ok 4 - nómina idéntica o revisión posterior queda pendiente
+      ---
+      duration_ms: 22.829324
+      type: 'test'
+      ...
+    # Subtest: depósito exige una muestra propia completa y no hereda la regla de nómina
+    ok 5 - depósito exige una muestra propia completa y no hereda la regla de nómina
+      ---
+      duration_ms: 70.727544
+      type: 'test'
+      ...
+    # Subtest: borrado conserva recibo y un reintento no recrea el ingreso
+    ok 6 - borrado conserva recibo y un reintento no recrea el ingreso
+      ---
+      duration_ms: 22.854364
+      type: 'test'
+      ...
+    # Subtest: aviso inválido y operación abortada no crean dinero
+    ok 7 - aviso inválido y operación abortada no crean dinero
+      ---
+      duration_ms: 33.67003
+      type: 'test'
+      ...
+    # Subtest: primera quincena usa su estimación y permite reutilizar la clave bancaria en otra fecha
+    ok 8 - primera quincena usa su estimación y permite reutilizar la clave bancaria en otra fecha
+      ---
+      duration_ms: 41.205116
+      type: 'test'
+      ...
+    # Subtest: API filtra ingresos y protege sus detalles y reglas por propietario
+    ok 9 - API filtra ingresos y protege sus detalles y reglas por propietario
+      ---
+      duration_ms: 37.058662
+      type: 'test'
+      ...
+    1..9
+ok 1 - ingresos BBVA: nómina estimada inmediata, confirmación, duplicidad, aislamiento y rollback
+  ---
+  duration_ms: 780.874797
+  type: 'test'
+  ...
+# Subtest: nómina BBVA real anonimizada conserva la ausencia de importe y cuenta exacta
+ok 2 - nómina BBVA real anonimizada conserva la ausencia de importe y cuenta exacta
+  ---
+  duration_ms: 0.86429
+  type: 'test'
+  ...
+# Subtest: candidato de depósito conserva importe y exige regla propia, sin declararse verificado
+ok 3 - candidato de depósito conserva importe y exige regla propia, sin declararse verificado
+  ---
+  duration_ms: 0.18281
+  type: 'test'
+  ...
+# Subtest: ingresos no acepta fecha inválida
+ok 4 - ingresos no acepta fecha inválida
+  ---
+  duration_ms: 0.12425
+  type: 'test'
+  ...
+# Subtest: ingresos no acepta hora inválida
+ok 5 - ingresos no acepta hora inválida
+  ---
+  duration_ms: 0.08689
+  type: 'test'
+  ...
+# Subtest: ingresos no acepta compra
+ok 6 - ingresos no acepta compra
+  ---
+  duration_ms: 0.835721
+  type: 'test'
+  ...
+# Subtest: ingresos no acepta promoción
+ok 7 - ingresos no acepta promoción
+  ---
+  duration_ms: 0.35184
+  type: 'test'
+  ...
+# Subtest: ingresos no acepta otro banco
+ok 8 - ingresos no acepta otro banco
+  ---
+  duration_ms: 0.14725
+  type: 'test'
+  ...
+# Subtest: ingresos no acepta rechazo
+ok 9 - ingresos no acepta rechazo
+  ---
+  duration_ms: 0.1679
+  type: 'test'
+  ...
+# Subtest: ingresos no acepta precisión
+ok 10 - ingresos no acepta precisión
+  ---
+  duration_ms: 0.213461
+  type: 'test'
+  ...
+# Subtest: no elige importe entre campos contradictorios
+ok 11 - no elige importe entre campos contradictorios
+  ---
+  duration_ms: 0.15942
+  type: 'test'
+  ...
+1..11
+# tests 20
+# suites 0
+# pass 20
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1105.253535

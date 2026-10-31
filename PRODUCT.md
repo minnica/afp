@@ -24,6 +24,8 @@ Mi dinero incorpora cuentas, conciliaciones, transferencias, asignación de movi
 
 Mi dinero también permite consultar rendimientos por período y cuenta, empezando por el mes actual. Muestra como cifra principal el acumulado automático de días transcurridos, sin requerir capturas diarias; los abonos registrados sustituyen los cálculos de su cuenta y fecha. Conserva el origen de cada importe y estima cuánto podrían generar los saldos actuales en 7 y 30 días, sin capitalización. Una conciliación de saldo no demuestra por sí sola cuánto se ganó.
 
+La captura de nómina BBVA, publicada y activada para la cuenta personal el 31 de octubre de 2026, puede sumar un ingreso estimado a Mi dinero al recibir un aviso sin importe, mediante una regla expresa por cuenta y cantidades netas por quincena. La evidencia original conserva la ausencia de importe; el saldo y el ingreso identifican la estimación. Confirmar el importe real actualiza el mismo ingreso. Los depósitos completos requieren una muestra propia revisada antes de automatizarse; los avisos faltantes no se reconstruyen a partir de importes.
+
 ## Evidence on Hand
 
 La captura Android incorpora recibos de Uber desde notificaciones de Gmail como fuente optativa, publicada e instalada en la APK 0.9.0. Usa fecha e importe explícitos del recibo y terminaciones bancarias verificadas; los avisos recortados requieren revisión. La asociación con cargos bancarios y las propinas conservan evidencia, controles de duplicidad y decisiones personales. No consulta el buzón ni recupera correos históricos. Gmail está seleccionado en el teléfono personal; falta observar una notificación real completa y cotejarla antes de habilitar el formato por tarjeta.
