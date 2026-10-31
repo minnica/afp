@@ -1,0 +1,107 @@
+
+> afp@0.1.0 test /home/garatachia/projects/afp
+> node --import tsx tests/run-tests.ts capture-payables-integration.test.ts
+
+TAP version 13
+# Subtest: BBVA y cuentas por pagar: fecha/importe exactos, una salida de dinero y ambigüedades
+    # Subtest: una coincidencia exacta liquida la deuda y descuenta una vez con fecha bancaria
+    ok 1 - una coincidencia exacta liquida la deuda y descuenta una vez con fecha bancaria
+      ---
+      duration_ms: 261.81377
+      type: 'test'
+      ...
+(node:89000) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+    # Subtest: una deuda creada desde la API participa en la automatización del mismo propietario
+    ok 2 - una deuda creada desde la API participa en la automatización del mismo propietario
+      ---
+      duration_ms: 56.00368
+      type: 'test'
+      ...
+    # Subtest: pagos parciales previos comparan el saldo pendiente, con centavos exactos
+    ok 3 - pagos parciales previos comparan el saldo pendiente, con centavos exactos
+      ---
+      duration_ms: 43.528363
+      type: 'test'
+      ...
+    # Subtest: la cuenta de débito real prevalece sobre la ruta genérica de efectivo
+    ok 4 - la cuenta de débito real prevalece sobre la ruta genérica de efectivo
+      ---
+      duration_ms: 44.210544
+      type: 'test'
+      ...
+    # Subtest: dos operaciones de igual importe con horas bancarias distintas se registran ambas
+    ok 5 - dos operaciones de igual importe con horas bancarias distintas se registran ambas
+      ---
+      duration_ms: 147.300099
+      type: 'test'
+      ...
+    # Subtest: una revisión del mismo aviso solo permite otro cargo si cambia la hora bancaria
+    ok 6 - una revisión del mismo aviso solo permite otro cargo si cambia la hora bancaria
+      ---
+      duration_ms: 70.423828
+      type: 'test'
+      ...
+    # Subtest: dos deudas con misma fecha/importe quedan pendientes sin escoger una
+    ok 7 - dos deudas con misma fecha/importe quedan pendientes sin escoger una
+      ---
+      duration_ms: 183.972329
+      type: 'test'
+      ...
+    # Subtest: no cruza propietarios, cuentas bancarias, fechas, importes ni deudas canceladas
+    ok 8 - no cruza propietarios, cuentas bancarias, fechas, importes ni deudas canceladas
+      ---
+      duration_ms: 190.452092
+      type: 'test'
+      ...
+    # Subtest: una cuenta por pagar y un corte de tarjeta compatibles conservan revisión
+    ok 9 - una cuenta por pagar y un corte de tarjeta compatibles conservan revisión
+      ---
+      duration_ms: 40.652932
+      type: 'test'
+      ...
+    # Subtest: los préstamos no amortizan capital a partir de un cargo genérico
+    ok 10 - los préstamos no amortizan capital a partir de un cargo genérico
+      ---
+      duration_ms: 40.105662
+      type: 'test'
+      ...
+    # Subtest: editar y borrar un pago con débito recalcula deuda y cuenta
+    ok 11 - editar y borrar un pago con débito recalcula deuda y cuenta
+      ---
+      duration_ms: 173.108862
+      type: 'test'
+      ...
+    # Subtest: un gasto previo se vincula y corrige de fecha sin otra salida de dinero
+    ok 12 - un gasto previo se vincula y corrige de fecha sin otra salida de dinero
+      ---
+      duration_ms: 119.301394
+      type: 'test'
+      ...
+    # Subtest: gastos editados o incluidos en referencia no se reasocian automáticamente
+    ok 13 - gastos editados o incluidos en referencia no se reasocian automáticamente
+      ---
+      duration_ms: 126.571168
+      type: 'test'
+      ...
+    # Subtest: rollback revierte gasto, recibo y liquidación de deuda juntos
+    ok 14 - rollback revierte gasto, recibo y liquidación de deuda juntos
+      ---
+      duration_ms: 36.03386
+      type: 'test'
+      ...
+    1..14
+ok 1 - BBVA y cuentas por pagar: fecha/importe exactos, una salida de dinero y ambigüedades
+  ---
+  duration_ms: 2068.192289
+  type: 'test'
+  ...
+1..1
+# tests 15
+# suites 0
+# pass 15
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2350.875639

@@ -239,7 +239,11 @@ export async function PATCH(request: Request) {
       if (!existing) throw new SubscriptionChargeError("Gasto no encontrado.", 404);
       if (numericAmount === 0 && existing.refundOriginalAmount == null) throw new ApiAccessError("El monto debe ser mayor a 0.", 400);
       assertRefundExpenseEdit(existing, body);
-      if (paymentMethod === "DEBIT" && (existing.payableAccountId || existing.receivableAccountId)) throw new ApiAccessError("Revisa los vínculos de este gasto por separado.", 400);
+      if (paymentMethod === "DEBIT" && existing.receivableAccountId) throw new ApiAccessError("Revisa los vínculos de este gasto por separado.", 400);
+      if (paymentMethod === "DEBIT" && existing.payableAccountId) {
+        const payable = await tx.payableAccount.findFirst({ where: { id: existing.payableAccountId, userId } });
+        if (payable?.accountType !== 'SIMPLE') throw new ApiAccessError("Los préstamos necesitan revisar capital e intereses por separado.", 409);
+      }
       // Los clientes anteriores conservan la aportación al omitir el campo.
       const cashContributionAmount = body.cashContributionAmount === undefined
         ? String(existing.cashContributionAmount ?? 0) : body.cashContributionAmount;

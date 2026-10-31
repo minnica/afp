@@ -49,7 +49,11 @@ export async function createExpenseInTransaction<S extends Prisma.DailyExpenseSe
   }
 
   if (paymentMethod === "DEBIT" && !debitAccountId) throw new ApiAccessError("Selecciona la cuenta de débito.", 400);
-  if (paymentMethod === "DEBIT" && (subscriptionId || payableAccountId || receivableAccountId || createReceivable)) throw new ApiAccessError("Revisa por separado los vínculos de este gasto con débito.", 400);
+  if (paymentMethod === "DEBIT" && (subscriptionId || receivableAccountId || createReceivable)) throw new ApiAccessError("Revisa por separado los vínculos de este gasto con débito.", 400);
+  if (paymentMethod === "DEBIT" && payableAccountId) {
+    const payable = await tx.payableAccount.findFirst({ where: { id: payableAccountId, userId } });
+    if (payable?.accountType !== 'SIMPLE') throw new ApiAccessError("Los préstamos necesitan revisar capital e intereses por separado.", 409);
+  }
   const numericAmount = Number(amount);
 
   if (!Number.isFinite(numericAmount) || numericAmount <= 0) {

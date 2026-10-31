@@ -47,6 +47,7 @@ export const sourceExports = {
   'src/app/api/captures/events/route.ts': {"POST":"function"},
   'src/lib/captureReconciliation.ts': {"captureStatement":"function","reconcileCaptureStatement":"function"},
   'src/lib/captureConfiguration.ts': {"configureCapture":"function","captureConfiguration":"function","captureInventorySchema":"object","actionSchema":"object"},
+  'src/lib/capturePayables.ts': { payableCaptureCandidates: 'function', bbvaDebitEvidence: 'function', inspectCapturedPayable: 'function', matchCapturedPayable: 'function' },
   'src/lib/captureIncome.ts': { incomePolicySchema: 'object', configureIncomeCapture: 'function', completeIncomeCapture: 'function', postCapturedIncome: 'function', automateIncomeCapture: 'function', incomeCaptureDetail: 'function', resolveIncomeCapture: 'function' },
   'src/lib/captureProcessing.ts': {"archiveCapturedExpense":"function","captureCandidates":"function","processCaptureEvent":"function","registerCaptureMovement":"function","resolveCaptureMovement":"function"},
   'src/lib/captureInbox.ts': { captureKinds: 'object', captureKindWhere: 'function', captureMovementKind: 'function' },

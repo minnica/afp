@@ -1,3 +1,4 @@
+import { matchCapturedPayable } from './capturePayables';
 import { completeIncomeCapture, automateIncomeCapture, resolveIncomeCapture } from './captureIncome';
 import { incomeCaptureKind } from './captureIncomeParsers';
 import type { PrismaClient, DailyExpense, CaptureEvent } from '@prisma/client';
@@ -309,7 +310,7 @@ export async function registerCaptureMovement(tx: Prisma.TransactionClient, move
 export async function resolveCaptureMovement(db: PrismaClient, userId: string, rawInput: unknown) {
   const input = captureInput(rawInput);
   if (!input || typeof input.id !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(input.id)
-    || typeof input.action !== 'string' || !["link", "linkInstallment", "distinct", "discard", "convertToInstallments", "correct", "register", "reinterpret", "validateWalletBackup", "registerPayment", "linkPayment", "reversePayment", "applyRefund", "reverseRefund", "registerMoneyTransfer", "registerMoneyWithdrawal", "registerDebitExpense", "correctDebitType", "registerIncome", "linkIncome", "confirmIncome"].includes(String(input.action))) {
+    || typeof input.action !== 'string' || !["link", "linkInstallment", "distinct", "discard", "convertToInstallments", "correct", "register", "reinterpret", "validateWalletBackup", "registerPayment", "linkPayment", "reversePayment", "applyRefund", "reverseRefund", "registerMoneyTransfer", "registerMoneyWithdrawal", "registerDebitExpense", "correctDebitType", "registerIncome", "linkIncome", "confirmIncome", "matchPayable"].includes(String(input.action))) {
     throw new ApiAccessError("Resolución no válida.", 400);
   }
   const id = input.id;
@@ -319,6 +320,7 @@ export async function resolveCaptureMovement(db: PrismaClient, userId: string, r
     if (!movement) throw new ApiAccessError("Aviso no encontrado.", 404);
     if (["registerIncome", "linkIncome", "confirmIncome"].includes(String(input.action))) return resolveIncomeCapture(tx, movement, input);
     if (incomeCaptureKind(movement) && !["reinterpret", "discard"].includes(String(input.action))) throw new ApiAccessError("Revisa este aviso como ingreso.", 409);
+    if (input.action === "matchPayable") return matchCapturedPayable(tx, movement);
     if (input.action === "correctDebitType") return correctDebitCapture(tx, movement, input);
     if (["registerMoneyTransfer", "registerMoneyWithdrawal", "registerDebitExpense"].includes(String(input.action))) return resolveMoneyCapture(tx, movement, input);
     if (moneyCaptureKind(movement) && !["discard", "reinterpret"].includes(String(input.action))) throw new ApiAccessError("Revisa este aviso como movimiento entre cuentas.", 409);

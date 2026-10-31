@@ -1,0 +1,23 @@
+{
+  "status": "IMPLEMENTED_LOCALLY",
+  "productionChanged": false,
+  "schemaChanged": false,
+  "newDependencies": false,
+  "visualValidation": false,
+  "screenshotsTaken": false,
+  "agentBrowserUsed": false,
+  "tests": {
+    "total": 1087,
+    "passed": 1087,
+    "failed": 0,
+    "skipped": 0,
+    "newScenarios": 22
+  },
+  "readOnlyLiveInspection": {
+    "registeredExpenses": 8,
+    "uniqueMatches": 5,
+    "ambiguous": 1,
+    "unmatched": 2,
+    "applied": 0
+  }
+}

@@ -12,10 +12,11 @@ import { moneyCaptureKind, accountDebitNotice } from '@/lib/captureMoneyParsers'
 import { day, todayInMexico } from '@/lib/money/dates';
 import { getCyclePaymentAmounts } from '@/lib/calculations/cardCyclePayments';
 import { mutateMoney } from '@/lib/money/service';
+import { payableCaptureCandidates, bbvaDebitEvidence } from './capturePayables';
 import { cents } from '@/lib/money/sources';
 
 const text = z.string().trim().min(1).max(160);
-const inputSchema = z.object({ fromAccountId: text, toAccountId: text.optional(), amount: captureAmount, date: captureDate, concept: text, categoryId: text.optional(), currency: z.literal('MXN'), distinct: z.boolean().default(false) }).strict();
+const inputSchema = z.object({ fromAccountId: text, toAccountId: text.optional(), amount: captureAmount, date: captureDate, concept: text, categoryId: text.optional(), payableAccountId: text.optional(), currency: z.literal('MXN'), distinct: z.boolean().default(false) }).strict();
 export const moneyPolicySchema = z.object({ action: z.literal('moneyPolicy'), kind: z.enum(['NU_TRANSFER', 'BBVA_WITHDRAWAL', 'BBVA_DEBIT']), fromAccountId: text, toAccountId: text.nullable().optional(), destinationLabel: z.string().trim().max(160).default(''), accountLast4: z.string().regex(/^\d{4}$/).nullable().optional(), accountSuffixes: z.array(z.string().regex(/^\d{4,5}$/)).max(10).default([]), treatAsExpense: z.literal(true).optional(), currency: z.literal('MXN'), datePolicy: z.literal('NOTIFICATION_POSTED_AT'), mode: z.enum(['OBSERVATION', 'AUTOMATIC']), verifiedMovementId: z.string().uuid().nullable().optional() }).strict();
 
 async function ownedAccount(tx: Prisma.TransactionClient, userId: string, id: unknown) {
@@ -67,20 +68,40 @@ function sourceKey(event: CaptureEvent) { return captureHash(JSON.stringify([eve
 async function sameSourcePosting(tx: Prisma.TransactionClient, movement: Movement, event: CaptureEvent) {
   return tx.captureMoneyPosting.findUnique({ where: { userId_sourceKey: { userId: movement.userId, sourceKey: sourceKey(event) } } });
 }
-async function duplicateCandidates(tx: Prisma.TransactionClient, userId: string, kind: string, values: z.output<typeof inputSchema>) {
+async function duplicateCandidates(tx: Prisma.TransactionClient, userId: string, kind: string, values: z.output<typeof inputSchema>, event?: CaptureEvent) {
   const date = new Date(`${values.date}T00:00:00Z`), window = { gte: new Date(date.getTime() - 86400000), lte: new Date(date.getTime() + 2 * 86400000 - 1) };
   if (kind === 'TRANSFER') return tx.moneyTransfer.findMany({ where: { userId, fromAccountId: values.fromAccountId, toAccountId: values.toAccountId, amount: values.amount, date: window, reversedAt: null }, select: { id: true } });
   if (kind === 'WITHDRAWAL') return tx.moneyWithdrawal.findMany({ where: { userId, accountId: values.fromAccountId, amount: values.amount, date: window, reversedAt: null }, select: { id: true } });
-  const expenses = await tx.dailyExpense.findMany({ where: { userId, paymentMethod: 'DEBIT', debitAccountId: values.fromAccountId, amount: values.amount, date: window }, select: { id: true } });
+  const expenses = await tx.dailyExpense.findMany({ where: { userId, paymentMethod: 'DEBIT', debitAccountId: values.fromAccountId, amount: values.amount, date: window }, select: { id: true, amount: true, date: true, captureMovements: { where: { userId }, select: { parserKey: true, proposal: true, correction: true, events: { select: { fields: true, sourcePackage: true, postedAt: true, receivedAt: true } } } } } });
   const withdrawals = await tx.moneyWithdrawal.findMany({ where: { userId, accountId: values.fromAccountId, amount: values.amount, date: window, reversedAt: null }, select: { id: true } });
   const transfers = await tx.moneyTransfer.findMany({ where: { userId, fromAccountId: values.fromAccountId, amount: values.amount, date: window, reversedAt: null }, select: { id: true } });
   const payments = await tx.moneyCardPayment.findMany({ where: { userId, accountId: values.fromAccountId, amount: values.amount, date: window, reversedAt: null }, select: { id: true } });
-  return [...expenses, ...withdrawals, ...transfers, ...payments];
+  const operationAt = event && bbvaDebitEvidence(event)?.operationAt;
+  const unresolved = expenses.filter(expense => {
+    if (!operationAt || !expense.captureMovements.length) return true;
+    const proofs = expense.captureMovements.map(row => {
+      if (row.parserKey !== 'bbva.account-charge.es.v1' || row.correction || row.events.length !== 1 || !row.proposal) return null;
+      const original = captureProposal(row.proposal), evidence = bbvaDebitEvidence(row.events[0]!);
+      return evidence?.amount && cents(evidence.amount) === cents(expense.amount) && day(expense.date) === original.date ? evidence.operationAt || null : null;
+    });
+    // Distinct printed operation times prove separate debits. Missing clocks,
+    // manual expenses and the same minute remain possible duplicates.
+    return proofs.some(time => !time || time === operationAt);
+  });
+  const deleted = await tx.captureMoneyPosting.findMany({ where: { userId, kind: 'DEBIT_EXPENSE', expenseId: null },
+    select: { originalRecordId: true, snapshot: true, movement: { select: { events: { select: { fields: true, sourcePackage: true, postedAt: true, receivedAt: true } } } } } });
+  const deletedCandidates = deleted.filter(row => {
+    const snapshot = captureSnapshot(row.snapshot), time = snapshot.date ? Date.parse(`${snapshot.date}T12:00:00Z`) : NaN;
+    if (snapshot.fromAccountId !== values.fromAccountId || cents(snapshot.amount) !== cents(values.amount) || !Number.isFinite(time) || time < window.gte.getTime() || time > window.lte.getTime()) return false;
+    const previousTime = row.movement.events.length === 1 ? bbvaDebitEvidence(row.movement.events[0]!)?.operationAt : null;
+    return !operationAt || !previousTime || operationAt === previousTime;
+  }).map(row => ({ id: row.originalRecordId }));
+  return [...unresolved.map(({ id }) => ({ id })), ...withdrawals, ...transfers, ...payments, ...deletedCandidates];
 }
 
-async function matchCardPayment(tx: Prisma.TransactionClient, movement: Movement, event: CaptureEvent, v: z.output<typeof inputSchema>, from: { id: string; name: string }) {
+async function cardPaymentCandidates(tx: Prisma.TransactionClient, userId: string, v: z.output<typeof inputSchema>) {
   const date = new Date(`${v.date}T00:00:00Z`), dateMs = date.getTime();
-  const cycles = await tx.cardCycle.findMany({ where: { userId: movement.userId, statementAmount: { not: null },
+  const cycles = await tx.cardCycle.findMany({ where: { userId, statementAmount: { not: null },
     cutDate: { lt: new Date(dateMs + 86400000) },
     dueDate: { gte: new Date(dateMs - 86400000), lt: new Date(dateMs + 2 * 86400000) } },
     include: { card: { select: { id: true, name: true } } } });
@@ -92,7 +113,9 @@ async function matchCardPayment(tx: Prisma.TransactionClient, movement: Movement
         pendingAmount: pending.toFixed(2), difference: (difference / 100).toFixed(2), tolerance: '1.00',
         dayOffset: Math.round((dateMs - Date.parse(`${day(cycle.dueDate)}T00:00:00Z`)) / 86400000) }] : [];
   });
-  if (!matches.length) return null;
+  return matches;
+}
+async function matchCardPayment(tx: Prisma.TransactionClient, movement: Movement, event: CaptureEvent, v: z.output<typeof inputSchema>, from: { id: string; name: string }, matches: Awaited<ReturnType<typeof cardPaymentCandidates>>) {
   const p = captureProposal(movement.proposal);
   if (matches.length > 1) return tx.captureMovement.update({ where: { id: movement.id }, data: {
     reason: 'BBVA_PAYMENT_MATCH_AMBIGUOUS', proposal: { ...p, paymentMatchCandidates: matches },
@@ -132,18 +155,32 @@ async function post(tx: Prisma.TransactionClient, movement: Movement, kind: 'TRA
     return (await tx.captureMovement.findUnique({ where: { id: prior.movementId } }))!;
   }
   if (automatic && kind === 'DEBIT_EXPENSE') {
-    const revision = await tx.captureEvent.findFirst({ where: { userId, deviceId: events[0]!.deviceId, sourcePackage: events[0]!.sourcePackage,
+    const revisions = await tx.captureEvent.findMany({ where: { userId, deviceId: events[0]!.deviceId, sourcePackage: events[0]!.sourcePackage,
       notificationKeyHash: events[0]!.notificationKeyHash, postedAt: events[0]!.postedAt, id: { not: events[0]!.id } } });
-    if (revision) return tx.captureMovement.update({ where: { id: movement.id }, data: { reason: 'NOTIFICATION_REVISION' } });
+    const currentTime = bbvaDebitEvidence(events[0]!)?.operationAt;
+    if (revisions.some(revision => { const previousTime = bbvaDebitEvidence(revision)?.operationAt; return !currentTime || !previousTime || currentTime === previousTime; })) return tx.captureMovement.update({ where: { id: movement.id }, data: { reason: 'NOTIFICATION_REVISION' } });
   }
-  const candidates = await duplicateCandidates(tx, userId, kind, v);
+  const candidates = await duplicateCandidates(tx, userId, kind, v, events[0]);
   if (candidates.length && !v.distinct) {
     if (!automatic) throw new ApiAccessError('Hay un movimiento cercano con el mismo importe y cuentas. Confirma que es otro movimiento.', 409);
     return tx.captureMovement.update({ where: { id: movement.id }, data: { reason: 'MONEY_POSSIBLE_DUPLICATE', proposal: { ...p, moneyCandidates: candidates } } });
   }
-  if (automatic && kind === 'DEBIT_EXPENSE') {
-    const payment = await matchCardPayment(tx, movement, events[0]!, v, from);
-    if (payment) return payment;
+  let payableMatch: Awaited<ReturnType<typeof payableCaptureCandidates>>[number] | undefined;
+  if (kind !== 'DEBIT_EXPENSE' && v.payableAccountId) throw new ApiAccessError('Solo un gasto con débito puede pagar esta deuda.', 400);
+  if (kind === 'DEBIT_EXPENSE' && (automatic || v.payableAccountId)) {
+    const payableMatches = await payableCaptureCandidates(tx, userId, from.id, v.amount, v.date);
+    if (v.payableAccountId) {
+      payableMatch = payableMatches.find(row => row.id === v.payableAccountId);
+      if (!payableMatch) throw new ApiAccessError('La cuenta por pagar no coincide en propietario, fecha, saldo pendiente y cuenta bancaria.', 409);
+    } else {
+      const cardMatches = await cardPaymentCandidates(tx, userId, v);
+      if (payableMatches.length > 1 || (payableMatches.length && cardMatches.length)) return tx.captureMovement.update({ where: { id: movement.id }, data: {
+        reason: cardMatches.length ? 'BBVA_DESTINATION_MATCH_AMBIGUOUS' : 'BBVA_PAYABLE_MATCH_AMBIGUOUS',
+        proposal: { ...p, payableMatchCandidates: payableMatches, paymentMatchCandidates: cardMatches },
+      } });
+      if (cardMatches.length) return matchCardPayment(tx, movement, events[0]!, v, from, cardMatches);
+      payableMatch = payableMatches[0];
+    }
   }
   let record;
   if (kind === 'TRANSFER') record = await tx.moneyTransfer.create({ data: { userId, fromAccountId: from.id, toAccountId: to!.id, amount: v.amount, date: new Date(`${v.date}T12:00:00Z`), concept: v.concept } });
@@ -152,12 +189,12 @@ async function post(tx: Prisma.TransactionClient, movement: Movement, kind: 'TRA
     const category = v.categoryId ? await tx.category.findFirst({ where: { id: v.categoryId, userId } }) : await tx.category.findUnique({ where: { userId_name: { userId, name: 'Por clasificar' } } });
     const categoryId = category?.id || (!v.categoryId && (await tx.category.create({ data: { userId, name: 'Por clasificar' } })).id);
     if (!categoryId) throw new ApiAccessError('Categoría no encontrada.', 404);
-    record = (await createExpenseInTransaction(tx, userId, { date: v.date, paymentMethod: 'DEBIT', debitAccountId: from.id, concept: v.concept, amount: v.amount, categoryId }, { id: true }, 'CONFIRMED')).expense;
+    record = (await createExpenseInTransaction(tx, userId, { date: v.date, paymentMethod: 'DEBIT', debitAccountId: from.id, concept: payableMatch ? `Pago · ${payableMatch.concept}` : v.concept, amount: v.amount, categoryId, ...(payableMatch ? { payableAccountId: payableMatch.id } : {}) }, { id: true }, 'CONFIRMED')).expense;
   }
   await tx.captureMoneyPosting.create({ data: { id: randomUUID(), userId, movementId: movement.id, sourceKey: sourceKey(events[0]!), kind,
     transferId: kind === 'TRANSFER' ? record!.id : null, withdrawalId: kind === 'WITHDRAWAL' ? record!.id : null, expenseId: kind === 'DEBIT_EXPENSE' ? record!.id : null,
-    originalRecordId: record!.id, snapshot: { ...v, kind, automatic, fromName: from.name, toName: to?.name || null, destinationSource: 'USER_POLICY_OR_CONFIRMATION' } } });
-  return tx.captureMovement.update({ where: { id: movement.id }, data: { status: 'REGISTERED', reason: automatic && kind === 'DEBIT_EXPENSE' ? 'BBVA_DEBIT_AUTOMATIC' : kind === 'TRANSFER' ? 'MONEY_TRANSFER_REGISTERED' : kind === 'WITHDRAWAL' ? 'MONEY_WITHDRAWAL_REGISTERED' : 'DEBIT_EXPENSE_REGISTERED', resolvedAt: new Date(), proposal: { ...p, moneyKind: kind, fromAccountId: from.id, toAccountId: to?.id || null, currency: 'MXN' }, ...(kind === 'DEBIT_EXPENSE' ? { expenseId: record!.id, originalExpenseId: record!.id } : {}) } });
+    originalRecordId: record!.id, snapshot: { ...v, ...(p.operationAt ? { operationAt: p.operationAt } : {}), ...(payableMatch ? { payableAccountId: payableMatch.id, payableMatch: { ...payableMatch, matchedBy: 'EXACT_DATE_AND_PENDING_AMOUNT' } } : {}), kind, automatic, fromName: from.name, toName: to?.name || null, destinationSource: 'USER_POLICY_OR_CONFIRMATION' } } });
+  return tx.captureMovement.update({ where: { id: movement.id }, data: { status: 'REGISTERED', reason: payableMatch ? 'BBVA_PAYABLE_MATCHED' : automatic && kind === 'DEBIT_EXPENSE' ? 'BBVA_DEBIT_AUTOMATIC' : kind === 'TRANSFER' ? 'MONEY_TRANSFER_REGISTERED' : kind === 'WITHDRAWAL' ? 'MONEY_WITHDRAWAL_REGISTERED' : 'DEBIT_EXPENSE_REGISTERED', resolvedAt: new Date(), proposal: { ...p, ...(payableMatch ? { payableAccountId: payableMatch.id, merchant: `Pago · ${payableMatch.concept}`, payableMatch: { ...payableMatch, matchedBy: 'EXACT_DATE_AND_PENDING_AMOUNT' } } : {}), moneyKind: kind, fromAccountId: from.id, toAccountId: to?.id || null, currency: 'MXN' }, ...(kind === 'DEBIT_EXPENSE' ? { expenseId: record!.id, originalExpenseId: record!.id } : {}) } });
 }
 export async function automateMoneyCapture(tx: Prisma.TransactionClient, event: CaptureEvent, movement: Movement) {
   if (movement.reason !== 'MONEY_READY') return movement;

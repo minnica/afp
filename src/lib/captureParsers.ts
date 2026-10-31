@@ -279,7 +279,7 @@ export function interpretCapture(event: CaptureNotice): CaptureInterpretation {
         paymentEvidence: "SOURCE_DEBIT_ONLY", missingFields: ["destination", "card", "currency", "statementPeriod", "operationDate"],
       } };
     }
-    const accountCharge = interpretBbvaAccountCharge(event, captureAmount, captureNotificationDate);
+    const accountCharge = interpretBbvaAccountCharge(event, captureAmount, captureNotificationDate, captureOperationTime);
     if (accountCharge) return accountCharge;
   }
   // Muestra real confirmada como pago CFE desde Nu. El símbolo $ no fija la

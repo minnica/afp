@@ -185,20 +185,23 @@ export async function POST(request: Request) {
       );
     }
 
-    const payable = await prisma.payableAccount.create({
-      data: {
-        userId,
-        personId,
-        concept: concept.trim(),
-        originalAmount: numericOriginalAmount,
-        originDate: parsedOriginDate,
-        expectedMonthlyPayment: numericExpectedMonthlyPayment,
-        expectedDate: parsedExpectedDate,
-        notes: notes?.trim() || null,
-        status: "ACTIVE",
-        originType: "MANUAL",
-      },
-      select: payableSelect,
+    const payable = await runDebtAccountOperation(prisma, userId, async tx => {
+      await requireOwnedReferences(tx, userId, body, ["personId"]);
+      return tx.payableAccount.create({
+        data: {
+          userId,
+          personId,
+          concept: concept.trim(),
+          originalAmount: numericOriginalAmount,
+          originDate: parsedOriginDate,
+          expectedMonthlyPayment: numericExpectedMonthlyPayment,
+          expectedDate: parsedExpectedDate,
+          notes: notes?.trim() || null,
+          status: "ACTIVE",
+          originType: "MANUAL",
+        },
+        select: payableSelect,
+      });
     });
 
     return NextResponse.json({

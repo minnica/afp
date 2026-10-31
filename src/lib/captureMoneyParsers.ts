@@ -1,5 +1,5 @@
 import { captureFields, captureProposal } from './captureJson';
-import type { CaptureInterpretation, CaptureNotice, ParseAmount, NotificationDate, CaptureKindInput } from '@/lib/captureTypes';
+import type { CaptureInterpretation, CaptureNotice, ParseAmount, NotificationDate, CaptureKindInput, OperationTime } from '@/lib/captureTypes';
 export const moneyParserKeys = ['nu.account-transfer.es.v1', 'bbva.atm-withdrawal.es.v1'];
 export function moneyCaptureKind(movement: CaptureKindInput) {
   return ['MONEY_TRANSFER', 'CASH_WITHDRAWAL'].includes(captureProposal(movement.proposal)?.movementType ?? "") || moneyParserKeys.includes(movement.parserKey ?? "");
@@ -30,7 +30,7 @@ export function interpretMoneyNotice(event: CaptureNotice, parseAmount: ParseAmo
 
 // La cuenta se conserva tal como aparece (cuatro o cinco cifras), sin inferir
 // destinatario ni recortar la terminación. La regla del usuario decide el gasto.
-export function interpretBbvaAccountCharge(event: CaptureNotice, parseAmount: ParseAmount, notificationDate: NotificationDate): CaptureInterpretation | null {
+export function interpretBbvaAccountCharge(event: CaptureNotice, parseAmount: ParseAmount, notificationDate: NotificationDate, operationTime: OperationTime): CaptureInterpretation | null {
   if (event.sourcePackage !== 'com.bancomer.mbanking') return null;
   const fields = captureFields(event.fields ?? {}) || {}, body = fields['android.bigText'] || fields['android.text'] || '';
   const old = body.match(/^Tienes un cargo a tu cuenta \*(\d{4,5}) de \$([\d,.]+)\. /);
@@ -44,9 +44,19 @@ export function interpretBbvaAccountCharge(event: CaptureNotice, parseAmount: Pa
   if (/cancel|devol|revers|rechaz|no se (?:aplic[oó]|realiz[oó])/i.test(text)) return { ...base, reason: 'SPECIAL_MOVEMENT' };
   const amount = parseAmount(match[2]!);
   if (!amount || (body.match(/\$/g) || []).length !== 1) return { ...base, reason: 'INVALID_FIELDS' };
+  const published = notificationDate(event);
+  const printed = body.match(/ (\d{1,2}) de ([a-z]+) de (\d{4}), (\d{2}):(\d{2}) h\s*$/i);
+  let bankTime: ReturnType<OperationTime> = null;
+  if (printed) {
+    const month = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'].indexOf(printed[2]!.toLowerCase()) + 1;
+    bankTime = month ? operationTime(`${printed[1]!.padStart(2, '0')}/${String(month).padStart(2, '0')}/${printed[3]} ${printed[4]}:${printed[5]}:00`) : null;
+    if (!bankTime) return { ...base, reason: 'INVALID_FIELDS' };
+    if (!Number.isFinite(new Date(event.receivedAt).getTime())) return { ...base, reason: 'INVALID_FIELDS' };
+    if (Date.parse(bankTime.operationAt) > new Date(event.receivedAt).getTime() + 5 * 60000) return { ...base, reason: 'FUTURE_OPERATION' };
+  } else if (/\bde \d{4},/.test(body)) return { ...base, reason: 'INVALID_FIELDS' };
   return { ...base, reason: 'ACCOUNT_DEBIT_REVIEW', proposal: {
     movementType: 'ACCOUNT_DEBIT', merchant: 'Cargo BBVA', amount, accountSuffix: match[1]!,
-    ...notificationDate(event), paymentEvidence: 'SOURCE_DEBIT_ONLY',
-    missingFields: ['destination', 'card', 'currency', 'statementPeriod', 'operationDate'],
+    ...(published || {}), ...(bankTime ? { ...bankTime, dateSource: 'BANK_OPERATION' } : {}), paymentEvidence: 'SOURCE_DEBIT_ONLY',
+    missingFields: ['destination', 'card', 'currency', 'statementPeriod', ...(!bankTime ? ['operationDate'] : [])],
   } };
 }

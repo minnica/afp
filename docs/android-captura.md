@@ -773,3 +773,18 @@ El candidato `bbva.account-deposit.es.v1` permanece sin acreditación global de 
 Registro automático añade Ingresos y un editor para registrar, vincular y confirmar estimaciones. Confirmar modifica el mismo ingreso; editar desde Ingresos también lo confirma. Mi dinero señala el importe estimado dentro del saldo y consulta cada 15 segundos cuando está visible, además de al recuperar foco/conexión. La entrega sigue dependiendo de una notificación accesible y del envío nativo.
 
 La migración aditiva `20261031010000_capture_income` añade reglas privadas con RLS, la marca de ingreso estimado y el vínculo idempotente desde `CaptureMoneyPosting`. No activa reglas ni procesa históricos. Reinterpretar conserva el original y el historial sin registrar. La publicación, migración productiva y activación personal se autorizan por separado conforme al README. [Verificación y límites](../artifacts/capture-income-2026-10-31/README.md).
+
+
+## Cargos BBVA y cuentas por pagar — implementación funcional del 31/10/2026
+
+La gramática ya observada de `bbva.account-charge.es.v1` conserva ahora la fecha/hora bancaria impresa (`BANK_OPERATION`, minutos explícitos y zona México), además de la publicación original. Se valida calendario, horario y operación futura. Si el aviso no trae ese dato, permanece el respaldo `NOTIFICATION_POSTED_AT`; si lo trae mal formado, no se sustituye silenciosamente. Los avisos e interpretaciones originales guardados no se reescriben.
+
+La regla BBVA de débito aceptada y automática compara la fecha completa prevista y el saldo pendiente de cuentas por pagar simples activas. El importe debe coincidir exactamente a centavos; los abonos previos reducen el saldo candidato. Se respetan las rutas y exclusiones por deuda, y se conserva como origen la cuenta bancaria del cargo. Una coincidencia única crea un gasto `DEBIT` vinculado, su recibo y la actualización de la deuda en la misma transacción. El alta de deudas también toma el bloqueo financiero por propietario. Las cuotas de préstamos con capital/intereses quedan fuera de esta asociación.
+
+La búsqueda de pagos de tarjeta mantiene su tolerancia anterior. Varias deudas compatibles o una deuda y un corte compatibles producen revisión sin crear pagos. El backend permite seleccionar una deuda pendiente mediante `registerDebitExpense.money.payableAccountId`; conserva la validación de fecha, importe, propietario y cuenta. No se añadió ni validó visualmente una interfaz de selección en esta tarea.
+
+Dos cargos de igual importe pueden distinguirse si ambos aportan horas de operación diferentes. Las posibles actualizaciones del mismo aviso se comparan contra todas sus revisiones; un mismo reloj o un reloj ausente conserva revisión. Las evidencias de un gasto cuyo importe o fecha cambiaron no se usan para saltar duplicidades. Los recibos de gastos eliminados también participan en la revisión, evitando recrearlos al recibir otra identidad del mismo aviso.
+
+La acción `matchPayable` vincula un gasto BBVA genérico existente, sin crear otra salida. Solo procede sobre un registro intacto y una coincidencia única, conserva el evento y análisis inicial, guarda historial y protege saldos de referencia, conciliaciones, correcciones y otros vínculos. Los gastos borrados no se reconstruyen. Esta acción no se ejecuta automáticamente sobre avisos históricos al desplegar.
+
+No requiere APK, migración ni dependencia nueva. Código local y pruebas funcionales; sin publicación ni cambios financieros productivos. El diagnóstico de datos reales permanece privado y se realizó con una transacción de solo lectura. [Evidencia](../artifacts/capture-payables-2026-10-31/README.md).

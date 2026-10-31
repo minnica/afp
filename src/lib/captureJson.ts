@@ -26,6 +26,7 @@ export const captureProposalSchema = z.object({
   bankFallback: z.object({ policyId: z.string(), acceptedAt: z.string(), walletParserKey: z.string(), waitMinutes: z.number() }).optional(),
   destinationLabel: text, accountLast4: text, accountSuffix: text,
   fromAccountId: text, toAccountId: text, moneyPolicyId: text, moneyKind: text,
+  payableAccountId: text,
   paymentPolicyId: text, paymentEvidence: text, paymentCoverage: text,
   statementMonth: number, statementYear: number, statementConcept: text,
   uberReceipt: z.object({ tripAt: z.string(), updated: z.boolean(), tipAmount: z.string().optional(),
