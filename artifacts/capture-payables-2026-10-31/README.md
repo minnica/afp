@@ -1,6 +1,6 @@
 # Cuentas por pagar desde cargos BBVA — 31/10/2026
 
-Implementación funcional local. Sin publicación, cambios de reglas ni escrituras financieras en producción. Por instrucción del propietario no se usó agent-browser, no se hicieron validaciones visuales ni se tomaron capturas. No hay componentes nuevos, migraciones, dependencias ni cambios de APK.
+La implementación inicial se verificó localmente sin publicar ni modificar producción. El seguimiento de publicación y la vinculación histórica autorizada se documentan al final. Por instrucción del propietario no se usó agent-browser, no se hicieron validaciones visuales ni se tomaron capturas. No hay componentes nuevos, migraciones, dependencias ni cambios de APK.
 
 ## Resultado
 
@@ -25,6 +25,20 @@ La selección explícita de una deuda en revisión se admite en `registerDebitEx
 - `typecheck`, `typecheck:tests`, `test:types`, `lint` y `build` correctos. Los resultados completos están en los logs adjuntos; los avisos de herramientas que aparezcan en ellos permanecen visibles.
 - La comprobación final de API y persistencia ejecutó por separado sus quince escenarios y pasó todos.
 - Esquema y migraciones sin modificaciones. La BD de pruebas se reconstruyó con las 44 migraciones existentes.
-- La revisión de datos reales se ejecutó con `SET TRANSACTION READ ONLY`. El plan privado identifica cinco coincidencias únicas, una ambigua y dos sin coincidencia entre ocho gastos registrados; no se aplicó ninguna. El informe detallado queda fuera de Git en `estados_cuenta/_soporte/respaldos-y-revisiones/capture-payables-2026-10-31/`.
+- La revisión inicial de datos reales se ejecutó con `SET TRANSACTION READ ONLY`. El plan privado identificó cinco coincidencias únicas, una ambigua y dos sin coincidencia entre ocho gastos registrados; en esa revisión no se aplicó ninguna. El informe detallado queda fuera de Git en `estados_cuenta/_soporte/respaldos-y-revisiones/capture-payables-2026-10-31/`.
 
-La evidencia acredita lógica, API, persistencia y compilación. No acredita publicación ni comprobación visual.
+La verificación inicial acredita lógica, API, persistencia y compilación. No incluyó publicación ni comprobación visual.
+
+## Publicación y vinculación histórica autorizada
+
+En el seguimiento se comprobó que el commit `c30e5c9ddd13412108d0c5dd698247c48a307a7c` ya estaba publicado en Vercel, deployment `dpl_21u4QnCwmR1uceJ33WZZ5LoAcF4j`, production/READY. La vinculación histórica posterior no requirió otra publicación, migración ni activación de reglas.
+
+El propietario aclaró el importe definitivo de una deuda estimada y confirmó que dos operaciones de igual importe pagaron dos deudas con conceptos iguales. Después autorizó expresamente el plan concreto. Se guardó un respaldo privado de las 46 tablas del esquema público y se verificó que el archivo pudiera leerse y contuviera las tablas financieras y de captura necesarias.
+
+La operación se ensayó completa dentro de una transacción y se revirtió antes de su aplicación definitiva. La aplicación tomó el bloqueo financiero del propietario, comprobó versiones y evidencias contra el plan revisado y utilizó los servicios existentes. Para el par de deudas iguales se registró el cargo faltante con el destino confirmado; el gasto existente quedó con una única deuda pendiente compatible. La revisión del importe estimado conserva la explicación del propietario en notas y trazabilidad privada.
+
+Resultado comprobado: ocho cuentas liquidadas, siete gastos reutilizados y un único gasto nuevo. Los dos cargos recibidos después de medianoche quedaron con el día bancario anterior. Las cuentas conservaron sus referencias; el cambio de saldo corresponde exclusivamente al cargo que faltaba. Se conservaron los eventos y sus interpretaciones originales, los recibos existentes y los demás registros financieros.
+
+Una conexión nueva verificó el commit con `SET TRANSACTION READ ONLY`. Se repitieron las rutas de vinculación y registro del cargo recuperado bajo esa restricción: conservaron las identidades existentes sin crear gastos adicionales. La ejecución no modificó código funcional ni requirió repetir la suite de la implementación inicial. Ver [resultado técnico sin datos personales](historical-linking-verification.json).
+
+Los respaldos, las versiones previas, el plan aplicado, las correspondencias, los importes, el script operativo y los resultados completos permanecen fuera de Git en el directorio privado indicado arriba. No se usó navegador ni se hicieron validaciones visuales o capturas.

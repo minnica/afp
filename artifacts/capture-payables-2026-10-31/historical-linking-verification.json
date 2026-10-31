@@ -1,0 +1,40 @@
+{
+  "date": "2026-10-31",
+  "status": "POST_COMMIT_VERIFIED",
+  "scope": "Historical payable links explicitly approved by the owner",
+  "deployment": {
+    "commit": "c30e5c9ddd13412108d0c5dd698247c48a307a7c",
+    "id": "dpl_21u4QnCwmR1uceJ33WZZ5LoAcF4j",
+    "verifiedEarlierInSession": true
+  },
+  "backup": {
+    "archiveReadable": true,
+    "publicTables": 46,
+    "storedOutsideGit": true
+  },
+  "transaction": {
+    "rehearsedAndRolledBack": true,
+    "committed": true,
+    "ownerFinancialLock": true,
+    "reviewedVersionsRechecked": true
+  },
+  "result": {
+    "payablesPaidOff": 8,
+    "reusedExpenses": 7,
+    "newExpenses": 1,
+    "onlyMissingDebitChangesAccountBalance": true,
+    "allOtherFinancialRecordsPreserved": true,
+    "originalCaptureEventsAndInterpretationsPreserved": true
+  },
+  "verification": {
+    "freshConnection": true,
+    "readOnly": true,
+    "retriesCreateNoAdditionalExpenses": true
+  },
+  "migrations": 0,
+  "newDeploymentRequired": false,
+  "functionalCodeChanges": 0,
+  "visualValidation": false,
+  "screenshots": false,
+  "privateAmountsAndCorrespondencesOmitted": true
+}

@@ -487,7 +487,7 @@ La implementación del 31 de octubre incorpora el vínculo automático dentro de
 
 `PATCH /api/captures/movements` con `{id, action: "matchPayable"}` permite vincular un cargo genérico ya registrado a una única deuda compatible, reutilizando el gasto. Conserva el recibo, el análisis original y el historial; una fecha de publicación incorrecta puede sustituirse por la fecha bancaria cuando no afecta un saldo de referencia cerrado. Los gastos editados, conciliados, eliminados o con otros vínculos se protegen. No procesa históricos al publicar ni al consultar: la acción de vinculación se solicita expresamente. La selección explícita de una deuda ambigua se admite en `registerDebitExpense` mediante `money.payableAccountId`, validando de nuevo propietario, cuenta, fecha y saldo; no añade una interfaz nueva.
 
-No hay migraciones ni dependencias nuevas. La implementación local está verificada con PostgreSQL desechable; no se publicó ni aplicó a datos reales en esta tarea. [Alcance y resultados](artifacts/capture-payables-2026-10-31/README.md).
+No hay migraciones ni dependencias nuevas. La implementación se verificó con PostgreSQL desechable y su publicación en producción quedó comprobada el 31 de octubre de 2026. Con autorización posterior del propietario se vincularon los pagos históricos revisados, reutilizando sus gastos existentes y registrando únicamente el cargo faltante. Los importes y correspondencias personales permanecen en la evidencia privada. [Alcance y resultados](artifacts/capture-payables-2026-10-31/README.md).
 
 ### Programación del respaldo bancario
 
