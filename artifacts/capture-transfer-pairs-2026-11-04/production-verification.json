@@ -1,0 +1,24 @@
+{
+  "checkedAt": "2026-11-04T06:41:26.469Z",
+  "origin": "https://finanzas.garatachia.com",
+  "deploymentId": "dpl_Ck794ATt5Pcbi9gxoA4H5z9mUkbZ",
+  "codeCommit": "d3f6ff67de4bc254ffc19e5a52a75e67f6d15ac4",
+  "ready": true,
+  "migration": "20261104010000_capture_bbva_nu_transfer_pairs",
+  "migrationHistoryClean": true,
+  "policyActive": true,
+  "correctedTransferVerified": true,
+  "twoReceiptsOneTransfer": true,
+  "originalEvidencePreserved": true,
+  "originalExpenseRemovedWithTombstone": true,
+  "otherRulesUnchanged": true,
+  "visibleDatabaseNote": true,
+  "principalAndCalculatedYieldValidatedSeparately": true,
+  "phoneAuthenticatedBalancesVerified": true,
+  "runtimeLogs": {
+    "operationalFailureObserved": false,
+    "driverDeprecationWarningsObserved": true
+  },
+  "phoneLedgerTransferAndDatabaseNoteVerified": true,
+  "calendarSyncStatus": "PENDING"
+}

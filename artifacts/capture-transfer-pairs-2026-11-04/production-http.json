@@ -1,0 +1,32 @@
+[
+  {
+    "path": "/registro-automatico",
+    "status": 200,
+    "url": "https://finanzas.garatachia.com/registro-automatico",
+    "hasHtml": true
+  },
+  {
+    "path": "/mi-dinero",
+    "status": 200,
+    "url": "https://finanzas.garatachia.com/mi-dinero",
+    "hasHtml": true
+  },
+  {
+    "path": "/api/money",
+    "status": 401,
+    "url": "https://finanzas.garatachia.com/api/money",
+    "hasHtml": false
+  },
+  {
+    "path": "/api/captures/configuration",
+    "status": 401,
+    "url": "https://finanzas.garatachia.com/api/captures/configuration",
+    "hasHtml": false
+  },
+  {
+    "path": "/api/captures/events",
+    "status": 405,
+    "url": "https://finanzas.garatachia.com/api/captures/events",
+    "hasHtml": false
+  }
+]

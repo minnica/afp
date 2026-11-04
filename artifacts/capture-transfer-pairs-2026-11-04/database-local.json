@@ -1,8 +1,20 @@
 {
-  "note": "PostgreSQL local real, usuario y cuentas ficticios.",
+  "note": "Datos ficticios; destino de ahorro verificado en PostgreSQL local.",
+  "accounts": [
+    {
+      "id": "transfer-pair-bbva-qa",
+      "name": "BBVA ficticia",
+      "kind": "BANK"
+    },
+    {
+      "id": "transfer-pair-nu-qa",
+      "name": "Nu ficticia",
+      "kind": "SAVINGS"
+    }
+  ],
   "transfers": [
     {
-      "id": "cf7fcee1-eadb-4af1-a407-29c5e603ec0f",
+      "id": "f022ae64-3947-46fe-8d08-9424a421943c",
       "amount": "845.3",
       "fromAccountId": "transfer-pair-bbva-qa",
       "toAccountId": "transfer-pair-nu-qa",
@@ -12,8 +24,8 @@
   "postings": [
     {
       "kind": "TRANSFER",
-      "transferId": "cf7fcee1-eadb-4af1-a407-29c5e603ec0f",
-      "movementId": "6a565aa6-b28f-45de-8115-277d536087b7",
+      "transferId": "f022ae64-3947-46fe-8d08-9424a421943c",
+      "movementId": "eb6bf271-f7c7-4577-81e3-c248842fb0f9",
       "snapshot": {
         "date": "2026-11-04",
         "kind": "TRANSFER",
@@ -23,21 +35,21 @@
         "automatic": true,
         "toAccountId": "transfer-pair-nu-qa",
         "transferPair": {
-          "policyId": "b4eebc97-936c-40fc-a127-a4cb871e4642",
+          "policyId": "a45c849d-62bf-4c5d-8967-e8b38423af06",
           "matchedBy": "EXACT_AMOUNT_AND_FIVE_MINUTE_WINDOW",
-          "acceptedAt": "2026-11-04T06:18:10.944Z",
-          "debitEventId": "c91264a5-6b33-4d15-8297-5967692c1373",
-          "debitMovementId": "6a565aa6-b28f-45de-8115-277d536087b7",
-          "incomingEventId": "8fc32d4b-0878-44b5-87a6-fbef572fe52b",
-          "incomingMovementId": "3e3e70b4-b0db-4881-b872-4c5c1ed874b2"
+          "acceptedAt": "2026-11-04T06:39:07.566Z",
+          "debitEventId": "bd227d32-4c8f-4833-8da8-d422ba215147",
+          "debitMovementId": "eb6bf271-f7c7-4577-81e3-c248842fb0f9",
+          "incomingEventId": "26eb7973-2b10-4e60-ae17-1dfd2ffffcda",
+          "incomingMovementId": "90ddab29-b6ac-48c9-a0e1-2e1ed374d3dc"
         },
         "fromAccountId": "transfer-pair-bbva-qa"
       }
     },
     {
       "kind": "TRANSFER",
-      "transferId": "cf7fcee1-eadb-4af1-a407-29c5e603ec0f",
-      "movementId": "3e3e70b4-b0db-4881-b872-4c5c1ed874b2",
+      "transferId": "f022ae64-3947-46fe-8d08-9424a421943c",
+      "movementId": "90ddab29-b6ac-48c9-a0e1-2e1ed374d3dc",
       "snapshot": {
         "date": "2026-11-04",
         "kind": "TRANSFER",
@@ -47,13 +59,13 @@
         "automatic": true,
         "toAccountId": "transfer-pair-nu-qa",
         "transferPair": {
-          "policyId": "b4eebc97-936c-40fc-a127-a4cb871e4642",
+          "policyId": "a45c849d-62bf-4c5d-8967-e8b38423af06",
           "matchedBy": "EXACT_AMOUNT_AND_FIVE_MINUTE_WINDOW",
-          "acceptedAt": "2026-11-04T06:18:10.944Z",
-          "debitEventId": "c91264a5-6b33-4d15-8297-5967692c1373",
-          "debitMovementId": "6a565aa6-b28f-45de-8115-277d536087b7",
-          "incomingEventId": "8fc32d4b-0878-44b5-87a6-fbef572fe52b",
-          "incomingMovementId": "3e3e70b4-b0db-4881-b872-4c5c1ed874b2"
+          "acceptedAt": "2026-11-04T06:39:07.566Z",
+          "debitEventId": "bd227d32-4c8f-4833-8da8-d422ba215147",
+          "debitMovementId": "eb6bf271-f7c7-4577-81e3-c248842fb0f9",
+          "incomingEventId": "26eb7973-2b10-4e60-ae17-1dfd2ffffcda",
+          "incomingMovementId": "90ddab29-b6ac-48c9-a0e1-2e1ed374d3dc"
         },
         "fromAccountId": "transfer-pair-bbva-qa"
       }

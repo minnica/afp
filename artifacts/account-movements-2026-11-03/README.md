@@ -1,6 +1,6 @@
 # Movimientos por cuenta — 3 de noviembre de 2026
 
-Implementación local de **Mi dinero → Cuentas → Ver movimientos**, solicitada por el propietario con Impeccable y shadcn. Sin publicación, migraciones, cambios de reglas ni escrituras de datos personales.
+Implementación de **Mi dinero → Cuentas → Ver movimientos**, solicitada por el propietario con Impeccable y shadcn. Verificada localmente el 3 de noviembre y publicada con autorización el 4 de noviembre. El desglose no requiere migraciones, cambios de reglas ni escrituras de datos personales.
 
 ## Comportamiento
 
@@ -40,3 +40,7 @@ AFP_TEST_DATABASE_URL=postgresql://postgres:afp_test_only@127.0.0.1:55463/afp_te
 ```
 
 Abrir `http://127.0.0.1:4216/login`, utilizar `money-qa@example.test` y una contraseña ficticia de al menos seis caracteres. El fixture copia el código, conserva las API reales y simula Auth; se niega a usar una base remota. La base y el servidor de esta verificación se retiraron al terminar. Los archivos adjuntos contienen exclusivamente datos ficticios.
+
+## Publicación del 4 de noviembre de 2026
+
+Publicado junto con la automatización BBVA → Nu autorizada por el propietario. Commit de código final `d3f6ff6`, deployment `dpl_Ck794ATt5Pcbi9gxoA4H5z9mUkbZ`, production/READY en el dominio habitual. Se comprobó Mi dinero y sus saldos desde la sesión real del celular; la evidencia personal permanece privada. [Verificación de la publicación](../capture-transfer-pairs-2026-11-04/production-verification.json).
