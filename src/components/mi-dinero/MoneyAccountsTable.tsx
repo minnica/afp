@@ -1,7 +1,7 @@
 'use client';
 
 import { HugeiconsIcon } from '@hugeicons/react';
-import { ArrowDown01Icon, ArrowReloadHorizontalIcon, PencilEdit01Icon } from '@hugeicons/core-free-icons';
+import { ArrowDown01Icon, ArrowReloadHorizontalIcon, HistoryIcon, PencilEdit01Icon } from '@hugeicons/core-free-icons';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -17,9 +17,10 @@ interface MoneyAccountsTableProps {
   totals: AccountTotals;
   onReconcile: (account: AccountResponse) => void;
   onEdit: (account: AccountResponse) => void;
+  onMovements: (account: AccountResponse) => void;
 }
 
-export default function MoneyAccountsTable({ accounts, totals, onReconcile, onEdit }: MoneyAccountsTableProps) {
+export default function MoneyAccountsTable({ accounts, totals, onReconcile, onEdit, onMovements }: MoneyAccountsTableProps) {
   return (
     <div className="hidden min-w-0 rounded-lg border md:block">
       <Table tabIndex={0} className="min-w-2xl focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring">
@@ -73,6 +74,10 @@ export default function MoneyAccountsTable({ accounts, totals, onReconcile, onEd
               </TableCell>
               <TableCell className="py-4 pr-4 align-top">
                 <div className="flex flex-col items-end gap-1">
+                  <Button variant="outline" className="min-h-11" onClick={() => onMovements(account)} aria-label={`Ver movimientos de ${account.name}`}>
+                    <HugeiconsIcon icon={HistoryIcon} data-icon="inline-start" aria-hidden="true" />
+                    Ver movimientos
+                  </Button>
                   <Button variant="outline" className="min-h-11" onClick={() => onReconcile(account)} aria-label={`Conciliar saldo de ${account.name}`}>
                     <HugeiconsIcon icon={ArrowReloadHorizontalIcon} data-icon="inline-start" aria-hidden="true" />
                     Conciliar saldo

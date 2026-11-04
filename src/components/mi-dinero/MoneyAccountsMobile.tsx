@@ -1,7 +1,7 @@
 'use client';
 
 import { HugeiconsIcon } from '@hugeicons/react';
-import { ArrowReloadHorizontalIcon, PencilEdit01Icon } from '@hugeicons/core-free-icons';
+import { ArrowReloadHorizontalIcon, HistoryIcon, PencilEdit01Icon } from '@hugeicons/core-free-icons';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -15,11 +15,12 @@ interface MoneyAccountsMobileProps {
   accounts: AccountResponse[];
   onReconcile: (account: AccountResponse) => void;
   onEdit: (account: AccountResponse) => void;
+  onMovements: (account: AccountResponse) => void;
 }
 
 const accountKinds = { BANK: 'Cuenta bancaria', SAVINGS: 'Ahorro a la vista', CASH: 'Efectivo' };
 
-export default function MoneyAccountsMobile({ accounts, onReconcile, onEdit }: MoneyAccountsMobileProps) {
+export default function MoneyAccountsMobile({ accounts, onReconcile, onEdit, onMovements }: MoneyAccountsMobileProps) {
   return (
     <Accordion type="single" collapsible className="md:hidden">
       {accounts.map(account => (
@@ -55,6 +56,10 @@ export default function MoneyAccountsMobile({ accounts, onReconcile, onEdit }: M
                 </div>
               </dl>
               <div className="flex flex-wrap gap-2">
+                <Button variant="outline" className="min-h-11" onClick={() => onMovements(account)} aria-label={`Ver movimientos de ${account.name}`}>
+                  <HugeiconsIcon icon={HistoryIcon} data-icon="inline-start" aria-hidden="true" />
+                  Ver movimientos
+                </Button>
                 <Button variant="outline" className="min-h-11" onClick={() => onReconcile(account)} aria-label={`Conciliar saldo de ${account.name}`}>
                   <HugeiconsIcon icon={ArrowReloadHorizontalIcon} data-icon="inline-start" aria-hidden="true" />
                   Conciliar saldo

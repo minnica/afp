@@ -1,0 +1,128 @@
+
+> afp@0.1.0 test /home/garatachia/projects/afp
+> node --import tsx tests/run-tests.ts money-account-ledger.test.ts
+
+TAP version 13
+# Subtest: desglose: referencia, entradas y salidas explican el saldo con centavos y orden diario estable
+ok 1 - desglose: referencia, entradas y salidas explican el saldo con centavos y orden diario estable
+  ---
+  duration_ms: 4.064995
+  type: 'test'
+  ...
+# Subtest: desglose: cada cuenta recibe su propio lado de una transferencia y conserva el total
+ok 2 - desglose: cada cuenta recibe su propio lado de una transferencia y conserva el total
+  ---
+  duration_ms: 0.736959
+  type: 'test'
+  ...
+# Subtest: desglose: excluye previsiones, movimientos futuros, sin cuenta y anteriores a la referencia
+ok 3 - desglose: excluye previsiones, movimientos futuros, sin cuenta y anteriores a la referencia
+  ---
+  duration_ms: 0.23697
+  type: 'test'
+  ...
+# Subtest: desglose: los movimientos ya incluidos en la referencia no se vuelven a sumar
+ok 4 - desglose: los movimientos ya incluidos en la referencia no se vuelven a sumar
+  ---
+  duration_ms: 0.350429
+  type: 'test'
+  ...
+# Subtest: desglose: editar un registro incluido muestra solo su cambio neto como ajuste
+ok 5 - desglose: editar un registro incluido muestra solo su cambio neto como ajuste
+  ---
+  duration_ms: 0.30876
+  type: 'test'
+  ...
+# Subtest: desglose: un ingreso eliminado y un gasto excluido conservan el efecto de corrección
+ok 6 - desglose: un ingreso eliminado y un gasto excluido conservan el efecto de corrección
+  ---
+  duration_ms: 0.329439
+  type: 'test'
+  ...
+# Subtest: desglose: al trasladar un registro de referencia entre cuentas se explican ambos cambios
+ok 7 - desglose: al trasladar un registro de referencia entre cuentas se explican ambos cambios
+  ---
+  duration_ms: 0.28045
+  type: 'test'
+  ...
+# Subtest: desglose: asignar un registro de referencia sin cuenta no crea una entrada nueva
+ok 8 - desglose: asignar un registro de referencia sin cuenta no crea una entrada nueva
+  ---
+  duration_ms: 0.1696
+  type: 'test'
+  ...
+# Subtest: desglose: una asignación sin cuenta que también cambia importe muestra solo el excedente
+ok 9 - desglose: una asignación sin cuenta que también cambia importe muestra solo el excedente
+  ---
+  duration_ms: 0.290329
+  type: 'test'
+  ...
+# Subtest: desglose: reparto de importes sin cuenta conserva la asignación determinista entre cuentas
+ok 10 - desglose: reparto de importes sin cuenta conserva la asignación determinista entre cuentas
+  ---
+  duration_ms: 0.37361
+  type: 'test'
+  ...
+# Subtest: desglose: identificaciones de pagos de tarjeta ya incluidos no duplican salidas
+ok 11 - desglose: identificaciones de pagos de tarjeta ya incluidos no duplican salidas
+  ---
+  duration_ms: 0.16516
+  type: 'test'
+  ...
+# Subtest: desglose: pagos nuevos del mismo corte muestran sus partidas individuales una sola vez
+ok 12 - desglose: pagos nuevos del mismo corte muestran sus partidas individuales una sola vez
+  ---
+  duration_ms: 0.14062
+  type: 'test'
+  ...
+# Subtest: desglose: un abono adicional a un corte incluido se expresa como ajuste neto de referencia
+ok 13 - desglose: un abono adicional a un corte incluido se expresa como ajuste neto de referencia
+  ---
+  duration_ms: 0.13811
+  type: 'test'
+  ...
+# Subtest: desglose: rendimientos calculados e ingresos estimados conservan su certeza
+ok 14 - desglose: rendimientos calculados e ingresos estimados conservan su certeza
+  ---
+  duration_ms: 0.26059
+  type: 'test'
+  ...
+# Subtest: desglose: mover un registro de referencia al futuro no inventa una operación futura o una fecha de edición
+ok 15 - desglose: mover un registro de referencia al futuro no inventa una operación futura o una fecha de edición
+  ---
+  duration_ms: 0.142379
+  type: 'test'
+  ...
+# Subtest: desglose: los ajustes de una nómina estimada siguen identificados como aproximados
+ok 16 - desglose: los ajustes de una nómina estimada siguen identificados como aproximados
+  ---
+  duration_ms: 0.13961
+  type: 'test'
+  ...
+# Subtest: desglose: búsqueda y mes conservan el saldo acumulado de los registros ocultos
+ok 17 - desglose: búsqueda y mes conservan el saldo acumulado de los registros ocultos
+  ---
+  duration_ms: 0.592169
+  type: 'test'
+  ...
+# Subtest: desglose: efectivo aportado, retiros y saldo negativo mantienen sus signos
+ok 18 - desglose: efectivo aportado, retiros y saldo negativo mantienen sus signos
+  ---
+  duration_ms: 0.14515
+  type: 'test'
+  ...
+# Subtest: desglose: el saldo de referencia conserva el redondeo financiero y no muta los datos
+ok 19 - desglose: el saldo de referencia conserva el redondeo financiero y no muta los datos
+  ---
+  duration_ms: 0.14608
+  type: 'test'
+  ...
+1..19
+# tests 19
+# suites 0
+# pass 19
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 309.462768

@@ -1,12 +1,12 @@
-import type { CalculationData, MoneyEvent, MoneyIssue, MoneyValue, MoneyRoute, Exposure, DateValue } from './types';
+import type { CalculationData, MoneyEvent, MoneyIssue, MoneyValue, MoneyRoute, DateValue } from './types';
 import { readBaseline, readSnapshot } from './persisted';
+import { cents, amount, accountBalanceEffects } from './balance';
+export { cents, amount, exposure } from './balance';
 
 type BalanceReference = { id: string; asOf: DateValue; openingBalance: MoneyValue; reservedAmount?: MoneyValue; baseline?: unknown; yieldInitialPendingDays?: number | null };
 import { Prisma } from '@prisma/client';
 import { day, addDays, todayInMexico } from '@/lib/money/dates';
 import { yieldHistory, ruleAt, dailyYieldCents, roundedYieldCents, paysOn, isRecordedYield } from '@/lib/money/yieldRules';
-export function cents(value: MoneyValue) { return new Prisma.Decimal(value || 0).toDecimalPlaces(2, Prisma.Decimal.ROUND_HALF_UP).mul(100).toNumber(); }
-export function amount(value: number) { return value / 100; }
 export function resolveRoute(data: CalculationData, keys: (string | false | null)[], fallback: MoneyRoute = {}) {
   for (const key of keys) { const route = data.routes.find(r => r.key === key); if (route) return route; }
   return fallback;
@@ -93,35 +93,11 @@ export function buildSources(data: CalculationData, today = todayInMexico()) {
   return { ...result, pendingYields };
 }
 
-// Agrupar abonos por corte impide que vincular evidencia al acumulado cree dinero.
-export function exposure(events: MoneyEvent[], from: string, to: string, includeAutomatic = true) {
-  const result: Exposure = {};
-  for (const e of events) {
-    if (e.excluded || !e.date || e.date < from || e.date > to || (!includeAutomatic && e.automaticYield)) continue;
-    const key = e.paymentGroup ? `card-flow:${e.paymentGroup}` : e.key;
-    result[key] ||= {};
-    const account = e.accountId || 'UNASSIGNED';
-    result[key]![account] = (result[key]![account] || 0) + e.cents;
-  }
-  return result;
-}
 export function accountBalances<T extends BalanceReference>(accounts: T[], events: MoneyEvent[], today: string) {
   return accounts.map(account => {
     const applicable = events.filter(e => !e.automaticYield || (e.date !== null && e.date > day(account.asOf)));
-    const base = readBaseline(account.baseline), current = exposure(applicable, day(account.asOf), today);
-    let delta = 0;
-    for (const key of new Set([...Object.keys(base), ...Object.keys(current)])) {
-      const now = current[key] || {}, before = base[key] || {};
-      delta += (now[account.id] || 0) - (before[account.id] || 0);
-      // Resolver una cuenta desconocida de la captura inicial no reaplica ese dinero.
-      let unknown = Math.abs(before.UNASSIGNED || 0);
-      for (const id of Object.keys(now).filter(id => id !== 'UNASSIGNED').sort()) {
-        const newlyAssigned = Math.max(0, Math.abs(now[id]!) - Math.abs(before[id] || 0));
-        const covered = Math.min(unknown, newlyAssigned);
-        if (id === account.id) delta -= Math.sign(now[id]!) * covered;
-        unknown -= covered;
-      }
-    }
+    const base = readBaseline(account.baseline);
+    const delta = accountBalanceEffects(account, applicable, today).reduce((sum, effect) => sum + effect.cents, 0);
     const balance = cents(account.openingBalance) + delta;
     const calculatedYield = applicable.filter(e => e.automaticYield && e.accountId === account.id && e.date !== null && e.date <= today && !e.excluded).reduce((sum, e) => sum + e.cents, 0);
     const estimatedIncomeAmount = applicable.filter(e => e.estimatedIncome && e.accountId === account.id && e.date !== null && e.date >= day(account.asOf) && e.date <= today && !e.excluded).reduce((sum, e) => sum + Math.max(0, e.cents - (base[e.key]?.[account.id] || 0)), 0);

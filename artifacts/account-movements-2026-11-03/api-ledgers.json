@@ -1,0 +1,819 @@
+{
+  "today": "2026-11-03",
+  "unauthorized": 401,
+  "authorized": 200,
+  "cacheControl": "private, no-store",
+  "ledgers": [
+    {
+      "id": "ledger-bank",
+      "name": "Banco ficticio",
+      "referenceDate": "2026-10-24",
+      "today": "2026-11-03",
+      "openingBalance": 5000,
+      "balance": 8421.88,
+      "incoming": 3688.65,
+      "outgoing": 486.77,
+      "adjustments": 220,
+      "calculated": 0,
+      "estimated": 999.99,
+      "entries": [
+        {
+          "key": "income:ledger-salary",
+          "date": "2026-11-03",
+          "label": "Nómina ficticia",
+          "kind": "INCOME",
+          "kindLabel": "Ingreso",
+          "cents": 200050,
+          "amount": 2000.5,
+          "balance": 8421.88,
+          "adjustment": false,
+          "certainty": "REGISTERED",
+          "description": null,
+          "source": {
+            "href": "/ingresos",
+            "label": "Ingresos"
+          }
+        },
+        {
+          "key": "income:ledger-deposit-18",
+          "date": "2026-11-03",
+          "label": "Depósito ficticio 19",
+          "kind": "INCOME",
+          "kindLabel": "Ingreso",
+          "cents": 1018,
+          "amount": 10.18,
+          "balance": 6421.38,
+          "adjustment": false,
+          "certainty": "REGISTERED",
+          "description": null,
+          "source": {
+            "href": "/ingresos",
+            "label": "Ingresos"
+          }
+        },
+        {
+          "key": "income:ledger-deposit-09",
+          "date": "2026-11-03",
+          "label": "Depósito ficticio 10",
+          "kind": "INCOME",
+          "kindLabel": "Ingreso",
+          "cents": 1009,
+          "amount": 10.09,
+          "balance": 6411.2,
+          "adjustment": false,
+          "certainty": "REGISTERED",
+          "description": null,
+          "source": {
+            "href": "/ingresos",
+            "label": "Ingresos"
+          }
+        },
+        {
+          "key": "income:ledger-deposit-00",
+          "date": "2026-11-03",
+          "label": "Depósito ficticio 01",
+          "kind": "INCOME",
+          "kindLabel": "Ingreso",
+          "cents": 1000,
+          "amount": 10,
+          "balance": 6401.11,
+          "adjustment": false,
+          "certainty": "REGISTERED",
+          "description": null,
+          "source": {
+            "href": "/ingresos",
+            "label": "Ingresos"
+          }
+        },
+        {
+          "key": "expense:ledger-debit",
+          "date": "2026-11-03",
+          "label": "Compra ficticia con débito y un concepto largo que debe poder leerse completo incluso desde un teléfono pequeño",
+          "kind": "EXPENSE",
+          "kindLabel": "Gasto",
+          "cents": -4567,
+          "amount": -45.67,
+          "balance": 6391.11,
+          "adjustment": false,
+          "certainty": "REGISTERED",
+          "description": null,
+          "source": {
+            "href": "/gastos",
+            "label": "Gastos"
+          }
+        },
+        {
+          "key": "contribution:ledger-credit",
+          "date": "2026-11-03",
+          "label": "Efectivo recibido · Compra con crédito ficticia y aportación en efectivo",
+          "kind": "CONTRIBUTION",
+          "kindLabel": "Aportación recibida",
+          "cents": 2525,
+          "amount": 25.25,
+          "balance": 6436.78,
+          "adjustment": false,
+          "certainty": "REGISTERED",
+          "description": null,
+          "source": {
+            "href": "/gastos",
+            "label": "Gastos"
+          }
+        },
+        {
+          "key": "transfer:ledger-transfer:out",
+          "date": "2026-11-02",
+          "label": "Traspaso ficticio al ahorro",
+          "kind": "TRANSFER",
+          "kindLabel": "Transferencia",
+          "cents": -27550,
+          "amount": -275.5,
+          "balance": 6411.53,
+          "adjustment": false,
+          "certainty": "REGISTERED",
+          "description": null,
+          "source": null
+        },
+        {
+          "key": "payment:legacy:e8fb0f79-01b3-4363-abbb-596dbe6f68e7",
+          "date": "2026-11-02",
+          "label": "Pago acumulado · Tarjeta ficticia",
+          "kind": "CARD_PAYMENT",
+          "kindLabel": "Pago de tarjeta",
+          "cents": -12550,
+          "amount": -125.5,
+          "balance": 6687.03,
+          "adjustment": false,
+          "certainty": "REGISTERED",
+          "description": "Fecha aproximada del último abono; el detalle histórico está incompleto.",
+          "source": {
+            "href": "/tarjetas",
+            "label": "Tarjetas"
+          }
+        },
+        {
+          "key": "income:ledger-estimated",
+          "date": "2026-11-02",
+          "label": "Nómina ficticia por confirmar (estimado)",
+          "kind": "INCOME",
+          "kindLabel": "Ingreso",
+          "cents": 99999,
+          "amount": 999.99,
+          "balance": 6812.53,
+          "adjustment": false,
+          "certainty": "ESTIMATED",
+          "description": null,
+          "source": {
+            "href": "/ingresos",
+            "label": "Ingresos"
+          }
+        },
+        {
+          "key": "income:ledger-deposit-19",
+          "date": "2026-11-02",
+          "label": "Depósito ficticio 20",
+          "kind": "INCOME",
+          "kindLabel": "Ingreso",
+          "cents": 1019,
+          "amount": 10.19,
+          "balance": 5812.54,
+          "adjustment": false,
+          "certainty": "REGISTERED",
+          "description": null,
+          "source": {
+            "href": "/ingresos",
+            "label": "Ingresos"
+          }
+        },
+        {
+          "key": "income:ledger-deposit-10",
+          "date": "2026-11-02",
+          "label": "Depósito ficticio 11",
+          "kind": "INCOME",
+          "kindLabel": "Ingreso",
+          "cents": 1010,
+          "amount": 10.1,
+          "balance": 5802.35,
+          "adjustment": false,
+          "certainty": "REGISTERED",
+          "description": null,
+          "source": {
+            "href": "/ingresos",
+            "label": "Ingresos"
+          }
+        },
+        {
+          "key": "income:ledger-deposit-01",
+          "date": "2026-11-02",
+          "label": "Depósito ficticio 02",
+          "kind": "INCOME",
+          "kindLabel": "Ingreso",
+          "cents": 1001,
+          "amount": 10.01,
+          "balance": 5792.25,
+          "adjustment": false,
+          "certainty": "REGISTERED",
+          "description": null,
+          "source": {
+            "href": "/ingresos",
+            "label": "Ingresos"
+          }
+        },
+        {
+          "key": "withdrawal:ledger-withdrawal",
+          "date": "2026-11-01",
+          "label": "Retiro ficticio",
+          "kind": "WITHDRAWAL",
+          "kindLabel": "Retiro",
+          "cents": -4010,
+          "amount": -40.1,
+          "balance": 5782.24,
+          "adjustment": false,
+          "certainty": "REGISTERED",
+          "description": null,
+          "source": null
+        },
+        {
+          "key": "income:ledger-deposit-20",
+          "date": "2026-11-01",
+          "label": "Depósito ficticio 21",
+          "kind": "INCOME",
+          "kindLabel": "Ingreso",
+          "cents": 1020,
+          "amount": 10.2,
+          "balance": 5822.34,
+          "adjustment": false,
+          "certainty": "REGISTERED",
+          "description": null,
+          "source": {
+            "href": "/ingresos",
+            "label": "Ingresos"
+          }
+        },
+        {
+          "key": "income:ledger-deposit-11",
+          "date": "2026-11-01",
+          "label": "Depósito ficticio 12",
+          "kind": "INCOME",
+          "kindLabel": "Ingreso",
+          "cents": 1011,
+          "amount": 10.11,
+          "balance": 5812.14,
+          "adjustment": false,
+          "certainty": "REGISTERED",
+          "description": null,
+          "source": {
+            "href": "/ingresos",
+            "label": "Ingresos"
+          }
+        },
+        {
+          "key": "income:ledger-deposit-02",
+          "date": "2026-11-01",
+          "label": "Depósito ficticio 03",
+          "kind": "INCOME",
+          "kindLabel": "Ingreso",
+          "cents": 1002,
+          "amount": 10.02,
+          "balance": 5802.03,
+          "adjustment": false,
+          "certainty": "REGISTERED",
+          "description": null,
+          "source": {
+            "href": "/ingresos",
+            "label": "Ingresos"
+          }
+        },
+        {
+          "key": "income:ledger-deposit-21",
+          "date": "2026-10-31",
+          "label": "Depósito ficticio 22",
+          "kind": "INCOME",
+          "kindLabel": "Ingreso",
+          "cents": 1021,
+          "amount": 10.21,
+          "balance": 5792.01,
+          "adjustment": false,
+          "certainty": "REGISTERED",
+          "description": null,
+          "source": {
+            "href": "/ingresos",
+            "label": "Ingresos"
+          }
+        },
+        {
+          "key": "income:ledger-deposit-12",
+          "date": "2026-10-31",
+          "label": "Depósito ficticio 13",
+          "kind": "INCOME",
+          "kindLabel": "Ingreso",
+          "cents": 1012,
+          "amount": 10.12,
+          "balance": 5781.8,
+          "adjustment": false,
+          "certainty": "REGISTERED",
+          "description": null,
+          "source": {
+            "href": "/ingresos",
+            "label": "Ingresos"
+          }
+        },
+        {
+          "key": "income:ledger-deposit-03",
+          "date": "2026-10-31",
+          "label": "Depósito ficticio 04",
+          "kind": "INCOME",
+          "kindLabel": "Ingreso",
+          "cents": 1003,
+          "amount": 10.03,
+          "balance": 5771.68,
+          "adjustment": false,
+          "certainty": "REGISTERED",
+          "description": null,
+          "source": {
+            "href": "/ingresos",
+            "label": "Ingresos"
+          }
+        },
+        {
+          "key": "income:ledger-collection",
+          "date": "2026-10-31",
+          "label": "Cobro ficticio de préstamo",
+          "kind": "COLLECTION",
+          "kindLabel": "Cobro recibido",
+          "cents": 42015,
+          "amount": 420.15,
+          "balance": 5761.65,
+          "adjustment": false,
+          "certainty": "REGISTERED",
+          "description": null,
+          "source": {
+            "href": "/ingresos",
+            "label": "Ingresos"
+          }
+        },
+        {
+          "key": "income:ledger-deposit-22",
+          "date": "2026-10-30",
+          "label": "Depósito ficticio 23",
+          "kind": "INCOME",
+          "kindLabel": "Ingreso",
+          "cents": 1022,
+          "amount": 10.22,
+          "balance": 5341.5,
+          "adjustment": false,
+          "certainty": "REGISTERED",
+          "description": null,
+          "source": {
+            "href": "/ingresos",
+            "label": "Ingresos"
+          }
+        },
+        {
+          "key": "income:ledger-deposit-13",
+          "date": "2026-10-30",
+          "label": "Depósito ficticio 14",
+          "kind": "INCOME",
+          "kindLabel": "Ingreso",
+          "cents": 1013,
+          "amount": 10.13,
+          "balance": 5331.28,
+          "adjustment": false,
+          "certainty": "REGISTERED",
+          "description": null,
+          "source": {
+            "href": "/ingresos",
+            "label": "Ingresos"
+          }
+        },
+        {
+          "key": "income:ledger-deposit-04",
+          "date": "2026-10-30",
+          "label": "Depósito ficticio 05",
+          "kind": "INCOME",
+          "kindLabel": "Ingreso",
+          "cents": 1004,
+          "amount": 10.04,
+          "balance": 5321.15,
+          "adjustment": false,
+          "certainty": "REGISTERED",
+          "description": null,
+          "source": {
+            "href": "/ingresos",
+            "label": "Ingresos"
+          }
+        },
+        {
+          "key": "income:ledger-deposit-23",
+          "date": "2026-10-29",
+          "label": "Depósito ficticio 24",
+          "kind": "INCOME",
+          "kindLabel": "Ingreso",
+          "cents": 1023,
+          "amount": 10.23,
+          "balance": 5311.11,
+          "adjustment": false,
+          "certainty": "REGISTERED",
+          "description": null,
+          "source": {
+            "href": "/ingresos",
+            "label": "Ingresos"
+          }
+        },
+        {
+          "key": "income:ledger-deposit-14",
+          "date": "2026-10-29",
+          "label": "Depósito ficticio 15",
+          "kind": "INCOME",
+          "kindLabel": "Ingreso",
+          "cents": 1014,
+          "amount": 10.14,
+          "balance": 5300.88,
+          "adjustment": false,
+          "certainty": "REGISTERED",
+          "description": null,
+          "source": {
+            "href": "/ingresos",
+            "label": "Ingresos"
+          }
+        },
+        {
+          "key": "income:ledger-deposit-05",
+          "date": "2026-10-29",
+          "label": "Depósito ficticio 06",
+          "kind": "INCOME",
+          "kindLabel": "Ingreso",
+          "cents": 1005,
+          "amount": 10.05,
+          "balance": 5290.74,
+          "adjustment": false,
+          "certainty": "REGISTERED",
+          "description": null,
+          "source": {
+            "href": "/ingresos",
+            "label": "Ingresos"
+          }
+        },
+        {
+          "key": "income:ledger-deposit-15",
+          "date": "2026-10-28",
+          "label": "Depósito ficticio 16",
+          "kind": "INCOME",
+          "kindLabel": "Ingreso",
+          "cents": 1015,
+          "amount": 10.15,
+          "balance": 5280.69,
+          "adjustment": false,
+          "certainty": "REGISTERED",
+          "description": null,
+          "source": {
+            "href": "/ingresos",
+            "label": "Ingresos"
+          }
+        },
+        {
+          "key": "income:ledger-deposit-06",
+          "date": "2026-10-28",
+          "label": "Depósito ficticio 07",
+          "kind": "INCOME",
+          "kindLabel": "Ingreso",
+          "cents": 1006,
+          "amount": 10.06,
+          "balance": 5270.54,
+          "adjustment": false,
+          "certainty": "REGISTERED",
+          "description": null,
+          "source": {
+            "href": "/ingresos",
+            "label": "Ingresos"
+          }
+        },
+        {
+          "key": "income:ledger-deposit-16",
+          "date": "2026-10-27",
+          "label": "Depósito ficticio 17",
+          "kind": "INCOME",
+          "kindLabel": "Ingreso",
+          "cents": 1016,
+          "amount": 10.16,
+          "balance": 5260.48,
+          "adjustment": false,
+          "certainty": "REGISTERED",
+          "description": null,
+          "source": {
+            "href": "/ingresos",
+            "label": "Ingresos"
+          }
+        },
+        {
+          "key": "income:ledger-deposit-07",
+          "date": "2026-10-27",
+          "label": "Depósito ficticio 08",
+          "kind": "INCOME",
+          "kindLabel": "Ingreso",
+          "cents": 1007,
+          "amount": 10.07,
+          "balance": 5250.32,
+          "adjustment": false,
+          "certainty": "REGISTERED",
+          "description": null,
+          "source": {
+            "href": "/ingresos",
+            "label": "Ingresos"
+          }
+        },
+        {
+          "key": "income:ledger-deposit-17",
+          "date": "2026-10-26",
+          "label": "Depósito ficticio 18",
+          "kind": "INCOME",
+          "kindLabel": "Ingreso",
+          "cents": 1017,
+          "amount": 10.17,
+          "balance": 5240.25,
+          "adjustment": false,
+          "certainty": "REGISTERED",
+          "description": null,
+          "source": {
+            "href": "/ingresos",
+            "label": "Ingresos"
+          }
+        },
+        {
+          "key": "income:ledger-deposit-08",
+          "date": "2026-10-26",
+          "label": "Depósito ficticio 09",
+          "kind": "INCOME",
+          "kindLabel": "Ingreso",
+          "cents": 1008,
+          "amount": 10.08,
+          "balance": 5230.08,
+          "adjustment": false,
+          "certainty": "REGISTERED",
+          "description": null,
+          "source": {
+            "href": "/ingresos",
+            "label": "Ingresos"
+          }
+        },
+        {
+          "key": "reference-change:income:ledger-reference",
+          "date": "2026-10-24",
+          "label": "Ajuste · Depósito incluido en referencia y editado después",
+          "kind": "ADJUSTMENT",
+          "kindLabel": "Ajuste de referencia",
+          "cents": 20000,
+          "amount": 200,
+          "balance": 5220,
+          "adjustment": true,
+          "certainty": "REGISTERED",
+          "source": null,
+          "description": "Cambio neto de un registro modificado, eliminado o reasignado respecto al saldo de referencia. No representa una nueva operación bancaria; su fecha de cambio no está disponible."
+        },
+        {
+          "key": "reference-change:expense:ledger-deleted",
+          "date": "2026-10-24",
+          "label": "Cambio en un movimiento incluido",
+          "kind": "ADJUSTMENT",
+          "kindLabel": "Ajuste de referencia",
+          "cents": 2000,
+          "amount": 20,
+          "balance": 5020,
+          "adjustment": true,
+          "certainty": "REGISTERED",
+          "source": null,
+          "description": "Cambio neto de un registro modificado, eliminado o reasignado respecto al saldo de referencia. No representa una nueva operación bancaria; su fecha de cambio no está disponible."
+        }
+      ],
+      "months": [
+        "2026-11",
+        "2026-10"
+      ]
+    },
+    {
+      "id": "ledger-empty",
+      "name": "Efectivo ficticio sin movimientos",
+      "referenceDate": "2026-10-24",
+      "today": "2026-11-03",
+      "openingBalance": 120,
+      "balance": 120,
+      "incoming": 0,
+      "outgoing": 0,
+      "adjustments": 0,
+      "calculated": 0,
+      "estimated": 0,
+      "entries": [],
+      "months": []
+    },
+    {
+      "id": "ledger-savings",
+      "name": "Ahorro ficticio con un nombre largo para comprobar la lectura en pantalla pequeña",
+      "referenceDate": "2026-10-24",
+      "today": "2026-11-03",
+      "openingBalance": 600,
+      "balance": 878.11,
+      "incoming": 278.11,
+      "outgoing": 0,
+      "adjustments": 0,
+      "calculated": 2.36,
+      "estimated": 0,
+      "entries": [
+        {
+          "key": "yield:auto:ledger-savings:2026-11-03",
+          "date": "2026-11-03",
+          "label": "Rendimiento calculado · Ahorro ficticio con un nombre largo para comprobar la lectura en pantalla pequeña",
+          "kind": "AUTO_YIELD",
+          "kindLabel": "Rendimiento",
+          "cents": 36,
+          "amount": 0.36,
+          "balance": 878.11,
+          "adjustment": false,
+          "certainty": "CALCULATED",
+          "description": null,
+          "source": null
+        },
+        {
+          "key": "yield:auto:ledger-savings:2026-11-02",
+          "date": "2026-11-02",
+          "label": "Rendimiento calculado · Ahorro ficticio con un nombre largo para comprobar la lectura en pantalla pequeña",
+          "kind": "AUTO_YIELD",
+          "kindLabel": "Rendimiento",
+          "cents": 25,
+          "amount": 0.25,
+          "balance": 877.75,
+          "adjustment": false,
+          "certainty": "CALCULATED",
+          "description": null,
+          "source": null
+        },
+        {
+          "key": "transfer:ledger-transfer:in",
+          "date": "2026-11-02",
+          "label": "Traspaso ficticio al ahorro",
+          "kind": "TRANSFER",
+          "kindLabel": "Transferencia",
+          "cents": 27550,
+          "amount": 275.5,
+          "balance": 877.5,
+          "adjustment": false,
+          "certainty": "REGISTERED",
+          "description": null,
+          "source": null
+        },
+        {
+          "key": "income:ledger-yield-recorded",
+          "date": "2026-11-01",
+          "label": "Abono de rendimiento ficticio",
+          "kind": "INCOME",
+          "kindLabel": "Ingreso",
+          "cents": 25,
+          "amount": 0.25,
+          "balance": 602,
+          "adjustment": false,
+          "certainty": "REGISTERED",
+          "description": null,
+          "source": {
+            "href": "/ingresos",
+            "label": "Ingresos"
+          }
+        },
+        {
+          "key": "yield:auto:ledger-savings:2026-10-31",
+          "date": "2026-10-31",
+          "label": "Rendimiento calculado · Ahorro ficticio con un nombre largo para comprobar la lectura en pantalla pequeña",
+          "kind": "AUTO_YIELD",
+          "kindLabel": "Rendimiento",
+          "cents": 25,
+          "amount": 0.25,
+          "balance": 601.75,
+          "adjustment": false,
+          "certainty": "CALCULATED",
+          "description": null,
+          "source": null
+        },
+        {
+          "key": "yield:auto:ledger-savings:2026-10-30",
+          "date": "2026-10-30",
+          "label": "Rendimiento calculado · Ahorro ficticio con un nombre largo para comprobar la lectura en pantalla pequeña",
+          "kind": "AUTO_YIELD",
+          "kindLabel": "Rendimiento",
+          "cents": 25,
+          "amount": 0.25,
+          "balance": 601.5,
+          "adjustment": false,
+          "certainty": "CALCULATED",
+          "description": null,
+          "source": null
+        },
+        {
+          "key": "yield:auto:ledger-savings:2026-10-29",
+          "date": "2026-10-29",
+          "label": "Rendimiento calculado · Ahorro ficticio con un nombre largo para comprobar la lectura en pantalla pequeña",
+          "kind": "AUTO_YIELD",
+          "kindLabel": "Rendimiento",
+          "cents": 25,
+          "amount": 0.25,
+          "balance": 601.25,
+          "adjustment": false,
+          "certainty": "CALCULATED",
+          "description": null,
+          "source": null
+        },
+        {
+          "key": "yield:auto:ledger-savings:2026-10-28",
+          "date": "2026-10-28",
+          "label": "Rendimiento calculado · Ahorro ficticio con un nombre largo para comprobar la lectura en pantalla pequeña",
+          "kind": "AUTO_YIELD",
+          "kindLabel": "Rendimiento",
+          "cents": 25,
+          "amount": 0.25,
+          "balance": 601,
+          "adjustment": false,
+          "certainty": "CALCULATED",
+          "description": null,
+          "source": null
+        },
+        {
+          "key": "yield:auto:ledger-savings:2026-10-27",
+          "date": "2026-10-27",
+          "label": "Rendimiento calculado · Ahorro ficticio con un nombre largo para comprobar la lectura en pantalla pequeña",
+          "kind": "AUTO_YIELD",
+          "kindLabel": "Rendimiento",
+          "cents": 25,
+          "amount": 0.25,
+          "balance": 600.75,
+          "adjustment": false,
+          "certainty": "CALCULATED",
+          "description": null,
+          "source": null
+        },
+        {
+          "key": "yield:auto:ledger-savings:2026-10-26",
+          "date": "2026-10-26",
+          "label": "Rendimiento calculado · Ahorro ficticio con un nombre largo para comprobar la lectura en pantalla pequeña",
+          "kind": "AUTO_YIELD",
+          "kindLabel": "Rendimiento",
+          "cents": 25,
+          "amount": 0.25,
+          "balance": 600.5,
+          "adjustment": false,
+          "certainty": "CALCULATED",
+          "description": null,
+          "source": null
+        },
+        {
+          "key": "yield:auto:ledger-savings:2026-10-25",
+          "date": "2026-10-25",
+          "label": "Rendimiento calculado · Ahorro ficticio con un nombre largo para comprobar la lectura en pantalla pequeña",
+          "kind": "AUTO_YIELD",
+          "kindLabel": "Rendimiento",
+          "cents": 25,
+          "amount": 0.25,
+          "balance": 600.25,
+          "adjustment": false,
+          "certainty": "CALCULATED",
+          "description": null,
+          "source": null
+        }
+      ],
+      "months": [
+        "2026-11",
+        "2026-10"
+      ]
+    },
+    {
+      "id": "ledger-negative",
+      "name": "Cuenta ficticia con saldo negativo",
+      "referenceDate": "2026-10-24",
+      "today": "2026-11-03",
+      "openingBalance": 0,
+      "balance": -30,
+      "incoming": 0,
+      "outgoing": 30,
+      "adjustments": 0,
+      "calculated": 0,
+      "estimated": 0,
+      "entries": [
+        {
+          "key": "expense:ledger-negative-expense",
+          "date": "2026-11-03",
+          "label": "Gasto ficticio por conciliar",
+          "kind": "EXPENSE",
+          "kindLabel": "Gasto",
+          "cents": -3000,
+          "amount": -30,
+          "balance": -30,
+          "adjustment": false,
+          "certainty": "REGISTERED",
+          "description": null,
+          "source": {
+            "href": "/gastos",
+            "label": "Gastos"
+          }
+        }
+      ],
+      "months": [
+        "2026-11"
+      ]
+    }
+  ]
+}

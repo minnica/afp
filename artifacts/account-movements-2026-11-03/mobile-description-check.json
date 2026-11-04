@@ -1,0 +1,20 @@
+{
+  "background": "oklch(0.205 0 0)",
+  "color": "oklch(0.708 0 0)",
+  "contrast": 6.938930345767489,
+  "textLines": [
+    {
+      "left": 16,
+      "right": 242.578125,
+      "top": 88.40625,
+      "unobscured": true
+    },
+    {
+      "left": 16,
+      "right": 110.3125,
+      "top": 107.90625,
+      "unobscured": true
+    }
+  ],
+  "viewport": 320
+}

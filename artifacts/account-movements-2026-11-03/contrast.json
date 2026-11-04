@@ -1,0 +1,913 @@
+{
+  "descriptionTextLines": [
+    {
+      "obscured": false,
+      "width": 323.890625
+    }
+  ],
+  "minimum": 6.207064877222629,
+  "samples": [
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.708 0 0)",
+      "ratio": 6.938930345767489,
+      "text": "Cómo llegaste a tu saldo actual, desde tu última referencia."
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.985 0 0)",
+      "ratio": 17.176123405576867,
+      "text": "Saldo actual en AFP"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.985 0 0)",
+      "ratio": 17.176123405576867,
+      "text": "$8,421.88"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.708 0 0)",
+      "ratio": 6.938930345767489,
+      "text": "Desde el 24 oct 2026 hasta el 3 nov 2026."
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.708 0 0)",
+      "ratio": 6.938930345767489,
+      "text": "Saldo de referencia"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.985 0 0)",
+      "ratio": 17.176123405576867,
+      "text": "$5,000.00"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.708 0 0)",
+      "ratio": 6.938930345767489,
+      "text": "Entradas"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.765 0.177 163.223)",
+      "ratio": 9.24774170397976,
+      "text": "+$3,688.65"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.708 0 0)",
+      "ratio": 6.938930345767489,
+      "text": "Salidas"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.704 0.191 22.216)",
+      "ratio": 6.207064877222629,
+      "text": "−$486.77"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.708 0 0)",
+      "ratio": 6.938930345767489,
+      "text": "Ajustes de referencia"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.985 0 0)",
+      "ratio": 17.176123405576867,
+      "text": "+$220.00"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.708 0 0)",
+      "ratio": 6.938930345767489,
+      "text": "El saldo parte de tu referencia, más entradas, menos salidas y con los ajustes indicados. Los movimi"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.828 0.189 84.429)",
+      "ratio": 10.408037318852417,
+      "text": "Incluye $999.99 de ingresos estimados pendientes de confirmar."
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.708 0 0)",
+      "ratio": 6.938930345767489,
+      "text": "Más recientes primero. Los filtros conservan el saldo completo de cada movimiento."
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.708 0 0)",
+      "ratio": 6.938930345767489,
+      "text": "34 movimientos desde la referencia."
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.985 0 0)",
+      "ratio": 17.176123405576867,
+      "text": "Fecha"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.985 0 0)",
+      "ratio": 17.176123405576867,
+      "text": "Concepto"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.985 0 0)",
+      "ratio": 17.176123405576867,
+      "text": "Movimiento"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.985 0 0)",
+      "ratio": 17.176123405576867,
+      "text": "Saldo después"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.985 0 0)",
+      "ratio": 17.176123405576867,
+      "text": "Nómina ficticia"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.708 0 0)",
+      "ratio": 6.938930345767489,
+      "text": "Ver en Ingresos"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.985 0 0)",
+      "ratio": 17.176123405576867,
+      "text": "$8,421.88"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.985 0 0)",
+      "ratio": 17.176123405576867,
+      "text": "Depósito ficticio 19"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.708 0 0)",
+      "ratio": 6.938930345767489,
+      "text": "Ver en Ingresos"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.985 0 0)",
+      "ratio": 17.176123405576867,
+      "text": "$6,421.38"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.985 0 0)",
+      "ratio": 17.176123405576867,
+      "text": "Depósito ficticio 10"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.708 0 0)",
+      "ratio": 6.938930345767489,
+      "text": "Ver en Ingresos"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.985 0 0)",
+      "ratio": 17.176123405576867,
+      "text": "$6,411.20"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.985 0 0)",
+      "ratio": 17.176123405576867,
+      "text": "Depósito ficticio 01"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.708 0 0)",
+      "ratio": 6.938930345767489,
+      "text": "Ver en Ingresos"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.985 0 0)",
+      "ratio": 17.176123405576867,
+      "text": "$6,401.11"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.985 0 0)",
+      "ratio": 17.176123405576867,
+      "text": "Compra ficticia con débito y un concepto largo que debe poder leerse completo incluso desde un teléf"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.708 0 0)",
+      "ratio": 6.938930345767489,
+      "text": "Ver en Gastos"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.985 0 0)",
+      "ratio": 17.176123405576867,
+      "text": "$6,391.11"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.985 0 0)",
+      "ratio": 17.176123405576867,
+      "text": "Efectivo recibido · Compra con crédito ficticia y aportación en efectivo"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.708 0 0)",
+      "ratio": 6.938930345767489,
+      "text": "Ver en Gastos"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.985 0 0)",
+      "ratio": 17.176123405576867,
+      "text": "$6,436.78"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.985 0 0)",
+      "ratio": 17.176123405576867,
+      "text": "Traspaso ficticio al ahorro"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.985 0 0)",
+      "ratio": 17.176123405576867,
+      "text": "$6,411.53"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.985 0 0)",
+      "ratio": 17.176123405576867,
+      "text": "Pago acumulado · Tarjeta ficticia"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.708 0 0)",
+      "ratio": 6.938930345767489,
+      "text": "Ver en Tarjetas"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.708 0 0)",
+      "ratio": 6.938930345767489,
+      "text": "Fecha aproximada del último abono; el detalle histórico está incompleto."
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.985 0 0)",
+      "ratio": 17.176123405576867,
+      "text": "$6,687.03"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.985 0 0)",
+      "ratio": 17.176123405576867,
+      "text": "Nómina ficticia por confirmar (estimado)"
+    },
+    {
+      "background": [
+        46.654901960784315,
+        39.61960784313726,
+        20.654901960784315,
+        1
+      ],
+      "color": "oklch(0.828 0.189 84.429)",
+      "ratio": 8.53620388765076,
+      "text": "Importe estimado"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.708 0 0)",
+      "ratio": 6.938930345767489,
+      "text": "Ver en Ingresos"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.985 0 0)",
+      "ratio": 17.176123405576867,
+      "text": "$6,812.53"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.985 0 0)",
+      "ratio": 17.176123405576867,
+      "text": "Depósito ficticio 20"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.708 0 0)",
+      "ratio": 6.938930345767489,
+      "text": "Ver en Ingresos"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.985 0 0)",
+      "ratio": 17.176123405576867,
+      "text": "$5,812.54"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.985 0 0)",
+      "ratio": 17.176123405576867,
+      "text": "Depósito ficticio 11"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.708 0 0)",
+      "ratio": 6.938930345767489,
+      "text": "Ver en Ingresos"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.985 0 0)",
+      "ratio": 17.176123405576867,
+      "text": "$5,802.35"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.985 0 0)",
+      "ratio": 17.176123405576867,
+      "text": "Depósito ficticio 02"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.708 0 0)",
+      "ratio": 6.938930345767489,
+      "text": "Ver en Ingresos"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.985 0 0)",
+      "ratio": 17.176123405576867,
+      "text": "$5,792.25"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.985 0 0)",
+      "ratio": 17.176123405576867,
+      "text": "Retiro ficticio"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.985 0 0)",
+      "ratio": 17.176123405576867,
+      "text": "$5,782.24"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.985 0 0)",
+      "ratio": 17.176123405576867,
+      "text": "Depósito ficticio 21"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.708 0 0)",
+      "ratio": 6.938930345767489,
+      "text": "Ver en Ingresos"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.985 0 0)",
+      "ratio": 17.176123405576867,
+      "text": "$5,822.34"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.985 0 0)",
+      "ratio": 17.176123405576867,
+      "text": "Depósito ficticio 12"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.708 0 0)",
+      "ratio": 6.938930345767489,
+      "text": "Ver en Ingresos"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.985 0 0)",
+      "ratio": 17.176123405576867,
+      "text": "$5,812.14"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.985 0 0)",
+      "ratio": 17.176123405576867,
+      "text": "Depósito ficticio 03"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.708 0 0)",
+      "ratio": 6.938930345767489,
+      "text": "Ver en Ingresos"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.985 0 0)",
+      "ratio": 17.176123405576867,
+      "text": "$5,802.03"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.985 0 0)",
+      "ratio": 17.176123405576867,
+      "text": "Depósito ficticio 22"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.708 0 0)",
+      "ratio": 6.938930345767489,
+      "text": "Ver en Ingresos"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.985 0 0)",
+      "ratio": 17.176123405576867,
+      "text": "$5,792.01"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.985 0 0)",
+      "ratio": 17.176123405576867,
+      "text": "Depósito ficticio 13"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.708 0 0)",
+      "ratio": 6.938930345767489,
+      "text": "Ver en Ingresos"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.985 0 0)",
+      "ratio": 17.176123405576867,
+      "text": "$5,781.80"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.985 0 0)",
+      "ratio": 17.176123405576867,
+      "text": "Depósito ficticio 04"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.708 0 0)",
+      "ratio": 6.938930345767489,
+      "text": "Ver en Ingresos"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.985 0 0)",
+      "ratio": 17.176123405576867,
+      "text": "$5,771.68"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.985 0 0)",
+      "ratio": 17.176123405576867,
+      "text": "Cobro ficticio de préstamo"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.708 0 0)",
+      "ratio": 6.938930345767489,
+      "text": "Ver en Ingresos"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.985 0 0)",
+      "ratio": 17.176123405576867,
+      "text": "$5,761.65"
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.708 0 0)",
+      "ratio": 6.938930345767489,
+      "text": "20 de 34 movimientos."
+    },
+    {
+      "background": [
+        23,
+        23,
+        23,
+        1
+      ],
+      "color": "oklch(0.708 0 0)",
+      "ratio": 6.938930345767489,
+      "text": "El orden dentro de un mismo día es de AFP y puede diferir del banco. Las compras con crédito aparece"
+    }
+  ]
+}

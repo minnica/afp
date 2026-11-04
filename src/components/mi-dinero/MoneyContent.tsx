@@ -40,6 +40,7 @@ import { toast } from '@/components/ui/sonner';
 import MoneyEditor from './MoneyEditor';
 import MoneyAccountsTable from './MoneyAccountsTable';
 import MoneyAccountsMobile from './MoneyAccountsMobile';
+import MoneyAccountMovements from './MoneyAccountMovements';
 import AccountYieldSummary from './AccountYieldSummary';
 import { accountTotals } from './accountTotals';
 import { createTransferEditor } from './transferEditor';
@@ -59,6 +60,7 @@ export default function MoneyContent() {
   const router = useRouter(), [data, setData] = useState<MoneyResponse | null>(null), [userId, setUserId] = useState<string | null>(null);
   const [error, setError] = useState(''), [loading, setLoading] = useState(true), [editor, setEditor] = useState<EditorConfiguration | null>(null), [confirmation, setConfirmation] = useState<Confirmation | null>(null), [confirming, setConfirming] = useState(false);
   const [scenario, setScenario] = useState<Scenario | null>(null), [movementFilter, setMovementFilter] = useState('PENDING'), [query, setQuery] = useState(''), [limit, setLimit] = useState(30), [planMonth, setPlanMonth] = useState('');
+  const [movementAccountId, setMovementAccountId] = useState<string | null>(null);
   const requestRef = useRef<ReturnType<typeof createLatestRequest> | null>(null), savingRef = useRef(false), actorRef = useRef<string | null>(null), scenarioRef = useRef<Scenario | null>(null);
   if (requestRef.current === null) requestRef.current = createLatestRequest();
   const { captureFocus, restoreFocus } = useDialogFocus();
@@ -88,7 +90,7 @@ export default function MoneyContent() {
     void initialize();
     const { data: subscription } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_OUT' || (actorRef.current && session?.user.id && session.user.id !== actorRef.current)) {
-        actorRef.current = null; requestRef.current!.cancel(); setData(null); setEditor(null); if (!localLogoutRunning) router.replace('/login');
+        actorRef.current = null; requestRef.current!.cancel(); setData(null); setEditor(null); setMovementAccountId(null); if (!localLogoutRunning) router.replace('/login');
       }
     });
     return () => { cancelled = true; requestRef.current!.cancel(); subscription.subscription.unsubscribe(); };
@@ -183,6 +185,7 @@ export default function MoneyContent() {
   function confirmAction(title: string, description: string, payload: ConfirmationInput) { setConfirmation({ title, description, payload: { ...payload, operationId: crypto.randomUUID() } }); }
   async function performConfirmed() { if (!confirmation) return; setConfirming(true); try { await save(confirmation.payload); setConfirmation(null); } catch (failure) { toast.error(errorMessage(failure, 'No se pudo guardar.')); } finally { setConfirming(false); } }
   const accounts = data?.forecast.accounts || [];
+  const movementAccount = accounts.find(account => account.id === movementAccountId);
   const totals = accountTotals(accounts);
   const movements = (data?.forecast.actual || []).filter(e => (movementFilter === 'ALL' || (movementFilter === 'PENDING' && e.needsAccount) || (movementFilter === 'EXCLUDED' && e.excluded)) && e.label.toLocaleLowerCase('es').includes(query.toLocaleLowerCase('es'))).sort((a, b) => (b.date || '').localeCompare(a.date || ''));
   return <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-5 md:py-8" onClickCapture={captureFocus}>
@@ -195,8 +198,8 @@ export default function MoneyContent() {
         <TabsContent value="yields"><MoneyYields forecast={data.forecast} onEditAccount={openAccount} /></TabsContent>
         <TabsContent value="accounts" className="flex min-w-0 flex-col gap-5">
           <div className="flex flex-wrap gap-2"><Button variant="outline" onClick={openTransfer} disabled={accounts.length < 2} className="min-h-11"><ArrowLeftRight data-icon="inline-start" />Transferir</Button><Button variant="outline" onClick={openWithdrawal} disabled={!accounts.length} className="min-h-11"><Wallet data-icon="inline-start" />Registrar retiro</Button><Button variant="outline" onClick={openPayment} className="min-h-11"><CreditCard data-icon="inline-start" />Abonar a tarjeta</Button></div>
-          <MoneyAccountsTable accounts={accounts} totals={totals} onReconcile={openReconcile} onEdit={openAccount} />
-          <MoneyAccountsMobile accounts={accounts} onReconcile={openReconcile} onEdit={openAccount} />
+          <MoneyAccountsTable accounts={accounts} totals={totals} onReconcile={openReconcile} onEdit={openAccount} onMovements={account => setMovementAccountId(account.id)} />
+          <MoneyAccountsMobile accounts={accounts} onReconcile={openReconcile} onEdit={openAccount} onMovements={account => setMovementAccountId(account.id)} />
           <footer className="flex flex-col gap-3 text-center text-sm md:hidden" aria-label="Totales de todas las cuentas">
             <Separator />
             <h3 className="font-semibold">Total de cuentas</h3>
@@ -222,6 +225,7 @@ export default function MoneyContent() {
         <TabsContent value="routes" className="flex flex-col gap-4"><h2 className="text-lg font-semibold">Cuentas por defecto</h2><p className="text-sm text-muted-foreground">Una regla específica tiene prioridad sobre la general. Los gastos con débito usan la cuenta elegida en Gastos. Estas reglas asignan los demás movimientos.</p><ItemGroup>{data.routingOptions.map((option, index) => { const rule = data.routes.find(r => r.key === option.key); return <div key={option.key}>{index > 0 && <ItemSeparator />}<Item className="flex-wrap px-0"><ItemContent><ItemTitle>{option.label}</ItemTitle><ItemDescription>{rule ? rule.excluded ? 'Sin efecto en cuentas / descontado en nómina' : accounts.find(a => a.id === rule.accountId)?.name : option.payrollDefault ? 'Ya descontado de la nómina neta (por defecto)' : 'Usar regla general; sin asignación propia'}</ItemDescription></ItemContent><ItemActions><Button variant="outline" className="min-h-11" onClick={() => openRoute(option.key, option.label)}>Configurar</Button></ItemActions></Item></div>; })}</ItemGroup></TabsContent>
       </Tabs>}
     </>}
+    {data && movementAccount && <MoneyAccountMovements key={movementAccount.id} account={movementAccount} events={data.forecast.actual} today={data.forecast.today} error={error} onClose={() => setMovementAccountId(null)} onRefresh={() => void load(userId).catch(() => {})} restoreFocus={restoreFocus} />}
     {editor && <MoneyEditor key={`${editor.action}:${editor.extra?.id || editor.extra?.key || editor.title}`} editor={editor} onClose={() => setEditor(null)} onSave={save} restoreFocus={restoreFocus} />}
     <AlertDialog open={!!confirmation} onOpenChange={open => { if (!open && !confirming) setConfirmation(null); }}><AlertDialogContent onCloseAutoFocus={restoreFocus}><AlertDialogHeader><AlertDialogTitle>{confirmation?.title}</AlertDialogTitle><AlertDialogDescription>{confirmation?.description}</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel disabled={confirming}>Cancelar</AlertDialogCancel><AlertDialogAction disabled={confirming} onClick={(e: React.MouseEvent<HTMLButtonElement>) => { e.preventDefault(); void performConfirmed(); }}>{confirming ? 'Guardando…' : 'Confirmar'}</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
   </div>;

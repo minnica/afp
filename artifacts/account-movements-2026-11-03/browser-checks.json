@@ -1,0 +1,177 @@
+{
+  "checks": [
+    {
+      "name": "Desktop: API, saldo y primeros veinte movimientos coinciden",
+      "pass": true
+    },
+    {
+      "name": "Búsqueda sin acentos conserva los saldos acumulados",
+      "pass": true
+    },
+    {
+      "name": "Estado vacío y recuperación de filtros",
+      "pass": true
+    },
+    {
+      "name": "Ampliación de lista y ajustes de referencia: 34 registros",
+      "pass": true
+    },
+    {
+      "name": "Filtro de mes conserva los saldos de todo el historial",
+      "pass": true
+    },
+    {
+      "name": "Escritorio 1024: sin desbordamiento",
+      "pass": true,
+      "bodyOverflow": 0,
+      "firstRowTop": 585.5,
+      "panelOverflow": 0,
+      "smallControls": [
+        {
+          "height": 24,
+          "text": "Ver en Ingresos"
+        },
+        {
+          "height": 24,
+          "text": "Ver en Ingresos"
+        },
+        {
+          "height": 24,
+          "text": "Ver en Ingresos"
+        },
+        {
+          "height": 24,
+          "text": "Ver en Ingresos"
+        },
+        {
+          "height": 24,
+          "text": "Ver en Gastos"
+        },
+        {
+          "height": 24,
+          "text": "Ver en Gastos"
+        },
+        {
+          "height": 24,
+          "text": "Ver en Tarjetas"
+        },
+        {
+          "height": 24,
+          "text": "Ver en Ingresos"
+        },
+        {
+          "height": 24,
+          "text": "Ver en Ingresos"
+        },
+        {
+          "height": 24,
+          "text": "Ver en Ingresos"
+        },
+        {
+          "height": 24,
+          "text": "Ver en Ingresos"
+        },
+        {
+          "height": 24,
+          "text": "Ver en Ingresos"
+        },
+        {
+          "height": 24,
+          "text": "Ver en Ingresos"
+        },
+        {
+          "height": 24,
+          "text": "Ver en Ingresos"
+        },
+        {
+          "height": 24,
+          "text": "Ver en Ingresos"
+        },
+        {
+          "height": 24,
+          "text": "Ver en Ingresos"
+        },
+        {
+          "height": 24,
+          "text": "Ver en Ingresos"
+        },
+        {
+          "height": 24,
+          "text": "Ver en Ingresos"
+        }
+      ],
+      "viewportHeight": 900,
+      "width": 1024
+    },
+    {
+      "name": "Escape cierra el panel y devuelve el foco al botón de la cuenta",
+      "pass": true
+    },
+    {
+      "name": "Cuenta: ledger-empty",
+      "pass": true,
+      "balance": 120,
+      "rows": 0
+    },
+    {
+      "name": "Cuenta: ledger-negative",
+      "pass": true,
+      "balance": -30,
+      "rows": 1
+    },
+    {
+      "name": "Cuenta: ledger-savings",
+      "pass": true,
+      "balance": 878.11,
+      "rows": 11
+    },
+    {
+      "name": "Móvil 390: controles táctiles, primera fila visible y sin desbordamiento",
+      "pass": true,
+      "bodyOverflow": 0,
+      "firstRowTop": 567.140625,
+      "panelOverflow": 0,
+      "smallControls": [],
+      "viewportHeight": 844,
+      "width": 390
+    },
+    {
+      "name": "Móvil: referencia desplegable conserva las estimaciones visibles",
+      "pass": true
+    },
+    {
+      "name": "Selector de mes móvil funciona dentro del panel",
+      "pass": true
+    },
+    {
+      "name": "Móvil 320: controles táctiles, primera fila visible y sin desbordamiento",
+      "pass": true,
+      "bodyOverflow": 0,
+      "firstRowTop": 576.90625,
+      "panelOverflow": 0,
+      "smallControls": [],
+      "viewportHeight": 740,
+      "width": 320
+    },
+    {
+      "name": "Concepto largo legible y saldo conservado en móvil",
+      "pass": true
+    },
+    {
+      "name": "Móvil: Escape y retorno del foco",
+      "pass": true
+    },
+    {
+      "name": "Tab mantiene el foco en el panel y etiquetas compactas de mes en 320/390",
+      "pass": true
+    }
+  ],
+  "consoleErrors": [],
+  "api": {
+    "status": 200,
+    "unauthorized": 401,
+    "cacheControl": "private, no-store"
+  },
+  "contrastMinimum": 6.207064877222629,
+  "descriptionTextUnobscured": true
+}
