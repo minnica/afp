@@ -17,7 +17,7 @@ import { cents } from '@/lib/money/sources';
 
 const text = z.string().trim().min(1).max(160);
 const inputSchema = z.object({ fromAccountId: text, toAccountId: text.optional(), amount: captureAmount, date: captureDate, concept: text, categoryId: text.optional(), payableAccountId: text.optional(), currency: z.literal('MXN'), distinct: z.boolean().default(false) }).strict();
-export const moneyPolicySchema = z.object({ action: z.literal('moneyPolicy'), kind: z.enum(['NU_TRANSFER', 'BBVA_WITHDRAWAL', 'BBVA_DEBIT']), fromAccountId: text, toAccountId: text.nullable().optional(), destinationLabel: z.string().trim().max(160).default(''), accountLast4: z.string().regex(/^\d{4}$/).nullable().optional(), accountSuffixes: z.array(z.string().regex(/^\d{4,5}$/)).max(10).default([]), treatAsExpense: z.literal(true).optional(), currency: z.literal('MXN'), datePolicy: z.literal('NOTIFICATION_POSTED_AT'), mode: z.enum(['OBSERVATION', 'AUTOMATIC']), verifiedMovementId: z.string().uuid().nullable().optional() }).strict();
+export const moneyPolicySchema = z.object({ action: z.literal('moneyPolicy'), kind: z.enum(['NU_TRANSFER', 'BBVA_NU_TRANSFER', 'BBVA_WITHDRAWAL', 'BBVA_DEBIT']), fromAccountId: text, toAccountId: text.nullable().optional(), destinationLabel: z.string().trim().max(160).default(''), accountLast4: z.string().regex(/^\d{4}$/).nullable().optional(), accountSuffixes: z.array(z.string().regex(/^\d{4,5}$/)).max(10).default([]), treatAsExpense: z.literal(true).optional(), pairByAmountAndTime: z.literal(true).optional(), currency: z.literal('MXN'), datePolicy: z.literal('NOTIFICATION_POSTED_AT'), mode: z.enum(['OBSERVATION', 'AUTOMATIC']), verifiedMovementId: z.string().uuid().nullable().optional() }).strict();
 
 async function ownedAccount(tx: Prisma.TransactionClient, userId: string, id: unknown) {
   const row = typeof id === 'string' && await tx.moneyAccount.findFirst({ where: { id, userId } });
@@ -27,10 +27,15 @@ async function ownedAccount(tx: Prisma.TransactionClient, userId: string, id: un
 export async function configureMoneyCapture(tx: Prisma.TransactionClient, userId: string, rawInput: unknown) {
   const input = captureInput(rawInput);
   const parsed = moneyPolicySchema.safeParse(input); if (!parsed.success) throw new ApiAccessError('Revisa las cuentas y la regla de movimientos.', 400);
-  const { action: _action, treatAsExpense, ...values } = parsed.data;
+  const { action: _action, treatAsExpense, pairByAmountAndTime, ...values } = parsed.data;
   void _action;
   await ownedAccount(tx, userId, values.fromAccountId);
-  if (values.kind === 'NU_TRANSFER') {
+  if (values.kind === 'BBVA_NU_TRANSFER') {
+    const from = await ownedAccount(tx, userId, values.fromAccountId);
+    const to = await ownedAccount(tx, userId, values.toAccountId);
+    if (!pairByAmountAndTime || from.id === to.id || from.kind !== 'BANK' || to.kind !== 'BANK' || !values.accountSuffixes.length || values.destinationLabel || values.accountLast4 || treatAsExpense) throw new ApiAccessError('Confirma las cuentas bancarias BBVA y Nu, las terminaciones y la vinculación por importe y tiempo.', 400);
+    values.accountSuffixes = [...new Set(values.accountSuffixes)];
+  } else if (values.kind === 'NU_TRANSFER') {
     if (!values.destinationLabel || !values.toAccountId || values.toAccountId === values.fromAccountId || values.accountLast4) throw new ApiAccessError('Indica el destino exacto del aviso y dos cuentas distintas.', 400);
     await ownedAccount(tx, userId, values.toAccountId);
   } else if (values.kind === 'BBVA_DEBIT') {
@@ -45,7 +50,8 @@ export async function configureMoneyCapture(tx: Prisma.TransactionClient, userId
       if (!sample || sample.parserKey !== 'bbva.atm-withdrawal.es.v1' || captureProposal(sample.proposal).accountLast4 !== values.accountLast4 || (sample.moneyPosting?.kind !== 'WITHDRAWAL' || sample.moneyPosting.withdrawal?.reversedAt) || captureSnapshot(sample.moneyPosting.snapshot).fromAccountId !== values.fromAccountId || sample.correction) throw new ApiAccessError('Primero revisa y registra un aviso real de retiro de esta cuenta. El cargo genérico no lo sustituye.', 409);
     }
   }
-  if (values.kind !== 'BBVA_DEBIT' && values.accountSuffixes.length) throw new ApiAccessError('Estas terminaciones solo corresponden a cargos BBVA.', 400);
+  if (!['BBVA_DEBIT', 'BBVA_NU_TRANSFER'].includes(values.kind) && values.accountSuffixes.length) throw new ApiAccessError('Estas terminaciones solo corresponden a cargos BBVA.', 400);
+  if (values.kind !== 'BBVA_NU_TRANSFER' && pairByAmountAndTime) throw new ApiAccessError('Esta confirmación solo corresponde a transferencias BBVA a Nu.', 400);
   const identity = { userId, kind: values.kind, destinationLabel: values.destinationLabel };
   return tx.captureMoneyPolicy.upsert({ where: { userId_kind_destinationLabel: identity }, create: { ...values, userId, acceptedAt: new Date() }, update: { ...values, acceptedAt: new Date() } });
 }

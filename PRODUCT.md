@@ -28,7 +28,11 @@ La captura de nómina BBVA, publicada y activada para la cuenta personal el 31 d
 
 Los cargos BBVA pueden liquidar automáticamente una cuenta por pagar simple mediante coincidencia única de fecha bancaria y saldo pendiente exacto, conservando una sola salida de la cuenta. Los avisos tardíos usan la fecha bancaria impresa cuando es válida. Ambigüedades entre deudas o entre una deuda y un pago de tarjeta requieren revisión; los préstamos conservan su tratamiento de capital e intereses. La vinculación de gastos genéricos existentes conserva los registros y protege ediciones y conciliaciones. Implementación local del 31 de octubre de 2026, pendiente de publicación.
 
+El desglose de movimientos por cuenta explica el saldo desde la última referencia, con entradas, salidas, ajustes y saldos acumulados. Las búsquedas y filtros de mes no alteran los saldos de las filas. Los cambios de registros ya incluidos en una referencia se identifican como ajustes, con sus límites históricos; los importes estimados y los cálculos de AFP conservan su identificación. El detalle se consulta desde Cuentas y no modifica operaciones financieras.
+
 ## Evidence on Hand
+
+La asociación de transferencias BBVA → Nu está implementada y verificada localmente, pendiente de publicación y activación expresa. Con una regla aceptada por cuenta, terminaciones e importe/tiempo, vincula ambos avisos y conserva el total entre cuentas. Los avisos deben ser nuevos tras la aceptación; los casos ambiguos, editados o ya registrados requieren revisión. La activación no corrige movimientos históricos.
 
 La captura Android incorpora recibos de Uber desde notificaciones de Gmail como fuente optativa, publicada e instalada en la APK 0.9.0. Usa fecha e importe explícitos del recibo y terminaciones bancarias verificadas; los avisos recortados requieren revisión. La asociación con cargos bancarios y las propinas conservan evidencia, controles de duplicidad y decisiones personales. No consulta el buzón ni recupera correos históricos. Gmail está seleccionado en el teléfono personal; falta observar una notificación real completa y cotejarla antes de habilitar el formato por tarjeta.
 

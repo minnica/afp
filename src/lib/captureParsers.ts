@@ -18,6 +18,7 @@ export const captureParsers: CaptureParser[] = [
   { key: uberReceiptParserKey, sourcePackage: gmailCapturePackage, verified: true, evidence: 'REAL_REVIEWED',
     aliasSourcePackages: bankCapturePackages, aliasKinds: ['PHYSICAL', 'DIGITAL'], dateSource: 'RECEIPT_OPERATION' },
   { key: "nu.account-transfer.es.v1", sourcePackage: "com.nu.production", verified: true, evidence: "REAL_REVIEWED", moneyOnly: true },
+  { key: "nu.account-received.es.v1", sourcePackage: "com.nu.production", verified: true, evidence: "REAL_REVIEWED_POLICY_REQUIRED", moneyOnly: true },
   { key: "bbva.atm-withdrawal.es.v1", sourcePackage: "com.bancomer.mbanking", verified: false, evidence: "AWAITING_REAL_NOTICE", moneyOnly: true },
   { key: "mercadopago.refund.es.v1", sourcePackage: "com.mercadopago.wallet", verified: true, evidence: "REAL_REVIEWED", refundOnly: true },
   { key: "banamex.purchase-cancellation.es.v1", sourcePackage: "com.citibanamex.banamexmobile", verified: true, evidence: "REAL_REVIEWED", refundOnly: true,

@@ -1,0 +1,147 @@
+
+> afp@0.1.0 test /home/garatachia/projects/afp
+> node --import tsx tests/run-tests.ts capture-transfer-pairs.test.ts
+
+TAP version 13
+# Subtest: recepción Nu: gramática real anonimizada, sin inventar remitente ni ingreso
+ok 1 - recepción Nu: gramática real anonimizada, sin inventar remitente ni ingreso
+  ---
+  duration_ms: 4.837513
+  type: 'test'
+  ...
+# Subtest: transferencias BBVA → Nu: evidencias, concurrencia, reemplazo y protecciones
+    # Subtest: sin regla no se acredita; aceptación explícita y cuentas propias
+    ok 1 - sin regla no se acredita; aceptación explícita y cuentas propias
+      ---
+      duration_ms: 138.240698
+      type: 'test'
+      ...
+    # Subtest: entrada primero: una transferencia, dos recibos y saldos conservados
+    ok 2 - entrada primero: una transferencia, dos recibos y saldos conservados
+      ---
+      duration_ms: 168.104182
+      type: 'test'
+      ...
+    # Subtest: cargo primero: sustituye gasto genérico sin descontar dos veces
+    ok 3 - cargo primero: sustituye gasto genérico sin descontar dos veces
+      ---
+      duration_ms: 192.871585
+      type: 'test'
+      ...
+    # Subtest: reintentos y recepción simultánea aplican una sola vez
+    ok 4 - reintentos y recepción simultánea aplican una sola vez
+      ---
+      duration_ms: 190.618898
+      type: 'test'
+      ...
+    # Subtest: importe, terminación y ventana temporal deben coincidir exactamente
+    ok 5 - importe, terminación y ventana temporal deben coincidir exactamente
+      ---
+      duration_ms: 162.773861
+      type: 'test'
+      ...
+    # Subtest: varios avisos y comprobación recíproca impiden adivinar el destino
+    ok 6 - varios avisos y comprobación recíproca impiden adivinar el destino
+      ---
+      duration_ms: 170.908288
+      type: 'test'
+      ...
+    # Subtest: conserva gasto editado o conciliado: notes
+    ok 7 - conserva gasto editado o conciliado: notes
+      ---
+      duration_ms: 69.879683
+      type: 'test'
+      ...
+    # Subtest: conserva gasto editado o conciliado: concept
+    ok 8 - conserva gasto editado o conciliado: concept
+      ---
+      duration_ms: 52.732689
+      type: 'test'
+      ...
+    # Subtest: conserva gasto editado o conciliado: amount
+    ok 9 - conserva gasto editado o conciliado: amount
+      ---
+      duration_ms: 59.026769
+      type: 'test'
+      ...
+    # Subtest: conserva gasto editado o conciliado: date
+    ok 10 - conserva gasto editado o conciliado: date
+      ---
+      duration_ms: 48.663445
+      type: 'test'
+      ...
+    # Subtest: conserva gasto editado o conciliado: reconciledAt
+    ok 11 - conserva gasto editado o conciliado: reconciledAt
+      ---
+      duration_ms: 52.865059
+      type: 'test'
+      ...
+    # Subtest: gasto eliminado no se recrea ni se convierte
+    ok 12 - gasto eliminado no se recrea ni se convierte
+      ---
+      duration_ms: 49.058215
+      type: 'test'
+      ...
+    # Subtest: conserva clasificación y vínculos personales
+    ok 13 - conserva clasificación y vínculos personales
+      ---
+      duration_ms: 109.281362
+      type: 'test'
+      ...
+    # Subtest: un ingreso manual cercano bloquea una nueva acreditación
+    ok 14 - un ingreso manual cercano bloquea una nueva acreditación
+      ---
+      duration_ms: 46.930848
+      type: 'test'
+      ...
+    # Subtest: avisos de otro propietario no se usan como evidencia
+    ok 15 - avisos de otro propietario no se usan como evidencia
+      ---
+      duration_ms: 41.585256
+      type: 'test'
+      ...
+    # Subtest: la BD mantiene las restricciones y RLS de la regla
+    ok 16 - la BD mantiene las restricciones y RLS de la regla
+      ---
+      duration_ms: 32.255891
+      type: 'test'
+      ...
+    # Subtest: registros manuales y transferencias revertidas bloquean duplicados
+    ok 17 - registros manuales y transferencias revertidas bloquean duplicados
+      ---
+      duration_ms: 40.392338
+      type: 'test'
+      ...
+    # Subtest: regla pausada, avisos anteriores y reinterpretación no escriben dinero
+    ok 18 - regla pausada, avisos anteriores y reinterpretación no escriben dinero
+      ---
+      duration_ms: 126.326566
+      type: 'test'
+      ...
+    # Subtest: cruce de medianoche usa fecha del cargo y respeta referencia de ambas cuentas
+    ok 19 - cruce de medianoche usa fecha del cargo y respeta referencia de ambas cuentas
+      ---
+      duration_ms: 93.458267
+      type: 'test'
+      ...
+    # Subtest: un fallo revierte transferencia, recibos y eliminación del gasto juntos
+    ok 20 - un fallo revierte transferencia, recibos y eliminación del gasto juntos
+      ---
+      duration_ms: 70.376482
+      type: 'test'
+      ...
+    1..20
+ok 2 - transferencias BBVA → Nu: evidencias, concurrencia, reemplazo y protecciones
+  ---
+  duration_ms: 2330.53274
+  type: 'test'
+  ...
+1..2
+# tests 22
+# suites 0
+# pass 22
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2702.02433

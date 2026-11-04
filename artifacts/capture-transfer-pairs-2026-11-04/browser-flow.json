@@ -1,0 +1,74 @@
+{
+  "success": true,
+  "data": {
+    "lifecycle": {
+      "effectiveLaunch": {
+        "browserLaunched": true,
+        "engine": "chrome",
+        "launchHash": 11677035664275010974
+      },
+      "launched": false,
+      "relaunchedBrowser": false,
+      "restartedBackground": false,
+      "restoreStatus": "not_configured",
+      "reused": true,
+      "saveStatus": "not_attempted"
+    },
+    "origin": "http://127.0.0.1:4208/registro-automatico?tipo=pendientes",
+    "result": {
+      "accounts": [
+        {
+          "balance": 9154.7,
+          "id": "transfer-pair-bbva-qa",
+          "name": "BBVA ficticia"
+        },
+        {
+          "balance": 10845.3,
+          "id": "transfer-pair-nu-qa",
+          "name": "Nu ficticia"
+        }
+      ],
+      "layout": {
+        "documentWidth": 390,
+        "viewport": 390
+      },
+      "moneyStatus": 200,
+      "movementStatus": 200,
+      "movements": [
+        {
+          "amount": "333.40",
+          "id": "d3f5ebec-3a4c-400a-a402-9942f7c5a36d",
+          "reason": "TRANSFER_PAIR_WAITING",
+          "status": "REVIEW"
+        },
+        {
+          "amount": "845.30",
+          "id": "c4ebc346-1179-4912-834c-b890aaec8889",
+          "reason": "MONEY_REPEATED_NOTICE",
+          "status": "DISCARDED"
+        },
+        {
+          "amount": "845.30",
+          "id": "6a565aa6-b28f-45de-8115-277d536087b7",
+          "moneyKind": "TRANSFER",
+          "reason": "TRANSFER_PAIR_REGISTERED",
+          "status": "REGISTERED"
+        },
+        {
+          "amount": "845.30",
+          "id": "3e3e70b4-b0db-4881-b872-4c5c1ed874b2",
+          "moneyKind": "TRANSFER",
+          "reason": "TRANSFER_PAIR_REGISTERED",
+          "status": "REGISTERED"
+        }
+      ],
+      "receipt": {
+        "registrationForm": false,
+        "text": "Transferencia recibida en Nu$333.40 · 2026-11-04Esperando un cargo BBVA del mismo importe, con hasta cinco minutos entre avisos. La entrada todavía no cambia tus saldos.Este aviso no indica quién envió el dinero. Si lo transferiste desde BBVA, revisa el cargo en Registro automático o registra la transferencia en Mi dinero. Si fue un pago de otra persona, regístralo desde Ingresos.Ver Mi dineroVer ingresosVer notificación original CerrarCerrar",
+        "title": "Transferencia recibida en Nu"
+      },
+      "unauthenticatedStatus": 401
+    }
+  },
+  "error": null
+}

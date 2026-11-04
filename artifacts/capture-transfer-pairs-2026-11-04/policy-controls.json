@@ -1,0 +1,5 @@
+{
+  "pauseAndReactivateViaUI": true,
+  "finalModeVerifiedInDatabase": "AUTOMATIC",
+  "note": "Las pruebas de dominio verifican que OBSERVATION no procesa transferencias ni aplica históricos."
+}

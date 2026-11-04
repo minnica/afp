@@ -1,4 +1,9 @@
 export const captureReasons: Record<string, string> = {
+  TRANSFER_PAIR_REQUIRED: 'Nu confirmó una entrada. Para reconocer transferencias propias, configura la regla BBVA → Nu. Si proviene de otra persona, regístrala desde Ingresos.',
+  TRANSFER_PAIR_WAITING: 'Esperando un cargo BBVA del mismo importe, con hasta cinco minutos entre avisos. La entrada todavía no cambia tus saldos.',
+  TRANSFER_PAIR_AMBIGUOUS: 'Hay varios avisos compatibles. Comprueba el origen y el destino antes de registrar la transferencia.',
+  TRANSFER_PAIR_PROTECTED: 'Uno de los avisos ya fue resuelto, editado o tiene un registro asociado. Revisa ambos movimientos antes de corregirlos.',
+  TRANSFER_PAIR_REGISTERED: 'Transferencia BBVA → Nu registrada con ambos avisos. Se descontó de BBVA y se sumó a Nu una sola vez, sin crear ingreso ni gasto.',
   UBER_RECEIPT_INCOMPLETE: 'El recibo de Uber está recortado o contiene varios viajes. Revisa el correo completo.',
   UBER_RECEIPT_CARD_REQUIRED: 'El recibo indica fecha e importe del viaje, pero falta la tarjeta. Completa ese dato o vincula el cargo bancario.',
   UBER_RECEIPT_CHANGED: 'El recibo modifica un viaje registrado. Revisa el total y la propina antes de actualizarlo.',

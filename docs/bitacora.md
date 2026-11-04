@@ -4,6 +4,22 @@ Historial resumido de decisiones, cambios, migraciones e incidencias que ayudan 
 
 Consolidado el **27 de octubre de 2026** a partir del README del commit `4562aa0cec0a46d8b482fdfef96116d1d3040282` y sus evidencias. «Publicado», «aplicado» y «pendiente» describen lo documentado en cada fecha; esta consolidación no incluye una comprobación remota nueva. Se conservan las fechas de los registros originales, que pueden usar hora local o UTC. El nombre de una migración identifica su versión, no demuestra cuándo se aplicó.
 
+## 2026-11-04
+
+### Transferencias BBVA → Nu con ambos avisos
+
+Se reconoce la gramática real anonimizada de recepción en Cuenta Nu y se añade una regla expresa que vincula importe exacto y hasta cinco minutos entre avisos, comprobando unicidad desde ambos extremos. La transferencia conserva el total entre cuentas y deja ambos avisos ligados al mismo registro. Cuando BBVA ya generó un gasto genérico automático intacto, se sustituye transaccionalmente, conservando evidencia y tombstone. Las decisiones personales, duplicados, reversiones y referencias posteriores impiden la conversión automática. Los recibos de Nu sin contraparte quedan pendientes con orientación hacia Mi dinero o Ingresos.
+
+Migración aditiva de restricciones, sin tablas nuevas ni cambios a RLS. Veintidós pruebas nuevas y suite completa de 1128 correctas sin omisiones; reconstrucción desde cero y actualización histórica verificadas. Interfaz y API locales con datos ficticios. Pendiente publicar, aceptar la regla en producción y cualquier corrección histórica; no se modificaron datos reales ni la APK. [Evidencias](../artifacts/capture-transfer-pairs-2026-11-04/README.md).
+
+## 2026-11-03
+
+### Mi dinero: desglose de movimientos por cuenta
+
+Cada cuenta incorpora «Ver movimientos»: referencia, entradas, salidas, ajustes y saldo acumulado, con búsqueda, filtro de mes y ampliación de la lista. La vista hereda el sistema Mira; usa Sheet lateral en escritorio e inferior en móvil, donde la composición del saldo empieza plegada. Conserva los importes aproximados visibles y permite consultar los módulos de origen.
+
+El saldo y su desglose comparten ahora el cálculo de efectos respecto a la referencia. Se mantienen los controles de duplicidad de pagos de tarjeta y asignación de movimientos previamente sin cuenta. Los cambios de registros incluidos se describen como ajustes netos, sin atribuirles una nueva operación bancaria. No se cambian API, reglas, persistencia ni datos personales. Diecinueve regresiones nuevas cubren los casos financieros; la suite completa termina con 1106 pruebas correctas sin omisiones. Cambio local, pendiente de publicación. [Evidencias](../artifacts/account-movements-2026-11-03/README.md).
+
 ## 2026-10-30
 
 ### Mi dinero: rendimientos confirmados y estimados

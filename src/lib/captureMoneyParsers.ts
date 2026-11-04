@@ -1,6 +1,6 @@
 import { captureFields, captureProposal } from './captureJson';
 import type { CaptureInterpretation, CaptureNotice, ParseAmount, NotificationDate, CaptureKindInput, OperationTime } from '@/lib/captureTypes';
-export const moneyParserKeys = ['nu.account-transfer.es.v1', 'bbva.atm-withdrawal.es.v1'];
+export const moneyParserKeys = ['nu.account-transfer.es.v1', 'bbva.atm-withdrawal.es.v1', 'nu.account-received.es.v1'];
 export function moneyCaptureKind(movement: CaptureKindInput) {
   return ['MONEY_TRANSFER', 'CASH_WITHDRAWAL'].includes(captureProposal(movement.proposal)?.movementType ?? "") || moneyParserKeys.includes(movement.parserKey ?? "");
 }
@@ -8,6 +8,13 @@ export function accountDebitNotice(movement: CaptureKindInput) { return movement
 
 export function interpretMoneyNotice(event: CaptureNotice, parseAmount: ParseAmount, notificationDate: NotificationDate): CaptureInterpretation | null {
   const fields = captureFields(event.fields ?? {}) || {}, title = fields['android.title'] || '', body = fields['android.bigText'] || fields['android.text'] || '';
+  if (event.sourcePackage === 'com.nu.production' && title === '¡Recibiste una transferencia!') {
+    const base = { parserKey: 'nu.account-received.es.v1', verified: true, proposal: { movementType: 'TRANSFER_RECEIPT' } };
+    if ((fields['android.bigText'] && fields['android.text'] && fields['android.bigText'] !== fields['android.text']) || (fields['android.title.big'] && fields['android.title.big'] !== title)) return { ...base, reason: 'CONFLICTING_FIELDS' };
+    const match = body.match(/^Recibiste \$([\d,.]+) en tu Cuenta Nu\.$/), amount = match && parseAmount(match[1]!), date = notificationDate(event);
+    if (!amount || !date) return { ...base, reason: 'INCOMPLETE_FORMAT' };
+    return { ...base, reason: 'TRANSFER_PAIR_REQUIRED', proposal: { ...base.proposal, amount, ...date, merchant: 'Transferencia recibida en Nu' } };
+  }
   if (event.sourcePackage === 'com.nu.production' && title === 'Transferencia exitosa') {
     const base: Omit<CaptureInterpretation, 'reason'> = { parserKey: moneyParserKeys[0]!, verified: true, proposal: { movementType: 'MONEY_TRANSFER' } };
     if ((fields['android.bigText'] && fields['android.text'] && fields['android.bigText'] !== fields['android.text']) || (fields['android.title.big'] && fields['android.title.big'] !== title)) return { ...base, reason: 'CONFLICTING_FIELDS' };

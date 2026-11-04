@@ -1,0 +1,60 @@
+{
+  "note": "Datos ficticios, API nativa y PostgreSQL locales reales.",
+  "responses": [
+    {
+      "status": 200,
+      "data": {
+        "event": {
+          "id": "8fc32d4b-0878-44b5-87a6-fbef572fe52b",
+          "eventId": "bde33ca8-1e87-474f-bebb-d9128ac4ef87",
+          "status": "RECEIVED",
+          "receivedAt": "2026-11-04T06:18:53.166Z"
+        }
+      }
+    },
+    {
+      "status": 200,
+      "data": {
+        "event": {
+          "id": "c91264a5-6b33-4d15-8297-5967692c1373",
+          "eventId": "b9fbe399-eb5e-4e1a-8604-cbe424fbcde6",
+          "status": "RECEIVED",
+          "receivedAt": "2026-11-04T06:18:53.210Z"
+        }
+      }
+    },
+    {
+      "status": 200,
+      "data": {
+        "event": {
+          "id": "8fc32d4b-0878-44b5-87a6-fbef572fe52b",
+          "eventId": "bde33ca8-1e87-474f-bebb-d9128ac4ef87",
+          "status": "RECEIVED",
+          "receivedAt": "2026-11-04T06:18:53.166Z"
+        }
+      }
+    },
+    {
+      "status": 200,
+      "data": {
+        "event": {
+          "id": "e734aa08-3398-45ca-af58-db593d6e3c3f",
+          "eventId": "5c81481f-5ee6-4815-8440-0ba37d7f8b33",
+          "status": "RECEIVED",
+          "receivedAt": "2026-11-04T06:18:53.282Z"
+        }
+      }
+    },
+    {
+      "status": 200,
+      "data": {
+        "event": {
+          "id": "a6451ca3-b6d8-4aa6-b37f-0c6c018765c0",
+          "eventId": "da5789f4-be0e-4f0b-a00d-a8d44a62a90e",
+          "status": "RECEIVED",
+          "receivedAt": "2026-11-04T06:18:53.303Z"
+        }
+      }
+    }
+  ]
+}

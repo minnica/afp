@@ -22,6 +22,7 @@ import { automateCapturePayment } from "@/lib/capturePaymentAutomation";
 import { moneyCaptureKind, accountDebitNotice } from "@/lib/captureMoneyParsers";
 import { completeMoneyCapture, automateMoneyCapture, resolveMoneyCapture } from "@/lib/captureMoney";
 import { correctDebitCapture } from "@/lib/captureDebitCorrections";
+import { automateTransferPair } from "@/lib/captureTransferPairs";
 import { refundCaptureKind } from "@/lib/captureRefundParsers";
 import { completeRefundIdentity, resolveCaptureRefund } from "@/lib/captureRefunds";
 import { uberReceiptParserKey } from './gmailUberReceipts';
@@ -174,7 +175,10 @@ export async function processCaptureEvent(tx: Prisma.TransactionClient, event: C
   }
   if (incomeCaptureKind(movement)) movement = await automateIncomeCapture(tx, event, movement);
   if (paymentCaptureKind(movement)) movement = await automateCapturePayment(tx, event, movement);
-  if (moneyCaptureKind(movement) || accountDebitNotice(movement)) movement = await automateMoneyCapture(tx, event, movement);
+  if (moneyCaptureKind(movement) || accountDebitNotice(movement)) {
+    await tx.captureEvent.update({ where: { id: event.id }, data: { movementId: movement.id } });
+    movement = await automateTransferPair(tx, event, movement) ?? await automateMoneyCapture(tx, event, movement);
+  }
   await tx.captureEvent.update({ where: { id: event.id }, data: {
     movementId: movement.id, interpretation: { ...interpretation, proposal, reason },
   } });
