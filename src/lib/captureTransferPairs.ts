@@ -56,7 +56,7 @@ export async function automateTransferPair(tx: Prisma.TransactionClient, event: 
   if (matches.length !== 1 || proofs.filter(proof => compatible(match, proof)).length !== 1) return markReview('TRANSFER_PAIR_AMBIGUOUS');
   const debit = current.row.parserKey === debitKey ? current : match, incoming = current.row.parserKey === incomingKey ? current : match;
   const from = await tx.moneyAccount.findFirst({ where: { userId: movement.userId, id: policy.fromAccountId, kind: 'BANK' } });
-  const to = policy.toAccountId && await tx.moneyAccount.findFirst({ where: { userId: movement.userId, id: policy.toAccountId, kind: 'BANK' } });
+  const to = policy.toAccountId && await tx.moneyAccount.findFirst({ where: { userId: movement.userId, id: policy.toAccountId, kind: { in: ['BANK', 'SAVINGS'] } } });
   const date = debit.proposal.date!;
   if (!from || !to || from.id === to.id) return markReview('MONEY_ACCOUNT_REQUIRED');
   if (date > todayInMexico() || incoming.proposal.date! > todayInMexico()) return markReview('MONEY_FUTURE');

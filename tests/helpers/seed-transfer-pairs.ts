@@ -8,7 +8,8 @@ async function main() {
     const userId = '00000000-0000-4000-8000-000000000091';
     await db.user.upsert({ where: { id: userId }, create: { id: userId, email: 'capture-qa@example.test' }, update: {} });
     for (const [id, name] of [['transfer-pair-bbva-qa', 'BBVA ficticia'], ['transfer-pair-nu-qa', 'Nu ficticia']]) {
-      await db.moneyAccount.upsert({ where: { id }, create: { id, userId, name: name!, kind: 'BANK', openingBalance: 10000, asOf: new Date('2026-10-24'), baseline: {} }, update: {} });
+      const kind = id === 'transfer-pair-nu-qa' ? 'SAVINGS' : 'BANK';
+      await db.moneyAccount.upsert({ where: { id }, create: { id, userId, name: name!, kind, openingBalance: 10000, asOf: new Date('2026-10-24'), baseline: {} }, update: { kind } });
     }
     const secret = randomBytes(32).toString('base64url');
     const device = await db.captureDevice.create({ data: { userId, name: 'Teléfono QA transferencias', approvedAt: new Date(), secretHash: createHash('sha256').update(secret).digest('hex') } });

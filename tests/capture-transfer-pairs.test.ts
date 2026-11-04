@@ -34,6 +34,7 @@ test('transferencias BBVA → Nu: evidencias, concurrencia, reemplazo y protecci
   const configuration = load('src/lib/captureConfiguration.ts'), money = load('src/lib/money/service.ts'), sources = load('src/lib/money/sources.ts');
   const account = (userId: string, name: string) => db.moneyAccount.create({ data: { userId, name, kind: 'BANK', openingBalance: 10000, asOf: new Date('2026-10-24'), baseline: {} } });
   const bbva = await account(user.id, 'Banco salida QA'), nu = await account(user.id, 'Cuenta destino QA'), foreign = await account(other.id, 'Ajena QA');
+  await db.moneyAccount.update({ where: { id: nu.id }, data: { kind: 'SAVINGS' } });
   const device = await db.captureDevice.create({ data: { userId: user.id, name: 'Teléfono ficticio', approvedAt: new Date(), secretHash: protocol.captureHash(randomUUID()) } });
   const credential = { id: device.id, secretHash: device.secretHash };
   const rule = { action: 'moneyPolicy', kind: 'BBVA_NU_TRANSFER', fromAccountId: bbva.id, toAccountId: nu.id,
@@ -81,6 +82,12 @@ test('transferencias BBVA → Nu: evidencias, concurrencia, reemplazo y protecci
       assert.equal(Number(present(balances.find(a => a.id === nu.id)).balance), 10102);
       const original = await db.captureEvent.findFirstOrThrow({ where: { movementId: incoming.id } });
       assert.equal(original.interpretation && JSON.stringify(original.interpretation).includes('TRANSFER_PAIR_REQUIRED'), true);
+    });
+    await t.test('acepta Nu como cuenta de ahorro y rechaza efectivo como destino', async () => {
+      assert.equal((await db.moneyAccount.findUniqueOrThrow({ where: { id: nu.id } })).kind, 'SAVINGS');
+      const cash = await db.moneyAccount.create({ data: { userId: user.id, name: 'Efectivo QA', kind: 'CASH', openingBalance: 0, asOf: new Date('2026-10-24'), baseline: {} } });
+      await assert.rejects(activate({ toAccountId: cash.id }));
+      assert.equal((await db.captureMoneyPolicy.findUniqueOrThrow({ where: { userId_kind_destinationLabel: { userId: user.id, kind: 'BBVA_NU_TRANSFER', destinationLabel: '' } } })).toAccountId, nu.id);
     });
     await t.test('cargo primero: sustituye gasto genérico sin descontar dos veces', async () => {
       await configuration.configureCapture(db, user.id, { action: 'moneyPolicy', kind: 'BBVA_DEBIT', fromAccountId: bbva.id, accountSuffixes: ['0123', '00123'], treatAsExpense: true, currency: 'MXN', datePolicy: 'NOTIFICATION_POSTED_AT', mode: 'AUTOMATIC' });

@@ -33,7 +33,7 @@ export async function configureMoneyCapture(tx: Prisma.TransactionClient, userId
   if (values.kind === 'BBVA_NU_TRANSFER') {
     const from = await ownedAccount(tx, userId, values.fromAccountId);
     const to = await ownedAccount(tx, userId, values.toAccountId);
-    if (!pairByAmountAndTime || from.id === to.id || from.kind !== 'BANK' || to.kind !== 'BANK' || !values.accountSuffixes.length || values.destinationLabel || values.accountLast4 || treatAsExpense) throw new ApiAccessError('Confirma las cuentas bancarias BBVA y Nu, las terminaciones y la vinculación por importe y tiempo.', 400);
+    if (!pairByAmountAndTime || from.id === to.id || from.kind !== 'BANK' || !['BANK', 'SAVINGS'].includes(to.kind) || !values.accountSuffixes.length || values.destinationLabel || values.accountLast4 || treatAsExpense) throw new ApiAccessError('Confirma la cuenta BBVA de salida, la cuenta bancaria o de ahorro Nu, las terminaciones y la vinculación por importe y tiempo.', 400);
     values.accountSuffixes = [...new Set(values.accountSuffixes)];
   } else if (values.kind === 'NU_TRANSFER') {
     if (!values.destinationLabel || !values.toAccountId || values.toAccountId === values.fromAccountId || values.accountLast4) throw new ApiAccessError('Indica el destino exacto del aviso y dos cuentas distintas.', 400);
