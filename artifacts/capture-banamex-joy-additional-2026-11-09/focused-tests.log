@@ -1,0 +1,231 @@
+
+> afp@0.1.0 test /home/garatachia/projects/afp
+> node --import tsx tests/run-tests.ts capture-banamex2-real.test.ts capture-bank-fallback-integration.test.ts
+
+TAP version 13
+# Subtest: BANAMEX 2 reutiliza exactamente el analizador Wallet de BANAMEX 1 y conserva origen de fecha
+ok 1 - BANAMEX 2 reutiliza exactamente el analizador Wallet de BANAMEX 1 y conserva origen de fecha
+  ---
+  duration_ms: 3.009705
+  type: 'test'
+  ...
+# Subtest: JOY BANAMEX bancario conserva comercio completo, centavos, tres cifras, fecha AM/PM y autorización solo como evidencia
+ok 2 - JOY BANAMEX bancario conserva comercio completo, centavos, tres cifras, fecha AM/PM y autorización solo como evidencia
+  ---
+  duration_ms: 1.461418
+  type: 'test'
+  ...
+# Subtest: JOY bancario rechaza cuerpos contradictorios, importes inválidos, calendarios imposibles y operaciones futuras
+ok 3 - JOY bancario rechaza cuerpos contradictorios, importes inválidos, calendarios imposibles y operaciones futuras
+  ---
+  duration_ms: 1.359378
+  type: 'test'
+  ...
+# Subtest: JOY BANAMEX ADICIONAL: conserva el contrato parcial y los datos del aviso adicional existente
+ok 4 - JOY BANAMEX ADICIONAL: conserva el contrato parcial y los datos del aviso adicional existente
+  ---
+  duration_ms: 0.478759
+  type: 'test'
+  ...
+# Subtest: JOY BANAMEX ADICIONAL: no acepta otra marca, alias incompleto, importes o fechas inválidos ni contradicciones
+ok 5 - JOY BANAMEX ADICIONAL: no acepta otra marca, alias incompleto, importes o fechas inválidos ni contradicciones
+  ---
+  duration_ms: 1.246428
+  type: 'test'
+  ...
+# Subtest: JOY no amplía el formato bancario a otra marca, fuente, referencias, moneda supuesta ni avisos especiales
+ok 6 - JOY no amplía el formato bancario a otra marca, fuente, referencias, moneda supuesta ni avisos especiales
+  ---
+  duration_ms: 1.726737
+  type: 'test'
+  ...
+# Subtest: Wallet principal y respaldo bancario persistente: API y PostgreSQL
+    # Subtest: activación por tarjeta exige Wallet, alias inequívoco y muestra bancaria cotejada propia
+    ok 1 - activación por tarjeta exige Wallet, alias inequívoco y muestra bancaria cotejada propia
+      ---
+      duration_ms: 553.094902
+      type: 'test'
+      ...
+    # Subtest: Banamex A ficticia: antes de 15 minutos no registra; al vencer crea un solo gasto pendiente
+    ok 2 - Banamex A ficticia: antes de 15 minutos no registra; al vencer crea un solo gasto pendiente
+      ---
+      duration_ms: 291.793417
+      type: 'test'
+      ...
+    # Subtest: Banamex A ficticia: banco antes, después y simultáneo con Wallet conserva prioridad y un gasto
+    ok 3 - Banamex A ficticia: banco antes, después y simultáneo con Wallet conserva prioridad y un gasto
+      ---
+      duration_ms: 216.828774
+      type: 'test'
+      ...
+    # Subtest: Banamex B ficticia: antes de 15 minutos no registra; al vencer crea un solo gasto pendiente
+    ok 4 - Banamex B ficticia: antes de 15 minutos no registra; al vencer crea un solo gasto pendiente
+      ---
+      duration_ms: 173.360221
+      type: 'test'
+      ...
+    # Subtest: Banamex B ficticia: banco antes, después y simultáneo con Wallet conserva prioridad y un gasto
+    ok 5 - Banamex B ficticia: banco antes, después y simultáneo con Wallet conserva prioridad y un gasto
+      ---
+      duration_ms: 218.656881
+      type: 'test'
+      ...
+    # Subtest: Nu ficticia: antes de 15 minutos no registra; al vencer crea un solo gasto pendiente
+    ok 6 - Nu ficticia: antes de 15 minutos no registra; al vencer crea un solo gasto pendiente
+      ---
+      duration_ms: 184.928754
+      type: 'test'
+      ...
+    # Subtest: Nu ficticia: banco antes, después y simultáneo con Wallet conserva prioridad y un gasto
+    ok 7 - Nu ficticia: banco antes, después y simultáneo con Wallet conserva prioridad y un gasto
+      ---
+      duration_ms: 191.339323
+      type: 'test'
+      ...
+    # Subtest: Santander ficticia: antes de 15 minutos no registra; al vencer crea un solo gasto pendiente
+    ok 8 - Santander ficticia: antes de 15 minutos no registra; al vencer crea un solo gasto pendiente
+      ---
+      duration_ms: 174.10374
+      type: 'test'
+      ...
+    # Subtest: Santander ficticia: banco antes, después y simultáneo con Wallet conserva prioridad y un gasto
+    ok 9 - Santander ficticia: banco antes, después y simultáneo con Wallet conserva prioridad y un gasto
+      ---
+      duration_ms: 169.593987
+      type: 'test'
+      ...
+    # Subtest: JOY BANAMEX ADICIONAL: cargo y propina usan la regla existente, esperan y se registran una sola vez
+    ok 10 - JOY BANAMEX ADICIONAL: cargo y propina usan la regla existente, esperan y se registran una sola vez
+      ---
+      duration_ms: 200.00836
+      type: 'test'
+      ...
+    # Subtest: JOY BANAMEX ADICIONAL: reinterpretar un aviso histórico conserva el original y no registra ni programa históricos
+    ok 11 - JOY BANAMEX ADICIONAL: reinterpretar un aviso histórico conserva el original y no registra ni programa históricos
+      ---
+      duration_ms: 156.101007
+      type: 'test'
+      ...
+    # Subtest: sin hora bancaria de operación, un aviso del día siguiente conserva revisión frente a Wallet
+    ok 12 - sin hora bancaria de operación, un aviso del día siguiente conserva revisión frente a Wallet
+      ---
+      duration_ms: 59.765818
+      type: 'test'
+      ...
+    # Subtest: compras diarias iguales con ambos avisos no se bloquean por el banco pendiente del día anterior
+    ok 13 - compras diarias iguales con ambos avisos no se bloquean por el banco pendiente del día anterior
+      ---
+      duration_ms: 192.94963
+      type: 'test'
+      ...
+    # Subtest: banco y Wallet a ambos lados de medianoche conservan un gasto en cualquier orden
+    ok 14 - banco y Wallet a ambos lados de medianoche conservan un gasto en cualquier orden
+      ---
+      duration_ms: 119.474615
+      type: 'test'
+      ...
+    # Subtest: Wallet tardío conserva fecha, concepto, notas y monto editados; vinculación explícita no suma gasto
+    ok 15 - Wallet tardío conserva fecha, concepto, notas y monto editados; vinculación explícita no suma gasto
+      ---
+      duration_ms: 203.610924
+      type: 'test'
+      ...
+    # Subtest: Nu usa día de publicación en México; el retraso de entrega no desplaza el día
+    ok 16 - Nu usa día de publicación en México; el retraso de entrega no desplaza el día
+      ---
+      duration_ms: 54.688715
+      type: 'test'
+      ...
+    # Subtest: Santander no permite saltarse el respaldo activando de nuevo el banco inmediato
+    ok 17 - Santander no permite saltarse el respaldo activando de nuevo el banco inmediato
+      ---
+      duration_ms: 2.576696
+      type: 'test'
+      ...
+    # Subtest: pausar cancela pendientes; reactivar no procesa avisos antiguos ni reinicia su espera
+    ok 18 - pausar cancela pendientes; reactivar no procesa avisos antiguos ni reinicia su espera
+      ---
+      duration_ms: 75.954582
+      type: 'test'
+      ...
+    # Subtest: pausa del teléfono, fuente, Wallet o revocación impide el respaldo pendiente
+    ok 19 - pausa del teléfono, fuente, Wallet o revocación impide el respaldo pendiente
+      ---
+      duration_ms: 181.410319
+      type: 'test'
+      ...
+    # Subtest: corregir o descartar durante la espera detiene el registro automático
+    ok 20 - corregir o descartar durante la espera detiene el registro automático
+      ---
+      duration_ms: 59.834817
+      type: 'test'
+      ...
+    # Subtest: alias nuevo ambiguo, moneda contradictoria, retiro explícito y formato distinto requieren revisión
+    ok 21 - alias nuevo ambiguo, moneda contradictoria, retiro explícito y formato distinto requieren revisión
+      ---
+      duration_ms: 264.14621
+      type: 'test'
+      ...
+    # Subtest: dos compras bancarias iguales quedan en revisión sin elegir una por importe
+    ok 22 - dos compras bancarias iguales quedan en revisión sin elegir una por importe
+      ---
+      duration_ms: 51.49608
+      type: 'test'
+      ...
+    # Subtest: revisión del mismo aviso durante la espera detiene el original aunque cambie el importe
+    ok 23 - revisión del mismo aviso durante la espera detiene el original aunque cambie el importe
+      ---
+      duration_ms: 51.439361
+      type: 'test'
+      ...
+    # Subtest: Wallet sigue registrando con respaldo pausado aunque el banco llegue primero
+    ok 24 - Wallet sigue registrando con respaldo pausado aunque el banco llegue primero
+      ---
+      duration_ms: 58.729569
+      type: 'test'
+      ...
+    # Subtest: Wallet y el trabajador concurrentes conservan exactamente un gasto
+    ok 25 - Wallet y el trabajador concurrentes conservan exactamente un gasto
+      ---
+      duration_ms: 68.103524
+      type: 'test'
+      ...
+    # Subtest: fallo transitorio conserva vencimiento y el siguiente proceso recupera sin duplicar
+    ok 26 - fallo transitorio conserva vencimiento y el siguiente proceso recupera sin duplicar
+      ---
+      duration_ms: 37.033303
+      type: 'test'
+      ...
+    # Subtest: fallo después de crear el gasto revierte toda la transacción y permite reintento
+    ok 27 - fallo después de crear el gasto revierte toda la transacción y permite reintento
+      ---
+      duration_ms: 54.811285
+      type: 'test'
+      ...
+    # Subtest: gasto borrado no resucita al llegar Wallet; otras cuentas y reglas se conservan
+    ok 28 - gasto borrado no resucita al llegar Wallet; otras cuentas y reglas se conservan
+      ---
+      duration_ms: 66.236727
+      type: 'test'
+      ...
+    # Subtest: endpoint del programador exige secreto, no filtra usuarios y devuelve fallo recuperable
+    ok 29 - endpoint del programador exige secreto, no filtra usuarios y devuelve fallo recuperable
+      ---
+      duration_ms: 136.862468
+      type: 'test'
+      ...
+    1..29
+ok 7 - Wallet principal y respaldo bancario persistente: API y PostgreSQL
+  ---
+  duration_ms: 4648.142144
+  type: 'test'
+  ...
+1..7
+# tests 36
+# suites 0
+# pass 36
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 5008.097766

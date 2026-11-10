@@ -1,0 +1,18 @@
+{
+  "deploymentId": "dpl_FEBVrE7dAM45xdo3BP3TXpYQswu5",
+  "project": "afp",
+  "projectId": "prj_FUBRDkPPFpOgJG9zuLLhTwm3JHKV",
+  "domain": "finanzas.garatachia.com",
+  "url": "afp-10vvkcj9o-minnicas-projects.vercel.app",
+  "target": "production",
+  "state": "READY",
+  "framework": "nextjs",
+  "workspaceBase": "63c566fd19216d8f7083f0faad16af68c8e94edf",
+  "workspaceChangesIncluded": true,
+  "newCommitCreated": false,
+  "pushPerformed": false,
+  "sourceFilesMatched": 412,
+  "changedParserSha": "14f144e64d402373d56cf6d46d7257f0e5986965",
+  "migrationApplied": false,
+  "apkChanged": false
+}

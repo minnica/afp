@@ -1,0 +1,5 @@
+
+> afp@0.1.0 audit:prod /home/garatachia/projects/afp
+> pnpm audit --prod
+
+No known vulnerabilities found

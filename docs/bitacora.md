@@ -6,6 +6,10 @@ Consolidado el **27 de octubre de 2026** a partir del README del commit `4562aa0
 
 ## 2026-11-09
 
+### Variante JOY BANAMEX ADICIONAL y recuperación de un viaje
+
+Los avisos de un viaje y su propina llegaron al servidor, pero el analizador bancario no admitía `JOY BANAMEX ADICIONAL`. La ampliación conserva el formato parcial existente y sus requisitos de alias, moneda, compra expresa y espera de respaldo; no habilita automatizaciones nuevas. Se añadieron cuatro regresiones: compatibilidad de formato, variantes inválidas, registro por respaldo con reintentos y reinterpretación histórica sin registro automático. Pasaron 1138 pruebas con PostgreSQL local, sin omisiones; tipos, lint y build correctos, con tres advertencias de lint previas fuera de los archivos modificados. Publicado en producción, `dpl_FEBVrE7dAM45xdo3BP3TXpYQswu5`, con los 412 archivos cotejados. Tras el respaldo y el ensayo revertido, la recuperación autorizada reunió cuatro evidencias en un solo gasto, mediante correspondencia confirmada del viaje y sus dos pagos, sin relajar el reloj de las asociaciones automáticas. La lectura independiente confirmó conservación de los demás gastos, eventos originales y reglas y protección de duplicados por cada importe desglosado. Sin APK, migración, commit ni push nuevos. [Verificaciones y publicación](../artifacts/capture-banamex-joy-additional-2026-11-09/README.md).
+
 ### Diagnóstico de compras, propinas y cancelaciones Android
 
 Consulta de producción en transacciones de solo lectura y validación del teléfono por ADB. Se corrigieron localmente cuatro diferencias observadas: símbolo de pesos simple/doble en Santander, total pegado al saludo en el recibo de propina Gmail, cancelación Banamex sin nombre de tarjeta y omisión del sufijo terminal «CIU» al proponer el cargo cancelado. La propina investigada ya tenía un gasto bancario separado; el recibo completo no justifica registrar de nuevo ese total. El gasto cancelado conserva una edición con fracción de centavo que requiere normalización revisada antes de aplicar el reembolso.

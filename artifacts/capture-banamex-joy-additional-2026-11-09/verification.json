@@ -1,0 +1,30 @@
+{
+  "status": "PUBLISHED_AND_RECOVERED",
+  "tests": {
+    "passed": 1138,
+    "failed": 0,
+    "skipped": 0
+  },
+  "typecheck": true,
+  "typecheckTests": true,
+  "testTypes": true,
+  "lint": {
+    "errors": 0,
+    "warnings": 3
+  },
+  "build": true,
+  "productionDeploymentId": "dpl_FEBVrE7dAM45xdo3BP3TXpYQswu5",
+  "sourceFilesVerified": 412,
+  "backupVerified": true,
+  "rehearsalRolledBack": true,
+  "recoveredExpenseCount": 1,
+  "linkedNoticeCount": 4,
+  "duplicateProtectionVerified": true,
+  "existingExpensesPreserved": true,
+  "originalEventsPreserved": true,
+  "automationRulesUnchanged": true,
+  "calendarStatus": "SYNCED",
+  "apkChanged": false,
+  "migrationApplied": false,
+  "dependencyChanges": false
+}

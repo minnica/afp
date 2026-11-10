@@ -3,6 +3,7 @@ import { present,sparseCalculations } from './helpers/financial-fixtures';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import additional from './fixtures/captures/banamex-card-charge.es.v1.json';
+import joyAdditional from './fixtures/captures/banamex-joy-additional-card-charge.es.v1.json';
 import bank from './fixtures/captures/banamex-joy-card-charge.es.v1.json';
 import firstWallet from './fixtures/captures/wallet-banamex-purchase.es.v1.json';
 import wallet from './fixtures/captures/wallet-banamex2-purchase.es.v1.json';
@@ -45,6 +46,36 @@ test('JOY bancario rechaza cuerpos contradictorios, importes inválidos, calenda
   for (const [hour, expected] of [['12:21:22 AM', '2026-10-20T06:21:22.000Z'], ['12:21:22 PM', '2026-10-20T18:21:22.000Z']] as const) {
     assert.equal(interpretCapture(change('04:21:22 PM', hour)).proposal.operationAt, expected);
   }
+});
+
+test('JOY BANAMEX ADICIONAL: conserva el contrato parcial y los datos del aviso adicional existente', () => {
+  const parsed = interpretCapture(joyAdditional.event);
+  assert.deepEqual(parsed, interpretCapture(additional.event));
+  assert.equal(parsed.parserKey, 'banamex.card-charge.es.v1');
+  assert.equal(parsed.verified, false);
+  assert.equal(parsed.reason, 'INCOMPLETE_FORMAT');
+  assert.equal(parsed.proposal.amount, '123.45');
+  assert.equal(parsed.proposal.merchant, 'COMERCIO FICTICIO CIUDAD');
+  assert.equal(parsed.proposal.printedAlias?.value, '123');
+  assert.equal(parsed.proposal.currency, undefined);
+  assert.equal(parsed.proposal.cardId, undefined);
+});
+
+test('JOY BANAMEX ADICIONAL: no acepta otra marca, alias incompleto, importes o fechas inválidos ni contradicciones', () => {
+  const event = (from: string, to: string) => ({ ...joyAdditional.event, fields: Object.fromEntries(
+    Object.entries(joyAdditional.event.fields).map(([key, value]) => [key, value.replaceAll(from, () => to)])) });
+  for (const [from, to] of [
+    ['JOY BANAMEX', 'OTRA MARCA'], ['ADICIONAL 123', 'ADICIONAL 12'], ['ADICIONAL 123', 'ADICIONAL 0123'],
+    ['123.45', '1,23.45'], ['123.45', '0.00'], ['20/10/26', '31/02/26'], ['08:28:47 PM', '13:28:47 PM'],
+  ] as const) assert.equal(Object.keys(interpretCapture(event(from, to)).proposal).length, 0);
+  const future = event('20/10/26', '22/10/26');
+  assert.equal(interpretCapture(future).reason, 'FUTURE_OPERATION');
+  assert.equal(interpretCapture({ ...joyAdditional.event, fields: { ...joyAdditional.event.fields,
+    'android.bigText': joyAdditional.event.fields['android.bigText'].replace('123.45', '999.00'),
+  } }).reason, 'CONFLICTING_FIELDS');
+  assert.equal(interpretCapture({ ...joyAdditional.event, fields: { ...joyAdditional.event.fields,
+    'android.subText': 'devolución',
+  } }).reason, 'SPECIAL_MOVEMENT');
 });
 
 test('JOY no amplía el formato bancario a otra marca, fuente, referencias, moneda supuesta ni avisos especiales', () => {

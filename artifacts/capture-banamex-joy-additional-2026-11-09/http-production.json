@@ -1,0 +1,30 @@
+{
+  "origin": "https://finanzas.garatachia.com",
+  "checkedAt": "2026-11-10T05:07:44.581Z",
+  "rows": [
+    {
+      "path": "/login",
+      "status": 200,
+      "cacheControl": "public, max-age=0, must-revalidate",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+    },
+    {
+      "path": "/api/captures/movements",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "Authorization"
+    },
+    {
+      "path": "/api/captures/configuration",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "Authorization"
+    },
+    {
+      "path": "/api/expenses",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "Authorization"
+    }
+  ]
+}

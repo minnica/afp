@@ -14,6 +14,7 @@ import { PrismaClient } from '@prisma/client';
 import assert from 'node:assert/strict';
 import { randomBytes,randomUUID } from 'node:crypto';
 import { test } from 'node:test';
+import { captureFields } from '../src/lib/captureJson';
 
 const fixture = (name: string) => noticeSample(objectValue(parseJson(fs.readFileSync(path.join(__dirname, `fixtures/captures/${name}.json`), 'utf8'))).event);
 const connectionString = process.env.AFP_TEST_DATABASE_URL;
@@ -110,6 +111,49 @@ test('Wallet principal y respaldo bancario persistente: API y PostgreSQL', { ski
       });
     }
     const c = cards[0], nu = cards[2], santander = cards[3];
+    await t.test('JOY BANAMEX ADICIONAL: cargo y propina usan la regla existente, esperan y se registran una sola vez', async () => {
+      const before = await count();
+      const format = fixture('banamex-joy-additional-card-charge.es.v1');
+      for (const amount of ['47.83', '17.25']) {
+        const event = input(format, amount);
+        const movement = present(await send(event));
+        assert.equal(movement.reason, 'BANK_FALLBACK_WAIT');
+        assert.equal(movement.cardId, present(c).card.id);
+        assert.equal(movement.parserKey, 'banamex.card-charge.es.v1');
+        assert.equal(movement.expenseId, null);
+        const storedEvent = await db.captureEvent.findFirstOrThrow({ where: { movementId: movement.id } });
+        await Promise.all(Array.from({ length: 4 }, () => send(event)));
+        await Promise.all(Array.from({ length: 4 }, () => due(movement)));
+        const registered = await db.captureMovement.findUniqueOrThrow({ where: { id: movement.id }, include: { expense: true } });
+        assert.equal(registered.reason, 'BANK_FALLBACK_REGISTERED');
+        assert.equal(registered.expense?.amount.toString(), amount);
+        assert.equal(registered.expense?.date.toISOString().slice(0, 10), '2026-10-20');
+        assert.equal(registered.expense?.cardId, present(c).card.id);
+        assert.deepEqual(await db.captureEvent.findUnique({ where: { id: storedEvent.id } }), storedEvent);
+      }
+      assert.equal(await count(), before + 2);
+    });
+    await t.test('JOY BANAMEX ADICIONAL: reinterpretar un aviso histórico conserva el original y no registra ni programa históricos', async () => {
+      const parsers = sparseCalculations(load('src/lib/captureParsers.ts'));
+      const legacy = sourceLoader({ ...mocks, '@/lib/captureParsers': { ...parsers, interpretCapture: event => {
+        if (captureFields(event.fields)['android.text']?.includes('JOY BANAMEX ADICIONAL')) return { reason: 'UNKNOWN_FORMAT', proposal: {} };
+        return parsers.interpretCapture(event);
+      } } })('src/lib/captureService.ts');
+      const event = protocol.validateCaptureEvent(input(fixture('banamex-joy-additional-card-charge.es.v1'), '62.17'));
+      await legacy.receiveCaptureEvent(db, { id: device.id, secretHash: device.secretHash }, event);
+      const raw = await db.captureEvent.findUniqueOrThrow({ where: { deviceId_eventId: { deviceId: device.id, eventId: event.eventId } } });
+      const before = await count();
+      const current = await resolve({ id: present(raw.movementId), action: 'reinterpret' });
+      assert.equal(present(current).status, 'OBSERVED');
+      assert.equal(present(current).reason, 'BANK_FALLBACK_PAUSED');
+      assert.equal(present(current).amount?.toString(), '62.17');
+      assert.equal(present(current).expenseId, null);
+      assert.equal(present(current).fallbackDueAt, null);
+      assert.deepEqual(await db.captureEvent.findUnique({ where: { id: raw.id } }), raw);
+      await resolve({ id: present(raw.movementId), action: 'reinterpret' });
+      assert.equal(await count(), before);
+      assert.deepEqual(await db.captureEvent.findUnique({ where: { id: raw.id } }), raw);
+    });
     await t.test('sin hora bancaria de operación, un aviso del día siguiente conserva revisión frente a Wallet', async () => {
       const a = amount(), before = await count(), wallet = input(present(nu).wallet, a), bank = input(present(nu).bank, a);
       wallet.postedAt = '2026-10-23T18:00:00Z'; wallet.receivedAt = '2026-10-23T18:00:01Z';

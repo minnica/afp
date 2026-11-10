@@ -127,7 +127,7 @@ function realWalletPurchase(event: CaptureNotice): CaptureInterpretation | null 
 
 function realBanamexCharge(event: CaptureNotice): CaptureInterpretation | null {
   const fields = captureFields(event.fields ?? {}) || {}, body = fields["android.bigText"] || fields["android.text"] || "";
-  const additional = body.match(/^Retiro\/Compra (.{1,200}) -\s+ADICIONAL (\d{3}) monto \$\s*([\d,.]+) el (\d{2}\/\d{2}\/\d{2}) (\d{2}):(\d{2}):(\d{2}) (AM|PM)\. Auto\. (\d{6})$/);
+  const additional = body.match(/^Retiro\/Compra (.{1,200}) -\s+(?:JOY BANAMEX )?ADICIONAL (\d{3}) monto \$\s*([\d,.]+) el (\d{2}\/\d{2}\/\d{2}) (\d{2}):(\d{2}):(\d{2}) (AM|PM)\. Auto\. (\d{6})$/);
   const match = additional || body.match(/^Retiro\/Compra (.{1,200}) JOY BANAMEX(\d{3}) monto \$([\d,.]+) el (\d{2}\/\d{2}\/\d{2}) (\d{2}):(\d{2}):(\d{2}) (AM|PM)\. Auto\. (\d{6})$/);
   if (!match) return null;
   const parserKey = additional ? "banamex.card-charge.es.v1" : "banamex.joy-card-charge.es.v1";

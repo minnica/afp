@@ -1,0 +1,12 @@
+{
+  "verifiedAt": "2026-11-10T05:08:32.333Z",
+  "independentReadOnlyPostflight": true,
+  "oneExpenseRegistered": true,
+  "fourNoticesLinked": true,
+  "bankAndReceiptAmountsPreserved": true,
+  "otherExpensesPreserved": true,
+  "originalEventsUnchanged": true,
+  "automationRulesUnchanged": true,
+  "bankFallbackRulesUnchanged": true,
+  "duplicateProtectionVerified": true
+}
