@@ -1,0 +1,29 @@
+{
+  "checkedAt": "2026-11-10T07:10:22.233Z",
+  "backupReadable": true,
+  "backupTableDataEntries": 46,
+  "rehearsalRolledBack": true,
+  "applied": true,
+  "independentlyVerified": true,
+  "singleExpenseCreated": true,
+  "method": "DEBIT",
+  "bankDebitAppliedOnce": true,
+  "originalEventUnchanged": true,
+  "otherFinancialRowsUnchanged": true,
+  "otherCaptureMovementsUnchanged": true,
+  "policiesUnchanged": true,
+  "idempotentRetryVerified": true,
+  "schemaChange": false,
+  "apkChange": false,
+  "calendar": {
+    "status": "SYNCED",
+    "upToDate": true
+  },
+  "phoneVerified": {
+    "expenseVisible": true,
+    "methodAndSourceAccountVerified": true,
+    "bankBalanceMatches": true,
+    "cashBalanceMatches": true,
+    "evidenceLocation": "private"
+  }
+}

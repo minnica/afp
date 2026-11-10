@@ -4,7 +4,7 @@ import { ApiAccessError } from './apiAuth';
 import { getDebtAccountState } from './calculations/debtAccounts';
 import { captureProposal, captureSnapshot, captureHistory } from './captureJson';
 import { captureAmount, captureNotificationDate, captureOperationTime } from './captureParsers';
-import { accountDebitNotice, interpretBbvaAccountCharge } from './captureMoneyParsers';
+import { accountDebitNotice, interpretBbvaAccountCharge, interpretBbvaDebitPurchase } from './captureMoneyParsers';
 import { day } from './money/dates';
 import { cents } from './money/sources';
 import { readBaseline } from './money/persisted';
@@ -30,7 +30,8 @@ export async function payableCaptureCandidates(db: CaptureDb, userId: string, ac
 // Historical evidence is read with today's parser solely for comparison. The
 // event and its initial interpretation are never rewritten.
 export function bbvaDebitEvidence(event: Parameters<typeof interpretBbvaAccountCharge>[0]) {
-  const decoded = interpretBbvaAccountCharge(event, captureAmount, captureNotificationDate, captureOperationTime);
+  const decoded = interpretBbvaDebitPurchase(event, captureAmount, captureNotificationDate, captureOperationTime)
+    || interpretBbvaAccountCharge(event, captureAmount, captureNotificationDate, captureOperationTime);
   return decoded?.reason === 'ACCOUNT_DEBIT_REVIEW' ? decoded.proposal : null;
 }
 

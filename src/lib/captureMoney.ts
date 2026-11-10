@@ -8,7 +8,7 @@ import { ApiAccessError } from '@/lib/apiAuth';
 import { captureHash } from '@/lib/captureProtocol';
 import { captureAmount, captureDate } from '@/lib/captureReview';
 import { createExpenseInTransaction } from '@/lib/expenseService';
-import { moneyCaptureKind, accountDebitNotice } from '@/lib/captureMoneyParsers';
+import { moneyCaptureKind, accountDebitNotice, bbvaDebitPurchaseParserKey } from '@/lib/captureMoneyParsers';
 import { day, todayInMexico } from '@/lib/money/dates';
 import { getCyclePaymentAmounts } from '@/lib/calculations/cardCyclePayments';
 import { mutateMoney } from '@/lib/money/service';
@@ -86,7 +86,7 @@ async function duplicateCandidates(tx: Prisma.TransactionClient, userId: string,
   const unresolved = expenses.filter(expense => {
     if (!operationAt || !expense.captureMovements.length) return true;
     const proofs = expense.captureMovements.map(row => {
-      if (row.parserKey !== 'bbva.account-charge.es.v1' || row.correction || row.events.length !== 1 || !row.proposal) return null;
+      if (!accountDebitNotice(row) || row.correction || row.events.length !== 1 || !row.proposal) return null;
       const original = captureProposal(row.proposal), evidence = bbvaDebitEvidence(row.events[0]!);
       return evidence?.amount && cents(evidence.amount) === cents(expense.amount) && day(expense.date) === original.date ? evidence.operationAt || null : null;
     });
@@ -173,7 +173,7 @@ async function post(tx: Prisma.TransactionClient, movement: Movement, kind: 'TRA
   }
   let payableMatch: Awaited<ReturnType<typeof payableCaptureCandidates>>[number] | undefined;
   if (kind !== 'DEBIT_EXPENSE' && v.payableAccountId) throw new ApiAccessError('Solo un gasto con débito puede pagar esta deuda.', 400);
-  if (kind === 'DEBIT_EXPENSE' && (automatic || v.payableAccountId)) {
+  if (kind === 'DEBIT_EXPENSE' && ((automatic && movement.parserKey !== bbvaDebitPurchaseParserKey) || v.payableAccountId)) {
     const payableMatches = await payableCaptureCandidates(tx, userId, from.id, v.amount, v.date);
     if (v.payableAccountId) {
       payableMatch = payableMatches.find(row => row.id === v.payableAccountId);

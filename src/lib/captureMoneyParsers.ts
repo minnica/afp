@@ -4,7 +4,45 @@ export const moneyParserKeys = ['nu.account-transfer.es.v1', 'bbva.atm-withdrawa
 export function moneyCaptureKind(movement: CaptureKindInput) {
   return ['MONEY_TRANSFER', 'CASH_WITHDRAWAL'].includes(captureProposal(movement.proposal)?.movementType ?? "") || moneyParserKeys.includes(movement.parserKey ?? "");
 }
-export function accountDebitNotice(movement: CaptureKindInput) { return movement.parserKey === 'bbva.account-charge.es.v1' && captureProposal(movement.proposal)?.movementType === 'ACCOUNT_DEBIT'; }
+export const bbvaDebitPurchaseParserKey = 'bbva.debit-purchase.es.v1';
+const foreignCurrencyCodes = new Set(Intl.supportedValuesOf('currency').filter(code => code !== 'MXN'));
+export function accountDebitNotice(movement: CaptureKindInput) { return [bbvaDebitPurchaseParserKey, 'bbva.account-charge.es.v1'].includes(movement.parserKey ?? '') && captureProposal(movement.proposal)?.movementType === 'ACCOUNT_DEBIT'; }
+
+// A purchase names its merchant. It uses the accepted debit-account policy,
+// without guessing a credit-card payment or a payable from its amount.
+export function interpretBbvaDebitPurchase(event: CaptureNotice, parseAmount: ParseAmount, notificationDate: NotificationDate, operationTime: OperationTime): CaptureInterpretation | null {
+  if (event.sourcePackage !== 'com.bancomer.mbanking') return null;
+  const fields = captureFields(event.fields ?? {}), title = fields['android.title'], body = fields['android.bigText'] || fields['android.text'] || '';
+  if (title !== 'Compra con TDD' || !body.startsWith('Compra con TDD ')) return null;
+  // This separately reviewed descriptor is evidence of a credit-card payment.
+  if (/^Compra con TDD \d{4} en MERPAGO\*TARJETADE /i.test(body)) return null;
+  const base = { parserKey: bbvaDebitPurchaseParserKey, verified: true, proposal: {} };
+  if ((fields['android.bigText'] && fields['android.text'] && fields['android.bigText'] !== fields['android.text'])
+    || (fields['android.title.big'] && fields['android.title.big'] !== title)) return { ...base, reason: 'CONFLICTING_FIELDS' };
+  const text = Object.values(fields).join('\n');
+  if ((text.toUpperCase().match(/\b[A-Z]{3}\b/g) || []).some(code => foreignCurrencyCodes.has(code))
+    || /\b(?:d[oó]lares|euros|yenes|libras)\b|US\$/i.test(text)
+    || (text.match(/\p{Sc}/gu) || []).some(symbol => symbol !== '$')) return { ...base, reason: 'FOREIGN_CURRENCY' };
+  const match = body.match(/^Compra con TDD (\d{4}) en ([^\r\n$]{1,160}) \$([\d,.]+) (\d{1,2}) ([a-z]+) (\d{2}):(\d{2})h$/i);
+  if (!match) return { ...base, reason: 'INCOMPLETE_FORMAT' };
+  const amount = parseAmount(match[3]!), published = notificationDate(event), merchant = match[2]!.trim();
+  if (!amount || !published || !merchant || /[\u0000-\u001f\u007f]/.test(merchant)) return { ...base, reason: 'INVALID_FIELDS' };
+  const month = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'].indexOf(match[5]!.toLowerCase()) + 1;
+  // The notice omits the year. Only one valid bank time within 36 hours of
+  // publication can complete it, including notices crossing New Year's Eve.
+  const year = Number(published.date.slice(0, 4)), posted = Date.parse(published.notificationAt);
+  const times = [year - 1, year, year + 1].flatMap(y => {
+    const time = month && operationTime(`${match[4]!.padStart(2, '0')}/${String(month).padStart(2, '0')}/${y} ${match[6]}:${match[7]}:00`);
+    return time && Math.abs(Date.parse(time.operationAt) - posted) <= 36 * 60 * 60_000 ? [time] : [];
+  });
+  if (times.length !== 1) return { ...base, reason: 'INVALID_FIELDS' };
+  const time = times[0]!;
+  if (Date.parse(time.operationAt) > new Date(event.receivedAt).getTime() + 5 * 60_000) return { ...base, reason: 'FUTURE_OPERATION' };
+  return { ...base, reason: 'ACCOUNT_DEBIT_REVIEW', proposal: {
+    movementType: 'ACCOUNT_DEBIT', merchant, amount, accountSuffix: match[1]!,
+    ...published, ...time, dateSource: 'BANK_OPERATION', paymentEvidence: 'DEBIT_PURCHASE', missingFields: ['currency'],
+  } };
+}
 
 export function interpretMoneyNotice(event: CaptureNotice, parseAmount: ParseAmount, notificationDate: NotificationDate): CaptureInterpretation | null {
   const fields = captureFields(event.fields ?? {}) || {}, title = fields['android.title'] || '', body = fields['android.bigText'] || fields['android.text'] || '';

@@ -6,6 +6,12 @@ Consolidado el **27 de octubre de 2026** a partir del README del commit `4562aa0
 
 ## 2026-11-10
 
+### Compras con TDD BBVA: comercio y salida de cuenta
+
+Un aviso bancario llegó correctamente, pero la rama antigua «Compra con TDD» solo admitía el descriptor de pago `MERPAGO*TARJETADE`. Se añadió `bbva.debit-purchase.es.v1` para compras con comercio, terminación e importe explícitos y fecha/hora bancaria. Usa la regla BBVA_DEBIT aceptada por el propietario y crea un gasto Débito con la cuenta configurada. Las coincidencias de importe con deudas o cortes no convierten una compra explícita en pago. El descriptor anterior conserva su tratamiento específico. La bandeja muestra los gastos aplicados en Gastos y las compras pendientes en Cuentas/Pendientes.
+
+Pasaron 1161 pruebas con PostgreSQL local, sin fallos ni omisiones, incluidas doce nuevas de reconocimiento, registro, duplicidad, rollback y recuperación histórica. Tipos, lint y build correctos; tres advertencias previas de lint fuera del alcance. Publicado `dpl_6eNJkbf64Qykck67D1YxTuNK3LBA`, producción/READY, con 414 archivos cotejados. Se recuperó el aviso puntual autorizado, después de respaldo y ensayo revertido, mediante los servicios de reinterpretación y registro. La lectura independiente confirmó un solo gasto de débito, un solo descuento, evidencia original y demás registros conservados, con reglas sin cambios. Calendar sincronizado. Sin migración, APK, commit ni push nuevos. [Evidencias](../artifacts/capture-bbva-tdd-2026-11-10/README.md).
+
 ### Retiros: banco, efectivo recibido y comisión
 
 El formulario anterior registraba únicamente la salida bancaria. Registrar retiro ahora requiere destino de tipo Efectivo e importe recibido, además del total descontado del banco. Un solo registro produce las dos partes del movimiento y conserva su diferencia como comisión; la reversión retira ambas y comprueba las referencias de las dos cuentas. Los clientes anteriores y los retiros históricos sin destino mantienen su comportamiento. No se habilitó la automatización de retiros ni se cambió la APK.

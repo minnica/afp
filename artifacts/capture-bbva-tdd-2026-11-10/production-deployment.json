@@ -1,0 +1,16 @@
+{
+  "checkedAt": "2026-11-10T07:09:33.933Z",
+  "id": "dpl_6eNJkbf64Qykck67D1YxTuNK3LBA",
+  "state": "READY",
+  "target": "production",
+  "alias": [
+    "afp-virid.vercel.app",
+    "finanzas.garatachia.com",
+    "afp-minnicas-projects.vercel.app"
+  ],
+  "workspaceBase": "66b8fd478f014ff7da5c5c7fee1d65ac89af1056",
+  "dirty": true,
+  "sourceFiles": 414,
+  "newCommitCreated": false,
+  "pushed": false
+}

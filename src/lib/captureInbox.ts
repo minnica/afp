@@ -9,14 +9,14 @@ const income: Prisma.CaptureMovementWhereInput = { parserKey: { in: incomeKeys }
 const refundKeys = captureParsers.filter(row => row.refundOnly).map(row => row.key);
 const paymentKeys = captureParsers.filter(row => row.paymentOnly).map(row => row.key);
 const moneyKeys = captureParsers.filter(row => row.moneyOnly).map(row => row.key);
-const money: Prisma.CaptureMovementWhereInput = { OR: [{ parserKey: { in: moneyKeys } }, { reason: { in: ["BBVA_PAYMENT_MATCH_AMBIGUOUS", "BBVA_PAYABLE_MATCH_AMBIGUOUS", "BBVA_DESTINATION_MATCH_AMBIGUOUS"] } }, { moneyPosting: { is: { kind: { in: ["TRANSFER", "WITHDRAWAL"] } } } }] };
+const money: Prisma.CaptureMovementWhereInput = { OR: [{ AND: [{ parserKey: { in: moneyKeys } }, { NOT: { moneyPosting: { is: { kind: 'DEBIT_EXPENSE' } } } }] }, { reason: { in: ["BBVA_PAYMENT_MATCH_AMBIGUOUS", "BBVA_PAYABLE_MATCH_AMBIGUOUS", "BBVA_DESTINATION_MATCH_AMBIGUOUS"] } }, { moneyPosting: { is: { kind: { in: ["TRANSFER", "WITHDRAWAL"] } } } }] };
 const expenseKeys = captureParsers.filter(row => !row.incomeOnly && !row.moneyOnly && !row.refundOnly && !row.paymentOnly && row.key !== "bbva.account-charge.es.v1").map(row => row.key);
 const financialKeys = [...incomeKeys, ...moneyKeys, ...refundKeys, ...paymentKeys, ...expenseKeys];
 const unclassified: Prisma.CaptureMovementWhereInput = { OR: [{ parserKey: null }, { parserKey: { notIn: financialKeys } }] };
 const resolvedExpense: Prisma.CaptureMovementWhereInput = { OR: [{ originalExpenseId: { not: null } }, { moneyPosting: { is: { kind: "DEBIT_EXPENSE" } } },{ expenseId: { not: null } }, { installmentPurchaseId: { not: null } }, { AND: [{ correction: { not: Prisma.DbNull } }, { correction: { not: Prisma.JsonNull } }] }] };
 const expense: Prisma.CaptureMovementWhereInput = { AND: [
   { OR: [{ moneyPosting: null }, { moneyPosting: { is: { kind: "DEBIT_EXPENSE" } } }] },
-  { OR: [{ parserKey: { in: expenseKeys } }, { AND: [unclassified, resolvedExpense] }] },
+  { OR: [{ parserKey: { in: expenseKeys } }, { moneyPosting: { is: { kind: 'DEBIT_EXPENSE' } } }, { AND: [unclassified, resolvedExpense] }] },
 ] };
 const other: Prisma.CaptureMovementWhereInput = { AND: [unclassified, { reason: { notIn: ["BBVA_PAYMENT_MATCH_AMBIGUOUS", "BBVA_PAYABLE_MATCH_AMBIGUOUS", "BBVA_DESTINATION_MATCH_AMBIGUOUS"] } }, { moneyPosting: null }, { expenseId: null, installmentPurchaseId: null, OR: [{ correction: { equals: Prisma.DbNull } }, { correction: { equals: Prisma.JsonNull } }] }] };
 
@@ -36,8 +36,8 @@ export function captureMovementKind(row: Pick<Movement, 'parserKey' | 'proposal'
   if (incomeKeys.includes(row.parserKey ?? "")) return "INCOME";
   if (["BBVA_PAYMENT_MATCH_AMBIGUOUS", "BBVA_PAYABLE_MATCH_AMBIGUOUS", "BBVA_DESTINATION_MATCH_AMBIGUOUS"].includes(row.reason || "")) return "MONEY";
   if (captureProposal(row.proposal)?.moneyKind === "CARD_PAYMENT") return "PAYMENT";
-  if (moneyKeys.includes(row.parserKey ?? "") || ["TRANSFER", "WITHDRAWAL"].includes(captureProposal(row.proposal)?.moneyKind ?? "")) return "MONEY";
   if (captureProposal(row.proposal)?.moneyKind === "DEBIT_EXPENSE") return "EXPENSE";
+  if (moneyKeys.includes(row.parserKey ?? "") || ["TRANSFER", "WITHDRAWAL"].includes(captureProposal(row.proposal)?.moneyKind ?? "")) return "MONEY";
   if (refundKeys.includes(row.parserKey ?? "")) return "REFUND";
   if (paymentKeys.includes(row.parserKey ?? "")) return "PAYMENT";
   if (expenseKeys.includes(row.parserKey ?? "") || row.expenseId || row.installmentPurchaseId || row.correction) return "EXPENSE";

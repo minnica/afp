@@ -9,10 +9,11 @@ import { parsePaymentReceipt, paymentReceiptSource } from "@/lib/paymentReceipts
 import { reviewOnlyCapturePackages } from "@/lib/captureSourcePolicy";
 import { bankCapturePackages, gmailCapturePackage } from './captureSourcePolicy';
 import { parseGmailUberReceipt, uberReceiptParserKey } from './gmailUberReceipts';
-import { interpretMoneyNotice, interpretBbvaAccountCharge } from "@/lib/captureMoneyParsers";
+import { interpretMoneyNotice, interpretBbvaAccountCharge, interpretBbvaDebitPurchase, bbvaDebitPurchaseParserKey } from "@/lib/captureMoneyParsers";
 import { interpretRefundNotice } from "@/lib/captureRefundParsers";
 
 export const captureParsers: CaptureParser[] = [
+  { key: bbvaDebitPurchaseParserKey, sourcePackage: 'com.bancomer.mbanking', verified: true, evidence: 'REAL_REVIEWED_POLICY_REQUIRED', moneyOnly: true },
   { key: "bbva.payroll.es.v1", sourcePackage: "com.bancomer.mbanking", verified: true, evidence: "REAL_REVIEWED_PARTIAL", incomeOnly: true },
   { key: "bbva.account-deposit.es.v1", sourcePackage: "com.bancomer.mbanking", verified: false, evidence: "AWAITING_REAL_NOTICE", incomeOnly: true },
   { key: uberReceiptParserKey, sourcePackage: gmailCapturePackage, verified: true, evidence: 'REAL_REVIEWED',
@@ -266,6 +267,8 @@ export function interpretCapture(event: CaptureNotice): CaptureInterpretation {
   // Prefijo observado y confirmado por el propietario como transferencia de
   // débito. No vincular su terminación con los alias de tarjetas de crédito.
   if (event.sourcePackage === "com.bancomer.mbanking") {
+    const purchase = interpretBbvaDebitPurchase(event, captureAmount, captureNotificationDate, captureOperationTime);
+    if (purchase) return purchase;
     const body = captureFields(event.fields ?? {})?.["android.bigText"] || captureFields(event.fields ?? {})?.["android.text"] || "";
     // Evidencia de salida con débito: el descriptor comercial no identifica una
     // tarjeta de crédito receptora ni confirma que el abono haya sido aplicado.
