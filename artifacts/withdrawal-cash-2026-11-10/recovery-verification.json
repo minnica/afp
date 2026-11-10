@@ -1,0 +1,29 @@
+{
+  "checkedAt": "2026-11-10T06:35:34.353Z",
+  "rehearsalRolledBack": true,
+  "applied": true,
+  "independentlyVerified": true,
+  "changedExistingWithdrawalOnly": true,
+  "changedFields": [
+    "cashAccountId",
+    "cashAmount"
+  ],
+  "bankDebitPreserved": true,
+  "cashAndCommissionVerified": true,
+  "allOtherFinancialRowsPreserved": true,
+  "capturePoliciesPreserved": true,
+  "originalOperationPreserved": true,
+  "rlsUnchanged": true,
+  "duplicateWithdrawalCreated": false,
+  "backup": {
+    "format": "PostgreSQL custom",
+    "schema": "public",
+    "tableDataEntries": 46,
+    "archiveReadable": true,
+    "location": "private"
+  },
+  "calendar": {
+    "status": "SKIPPED",
+    "upToDate": true
+  }
+}

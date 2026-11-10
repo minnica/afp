@@ -136,10 +136,16 @@ export async function mutateMoney(db: MoneyTransactionRunner, userId: string, bo
     } else if (command.action === 'WITHDRAWAL') {
       const values = parsed(withdrawalSchema, command), account = requireRecord(data.accounts, values.accountId);
       if (values.date > today || values.date < day(account.asOf)) throw new ApiAccessError('El retiro debe tener una fecha real desde el saldo de referencia.', 400);
+      if (values.cashAccountId) {
+        const cash = requireRecord(data.accounts, values.cashAccountId);
+        if (cash.kind !== 'CASH' || account.kind === 'CASH') throw new ApiAccessError('Selecciona una cuenta bancaria de salida y una cuenta de efectivo de destino.', 400);
+        if (values.date < day(cash.asOf)) throw new ApiAccessError('El retiro es anterior al saldo de referencia de la cuenta de efectivo. Revisa si ya está incluido.', 400);
+      }
       const saved = await tx.moneyWithdrawal.create({ data: { ...values, userId, date: new Date(values.date) } }); result.id = saved.id;
     } else if (command.action === 'REVERSE_WITHDRAWAL') {
       const withdrawal = requireRecord(data.withdrawals, command.id);
-      if (day(requireRecord(data.accounts, withdrawal.accountId).asOf) > day(withdrawal.date)) throw new ApiAccessError('El retiro ya quedó incluido en una conciliación posterior. Revisa el saldo de la cuenta.', 409);
+      const affectedAccounts = [withdrawal.accountId, withdrawal.cashAccountId].filter((id): id is string => Boolean(id));
+      if (affectedAccounts.some(id => day(requireRecord(data.accounts, id).asOf) > day(withdrawal.date))) throw new ApiAccessError('El retiro ya quedó incluido en una conciliación posterior. Revisa los saldos de las cuentas.', 409);
       await tx.moneyWithdrawal.update({ where: { id: withdrawal.id, userId }, data: { reversedAt: withdrawal.reversedAt || new Date() } });
       const samples = await tx.captureMoneyPosting.findMany({ where: { userId, withdrawalId: withdrawal.id }, select: { movementId: true } });
       if (samples.length) await tx.captureMoneyPolicy.updateMany({ where: { userId, kind: 'BBVA_WITHDRAWAL', verifiedMovementId: { in: samples.map(s => s.movementId) } }, data: { mode: 'OBSERVATION', verifiedMovementId: null } });

@@ -30,6 +30,8 @@ Los cargos BBVA pueden liquidar automáticamente una cuenta por pagar simple med
 
 El desglose de movimientos por cuenta explica el saldo desde la última referencia, con entradas, salidas, ajustes y saldos acumulados. Las búsquedas y filtros de mes no alteran los saldos de las filas. Los cambios de registros ya incluidos en una referencia se identifican como ajustes, con sus límites históricos; los importes estimados y los cálculos de AFP conservan su identificación. El detalle se consulta desde Cuentas y no modifica operaciones financieras. Publicado y verificado en el celular el 4 de noviembre de 2026.
 
+Registrar retiro permite elegir una cuenta bancaria de salida y una cuenta de efectivo de destino, separando el total bancario del efectivo recibido. Ambos efectos pertenecen al mismo retiro; solo la diferencia reduce el dinero conjunto como comisión. La reversión afecta a ambas cuentas y respeta sus saldos de referencia. Los retiros históricos sin destino conservan su comportamiento anterior. Publicado el 10 de noviembre de 2026 con una corrección histórica puntual autorizada, sin duplicar el descuento bancario.
+
 ## Evidence on Hand
 
 La asociación de transferencias BBVA → Nu fue publicada y activada para la cuenta personal el 4 de noviembre de 2026, con autorización expresa. Admite destino Nu de tipo bancario o ahorro. Con una regla aceptada por cuenta, terminaciones e importe/tiempo, vincula ambos avisos y conserva el total entre cuentas. Los avisos deben ser nuevos tras la aceptación; los casos ambiguos, editados o ya registrados requieren revisión. La activación no corrige movimientos históricos.

@@ -9,7 +9,7 @@ export const moneyCommandSchema = z.union([
   z.object(accountSchema.shape).partial().safeExtend({ action: z.literal('UPDATE_ACCOUNT'), operationId, id, version }),
   reconcileSchema.extend({ action: z.literal('RECONCILE'), operationId }),
   planSchema.safeExtend({ action: z.literal('SAVE_PLAN'), operationId, id: id.optional(), version: version.optional() }),
-  withdrawalSchema.extend({ action: z.literal('WITHDRAWAL'), operationId }),
+  withdrawalSchema.safeExtend({ action: z.literal('WITHDRAWAL'), operationId }),
   paymentSchema.extend({ additional: z.literal(true), action: z.literal('CARD_PAYMENT'), operationId }),
   transferCommandSchema, reverseTransferCommandSchema,
   z.object({ action: z.literal('REVERSE_WITHDRAWAL'), operationId, id }),

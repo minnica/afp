@@ -49,7 +49,10 @@ function rawSources(data: CalculationData) {
   for (const transfer of data.transfers.filter(t => !t.reversedAt)) {
     for (const [suffix, accountId, sign] of [['out', transfer.fromAccountId, -1], ['in', transfer.toAccountId, 1]] as const) events.push({ key: `transfer:${transfer.id}:${suffix}`, date: day(transfer.date), cents: sign * cents(transfer.amount), label: transfer.concept, kind: 'TRANSFER', accountId, transferId: transfer.id, excluded: false, status: 'ACTUAL' });
   }
-  for (const withdrawal of (data.withdrawals || []).filter(t => !t.reversedAt)) events.push({ key: `withdrawal:${withdrawal.id}`, date: day(withdrawal.date), cents: -cents(withdrawal.amount), label: withdrawal.concept, kind: 'WITHDRAWAL', accountId: withdrawal.accountId, withdrawalId: withdrawal.id, excluded: false, status: 'ACTUAL', route: '/mi-dinero' });
+  for (const withdrawal of (data.withdrawals || []).filter(t => !t.reversedAt)) {
+    events.push({ key: `withdrawal:${withdrawal.id}`, date: day(withdrawal.date), cents: -cents(withdrawal.amount), label: withdrawal.concept, kind: 'WITHDRAWAL', accountId: withdrawal.accountId, withdrawalId: withdrawal.id, excluded: false, status: 'ACTUAL', route: '/mi-dinero' });
+    if (withdrawal.cashAccountId && withdrawal.cashAmount != null) events.push({ key: `withdrawal:${withdrawal.id}:cash`, date: day(withdrawal.date), cents: cents(withdrawal.cashAmount), label: `Efectivo recibido · ${withdrawal.concept}`, kind: 'WITHDRAWAL', accountId: withdrawal.cashAccountId, withdrawalId: withdrawal.id, excluded: false, status: 'ACTUAL', route: '/mi-dinero' });
+  }
   for (const e of events.filter(e => e.estimatedIncome && !e.excluded)) issues.push({ key: `estimated:${e.key}`, message: `${e.label}: el saldo incluye una cantidad aproximada. Confirma el importe real en Ingresos o Registro automático.` });
   return { events, issues };
 }

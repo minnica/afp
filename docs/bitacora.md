@@ -4,6 +4,14 @@ Historial resumido de decisiones, cambios, migraciones e incidencias que ayudan 
 
 Consolidado el **27 de octubre de 2026** a partir del README del commit `4562aa0cec0a46d8b482fdfef96116d1d3040282` y sus evidencias. «Publicado», «aplicado» y «pendiente» describen lo documentado en cada fecha; esta consolidación no incluye una comprobación remota nueva. Se conservan las fechas de los registros originales, que pueden usar hora local o UTC. El nombre de una migración identifica su versión, no demuestra cuándo se aplicó.
 
+## 2026-11-10
+
+### Retiros: banco, efectivo recibido y comisión
+
+El formulario anterior registraba únicamente la salida bancaria. Registrar retiro ahora requiere destino de tipo Efectivo e importe recibido, además del total descontado del banco. Un solo registro produce las dos partes del movimiento y conserva su diferencia como comisión; la reversión retira ambas y comprueba las referencias de las dos cuentas. Los clientes anteriores y los retiros históricos sin destino mantienen su comportamiento. No se habilitó la automatización de retiros ni se cambió la APK.
+
+Migración aditiva `20261110010000_withdrawal_cash_destination`, aplicada con respaldo privado legible, sin cambios de RLS ni asignaciones históricas implícitas. Pasaron 1149 pruebas con PostgreSQL local, sin fallos ni omisiones, los tres controles de tipos, lint y build. Se verificaron reconstrucción y actualización histórica, validación de importes, reintentos concurrentes, propiedad, referencias y reversión. El formulario se comprobó en móvil y escritorio con una operación ficticia y API real local. Publicado `dpl_676VHB1Q8j5v52XpGxkZKaTyGNzr`, producción/READY, con 414 archivos cotejados por SHA-1. La corrección puntual actualizó únicamente el destino y efectivo del retiro existente, con ensayo revertido y lectura independiente; preservó el descuento bancario y todos los demás registros financieros y reglas. Sin commit ni push nuevos. [Evidencias](../artifacts/withdrawal-cash-2026-11-10/README.md).
+
 ## 2026-11-09
 
 ### Variante JOY BANAMEX ADICIONAL y recuperación de un viaje

@@ -1,9 +1,9 @@
 import { z } from 'zod';
-import { accountSchema, reconcileSchema, planSchema, withdrawalSchema, paymentSchema, scenarioSchema } from '@/lib/money/schema';
+import { accountSchema, reconcileSchema, planSchema, cashWithdrawalFormSchema, paymentSchema, scenarioSchema } from '@/lib/money/schema';
 import { transferSchema } from '@/lib/money/transferContracts';
 import { moneyCommandSchema } from '@/lib/money/commands';
 export const routeEditorSchema = z.object({ accountId: z.string().min(1, 'Selecciona una cuenta o un tratamiento.'), planChoice: z.string().optional() });
-export const editorSchemas = { CREATE_ACCOUNT: accountSchema, UPDATE_ACCOUNT: accountSchema, RECONCILE: reconcileSchema, SAVE_PLAN: planSchema, WITHDRAWAL: withdrawalSchema, CARD_PAYMENT: paymentSchema, TRANSFER: transferSchema, ROUTE: routeEditorSchema, SCENARIO: scenarioSchema };
+export const editorSchemas = { CREATE_ACCOUNT: accountSchema, UPDATE_ACCOUNT: accountSchema, RECONCILE: reconcileSchema, SAVE_PLAN: planSchema, WITHDRAWAL: cashWithdrawalFormSchema, CARD_PAYMENT: paymentSchema, TRANSFER: transferSchema, ROUTE: routeEditorSchema, SCENARIO: scenarioSchema };
 type Schemas = typeof editorSchemas;
 type Action = keyof Schemas;
 type KeysOfUnion<T> = T extends unknown ? keyof T : never;

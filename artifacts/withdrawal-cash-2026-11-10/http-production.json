@@ -1,0 +1,23 @@
+{
+  "checkedAt": "2026-11-10T06:35:04.556Z",
+  "results": [
+    {
+      "path": "/login",
+      "status": 200,
+      "cacheControl": "public, max-age=0, must-revalidate",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+    },
+    {
+      "path": "/mi-dinero",
+      "status": 200,
+      "cacheControl": "public, max-age=0, must-revalidate",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+    },
+    {
+      "path": "/api/money",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "Authorization"
+    }
+  ]
+}

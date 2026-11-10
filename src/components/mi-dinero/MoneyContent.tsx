@@ -22,7 +22,7 @@ import { createLatestRequest } from '@/lib/latestRequest';
 import { supabase } from '@/lib/supabase';
 import { ensureUserSetup } from '@/lib/userSetup';
 import { useDialogFocus } from '@/hooks/use-dialog-focus';
-import { accountSchema, reconcileSchema, planSchema, withdrawalSchema, paymentSchema, scenarioSchema } from '@/lib/money/schema';
+import { accountSchema, reconcileSchema, planSchema, paymentSchema, scenarioSchema } from '@/lib/money/schema';
 import { day } from '@/lib/money/dates';
 
 
@@ -44,6 +44,7 @@ import MoneyAccountMovements from './MoneyAccountMovements';
 import AccountYieldSummary from './AccountYieldSummary';
 import { accountTotals } from './accountTotals';
 import { createTransferEditor } from './transferEditor';
+import { createWithdrawalEditor } from './withdrawalEditor';
 import { sendTransfer } from '@/lib/money/transferClient';
 import { transferMutationSchema } from '@/lib/money/transferContracts';
 import MoneyProjection from './MoneyProjection';
@@ -158,8 +159,7 @@ export default function MoneyContent() {
   }
   function openWithdrawal() {
     if (!data) return;
-    setEditor({ title: 'Registrar retiro de efectivo', description: 'Descuenta el importe de la cuenta. No crea una compra ni un pago de tarjeta.', action: 'WITHDRAWAL', schema: withdrawalSchema,
-      values: { accountId: '', amount: '', date: data.forecast.today, concept: 'Retiro de efectivo' }, fields: [field('accountId', 'Cuenta de salida', { options: accountOptions(data.forecast.accounts) }), amountField('amount', 'Importe total descontado (MXN)'), field('date', 'Fecha del retiro', { type: 'date' }), field('concept', 'Concepto')] });
+    setEditor(createWithdrawalEditor(data.forecast.accounts, data.forecast.today));
   }
   function openPayment() {
     if (!data) return;

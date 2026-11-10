@@ -40,6 +40,7 @@ test('A11: recupera la migración original y conserva los trece checksums aplica
     '20261029010000_capture_receipt_date_policy',
     '20261031010000_capture_income',
     '20261104010000_capture_bbva_nu_transfer_pairs',
+    '20261110010000_withdrawal_cash_destination',
   ]);
 });
 

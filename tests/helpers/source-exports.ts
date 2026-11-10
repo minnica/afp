@@ -96,7 +96,7 @@ export const sourceExports = {
   'src/lib/money/forecast.ts': { 'planDates': 'function', 'buildForecast': 'function' },
   'src/lib/money/persisted.ts': { 'readPaymentMix': 'function', 'readBaseline': 'function', 'readSnapshot': 'function', 'readYieldHistory': 'function', 'preserveYieldHistory': 'function', 'baselineSchema': 'object', 'paymentMixSchema': 'object', 'storedYieldRuleSchema': 'object', 'yieldHistoryEntrySchema': 'object', 'accountSnapshotSchema': 'object' },
   'src/lib/money/responses.ts': { 'accountResponseSchema': 'object', 'planResponseSchema': 'object', 'dailySchema': 'object', 'monthlySchema': 'object', 'forecastResponseSchema': 'object', 'moneyResponseSchema': 'object' },
-  'src/lib/money/schema.ts': { 'accountSchema': 'object', 'reconcileSchema': 'object', 'planSchema': 'object', 'transferSchema': 'object', 'withdrawalSchema': 'object', 'paymentSchema': 'object', 'scenarioSchema': 'object' },
+  'src/lib/money/schema.ts': { 'accountSchema': 'object', 'reconcileSchema': 'object', 'planSchema': 'object', 'transferSchema': 'object', 'withdrawalSchema': 'object', 'cashWithdrawalFormSchema': 'object', 'paymentSchema': 'object', 'scenarioSchema': 'object' },
   'src/lib/money/service.ts': { 'routingOptions': 'function', 'mutateMoney': 'function', 'loadMoneyData': 'function' },
   'src/lib/money/sources.ts': { 'cents': 'function', 'amount': 'function', 'resolveRoute': 'function', 'buildSources': 'function', 'exposure': 'function', 'accountBalances': 'function' },
   'src/lib/money/transfers.ts': { 'executeTransfer': 'function' },

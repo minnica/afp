@@ -36,7 +36,15 @@ export const planSchema = z.object({
   if (v.useHistoricalPayments && (v.kind !== 'VARIABLE' || v.cardId)) ctx.addIssue({ code: 'custom', path: ['useHistoricalPayments'], message: 'La estimación histórica requiere un presupuesto variable sin tarjeta fija.' });
 });
 export { transferSchema } from '@/lib/money/transferContracts';
-export const withdrawalSchema = z.object({ accountId: text, amount: positive, date, concept: text });
+export const withdrawalSchema = z.object({
+  accountId: text, amount: positive, date, concept: text,
+  cashAccountId: text.optional(), cashAmount: positive.optional(),
+}).superRefine((v, ctx) => {
+  if (Boolean(v.cashAccountId) !== (v.cashAmount !== undefined)) ctx.addIssue({ code: 'custom', path: [v.cashAccountId ? 'cashAmount' : 'cashAccountId'], message: 'Indica la cuenta de efectivo y el importe recibido.' });
+  if (v.cashAccountId === v.accountId) ctx.addIssue({ code: 'custom', path: ['cashAccountId'], message: 'Selecciona otra cuenta para recibir el efectivo.' });
+  if (v.cashAmount !== undefined && Math.round(v.cashAmount * 100) > Math.round(v.amount * 100)) ctx.addIssue({ code: 'custom', path: ['cashAmount'], message: 'El efectivo recibido no puede superar el total descontado.' });
+});
+export const cashWithdrawalFormSchema = withdrawalSchema.safeExtend({ cashAccountId: text, cashAmount: positive });
 export const paymentSchema = z.object({ cycleId: text, accountId: text, amount: positive, date, additional: z.boolean({ error: 'Confirma que es un abono nuevo.' }).refine(value => value, 'Confirma que es un abono nuevo.').transform(() => true as const) });
 export const scenarioSchema = z.object({ stopPayrollDate: z.union([date, z.literal('')]).default(''), collectionDelay: z.coerce.number().int().min(0).max(180).default(0), variablePercent: z.coerce.number().min(0).max(300).default(100), extraAmount: money.refine(v => v >= 0).default(0), extraDate: z.union([date, z.literal('')]).default(''), extraAccountId: z.string().default('') }).superRefine((v, ctx) => {
   if (v.extraAmount > 0 && !v.extraDate) ctx.addIssue({ code: 'custom', path: ['extraDate'], message: 'Indica cuándo harías la compra.' });

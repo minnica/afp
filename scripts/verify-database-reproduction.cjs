@@ -93,6 +93,9 @@ function assertCatalog(actual) {
   assert.match(actual.constraints.find(row => row.name === 'daily_expenses_debit_account_check')?.definition || '', /DEBIT.*debitAccountId/s);
   for (const table of ['capture_income_policies', 'money_withdrawals', 'capture_money_policies', 'capture_money_postings']) assert.ok(actual.security.some(row => row.table_name === table && row.rls));
   assert.match(actual.constraints.find(row => row.name === 'money_withdrawals_amount_check')?.definition || '', /amount.*0/);
+  for (const name of ['cashAccountId', 'cashAmount']) assert.equal(actual.columns.find(row => row.table_name === 'money_withdrawals' && row.column_name === name)?.is_nullable, 'YES');
+  assert.match(actual.constraints.find(row => row.name === 'money_withdrawals_cash_destination_check')?.definition || '', /cashAmount.*amount/s);
+  assert.ok(actual.constraints.some(row => row.name === 'money_withdrawals_cashAccountId_fkey'));
   assert.match(actual.constraints.find(row => row.name === 'capture_money_postings_kind_check')?.definition || '', /TRANSFER.*WITHDRAWAL.*DEBIT_EXPENSE/s);
   const refundColumn = actual.columns.filter(row => row.table_name === 'daily_expenses' && row.column_name === 'refundOriginalAmount');
   assert.equal(refundColumn.length, 1);

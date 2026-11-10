@@ -1,0 +1,144 @@
+
+> afp@0.1.0 test /home/garatachia/projects/afp
+> node --import tsx tests/run-tests.ts money-withdrawal-cash.test.ts money-withdrawal-cash-integration.test.ts capture-money-integration.test.ts
+
+TAP version 13
+# Subtest: captura de cuentas: transferencias Nu, débito confirmado y retiros sin duplicar dinero
+    # Subtest: reglas son explícitas, aisladas y no se infieren de nombres
+    ok 1 - reglas son explícitas, aisladas y no se infieren de nombres
+      ---
+      duration_ms: 122.430919
+      type: 'test'
+      ...
+    # Subtest: nuevas transferencias e identidades concurrentes se aplican una sola vez
+    ok 2 - nuevas transferencias e identidades concurrentes se aplican una sola vez
+      ---
+      duration_ms: 196.19965
+      type: 'test'
+      ...
+    # Subtest: solo los tres cargos confirmados se convierten en gasto de débito
+    ok 3 - solo los tres cargos confirmados se convierten en gasto de débito
+      ---
+      duration_ms: 196.33984
+      type: 'test'
+      ...
+(node:485112) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+    # Subtest: retiro manual idempotente disminuye la cuenta sin inventar aviso o gasto
+    ok 4 - retiro manual idempotente disminuye la cuenta sin inventar aviso o gasto
+      ---
+      duration_ms: 102.769629
+      type: 'test'
+      ...
+    # Subtest: retiro futuro necesita muestra explícita comprobada; nunca se usa el cargo genérico
+    ok 5 - retiro futuro necesita muestra explícita comprobada; nunca se usa el cargo genérico
+      ---
+      duration_ms: 121.68308
+      type: 'test'
+      ...
+    # Subtest: una regla no registra avisos incompletos, contradictorios o anteriores a la referencia
+    ok 6 - una regla no registra avisos incompletos, contradictorios o anteriores a la referencia
+      ---
+      duration_ms: 36.554406
+      type: 'test'
+      ...
+    # Subtest: gastos de débito conservan edición, borrado, cuenta, aislamiento e historial
+    ok 7 - gastos de débito conservan edición, borrado, cuenta, aislamiento e historial
+      ---
+      duration_ms: 200.335604
+      type: 'test'
+      ...
+    # Subtest: un lote abortado revierte la regla, captura y retiro juntos
+    ok 8 - un lote abortado revierte la regla, captura y retiro juntos
+      ---
+      duration_ms: 67.54169
+      type: 'test'
+      ...
+    # Subtest: lecturas por tipo y referencias mantienen propietario y filtros antes de paginar
+    ok 9 - lecturas por tipo y referencias mantienen propietario y filtros antes de paginar
+      ---
+      duration_ms: 58.091714
+      type: 'test'
+      ...
+    1..9
+ok 1 - captura de cuentas: transferencias Nu, débito confirmado y retiros sin duplicar dinero
+  ---
+  duration_ms: 1537.506268
+  type: 'test'
+  ...
+# Subtest: retiro con destino de efectivo: PostgreSQL, propietario, comisión, reintentos y reversión
+    # Subtest: concurrencia y reintento conservan un retiro y una entrada; solo la comisión reduce el total
+    ok 1 - concurrencia y reintento conservan un retiro y una entrada; solo la comisión reduce el total
+      ---
+      duration_ms: 283.708061
+      type: 'test'
+      ...
+    # Subtest: destino ajeno, de otro tipo, igual al origen o incompleto no crea movimientos
+    ok 2 - destino ajeno, de otro tipo, igual al origen o incompleto no crea movimientos
+      ---
+      duration_ms: 80.90144
+      type: 'test'
+      ...
+    # Subtest: el saldo de referencia de la caja protege altas y reversiones históricas
+    ok 3 - el saldo de referencia de la caja protege altas y reversiones históricas
+      ---
+      duration_ms: 66.304822
+      type: 'test'
+      ...
+    # Subtest: la restricción SQL protege parejas nulas, importes y origen igual al destino
+    ok 4 - la restricción SQL protege parejas nulas, importes y origen igual al destino
+      ---
+      duration_ms: 30.766005
+      type: 'test'
+      ...
+    # Subtest: el contrato anterior persiste sin destino y conserva su salida única
+    ok 5 - el contrato anterior persiste sin destino y conserva su salida única
+      ---
+      duration_ms: 39.895281
+      type: 'test'
+      ...
+    1..5
+ok 2 - retiro con destino de efectivo: PostgreSQL, propietario, comisión, reintentos y reversión
+  ---
+  duration_ms: 1471.500845
+  type: 'test'
+  ...
+# Subtest: retiro: el contrato conserva solicitudes antiguas y exige cuenta e importe de efectivo juntos
+ok 3 - retiro: el contrato conserva solicitudes antiguas y exige cuenta e importe de efectivo juntos
+  ---
+  duration_ms: 2.014187
+  type: 'test'
+  ...
+# Subtest: retiro: banco descuenta el total, caja recibe el efectivo y el total solo pierde la comisión
+ok 4 - retiro: banco descuenta el total, caja recibe el efectivo y el total solo pierde la comisión
+  ---
+  duration_ms: 0.648389
+  type: 'test'
+  ...
+# Subtest: retiro: sin comisión conserva el total y revertir retira ambas partes
+ok 5 - retiro: sin comisión conserva el total y revertir retira ambas partes
+  ---
+  duration_ms: 0.32569
+  type: 'test'
+  ...
+# Subtest: retiros históricos sin destino conservan exclusivamente su salida original
+ok 6 - retiros históricos sin destino conservan exclusivamente su salida original
+  ---
+  duration_ms: 0.257249
+  type: 'test'
+  ...
+# Subtest: editor de retiro: separa banco y caja, selecciona solo una caja inequívoca y conserva importes vacíos
+ok 7 - editor de retiro: separa banco y caja, selecciona solo una caja inequívoca y conserva importes vacíos
+  ---
+  duration_ms: 1.532048
+  type: 'test'
+  ...
+1..7
+# tests 21
+# suites 0
+# pass 21
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3357.607288

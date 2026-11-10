@@ -1,0 +1,40 @@
+{
+  "checkedAt": "2026-11-10T06:34:52.668Z",
+  "fixture": "Next.js compilado, Auth ficticia y API con PostgreSQL local real",
+  "desktop": {
+    "width": 1440,
+    "height": 1000
+  },
+  "mobile": {
+    "width": 390,
+    "height": 844,
+    "dialogFitsViewport": true,
+    "horizontalOverflow": false,
+    "scrollableFields": true
+  },
+  "scenario": {
+    "before": {
+      "bank": 4950,
+      "cash": 5000,
+      "total": 9950
+    },
+    "bankDebit": 100.47,
+    "cashReceived": 100,
+    "commission": 0.47,
+    "after": {
+      "bank": 4849.53,
+      "cash": 5100,
+      "total": 9949.53
+    }
+  },
+  "validation": {
+    "cashAboveBankDebit": "rechazado en el formulario",
+    "cashAccount": "preselección solo con una cuenta CASH"
+  },
+  "screenshots": [
+    "withdrawal-desktop.png",
+    "withdrawal-mobile.png",
+    "balances-after-fictitious-withdrawal.png"
+  ],
+  "reviewedVisually": true
+}
