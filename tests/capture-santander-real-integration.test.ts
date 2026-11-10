@@ -131,6 +131,19 @@ const configuration = load('src/lib/captureConfiguration.ts');
       }
     });
 
+    await t.test('un símbolo de pesos: reintentos registran una compra con fecha bancaria', async () => {
+      const input = event(bankFixture, '287.65'), before = await count();
+      input.fields = Object.fromEntries(Object.entries(input.fields).map(([key, value]) => [key, value.replaceAll('$$', () => '$')]));
+      const first = await post(input), retry = await post(input);
+      assert.equal(first.status, 200); assert.deepEqual(retry.body, first.body);
+      const movement = present(present(await read(input)).movement);
+      assert.equal(movement.reason, 'AUTOMATIC'); assert.equal(movement.cardId, card.id);
+      const expense = await db.dailyExpense.findUniqueOrThrow({ where: { id: present(movement.expenseId) } });
+      assert.equal(expense.amount.toString(), '287.65');
+      assert.equal(expense.date.toISOString(), '2026-10-20T12:00:00.000Z');
+      assert.equal(await count(), before + 1);
+    });
+
     await t.test('ocho entregas simultáneas y respuesta perdida conservan un gasto y el mismo recibo', async () => {
       const input = event(bankFixture, '301.25'), before = await count();
       const responses = await Promise.all(Array.from({ length: 8 }, () => post(input)));

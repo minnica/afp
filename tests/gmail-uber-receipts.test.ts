@@ -31,6 +31,24 @@ test('recibo Gmail: el total actualizado ya contiene propina; no suma total y pa
   assert.equal(result.proposal.uberReceipt?.updated, true);
 });
 
+test('recibo Gmail: saludo de propina pegado a Total y espacios no separables', () => {
+  const updated = body.replace('Gracias por usar Uber, Persona ficticia\nEsperamos que hayas disfrutado tu viaje de esta noche.\nTotal',
+    'Gracias por el monto extra, Persona ficticiaTotal')
+    .replace('Total\nMXN 160.25', 'Total\nMXN\u00a0180.25')
+    .replace('Pagos\n', 'Monto\u00a0propina\nMXN\u00a020.00\nPagos\n')
+    + '\nVisa ••••0123 (Nombre editable)\nMXN\u00a020.00';
+  const parsed = interpretCapture(validateCaptureEvent(input(updated)));
+  assert.equal(parsed.reason, 'PURCHASE');
+  assert.equal(parsed.proposal.amount, '180.25');
+  assert.equal(parsed.proposal.uberReceipt?.tipAmount, '20.00');
+  assert.equal(parsed.proposal.uberReceipt?.updated, true);
+  assert.equal(parsed.proposal.dateSource, 'RECEIPT_OPERATION');
+  assert.equal(parsed.proposal.printedAlias?.value, '0123');
+  assert.equal(interpretCapture(validateCaptureEvent(input(updated + '\nTotal\nMXN 200.00'))).reason, 'CONFLICTING_FIELDS');
+  assert.equal(interpretCapture(validateCaptureEvent(input(body.replace('Total\n', 'Subtotal\n')))).reason, 'UBER_RECEIPT_INCOMPLETE');
+  assert.equal(interpretCapture(validateCaptureEvent(input(updated.replace('Gracias por el monto extra,', 'Otro encabezado,')))).reason, 'UBER_RECEIPT_INCOMPLETE');
+});
+
 test('recibo Gmail recortado: conserva fecha e importe, sin inventar tarjeta', () => {
   const result = interpretCapture(validateCaptureEvent(input(body.split('Pagos')[0])));
   assert.equal(result.reason, 'UBER_RECEIPT_CARD_REQUIRED');

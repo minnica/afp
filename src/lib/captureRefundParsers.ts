@@ -25,7 +25,7 @@ export function interpretRefundNotice(event: CaptureNotice, parseAmount: ParseAm
     merchant = m[1]!.trim(); amount = parseAmount(m[2]!.includes(".") ? m[2]! : `${m[2]!}.00`);
     time = notificationDate(event);
   } else {
-    const m = body.match(/^CANCELADA compra por \$ ([\d,.]+) con su tarjeta JOY BANAMEX (\d{3}) en (.{1,200}) el (\d{2}\/\d{2}\/\d{4}) (\d{2}):(\d{2}):(\d{2}) (AM|PM)$/);
+    const m = body.match(/^CANCELADA compra por \$ ([\d,.]+) con su tarjeta {1,2}(?:JOY BANAMEX )?(\d{3}) en (.{1,200}) el (\d{2}\/\d{2}\/\d{4}) (\d{2}):(\d{2}):(\d{2}) (AM|PM)$/);
     if (!m || title !== "Notificacion") return { ...base, reason: "INCOMPLETE_FORMAT" };
     amount = parseAmount(m[1]!); merchant = m[3]!.trim();
     const h = Number(m[5]!);

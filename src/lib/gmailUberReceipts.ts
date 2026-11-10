@@ -14,7 +14,9 @@ export function parseGmailUberReceipt(event: CaptureNotice, amount: ParseAmount,
   const fields = captureFields(event.fields ?? {});
   const base = { parserKey: uberReceiptParserKey, verified: true, proposal: {} };
   if (!isUberGmailNotice(fields)) return { ...base, reason: 'UBER_RECEIPT_INCOMPLETE' };
-  const body = clean(fields['android.bigText'] || fields['android.text'] || '');
+  // Gmail can concatenate the tip greeting and Total when flattening the email.
+  const body = clean(fields['android.bigText'] || fields['android.text'] || '')
+    .replace(/(Gracias por el monto extra,[^\n]{1,120})Total(?=\s*,?\s*MXN\s+[\d,.]+)/g, '$1\nTotal');
   const totals = [...body.matchAll(/\bTotal\s*,?\s*MXN\s+([\d,.]+)/g)].map(match => amount(match[1]));
   const dates = [...body.matchAll(/(\d{2})\/(\d{2})\/(20\d{2})\s*[,\.]?\s*(\d{1,2}):(\d{2})\s*([ap])\.?\s*m\.?/gi)]
     .map(match => {

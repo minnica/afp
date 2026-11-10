@@ -1,0 +1,25 @@
+{
+  "deploymentId": "dpl_3FTRETzhZJGRdG2wgZb9bHYuuDvW",
+  "listedFileCount": 412,
+  "listedMatchingFileCount": 412,
+  "mismatches": [],
+  "changedParserFiles": [
+    {
+      "file": "src/lib/captureParsers.ts",
+      "matched": true
+    },
+    {
+      "file": "src/lib/captureRefundParsers.ts",
+      "matched": true
+    },
+    {
+      "file": "src/lib/captureRefunds.ts",
+      "matched": true
+    },
+    {
+      "file": "src/lib/gmailUberReceipts.ts",
+      "matched": true
+    }
+  ],
+  "limitation": "All 412 files in the uploaded source manifest were exposed by the platform and matched by SHA-1."
+}

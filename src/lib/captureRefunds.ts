@@ -66,8 +66,13 @@ export async function refundCandidates(tx: CaptureDb, userId: string, movement: 
   const byExpense = new Map<string, { id: string; concept: string; cardId: string | null; amount: string; originalAmount: string; date: Date; updatedAt: Date }>();
   for (const purchase of purchases) {
     const expense = purchase.expense, original = captureProposal(purchase.proposal);
+    const purchaseMerchant = normalizeMerchant(original.merchant), refundMerchant = normalizeMerchant(p.merchant);
+    // Banamex can omit the terminal CIU suffix in its cancellation notice.
+    // This only proposes a candidate; applying the refund still needs confirmation.
+    const sameMerchant = purchaseMerchant === refundMerchant
+      || (movement.parserKey === 'banamex.purchase-cancellation.es.v1' && purchaseMerchant === `${refundMerchant} CIU`);
     if (!expense || expense.userId !== userId || expense.cardId !== p.cardId || protectedExpense(expense)
-      || normalizeMerchant(original.merchant) !== normalizeMerchant(p.merchant)
+      || !sameMerchant
       || !original.amount || !money(expense.refundOriginalAmount ?? expense.amount).eq(original.amount)
       || purchase.events.every(event => event.postedAt > refundAt)
       || money(expense.amount).lt(p.amount!)) continue;

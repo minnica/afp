@@ -1,0 +1,16 @@
+{
+  "deploymentId": "dpl_3FTRETzhZJGRdG2wgZb9bHYuuDvW",
+  "url": "afp-7vcyb3luk-minnicas-projects.vercel.app",
+  "domain": "finanzas.garatachia.com",
+  "projectId": "prj_FUBRDkPPFpOgJG9zuLLhTwm3JHKV",
+  "target": "production",
+  "state": "READY",
+  "workspaceBase": "98bfe4aa6b457963fd6e306a8a74abdef5a5139a",
+  "workspaceChangesIncluded": true,
+  "gitCommitCreated": false,
+  "sourceFileCount": 412,
+  "sourceFilesMatched": 412,
+  "sourceManifestSha256": "7b91da173d6836e65bdc7616e613d8b2f425c210aefc19b3a6f89e463a525bf6",
+  "apkChanged": false,
+  "migrationApplied": false
+}

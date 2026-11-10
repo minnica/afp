@@ -4,6 +4,14 @@ Historial resumido de decisiones, cambios, migraciones e incidencias que ayudan 
 
 Consolidado el **27 de octubre de 2026** a partir del README del commit `4562aa0cec0a46d8b482fdfef96116d1d3040282` y sus evidencias. «Publicado», «aplicado» y «pendiente» describen lo documentado en cada fecha; esta consolidación no incluye una comprobación remota nueva. Se conservan las fechas de los registros originales, que pueden usar hora local o UTC. El nombre de una migración identifica su versión, no demuestra cuándo se aplicó.
 
+## 2026-11-09
+
+### Diagnóstico de compras, propinas y cancelaciones Android
+
+Consulta de producción en transacciones de solo lectura y validación del teléfono por ADB. Se corrigieron localmente cuatro diferencias observadas: símbolo de pesos simple/doble en Santander, total pegado al saludo en el recibo de propina Gmail, cancelación Banamex sin nombre de tarjeta y omisión del sufijo terminal «CIU» al proponer el cargo cancelado. La propina investigada ya tenía un gasto bancario separado; el recibo completo no justifica registrar de nuevo ese total. El gasto cancelado conserva una edición con fracción de centavo que requiere normalización revisada antes de aplicar el reembolso.
+
+Sin cambios de APK, dependencias ni esquema. Las reglas existentes, las confirmaciones de devolución y la protección de gastos editados permanecen vigentes. Suite completa de 1134 pruebas correctas con PostgreSQL local, sin omisiones; tipos y build correctos, lint sin errores y con tres advertencias en componentes sin cambios. Tras la autorización expresa del propietario se respaldó el esquema público, se ensayó y revirtió la recuperación y se publicó `dpl_3FTRETzhZJGRdG2wgZb9bHYuuDvW` en producción. Los 412 archivos remotos coinciden con el manifiesto local, incluidos los cuatro módulos corregidos; no se creó un commit ni se hizo push. Se aplicó atómicamente un gasto nuevo, la reinterpretación del recibo sin otro gasto y una devolución al cargo existente, normalizando antes su importe revisado. La lectura independiente confirmó neto cero en el cargo cancelado, concepto y notas conservados, viaje y propina intactos, eventos originales inmutables y reglas sin cambios. Auditoría de producción sin vulnerabilidades; dos avisos de desarrollo conservados. Evidencia técnica anónima en [el informe](../artifacts/capture-incidents-2026-11-09/README.md); respaldo, muestras y recibos de ejecución permanecen privados.
+
 ## 2026-11-04
 
 ### Transferencias BBVA → Nu con ambos avisos

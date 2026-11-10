@@ -86,6 +86,22 @@ test('Gmail Uber PostgreSQL: fecha real, banco, propinas, pausas, revisiones e i
       assert.equal((await c.bank('160.25')).reason, 'POSSIBLE_DUPLICATE');
       assert.equal((await c.send(c.input())).reason, 'UBER_RECEIPT_OLDER'); assert.equal(await c.count(), 1);
     });
+    await t.test('propina con saludo pegado a Total: concurrencia y cargos desglosados conservan un gasto', async () => {
+      const c = await setup(), base = await c.send(c.input());
+      const event = c.input(true);
+      event.fields['android.bigText'] = event.fields['android.bigText']!.replace(
+        'Gracias por el monto extra, Persona ficticia\nEsperamos que hayas disfrutado tu viaje de esta noche.\nTotal',
+        'Gracias por el monto extra, Persona ficticiaTotal');
+      const results = await Promise.all(Array.from({ length: 4 }, () => c.send(event)));
+      for (const result of results) {
+        assert.equal(result.reason, 'UBER_RECEIPT_UPDATED');
+        assert.equal(result.expenseId, base.expenseId);
+        assert.equal(result.expense?.amount.toString(), '180.25');
+      }
+      assert.equal((await c.bank('160.25')).expenseId, base.expenseId);
+      assert.equal((await c.bank('20.00')).expenseId, base.expenseId);
+      assert.equal(await c.count(), 1);
+    });
     await t.test('fuente en observación y aviso recortado no generan gastos', async () => {
       const c = await setup('OBSERVATION'); assert.equal((await c.send(c.input())).status, 'OBSERVED'); assert.equal(await c.count(), 0);
       const d = await setup(), fields = { ...fixture.event.fields, 'android.bigText': fixture.event.fields['android.bigText'].split('Pagos')[0]! };

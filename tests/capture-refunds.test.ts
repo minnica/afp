@@ -35,3 +35,17 @@ test('devoluciones: enteros observados; importes, textos contradictorios y fuent
   }
   assert.equal(interpretCapture({ ...refund.event, fields: { ...refund.event.fields, 'android.subText': 'USD' } }).reason, 'FOREIGN_CURRENCY');
 });
+
+test('cancelación Banamex: tarjeta sin nombre y doble espacio conserva tres cifras sin inventar moneda', () => {
+  const fields = Object.fromEntries(Object.entries(cancellation.event.fields)
+    .map(([key, value]) => [key, value.replace('tarjeta JOY BANAMEX 123', 'tarjeta  123')]));
+  const event = { ...cancellation.event, fields };
+  assert.deepEqual(interpretCapture(event), interpretCapture(cancellation.event));
+  for (const suffix of ['12', '1234', '', 'JOY OTRA 123']) {
+    const invalid = Object.fromEntries(Object.entries(fields).map(([key, value]) => [key, value.replace('tarjeta  123', `tarjeta  ${suffix}`)]));
+    assert.notEqual(interpretCapture({ ...event, fields: invalid }).reason, 'REFUND_REVIEW');
+  }
+  assert.equal(interpretCapture({ ...event, fields: { ...fields,
+    'android.bigText': fields['android.bigText']!.replace('123.45', '999.00'),
+  } }).reason, 'CONFLICTING_FIELDS');
+});

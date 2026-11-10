@@ -1,0 +1,13 @@
+{
+  "verifiedAt": "2026-11-10T04:52:53.208Z",
+  "independentReadOnlyPostflight": true,
+  "missingPurchaseRegisteredExactlyOnce": true,
+  "cancellationRefundAppliedExactlyOnce": true,
+  "cancelledExpenseNetIsZero": true,
+  "originalRefundAmountPreserved": true,
+  "personalConceptAndNotesPreserved": true,
+  "tripAndTipUnchanged": true,
+  "receiptReinterpretedWithoutAnotherExpense": true,
+  "originalEventsUnchanged": true,
+  "automationRulesUnchanged": true
+}

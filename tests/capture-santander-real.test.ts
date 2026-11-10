@@ -6,7 +6,7 @@ import bank from './fixtures/captures/santander-card-purchase.es.v1.json';
 import wallet from './fixtures/captures/wallet-santander-purchase.es.v1.json';
 import { integrationLoader as sourceLoader } from './helpers/integration-fixtures';
 const { interpretCapture, captureParsers } = sparseCalculations(sourceLoader()('src/lib/captureParsers.ts'));
-const changeBank = (from: string, to: string) => ({ ...bank.event, fields: Object.fromEntries(Object.entries(bank.event.fields).map(([key, value]) => [key, value.replaceAll(from, to)])) });
+const changeBank = (from: string, to: string) => ({ ...bank.event, fields: Object.fromEntries(Object.entries(bank.event.fields).map(([key, value]) => [key, value.replaceAll(from, () => to)])) });
 
 test('Santander real: compra MXN con fecha bancaria México, comercio y terminación física/digital', () => {
   const parsed = interpretCapture(bank.event);
@@ -32,10 +32,24 @@ test('Santander real: centavos, miles y fecha bancaria distinta del día de rece
   assert.equal(interpretCapture(changeBank('14:49:02', '00:00:00')).proposal.operationAt, '2026-10-20T06:00:00.000Z');
 });
 
+test('Santander real: uno o dos símbolos de pesos conservan importe, alias y fecha bancaria', () => {
+  const original = interpretCapture(bank.event);
+  const single = interpretCapture(changeBank('$$', '$'));
+  assert.equal(single.reason, 'PURCHASE');
+  assert.deepEqual(single, original);
+  for (const marker of ['', '$$$', '$ $']) {
+    assert.notEqual(interpretCapture(changeBank('$$', marker)).reason, 'PURCHASE');
+  }
+  const event = changeBank('$$', '$');
+  assert.equal(interpretCapture({ ...event, fields: { ...event.fields,
+    'android.bigText': event.fields['android.bigText']!.replace('123.45', '999.00'),
+  } }).reason, 'CONFLICTING_FIELDS');
+});
+
 test('Santander real: incompletos, importes inválidos, calendarios imposibles y fechas futuras no registran', () => {
   for (const [from, to] of [['123.45', '0.00'], ['123.45', '1,23.45'], ['123.45', '10'], ['123.45', '-1.00'],
     ['20/10/2026', '31/02/2026'], ['14:49:02', '24:00:00'], ['20/10/2026', '21/10/2026'],
-    ['**0123', '**123'], ['**0123', '**12345'], ['$$', '$'], ['MXN', '$'], ['credito', 'debito'],
+    ['**0123', '**123'], ['**0123', '**12345'], ['$$', '$$$'], ['MXN', '$'], ['credito', 'debito'],
     ['Compra con tarjeta', 'Aviso de tarjeta'], ['COMERCIO FICTICIO', ''], ['hrs.', 'hrs. Otro importe 50.00']] as const) {
     assert.notEqual(interpretCapture(changeBank(from, to)).reason, 'PURCHASE', `${from} → ${to}`);
   }

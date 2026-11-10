@@ -154,7 +154,7 @@ function realSantanderPurchase(event: CaptureNotice): CaptureInterpretation | nu
   const fields = captureFields(event.fields ?? {}) || {};
   if (fields["android.title"] !== "Compra con tarjeta") return null;
   const body = fields["android.bigText"] || fields["android.text"] || "";
-  const match = body.match(/^En (.{1,200}) por \$\$([\d,.]+) (MXN|USD|EUR) con tarjeta de credito \*\*(\d{4}), el (\d{2}\/\d{2}\/\d{4}) a las (\d{2}:\d{2}:\d{2}) hrs\.$/);
+  const match = body.match(/^En (.{1,200}) por \${1,2}([\d,.]+) (MXN|USD|EUR) con tarjeta de credito \*\*(\d{4}), el (\d{2}\/\d{2}\/\d{4}) a las (\d{2}:\d{2}:\d{2}) hrs\.$/);
   if (!match) return null;
   const parserKey = "santander.card-purchase.es.v1";
   if (conflictingBodies(fields)) return { parserKey, verified: true, reason: "CONFLICTING_FIELDS", proposal: {} };

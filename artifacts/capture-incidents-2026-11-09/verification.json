@@ -1,0 +1,29 @@
+{
+  "status": "PUBLISHED_AND_RECOVERED",
+  "nodeTests": {
+    "passed": 1134,
+    "failed": 0,
+    "skipped": 0
+  },
+  "typecheck": true,
+  "typecheckTests": true,
+  "testTypes": true,
+  "lint": {
+    "errors": 0,
+    "warnings": 3,
+    "changedFilesAffected": false
+  },
+  "build": true,
+  "productionDataAccess": "AUTHORIZED_ATOMIC_RECOVERY_AND_READ_ONLY_VERIFICATION",
+  "productionRecovery": "APPLIED_VERIFIED",
+  "androidVersion": "0.9.0 / 13",
+  "androidChanges": false,
+  "migrationChanges": false,
+  "dependencyChanges": false,
+  "deploymentId": "dpl_3FTRETzhZJGRdG2wgZb9bHYuuDvW",
+  "domain": "finanzas.garatachia.com",
+  "sourceFilesMatched": 412,
+  "backupVerified": true,
+  "rehearsalRolledBack": true,
+  "calendarSync": "SYNCED"
+}

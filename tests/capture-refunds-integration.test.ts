@@ -9,6 +9,7 @@ import assert from 'node:assert/strict';
 import { randomBytes,randomUUID } from 'node:crypto';
 import { test } from 'node:test';
 import fixture from './fixtures/captures/mercadopago-refund.es.v1.json';
+import { serializedCapture } from '../src/lib/captureJson';
 import { integrationLoader as sourceLoader } from './helpers/integration-fixtures';
 const connectionString = process.env.AFP_TEST_DATABASE_URL;
 
@@ -182,12 +183,27 @@ test('devoluciones PostgreSQL: confirmación, neto exacto, historial e idempoten
       const bank = await db.card.create({ data: { userId: present(user).id, name: 'JOY ficticia', usualCutDay: 25, usualDueDay: 15 } });
       await db.captureCardAlias.create({ data: { userId: present(user).id, cardId: bank.id, sourcePackage: 'com.citibanamex.banamexmobile', kind: 'DIGITAL', value: '0123', verifiedAt: new Date() } });
       await db.captureAutomation.create({ data: { userId: present(user).id, cardId: bank.id, parserKey: 'wallet.banamex-purchase.es.v1', mode: 'AUTOMATIC', datePolicy: 'NOTIFICATION_POSTED_AT' } });
-      const original = await send({ ...event({ 'android.title': 'COMERCIO FICTICIO BANAMEX', 'android.text': 'MXN123.45 con Joy Banamex ••0123' }, '2026-10-24T17:00:00Z'), sourcePackage: 'com.google.android.apps.walletnfcrel' });
+      const original = await send({ ...event({ 'android.title': 'COMERCIO FICTICIO BANAMEX CIU', 'android.text': 'MXN123.45 con Joy Banamex ••0123' }, '2026-10-24T17:00:00Z'), sourcePackage: 'com.google.android.apps.walletnfcrel' });
       assert.equal(present(original).status, 'REGISTERED');
       await db.captureBankFallback.create({ data: { userId: present(user).id, cardId: bank.id, bankSourcePackage: 'com.citibanamex.banamexmobile', mode: 'AUTOMATIC', currency: 'MXN',
         bankDatePolicy: 'BANK_OPERATION', purchasesOnly: true, waitMinutes: 15, acceptedAt: new Date('2026-10-01T00:00:00Z'), evidenceMovementId: present(original).id } });
       const fixture = jsonFixture0;
       const input = { ...event(Object.fromEntries(Object.entries(fixture.event.fields).map(([k, v]) => [k, v.replaceAll('COMERCIO FICTICIO', 'COMERCIO FICTICIO BANAMEX')]))), sourcePackage: fixture.event.sourcePackage };
+      const unnamed = await send({ ...input, eventId: randomUUID(), fields: Object.fromEntries(
+        Object.entries(input.fields).map(([key, value]) => [key, value.replace('tarjeta JOY BANAMEX 123', 'tarjeta  123')])) });
+      assert.equal(present(unnamed).reason, 'REFUND_REVIEW'); assert.equal(present(unnamed).cardId, bank.id);
+      assert.equal((await detail(unnamed)).candidates.length, 1);
+      assert.equal(String(present((await expense(original))).amount), '123.45');
+      assert.equal(await db.expenseRefund.count({ where: { movementId: present(unnamed).id } }), 0);
+      const purchase = present(original), proposal = serializedCapture(purchase.proposal);
+      for (const merchant of ['COMERCIO FICTICIO BANAMEX CIUDAD', 'COMERCIO FICTICIO BANAMEX OTRO CIU']) {
+        await db.captureMovement.update({ where: { id: purchase.id }, data: { proposal: { ...proposal, merchant } } });
+        assert.equal((await detail(unnamed)).candidates.length, 0);
+      }
+      await db.captureMovement.update({ where: { id: purchase.id }, data: { proposal } });
+      await db.dailyExpense.update({ where: { id: present(purchase.expenseId) }, data: { amount: '123.45000000000001' } });
+      assert.equal((await detail(unnamed)).candidates.length, 0);
+      await db.dailyExpense.update({ where: { id: present(purchase.expenseId) }, data: { amount: '123.45' } });
       const refund = await send(input);
       assert.equal(present(refund).cardId, bank.id); assert.equal(objectValue(present(present(refund).proposal)).currency, 'MXN');
       assert.equal((await detail(refund)).candidates.length, 1); await apply(refund);

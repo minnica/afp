@@ -1,0 +1,422 @@
+
+> afp@0.1.0 test /home/garatachia/projects/afp
+> node --import tsx tests/run-tests.ts capture-santander-real.test.ts capture-santander-real-integration.test.ts capture-santander-wallet-backup-integration.test.ts capture-refunds.test.ts capture-refunds-integration.test.ts gmail-uber-receipts.test.ts gmail-uber-integration.test.ts
+
+TAP version 13
+# Subtest: devoluciones PostgreSQL: confirmación, neto exacto, historial e idempotencia con aislamiento
+    # Subtest: avisos recibidos se revisan sin gasto nuevo, abono, ingreso ni actualización automática
+    ok 1 - avisos recibidos se revisan sin gasto nuevo, abono, ingreso ni actualización automática
+      ---
+      duration_ms: 139.024366
+      type: 'test'
+      ...
+    # Subtest: devolución total concurrente descuenta una vez, preserva ediciones y cargo original, limpia conciliación
+    ok 2 - devolución total concurrente descuenta una vez, preserva ediciones y cargo original, limpia conciliación
+      ---
+      duration_ms: 112.344017
+      type: 'test'
+      ...
+(node:353616) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+    # Subtest: totales y edición del gasto usan neto cero; no permite cambiar la base financiera a escondidas
+    ok 3 - totales y edición del gasto usan neto cero; no permite cambiar la base financiera a escondidas
+      ---
+      duration_ms: 34.907346
+      type: 'test'
+      ...
+    # Subtest: deshacer restaura el neto sin borrar historial; reintentos no vuelven a aplicarlo
+    ok 4 - deshacer restaura el neto sin borrar historial; reintentos no vuelven a aplicarlo
+      ---
+      duration_ms: 18.550901
+      type: 'test'
+      ...
+    # Subtest: parciales acumuladas, aviso repetido, elección explícita de otra devolución y límite del cargo
+    ok 5 - parciales acumuladas, aviso repetido, elección explícita de otra devolución y límite del cargo
+      ---
+      duration_ms: 188.08255
+      type: 'test'
+      ...
+    # Subtest: notificación adelantada y compras ambiguas siempre esperan selección y confirmación
+    ok 6 - notificación adelantada y compras ambiguas siempre esperan selección y confirmación
+      ---
+      duration_ms: 544.004411
+      type: 'test'
+      ...
+    # Subtest: solo propone compras anteriores al aviso dentro de treinta días completos
+    ok 7 - solo propone compras anteriores al aviso dentro de treinta días completos
+      ---
+      duration_ms: 82.043663
+      type: 'test'
+      ...
+    # Subtest: cambios de gasto o regla posteriores, gastos ajenos y alias no verificado bloquean la aplicación
+    ok 8 - cambios de gasto o regla posteriores, gastos ajenos y alias no verificado bloquean la aplicación
+      ---
+      duration_ms: 97.06717
+      type: 'test'
+      ...
+    # Subtest: un aviso antiguo se reanaliza expresamente sin reescribir evento ni aplicar el reembolso
+    ok 9 - un aviso antiguo se reanaliza expresamente sin reescribir evento ni aplicar el reembolso
+      ---
+      duration_ms: 182.858098
+      type: 'test'
+      ...
+    # Subtest: cancelación Banamex usa alias propio y regla MXN; una colisión de tres cifras requiere revisión
+    ok 10 - cancelación Banamex usa alias propio y regla MXN; una colisión de tres cifras requiere revisión
+      ---
+      duration_ms: 106.504206
+      type: 'test'
+      ...
+    # Subtest: eliminar un gasto reembolsado conserva evidencia y no permite deshacer recreándolo
+    ok 11 - eliminar un gasto reembolsado conserva evidencia y no permite deshacer recreándolo
+      ---
+      duration_ms: 62.339983
+      type: 'test'
+      ...
+    1..11
+ok 1 - devoluciones PostgreSQL: confirmación, neto exacto, historial e idempotencia con aislamiento
+  ---
+  duration_ms: 1972.533156
+  type: 'test'
+  ...
+# Subtest: devoluciones reales: conserva datos impresos sin inventar tarjeta, MXN ni referencia
+ok 2 - devoluciones reales: conserva datos impresos sin inventar tarjeta, MXN ni referencia
+  ---
+  duration_ms: 1.775987
+  type: 'test'
+  ...
+# Subtest: devoluciones: enteros observados; importes, textos contradictorios y fuentes ajenas requieren revisión
+ok 3 - devoluciones: enteros observados; importes, textos contradictorios y fuentes ajenas requieren revisión
+  ---
+  duration_ms: 1.339928
+  type: 'test'
+  ...
+# Subtest: cancelación Banamex: tarjeta sin nombre y doble espacio conserva tres cifras sin inventar moneda
+ok 4 - cancelación Banamex: tarjeta sin nombre y doble espacio conserva tres cifras sin inventar moneda
+  ---
+  duration_ms: 0.714279
+  type: 'test'
+  ...
+# Subtest: Santander real anonimizado: API, revisión, activación y un gasto por compra con evidencia Wallet
+    # Subtest: recepción anterior y reintentos conservan originales; reinterpretación explícita no crea dinero
+    ok 1 - recepción anterior y reintentos conservan originales; reinterpretación explícita no crea dinero
+      ---
+      duration_ms: 337.161529
+      type: 'test'
+      ...
+    # Subtest: revisar banco, registrar una vez, vincular Wallet y cotejar habilita solo Santander y ese formato
+    ok 2 - revisar banco, registrar una vez, vincular Wallet y cotejar habilita solo Santander y ese formato
+      ---
+      duration_ms: 128.700761
+      type: 'test'
+      ...
+    # Subtest: banco y Wallet en ambos órdenes: un gasto por conciliar; la otra evidencia requiere vínculo explícito
+    ok 3 - banco y Wallet en ambos órdenes: un gasto por conciliar; la otra evidencia requiere vínculo explícito
+      ---
+      duration_ms: 128.760892
+      type: 'test'
+      ...
+    # Subtest: un símbolo de pesos: reintentos registran una compra con fecha bancaria
+    ok 4 - un símbolo de pesos: reintentos registran una compra con fecha bancaria
+      ---
+      duration_ms: 49.963053
+      type: 'test'
+      ...
+    # Subtest: ocho entregas simultáneas y respuesta perdida conservan un gasto y el mismo recibo
+    ok 5 - ocho entregas simultáneas y respuesta perdida conservan un gasto y el mismo recibo
+      ---
+      duration_ms: 139.641985
+      type: 'test'
+      ...
+    # Subtest: dos compras iguales conservan multiplicidad y la segunda exige confirmar otra compra
+    ok 6 - dos compras iguales conservan multiplicidad y la segunda exige confirmar otra compra
+      ---
+      duration_ms: 64.257531
+      type: 'test'
+      ...
+    # Subtest: un gasto manual coincidente se revisa y vincularlo conserva sus datos personales
+    ok 7 - un gasto manual coincidente se revisa y vincularlo conserva sus datos personales
+      ---
+      duration_ms: 33.408899
+      type: 'test'
+      ...
+    # Subtest: actualizar la misma notificación no crea otra compra
+    ok 8 - actualizar la misma notificación no crea otra compra
+      ---
+      duration_ms: 57.213592
+      type: 'test'
+      ...
+    # Subtest: alias ambiguos o no verificados y tarjeta desconocida bloquean altas sin modificar alias NFC
+    ok 9 - alias ambiguos o no verificados y tarjeta desconocida bloquean altas sin modificar alias NFC
+      ---
+      duration_ms: 102.539892
+      type: 'test'
+      ...
+    # Subtest: otra tarjeta no hereda automatización y las credenciales conservan el aislamiento
+    ok 10 - otra tarjeta no hereda automatización y las credenciales conservan el aislamiento
+      ---
+      duration_ms: 38.107601
+      type: 'test'
+      ...
+    # Subtest: forzar el modo histórico Wallet v1 no habilita v2; una corrección personal conserva revisión
+    ok 11 - forzar el modo histórico Wallet v1 no habilita v2; una corrección personal conserva revisión
+      ---
+      duration_ms: 53.787557
+      type: 'test'
+      ...
+    # Subtest: volver a observación detiene futuras altas y conserva gasto piloto, resolución y análisis originales
+    ok 12 - volver a observación detiene futuras altas y conserva gasto piloto, resolución y análisis originales
+      ---
+      duration_ms: 38.67411
+      type: 'test'
+      ...
+    1..12
+ok 5 - Santander real anonimizado: API, revisión, activación y un gasto por compra con evidencia Wallet
+  ---
+  duration_ms: 1425.22347
+  type: 'test'
+  ...
+# Subtest: Santander real: compra MXN con fecha bancaria México, comercio y terminación física/digital
+ok 6 - Santander real: compra MXN con fecha bancaria México, comercio y terminación física/digital
+  ---
+  duration_ms: 0.784588
+  type: 'test'
+  ...
+# Subtest: Santander real: centavos, miles y fecha bancaria distinta del día de recepción
+ok 7 - Santander real: centavos, miles y fecha bancaria distinta del día de recepción
+  ---
+  duration_ms: 1.006128
+  type: 'test'
+  ...
+# Subtest: Santander real: uno o dos símbolos de pesos conservan importe, alias y fecha bancaria
+ok 8 - Santander real: uno o dos símbolos de pesos conservan importe, alias y fecha bancaria
+  ---
+  duration_ms: 0.778309
+  type: 'test'
+  ...
+# Subtest: Santander real: incompletos, importes inválidos, calendarios imposibles y fechas futuras no registran
+ok 9 - Santander real: incompletos, importes inválidos, calendarios imposibles y fechas futuras no registran
+  ---
+  duration_ms: 2.054967
+  type: 'test'
+  ...
+# Subtest: Santander real: títulos y cuerpos contradictorios no eligen datos; otra moneda queda por revisar
+ok 10 - Santander real: títulos y cuerpos contradictorios no eligen datos; otra moneda queda por revisar
+  ---
+  duration_ms: 1.781387
+  type: 'test'
+  ...
+# Subtest: Wallet Santander v2: propone fecha del aviso México con alias bancario, sin fecha bancaria inventada
+ok 11 - Wallet Santander v2: propone fecha del aviso México con alias bancario, sin fecha bancaria inventada
+  ---
+  duration_ms: 0.31932
+  type: 'test'
+  ...
+# Subtest: Wallet Santander v2: la publicación define el día México incluso con entrega tardía o cambio UTC de día
+ok 12 - Wallet Santander v2: la publicación define el día México incluso con entrega tardía o cambio UTC de día
+  ---
+  duration_ms: 0.295039
+  type: 'test'
+  ...
+# Subtest: Wallet Santander real: otra tarjeta, moneda, estructura, fecha o contenido contradictorio conserva revisión
+ok 13 - Wallet Santander real: otra tarjeta, moneda, estructura, fecha o contenido contradictorio conserva revisión
+  ---
+  duration_ms: 1.696297
+  type: 'test'
+  ...
+# Subtest: Santander Wallet de respaldo: legado vinculado, fecha aceptada y un gasto con API/PostgreSQL
+    # Subtest: validar legado exige vínculo y cotejo previo; no crea dinero ni hereda la fecha aceptada del banco
+    ok 1 - validar legado exige vínculo y cotejo previo; no crea dinero ni hereda la fecha aceptada del banco
+      ---
+      duration_ms: 112.216906
+      type: 'test'
+      ...
+    # Subtest: validación expresa idempotente conserva gasto, estado terminal, recibo e interpretación originales
+    ok 2 - validación expresa idempotente conserva gasto, estado terminal, recibo e interpretación originales
+      ---
+      duration_ms: 66.070328
+      type: 'test'
+      ...
+    # Subtest: solo Wallet: ocho entregas y respuesta perdida crean un gasto pendiente con la fecha del aviso
+    ok 3 - solo Wallet: ocho entregas y respuesta perdida crean un gasto pendiente con la fecha del aviso
+      ---
+      duration_ms: 171.984605
+      type: 'test'
+      ...
+    # Subtest: ambas fuentes en ambos órdenes conservan un gasto y la segunda evidencia queda por revisar
+    ok 4 - ambas fuentes en ambos órdenes conservan un gasto y la segunda evidencia queda por revisar
+      ---
+      duration_ms: 115.712151
+      type: 'test'
+      ...
+    # Subtest: llegadas concurrentes de ambas fuentes conservan un gasto sin asociación por hora o importe
+    ok 5 - llegadas concurrentes de ambas fuentes conservan un gasto sin asociación por hora o importe
+      ---
+      duration_ms: 42.528464
+      type: 'test'
+      ...
+    # Subtest: banco tardío de otro día no duplica ni cambia silenciosamente la fecha guardada por Wallet
+    ok 6 - banco tardío de otro día no duplica ni cambia silenciosamente la fecha guardada por Wallet
+      ---
+      duration_ms: 55.863034
+      type: 'test'
+      ...
+    # Subtest: compras iguales, avisos revisados, gasto manual y borrado conservan revisión y datos personales
+    ok 7 - compras iguales, avisos revisados, gasto manual y borrado conservan revisión y datos personales
+      ---
+      duration_ms: 138.756386
+      type: 'test'
+      ...
+    # Subtest: validación rechaza otra fecha, corrección personal, gasto sin banco y fuentes distintas sin alterar el gasto
+    ok 8 - validación rechaza otra fecha, corrección personal, gasto sin banco y fuentes distintas sin alterar el gasto
+      ---
+      duration_ms: 65.588279
+      type: 'test'
+      ...
+    # Subtest: alias ambiguo, token NFC, moneda extranjera y producto desconocido no registran compras
+    ok 9 - alias ambiguo, token NFC, moneda extranjera y producto desconocido no registran compras
+      ---
+      duration_ms: 75.559033
+      type: 'test'
+      ...
+    # Subtest: volver Wallet a observación no frena al banco; una corrección personal sigue bloqueando duplicados
+    ok 10 - volver Wallet a observación no frena al banco; una corrección personal sigue bloqueando duplicados
+      ---
+      duration_ms: 92.185328
+      type: 'test'
+      ...
+    1..10
+ok 14 - Santander Wallet de respaldo: legado vinculado, fecha aceptada y un gasto con API/PostgreSQL
+  ---
+  duration_ms: 1308.211631
+  type: 'test'
+  ...
+# Subtest: Gmail Uber PostgreSQL: fecha real, banco, propinas, pausas, revisiones e idempotencia
+    # Subtest: banco primero: un gasto con fecha del viaje y originales preservados
+    ok 1 - banco primero: un gasto con fecha del viaje y originales preservados
+      ---
+      duration_ms: 126.357065
+      type: 'test'
+      ...
+    # Subtest: recibo primero: banco tardío vinculado sin segundo gasto
+    ok 2 - recibo primero: banco tardío vinculado sin segundo gasto
+      ---
+      duration_ms: 55.423325
+      type: 'test'
+      ...
+    # Subtest: HSBC sin aviso bancario: recibo completo usa alias verificado del propietario
+    ok 3 - HSBC sin aviso bancario: recibo completo usa alias verificado del propietario
+      ---
+      duration_ms: 35.580835
+      type: 'test'
+      ...
+    # Subtest: propina: reemplaza el total una vez y conserva ambos recibos
+    ok 4 - propina: reemplaza el total una vez y conserva ambos recibos
+      ---
+      duration_ms: 181.617539
+      type: 'test'
+      ...
+    # Subtest: recibo actualizado primero: cargos desglosados y recibo anterior no duplican ni reducen el total
+    ok 5 - recibo actualizado primero: cargos desglosados y recibo anterior no duplican ni reducen el total
+      ---
+      duration_ms: 106.102307
+      type: 'test'
+      ...
+    # Subtest: propina con saludo pegado a Total: concurrencia y cargos desglosados conservan un gasto
+    ok 6 - propina con saludo pegado a Total: concurrencia y cargos desglosados conservan un gasto
+      ---
+      duration_ms: 104.296738
+      type: 'test'
+      ...
+    # Subtest: fuente en observación y aviso recortado no generan gastos
+    ok 7 - fuente en observación y aviso recortado no generan gastos
+      ---
+      duration_ms: 52.602229
+      type: 'test'
+      ...
+    # Subtest: gasto editado conserva la decisión personal y bloquea crear otro por la propina
+    ok 8 - gasto editado conserva la decisión personal y bloquea crear otro por la propina
+      ---
+      duration_ms: 60.412347
+      type: 'test'
+      ...
+    # Subtest: gasto borrado no resucita por una propina posterior
+    ok 9 - gasto borrado no resucita por una propina posterior
+      ---
+      duration_ms: 49.178674
+      type: 'test'
+      ...
+    # Subtest: activación exige fecha del recibo y Gmail no puede usarse como banco en alias
+    ok 10 - activación exige fecha del recibo y Gmail no puede usarse como banco en alias
+      ---
+      duration_ms: 15.580736
+      type: 'test'
+      ...
+    # Subtest: alias en colisión requiere revisión, sin elegir por nombre
+    ok 11 - alias en colisión requiere revisión, sin elegir por nombre
+      ---
+      duration_ms: 26.939338
+      type: 'test'
+      ...
+    # Subtest: varios cargos Uber iguales no eligen el primero ni cambian fechas
+    ok 12 - varios cargos Uber iguales no eligen el primero ni cambian fechas
+      ---
+      duration_ms: 54.597146
+      type: 'test'
+      ...
+    # Subtest: mismo importe en viajes de días distintos conserva dos gastos
+    ok 13 - mismo importe en viajes de días distintos conserva dos gastos
+      ---
+      duration_ms: 52.563489
+      type: 'test'
+      ...
+    1..13
+ok 15 - Gmail Uber PostgreSQL: fecha real, banco, propinas, pausas, revisiones e idempotencia
+  ---
+  duration_ms: 1089.404019
+  type: 'test'
+  ...
+# Subtest: recibo Gmail: fecha del viaje, total MXN y terminación bancaria; no fecha de publicación ni nombre editable
+ok 16 - recibo Gmail: fecha del viaje, total MXN y terminación bancaria; no fecha de publicación ni nombre editable
+  ---
+  duration_ms: 1.137978
+  type: 'test'
+  ...
+# Subtest: recibo Gmail: el total actualizado ya contiene propina; no suma total y pagos de nuevo
+ok 17 - recibo Gmail: el total actualizado ya contiene propina; no suma total y pagos de nuevo
+  ---
+  duration_ms: 0.343509
+  type: 'test'
+  ...
+# Subtest: recibo Gmail: saludo de propina pegado a Total y espacios no separables
+ok 18 - recibo Gmail: saludo de propina pegado a Total y espacios no separables
+  ---
+  duration_ms: 0.567879
+  type: 'test'
+  ...
+# Subtest: recibo Gmail recortado: conserva fecha e importe, sin inventar tarjeta
+ok 19 - recibo Gmail recortado: conserva fecha e importe, sin inventar tarjeta
+  ---
+  duration_ms: 0.29903
+  type: 'test'
+  ...
+# Subtest: Gmail: rechaza otros remitentes, promociones, fuente falsa y datos de la cuenta antes de persistir
+ok 20 - Gmail: rechaza otros remitentes, promociones, fuente falsa y datos de la cuenta antes de persistir
+  ---
+  duration_ms: 0.350569
+  type: 'test'
+  ...
+# Subtest: recibo Gmail: varios viajes, tarjetas, total inválido, fecha imposible y futura conservan revisión
+ok 21 - recibo Gmail: varios viajes, tarjetas, total inválido, fecha imposible y futura conservan revisión
+  ---
+  duration_ms: 0.48111
+  type: 'test'
+  ...
+1..21
+# tests 67
+# suites 0
+# pass 67
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 6317.390769
