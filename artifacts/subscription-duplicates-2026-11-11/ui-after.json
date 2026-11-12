@@ -1,0 +1,55 @@
+{
+  "stage": "after-phone-link",
+  "expenses": [
+    {
+      "id": "48817a48-ce75-4ccc-9427-40d5fd70b061",
+      "amount": "249",
+      "concept": "SERVICIO *PLAN MENSUAL",
+      "notes": "Nota ficticia que se conserva",
+      "subscriptionId": "fca8886f-4200-496e-a62c-0f1b0603b721"
+    },
+    {
+      "id": "0397d975-6b52-4b1a-a521-e9a31d6f0750",
+      "amount": "50",
+      "concept": "Compra ficticia CASH",
+      "notes": null,
+      "subscriptionId": null
+    },
+    {
+      "id": "8ba60c79-fb87-4c59-a447-2fd8e7df5ea5",
+      "amount": "50",
+      "concept": "Compra ficticia CARD",
+      "notes": null,
+      "subscriptionId": null
+    },
+    {
+      "id": "ba38bb79-1e85-4294-b6cd-4d5bc1876733",
+      "amount": "50",
+      "concept": "Compra ficticia DEBIT",
+      "notes": null,
+      "subscriptionId": null
+    }
+  ],
+  "rules": [
+    {
+      "id": "dce2dddf-e8d6-4713-a165-8b3babde7ec5",
+      "userId": "00000000-0000-4000-8000-000000000094",
+      "cardId": "c965a0ac-70d9-40c6-bedc-76431f0dea95",
+      "merchant": "SERVICIO *PLAN MENSUAL",
+      "categoryId": "41c3f4c2-5728-48ee-9e0a-47badc3e5568",
+      "subscriptionId": "fca8886f-4200-496e-a62c-0f1b0603b721"
+    }
+  ],
+  "charges": [
+    {
+      "id": "8d2b36d7-0013-4bae-be66-5a5dc9c8b694",
+      "userId": "00000000-0000-4000-8000-000000000094",
+      "subscriptionId": "fca8886f-4200-496e-a62c-0f1b0603b721",
+      "month": "2026-11",
+      "status": "CONFIRMED",
+      "expenseId": "48817a48-ce75-4ccc-9427-40d5fd70b061",
+      "createdAt": "2026-11-12T00:45:45.027Z",
+      "updatedAt": "2026-11-12T00:45:45.027Z"
+    }
+  ]
+}

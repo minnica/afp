@@ -1,0 +1,29 @@
+{
+  "checkedAt": "2026-11-12T00:52:45.940Z",
+  "results": [
+    {
+      "path": "/login",
+      "status": 200,
+      "cacheControl": "public, max-age=0, must-revalidate",
+      "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+    },
+    {
+      "path": "/api/subscription-charges?month=2026-11",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "Authorization"
+    },
+    {
+      "path": "/api/captures/configuration",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "Authorization"
+    },
+    {
+      "path": "/api/expenses",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "Authorization"
+    }
+  ]
+}

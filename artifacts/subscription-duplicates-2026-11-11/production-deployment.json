@@ -1,0 +1,16 @@
+{
+  "deploymentId": "dpl_8mCQRMRHLF7FfLzPcazgXK2QuViU",
+  "url": "afp-930yok50c-minnicas-projects.vercel.app",
+  "target": "production",
+  "status": "READY",
+  "alias": [
+    "afp-virid.vercel.app",
+    "finanzas.garatachia.com",
+    "afp-minnicas-projects.vercel.app"
+  ],
+  "buildingAt": 1794444648818,
+  "readyAt": 1794444731120,
+  "baseCommit": "de711f7de0abb7edeaa23e134ae86b03469e9269",
+  "dirtyWorkspace": true,
+  "commitOrPushCreated": false
+}

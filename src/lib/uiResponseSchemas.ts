@@ -593,6 +593,14 @@ const subscriptionChargesSchema4 = z.object({
   "charges": z.array(subscriptionChargesChargesItemSchema)
 }).passthrough();
 
+export const subscriptionChargePreviewSchema = z.object({
+  candidateKey: z.string(),
+  candidates: z.array(z.object({
+    expenseId: z.string(), concept: z.string(), date: z.string(), amount: z.number(), cardName: z.string(),
+    merchant: z.string().nullable(), canLink: z.boolean(), canRemember: z.boolean(), updatedAt: z.string(),
+  })),
+});
+
 const installmentPurchasesPurchasesItemCardSchema = z.object({
   "name": z.string(),
   "id": z.string(),
@@ -1696,7 +1704,7 @@ export const uiResponseSchemas = {
 "gastos/bootstrap": gastosBootstrapSchema,
 "incomes": incomesSchema,
 "subscriptions": subscriptionsSchema,
-"subscription-charges": z.union([subscriptionChargesSchema, subscriptionChargesSchema2, subscriptionChargesSchema3, subscriptionChargesSchema4]),
+"subscription-charges": z.union([subscriptionChargesSchema, subscriptionChargesSchema2, subscriptionChargesSchema3, subscriptionChargesSchema4, subscriptionChargePreviewSchema]),
 "installment-purchases": installmentPurchasesSchema,
 "installment-purchases/payments": z.object({ purchase: z.object({ id: z.string(), concept: z.string() }), receivable: receivablesReceivablesItemSchema.nullable() }),
 "receivables": receivablesSchema,
@@ -1713,6 +1721,6 @@ export const uiResponseSchemas = {
 export type UiResource = keyof typeof uiResponseSchemas;
 export type UiResponse<K extends UiResource> = z.output<(typeof uiResponseSchemas)[K]>;
 
-export const subscriptionChargeResultSchema = z.object({ charges: z.array(subscriptionChargesChargesItemSchema).default([]), alreadyConfirmed: z.boolean().optional(), error: z.string().optional() }).passthrough();
+export const subscriptionChargeResultSchema = z.object({ charges: z.array(subscriptionChargesChargesItemSchema).default([]), alreadyConfirmed: z.boolean().optional(), linkedExisting: z.boolean().optional(), error: z.string().optional() }).passthrough();
 
 export const captureDeviceResultSchema = capturesDevicesSchema3;

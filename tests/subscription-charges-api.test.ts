@@ -14,6 +14,7 @@ function api() {
     prisma: { $transaction: async <T>(run: (tx: string) => Promise<T>) => run("transaction") },
     loadSubscriptionCharges: async (...args: unknown[]) => { calls.push(args); return []; },
     applySubscriptionCharge: async (...args: unknown[]) => { calls.push(args); return { expenseId: "expense" }; },
+    previewSubscriptionCharge: async (...args: unknown[]) => { calls.push(args); return { candidates: [], candidateKey: 'preview' }; },
   };
   const route = sourceLoader({
     "@/lib/prisma": { prisma: globals.prisma },

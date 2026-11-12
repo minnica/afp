@@ -1,0 +1,35 @@
+{
+  "environment": "isolated local PostgreSQL, production fixture, fake auth",
+  "phone": {
+    "physical": true,
+    "cssWidth": 384,
+    "cssHeight": 693,
+    "viewportFits": true,
+    "linkSucceeded": true,
+    "reminderRemoved": true,
+    "ruleSaved": true
+  },
+  "desktop": {
+    "width": 1280,
+    "height": 900,
+    "viewportFits": true
+  },
+  "smallViewport": {
+    "width": 320,
+    "height": 740,
+    "documentWidth": 320,
+    "dialog": {
+      "x": 8,
+      "y": 68.25,
+      "width": 304,
+      "height": 603.5
+    },
+    "distinctInitiallyDisabled": true
+  },
+  "staleDesktopRetry": {
+    "expenseCount": 4,
+    "subscriptionChargeCount": 1,
+    "alreadyConfirmed": true
+  },
+  "productionFinancialWrites": false
+}

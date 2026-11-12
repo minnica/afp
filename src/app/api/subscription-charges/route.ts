@@ -2,12 +2,12 @@ import { readFinancialInput } from "@/lib/financialContracts";
 import { apiResponse as NextResponse, requireApiUser, apiAccessErrorResponse } from "@/lib/apiAuth";
 import { prisma } from "@/lib/prisma";
 import { validChargeDay, validChargeMonth } from "@/lib/subscriptionCharges";
-import { applySubscriptionCharge, loadSubscriptionCharges, SubscriptionChargeError } from "@/lib/subscriptionChargeService";
+import { applySubscriptionCharge, loadSubscriptionCharges, previewSubscriptionCharge, SubscriptionChargeError } from "@/lib/subscriptionChargeService";
 
 async function handle(request: Request, write: boolean) {
   try {
     const user = await requireApiUser(request);
-    const input = write ? readFinancialInput(await request.json().catch(() => null)) : Object.fromEntries(new URL(request.url).searchParams);
+    const input = readFinancialInput(write ? await request.json().catch(() => null) : Object.fromEntries(new URL(request.url).searchParams));
     // Acepta el día local solo dentro del margen de las zonas horarias del mundo.
     const utcToday = new Date().toISOString().slice(0, 10);
     const today = input?.today || utcToday;
@@ -16,11 +16,15 @@ async function handle(request: Request, write: boolean) {
       return NextResponse.json({ error: "El mes o la fecha local no son válidos. Actualiza la página." }, { status: 400 });
     }
     if (write) {
-      const { subscriptionId, month, action, amount, date, paymentMethod, cardId } = input;
+      const { subscriptionId, month, action, amount, date, paymentMethod, cardId, expenseId, rememberMerchant, confirmDistinctCapture, expectedCandidates } = input;
       const result = await prisma.$transaction(tx => applySubscriptionCharge(tx, user.id, {
-        subscriptionId, month, action, amount, date, paymentMethod, cardId, today,
-      }));
+        subscriptionId, month, action, amount, date, paymentMethod, cardId, today, expenseId, rememberMerchant, confirmDistinctCapture, expectedCandidates,
+      }), { isolationLevel: 'ReadCommitted' });
       return NextResponse.json(result, { headers: { "Cache-Control": "private, no-store" } });
+    }
+    if (input.subscriptionId) {
+      const preview = await prisma.$transaction(tx => previewSubscriptionCharge(tx, user.id, { ...input, today }), { isolationLevel: 'RepeatableRead' });
+      return NextResponse.json(preview);
     }
     const charges = await loadSubscriptionCharges(prisma, user.id, input.month, today);
     return NextResponse.json({ charges }, { headers: { "Cache-Control": "private, no-store" } });

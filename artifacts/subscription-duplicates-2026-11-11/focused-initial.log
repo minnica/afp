@@ -1,0 +1,131 @@
+
+> afp@0.1.0 test /home/garatachia/projects/afp
+> node --import tsx tests/run-tests.ts subscription-charges-integration.test.ts subscription-charges-api.test.ts subscription-payment-adjustments.test.ts capture-nu-subscription-integration.test.ts
+
+TAP version 13
+# Subtest: Nu/CFE: regla expresa, suscripción bimestral y avisos resueltos con un solo gasto
+    # Subtest: sin regla no basta el paquete Nu, un alias ni forzar el modo automático
+    ok 1 - sin regla no basta el paquete Nu, un alias ni forzar el modo automático
+      ---
+      duration_ms: 93.020164
+      type: 'test'
+      ...
+    # Subtest: la regla exige referencias propias y se guarda en observación, sin resolver suscripciones
+    ok 2 - la regla exige referencias propias y se guarda en observación, sin resolver suscripciones
+      ---
+      duration_ms: 24.358312
+      type: 'test'
+      ...
+    # Subtest: aviso antiguo: reintentar conserva recibo; reinterpretar pide análisis explícito y completa solo por la regla
+    ok 3 - aviso antiguo: reintentar conserva recibo; reinterpretar pide análisis explícito y completa solo por la regla
+      ---
+      duration_ms: 151.793581
+      type: 'test'
+      ...
+(node:91466) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+    # Subtest: registrar el piloto confirma el cobro bimestral con Nu y el importe real, sin cambiar la recurrencia en efectivo
+    ok 4 - registrar el piloto confirma el cobro bimestral con Nu y el importe real, sin cambiar la recurrencia en efectivo
+      ---
+      duration_ms: 119.719502
+      type: 'test'
+      ...
+    # Subtest: una fecha de aviso futura conserva la entrega en revisión sin crear gasto ni confirmar el cobro pendiente
+    ok 5 - una fecha de aviso futura conserva la entrega en revisión sin crear gasto ni confirmar el cobro pendiente
+      ---
+      duration_ms: 34.436486
+      type: 'test'
+      ...
+    # Subtest: octubre: ocho entregas concurrentes crean un gasto y resuelven ambos avisos por el cobro mensual
+    ok 6 - octubre: ocho entregas concurrentes crean un gasto y resuelven ambos avisos por el cobro mensual
+      ---
+      duration_ms: 257.799955
+      type: 'test'
+      ...
+    # Subtest: otro UUID o importe para el cobro ya resuelto conserva revisión y no crea otro gasto
+    ok 7 - otro UUID o importe para el cobro ya resuelto conserva revisión y no crea otro gasto
+      ---
+      duration_ms: 39.487578
+      type: 'test'
+      ...
+    # Subtest: mes sin cobro, decisión omitida, moneda ajena y textos contradictorios no se automatizan
+    ok 8 - mes sin cobro, decisión omitida, moneda ajena y textos contradictorios no se automatizan
+      ---
+      duration_ms: 69.82767
+      type: 'test'
+      ...
+    # Subtest: reasignar la regla deja una sola tarjeta, detiene el modo anterior y exige evidencia nueva
+    ok 9 - reasignar la regla deja una sola tarjeta, detiene el modo anterior y exige evidencia nueva
+      ---
+      duration_ms: 49.767672
+      type: 'test'
+      ...
+    # Subtest: borrar la suscripción deja el aviso por revisar y nunca genera un gasto genérico
+    ok 10 - borrar la suscripción deja el aviso por revisar y nunca genera un gasto genérico
+      ---
+      duration_ms: 15.924155
+      type: 'test'
+      ...
+    1..10
+ok 1 - Nu/CFE: regla expresa, suscripción bimestral y avisos resueltos con un solo gasto
+  ---
+  duration_ms: 1355.403312
+  type: 'test'
+  ...
+# Subtest: cobros API: exige sesión y obtiene el usuario del token
+ok 2 - cobros API: exige sesión y obtiene el usuario del token
+  ---
+  duration_ms: 15.656696
+  type: 'test'
+  ...
+# Subtest: cobros API: rechaza meses, días y cuerpos inválidos antes de escribir
+ok 3 - cobros API: rechaza meses, días y cuerpos inválidos antes de escribir
+  ---
+  duration_ms: 12.95404
+  type: 'test'
+  ...
+# Subtest: cobros: API persiste monto y tarjeta de una ocurrencia, valida propietario y conserva recurrencia
+ok 4 - cobros: API persiste monto y tarjeta de una ocurrencia, valida propietario y conserva recurrencia
+  ---
+  duration_ms: 213.438155
+  type: 'test'
+  ...
+# Subtest: cobros: transacción, concurrencia, omisión, restauración, evidencia y aislamiento
+ok 5 - cobros: transacción, concurrencia, omisión, restauración, evidencia y aislamiento
+  ---
+  duration_ms: 473.855906
+  type: 'test'
+  ...
+# Subtest: un cobro de $120 en efectivo se confirma por $135.50 en una tarjeta sin cambiar la suscripción
+ok 6 - un cobro de $120 en efectivo se confirma por $135.50 en una tarjeta sin cambiar la suscripción
+  ---
+  duration_ms: 42.136234
+  type: 'test'
+  ...
+# Subtest: permite otra tarjeta y al pagar en efectivo elimina la tarjeta del gasto
+ok 7 - permite otra tarjeta y al pagar en efectivo elimina la tarjeta del gasto
+  ---
+  duration_ms: 80.253704
+  type: 'test'
+  ...
+# Subtest: rechaza métodos inválidos, tarjetas ajenas o ausentes y filtros Prisma antes de crear el gasto
+ok 8 - rechaza métodos inválidos, tarjetas ajenas o ausentes y filtros Prisma antes de crear el gasto
+  ---
+  duration_ms: 352.624836
+  type: 'test'
+  ...
+# Subtest: confirmar sin ajustes sigue usando los datos recurrentes
+ok 9 - confirmar sin ajustes sigue usando los datos recurrentes
+  ---
+  duration_ms: 39.196308
+  type: 'test'
+  ...
+1..9
+# tests 19
+# suites 0
+# pass 19
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2951.619826

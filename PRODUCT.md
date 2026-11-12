@@ -34,6 +34,8 @@ Registrar retiro permite elegir una cuenta bancaria de salida y una cuenta de ef
 
 Las compras BBVA con aviso «Compra con TDD» conservan comercio y fecha bancaria y se registran como gastos de débito con la regla por cuenta y terminaciones aceptada por el propietario. La salida afecta directamente a la cuenta bancaria configurada. Una coincidencia de importe con una deuda o corte no convierte esa compra en un pago. Los registros conservan evidencia y protección de duplicados; los avisos históricos se recuperan mediante una revisión expresa.
 
+La confirmación de suscripciones permite revisar gastos ya capturados y vincular el correcto conservando una sola salida, sus datos y su evidencia. La asociación futura requiere aceptar el comercio exacto y la tarjeta; utiliza las reglas existentes, sin habilitar formatos ni procesar históricos. Los casos ambiguos y los cambios concurrentes requieren revisión. Publicado el 11 de noviembre de 2026; la corrección histórica y la regla puntual autorizadas conservaron un solo gasto y la suscripción confirmada.
+
 ## Evidence on Hand
 
 La asociación de transferencias BBVA → Nu fue publicada y activada para la cuenta personal el 4 de noviembre de 2026, con autorización expresa. Admite destino Nu de tipo bancario o ahorro. Con una regla aceptada por cuenta, terminaciones e importe/tiempo, vincula ambos avisos y conserva el total entre cuentas. Los avisos deben ser nuevos tras la aceptación; los casos ambiguos, editados o ya registrados requieren revisión. La activación no corrige movimientos históricos.

@@ -4,6 +4,14 @@ Historial resumido de decisiones, cambios, migraciones e incidencias que ayudan 
 
 Consolidado el **27 de octubre de 2026** a partir del README del commit `4562aa0cec0a46d8b482fdfef96116d1d3040282` y sus evidencias. «Publicado», «aplicado» y «pendiente» describen lo documentado en cada fecha; esta consolidación no incluye una comprobación remota nueva. Se conservan las fechas de los registros originales, que pueden usar hora local o UTC. El nombre de una migración identifica su versión, no demuestra cuándo se aplicó.
 
+## 2026-11-11
+
+### Suscripciones: reutilizar gastos capturados al confirmar
+
+Un cargo automático quedó como gasto independiente porque no existía una regla que lo asociara a la suscripción; la confirmación manual creó otro gasto. La revisión local añade propuestas por tarjeta, importe y fecha cercana, vinculación explícita del gasto existente y una opción para guardar la regla de comercio para futuros registros. La regla utiliza el importe real y mantiene la recurrencia. La confirmación y la captura comparten bloqueo por propietario; la lista revisada se vuelve a comprobar para proteger ediciones y nuevas capturas. La vinculación conserva notas, conciliación y evidencia y no modifica gastos históricos al publicar.
+
+Sin APK, migración ni dependencias nuevas. Pasaron 1172 pruebas con PostgreSQL local sin omisiones, los tres controles de tipos, lint y build. Tras la autorización expresa del propietario se respaldó el esquema público y se verificó su lectura, se ensayó y revirtió la recuperación y se publicó `dpl_8mCQRMRHLF7FfLzPcazgXK2QuViU`, production/READY, con los 415 archivos cotejados. La corrección histórica conservó la captura original, eliminó solamente el registro manual duplicado, reutilizó la decisión mensual y guardó la regla del comercio para futuros cobros. La lectura independiente confirmó una sola contabilización, evidencia y demás movimientos intactos; Calendar terminó sincronizado. Sin commit ni push nuevos. [Alcance y verificaciones](../artifacts/subscription-duplicates-2026-11-11/README.md).
+
 ## 2026-11-10
 
 ### Compras con TDD BBVA: comercio y salida de cuenta

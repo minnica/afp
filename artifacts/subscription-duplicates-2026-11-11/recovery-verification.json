@@ -1,0 +1,30 @@
+{
+  "authorized": true,
+  "backup": {
+    "format": "PostgreSQL custom",
+    "schema": "public",
+    "bytes": 789064,
+    "readable": true,
+    "tableDataEntries": 46
+  },
+  "rehearsal": {
+    "rolledBack": true,
+    "independentlyVerified": true
+  },
+  "applied": {
+    "preservedCapturedExpense": true,
+    "duplicateManualExpenseRemoved": true,
+    "netExpenseReduction": "399.00",
+    "monthlyChargeStillConfirmed": true,
+    "merchantRuleSaved": true,
+    "sourceEventsAndMovementsUnchanged": true,
+    "otherFinancialRowsUnchanged": true,
+    "idempotentRetryVerified": true,
+    "independentReadVerified": true
+  },
+  "deployment": "dpl_8mCQRMRHLF7FfLzPcazgXK2QuViU",
+  "calendar": {
+    "status": "SYNCED",
+    "upToDate": true
+  }
+}

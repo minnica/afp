@@ -1,0 +1,35 @@
+{
+  "stage": "before-link",
+  "expenses": [
+    {
+      "id": "0397d975-6b52-4b1a-a521-e9a31d6f0750",
+      "amount": "50",
+      "concept": "Compra ficticia CASH",
+      "notes": null,
+      "subscriptionId": null
+    },
+    {
+      "id": "8ba60c79-fb87-4c59-a447-2fd8e7df5ea5",
+      "amount": "50",
+      "concept": "Compra ficticia CARD",
+      "notes": null,
+      "subscriptionId": null
+    },
+    {
+      "id": "ba38bb79-1e85-4294-b6cd-4d5bc1876733",
+      "amount": "50",
+      "concept": "Compra ficticia DEBIT",
+      "notes": null,
+      "subscriptionId": null
+    },
+    {
+      "id": "48817a48-ce75-4ccc-9427-40d5fd70b061",
+      "amount": "249",
+      "concept": "SERVICIO *PLAN MENSUAL",
+      "notes": "Nota ficticia que se conserva",
+      "subscriptionId": null
+    }
+  ],
+  "rules": [],
+  "charges": []
+}

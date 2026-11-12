@@ -15,7 +15,8 @@ function fixture(paymentMethod: 'CASH' | 'CARD' = "CASH", cardId: string | null 
     cardCycle: { findMany: async () => [] },
     card: { findFirst: async ({ where }: { where: { id: string; userId: string } }) => cards.find(card => card.id === where.id && card.userId === where.userId) },
     category: { findFirst: async () => ({ id: "category" }) },
-    dailyExpense: { create: async ({ data }: { data: Prisma.DailyExpenseUncheckedCreateInput }) => {
+    captureMerchantRule: { findMany: async () => [] },
+    dailyExpense: { findMany: async () => [], create: async ({ data }: { data: Prisma.DailyExpenseUncheckedCreateInput }) => {
       const expense = { id: "expense", ...data };
       subscription.dailyExpenses.push({ ...expense, id: expense.id });
       return expense;

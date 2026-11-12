@@ -1,5 +1,6 @@
 "use client";
-import { subscriptionChargeResultSchema } from "@/lib/uiResponseSchemas";
+import { subscriptionChargePreviewSchema, subscriptionChargeResultSchema } from "@/lib/uiResponseSchemas";
+import { RequestError } from "@/lib/requestErrors";
 import type { Charge, Card as FinancialCard } from "@/lib/uiTypes";
 import { errorMessage } from "@/lib/uiTypes";
 
@@ -12,6 +13,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -59,6 +61,53 @@ const adjustmentSchema = z.object({
 
 type Adjustment = Omit<z.output<typeof adjustmentSchema>, "cardId" | "amount"> & { cardId: string | null; amount: string | number };
 type ChargeCommand = Partial<Adjustment> & { action: string; subscriptionId: string };
+type CaptureResolution = { expenseId?: string; rememberMerchant?: boolean; confirmDistinctCapture?: boolean; expectedCandidates: string };
+type CapturePreview = z.output<typeof subscriptionChargePreviewSchema>;
+type CaptureReview = { charge: Charge; overrides: Partial<Adjustment>; preview: CapturePreview; scope: string };
+
+function CapturedChargeReview({ review, busy, error, onLink, onDistinct }: {
+  review: CaptureReview; busy: boolean; error: string;
+  onLink: (expenseId: string, rememberMerchant: boolean) => void; onDistinct: () => void;
+}) {
+  const [expenseId, setExpenseId] = useState(review.preview.candidates.length === 1 ? review.preview.candidates[0]!.expenseId : '');
+  const [remember, setRemember] = useState(false);
+  const [distinct, setDistinct] = useState(false);
+  const candidate = review.preview.candidates.find(row => row.expenseId === expenseId);
+  return <div className="flex flex-col gap-4">
+    <Alert><AlertDescription>Hay gastos capturados que podrían corresponder a {review.charge.name}. Vincula el correcto para confirmar el cobro sin sumar otro gasto.</AlertDescription></Alert>
+    {review.preview.candidates.length > 1 ? <Field>
+      <FieldLabel htmlFor="subscription-capture-expense">Gasto que corresponde al cobro</FieldLabel>
+      <ResponsiveSelect id="subscription-capture-expense" value={expenseId} disabled={busy} title="Seleccionar gasto capturado"
+        placeholder="Revisa y elige un gasto" onValueChange={value => { setExpenseId(value); setRemember(false); }}
+        options={review.preview.candidates.map(row => ({ value: row.expenseId, label: `${row.concept} · ${dayLabel(row.date)} · ${money(row.amount)}` }))} />
+    </Field> : null}
+    {candidate ? <>
+      <ItemGroup><Item className="px-0"><ItemContent>
+        <ItemTitle className="break-words">{candidate.concept}</ItemTitle>
+        <ItemDescription className="line-clamp-none">{dayLabel(candidate.date)} · {candidate.cardName}</ItemDescription>
+        <p className="font-medium tabular-nums">{money(candidate.amount)}</p>
+      </ItemContent></Item></ItemGroup>
+      {candidate.canRemember ? <FieldGroup className="gap-1"><Field orientation="horizontal">
+        <Checkbox id="subscription-capture-remember" checked={remember} onCheckedChange={value => setRemember(value === true)} disabled={busy}
+          aria-describedby="subscription-capture-remember-description" />
+        <FieldLabel htmlFor="subscription-capture-remember" className="min-h-11">Vincular también los próximos cobros</FieldLabel>
+      </Field><FieldDescription id="subscription-capture-remember-description" className="break-words">Los próximos gastos registrados de «{candidate.merchant}» en {candidate.cardName} confirmarán el mes pendiente de {review.charge.name}. Los casos dudosos quedarán por revisar.</FieldDescription></FieldGroup> : null}
+      <Button type="button" className="min-h-11" disabled={busy || !candidate.canLink} onClick={() => onLink(candidate.expenseId, remember && candidate.canRemember)}>
+        Vincular este gasto
+      </Button>
+      {!candidate.canLink ? <p className="text-sm text-muted-foreground">Este gasto tiene una devolución o vínculos personales. Revísalo en Gastos antes de asociarlo.</p> : null}
+    </> : null}
+    <FieldGroup><Field orientation="horizontal">
+      <Checkbox id="subscription-capture-distinct" checked={distinct} onCheckedChange={value => setDistinct(value === true)} disabled={busy} />
+      <FieldLabel htmlFor="subscription-capture-distinct" className="min-h-11">Revisé las capturas y este cobro es otro gasto</FieldLabel>
+    </Field></FieldGroup>
+    <Button type="button" variant="outline" className="min-h-11" disabled={busy || !distinct} onClick={onDistinct}>
+      Registrar otro gasto de {money(review.overrides.amount ?? review.charge.amount)}
+    </Button>
+    {error ? <FieldError role="alert">{error}</FieldError> : null}
+  </div>;
+}
+
 function ChargeAdjustmentForm({ charge, cards, busy, isOnline, error, onConfirm }: { charge: Charge; cards: FinancialCard[]; busy: boolean; isOnline: boolean; error: string; onConfirm: (values: Adjustment) => Promise<void> }) {
   const { control, handleSubmit, setValue, setError } = useForm<z.input<typeof adjustmentSchema>>({
     resolver: zodResolver(adjustmentSchema),
@@ -167,18 +216,20 @@ export default function SubscriptionCharges({ userId, cards = [], isOnline, onCh
   const scopeRef = useRef("");
   const [feedback, setFeedback] = useState("");
   const [editing, setEditing] = useState<Charge | null>(null);
+  const [captureReview, setCaptureReview] = useState<CaptureReview | null>(null);
   const [skipping, setSkipping] = useState<Charge | null>(null);
   const [formError, setFormError] = useState("");
   const actionTriggerRef = useRef<HTMLElement | null>(null);
   const sectionRef = useRef<HTMLDivElement | null>(null);
   const { refresh: refreshDashboard } = useDashboard();
   const scope = `${userId}:${month}`;
+  const review = captureReview?.scope === scope ? captureReview : null;
 
-  const request = useCallback(async (body?: ChargeCommand, signal?: AbortSignal) => {
+  const request = useCallback(async (body?: ChargeCommand & Partial<CaptureResolution>, signal?: AbortSignal) => {
     const params = new URLSearchParams({ month, today: localDay() });
     const response = await apiFetch(`/api/subscription-charges${body ? "" : `?${params}`}`, {
       expectedUserId: userId,
-      errorMode: body ? "dialog" : "inline",
+      errorMode: "inline",
       method: body ? "POST" : "GET", cache: "no-store", signal,
       headers: { "Content-Type": "application/json" },
       ...(body ? { body: JSON.stringify({ ...body, month, today: localDay() }) } : {}),
@@ -187,6 +238,13 @@ export default function SubscriptionCharges({ userId, cards = [], isOnline, onCh
     if (!response.ok) throw new Error(result.error || "No se pudo actualizar el cobro.");
     return result;
   }, [userId, month]);
+
+  async function previewCapture(charge: Charge, overrides: Partial<Adjustment>) {
+    const params = new URLSearchParams({ month, today: localDay(), subscriptionId: charge.subscriptionId });
+    for (const [key, value] of Object.entries(overrides)) if (value != null) params.set(key, String(value));
+    const response = await apiFetch(`/api/subscription-charges?${params}`, { expectedUserId: userId, errorMode: 'inline' });
+    return subscriptionChargePreviewSchema.parse(await response.json());
+  }
 
   const refresh = useCallback(async ({ preserveError = false } = {}) => {
     if (busyRef.current || !isOnline || !validChargeMonth(month)) return;
@@ -246,7 +304,7 @@ export default function SubscriptionCharges({ userId, cards = [], isOnline, onCh
     return () => clearTimeout(timer);
   }, [feedback]);
 
-  async function update(charge: Charge, action: string, overrides: Partial<Adjustment> = {}) {
+  async function update(charge: Charge, action: string, overrides: Partial<Adjustment> = {}, resolution?: CaptureResolution) {
     if (busyRef.current || !isOnline) return;
     busyRef.current = true;
     setActiveAction({ id: charge.id, action });
@@ -255,12 +313,22 @@ export default function SubscriptionCharges({ userId, cards = [], isOnline, onCh
     revisionRef.current++;
     let saved = false;
     try {
-      const result = await request({ subscriptionId: charge.subscriptionId, action, ...overrides });
+      if (action === 'confirm' && !resolution) {
+        const preview = await previewCapture(charge, overrides);
+        if (scopeRef.current !== scope) return;
+        if (preview.candidates.length) {
+          setCaptureReview({ charge, overrides, preview, scope });
+          requestAnimationFrame(() => sectionRef.current?.focus({ preventScroll: true }));
+          return;
+        }
+      }
+      const result = await request({ subscriptionId: charge.subscriptionId, action, ...overrides, ...resolution });
       saved = true;
       if (scopeRef.current !== scope) return;
+      setCaptureReview(null);
       setEditing(null);
       setSkipping(null);
-      if (editing) requestAnimationFrame(() => sectionRef.current?.focus({ preventScroll: true }));
+      if (editing || review) requestAnimationFrame(() => sectionRef.current?.focus({ preventScroll: true }));
       setState(previous => ({ ...previous, error: "", charges: previous.charges.map(item => item.id === charge.id
         ? { ...item, status: action === "skip" ? "SKIPPED" : action === "restore" ? "PENDING" : "CONFIRMED",
           confirmedAmount: action === "confirm" && !result.alreadyConfirmed ? Number(overrides.amount ?? charge.amount) : null,
@@ -268,13 +336,24 @@ export default function SubscriptionCharges({ userId, cards = [], isOnline, onCh
           confirmedCardName: action === "confirm" && !result.alreadyConfirmed
             ? cards.find(card => card.id === (overrides.cardId ?? charge.cardId))?.name || null : null } : item) }));
       setFeedback(action === "skip" ? "Cobro omitido." : action === "restore" ? "Cobro restaurado."
+        : result.linkedExisting ? 'Gasto vinculado. El cobro quedó confirmado sin duplicarlo.'
         : result.alreadyConfirmed ? "Este cobro ya estaba registrado." : "Cobro confirmado.");
       await Promise.all([onChanged(), refreshDashboard()]);
     } catch (error) {
       if (scopeRef.current === scope) {
         const message = saved ? "El cambio se guardó. Actualiza la lista para verlo." : errorMessage(error);
-        if (!saved && (editing || skipping)) setFormError(message);
+        if (!saved && (editing || skipping || review)) setFormError(message);
         else setState(previous => ({ ...previous, error: message }));
+        if (!saved && error instanceof RequestError && error.status === 409 && ['confirm', 'link'].includes(action)) {
+          try {
+            const preview = await previewCapture(charge, overrides);
+            if (scopeRef.current === scope && preview.candidates.length) {
+              setCaptureReview({ charge, overrides, preview, scope });
+              setFormError(message);
+              requestAnimationFrame(() => sectionRef.current?.focus({ preventScroll: true }));
+            }
+          } catch { /* Conserva el error de guardado; la consulta no hizo cambios. */ }
+        }
       }
     } finally {
       busyRef.current = false;
@@ -295,6 +374,7 @@ export default function SubscriptionCharges({ userId, cards = [], isOnline, onCh
   }
 
   function returnToList() {
+    setCaptureReview(null);
     setEditing(null);
     setFormError("");
     requestAnimationFrame(() => sectionRef.current?.focus({ preventScroll: true }));
@@ -327,6 +407,7 @@ export default function SubscriptionCharges({ userId, cards = [], isOnline, onCh
         setOpen(nextOpen);
         if (nextOpen) refresh();
         else {
+          setCaptureReview(null);
           setEditing(null);
           setFormError("");
           setFeedback("");
@@ -350,19 +431,21 @@ export default function SubscriptionCharges({ userId, cards = [], isOnline, onCh
           onOpenAutoFocus={event => { event.preventDefault(); sectionRef.current?.focus(); }}
           onEscapeKeyDown={event => {
             if (busy || skipping) event.preventDefault();
-            else if (editing) { event.preventDefault(); returnToList(); }
+            else if (editing || review) { event.preventDefault(); returnToList(); }
           }}
-          onInteractOutside={event => { if (busy || editing || skipping) event.preventDefault(); }}>
+          onInteractOutside={event => { if (busy || editing || skipping || review) event.preventDefault(); }}>
           <DialogHeader className="shrink-0 pr-12">
             <div className="flex min-h-7 items-center gap-2">
-              {editing ? <Button type="button" variant="ghost" size="icon" className="-my-2 -ml-2 size-11" disabled={busy} aria-label="Volver a cobros" onClick={returnToList}><HugeiconsIcon icon={ArrowLeft02Icon} aria-hidden="true" /></Button> : null}
-              <DialogTitle>{editing ? "Ajustar cobro" : "Cobros de suscripciones"}</DialogTitle>
+              {editing || review ? <Button type="button" variant="ghost" size="icon" className="-my-2 -ml-2 size-11" disabled={busy} aria-label="Volver a cobros" onClick={returnToList}><HugeiconsIcon icon={ArrowLeft02Icon} aria-hidden="true" /></Button> : null}
+              <DialogTitle>{review ? 'Revisar gasto capturado' : editing ? "Ajustar cobro" : "Cobros de suscripciones"}</DialogTitle>
             </div>
             <DialogDescription className="sr-only">Confirma los cobros de tus suscripciones. Los ajustes de monto, fecha y método de pago afectan solo a ese cobro.</DialogDescription>
           </DialogHeader>
           <DialogClose asChild><Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2 size-11" disabled={busy} aria-label="Cerrar cobros de suscripciones"><HugeiconsIcon icon={Cancel01Icon} aria-hidden="true" /></Button></DialogClose>
-          <div ref={sectionRef} tabIndex={-1} role="region" aria-label={editing ? "Ajustar cobro" : "Cobros del mes"} className="flex min-h-0 min-w-0 flex-col gap-3 overflow-y-auto overscroll-contain pr-1 outline-none [color-scheme:dark] [scrollbar-gutter:stable] sm:[scrollbar-gutter:auto]">
-            {editing ? (
+          <div ref={sectionRef} tabIndex={-1} role="region" aria-label={review ? 'Revisar gasto capturado' : editing ? "Ajustar cobro" : "Cobros del mes"} className="flex min-h-0 min-w-0 flex-col gap-3 overflow-y-auto overscroll-contain pr-1 outline-none [color-scheme:dark] [scrollbar-gutter:stable] sm:[scrollbar-gutter:auto]">
+            {review ? <CapturedChargeReview key={review.preview.candidateKey} review={review} busy={disabled} error={formError}
+              onLink={(expenseId, rememberMerchant) => update(review.charge, 'link', review.overrides, { expenseId, rememberMerchant, expectedCandidates: review.preview.candidateKey })}
+              onDistinct={() => update(review.charge, 'confirm', review.overrides, { confirmDistinctCapture: true, expectedCandidates: review.preview.candidateKey })} /> : editing ? (
               <ChargeAdjustmentForm charge={editing} cards={cards} busy={busy} isOnline={isOnline} error={formError}
                 onConfirm={values => update(editing, "confirm", values)} />
             ) : (

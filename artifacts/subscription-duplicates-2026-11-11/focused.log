@@ -1,0 +1,83 @@
+
+> afp@0.1.0 test /home/garatachia/projects/afp
+> node --import tsx tests/run-tests.ts subscription-capture-integration.test.ts
+
+TAP version 13
+(node:95133) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+# Subtest: suscripciones y captura: vincular sin duplicar y recordar el comercio por tarjeta
+    # Subtest: confirmación rápida y API bloquean el duplicado; GET solo propone y no activa reglas
+    ok 1 - confirmación rápida y API bloquean el duplicado; GET solo propone y no activa reglas
+      ---
+      duration_ms: 93.247494
+      type: 'test'
+      ...
+    # Subtest: vincular conserva gasto, evidencia y recurrencia y retira la previsión de ese mes
+    ok 2 - vincular conserva gasto, evidencia y recurrencia y retira la previsión de ese mes
+      ---
+      duration_ms: 94.515252
+      type: 'test'
+      ...
+    # Subtest: regla aceptada confirma el siguiente mes con importe real y el reintento manual no suma otro gasto
+    ok 3 - regla aceptada confirma el siguiente mes con importe real y el reintento manual no suma otro gasto
+      ---
+      duration_ms: 116.893047
+      type: 'test'
+      ...
+    # Subtest: varias capturas exigen elegir y otra compra solo se permite tras revisar la lista vigente
+    ok 4 - varias capturas exigen elegir y otra compra solo se permite tras revisar la lista vigente
+      ---
+      duration_ms: 69.96219
+      type: 'test'
+      ...
+    # Subtest: una captura nueva o editada invalida la decisión anterior y no sobrescribe correcciones
+    ok 5 - una captura nueva o editada invalida la decisión anterior y no sobrescribe correcciones
+      ---
+      duration_ms: 54.901703
+      type: 'test'
+      ...
+    # Subtest: tarjeta, propietario, método, importe y ventana de tres días limitan candidatos
+    ok 6 - tarjeta, propietario, método, importe y ventana de tres días limitan candidatos
+      ---
+      duration_ms: 62.738192
+      type: 'test'
+      ...
+    # Subtest: captura editada, devolución o vínculos no permiten aprender silenciosamente ni borrar información
+    ok 7 - captura editada, devolución o vínculos no permiten aprender silenciosamente ni borrar información
+      ---
+      duration_ms: 50.99269
+      type: 'test'
+      ...
+    # Subtest: una regla de otra suscripción no se reemplaza y una omisión necesita restauración
+    ok 8 - una regla de otra suscripción no se reemplaza y una omisión necesita restauración
+      ---
+      duration_ms: 46.485217
+      type: 'test'
+      ...
+    # Subtest: concurrencia captura y confirmación conserva un solo gasto en cualquier orden
+    ok 9 - concurrencia captura y confirmación conserva un solo gasto en cualquier orden
+      ---
+      duration_ms: 31.447211
+      type: 'test'
+      ...
+    # Subtest: rollback revierte vínculo, ocurrencia y regla juntos; un gasto eliminado no se reconstruye
+    ok 10 - rollback revierte vínculo, ocurrencia y regla juntos; un gasto eliminado no se reconstruye
+      ---
+      duration_ms: 37.630421
+      type: 'test'
+      ...
+    1..10
+ok 1 - suscripciones y captura: vincular sin duplicar y recordar el comercio por tarjeta
+  ---
+  duration_ms: 1132.298752
+  type: 'test'
+  ...
+1..1
+# tests 11
+# suites 0
+# pass 11
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1375.891959

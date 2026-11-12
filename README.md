@@ -362,6 +362,12 @@ Los cálculos compartidos viven en [src/lib/calculations/](src/lib/calculations/
 - **Consumo mínimo:** los movimientos previstos no acreditan consumo confirmado; conservar períodos y condiciones por tarjeta y la evidencia de conciliación.
 - **Atomicidad e idempotencia:** las escrituras relacionadas se confirman en una transacción. Gastos y Mi dinero conservan recibos por usuario/UUID; repetir el UUID con otro contenido genera conflicto. No asumir que toda mutación tiene esta garantía.
 
+### Suscripciones y captura Android
+
+Al confirmar un cobro con tarjeta, se revisan gastos capturados sin suscripción en la misma tarjeta, con el mismo importe y hasta tres días antes o después de la fecha elegida. Una regla del comercio ya vinculada a esa suscripción también permite proponer importes diferentes. La coincidencia requiere revisión personal: **Vincular este gasto** conserva el registro, su importe, fecha, notas, categoría, conciliación y evidencia y confirma solamente el mes seleccionado.
+
+**Vincular también los próximos cobros** guarda, con aceptación expresa, la regla de ese comercio exacto y tarjeta; los siguientes gastos compatibles resuelven su suscripción con el importe real. La regla también se administra desde **Registro automático → Ajustes → Tarjetas y reglas → Categorías y suscripciones por comercio**. No habilita formatos ni recupera históricos. Crear otro gasto coincidente exige declarar que es distinto y volver a comprobar la lista bajo el bloqueo financiero; una edición o captura nueva invalida una revisión anterior. Los gastos con devoluciones, aportaciones o deudas vinculadas requieren su revisión aparte. Sin captura compatible ni regla conocida no se deduce una asociación. [Implementación y verificación local](artifacts/subscription-duplicates-2026-11-11/README.md).
+
 ### Lecturas de Gastos
 
 [expenseReader.ts](src/lib/expenseReader.ts) mantiene una lectura vigente por propietario y URL de filtros. Cambiar la selección cancela e invalida la consulta anterior inmediatamente, antes del debounce de 250 ms. Solo la generación vigente puede actualizar filas, meses disponibles, error e indicador de carga, incluso si el transporte termina después de cancelarse. Durante la espera se muestra el esqueleto de resultados.
