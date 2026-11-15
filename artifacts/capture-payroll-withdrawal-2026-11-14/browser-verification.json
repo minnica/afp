@@ -1,0 +1,32 @@
+{
+  "syntheticDataOnly": true,
+  "readOnlyVerification": true,
+  "browserSubmitted": true,
+  "apiPatchStatus": 200,
+  "withdrawalCount": 1,
+  "expenseRemoved": true,
+  "evidencePreserved": true,
+  "bankBalance": 849.53,
+  "cashBalance": 1150,
+  "bankDebited": 150.47,
+  "cashReceived": 150,
+  "fee": 0.47,
+  "viewports": [
+    {
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "documentWidth": 390
+    },
+    {
+      "width": 320,
+      "height": 740,
+      "documentWidth": 320
+    }
+  ],
+  "excessiveCashBlocked": true,
+  "consoleErrors": 0
+}

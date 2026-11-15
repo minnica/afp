@@ -45,7 +45,7 @@ export function captureHistory(value: unknown) { return checked(captureAnalysisS
 export function captureInput(value: unknown): Record<string, unknown> { return isRecord(value) ? value : {}; }
 export function captureSnapshot(value: unknown) {
   return checked(z.object({ fromAccountId: text, amount: text, date: text,
-    correction: z.object({ kind: z.string(), toAccountId: text, cycleId: text }).catchall(z.json().optional()).optional(),
+    correction: z.object({ kind: z.string(), toAccountId: text, cycleId: text, cashAccountId: text, cashAmount: text }).catchall(z.json().optional()).optional(),
   }).catchall(z.json().optional()), value);
 }
 export function captureStatementMatches(value: unknown) {

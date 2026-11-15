@@ -1,0 +1,68 @@
+{
+  "checkedAt": "2026-11-15T03:16:23.501644+00:00",
+  "explicitOwnerAuthorization": true,
+  "deploymentId": "dpl_Extz7mxbhbr6YA997XKifarbUzDw",
+  "state": "READY",
+  "productionAliasVerified": true,
+  "sourceFilesMatched": 421,
+  "migrationsPending": 0,
+  "migrationChecksumsVerified": true,
+  "schemaMetadataUnchanged": true,
+  "backup": {
+    "format": "pg_dump custom",
+    "schema": "public",
+    "bytes": 816858,
+    "tableDataEntries": 46,
+    "affectedTablesPresent": true,
+    "restoreIndexReadable": true
+  },
+  "rehearsalRolledBackAndIndependentlyVerified": true,
+  "appliedAtomically": true,
+  "independentPostflightMatched": true,
+  "incomeCountChange": 0,
+  "withdrawalCountChange": 1,
+  "expenseCountChange": -1,
+  "originalSourceEvidenceUnchanged": true,
+  "unrelatedFinancialRowsUnchanged": true,
+  "policiesUnchanged": true,
+  "repeatDidNotDuplicate": true,
+  "expectedBalancesVerified": true,
+  "calendar": {
+    "status": "SYNCED",
+    "upToDate": true
+  },
+  "httpChecks": [
+    {
+      "path": "/login",
+      "status": 200
+    },
+    {
+      "path": "/api/captures/movements",
+      "authenticated": false,
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "Authorization"
+    },
+    {
+      "path": "/api/money",
+      "authenticated": false,
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "vary": "Authorization"
+    }
+  ],
+  "phoneVerification": "production-phone-verification.json",
+  "runtimeLogInspection": {
+    "since": "2026-11-15T03:08:22Z",
+    "inspectedThrough": "2026-11-15T03:14:25.743Z",
+    "stderrEntriesClassifiedAsError": 1,
+    "messageKind": "pg client.query concurrency DeprecationWarning",
+    "route": "GET /api/money",
+    "functionalFailureObserved": false,
+    "authenticatedChecksReturned200": 3
+  },
+  "apkChanged": false,
+  "rulesActivated": false,
+  "newCommitCreated": false,
+  "pushed": false
+}

@@ -1,0 +1,283 @@
+
+> afp@0.1.0 test /home/garatachia/projects/afp
+> node --import tsx tests/run-tests.ts capture-bbva-debit.test.ts capture-income.test.ts capture-income-integration.test.ts money-withdrawal-cash.test.ts money-withdrawal-cash-integration.test.ts
+
+TAP version 13
+# Subtest: BBVA: admite las variantes exactas de cuatro y cinco cifras, sin inferir receptor ni moneda
+ok 1 - BBVA: admite las variantes exactas de cuatro y cinco cifras, sin inferir receptor ni moneda
+  ---
+  duration_ms: 4.611524
+  type: 'test'
+  ...
+# Subtest: BBVA: importes ambiguos, moneda extranjera, devolución, contradicción y otra app quedan sin propuesta de gasto
+ok 2 - BBVA: importes ambiguos, moneda extranjera, devolución, contradicción y otra app quedan sin propuesta de gasto
+  ---
+  duration_ms: 1.416349
+  type: 'test'
+  ...
+# Subtest: BBVA: regla, efecto financiero, corrección e idempotencia con PostgreSQL
+    # Subtest: requiere aceptación explícita y cuenta propia; no aplica avisos pasados al guardar
+    ok 1 - requiere aceptación explícita y cuenta propia; no aplica avisos pasados al guardar
+      ---
+      duration_ms: 117.507034
+      type: 'test'
+      ...
+    # Subtest: registra una sola vez, resta saldo y clasifica como débito sin buscar destinatario
+    ok 2 - registra una sola vez, resta saldo y clasifica como débito sin buscar destinatario
+      ---
+      duration_ms: 216.690731
+      type: 'test'
+      ...
+    # Subtest: pausas, otras terminaciones y avisos previos al saldo no producen gastos
+    ok 3 - pausas, otras terminaciones y avisos previos al saldo no producen gastos
+      ---
+      duration_ms: 46.353552
+      type: 'test'
+      ...
+(node:524941) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+    # Subtest: corregir a retiro conserva saldo e historial, retira el gasto y no se repite
+    ok 4 - corregir a retiro conserva saldo e historial, retira el gasto y no se repite
+      ---
+      duration_ms: 96.42883
+      type: 'test'
+      ...
+    # Subtest: corregir a transferencia mueve el destino sin otra salida y rechaza cuentas ajenas
+    ok 5 - corregir a transferencia mueve el destino sin otra salida y rechaza cuentas ajenas
+      ---
+      duration_ms: 131.019627
+      type: 'test'
+      ...
+    # Subtest: corregir a pago abona el corte, conserva la salida y aparece solo en Pagos
+    ok 6 - corregir a pago abona el corte, conserva la salida y aparece solo en Pagos
+      ---
+      duration_ms: 142.550043
+      type: 'test'
+      ...
+    # Subtest: errores y duplicados conservan el gasto original, sin efectos parciales
+    ok 7 - errores y duplicados conservan el gasto original, sin efectos parciales
+      ---
+      duration_ms: 106.632047
+      type: 'test'
+      ...
+    # Subtest: corregir a retiro abona efectivo una vez, conserva el descuento y separa la comisión
+    ok 8 - corregir a retiro abona efectivo una vez, conserva el descuento y separa la comisión
+      ---
+      duration_ms: 297.74818
+      type: 'test'
+      ...
+    # Subtest: destino de efectivo inválido, ajeno, incompleto o conciliado conserva gasto y saldos
+    ok 9 - destino de efectivo inválido, ajeno, incompleto o conciliado conserva gasto y saldos
+      ---
+      duration_ms: 96.52805
+      type: 'test'
+      ...
+    # Subtest: fallo tras corregir revierte retiro, abono de efectivo, borrado y comprobante juntos
+    ok 10 - fallo tras corregir revierte retiro, abono de efectivo, borrado y comprobante juntos
+      ---
+      duration_ms: 101.929564
+      type: 'test'
+      ...
+    1..10
+ok 3 - BBVA: regla, efecto financiero, corrección e idempotencia con PostgreSQL
+  ---
+  duration_ms: 1696.312633
+  type: 'test'
+  ...
+# Subtest: ingresos BBVA: nómina estimada inmediata, confirmación, duplicidad, aislamiento y rollback
+    # Subtest: sin regla solo propone ingreso y rechaza cuenta ajena o muestra ausente
+    ok 1 - sin regla solo propone ingreso y rechaza cuenta ajena o muestra ausente
+      ---
+      duration_ms: 39.514681
+      type: 'test'
+      ...
+    # Subtest: nueva nómina concurrente suma una vez y marca el saldo aproximado
+    ok 2 - nueva nómina concurrente suma una vez y marca el saldo aproximado
+      ---
+      duration_ms: 112.373121
+      type: 'test'
+      ...
+    # Subtest: confirma el real sobre el mismo ingreso y conserva el importe estimado original
+    ok 3 - confirma el real sobre el mismo ingreso y conserva el importe estimado original
+      ---
+      duration_ms: 34.416017
+      type: 'test'
+      ...
+    # Subtest: nómina idéntica o revisión posterior queda pendiente
+    ok 4 - nómina idéntica o revisión posterior queda pendiente
+      ---
+      duration_ms: 21.306124
+      type: 'test'
+      ...
+    # Subtest: depósito exige una muestra propia completa y no hereda la regla de nómina
+    ok 5 - depósito exige una muestra propia completa y no hereda la regla de nómina
+      ---
+      duration_ms: 82.679098
+      type: 'test'
+      ...
+    # Subtest: borrado conserva recibo y un reintento no recrea el ingreso
+    ok 6 - borrado conserva recibo y un reintento no recrea el ingreso
+      ---
+      duration_ms: 26.644627
+      type: 'test'
+      ...
+    # Subtest: aviso inválido y operación abortada no crean dinero
+    ok 7 - aviso inválido y operación abortada no crean dinero
+      ---
+      duration_ms: 34.532567
+      type: 'test'
+      ...
+    # Subtest: primera quincena usa su estimación y permite reutilizar la clave bancaria en otra fecha
+    ok 8 - primera quincena usa su estimación y permite reutilizar la clave bancaria en otra fecha
+      ---
+      duration_ms: 41.012139
+      type: 'test'
+      ...
+    # Subtest: API filtra ingresos y protege sus detalles y reglas por propietario
+    ok 9 - API filtra ingresos y protege sus detalles y reglas por propietario
+      ---
+      duration_ms: 28.806035
+      type: 'test'
+      ...
+    1..9
+ok 4 - ingresos BBVA: nómina estimada inmediata, confirmación, duplicidad, aislamiento y rollback
+  ---
+  duration_ms: 717.744698
+  type: 'test'
+  ...
+# Subtest: nómina BBVA real anonimizada conserva la ausencia de importe y cuenta exacta
+ok 5 - nómina BBVA real anonimizada conserva la ausencia de importe y cuenta exacta
+  ---
+  duration_ms: 0.727959
+  type: 'test'
+  ...
+# Subtest: candidato de depósito conserva importe y exige regla propia, sin declararse verificado
+ok 6 - candidato de depósito conserva importe y exige regla propia, sin declararse verificado
+  ---
+  duration_ms: 0.23644
+  type: 'test'
+  ...
+# Subtest: ingresos no acepta fecha inválida
+ok 7 - ingresos no acepta fecha inválida
+  ---
+  duration_ms: 0.13124
+  type: 'test'
+  ...
+# Subtest: ingresos no acepta hora inválida
+ok 8 - ingresos no acepta hora inválida
+  ---
+  duration_ms: 0.095659
+  type: 'test'
+  ...
+# Subtest: ingresos no acepta compra
+ok 9 - ingresos no acepta compra
+  ---
+  duration_ms: 0.784459
+  type: 'test'
+  ...
+# Subtest: ingresos no acepta promoción
+ok 10 - ingresos no acepta promoción
+  ---
+  duration_ms: 0.22875
+  type: 'test'
+  ...
+# Subtest: ingresos no acepta otro banco
+ok 11 - ingresos no acepta otro banco
+  ---
+  duration_ms: 0.09992
+  type: 'test'
+  ...
+# Subtest: ingresos no acepta rechazo
+ok 12 - ingresos no acepta rechazo
+  ---
+  duration_ms: 0.09454
+  type: 'test'
+  ...
+# Subtest: ingresos no acepta precisión
+ok 13 - ingresos no acepta precisión
+  ---
+  duration_ms: 0.08654
+  type: 'test'
+  ...
+# Subtest: no elige importe entre campos contradictorios
+ok 14 - no elige importe entre campos contradictorios
+  ---
+  duration_ms: 0.12067
+  type: 'test'
+  ...
+# Subtest: retiro con destino de efectivo: PostgreSQL, propietario, comisión, reintentos y reversión
+    # Subtest: concurrencia y reintento conservan un retiro y una entrada; solo la comisión reduce el total
+    ok 1 - concurrencia y reintento conservan un retiro y una entrada; solo la comisión reduce el total
+      ---
+      duration_ms: 135.344502
+      type: 'test'
+      ...
+    # Subtest: destino ajeno, de otro tipo, igual al origen o incompleto no crea movimientos
+    ok 2 - destino ajeno, de otro tipo, igual al origen o incompleto no crea movimientos
+      ---
+      duration_ms: 55.76765
+      type: 'test'
+      ...
+    # Subtest: el saldo de referencia de la caja protege altas y reversiones históricas
+    ok 3 - el saldo de referencia de la caja protege altas y reversiones históricas
+      ---
+      duration_ms: 61.942513
+      type: 'test'
+      ...
+    # Subtest: la restricción SQL protege parejas nulas, importes y origen igual al destino
+    ok 4 - la restricción SQL protege parejas nulas, importes y origen igual al destino
+      ---
+      duration_ms: 27.339316
+      type: 'test'
+      ...
+    # Subtest: el contrato anterior persiste sin destino y conserva su salida única
+    ok 5 - el contrato anterior persiste sin destino y conserva su salida única
+      ---
+      duration_ms: 28.437815
+      type: 'test'
+      ...
+    1..5
+ok 15 - retiro con destino de efectivo: PostgreSQL, propietario, comisión, reintentos y reversión
+  ---
+  duration_ms: 451.189809
+  type: 'test'
+  ...
+# Subtest: retiro: el contrato conserva solicitudes antiguas y exige cuenta e importe de efectivo juntos
+ok 16 - retiro: el contrato conserva solicitudes antiguas y exige cuenta e importe de efectivo juntos
+  ---
+  duration_ms: 1.793138
+  type: 'test'
+  ...
+# Subtest: retiro: banco descuenta el total, caja recibe el efectivo y el total solo pierde la comisión
+ok 17 - retiro: banco descuenta el total, caja recibe el efectivo y el total solo pierde la comisión
+  ---
+  duration_ms: 0.679639
+  type: 'test'
+  ...
+# Subtest: retiro: sin comisión conserva el total y revertir retira ambas partes
+ok 18 - retiro: sin comisión conserva el total y revertir retira ambas partes
+  ---
+  duration_ms: 0.26383
+  type: 'test'
+  ...
+# Subtest: retiros históricos sin destino conservan exclusivamente su salida original
+ok 19 - retiros históricos sin destino conservan exclusivamente su salida original
+  ---
+  duration_ms: 0.222849
+  type: 'test'
+  ...
+# Subtest: editor de retiro: separa banco y caja, selecciona solo una caja inequívoca y conserva importes vacíos
+ok 20 - editor de retiro: separa banco y caja, selecciona solo una caja inequívoca y conserva importes vacíos
+  ---
+  duration_ms: 0.994649
+  type: 'test'
+  ...
+1..20
+# tests 44
+# suites 0
+# pass 44
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3298.117163

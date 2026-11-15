@@ -45,7 +45,7 @@ export type CaptureResolution = { id: string } & (
   | { action: 'applyRefund'; expenseId: string; expectedExpenseUpdatedAt: string; distinctRefund?: boolean }
   | { action: 'registerMoneyTransfer'; money: CaptureMoneyInput & { toAccountId: string } }
   | { action: 'registerMoneyWithdrawal' | 'registerDebitExpense'; money: CaptureMoneyInput }
-  | { action: 'correctDebitType'; correction: { kind: 'TRANSFER'; toAccountId: string } | { kind: 'WITHDRAWAL' } | { kind: 'CARD_PAYMENT'; cycleId: string } }
+  | { action: 'correctDebitType'; correction: { kind: 'TRANSFER'; toAccountId: string } | { kind: 'WITHDRAWAL'; cashAccountId?: string; cashAmount?: string } | { kind: 'CARD_PAYMENT'; cycleId: string } }
   | { action: 'register' | 'distinct' | 'discard' | 'reinterpret' | 'validateWalletBackup' | 'reversePayment' | 'reverseRefund' }
 );
 export type Movement = StoredMovement;

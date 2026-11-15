@@ -1,0 +1,17 @@
+{
+  "checkedAt": "2026-11-15T03:09:05.174Z",
+  "deploymentId": "dpl_Extz7mxbhbr6YA997XKifarbUzDw",
+  "sourceFiles": 421,
+  "matchedFiles": 421,
+  "missing": [],
+  "different": [],
+  "unexpected": [],
+  "workspaceBase": "7a1b0d948f96a65e3a3a5b3ab0324066af5a4107",
+  "dirty": true,
+  "changedApplicationFiles": [
+    "src/components/configuracion/CaptureDebitCorrection.tsx",
+    "src/lib/captureDebitCorrections.ts",
+    "src/lib/captureJson.ts",
+    "src/lib/captureTypes.ts"
+  ]
+}

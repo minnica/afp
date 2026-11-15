@@ -131,5 +131,65 @@ test('BBVA: regla, efecto financiero, corrección e idempotencia con PostgreSQL'
       await db.dailyExpense.update({ where: { id: present(present(row).expenseId) }, data: { amount: '1.23' } });
       await assert.rejects(correct(present(row).id, { kind: 'TRANSFER', toAccountId: destination.id }), e => objectValue(e).status === 409);
     });
+    const cash = await db.moneyAccount.create({ data: { userId: present(user).id, name: 'Efectivo ficticio', kind: 'CASH', openingBalance: 1000, asOf: new Date('2026-10-24'), baseline: {} } });
+    await t.test('corregir a retiro abona efectivo una vez, conserva el descuento y separa la comisión', async () => {
+      for (const [total, received] of [['550.75', '550.75'], ['501.47', '500.00']] as const) {
+        const row = present(await send(make(total))), fromBefore = await balance(bbva.id), cashBefore = await balance(cash.id);
+        const correction = { kind: 'WITHDRAWAL', cashAccountId: cash.id, cashAmount: received };
+        await Promise.all([correct(row.id, correction), correct(row.id, correction)]);
+        await correct(row.id, { ...correction, cashAmount: String(Number(received)) });
+        const posting = await db.captureMoneyPosting.findUniqueOrThrow({ where: { movementId: row.id } });
+        const withdrawal = await db.moneyWithdrawal.findUniqueOrThrow({ where: { id: present(posting.withdrawalId) } });
+        assert.equal(withdrawal.cashAccountId, cash.id); assert.equal(Number(withdrawal.cashAmount), Number(received)); assert.equal(Number(withdrawal.amount), Number(total));
+        assert.equal(await balance(bbva.id), fromBefore); assert.equal(await balance(cash.id), cashBefore + Number(received));
+        assert.equal(await db.dailyExpense.findUnique({ where: { id: present(row.expenseId) } }), null);
+        assert.equal(await db.moneyWithdrawal.count({ where: { userId: present(user).id, accountId: bbva.id, amount: total } }), 1);
+        assert.equal(objectValue(posting.snapshot).toName, cash.name); assert.equal(objectValue(posting.snapshot).cashAmount, received);
+        const snapshotCorrection = objectValue(objectValue(posting.snapshot).correction);
+        assert.equal(objectValue(snapshotCorrection.previousExpense).id, row.expenseId);
+        await assert.rejects(correct(row.id, { ...correction, cashAmount: '1.00' }), e => objectValue(e).status === 409);
+        await assert.rejects(correct(row.id, { kind: 'WITHDRAWAL' }), e => objectValue(e).status === 409);
+        assert.equal(present(await send(make(total))).reason, 'MONEY_POSSIBLE_DUPLICATE');
+        await money.mutateMoney(db, present(user).id, { action: 'REVERSE_WITHDRAWAL', operationId: randomUUID(), id: withdrawal.id });
+        await money.mutateMoney(db, present(user).id, { action: 'REVERSE_WITHDRAWAL', operationId: randomUUID(), id: withdrawal.id });
+        assert.equal(await balance(cash.id), cashBefore); assert.equal(await balance(bbva.id), Math.round((fromBefore + Number(total)) * 100) / 100);
+      }
+    });
+    await t.test('destino de efectivo inválido, ajeno, incompleto o conciliado conserva gasto y saldos', async () => {
+      const row = present(await send(make('601.47'))), fromBefore = await balance(bbva.id), cashBefore = await balance(cash.id);
+      const base = { kind: 'WITHDRAWAL', cashAccountId: cash.id, cashAmount: '600.00' };
+      const invalid = [
+        { ...base, cashAccountId: foreign.id }, { ...base, cashAccountId: destination.id }, { ...base, cashAccountId: bbva.id },
+        { ...base, cashAccountId: undefined }, { ...base, cashAmount: undefined }, { ...base, cashAmount: '601.48' },
+        { ...base, cashAmount: '0' }, { ...base, cashAmount: '-1' }, { ...base, cashAmount: '600.001' },
+        { ...base, kind: 'TRANSFER', toAccountId: destination.id }, { ...base, kind: 'CARD_PAYMENT', cycleId: cycle.id },
+      ];
+      for (const correction of invalid) await assert.rejects(correct(row.id, correction));
+      await db.moneyAccount.update({ where: { id: cash.id }, data: { asOf: new Date('2026-10-26') } });
+      await assert.rejects(correct(row.id, base), e => objectValue(e).status === 409);
+      await db.moneyAccount.update({ where: { id: cash.id }, data: { asOf: new Date('2026-10-24') } });
+      assert.ok(await db.dailyExpense.findUnique({ where: { id: present(row.expenseId) } }));
+      assert.equal(await balance(bbva.id), fromBefore); assert.equal(await balance(cash.id), cashBefore);
+      assert.equal(await db.moneyWithdrawal.count({ where: { userId: present(user).id, amount: '601.47' } }), 0);
+    });
+    await t.test('fallo tras corregir revierte retiro, abono de efectivo, borrado y comprobante juntos', async () => {
+      const row = present(await send(make('701.47'))), fromBefore = await balance(bbva.id), cashBefore = await balance(cash.id);
+      const correction = { kind: 'WITHDRAWAL', cashAccountId: cash.id, cashAmount: '700.00' };
+      await assert.rejects(db.$transaction(async tx => {
+        await withFixtureDb(processing.resolveCaptureMovement, transactionFixture(tx), present(user).id, { id: row.id, action: 'correctDebitType', correction });
+        throw Error('rollback cash QA');
+      }), /rollback cash QA/);
+      assert.ok(await db.dailyExpense.findUnique({ where: { id: present(row.expenseId) } }));
+      assert.equal(await db.expenseTombstone.findUnique({ where: { expenseId: present(row.expenseId) } }), null);
+      assert.equal((await db.captureMoneyPosting.findUniqueOrThrow({ where: { movementId: row.id } })).kind, 'DEBIT_EXPENSE');
+      assert.equal(await balance(bbva.id), fromBefore); assert.equal(await balance(cash.id), cashBefore);
+      assert.equal(await db.moneyWithdrawal.count({ where: { userId: present(user).id, amount: '701.47' } }), 0);
+      const response = await route.PATCH(new Request('http://localhost/api/captures/movements', { method: 'PATCH', headers: { authorization: 'Bearer owner', 'Content-Type': 'application/json' }, body: JSON.stringify({ id: row.id, action: 'correctDebitType', correction }) }));
+      assert.equal(response.status, 200);
+      const posting = await db.captureMoneyPosting.findUniqueOrThrow({ where: { movementId: row.id } });
+      await db.moneyAccount.update({ where: { id: cash.id }, data: { asOf: new Date('2026-10-26') } });
+      await assert.rejects(money.mutateMoney(db, present(user).id, { action: 'REVERSE_WITHDRAWAL', operationId: randomUUID(), id: posting.withdrawalId }), e => objectValue(e).status === 409);
+      assert.equal((await db.moneyWithdrawal.findUniqueOrThrow({ where: { id: present(posting.withdrawalId) } })).reversedAt, null);
+    });
   } finally { await db.user.deleteMany({ where: { id: { in: users.map(u => u.id) } } }); await db.$disconnect(); }
 });

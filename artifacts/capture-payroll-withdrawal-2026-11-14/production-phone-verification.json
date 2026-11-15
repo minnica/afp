@@ -1,0 +1,32 @@
+{
+  "authenticatedRequests": [
+    {
+      "endpoint": "incomeCapture",
+      "status": 200
+    },
+    {
+      "endpoint": "withdrawalCapture",
+      "status": 200
+    },
+    {
+      "endpoint": "money",
+      "status": 200
+    }
+  ],
+  "bankBalanceMatches": true,
+  "cashBalanceMatches": true,
+  "cashNameMatches": true,
+  "checkedAt": "2026-11-15T03:13:32.501Z",
+  "payrollConfirmed": true,
+  "platform": "Android",
+  "readOnly": true,
+  "session": "existing authenticated app session",
+  "withdrawalCashLinked": true,
+  "withdrawalLinked": true,
+  "ui": {
+    "accountsTabSelected": true,
+    "cashAccountVisible": true,
+    "horizontalOverflow": false,
+    "oldNameAbsent": true
+  }
+}
