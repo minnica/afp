@@ -5,7 +5,7 @@ type NoticeSubscription = Omit<FinancialSubscription, 'dailyExpenses'> & { daily
 type NoticeReceivable = DebtAccount & { id: string; concept: string; expectedChargeDays?: number[]; expectedMonthlyPayment?: MoneyValue; originDate?: DateValue; person?: { name: string } | null; incomes?: ({ date: DateValue } & DebtPayment)[] };
 type NoticePayable = DebtAccount & { id: string; concept: string; expectedDate?: DateValue | null; person?: { name: string } | null; dailyExpenses?: DebtPayment[] };
 type Payment = { card: NoticeCard; currentPayment?: NoticeCycle | null };
-export interface ImportantNotice { id: string; type: string; group: string; title: string; description: string; date: DateValue; amount: number }
+export interface ImportantNotice { id: string; type: string; group: string; title: string; description: string; date: DateValue; amount: number; receivableAccountId?: string }
 import { getCyclePaymentState } from "@/lib/calculations/cardCyclePayments";
 import { getDebtAccountState } from "@/lib/calculations/debtAccounts";
 import { getSubscriptionReceipts, isSubscriptionChargeResolved } from "@/lib/subscriptionCharges";
@@ -255,6 +255,7 @@ export function buildReceivableNotices(receivables: NoticeReceivable[], now: Dat
 
       notices.push({
         id: `receivable-${receivable.id}-${currentYear}-${currentMonth}-${day}`,
+        receivableAccountId: receivable.id,
         type: "RECEIVABLE",
         group: timing.group,
         title:

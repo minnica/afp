@@ -4,6 +4,14 @@ Historial resumido de decisiones, cambios, migraciones e incidencias que ayudan 
 
 Consolidado el **27 de octubre de 2026** a partir del README del commit `4562aa0cec0a46d8b482fdfef96116d1d3040282` y sus evidencias. «Publicado», «aplicado» y «pendiente» describen lo documentado en cada fecha; esta consolidación no incluye una comprobación remota nueva. Se conservan las fechas de los registros originales, que pueden usar hora local o UTC. El nombre de una migración identifica su versión, no demuestra cuándo se aplicó.
 
+## 2026-11-14
+
+### Avisos de cobro: ingreso prerrellenado
+
+Pulsar un cobro programado o pendiente abre Ingresos con «Registrar cobro» y los datos actuales de la cuenta. Se eligió revisión y guardado explícitos para permitir abonos parciales y fechas reales distintas de las programadas. El importe sugerido no supera el saldo pendiente; no se inventa si falta. Se conserva el borrador manual y se consume el enlace para no reabrir el formulario al recargar. La lectura autenticada rechaza cuentas no disponibles y avisos ya atendidos o reprogramados; guardar utiliza la API transaccional existente y recarga los avisos.
+
+Sin migraciones, cambios de APK ni dependencias del proyecto. Implementación local, sin publicación ni modificación de datos personales. [Verificaciones y alcance](../artifacts/receivable-notice-prefill-2026-11-14/README.md).
+
 ## 2026-11-11
 
 ### Suscripciones: reutilizar gastos capturados al confirmar

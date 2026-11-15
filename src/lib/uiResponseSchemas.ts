@@ -1026,6 +1026,7 @@ const dashboardActiveReceivablesItemSchema = z.object({
 
 const dashboardImportantNoticesItemSchema = z.object({
   "id": z.string(),
+  "receivableAccountId": z.string().optional(),
   "type": z.string(),
   "group": z.string(),
   "title": z.string(),

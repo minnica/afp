@@ -10,6 +10,9 @@ import { uiFetch as apiFetch } from "@/lib/uiClient";
 import { useCreationDraft } from "@/hooks/use-creation-draft";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useIncomeHistory } from "@/hooks/use-income-history";
+import { useReceivableIncomePrefill } from "@/hooks/use-receivable-income-prefill";
+import type { IncomeDraft } from "@/lib/receivableIncomePrefill";
+import { useDashboard } from "@/components/dashboard/DashboardProvider";
 
 import CreateRecordSurface,{ useCreateDialogMode } from "@/components/ui/create-record-surface";
 
@@ -32,7 +35,7 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Pencil, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { toast } from "@/components/ui/sonner";
 
@@ -88,6 +91,7 @@ function formatDate(dateString: string) {
 
 export default function IngresosContent() {
   const { captureFocus, restoreFocus } = useDialogFocus();
+  const { refresh: refreshDashboard } = useDashboard();
   const router = useRouter();
   const mobileNavigation = useIsMobile();
   const compactEntry = useCreateDialogMode();
@@ -120,6 +124,20 @@ export default function IngresosContent() {
   const [isSaving, setIsSaving] = useState(false);
   const [incomeToDelete, setIncomeToDelete] = useState<Income | null>(null);
   const [error, setError] = useState("");
+  const onCollectionPrepared = useCallback((accounts: Receivable[]) => {
+    setReceivables(accounts);
+    setCreateError(null);
+  }, []);
+  const collection = useReceivableIncomePrefill(user?.id, incomeTypes, !isLoading && !isSaving, onCollectionPrepared);
+  // The notice has its own editable values; the user's manual draft stays intact.
+  const formValues: IncomeDraft = collection.draft || { date, incomeTypeId, source, concept, amount, receivableAccountId, notes };
+  function setIncomeField(field: keyof IncomeDraft, value: string) {
+    if (collection.draft) collection.setDraft(previous => previous ? { ...previous, [field]: value } : previous);
+    else {
+      const setters = { date: setDate, incomeTypeId: setIncomeTypeId, source: setSource, concept: setConcept, amount: setAmount, receivableAccountId: setReceivableAccountId, notes: setNotes };
+      setters[field](value);
+    }
+  }
 
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingIncomeId, setEditingIncomeId] = useState("");
@@ -198,6 +216,7 @@ export default function IngresosContent() {
 
   async function createIncome() {
     if (!user || isSaving) return false;
+    const fromNotice = Boolean(collection.draft);
 
     setCreateError(null);
     setError("");
@@ -212,14 +231,9 @@ export default function IngresosContent() {
         },
         body: JSON.stringify({
           userId: user.id,
-          date,
-          incomeTypeId,
-          source,
-          concept,
-          amount,
+          ...formValues,
           receivableAccountId:
-            receivableAccountId === "NONE" ? null : receivableAccountId,
-          notes,
+            formValues.receivableAccountId === "NONE" ? null : formValues.receivableAccountId,
         }),
       });
 
@@ -230,25 +244,29 @@ export default function IngresosContent() {
       }
 
       saved = true;
-      setSource("");
-      setConcept("");
-      setAmount("");
-      setReceivableAccountId("NONE");
-      setNotes("");
+      if (!fromNotice) {
+        setSource("");
+        setConcept("");
+        setAmount("");
+        setReceivableAccountId("NONE");
+        setNotes("");
+      }
 
+      void refreshDashboard({ silent: true });
       await Promise.all([loadIncomes(user.id, { mutationCompleted: true }), loadReceivables(user.id, { mutationCompleted: true })]);
-      if (!compactEntry) toast.success("Ingreso guardado exitosamente.");
+      if (!compactEntry || fromNotice) toast.success("Ingreso guardado exitosamente.");
       return { message: "Ingreso guardado exitosamente.", type: "success" };
     } catch (err) {
       if (saved) {
         setError("El registro se guardó, pero no se pudo actualizar la lista. Recarga para verlo.");
-        if (!compactEntry) toast.success("El registro se guardó; recarga la lista para verlo.");
+        if (!compactEntry || fromNotice) toast.success("El registro se guardó; recarga la lista para verlo.");
         return { message: "El registro se guardó; recarga la lista para verlo.", type: "success" };
       }
       setCreateError({ message: errorMessage(err) || "No se pudo guardar el ingreso." });
       return false;
     } finally {
       setIsSaving(false);
+      if (saved && fromNotice) collection.setDraft(null);
     }
   }
 
@@ -503,6 +521,15 @@ export default function IngresosContent() {
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         ) : null}
+        {collection.loading ? <p role="status" className="mb-4 text-sm text-muted-foreground">Preparando cobro…</p> : null}
+        {collection.error ? (
+          <Alert variant="destructive" className="mb-6">
+            <AlertDescription>
+              {collection.error}
+              <Button type="button" variant="outline" className="min-h-11" onClick={collection.retry}>Reintentar</Button>
+            </AlertDescription>
+          </Alert>
+        ) : null}
 
         <div className="mb-6 grid gap-4 md:grid-cols-3">
           <Card className="rounded-2xl border-border bg-card">
@@ -531,10 +558,21 @@ export default function IngresosContent() {
 
         <div className={`grid min-w-0 gap-5 ${compactEntry ? "" : "xl:grid-cols-[360px_1fr]"}`}>
           <CreateRecordSurface
+              key={collection.draft ? "scheduled-collection" : "manual-income"}
               showSaveFeedback
               compact={compactEntry}
-              title="Nuevo ingreso"
+              open={collection.draft ? true : undefined}
+              onOpenChange={(open) => { if (!open) { collection.setDraft(null); setCreateError(null); } }}
+              onCloseAutoFocus={collection.draft ? (event) => {
+                event.preventDefault();
+                requestAnimationFrame(() => {
+                  const target = document.querySelector<HTMLElement>('[data-slot="record-create-action"] button') || document.getElementById("income-date");
+                  target?.focus({ preventScroll: true });
+                });
+              } : undefined}
+              title={collection.draft ? "Registrar cobro" : "Nuevo ingreso"}
               saveLabel="Guardar ingreso"
+              notice={collection.draft ? "Datos del cobro programado. Revisa la fecha y el importe que recibiste antes de guardar." : undefined}
               error={createError}
               isSaving={isSaving}
               onSubmit={createIncome}
@@ -543,16 +581,16 @@ export default function IngresosContent() {
               <Label htmlFor="income-date">Fecha</Label>
               <DatePicker
                 id="income-date"
-                value={date}
-                onChange={setDate}
+                value={formValues.date}
+                onChange={value => setIncomeField("date", value)}
               />
               </div>
 
               <div className="space-y-2">
               <Label htmlFor="ingresos-field-1">Tipo de ingreso</Label>
               <ResponsiveSelect
-                value={incomeTypeId}
-                onValueChange={setIncomeTypeId}
+                value={formValues.incomeTypeId}
+                onValueChange={value => setIncomeField("incomeTypeId", value)}
                 id="ingresos-field-1"
                 title="Seleccionar tipo de ingreso"
                 placeholder="Selecciona tipo"
@@ -569,9 +607,9 @@ export default function IngresosContent() {
               <Label htmlFor="ingresos-field-2">Fuente</Label>
               <Input
                 id="ingresos-field-2"
-                value={source}
+                value={formValues.source}
                 placeholder="Ej. Empresa, Luis, Cuñado..."
-                onChange={(event) => setSource(event.target.value)}
+                onChange={(event) => setIncomeField("source", event.target.value)}
               />
               </div>
 
@@ -579,9 +617,9 @@ export default function IngresosContent() {
               <Label htmlFor="ingresos-field-3">Concepto</Label>
               <Input
                 id="ingresos-field-3"
-                value={concept}
+                value={formValues.concept}
                 placeholder="Ej. Nómina quincenal, pago celular..."
-                onChange={(event) => setConcept(event.target.value)}
+                onChange={(event) => setIncomeField("concept", event.target.value)}
               />
               </div>
 
@@ -589,21 +627,21 @@ export default function IngresosContent() {
               <Label htmlFor="ingresos-field-4">Monto</Label>
               <Input
                 id="ingresos-field-4"
-                value={amount}
+                value={formValues.amount}
                 type="number"
                 formatNumber
                 min="0"
                 step="0.01"
                 placeholder="0.00"
-                onChange={(event) => setAmount(event.target.value)}
+                onChange={(event) => setIncomeField("amount", event.target.value)}
               />
               </div>
 
               <div className="space-y-2">
               <Label htmlFor="ingresos-field-5">Cuenta por cobrar relacionada</Label>
               <SearchableSelect
-                value={receivableAccountId}
-                onValueChange={setReceivableAccountId}
+                value={formValues.receivableAccountId}
+                onValueChange={value => setIncomeField("receivableAccountId", value)}
                 id="ingresos-field-5"
                 title="Seleccionar cuenta por cobrar"
                 placeholder="Sin cuenta por cobrar"
@@ -626,9 +664,9 @@ export default function IngresosContent() {
               <div className="space-y-2">
               <Label htmlFor="ingresos-field-6">Notas opcional</Label>
               <Textarea id="ingresos-field-6"
-                value={notes}
+                value={formValues.notes}
                 placeholder="Detalles adicionales..."
-                onChange={(event) => setNotes(event.target.value)}
+                onChange={(event) => setIncomeField("notes", event.target.value)}
               />
               </div>
             </CreateRecordSurface>

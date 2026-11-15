@@ -31,12 +31,18 @@ export default function CreateRecordSurface({
   error, errorId: providedErrorId, isSaving, notice, onSubmit, actionSlot = "record-create-action",
   showSavingOverlay = false, savingOverlayLabel = "Guardando registro",
   showSaveFeedback = false,
-}: { compact: boolean; children?: React.ReactNode | ((options: { compact: boolean }) => React.ReactNode); title: string; saveLabel: string; description?: string; error?: { field?: string; message: string } | null; errorId?: string; isSaving: boolean; notice?: React.ReactNode; onSubmit: () => Promise<boolean | void | { message?: string; type?: string }>; actionSlot?: string; showSavingOverlay?: boolean; savingOverlayLabel?: string; showSaveFeedback?: boolean }) {
+  open: controlledOpen, onOpenChange, onCloseAutoFocus,
+}: { compact: boolean; children?: React.ReactNode | ((options: { compact: boolean }) => React.ReactNode); title: string; saveLabel: string; description?: string; error?: { field?: string; message: string } | null; errorId?: string; isSaving: boolean; notice?: React.ReactNode; onSubmit: () => Promise<boolean | void | { message?: string; type?: string }>; actionSlot?: string; showSavingOverlay?: boolean; savingOverlayLabel?: string; showSaveFeedback?: boolean; open?: boolean; onOpenChange?: (open: boolean) => void; onCloseAutoFocus?: React.ComponentProps<typeof DialogContent>["onCloseAutoFocus"] }) {
   const generatedId = useId()
   const mobile = useIsMobile()
   const errorId = providedErrorId ?? `${generatedId}-error`
   const submittingRef = useRef(false)
-  const [open, setOpen] = useState(false)
+  const [internalOpen, setInternalOpen] = useState(false)
+  const open = controlledOpen ?? internalOpen
+  function setOpen(value: boolean) {
+    if (controlledOpen === undefined) setInternalOpen(value)
+    onOpenChange?.(value)
+  }
   const [saveFeedback, setSaveFeedback] = useState<"" | { message: string; type: string }>("")
   const contentRef = useRef<HTMLDivElement | null>(null)
   const formRef = useRef<HTMLFormElement | null>(null)
@@ -191,6 +197,7 @@ export default function CreateRecordSurface({
           event.preventDefault()
           contentRef.current?.focus({ preventScroll: true })
         }}
+        onCloseAutoFocus={onCloseAutoFocus}
         onInteractOutside={(event) => { if (isSaving) event.preventDefault() }}
         onEscapeKeyDown={(event) => { if (isSaving) event.preventDefault() }}
       >

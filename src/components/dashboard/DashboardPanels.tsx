@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DialogClose } from "@/components/ui/dialog";
 import { Empty, EmptyDescription } from "@/components/ui/empty";
 import { formatPaymentDeadline } from "@/lib/cardPaymentPresentation";
+import { receivableIncomeHref } from "@/lib/receivableIncomePrefill";
 import { cn } from "@/lib/utils";
 import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -37,6 +38,7 @@ export function ImportantNoticesCard({ notices, today, inDialog = false, embedde
       {notices.map((notice) => {
         const category = getNoticeCategory(notice.type);
         const destination = NOTICE_DESTINATIONS[notice.type];
+        const collectionHref = receivableIncomeHref(notice);
         const actions = renderNoticeActions?.(notice);
 
         const alert = (
@@ -76,8 +78,8 @@ export function ImportantNoticesCard({ notices, today, inDialog = false, embedde
         const link = (
           <Link
             key={notice.id}
-            href={destination.href}
-            aria-label={`${notice.title}. Ir a ${destination.label}`}
+            href={collectionHref || destination.href}
+            aria-label={`${notice.title}. ${collectionHref ? "Registrar cobro en Ingresos" : `Ir a ${destination.label}`}`}
             className="block rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             {alert}

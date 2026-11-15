@@ -1,0 +1,63 @@
+{
+  "environment": "PostgreSQL local desechable, datos ficticios",
+  "database": [
+    {
+      "concept": "Cobro de revisión ficticio",
+      "status": "PAID_OFF",
+      "expected": 100,
+      "pending": 0,
+      "incomeCount": 1,
+      "incomes": [
+        {
+          "date": "2026-11-14",
+          "amount": 100,
+          "notes": null
+        }
+      ]
+    },
+    {
+      "concept": "Cobro ficticio",
+      "status": "PAID_OFF",
+      "expected": 500,
+      "pending": 0,
+      "incomeCount": 1,
+      "incomes": [
+        {
+          "date": "2026-11-14",
+          "amount": 350.25,
+          "notes": null
+        }
+      ]
+    },
+    {
+      "concept": "Cobro móvil ficticio",
+      "status": "ACTIVE",
+      "expected": 300,
+      "pending": 1074.5,
+      "incomeCount": 1,
+      "incomes": [
+        {
+          "date": "2026-11-14",
+          "amount": 125.5,
+          "notes": "Abono parcial ficticio"
+        }
+      ]
+    }
+  ],
+  "browser": {
+    "mobile": {
+      "width": 390,
+      "height": 844
+    },
+    "cancelKeepsManualDraft": true,
+    "draftSurvivesReload": true,
+    "noticeCanOpenFromSamePage": true,
+    "paidAccountLinkDoesNotOpenForm": true,
+    "normalNavigationDialogs": 0,
+    "focusAfterClose": "Nuevo ingreso",
+    "focusAfterSave": "Nuevo ingreso",
+    "preparedUrl": "/ingresos",
+    "horizontalOverflow": false,
+    "javascriptErrors": []
+  }
+}
