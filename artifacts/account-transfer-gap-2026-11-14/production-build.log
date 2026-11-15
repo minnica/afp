@@ -1,0 +1,100 @@
+2026-11-15T03:49:47.679Z 
+2026-11-15T03:49:47.679Z > afp@0.1.0 build /vercel/path1
+2026-11-15T03:49:47.679Z > prisma generate && next build
+2026-11-15T03:49:47.680Z 
+2026-11-15T03:49:48.660Z Loaded Prisma config from prisma.config.ts.
+2026-11-15T03:49:48.660Z 
+2026-11-15T03:49:48.868Z Prisma schema loaded from prisma/schema.prisma.
+2026-11-15T03:49:50.437Z ┌─────────────────────────────────────────────────────────┐
+2026-11-15T03:49:50.437Z │  Update available 7.10.1 -> 8.0.0-rc.33                 │
+2026-11-15T03:49:50.437Z │                                                         │
+2026-11-15T03:49:50.437Z │  This is a major update - please follow the guide at    │
+2026-11-15T03:49:50.437Z │  https://pris.ly/d/major-version-upgrade                │
+2026-11-15T03:49:50.437Z │                                                         │
+2026-11-15T03:49:50.437Z │  Run the following to update                            │
+2026-11-15T03:49:50.438Z │    npm i --save-dev prisma@latest                       │
+2026-11-15T03:49:50.438Z │    npm i @prisma/client@latest                          │
+2026-11-15T03:49:50.438Z └─────────────────────────────────────────────────────────┘
+2026-11-15T03:49:50.438Z 
+2026-11-15T03:49:50.438Z ✔ Generated Prisma Client (v7.10.1) to ./node_modules/.pnpm/@prisma+client@7.10.1_prisma@7.10.1_@types+node@22.20.5_@types+react-dom@19.3.0_@types+_67e1dd834939b123c798939e408e968c/node_modules/@prisma/client in 1.05s
+2026-11-15T03:49:50.438Z 
+2026-11-15T03:49:50.439Z Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+2026-11-15T03:49:50.439Z 
+2026-11-15T03:49:50.439Z 
+2026-11-15T03:49:51.033Z ▲ Next.js 16.4.3 (Turbopack)
+2026-11-15T03:49:51.103Z   Applying modifyConfig from Vercel
+2026-11-15T03:49:51.108Z ✓ Running next.config.mjs took 74ms
+2026-11-15T03:49:51.149Z 
+2026-11-15T03:49:51.199Z   Creating an optimized production build ...
+2026-11-15T03:49:54.050Z ✓ Compiled successfully in 2.8s
+2026-11-15T03:49:54.062Z   Running TypeScript ...
+2026-11-15T03:50:06.685Z   Finished TypeScript in 12.6s ...
+2026-11-15T03:50:06.688Z   Collecting page data using 1 worker ...
+2026-11-15T03:50:07.590Z   Generating static pages using 1 worker (0/53) ...
+2026-11-15T03:50:07.963Z   Generating static pages using 1 worker (13/53) 
+2026-11-15T03:50:07.970Z   Generating static pages using 1 worker (26/53) 
+2026-11-15T03:50:08.057Z   Generating static pages using 1 worker (39/53) 
+2026-11-15T03:50:08.454Z ✓ Generating static pages using 1 worker (53/53) in 875ms
+2026-11-15T03:50:08.466Z   Finalizing page optimization ...
+2026-11-15T03:50:08.613Z   Running onBuildComplete from Vercel
+2026-11-15T03:50:08.772Z 
+2026-11-15T03:50:08.774Z Route (app)
+2026-11-15T03:50:08.774Z ┌ ○ /
+2026-11-15T03:50:08.774Z ├ ○ /_not-found
+2026-11-15T03:50:08.774Z ├ ○ /acerca
+2026-11-15T03:50:08.774Z ├ ○ /analisis
+2026-11-15T03:50:08.774Z ├ ƒ /api/calendar/google
+2026-11-15T03:50:08.774Z ├ ƒ /api/calendar/google/callback
+2026-11-15T03:50:08.774Z ├ ƒ /api/calendar/google/connect
+2026-11-15T03:50:08.774Z ├ ƒ /api/calendar/google/disconnect
+2026-11-15T03:50:08.774Z ├ ƒ /api/calendar/google/sync
+2026-11-15T03:50:08.774Z ├ ƒ /api/captures/movements
+2026-11-15T03:50:08.774Z ├ ƒ /api/captures/notices
+2026-11-15T03:50:08.774Z ├ ƒ /api/captures/pairings
+2026-11-15T03:50:08.774Z ├ ƒ /api/captures/payment-receipts
+2026-11-15T03:50:08.774Z ├ ƒ /api/captures/reconciliation
+2026-11-15T03:50:08.774Z ├ ƒ /api/card-cycles
+2026-11-15T03:50:08.774Z ├ ƒ /api/cards
+2026-11-15T03:50:08.774Z ├ ƒ /api/cron/calendar-sync
+2026-11-15T03:50:08.774Z ├ ƒ /api/cron/capture-bank-fallback
+2026-11-15T03:50:08.774Z ├ ƒ /api/dashboard
+2026-11-15T03:50:08.774Z ├ ƒ /api/dashboard/summary
+2026-11-15T03:50:08.774Z ├ ƒ /api/expenses
+2026-11-15T03:50:08.775Z ├ ƒ /api/gastos/bootstrap
+2026-11-15T03:50:08.775Z ├ ƒ /api/incomes
+2026-11-15T03:50:08.775Z ├ ƒ /api/installment-purchases
+2026-11-15T03:50:08.775Z ├ ƒ /api/installment-purchases/payments
+2026-11-15T03:50:08.775Z ├ ƒ /api/money
+2026-11-15T03:50:08.775Z ├ ƒ /api/notice-dismissals
+2026-11-15T03:50:08.775Z ├ ƒ /api/payables
+2026-11-15T03:50:08.775Z ├ ƒ /api/receivables
+2026-11-15T03:50:08.775Z ├ ƒ /api/settings
+2026-11-15T03:50:08.775Z ├ ƒ /api/setup-user
+2026-11-15T03:50:08.775Z ├ ƒ /api/subscription-charges
+2026-11-15T03:50:08.775Z ├ ƒ /api/subscriptions
+2026-11-15T03:50:08.775Z ├ ○ /compras-a-meses
+2026-11-15T03:50:08.775Z ├ ○ /configuracion
+2026-11-15T03:50:08.775Z ├ ○ /credito-y-deuda
+2026-11-15T03:50:08.775Z ├ ○ /cuentas-por-cobrar
+2026-11-15T03:50:08.775Z ├ ○ /cuentas-por-pagar
+2026-11-15T03:50:08.775Z ├ ○ /dashboard
+2026-11-15T03:50:08.775Z ├ ○ /gastos
+2026-11-15T03:50:08.775Z ├ ○ /ingresos
+2026-11-15T03:50:08.775Z ├ ○ /login
+2026-11-15T03:50:08.775Z ├ ○ /mi-dinero
+2026-11-15T03:50:08.775Z ├ ○ /privacidad
+2026-11-15T03:50:08.776Z ├ ○ /registro-automatico
+2026-11-15T03:50:08.776Z ├ ○ /suscripciones
+2026-11-15T03:50:08.776Z └ ○ /tarjetas
+2026-11-15T03:50:08.776Z 
+2026-11-15T03:50:08.776Z 
+2026-11-15T03:50:08.776Z ○  (Static)   prerendered as static content
+2026-11-15T03:50:08.776Z ƒ  (Dynamic)  server-rendered on demand
+2026-11-15T03:50:08.776Z 
+2026-11-15T03:50:09.251Z Build Completed in /vercel/output [1m]
+2026-11-15T03:50:09.276Z Deploying outputs...
+2026-11-15T03:50:15.310Z Deployment completed
+2026-11-15T03:50:15.314Z Creating build cache...
+2026-11-15T03:50:48.304Z Created build cache: 33s
+2026-11-15T03:50:48.304Z Uploading build cache [494.07 MB]
+2026-11-15T03:50:57.085Z Build cache uploaded: 8.781s

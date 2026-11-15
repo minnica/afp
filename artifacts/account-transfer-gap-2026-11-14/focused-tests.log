@@ -1,0 +1,281 @@
+
+> afp@0.1.0 test /home/garatachia/projects/afp
+> node --import tsx tests/run-tests.ts capture-nu-transfer-duplicates.test.ts capture-money-integration.test.ts capture-transfer-pairs.test.ts
+
+TAP version 13
+# Subtest: captura de cuentas: transferencias Nu, débito confirmado y retiros sin duplicar dinero
+    # Subtest: reglas son explícitas, aisladas y no se infieren de nombres
+    ok 1 - reglas son explícitas, aisladas y no se infieren de nombres
+      ---
+      duration_ms: 97.851229
+      type: 'test'
+      ...
+    # Subtest: nuevas transferencias e identidades concurrentes se aplican una sola vez
+    ok 2 - nuevas transferencias e identidades concurrentes se aplican una sola vez
+      ---
+      duration_ms: 140.930696
+      type: 'test'
+      ...
+    # Subtest: solo los tres cargos confirmados se convierten en gasto de débito
+    ok 3 - solo los tres cargos confirmados se convierten en gasto de débito
+      ---
+      duration_ms: 150.242074
+      type: 'test'
+      ...
+    # Subtest: retiro manual idempotente disminuye la cuenta sin inventar aviso o gasto
+    ok 4 - retiro manual idempotente disminuye la cuenta sin inventar aviso o gasto
+      ---
+      duration_ms: 89.924029
+      type: 'test'
+      ...
+    # Subtest: retiro futuro necesita muestra explícita comprobada; nunca se usa el cargo genérico
+    ok 5 - retiro futuro necesita muestra explícita comprobada; nunca se usa el cargo genérico
+      ---
+      duration_ms: 93.483794
+      type: 'test'
+      ...
+    # Subtest: una regla no registra avisos incompletos, contradictorios o anteriores a la referencia
+    ok 6 - una regla no registra avisos incompletos, contradictorios o anteriores a la referencia
+      ---
+      duration_ms: 28.817284
+      type: 'test'
+      ...
+    # Subtest: gastos de débito conservan edición, borrado, cuenta, aislamiento e historial
+    ok 7 - gastos de débito conservan edición, borrado, cuenta, aislamiento e historial
+      ---
+      duration_ms: 153.1772
+      type: 'test'
+      ...
+    # Subtest: un lote abortado revierte la regla, captura y retiro juntos
+    ok 8 - un lote abortado revierte la regla, captura y retiro juntos
+      ---
+      duration_ms: 54.461713
+      type: 'test'
+      ...
+    # Subtest: lecturas por tipo y referencias mantienen propietario y filtros antes de paginar
+    ok 9 - lecturas por tipo y referencias mantienen propietario y filtros antes de paginar
+      ---
+      duration_ms: 52.522935
+      type: 'test'
+      ...
+    1..9
+ok 1 - captura de cuentas: transferencias Nu, débito confirmado y retiros sin duplicar dinero
+  ---
+  duration_ms: 1242.739021
+  type: 'test'
+  ...
+# Subtest: Nu: transferencias iguales en días distintos y protección de evidencias
+    # Subtest: dos días de México dentro del mismo día UTC registran dos transferencias; reintentos no suman otra
+    ok 1 - dos días de México dentro del mismo día UTC registran dos transferencias; reintentos no suman otra
+      ---
+      duration_ms: 179.045648
+      type: 'test'
+      ...
+    # Subtest: la recepción fuera de orden conserva ambas fechas
+    ok 2 - la recepción fuera de orden conserva ambas fechas
+      ---
+      duration_ms: 57.743498
+      type: 'test'
+      ...
+    # Subtest: mismo día y avisos junto a medianoche conservan revisión
+    ok 3 - mismo día y avisos junto a medianoche conservan revisión
+      ---
+      duration_ms: 148.167727
+      type: 'test'
+      ...
+    # Subtest: una clave de notificación reutilizada al día siguiente requiere revisión
+    ok 4 - una clave de notificación reutilizada al día siguiente requiere revisión
+      ---
+      duration_ms: 47.027861
+      type: 'test'
+      ...
+    # Subtest: una transferencia manual cercana sigue bloqueando el registro automático
+    ok 5 - una transferencia manual cercana sigue bloqueando el registro automático
+      ---
+      duration_ms: 32.78199
+      type: 'test'
+      ...
+    # Subtest: ediciones, correcciones y reversiones conservan revisión
+    ok 6 - ediciones, correcciones y reversiones conservan revisión
+      ---
+      duration_ms: 231.591753
+      type: 'test'
+      ...
+    # Subtest: varias evidencias o campos contradictorios no permiten asumir otra transferencia
+    ok 7 - varias evidencias o campos contradictorios no permiten asumir otra transferencia
+      ---
+      duration_ms: 104.49561
+      type: 'test'
+      ...
+    # Subtest: una regla pausada y un destino diferente no registran nuevas transferencias
+    ok 8 - una regla pausada y un destino diferente no registran nuevas transferencias
+      ---
+      duration_ms: 55.864121
+      type: 'test'
+      ...
+    # Subtest: un histórico pendiente requiere resolución expresa e idempotente, conservando su aviso
+    ok 9 - un histórico pendiente requiere resolución expresa e idempotente, conservando su aviso
+      ---
+      duration_ms: 67.153427
+      type: 'test'
+      ...
+    # Subtest: fallar al guardar la segunda evidencia revierte toda esa recepción
+    ok 10 - fallar al guardar la segunda evidencia revierte toda esa recepción
+      ---
+      duration_ms: 62.805112
+      type: 'test'
+      ...
+    1..10
+ok 2 - Nu: transferencias iguales en días distintos y protección de evidencias
+  ---
+  duration_ms: 1179.597139
+  type: 'test'
+  ...
+# Subtest: recepción Nu: gramática real anonimizada, sin inventar remitente ni ingreso
+ok 3 - recepción Nu: gramática real anonimizada, sin inventar remitente ni ingreso
+  ---
+  duration_ms: 0.839989
+  type: 'test'
+  ...
+# Subtest: transferencias BBVA → Nu: evidencias, concurrencia, reemplazo y protecciones
+    # Subtest: sin regla no se acredita; aceptación explícita y cuentas propias
+    ok 1 - sin regla no se acredita; aceptación explícita y cuentas propias
+      ---
+      duration_ms: 39.68035
+      type: 'test'
+      ...
+    # Subtest: entrada primero: una transferencia, dos recibos y saldos conservados
+    ok 2 - entrada primero: una transferencia, dos recibos y saldos conservados
+      ---
+      duration_ms: 81.379229
+      type: 'test'
+      ...
+    # Subtest: acepta Nu como cuenta de ahorro y rechaza efectivo como destino
+    ok 3 - acepta Nu como cuenta de ahorro y rechaza efectivo como destino
+      ---
+      duration_ms: 10.679907
+      type: 'test'
+      ...
+    # Subtest: cargo primero: sustituye gasto genérico sin descontar dos veces
+    ok 4 - cargo primero: sustituye gasto genérico sin descontar dos veces
+      ---
+      duration_ms: 115.891336
+      type: 'test'
+      ...
+    # Subtest: reintentos y recepción simultánea aplican una sola vez
+    ok 5 - reintentos y recepción simultánea aplican una sola vez
+      ---
+      duration_ms: 103.027033
+      type: 'test'
+      ...
+    # Subtest: importe, terminación y ventana temporal deben coincidir exactamente
+    ok 6 - importe, terminación y ventana temporal deben coincidir exactamente
+      ---
+      duration_ms: 84.736795
+      type: 'test'
+      ...
+    # Subtest: varios avisos y comprobación recíproca impiden adivinar el destino
+    ok 7 - varios avisos y comprobación recíproca impiden adivinar el destino
+      ---
+      duration_ms: 87.931441
+      type: 'test'
+      ...
+    # Subtest: conserva gasto editado o conciliado: notes
+    ok 8 - conserva gasto editado o conciliado: notes
+      ---
+      duration_ms: 43.647366
+      type: 'test'
+      ...
+    # Subtest: conserva gasto editado o conciliado: concept
+    ok 9 - conserva gasto editado o conciliado: concept
+      ---
+      duration_ms: 48.087651
+      type: 'test'
+      ...
+    # Subtest: conserva gasto editado o conciliado: amount
+    ok 10 - conserva gasto editado o conciliado: amount
+      ---
+      duration_ms: 43.250126
+      type: 'test'
+      ...
+    # Subtest: conserva gasto editado o conciliado: date
+    ok 11 - conserva gasto editado o conciliado: date
+      ---
+      duration_ms: 48.32902
+      type: 'test'
+      ...
+    # Subtest: conserva gasto editado o conciliado: reconciledAt
+    ok 12 - conserva gasto editado o conciliado: reconciledAt
+      ---
+      duration_ms: 44.042886
+      type: 'test'
+      ...
+    # Subtest: gasto eliminado no se recrea ni se convierte
+    ok 13 - gasto eliminado no se recrea ni se convierte
+      ---
+      duration_ms: 45.082144
+      type: 'test'
+      ...
+    # Subtest: conserva clasificación y vínculos personales
+    ok 14 - conserva clasificación y vínculos personales
+      ---
+      duration_ms: 92.858415
+      type: 'test'
+      ...
+    # Subtest: un ingreso manual cercano bloquea una nueva acreditación
+    ok 15 - un ingreso manual cercano bloquea una nueva acreditación
+      ---
+      duration_ms: 37.498614
+      type: 'test'
+      ...
+    # Subtest: avisos de otro propietario no se usan como evidencia
+    ok 16 - avisos de otro propietario no se usan como evidencia
+      ---
+      duration_ms: 40.11438
+      type: 'test'
+      ...
+    # Subtest: la BD mantiene las restricciones y RLS de la regla
+    ok 17 - la BD mantiene las restricciones y RLS de la regla
+      ---
+      duration_ms: 24.724229
+      type: 'test'
+      ...
+    # Subtest: registros manuales y transferencias revertidas bloquean duplicados
+    ok 18 - registros manuales y transferencias revertidas bloquean duplicados
+      ---
+      duration_ms: 42.297418
+      type: 'test'
+      ...
+    # Subtest: regla pausada, avisos anteriores y reinterpretación no escriben dinero
+    ok 19 - regla pausada, avisos anteriores y reinterpretación no escriben dinero
+      ---
+      duration_ms: 107.890456
+      type: 'test'
+      ...
+    # Subtest: cruce de medianoche usa fecha del cargo y respeta referencia de ambas cuentas
+    ok 20 - cruce de medianoche usa fecha del cargo y respeta referencia de ambas cuentas
+      ---
+      duration_ms: 59.842666
+      type: 'test'
+      ...
+    # Subtest: un fallo revierte transferencia, recibos y eliminación del gasto juntos
+    ok 21 - un fallo revierte transferencia, recibos y eliminación del gasto juntos
+      ---
+      duration_ms: 57.527249
+      type: 'test'
+      ...
+    1..21
+ok 4 - transferencias BBVA → Nu: evidencias, concurrencia, reemplazo y protecciones
+  ---
+  duration_ms: 1454.508378
+  type: 'test'
+  ...
+1..4
+# tests 44
+# suites 0
+# pass 44
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4225.214476

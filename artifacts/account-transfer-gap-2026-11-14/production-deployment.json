@@ -1,0 +1,17 @@
+{
+  "checkedAt": "2026-11-15T03:53:21.057466+00:00",
+  "deploymentId": "dpl_CyuLMDLjiRH3ePRWhXuK51W2GWXE",
+  "state": "READY",
+  "target": "production",
+  "url": "https://finanzas.garatachia.com",
+  "previousDeploymentId": "dpl_Bb3RNFpZ9QTM1YB1GHHYPt6CmBqN",
+  "workspaceBase": "791006b9cdbe87f17e22777e53b9d5d15a16dfe2",
+  "sourceFiles": 421,
+  "changedRuntimeFiles": [
+    "src/lib/captureMoney.ts"
+  ],
+  "newCommitCreated": false,
+  "pushed": false,
+  "apkUpdated": false,
+  "migrationApplied": false
+}

@@ -1,0 +1,14 @@
+## Runtime Logs
+
+**Project:** prj_FUBRDkPPFpOgJG9zuLLhTwm3JHKV
+**Deployment:** dpl_CyuLMDLjiRH3ePRWhXuK51W2GWXE
+**Time range:** 2026-11-15T03:47:11.859Z → 2026-11-15T03:52:11.859Z
+
+### 2026-11-15T03:50:36.573Z GET /api/money [error/function]
+dep=dpl_CyuLMDLjiRH3ePRWhXuK51W2GWXE request=m7d57-1794714634149-e766de4046bb domain=finanzas.garatachia.com environment=production region=cle1 runtime=nodejs24.x stream=stderr
+    (node:8) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+
+### 2026-11-15T03:50:21.868Z GET /api/money [error/function]
+dep=dpl_CyuLMDLjiRH3ePRWhXuK51W2GWXE request=9w56w-1794714619112-82026a96110e domain=finanzas.garatachia.com environment=production region=cle1 runtime=nodejs24.x stream=stderr
+    (node:8) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+

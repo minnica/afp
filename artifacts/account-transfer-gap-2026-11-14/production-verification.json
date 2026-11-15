@@ -1,0 +1,23 @@
+{
+  "checkedAt": "2026-11-15T03:53:21.057466+00:00",
+  "rehearsalRolledBack": true,
+  "idempotentReplayVerified": true,
+  "independentReadMatches": true,
+  "originalEventsUnchanged": true,
+  "newTransfers": 1,
+  "newIncomes": 5,
+  "newReconciliations": 2,
+  "captureRulesUnchanged": true,
+  "phoneAuthenticated": true,
+  "phoneBalancesMatchReportedBalances": true,
+  "phoneTransferRegistered": true,
+  "phoneApiStatuses": [
+    200,
+    200
+  ],
+  "phoneHorizontalOverflow": false,
+  "bankResidualOrigin": "not identified; documented as reconciliation, not income",
+  "yieldLimitation": "account combines money inside and outside savings; no bank interest credit invented",
+  "phoneAccountHeadingsMatch": true,
+  "calendarSynced": true
+}

@@ -6,6 +6,12 @@ Consolidado el **27 de octubre de 2026** a partir del README del commit `4562aa0
 
 ## 2026-11-14
 
+### Transferencias Nu repetidas en días distintos
+
+El aviso de una transferencia real quedó en revisión por tener el mismo importe y cuentas que otra del día anterior. La cola Android sí lo entregó; el filtro de duplicidad en el servidor comparaba tres días sin distinguir avisos Nu independientes. Se limita esa coincidencia cuando los días de México y las claves son distintos, hay más de quince minutos entre avisos del mismo dispositivo y se conserva intacta una transferencia automática con una sola evidencia. Los casos manuales, revertidos, modificados, cercanos a medianoche o con evidencias múltiples mantienen revisión.
+
+Pasaron 44 pruebas dirigidas y 1,222 pruebas de la suite con PostgreSQL, sin fallos ni omisiones; tipos, lint sin errores y build correctos. Sin migración, dependencias ni APK. Publicado en `dpl_CyuLMDLjiRH3ePRWhXuK51W2GWXE`, producción/READY, con 421 fuentes cotejadas. Tras respaldo y ensayo revertido se recuperó una transferencia, se registraron las cinco compensaciones SPEI comprobadas y se conciliaron las dos cuentas con los saldos confirmados, documentando los rendimientos estimados sobre dinero fuera de Cajita y la diferencia bancaria de origen pendiente. La repetición fue idempotente y la verificación independiente y la sesión real del teléfono coincidieron; Calendar quedó sincronizado. Muestras, saldos, respaldo y recibos permanecen privados. [Alcance, publicación y verificación](../artifacts/account-transfer-gap-2026-11-14/README.md).
+
 ### Captura BBVA: diagnóstico de nómina y corrección de retiro hacia efectivo
 
 La revisión productiva en solo lectura encontró ambos avisos recibidos: la nómina ya tenía un ingreso automático estimado porque su notificación omite el importe; el retiro llegó como cargo genérico sin evidencia de efectivo y siguió la regla de gasto aceptada. ADB confirmó la versión instalada y el acceso a notificaciones; el reporte del dispositivo mostró captura activa y envíos sin pausa. El diagnóstico inicial no realizó escrituras; la recuperación posterior se aplicó con autorización expresa.

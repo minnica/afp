@@ -8,7 +8,8 @@ import { ApiAccessError } from '@/lib/apiAuth';
 import { captureHash } from '@/lib/captureProtocol';
 import { captureAmount, captureDate } from '@/lib/captureReview';
 import { createExpenseInTransaction } from '@/lib/expenseService';
-import { moneyCaptureKind, accountDebitNotice, bbvaDebitPurchaseParserKey } from '@/lib/captureMoneyParsers';
+import { moneyCaptureKind, accountDebitNotice, bbvaDebitPurchaseParserKey, interpretMoneyNotice } from '@/lib/captureMoneyParsers';
+import { captureAmount as parseNoticeAmount, captureNotificationDate } from '@/lib/captureParsers';
 import { day, todayInMexico } from '@/lib/money/dates';
 import { getCyclePaymentAmounts } from '@/lib/calculations/cardCyclePayments';
 import { mutateMoney } from '@/lib/money/service';
@@ -76,7 +77,31 @@ async function sameSourcePosting(tx: Prisma.TransactionClient, movement: Movemen
 }
 async function duplicateCandidates(tx: Prisma.TransactionClient, userId: string, kind: string, values: z.output<typeof inputSchema>, event?: CaptureEvent) {
   const date = new Date(`${values.date}T00:00:00Z`), window = { gte: new Date(date.getTime() - 86400000), lte: new Date(date.getTime() + 2 * 86400000 - 1) };
-  if (kind === 'TRANSFER') return tx.moneyTransfer.findMany({ where: { userId, fromAccountId: values.fromAccountId, toAccountId: values.toAccountId, amount: values.amount, date: window, reversedAt: null }, select: { id: true } });
+  if (kind === 'TRANSFER') {
+    const rows = await tx.moneyTransfer.findMany({ where: { userId, fromAccountId: values.fromAccountId, toAccountId: values.toAccountId, amount: values.amount, date: window },
+      include: { capturePostings: { where: { userId }, include: { movement: { include: { events: { where: { userId } } } } } } } });
+    const current = event && interpretMoneyNotice(event, parseNoticeAmount, captureNotificationDate);
+    return rows.filter(row => {
+      // An amount repeated on another Mexico day is not itself a duplicate.
+      // Only independent, unedited Nu notices can release a nearby candidate;
+      // manual transfers, reversals and ambiguous evidence still need review.
+      if (!event || current?.reason !== 'MONEY_POLICY_REQUIRED' || current.parserKey !== 'nu.account-transfer.es.v1'
+        || current.proposal.date !== values.date || cents(current.proposal.amount) !== cents(values.amount)
+        || row.reversedAt || row.capturePostings.length !== 1) return true;
+      const posting = row.capturePostings[0]!, movement = posting.movement, snapshot = captureSnapshot(posting.snapshot);
+      if (posting.kind !== 'TRANSFER' || posting.originalRecordId !== row.id || movement.status !== 'REGISTERED'
+        || movement.parserKey !== current.parserKey || movement.correction || movement.events.length !== 1
+        || snapshot.automatic !== true || snapshot.correction || snapshot.fromAccountId !== row.fromAccountId
+        || snapshot.toAccountId !== row.toAccountId || snapshot.date !== day(row.date)
+        || cents(snapshot.amount) !== cents(row.amount) || snapshot.concept !== row.concept) return true;
+      const previousEvent = movement.events[0]!, previous = interpretMoneyNotice(previousEvent, parseNoticeAmount, captureNotificationDate);
+      return previous?.reason !== 'MONEY_POLICY_REQUIRED' || previous.parserKey !== current.parserKey
+        || previous.proposal.date !== day(row.date) || previous.proposal.date === current.proposal.date
+        || cents(previous.proposal.amount) !== cents(row.amount) || previous.proposal.destinationLabel !== current.proposal.destinationLabel
+        || previousEvent.deviceId !== event.deviceId || previousEvent.notificationKeyHash === event.notificationKeyHash
+        || Math.abs(previousEvent.postedAt.getTime() - event.postedAt.getTime()) <= 15 * 60_000;
+    }).map(({ id }) => ({ id }));
+  }
   if (kind === 'WITHDRAWAL') return tx.moneyWithdrawal.findMany({ where: { userId, accountId: values.fromAccountId, amount: values.amount, date: window, reversedAt: null }, select: { id: true } });
   const expenses = await tx.dailyExpense.findMany({ where: { userId, paymentMethod: 'DEBIT', debitAccountId: values.fromAccountId, amount: values.amount, date: window }, select: { id: true, amount: true, date: true, captureMovements: { where: { userId }, select: { parserKey: true, proposal: true, correction: true, events: { select: { fields: true, sourcePackage: true, postedAt: true, receivedAt: true } } } } } });
   const withdrawals = await tx.moneyWithdrawal.findMany({ where: { userId, accountId: values.fromAccountId, amount: values.amount, date: window, reversedAt: null }, select: { id: true } });
