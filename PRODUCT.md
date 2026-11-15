@@ -38,6 +38,8 @@ Las compras BBVA con aviso «Compra con TDD» conservan comercio y fecha bancari
 
 La confirmación de suscripciones permite revisar gastos ya capturados y vincular el correcto conservando una sola salida, sus datos y su evidencia. La asociación futura requiere aceptar el comercio exacto y la tarjeta; utiliza las reglas existentes, sin habilitar formatos ni procesar históricos. Los casos ambiguos y los cambios concurrentes requieren revisión. Publicado el 11 de noviembre de 2026; la corrección histórica y la regla puntual autorizadas conservaron un solo gasto y la suscripción confirmada.
 
+El consumo mínimo y el seguimiento de compras de Nu usan las compras registradas en AFP, incluidas capturas automáticas anteriores sin cotejo. La conciliación con el estado de cuenta es una comprobación opcional independiente del avance; no se confirma automáticamente. Cargos futuros, previsiones de suscripciones y discrepancias de importe permanecen aparte. La interfaz identifica el origen capturado y los cargos cotejados, y describe el cumplimiento según lo registrado. Implementación local del 15 de noviembre de 2026.
+
 ## Evidence on Hand
 
 Los avisos web de corte abren Tarjetas con el estado de cuenta del ciclo exacto y sus fechas actuales de inicio, corte y límite de pago, todos editables. Un monto bancario ausente queda vacío. Guardar confirma monto y fechas en una sola transacción, actualiza el saldo y recarga los avisos; abrir o cerrar no registra cambios. Se consulta el ciclo con la sesión autenticada, independientemente del año o página visibles. Implementación local del 14 de noviembre de 2026.

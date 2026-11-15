@@ -101,10 +101,36 @@ test('A13 PostgreSQL: ventanas, páginas, referencias y resumen', { skip: !conne
       assert.equal(summary.body.weeklyComparisonByMonth, undefined); assert.equal(summary.body.cycles, undefined);
       assert.equal(summary.headers.get('cache-control'), 'private, no-store');
     });
+    await t.test('web y resumen suman capturas existentes sin cotejarlas y reflejan correcciones', async () => {
+      const automated = await db.dailyExpense.create({ data: { userId: user.id, cardId: card.id, categoryId: category.id,
+        concept: 'Compra automática existente', amount: '268.38', paymentMethod: 'CARD', date: new Date('2026-10-20'), reconciliationStatus: 'PENDING' } });
+      await db.captureMovement.create({ data: { userId: user.id, cardId: card.id, expenseId: automated.id, status: 'REGISTERED', reason: 'REGISTERED', proposal: {} } });
+      const statementCount = await db.captureStatement.count({ where: { userId: user.id } });
+      const usage = async (route: string) => {
+        const response = await call(route);
+        assert.equal(response.status, 200);
+        return record(array(response.body.cardUsageWaiversCurrent).find(row => record(record(row).card).id === card.id));
+      };
+      for (const route of ['dashboard', 'dashboard/summary']) {
+        const item = await usage(route);
+        assert.equal(item.eligibleSpend, 268.38); assert.equal(item.remainingAmount, 31.62);
+        const entry = record(array(record(item.breakdown).includedDailyExpenses).find(row => record(row).id === automated.id));
+        assert.equal(entry.isCaptured, true); assert.equal(entry.reconciled, false);
+      }
+      const preserved = await db.dailyExpense.findUniqueOrThrow({ where: { id: automated.id } });
+      assert.equal(preserved.reconciliationStatus, 'PENDING'); assert.equal(preserved.reconciledAt, null);
+      assert.equal(await db.captureStatement.count({ where: { userId: user.id } }), statementCount);
+      await db.dailyExpense.update({ where: { id: automated.id }, data: { amount: 350 } });
+      assert.equal((await usage('dashboard/summary')).isExempt, true);
+      await db.dailyExpense.update({ where: { id: automated.id }, data: { amount: 200 } });
+      assert.equal((await usage('dashboard')).remainingAmount, 100);
+      await db.dailyExpense.delete({ where: { id: automated.id } });
+      assert.equal((await usage('dashboard/summary')).eligibleSpend, 0);
+    });
     await t.test('Turbo conserva la compra válida fuera de ventana y omite comisiones', async () => {
       const nu = await db.card.create({ data: { userId: user.id, name: 'Nu sintética', usualCutDay: 15, usualDueDay: 25, usagePolicy: { productKey: 'NU' } } });
       const expense = await db.dailyExpense.create({ data: { userId: user.id, cardId: nu.id, categoryId: category.id, concept: 'Compra antigua válida',
-        amount: 25, paymentMethod: 'CARD', date: new Date('2010-06-01') } });
+        amount: 25, paymentMethod: 'CARD', date: new Date('2010-06-01'), reconciliationStatus: 'PENDING' } });
       await db.dailyExpense.createMany({ data: Array.from({ length: 101 }, () => ({ userId: user.id, cardId: nu.id, categoryId: category.id, concept: 'COMISION ADMINISTRACION',
         amount: 20, paymentMethod: 'CARD' as const, date: new Date('2020-01-01') })) });
       const summary = await call('dashboard/summary'); assert.equal(summary.status, 200);

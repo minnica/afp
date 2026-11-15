@@ -1,0 +1,66 @@
+{
+  "date": "2026-11-15",
+  "scope": "Local; PostgreSQL desechable, autenticación y datos ficticios",
+  "suite": {
+    "tests": 1228,
+    "passed": 1228,
+    "failed": 0,
+    "skipped": 0
+  },
+  "checks": {
+    "typecheck": true,
+    "typecheckTests": true,
+    "typeContracts": true,
+    "build": true,
+    "lintErrors": 0,
+    "lintWarnings": 3,
+    "designFindings": 0
+  },
+  "browser": {
+    "desktop": {
+      "width": 1440,
+      "overflow": false,
+      "dailyTotal": 268.38,
+      "capturedPurchases": 4,
+      "forecastAmount": 40
+    },
+    "mobile": {
+      "widths": [
+        390,
+        320
+      ],
+      "overflow": false,
+      "eligibleSpend": 268.38,
+      "remainingAmount": 31.62
+    },
+    "api": {
+      "dashboard": 200,
+      "summary": 200,
+      "uiSchemasValid": true
+    },
+    "reconciliation": {
+      "before": 268.38,
+      "confirm": {
+        "status": 200,
+        "amount": 268.38,
+        "reconciled": true
+      },
+      "unconfirm": {
+        "status": 200,
+        "amount": 268.38,
+        "reconciled": false
+      }
+    }
+  },
+  "dependencies": {
+    "productionAdvisories": 0,
+    "developmentAdvisories": {
+      "moderate": 7,
+      "low": 2
+    },
+    "dependencyChanges": false
+  },
+  "migrationRequired": false,
+  "deployed": false,
+  "productionWrites": false
+}

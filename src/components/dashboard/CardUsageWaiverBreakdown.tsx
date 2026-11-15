@@ -8,6 +8,15 @@ import { BreakdownHelp, BreakdownSection, BreakdownSections } from "@/components
 import { useIsMobile } from "@/hooks/use-mobile";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { cn } from "@/lib/utils";
+
+type Entry = RegularUsage["breakdown"]["includedDailyExpenses"][number];
+function recordDetails(entry: Entry) {
+  return [entry.categoryName, entry.isCaptured && "Captura automática", entry.reconciled && "Conciliado"].filter(Boolean).join(" · ");
+}
+function sumEntries(entries: Entry[]) {
+  return entries.reduce((sum, entry) => sum + Math.round(entry.amount * 100), 0) / 100;
+}
 
 function formatMoney(value: unknown) {
   return new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" }).format(Number(value || 0));
@@ -22,6 +31,8 @@ export default function CardUsageWaiverBreakdown({ item }: { item: Usage }) {
   const isMobile = useIsMobile();
   if (item.requirementType === "PURCHASE_FREQUENCY") return <NuTurboUsageBreakdown item={item} />;
   const breakdown = item.breakdown || {};
+  const projected = (breakdown.projectedCharges || []).filter(entry => !entry.requiresReview);
+  const review = (breakdown.projectedCharges || []).filter(entry => entry.requiresReview);
   const sections = [
     {
       title: "Gastos diarios",
@@ -29,10 +40,10 @@ export default function CardUsageWaiverBreakdown({ item }: { item: Usage }) {
       items: breakdown.includedDailyExpenses || [],
       emptyText: "No hay gastos diarios que cuenten en este ciclo.",
       getPrimary: (entry: RegularUsage["breakdown"]["includedDailyExpenses"][number]) => entry.concept,
-      getSecondary: (entry: RegularUsage["breakdown"]["includedDailyExpenses"][number]) => `${formatBreakdownDate(entry.date)}${entry.categoryName ? ` · ${entry.categoryName}` : ""}`,
+      getSecondary: (entry: Entry) => [formatBreakdownDate(entry.date), recordDetails(entry)].filter(Boolean).join(" · "),
     },
     {
-      title: "Suscripciones confirmadas",
+      title: "Suscripciones verificadas",
       amount: breakdown.subscriptionsAmount,
       items: breakdown.includedSubscriptions || [],
       emptyText: "No hay suscripciones que cuenten en este ciclo.",
@@ -45,7 +56,7 @@ export default function CardUsageWaiverBreakdown({ item }: { item: Usage }) {
       items: breakdown.includedInstallmentPurchases || [],
       emptyText: "No hay compras a meses que cuenten en este ciclo.",
       getPrimary: (entry: RegularUsage["breakdown"]["includedDailyExpenses"][number]) => entry.concept,
-      getSecondary: (entry: RegularUsage["breakdown"]["includedDailyExpenses"][number]) => `${formatBreakdownDate(entry.purchaseDate)} · compra total${entry.categoryName ? ` · ${entry.categoryName}` : ""}`,
+      getSecondary: (entry: Entry) => [formatBreakdownDate(entry.purchaseDate), "compra total", recordDetails(entry)].filter(Boolean).join(" · "),
     },
     ...(breakdown.excludedExpenses?.length ? [{
       title: "Cargos que no cuentan",
@@ -54,36 +65,43 @@ export default function CardUsageWaiverBreakdown({ item }: { item: Usage }) {
       getPrimary: (entry: RegularUsage["breakdown"]["includedDailyExpenses"][number]) => entry.concept,
       getSecondary: (entry: RegularUsage["breakdown"]["includedDailyExpenses"][number]) => `${formatBreakdownDate(entry.date)} · ${entry.reason}`,
     }] : []),
-    ...(breakdown.projectedCharges?.length ? [{
-      title: "Previstos, por confirmar",
-      amount: item.projectedAmount,
-      items: breakdown.projectedCharges,
+    ...(review.length ? [{
+      title: "Cargos por revisar",
+      amount: sumEntries(review),
+      items: review,
+      getPrimary: (entry: Entry) => entry.name || entry.concept,
+      getSecondary: (entry: Entry) => `${formatBreakdownDate(entry.chargeDate || entry.date || entry.purchaseDate)} · ${entry.reason}`,
+    }] : []),
+    ...(projected.length ? [{
+      title: "Cargos previstos",
+      amount: sumEntries(projected),
+      items: projected,
       getPrimary: (entry: RegularUsage["breakdown"]["includedDailyExpenses"][number]) => entry.name || entry.concept,
       getSecondary: (entry: RegularUsage["breakdown"]["includedDailyExpenses"][number]) => `${formatBreakdownDate(entry.chargeDate || entry.date || entry.purchaseDate)} · ${entry.reason}`,
     }] : []),
   ];
-  const rules = "Las comisiones, sus impuestos, los intereses y las mensualidades de compras anteriores no cuentan. Los cargos previstos se muestran aparte hasta registrar o verificar el cobro.";
+  const rules = "Las compras registradas en AFP, incluidas las automáticas, suman sin cotejarlas con el estado de cuenta. La conciliación es una comprobación opcional. Las comisiones, sus impuestos, los intereses y las mensualidades de compras anteriores no cuentan. Los cargos futuros y las suscripciones sin cargo registrado se muestran aparte; las diferencias con el estado requieren revisión.";
   const statusText = item.periodSelectionPending ? "Por revisar: hay períodos superpuestos"
     : item.confirmationPending ? "Por revisar: importes distintos al estado"
     : item.status === "NO_CYCLE" ? "Sin ciclo registrado"
     : item.status === "FUTURE" ? "Período futuro"
-    : item.isExempt ? "Meta alcanzada"
+    : item.isExempt ? "Meta alcanzada según lo registrado"
     : item.status === "NOT_MET" ? "Meta no alcanzada en este período"
     : item.status === "UNCONFIRMED" ? "Hay cargos previstos por confirmar"
     : "Meta en progreso";
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col gap-4">
       {isMobile ? (
-        <div className="space-y-3">
-          <div className="space-y-1 text-sm text-muted-foreground">
+        <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-1 text-sm text-muted-foreground">
             <p>{item.product}{item.selectedCycle ? ` · ${item.periodVerified ? "Período verificado" : "Período previsto"}` : ""}</p>
             {item.selectedCycle && <p>Del {formatBreakdownDate(item.selectedCycle.startDate)} al {formatBreakdownDate(item.selectedCycle.cutDate)}</p>}
           </div>
-          <dl className="space-y-2">
+          <dl className="flex flex-col gap-2">
             <div className="flex items-baseline justify-between gap-3">
               <dt className="flex min-w-0 items-center text-sm">
-                Consumo que cuenta
+                Consumo registrado
                 <BreakdownHelp
                   title="Qué cuenta para la meta"
                   description={rules}
@@ -96,7 +114,7 @@ export default function CardUsageWaiverBreakdown({ item }: { item: Usage }) {
             <div className="flex items-baseline justify-between gap-3"><dt className="text-sm text-muted-foreground">Meta del período</dt><dd className="min-w-0 break-words text-right text-sm font-medium tabular-nums">{formatMoney(item.minimumAmount)}</dd></div>
             <div className="flex items-baseline justify-between gap-3"><dt className="text-sm text-muted-foreground">{item.status === "NOT_MET" ? "Faltó para la meta" : "Falta para la meta"}</dt><dd className="min-w-0 break-words text-right text-sm font-medium tabular-nums">{formatMoney(item.remainingAmount)}</dd></div>
           </dl>
-          <p className={`text-sm ${item.confirmationPending ? "text-red-400" : item.isExempt ? "text-emerald-400" : "text-muted-foreground"}`}>{statusText}</p>
+          <p className={cn("text-sm text-muted-foreground", item.confirmationPending && "text-destructive")}>{statusText}</p>
         </div>
       ) : (
         <>

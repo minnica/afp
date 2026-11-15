@@ -87,6 +87,10 @@ function MobileCurrentUsageList({ items, today, onBreakdown }: UsageListProps) {
                     className="[&_[data-slot=progress-indicator]]:motion-reduce:transition-none"
                   />
                 ) : null}
+                <p className="text-xs text-muted-foreground tabular-nums">
+                  {formatMoney(item.eligibleSpend)} de {formatMoney(item.minimumAmount)} registrados
+                </p>
+                {item.isExempt ? <p className="text-xs text-muted-foreground">Según lo registrado en AFP.</p> : null}
               </>
             ) : <p className="text-xs text-muted-foreground">Revisa sus ciclos en Tarjetas.</p>}
           </ItemContent>
@@ -161,11 +165,12 @@ function UsageList({ items, today, historical = false, compact = false, onBreakd
                 <p className="text-xs text-muted-foreground tabular-nums">
                   {formatMoney(item.eligibleSpend)} de {formatMoney(item.minimumAmount)} registrados
                 </p>
+                {item.isExempt ? <p className="text-xs text-muted-foreground">Según lo registrado en AFP.</p> : null}
                 {needsReview ? (
                   <p className="text-xs text-destructive">{item.periodSelectionPending ? "Hay períodos superpuestos." : "Hay importes distintos al estado."}</p>
                 ) : null}
                 {!compact && Number(item.projectedAmount) > 0 ? (
-                  <p className="text-xs text-muted-foreground tabular-nums">{formatMoney(item.projectedAmount)} por confirmar</p>
+                  <p className="text-xs text-muted-foreground tabular-nums">{formatMoney(item.projectedAmount)} {item.confirmationPending ? "fuera del avance; ver desglose" : "previstos"}</p>
                 ) : null}
               </>
             ) : (
@@ -219,7 +224,7 @@ export default function CardUsageWaiverProgress({
     <>
       <TabsContent value="current" className="flex min-w-0 flex-col gap-3 data-[state=inactive]:hidden">
         {pending.some((item) => item.subscriptionForecast?.upcomingCount || item.subscriptionForecast?.unconfirmedCount) ? (
-          <p className="text-xs text-muted-foreground">Las suscripciones previstas cuentan cuando se confirma el cobro.</p>
+          <p className="text-xs text-muted-foreground">Las suscripciones previstas cuentan cuando se registra el cargo.</p>
         ) : null}
         {pending.length ? <CurrentList items={pending} {...listProps} /> : current.length === completed.length && completed.length ? (
           <Empty className="px-0 py-4"><EmptyDescription>Todas tus metas en curso están alcanzadas.</EmptyDescription></Empty>

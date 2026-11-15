@@ -37,6 +37,16 @@ test("cualquier importe positivo renueva 30 días, sin depender del mes ni del c
   assert.equal(branch(present(run({ expenses: [expense({ date: "2028-02-01" })], now: new Date("2028-02-29T12:00:00Z") })), 'renewBy').renewBy, "2028-03-02");
 });
 
+test("las compras automáticas y MSI renuevan Turbo sin confirmar la conciliación", () => {
+  const automated = expense({ reconciliationStatus: "PENDING", reconciledAt: null });
+  const before = JSON.stringify(automated);
+  assert.equal(present(run({ expenses: [automated] })).status, "MET");
+  assert.equal(branch(present(run({ expenses: [automated] })), 'renewBy').renewBy, "2026-11-20");
+  const purchase = { id: "msi-auto", cardId: card.id, concept: "Compra automática", purchaseDate: "2026-10-21", totalAmount: 300, months: 3, status: "ACTIVE" as const, reconciliationStatus: "PENDING" };
+  assert.equal(present(run({ purchases: [purchase] })).status, "MET");
+  assert.equal(JSON.stringify(automated), before);
+});
+
 test("el día 30 pide comprar hoy; el plazo conserva todo el día y cambia al siguiente", () => {
   for (const [day, status, remaining] of [["2026-11-19", "MET", 1], ["2026-11-20", "DUE_TODAY", 0], ["2026-11-21", "NOT_MET", -1]]) {
     for (const time of ["00:00:00", "23:59:59"]) {
@@ -51,9 +61,9 @@ test("el día 30 pide comprar hoy; el plazo conserva todo el día y cambia al si
   assert.equal(branch(present(renewed), 'renewBy').renewBy, "2026-12-20");
 });
 
-test("futuros, capturas pendientes, efectivo, otra tarjeta e importes inválidos no acreditan compras", () => {
+test("futuros, efectivo, otra tarjeta e importes inválidos no acreditan compras", () => {
   for (const patch of [
-    { date: "2026-10-22" }, { reconciliationStatus: "PENDING" }, { paymentMethod: "CASH" as const },
+    { date: "2026-10-22" }, { paymentMethod: "CASH" as const },
     { cardId: "other" }, { amount: 0 }, { amount: -1 }, { amount: "invalid" }, { amount: Infinity },
     { date: null }, { date: "invalid" },
   ]) assert.equal(present(run({ expenses: [expense(patch)] })).status, "NOT_MET", JSON.stringify(patch));
@@ -71,7 +81,7 @@ test("MSI cuenta solo en la fecha original, incluso liquidada; sus mensualidades
   const purchase = { id: "msi", cardId: card.id, concept: "Compra a meses", purchaseDate: "2026-10-21", totalAmount: 300, months: 3, status: "PAID_OFF" as const };
   assert.equal(branch(present(run({ purchases: [purchase] })), 'purchaseCount').purchaseCount, 1);
   assert.equal(present(run({ purchases: [purchase], now: new Date("2026-11-21T12:00:00Z") })).status, "NOT_MET");
-  for (const patch of [{ status: "CANCELLED" as const }, { reconciliationStatus: "PENDING" }, { purchaseDate: "2026-10-22" }])
+  for (const patch of [{ status: "CANCELLED" as const }, { purchaseDate: "2026-10-22" }])
     assert.equal(present(run({ purchases: [{ ...purchase, ...patch }] })).status, "NOT_MET");
 });
 
@@ -83,7 +93,7 @@ test("suscripciones cuentan por gasto o evidencia verificada una vez, nunca por 
   assert.equal(branch(present(run({ subscriptions: [subscription], cyclesWithAmounts: [verified, { ...verified, id: "duplicate" }] })), 'purchaseCount').purchaseCount, 1);
   const linked = expense({ subscriptionId: subscription.id, amount: 99 });
   assert.equal(branch(present(run({ expenses: [linked], subscriptions: [subscription], cyclesWithAmounts: [verified] })), 'purchaseCount').purchaseCount, 1);
-  assert.equal(branch(present(run({ expenses: [{ ...linked, reconciliationStatus: "PENDING" }], subscriptions: [subscription], cyclesWithAmounts: [verified] })), 'purchaseCount').purchaseCount, 0);
+  assert.equal(branch(present(run({ expenses: [{ ...linked, reconciliationStatus: "PENDING" }], subscriptions: [subscription], cyclesWithAmounts: [verified] })), 'purchaseCount').purchaseCount, 1);
   assert.equal(branch(present(run({ cyclesWithAmounts: [{ ...verified, usageReconciliation: { ...verified.usageReconciliation, sourceSha256: "invalid" } }] })), 'purchaseCount').purchaseCount, 0);
 });
 

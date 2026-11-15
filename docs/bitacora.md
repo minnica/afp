@@ -4,6 +4,14 @@ Historial resumido de decisiones, cambios, migraciones e incidencias que ayudan 
 
 Consolidado el **27 de octubre de 2026** a partir del README del commit `4562aa0cec0a46d8b482fdfef96116d1d3040282` y sus evidencias. «Publicado», «aplicado» y «pendiente» describen lo documentado en cada fecha; esta consolidación no incluye una comprobación remota nueva. Se conservan las fechas de los registros originales, que pueden usar hora local o UTC. El nombre de una migración identifica su versión, no demuestra cuándo se aplicó.
 
+## 2026-11-15
+
+### Consumo mínimo: sumar las compras registradas sin cotejo obligatorio
+
+Las capturas ya guardadas, incluidos históricos y compras nuevas a meses, suman al avance de consumo mínimo sin confirmar cada compra. La conciliación bancaria conserva su estado y queda como comprobación opcional; se aplica también al seguimiento de Nu y a sus referencias fuera de ventana. Se mantienen fechas, exclusiones, duplicidad y discrepancias reales. El desglose distingue cargos previstos de cargos por revisar y muestra origen capturado y cotejos existentes; la meta describe lo registrado en AFP.
+
+Pasaron 1,228 pruebas con PostgreSQL local, sin fallos ni omisiones, los tres controles de tipos y build; lint sin errores y con tres avisos previos en archivos no modificados. Navegador de escritorio y móvil de 390/320 px, API y BD locales comprobaron avance, previsiones y cotejo reversible sin alterar el consumo. Sin migraciones, cambios de dependencias, APK ni publicación. Auditoría de producción sin avisos; nueve de desarrollo documentados. [Alcance, capturas y verificaciones](../artifacts/card-usage-registered-2026-11-15/README.md).
+
 ## 2026-11-14
 
 ### Transferencias Nu repetidas en días distintos

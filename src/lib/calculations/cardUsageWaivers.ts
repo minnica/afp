@@ -4,7 +4,7 @@ const verifiedAt = (value: unknown) => isRecord(value) ? value.verifiedAt : unde
 import { usageEvidence } from './usageEvidence';
 import type { FinancialCycle, FinancialExpense, FinancialPurchase, FinancialSubscription, UsageCard, DateValue, MoneyValue } from './types';
 interface UsageArgs { cycles?: unknown; cards: UsageCard[]; cyclesWithAmounts: FinancialCycle[]; expenses: FinancialExpense[]; subscriptions: FinancialSubscription[]; purchases: FinancialPurchase[]; year: number; month: number; now?: Date }
-interface UsageEntry { id: string; concept?: string; name?: string; amount: number; date?: DateValue; chargeDate?: string; purchaseDate?: DateValue; months?: number; categoryName?: string | null; source?: string; reason?: string; subscriptionProjection?: string }
+interface UsageEntry { id: string; concept?: string; name?: string; amount: number; date?: DateValue; chargeDate?: string; purchaseDate?: DateValue; months?: number; categoryName?: string | null; source?: string; reason?: string; subscriptionProjection?: string; isCaptured?: boolean; reconciled?: boolean; requiresReview?: boolean }
 import { isSubscriptionChargeResolved } from "../subscriptionCharges";
 import { todayInMexico } from '../financialDates';
 
@@ -97,7 +97,7 @@ function buildNuTurboUsage({ card, cyclesWithAmounts, expenses, subscriptions, p
     entries.push({ ...entry, date, amount: usageMoney(entry.amount) });
   };
   for (const expense of cardExpenses) {
-    if (expense.reconciliationStatus === "PENDING" || excludedIds.has(expense.id) || !isPurchase(expense)) continue;
+    if (excludedIds.has(expense.id) || !isPurchase(expense)) continue;
     add({ id: `expense:${expense.id}`, concept: expense.concept, amount: expense.amount, date: expense.date });
   }
   // Un comprobante verificado cuenta una vez; el calendario de suscripciones no cuenta.
@@ -117,7 +117,7 @@ function buildNuTurboUsage({ card, cyclesWithAmounts, expenses, subscriptions, p
     }
   }
   for (const purchase of purchases) {
-    if (purchase.cardId !== card.id || purchase.status === "CANCELLED" || purchase.reconciliationStatus === "PENDING" || !isPurchase(purchase)) continue;
+    if (purchase.cardId !== card.id || purchase.status === "CANCELLED" || !isPurchase(purchase)) continue;
     add({ id: `purchase:${purchase.id}`, concept: purchase.concept, amount: purchase.totalAmount, date: purchase.purchaseDate });
   }
   entries.sort((a, b) => b.date.localeCompare(a.date) || a.id.localeCompare(b.id));
@@ -221,13 +221,14 @@ export function buildCardUsageWaivers({ cards, cyclesWithAmounts, expenses, subs
     if (cycle) {
       for (const expense of cardExpenses) {
         if (!usageInRange(expense.date, cycle.startDate, cycle.cutDate)) continue;
-        const item = { id: expense.id, concept: expense.concept, amount: usageMoney(expense.amount), date: expense.date, categoryName: expense.category?.name || null };
+        const item = { id: expense.id, concept: expense.concept, amount: usageMoney(expense.amount), date: expense.date, categoryName: expense.category?.name || null,
+          isCaptured: Boolean(expense.captureMovements?.length), reconciled: Boolean(expense.reconciledAt) };
         const reason = Array.isArray(evidence?.excludedExpenseIds) && evidence.excludedExpenseIds.includes(expense.id)
           ? "Comisión, interés o impuesto bancario verificado"
           : getUsageExclusion(expense);
         if (reason) excluded.push({ ...item, reason });
-        else if (expense.reconciliationStatus === "PENDING") projected.push({ ...item, reason: "Captura automática por conciliar" });
         else if (usageDay(expense.date)! > today) projected.push({ ...item, reason: "Gasto con fecha futura" });
+        // El registro acredita consumo; el cotejo bancario es una revisión independiente.
         else daily.push(item);
       }
 
@@ -264,11 +265,11 @@ export function buildCardUsageWaivers({ cards, cyclesWithAmounts, expenses, subs
       // Una discrepancia conserva los importes originales, pero no acredita consumo confirmado.
       for (let index = daily.length - 1; index >= 0; index--) {
         const reason = reviewExpenseIds.get(daily[index]!.id);
-        if (reason) projected.push({ ...daily.splice(index, 1)[0]!, reason });
+        if (reason) projected.push({ ...daily.splice(index, 1)[0]!, reason, requiresReview: true });
       }
       for (const item of projected) {
         const reason = reviewExpenseIds.get(item.id);
-        if (reason) item.reason = reason;
+        if (reason) { item.reason = reason; item.requiresReview = true; }
       }
       const matchedExpenseIds = new Set();
       const matchedReceipts = new Set();
@@ -291,7 +292,7 @@ export function buildCardUsageWaivers({ cards, cyclesWithAmounts, expenses, subs
         if (matchedReceipts.has(index)) continue;
         const item = { id: `${receipt.subscriptionId}-${receipt.date}-${receipts.indexOf(receipt)}`, name: typeof receipt.name === "string" ? receipt.name : "Suscripción", amount: usageMoney(receipt.amount), chargeDate: `${usageDay(receipt.date)}T12:00:00.000Z`, source: evidence!.source };
         const reviewReason = reviewReasons.get(receiptKey(receipt.subscriptionId, receipt.date));
-        if (reviewReason) projected.push({ ...item, reason: reviewReason });
+        if (reviewReason) projected.push({ ...item, reason: reviewReason, requiresReview: true });
         else if (usageDay(receipt.date)! <= today) confirmedSubscriptions.push(item);
         else projected.push({ ...item, subscriptionProjection: "upcoming", reason: "Cargo con fecha futura" });
       }
@@ -312,9 +313,9 @@ export function buildCardUsageWaivers({ cards, cyclesWithAmounts, expenses, subs
 
       for (const purchase of purchases.filter((item) => item.cardId === card.id && item.status !== "CANCELLED")) {
         if (!usageInRange(purchase.purchaseDate, cycle.startDate, cycle.cutDate)) continue;
-        const item = { id: purchase.id, concept: purchase.concept, amount: usageMoney(purchase.totalAmount), purchaseDate: purchase.purchaseDate, months: purchase.months, categoryName: purchase.category?.name || null };
-        if (purchase.reconciliationStatus === "PENDING") projected.push({ ...item, reason: "Compra a meses por conciliar" });
-        else if (usageDay(purchase.purchaseDate)! > today) projected.push({ ...item, reason: "Compra con fecha futura" });
+        const item = { id: purchase.id, concept: purchase.concept, amount: usageMoney(purchase.totalAmount), purchaseDate: purchase.purchaseDate, months: purchase.months, categoryName: purchase.category?.name || null,
+          isCaptured: Boolean(purchase.captureMovements?.length), reconciled: Boolean(purchase.reconciledAt) };
+        if (usageDay(purchase.purchaseDate)! > today) projected.push({ ...item, reason: "Compra con fecha futura" });
         else newPurchases.push(item);
       }
     }

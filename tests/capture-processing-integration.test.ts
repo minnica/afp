@@ -227,13 +227,14 @@ test('Fase 4 PostgreSQL: interpretación, resoluciones y escritura financiera at
    const row=await send(event({merchant:name,amount:skipped?'1510.00':'1511.00'}));assert.equal(present(row.movement).reason,'SUBSCRIPTION_CONFLICT');assert.equal(present(row.movement).expenseId,null);
   }
  });
- await t.test('consumo mínimo excluye capturas y MSI por conciliar pero el cálculo de corte sí los incluye',async()=>{
+ await t.test('consumo mínimo incluye capturas y MSI registradas sin alterar su conciliación',async()=>{
   const calc=sparseCalculations(load('src/lib/calculations/cardUsageWaivers.ts'));
   const day=new Date('2026-10-21T12:00:00Z');
   const cycle={cardId:card.id,card:{usualCutDay:25},startDate:new Date('2026-10-01T12:00:00Z'),cutDate:new Date('2026-10-25T12:00:00Z'),month:10,year:2026};
   const pendingPurchase=await db.installmentPurchase.findFirst({where:{userId:user.id,reconciliationStatus:'PENDING'}});
   const [output]=calc.buildCardUsageWaivers({cards:[{...card,usagePolicy:{productKey:'HSBC_ZERO',verifiedAt:'2026-10-11'}}],cyclesWithAmounts:[cycle],expenses:[{...present(autoExpense),date:day}],subscriptions:[],purchases:[present(pendingPurchase)],year:2026,month:10,now:day});
-  assert.equal(present(output).eligibleSpend,0);assert.equal(present(output).remainingAmount,300);assert.equal(present(output).breakdown.projectedCharges.length,2);
+  assert.equal(present(output).eligibleSpend,1323.45);assert.equal(present(output).remainingAmount,0);assert.equal(present(output).breakdown.projectedCharges.length,0);
+  assert.equal(present(autoExpense).reconciliationStatus,'PENDING');assert.equal(present(pendingPurchase).reconciliationStatus,'PENDING');
   const financial=sparseCalculations(load('src/lib/calculations/cardCycles.ts')).calculateCycleAmount({cycle,expenses:[present(autoExpense)],purchases:[present(pendingPurchase)]});
   assert.equal(financial.calculatedAmount,223.45);assert.equal(financial.expensesAmount,123.45);assert.equal(financial.purchasesAmount,100);
 

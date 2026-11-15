@@ -11,6 +11,67 @@ const subscription = { id: "sub", cardId: card.id, name: "Servicio", amount: 399
 const run = (changes = {}) => ctx.buildCardUsageWaivers({ cards: [card], cyclesWithAmounts: [cycle], expenses: [], subscriptions: [], purchases: [], year: 2026, month: 10, now: new Date("2026-10-11T12:00:00Z"), ...changes });
 const current = (changes = {}) => ctx.buildCurrentCardUsageWaivers({ cards: [card], cyclesWithAmounts: [cycle], expenses: [], subscriptions: [], purchases: [], now: new Date("2026-10-13T12:00:00Z"), ...changes });
 
+test("las capturas ya guardadas suman al avance sin cotejo y sin modificar su estado", () => {
+  const rows = [15.63, 52.12, 185, 15.63].map((amount, index) => ({
+    ...expense(`auto-${index}`, amount), reconciliationStatus: "PENDING", reconciledAt: null,
+    captureMovements: [{ id: `capture-${index}` }],
+  }));
+  const before = JSON.stringify(rows);
+  const [item] = run({ expenses: rows });
+  assert.equal(present(item).eligibleSpend, 268.38);
+  assert.equal(present(item).remainingAmount, 31.62);
+  assert.equal(present(item).projectedAmount, 0);
+  assert.equal(present(item).breakdown.includedDailyExpenses.length, 4);
+  assert.ok(present(item).breakdown.includedDailyExpenses.every(entry => entry.isCaptured && !entry.reconciled));
+  assert.equal(JSON.stringify(rows), before);
+  const [met] = run({ expenses: [...rows, expense("manual", 31.62)] });
+  assert.equal(present(met).isExempt, true);
+  assert.equal(present(met).progress, 100);
+  const [reconciled] = run({ expenses: rows.map(row => ({ ...row, reconciliationStatus: "CONFIRMED", reconciledAt: "2026-10-11" })) });
+  assert.equal(present(reconciled).eligibleSpend, 268.38);
+  assert.ok(present(reconciled).breakdown.includedDailyExpenses.every(entry => entry.reconciled));
+});
+
+test("cargos automáticos futuros, excluidos y MSI canceladas conservan sus límites", () => {
+  const activeCycle = { ...cycle, startDate: "2026-10-01", cutDate: "2026-10-31" };
+  const automated = { reconciliationStatus: "PENDING" };
+  const [item] = run({ cyclesWithAmounts: [activeCycle], now: new Date("2026-10-21T12:00:00Z"), expenses: [
+    { ...expense("registered", 100, "Compra", "2026-10-20"), ...automated },
+    { ...expense("future", 999, "Compra futura", "2026-10-22"), ...automated },
+    { ...expense("fee", 50, "Comisión por tarjeta", "2026-10-20"), ...automated },
+  ], subscriptions: [subscription], purchases: [
+    { id: "new", cardId: card.id, concept: "MSI automática", totalAmount: 120, purchaseDate: "2026-10-20", months: 3, status: "ACTIVE", ...automated },
+    { id: "future-msi", cardId: card.id, concept: "MSI futura", totalAmount: 999, purchaseDate: "2026-10-22", months: 3, status: "ACTIVE", ...automated },
+    { id: "cancelled", cardId: card.id, concept: "Cancelada", totalAmount: 999, purchaseDate: "2026-10-20", months: 3, status: "CANCELLED", ...automated },
+  ] });
+  assert.equal(present(item).eligibleSpend, 220);
+  assert.equal(present(item).remainingAmount, 80);
+  assert.equal(present(item).breakdown.excludedAmount, 50);
+  assert.equal(present(item).projectedAmount, 2397);
+  assert.equal(present(item).isExempt, false);
+});
+
+test("captura de suscripción sustituye su previsión y comprobante una sola vez", () => {
+  const confirmed = { ...evidence, subscriptionCharges: [{ subscriptionId: "sub", date: "2026-10-03", amount: 399 }] };
+  const row = { ...expense("sub-auto", 399, "Servicio", "2026-10-03"), subscriptionId: "sub", reconciliationStatus: "PENDING" };
+  for (const usageReconciliation of [undefined, confirmed]) {
+    const [item] = run({ cyclesWithAmounts: [{ ...cycle, usageReconciliation }], subscriptions: [subscription], expenses: [row] });
+    assert.equal(present(item).eligibleSpend, 399);
+    assert.equal(present(item).projectedAmount, 0);
+    assert.equal(present(item).isExempt, true);
+  }
+});
+
+test("corregir, devolver o eliminar un gasto recalcula el avance sin requerir cotejo", () => {
+  const row = { ...expense("auto", 350), reconciliationStatus: "PENDING" };
+  assert.equal(present(run({ expenses: [row] })[0]).isExempt, true);
+  const [corrected] = run({ expenses: [{ ...row, amount: 250 }] });
+  assert.equal(present(corrected).remainingAmount, 50);
+  assert.equal(present(corrected).isExempt, false);
+  assert.equal(present(run({ expenses: [{ ...row, amount: 0 }] })[0]).eligibleSpend, 0);
+  assert.equal(present(run({ expenses: [] })[0]).remainingAmount, 300);
+});
+
 test("en curso reúne octubre y noviembre según el período de cada tarjeta", () => {
   const secondCard = { ...card, id: "second" };
   const next = { ...cycle, id: "nov", month: 11, startDate: "2026-10-11", cutDate: "2026-11-10", status: "PAID" as const };

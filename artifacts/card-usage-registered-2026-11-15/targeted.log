@@ -1,0 +1,461 @@
+
+> afp@0.1.0 test /home/garatachia/projects/afp
+> node --import tsx tests/run-tests.ts card-usage-waivers.test.ts nu-turbo-usage.test.ts capture-processing-integration.test.ts
+
+TAP version 13
+# Subtest: Fase 4 PostgreSQL: interpretación, resoluciones y escritura financiera atómica
+    # Subtest: rutas administrativas rechazan anónimos y credencial nativa antes de leer el cuerpo
+    ok 1 - rutas administrativas rechazan anónimos y credencial nativa antes de leer el cuerpo
+      ---
+      duration_ms: 161.580641
+      type: 'test'
+      ...
+    # Subtest: importación por nombres existentes, sin renombrar, conserva ceros y separa física/digital/Wallet
+    ok 2 - importación por nombres existentes, sin renombrar, conserva ceros y separa física/digital/Wallet
+      ---
+      duration_ms: 53.971964
+      type: 'test'
+      ...
+    # Subtest: registro real bloquea activación sin muestras verificadas y queda en observación aun con alias conocidos
+    ok 3 - registro real bloquea activación sin muestras verificadas y queda en observación aun con alias conocidos
+      ---
+      duration_ms: 67.423602
+      type: 'test'
+      ...
+(node:97117) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+    # Subtest: formato habilitado solo para tarjeta concreta crea gasto MXN Por conciliar y Por clasificar
+    ok 4 - formato habilitado solo para tarjeta concreta crea gasto MXN Por conciliar y Por clasificar
+      ---
+      duration_ms: 221.096066
+      type: 'test'
+      ...
+    # Subtest: diez entregas simultáneas y respuesta perdida mantienen evento, movimiento y gasto únicos
+    ok 5 - diez entregas simultáneas y respuesta perdida mantienen evento, movimiento y gasto únicos
+      ---
+      duration_ms: 528.144864
+      type: 'test'
+      ...
+    # Subtest: dos compras legítimas iguales requieren decisión explícita y conservan multiplicidad
+    ok 6 - dos compras legítimas iguales requieren decisión explícita y conservan multiplicidad
+      ---
+      duration_ms: 208.823208
+      type: 'test'
+      ...
+    # Subtest: BBVA y Wallet solo se unen automáticamente con referencia bancaria inequívoca
+    ok 7 - BBVA y Wallet solo se unen automáticamente con referencia bancaria inequívoca
+      ---
+      duration_ms: 237.387165
+      type: 'test'
+      ...
+    # Subtest: alias ausente, ambiguo y sin verificar bloquean registros; otra tarjeta del mismo banco no se habilita
+    ok 8 - alias ausente, ambiguo y sin verificar bloquean registros; otra tarjeta del mismo banco no se habilita
+      ---
+      duration_ms: 101.22256
+      type: 'test'
+      ...
+    # Subtest: regla exacta asigna categoría; cambiar el nombre del comercio no genera vínculos aproximados
+    ok 9 - regla exacta asigna categoría; cambiar el nombre del comercio no genera vínculos aproximados
+      ---
+      duration_ms: 95.634579
+      type: 'test'
+      ...
+    # Subtest: manual seguido de aviso permite vincular sin cambiar notas, categoría ni aportaciones
+    ok 10 - manual seguido de aviso permite vincular sin cambiar notas, categoría ni aportaciones
+      ---
+      duration_ms: 54.785053
+      type: 'test'
+      ...
+    # Subtest: aviso seguido de alta manual identifica posible duplicado sin perder el UUID offline
+    ok 11 - aviso seguido de alta manual identifica posible duplicado sin perder el UUID offline
+      ---
+      duration_ms: 20.546687
+      type: 'test'
+      ...
+    # Subtest: eliminación manual conserva huella y un aviso tardío permanece en revisión
+    ok 12 - eliminación manual conserva huella y un aviso tardío permanece en revisión
+      ---
+      duration_ms: 68.123753
+      type: 'test'
+      ...
+    # Subtest: reeditar o borrar un gasto nunca se revierte por reentrega ni por otra evidencia exacta
+    ok 13 - reeditar o borrar un gasto nunca se revierte por reentrega ni por otra evidencia exacta
+      ---
+      duration_ms: 257.370684
+      type: 'test'
+      ...
+    # Subtest: actualizar una notificación no crea otra compra y requiere resolución
+    ok 14 - actualizar una notificación no crea otra compra y requiere resolución
+      ---
+      duration_ms: 60.129155
+      type: 'test'
+      ...
+    # Subtest: suscripción explícita reutiliza su unicidad mensual y no duplica una ocurrencia existente u omitida
+    ok 15 - suscripción explícita reutiliza su unicidad mensual y no duplica una ocurrencia existente u omitida
+      ---
+      duration_ms: 102.813497
+      type: 'test'
+      ...
+    # Subtest: movimientos especiales, moneda extranjera y formatos desconocidos quedan visibles sin alterar gastos
+    ok 16 - movimientos especiales, moneda extranjera y formatos desconocidos quedan visibles sin alterar gastos
+      ---
+      duration_ms: 70.306189
+      type: 'test'
+      ...
+    # Subtest: fallo después del gasto revierte evento, movimiento y todos los efectos financieros
+    ok 17 - fallo después del gasto revierte evento, movimiento y todos los efectos financieros
+      ---
+      duration_ms: 18.60418
+      type: 'test'
+      ...
+    # Subtest: conversión a MSI sustituye gasto en una transacción, conserva correcciones y es idempotente
+    ok 18 - conversión a MSI sustituye gasto en una transacción, conserva correcciones y es idempotente
+      ---
+      duration_ms: 155.010995
+      type: 'test'
+      ...
+    # Subtest: rollback de conversión MSI restaura gasto, movimiento y ausencia de compra
+    ok 19 - rollback de conversión MSI restaura gasto, movimiento y ausencia de compra
+      ---
+      duration_ms: 44.49384
+      type: 'test'
+      ...
+    # Subtest: MSI no convierte gastos con aportaciones o vínculos personales
+    ok 20 - MSI no convierte gastos con aportaciones o vínculos personales
+      ---
+      duration_ms: 46.464956
+      type: 'test'
+      ...
+    # Subtest: volver a observación detiene solo la automatización de ese formato
+    ok 21 - volver a observación detiene solo la automatización de ese formato
+      ---
+      duration_ms: 67.980263
+      type: 'test'
+      ...
+    # Subtest: categoría eliminada de una regla queda en revisión sin rechazar la recepción
+    ok 22 - categoría eliminada de una regla queda en revisión sin rechazar la recepción
+      ---
+      duration_ms: 43.774741
+      type: 'test'
+      ...
+    # Subtest: suscripción omitida y evidencia bancaria impiden crear otro cargo
+    ok 23 - suscripción omitida y evidencia bancaria impiden crear otro cargo
+      ---
+      duration_ms: 148.712126
+      type: 'test'
+      ...
+    # Subtest: consumo mínimo incluye capturas y MSI registradas sin alterar su conciliación
+    ok 24 - consumo mínimo incluye capturas y MSI registradas sin alterar su conciliación
+      ---
+      duration_ms: 6.43135
+      type: 'test'
+      ...
+    # Subtest: dos cuentas no comparten alias, reglas, resoluciones, páginas ni datos financieros
+    ok 25 - dos cuentas no comparten alias, reglas, resoluciones, páginas ni datos financieros
+      ---
+      duration_ms: 42.813373
+      type: 'test'
+      ...
+    1..25
+ok 1 - Fase 4 PostgreSQL: interpretación, resoluciones y escritura financiera atómica
+  ---
+  duration_ms: 3417.866525
+  type: 'test'
+  ...
+# Subtest: las capturas ya guardadas suman al avance sin cotejo y sin modificar su estado
+ok 2 - las capturas ya guardadas suman al avance sin cotejo y sin modificar su estado
+  ---
+  duration_ms: 1.095248
+  type: 'test'
+  ...
+# Subtest: cargos automáticos futuros, excluidos y MSI canceladas conservan sus límites
+ok 3 - cargos automáticos futuros, excluidos y MSI canceladas conservan sus límites
+  ---
+  duration_ms: 0.643219
+  type: 'test'
+  ...
+# Subtest: captura de suscripción sustituye su previsión y comprobante una sola vez
+ok 4 - captura de suscripción sustituye su previsión y comprobante una sola vez
+  ---
+  duration_ms: 0.749049
+  type: 'test'
+  ...
+# Subtest: corregir, devolver o eliminar un gasto recalcula el avance sin requerir cotejo
+ok 5 - corregir, devolver o eliminar un gasto recalcula el avance sin requerir cotejo
+  ---
+  duration_ms: 0.328529
+  type: 'test'
+  ...
+# Subtest: en curso reúne octubre y noviembre según el período de cada tarjeta
+ok 6 - en curso reúne octubre y noviembre según el período de cada tarjeta
+  ---
+  duration_ms: 0.472949
+  type: 'test'
+  ...
+# Subtest: el día de corte completo sigue vigente y al día siguiente cambia de período
+ok 7 - el día de corte completo sigue vigente y al día siguiente cambia de período
+  ---
+  duration_ms: 0.29157
+  type: 'test'
+  ...
+# Subtest: cortes terminados salen de en curso aunque hayan cumplido o tengan cargos por confirmar
+ok 8 - cortes terminados salen de en curso aunque hayan cumplido o tengan cargos por confirmar
+  ---
+  duration_ms: 0.18949
+  type: 'test'
+  ...
+# Subtest: la selección vigente usa el período bancario verificado
+ok 9 - la selección vigente usa el período bancario verificado
+  ---
+  duration_ms: 0.253249
+  type: 'test'
+  ...
+# Subtest: diciembre selecciona enero del siguiente año y no arrastra la meta anterior
+ok 10 - diciembre selecciona enero del siguiente año y no arrastra la meta anterior
+  ---
+  duration_ms: 0.24774
+  type: 'test'
+  ...
+# Subtest: sin período vigente conserva la tarjeta sin seleccionar ciclos futuros ni inválidos
+ok 11 - sin período vigente conserva la tarjeta sin seleccionar ciclos futuros ni inválidos
+  ---
+  duration_ms: 0.289649
+  type: 'test'
+  ...
+# Subtest: períodos superpuestos requieren revisión y no acreditan una meta ambigua
+ok 12 - períodos superpuestos requieren revisión y no acreditan una meta ambigua
+  ---
+  duration_ms: 0.25977
+  type: 'test'
+  ...
+# Subtest: historial incluye cortes terminados de años distintos y excluye vigentes y futuros
+ok 13 - historial incluye cortes terminados de años distintos y excluye vigentes y futuros
+  ---
+  duration_ms: 0.575819
+  type: 'test'
+  ...
+# Subtest: HSBC octubre: comisiones e IVA no completan los $300
+ok 14 - HSBC octubre: comisiones e IVA no completan los $300
+  ---
+  duration_ms: 0.17647
+  type: 'test'
+  ...
+# Subtest: Banamex octubre: la inactividad no convierte $272.95 en meta cumplida
+ok 15 - Banamex octubre: la inactividad no convierte $272.95 en meta cumplida
+  ---
+  duration_ms: 0.175909
+  type: 'test'
+  ...
+# Subtest: la regla depende del producto verificado y sobrevive a renombrar una tarjeta
+ok 16 - la regla depende del producto verificado y sobrevive a renombrar una tarjeta
+  ---
+  duration_ms: 0.20336
+  type: 'test'
+  ...
+# Subtest: las fechas bancarias verificadas incluyen compras omitidas por el rango estimado
+ok 17 - las fechas bancarias verificadas incluyen compras omitidas por el rango estimado
+  ---
+  duration_ms: 0.14837
+  type: 'test'
+  ...
+# Subtest: una nota bancaria o evidencia conserva la exclusión al cambiar el concepto
+ok 18 - una nota bancaria o evidencia conserva la exclusión al cambiar el concepto
+  ---
+  duration_ms: 0.217269
+  type: 'test'
+  ...
+# Subtest: una comisión comercial no se confunde con una comisión del banco
+ok 19 - una comisión comercial no se confunde con una comisión del banco
+  ---
+  duration_ms: 0.15112
+  type: 'test'
+  ...
+# Subtest: futuras y vencidas sin evidencia siguen siendo proyecciones
+ok 20 - futuras y vencidas sin evidencia siguen siendo proyecciones
+  ---
+  duration_ms: 0.21068
+  type: 'test'
+  ...
+# Subtest: distingue suscripciones por cobrar y por confirmar de otros movimientos previstos
+ok 21 - distingue suscripciones por cobrar y por confirmar de otros movimientos previstos
+  ---
+  duration_ms: 0.258029
+  type: 'test'
+  ...
+# Subtest: una suscripción confirmada conserva importe y fecha históricos
+ok 22 - una suscripción confirmada conserva importe y fecha históricos
+  ---
+  duration_ms: 0.24977
+  type: 'test'
+  ...
+# Subtest: gasto vinculado, recibo y calendario no triplican una suscripción
+ok 23 - gasto vinculado, recibo y calendario no triplican una suscripción
+  ---
+  duration_ms: 0.224139
+  type: 'test'
+  ...
+# Subtest: frecuencia bimestral usa el mes real del cobro y respeta desactivación
+ok 24 - frecuencia bimestral usa el mes real del cobro y respeta desactivación
+  ---
+  duration_ms: 0.17392
+  type: 'test'
+  ...
+# Subtest: dos cargos reales iguales conservan su multiplicidad al emparejar un gasto vinculado
+ok 25 - dos cargos reales iguales conservan su multiplicidad al emparejar un gasto vinculado
+  ---
+  duration_ms: 0.21757
+  type: 'test'
+  ...
+# Subtest: un estado revisado no inventa una suscripción ausente
+ok 26 - un estado revisado no inventa una suscripción ausente
+  ---
+  duration_ms: 0.138149
+  type: 'test'
+  ...
+# Subtest: MSI nueva cuenta una vez aunque ya esté liquidada; cuotas antiguas y canceladas no
+ok 27 - MSI nueva cuenta una vez aunque ya esté liquidada; cuotas antiguas y canceladas no
+  ---
+  duration_ms: 0.1405
+  type: 'test'
+  ...
+# Subtest: MSI y gastos de fecha futura no marcan cumplimiento; centavos exactos
+ok 28 - MSI y gastos de fecha futura no marcan cumplimiento; centavos exactos
+  ---
+  duration_ms: 0.21068
+  type: 'test'
+  ...
+# Subtest: sin ciclo y evidencia inválida nunca producen un cumplimiento inventado
+ok 29 - sin ciclo y evidencia inválida nunca producen un cumplimiento inventado
+  ---
+  duration_ms: 0.1371
+  type: 'test'
+  ...
+# Subtest: fechas bancarias malformadas conservan el período previsto y sus movimientos
+ok 30 - fechas bancarias malformadas conservan el período previsto y sus movimientos
+  ---
+  duration_ms: 0.471069
+  type: 'test'
+  ...
+# Subtest: fechas imposibles no se normalizan como fechas bancarias verificadas
+ok 31 - fechas imposibles no se normalizan como fechas bancarias verificadas
+  ---
+  duration_ms: 0.12667
+  type: 'test'
+  ...
+# Subtest: recibos nulos o malformados no interrumpen el cálculo ni suman consumo
+ok 32 - recibos nulos o malformados no interrumpen el cálculo ni suman consumo
+  ---
+  duration_ms: 0.244039
+  type: 'test'
+  ...
+# Subtest: un nombre malformado conserva el importe válido sin romper el desglose
+ok 33 - un nombre malformado conserva el importe válido sin romper el desglose
+  ---
+  duration_ms: 0.16027
+  type: 'test'
+  ...
+# Subtest: un gasto distinto al comprobante queda por revisar sin acreditar una meta falsa
+ok 34 - un gasto distinto al comprobante queda por revisar sin acreditar una meta falsa
+  ---
+  duration_ms: 0.368449
+  type: 'test'
+  ...
+# Subtest: grupos ambiguos conservan multiplicidad e importes fuera del consumo confirmado
+ok 35 - grupos ambiguos conservan multiplicidad e importes fuera del consumo confirmado
+  ---
+  duration_ms: 0.53927
+  type: 'test'
+  ...
+# Subtest: emparejamientos exactos con distinta posición no crean discrepancias
+ok 36 - emparejamientos exactos con distinta posición no crean discrepancias
+  ---
+  duration_ms: 0.221829
+  type: 'test'
+  ...
+# Subtest: un comprobante adicional no consume la coincidencia exacta de otro cargo
+ok 37 - un comprobante adicional no consume la coincidencia exacta de otro cargo
+  ---
+  duration_ms: 0.20433
+  type: 'test'
+  ...
+# Subtest: omitir no cuenta como consumo y elimina la previsión del período
+ok 38 - omitir no cuenta como consumo y elimina la previsión del período
+  ---
+  duration_ms: 0.15382
+  type: 'test'
+  ...
+# Subtest: Nu aparece por producto verificado aunque no haya ciclo y no inventa una meta monetaria
+ok 39 - Nu aparece por producto verificado aunque no haya ciclo y no inventa una meta monetaria
+  ---
+  duration_ms: 0.380559
+  type: 'test'
+  ...
+# Subtest: cualquier importe positivo renueva 30 días, sin depender del mes ni del corte
+ok 40 - cualquier importe positivo renueva 30 días, sin depender del mes ni del corte
+  ---
+  duration_ms: 0.508479
+  type: 'test'
+  ...
+# Subtest: las compras automáticas y MSI renuevan Turbo sin confirmar la conciliación
+ok 41 - las compras automáticas y MSI renuevan Turbo sin confirmar la conciliación
+  ---
+  duration_ms: 0.314389
+  type: 'test'
+  ...
+# Subtest: el día 30 pide comprar hoy; el plazo conserva todo el día y cambia al siguiente
+ok 42 - el día 30 pide comprar hoy; el plazo conserva todo el día y cambia al siguiente
+  ---
+  duration_ms: 0.54003
+  type: 'test'
+  ...
+# Subtest: futuros, efectivo, otra tarjeta e importes inválidos no acreditan compras
+ok 43 - futuros, efectivo, otra tarjeta e importes inválidos no acreditan compras
+  ---
+  duration_ms: 0.28165
+  type: 'test'
+  ...
+# Subtest: comisiones, impuestos bancarios, intereses y disposiciones no son compras
+ok 44 - comisiones, impuestos bancarios, intereses y disposiciones no son compras
+  ---
+  duration_ms: 0.381849
+  type: 'test'
+  ...
+# Subtest: MSI cuenta solo en la fecha original, incluso liquidada; sus mensualidades no renuevan
+ok 45 - MSI cuenta solo en la fecha original, incluso liquidada; sus mensualidades no renuevan
+  ---
+  duration_ms: 0.23696
+  type: 'test'
+  ...
+# Subtest: suscripciones cuentan por gasto o evidencia verificada una vez, nunca por previsión
+ok 46 - suscripciones cuentan por gasto o evidencia verificada una vez, nunca por previsión
+  ---
+  duration_ms: 0.401379
+  type: 'test'
+  ...
+# Subtest: la última compra determina la renovación; las antiguas quedan fuera del listado reciente
+ok 47 - la última compra determina la renovación; las antiguas quedan fuera del listado reciente
+  ---
+  duration_ms: 0.16874
+  type: 'test'
+  ...
+# Subtest: Turbo no crea cortes históricos ni una posible comisión por falta de compras
+ok 48 - Turbo no crea cortes históricos ni una posible comisión por falta de compras
+  ---
+  duration_ms: 0.14267
+  type: 'test'
+  ...
+# Subtest: Dashboard entrega Nu con fecha local del cliente y conserva el aislamiento del usuario
+ok 49 - Dashboard entrega Nu con fecha local del cliente y conserva el aislamiento del usuario
+  ---
+  duration_ms: 47.802214
+  type: 'test'
+  ...
+1..49
+# tests 74
+# suites 0
+# pass 74
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3850.136363

@@ -5,7 +5,7 @@ import { isRecord } from './financialJson';
 import { todayInMexico } from './financialDates';
 
 // Búsqueda por lotes: conserva la última compra válida aunque sea anterior a la
-// ventana. Una comisión/captura pendiente nunca desplaza esa referencia.
+// ventana. Las compras registradas cuentan aunque su cotejo bancario siga pendiente.
 export async function nuHistoryReferences(db: PrismaClient, userId: string, cards: { id: string; name: string; usagePolicy: unknown }[], now: Date) {
   const expenseIds: string[] = [], purchaseIds: string[] = [], cycleIds: string[] = [];
   for (const card of cards.filter(card => isRecord(card.usagePolicy) && card.usagePolicy.productKey === 'NU')) {
@@ -13,7 +13,7 @@ export async function nuHistoryReferences(db: PrismaClient, userId: string, card
     let before: { date: Date; id: string } | null = null;
     for (;;) {
       const rows: { id: string; concept: string; notes: string | null; date: Date }[] = await db.dailyExpense.findMany({ where: { userId, cardId: card.id, paymentMethod: 'CARD', amount: { gt: 0 },
-        reconciliationStatus: { not: 'PENDING' }, date: { lte: end },
+        date: { lte: end },
         ...(before ? { OR: [{ date: { lt: before.date } }, { date: before.date, id: { lt: before.id } }] } : {}),
       }, select: { id: true, concept: true, notes: true, date: true }, orderBy: [{ date: 'desc' }, { id: 'desc' }], take: 100 });
       let found = false;
@@ -36,7 +36,7 @@ export async function nuHistoryReferences(db: PrismaClient, userId: string, card
     let purchaseBefore: { purchaseDate: Date; id: string } | null = null;
     for (;;) {
       const rows: InstallmentPurchase[] = await db.installmentPurchase.findMany({ where: { userId, cardId: card.id, status: { not: 'CANCELLED' },
-        reconciliationStatus: { not: 'PENDING' }, totalAmount: { gt: 0 }, purchaseDate: { lte: end },
+        totalAmount: { gt: 0 }, purchaseDate: { lte: end },
         ...(purchaseBefore ? { OR: [{ purchaseDate: { lt: purchaseBefore.purchaseDate } }, { purchaseDate: purchaseBefore.purchaseDate, id: { lt: purchaseBefore.id } }] } : {}),
       }, orderBy: [{ purchaseDate: 'desc' }, { id: 'desc' }], take: 100 });
       const row = rows.find(purchase => {

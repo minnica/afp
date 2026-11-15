@@ -885,6 +885,9 @@ const dashboardCardUsageWaiversItemSelectedCycleSchema = z.object({
 
 const dashboardCardUsageWaiversItemBreakdownIncludedDailyExpensesItemSchema = z.object({
   "id": z.string(),
+  "isCaptured": z.boolean().optional(),
+  "reconciled": z.boolean().optional(),
+  "requiresReview": z.boolean().optional(),
   "concept": z.union([z.undefined(), z.string()]).optional(),
   "name": z.union([z.undefined(), z.string()]).optional(),
   "amount": z.number(),
