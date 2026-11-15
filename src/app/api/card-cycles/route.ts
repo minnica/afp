@@ -171,6 +171,39 @@ function getTargetMonths() {
   }));
 }
 
+function adjacentCycleMonth(year: number, month: number, offset: -1 | 1) {
+  const index = year * 12 + month - 1 + offset;
+  return { year: Math.floor(index / 12), month: index % 12 + 1 };
+}
+
+function startAfterCut(cutDate: Date) {
+  const start = new Date(`${cutDate.toISOString().slice(0, 10)}T12:00:00.000Z`);
+  start.setUTCDate(start.getUTCDate() + 1);
+  return start;
+}
+
+type CyclePeriod = Prisma.CardCycleGetPayload<{ select: {
+  id: true; startDate: true; cutDate: true; datesConfirmedAt: true;
+} }>;
+
+async function alignCycleStart(tx: Prisma.TransactionClient, userId: string, cycle: CyclePeriod, previousCut: Date) {
+  if (cycle.datesConfirmedAt) return;
+  const startDate = startAfterCut(previousCut);
+  if (startDate.toISOString().slice(0, 10) >= new Date(cycle.cutDate).toISOString().slice(0, 10)) {
+    throw new ApiAccessError("El corte real no deja un período válido para el ciclo siguiente. Revisa su fecha de corte antes de guardar.", 409);
+  }
+  if (startDate.toISOString().slice(0, 10) === new Date(cycle.startDate).toISOString().slice(0, 10)) return;
+  // Inheriting the start does not confirm the next cycle's cut or due dates.
+  await tx.cardCycle.update({ where: { id: cycle.id, userId, datesConfirmedAt: null }, data: { startDate } });
+}
+
+async function alignFollowingCycle(tx: Prisma.TransactionClient, userId: string, cycle: { cardId: string; month: number; year: number; cutDate: Date }) {
+  const next = await tx.cardCycle.findUnique({ where: {
+    userId, cardId_month_year: { cardId: cycle.cardId, ...adjacentCycleMonth(cycle.year, cycle.month, 1) },
+  } });
+  if (next) await alignCycleStart(tx, userId, next, cycle.cutDate);
+}
+
 async function loadCycles(request: Request, generated = false, owner?: string) {
   try {
     const userId = owner ?? (await requireApiUser(request)).id;
@@ -275,35 +308,27 @@ export async function POST(request: Request) {
     const targetMonths = getTargetMonths();
 
     for (const card of cards) {
-      for (const target of targetMonths) {
-        const { startDate, cutDate, dueDate } = getCycleDates(
-          target.year,
-          target.monthIndex,
-          card.usualCutDay,
-          card.usualDueDay,
-        );
-
-        await prisma.cardCycle.upsert({
-          where: {
-            userId,
-            cardId_month_year: {
-              cardId: card.id,
-              month: target.month,
-              year: target.year,
-            },
-          },
-          update: {},
-          create: {
-            userId,
-            cardId: card.id,
-            month: target.month,
-            year: target.year,
-            startDate,
-            cutDate,
-            dueDate,
-          },
-        });
-      }
+      await prisma.$transaction(async tx => {
+        // Generation and date confirmation share the same card lock, including
+        // when the following cycle does not exist yet.
+        await tx.$queryRaw`SELECT id FROM cards WHERE id = ${card.id} AND "userId" = ${userId} FOR UPDATE`;
+        const first = targetMonths[0]!;
+        let previous = await tx.cardCycle.findUnique({ where: {
+          userId, cardId_month_year: { cardId: card.id, ...adjacentCycleMonth(first.year, first.month, -1) },
+        } });
+        for (const target of targetMonths) {
+          const dates = getCycleDates(target.year, target.monthIndex, card.usualCutDay, card.usualDueDay);
+          if (previous?.datesConfirmedAt) dates.startDate = startAfterCut(previous.cutDate);
+          const cycle = await tx.cardCycle.upsert({
+            where: { userId, cardId_month_year: { cardId: card.id, month: target.month, year: target.year } },
+            update: {},
+            create: { userId, cardId: card.id, month: target.month, year: target.year, ...dates },
+          });
+          if (previous?.datesConfirmedAt) await alignCycleStart(tx, userId, cycle, previous.cutDate);
+          previous = cycle;
+        }
+        if (previous?.datesConfirmedAt) await alignFollowingCycle(tx, userId, previous);
+      });
     }
 
     return loadCycles(request, true, userId);
@@ -321,8 +346,11 @@ export async function POST(request: Request) {
 
 // Serializa cambios de importe, pago y fechas para recalcular sobre la última fila.
 type CycleUpdate = Partial<{ startDate: Date; cutDate: Date; dueDate: Date; datesConfirmedAt: Date; statementAmount: number; paidAmount: number | null; paidAt: Date | null; postCutCreditAmount: number; postCutCreditDate: Date | null; postCutCreditNotes: string | null }>;
-async function updateCycle(userId: string, id: string, getData: (current: Prisma.CardCycleGetPayload<object>) => CycleUpdate) {
+async function updateCycle(userId: string, id: string, getData: (current: Prisma.CardCycleGetPayload<object>) => CycleUpdate, syncFollowingStart = false) {
   return prisma.$transaction(async (tx) => {
+    if (syncFollowingStart) {
+      await tx.$queryRaw`SELECT id FROM cards WHERE id = (SELECT "cardId" FROM card_cycles WHERE id = ${id} AND "userId" = ${userId}) AND "userId" = ${userId} FOR UPDATE`;
+    }
     await tx.$queryRaw`SELECT id FROM card_cycles WHERE id = ${id} AND "userId" = ${userId} FOR UPDATE`;
     const current = await tx.cardCycle.findUnique({ where: { id, userId } });
     if (!current) throw new ApiAccessError("Ciclo no encontrado.", 404);
@@ -342,6 +370,7 @@ async function updateCycle(userId: string, id: string, getData: (current: Prisma
     const cycle = await tx.cardCycle.update({
       where: { id, userId }, data: { ...data, status }, select: cycleSelect,
     });
+    if (syncFollowingStart) await alignFollowingCycle(tx, userId, cycle);
     return { ...cycle, ...getCyclePaymentState(cycle, now) };
   });
 }
@@ -362,7 +391,8 @@ export async function PATCH(request: Request) {
       );
     }
 
-    if (action === "UPDATE_DATES") {
+    const includesDates = body.startDate !== undefined || body.cutDate !== undefined || body.dueDate !== undefined;
+    if (action === "UPDATE_DATES" || (action === "UPDATE_STATEMENT" && includesDates)) {
       const { startDate, cutDate, dueDate } = body;
 
       if (!startDate || !cutDate || !dueDate) {
@@ -401,11 +431,16 @@ export async function PATCH(request: Request) {
         );
       }
 
+      const amount = action === "UPDATE_STATEMENT" ? parseCycleMoney(statementAmount) : undefined;
+      if (amount === null) {
+        throw new ApiAccessError("El estado de cuenta debe ser un importe no negativo con hasta dos decimales.", 400);
+      }
       const cycle = await updateCycle(userId, id, () => ({
         startDate: parsedStartDate, cutDate: parsedCutDate, dueDate: parsedDueDate,
         // Guardar también confirma las fechas cuando coinciden con las previstas.
         datesConfirmedAt: new Date(),
-      }));
+        ...(amount !== undefined ? { statementAmount: amount } : {}),
+      }), true);
 
       return NextResponse.json({ cycle });
     }

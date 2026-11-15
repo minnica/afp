@@ -1,0 +1,255 @@
+
+> afp@0.1.0 test /home/garatachia/projects/afp
+> node --import tsx tests/run-tests.ts card-cycle-starts-integration.test.ts card-statement-integration.test.ts card-cycle-payments.test.ts
+
+TAP version 13
+# Subtest: el detalle de captura calcula el saldo con importes sin necesitar fechas del corte
+ok 1 - el detalle de captura calcula el saldo con importes sin necesitar fechas del corte
+  ---
+  duration_ms: 1.347028
+  type: 'test'
+  ...
+# Subtest: las fechas reales se confirman al guardar, incluso sin cambiarlas; importe y pago no las confirman
+ok 2 - las fechas reales se confirman al guardar, incluso sin cambiarlas; importe y pago no las confirman
+  ---
+  duration_ms: 64.668891
+  type: 'test'
+  ...
+# Subtest: fechas inválidas o un guardado fallido no registran confirmación
+ok 3 - fechas inválidas o un guardado fallido no registran confirmación
+  ---
+  duration_ms: 40.757574
+  type: 'test'
+  ...
+# Subtest: estado y fechas se guardan juntos, confirman el período y recalculan el pendiente
+ok 4 - estado y fechas se guardan juntos, confirman el período y recalculan el pendiente
+  ---
+  duration_ms: 37.038069
+  type: 'test'
+  ...
+# Subtest: estado y fechas: entradas incompletas, inválidas y ajenas no guardan parcialmente
+ok 5 - estado y fechas: entradas incompletas, inválidas y ajenas no guardan parcialmente
+  ---
+  duration_ms: 39.624366
+  type: 'test'
+  ...
+# Subtest: estado y fechas: conserva las reglas de devolución al guardar ambos valores
+ok 6 - estado y fechas: conserva las reglas de devolución al guardar ambos valores
+  ---
+  duration_ms: 38.923086
+  type: 'test'
+  ...
+# Subtest: un peso de mil conserva 999 pendientes, aun con PAID/paidAt históricos
+ok 7 - un peso de mil conserva 999 pendientes, aun con PAID/paidAt históricos
+  ---
+  duration_ms: 0.30659
+  type: 'test'
+  ...
+# Subtest: el pago sigue vigente todo el día bancario de vencimiento
+ok 8 - el pago sigue vigente todo el día bancario de vencimiento
+  ---
+  duration_ms: 0.588839
+  type: 'test'
+  ...
+# Subtest: solo vence al empezar el día de México siguiente, incluidos cambios de mes y año
+ok 9 - solo vence al empezar el día de México siguiente, incluidos cambios de mes y año
+  ---
+  duration_ms: 0.500749
+  type: 'test'
+  ...
+# Subtest: el corte se presenta desde el inicio de su día bancario
+ok 10 - el corte se presenta desde el inicio de su día bancario
+  ---
+  duration_ms: 0.375629
+  type: 'test'
+  ...
+# Subtest: Dashboard usa la fecha del cliente para el estado y el aviso de vencimiento
+ok 11 - Dashboard usa la fecha del cliente para el estado y el aviso de vencimiento
+  ---
+  duration_ms: 55.195804
+  type: 'test'
+  ...
+# Subtest: A04: listado, Dashboard sin clientDate y PATCH conservan el mismo día de México
+ok 12 - A04: listado, Dashboard sin clientDate y PATCH conservan el mismo día de México
+  ---
+  duration_ms: 390.558562
+  type: 'test'
+  ...
+# Subtest: Dashboard rechaza clientDate vacío, imposible o con hora antes de consultar datos
+ok 13 - Dashboard rechaza clientDate vacío, imposible o con hora antes de consultar datos
+  ---
+  duration_ms: 35.315731
+  type: 'test'
+  ...
+# Subtest: centavos, excedente, cero y falta de estado tienen situaciones distintas
+ok 14 - centavos, excedente, cero y falta de estado tienen situaciones distintas
+  ---
+  duration_ms: 0.23894
+  type: 'test'
+  ...
+# Subtest: PATCH, listado, Dashboard y avisos comparten saldo sin reducir el total mensual
+ok 15 - PATCH, listado, Dashboard y avisos comparten saldo sin reducir el total mensual
+  ---
+  duration_ms: 53.313886
+  type: 'test'
+  ...
+# Subtest: lecturas corrigen PAID antiguo sin escribir ni ocultar avisos parciales
+ok 16 - lecturas corrigen PAID antiguo sin escribir ni ocultar avisos parciales
+  ---
+  duration_ms: 35.508151
+  type: 'test'
+  ...
+# Subtest: cero numérico y texto cierran sin pago ficticio y sin avisos de vencimiento
+ok 17 - cero numérico y texto cierran sin pago ficticio y sin avisos de vencimiento
+  ---
+  duration_ms: 102.784718
+  type: 'test'
+  ...
+# Subtest: editar el estado recalcula pago completo, parcial, excedente y cero; deshacer reabre
+ok 18 - editar el estado recalcula pago completo, parcial, excedente y cero; deshacer reabre
+  ---
+  duration_ms: 32.633435
+  type: 'test'
+  ...
+# Subtest: guardar total reemplaza el anterior; repetir no acumula y disminuir reabre
+ok 19 - guardar total reemplaza el anterior; repetir no acumula y disminuir reabre
+  ---
+  duration_ms: 33.868814
+  type: 'test'
+  ...
+# Subtest: rechaza importes ambiguos, fechas imposibles y pago sin estado capturado
+ok 20 - rechaza importes ambiguos, fechas imposibles y pago sin estado capturado
+  ---
+  duration_ms: 66.560708
+  type: 'test'
+  ...
+# Subtest: fallo de escritura revierte el cambio y el estado dentro de la transacción
+ok 21 - fallo de escritura revierte el cambio y el estado dentro de la transacción
+  ---
+  duration_ms: 35.966
+  type: 'test'
+  ...
+# Subtest: BBVA: devolución posterior liquida septiembre sin modificar estado, pago ni cálculo de cargos
+ok 22 - BBVA: devolución posterior liquida septiembre sin modificar estado, pago ni cálculo de cargos
+  ---
+  duration_ms: 50.322881
+  type: 'test'
+  ...
+# Subtest: reducir o retirar devolución reabre el saldo y los avisos; deshacer pago conserva la devolución
+ok 23 - reducir o retirar devolución reabre el saldo y los avisos; deshacer pago conserva la devolución
+  ---
+  duration_ms: 52.249318
+  type: 'test'
+  ...
+# Subtest: devolución total cubre sin pago ficticio; parcial sin pago conserva avisos; excedente se informa
+ok 24 - devolución total cubre sin pago ficticio; parcial sin pago conserva avisos; excedente se informa
+  ---
+  duration_ms: 67.607606
+  type: 'test'
+  ...
+# Subtest: bonificaciones de cargos y otro corte no descuentan de nuevo una devolución del pago
+ok 25 - bonificaciones de cargos y otro corte no descuentan de nuevo una devolución del pago
+  ---
+  duration_ms: 0.28692
+  type: 'test'
+  ...
+# Subtest: devoluciones: validación de importe, evidencia, fecha, corte y propietario sin escrituras
+ok 26 - devoluciones: validación de importe, evidencia, fecha, corte y propietario sin escrituras
+  ---
+  duration_ms: 70.724202
+  type: 'test'
+  ...
+# Subtest: editar estado o fechas conserva coherencia de la devolución y rollback conserva evidencia
+ok 27 - editar estado o fechas conserva coherencia de la devolución y rollback conserva evidencia
+  ---
+  duration_ms: 33.437124
+  type: 'test'
+  ...
+# Subtest: PostgreSQL: inicio del ciclo siguiente desde el corte real anterior
+    # Subtest: actualiza el inicio al confirmar y corregir el corte; conserva todos los demás campos
+    ok 1 - actualiza el inicio al confirmar y corregir el corte; conserva todos los demás campos
+      ---
+      duration_ms: 103.833647
+      type: 'test'
+      ...
+    # Subtest: guardar el estado con fechas también enlaza el siguiente ciclo, incluso si el corte no cambia
+    ok 2 - guardar el estado con fechas también enlaza el siguiente ciclo, incluso si el corte no cambia
+      ---
+      duration_ms: 37.158799
+      type: 'test'
+      ...
+    # Subtest: respeta el inicio confirmado del siguiente ciclo, que continúa editable
+    ok 3 - respeta el inicio confirmado del siguiente ciclo, que continúa editable
+      ---
+      duration_ms: 32.288125
+      type: 'test'
+      ...
+    # Subtest: usa el mes inmediato de la misma tarjeta; no salta meses ni modifica otra tarjeta o propietario
+    ok 4 - usa el mes inmediato de la misma tarjeta; no salta meses ni modifica otra tarjeta o propietario
+      ---
+      duration_ms: 61.939714
+      type: 'test'
+      ...
+    # Subtest: febrero bisiesto, febrero normal y diciembre conservan el día bancario
+    ok 5 - febrero bisiesto, febrero normal y diciembre conservan el día bancario
+      ---
+      duration_ms: 54.724035
+      type: 'test'
+      ...
+    # Subtest: actualizar solo importe o pago no confirma fechas ni cambia el inicio siguiente
+    ok 6 - actualizar solo importe o pago no confirma fechas ni cambia el inicio siguiente
+      ---
+      duration_ms: 31.313196
+      type: 'test'
+      ...
+    # Subtest: un período siguiente imposible rechaza y revierte ambas filas
+    ok 7 - un período siguiente imposible rechaza y revierte ambas filas
+      ---
+      duration_ms: 85.871602
+      type: 'test'
+      ...
+    # Subtest: un fallo después de escribir el siguiente ciclo revierte también monto y fechas del actual
+    ok 8 - un fallo después de escribir el siguiente ciclo revierte también monto y fechas del actual
+      ---
+      duration_ms: 18.061585
+      type: 'test'
+      ...
+    # Subtest: la generación hereda diciembre anterior para enero nuevo, repara inicios sin confirmar y respeta confirmados
+    ok 9 - la generación hereda diciembre anterior para enero nuevo, repara inicios sin confirmar y respeta confirmados
+      ---
+      duration_ms: 1212.161928
+      type: 'test'
+      ...
+    # Subtest: generación y confirmación concurrentes no pierden el corte real aunque enero no exista
+    ok 10 - generación y confirmación concurrentes no pierden el corte real aunque enero no exista
+      ---
+      duration_ms: 81.096808
+      type: 'test'
+      ...
+    # Subtest: confirmaciones concurrentes de meses vecinos conservan el inicio elegido expresamente
+    ok 11 - confirmaciones concurrentes de meses vecinos conservan el inicio elegido expresamente
+      ---
+      duration_ms: 28.248061
+      type: 'test'
+      ...
+    1..11
+ok 28 - PostgreSQL: inicio del ciclo siguiente desde el corte real anterior
+  ---
+  duration_ms: 1974.830037
+  type: 'test'
+  ...
+# Subtest: PostgreSQL: estado y fechas atómicos, rollback, lectura histórica y propiedad
+ok 29 - PostgreSQL: estado y fechas atómicos, rollback, lectura histórica y propiedad
+  ---
+  duration_ms: 195.82834
+  type: 'test'
+  ...
+1..29
+# tests 40
+# suites 0
+# pass 40
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3820.311882

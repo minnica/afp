@@ -17,6 +17,8 @@ import { es } from "date-fns/locale";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import CycleBreakdown from "@/components/tarjetas/CycleBreakdown";
+import CycleStatementForm from "@/components/tarjetas/CycleStatementForm";
+import type { CardStatementDraft } from "@/lib/cardStatementPrefill";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
@@ -202,18 +204,22 @@ export default function CyclesDataTable({
   onMonthChange,
   monthOptions,
   updateCycleDates,
-  updateStatementAmount,
+  updateStatement,
+  requestedStatement,
+  onStatementClosed,
   unmarkCycleAsPaid,
   markCycleAsPaid,
   updatePostCutCredit,
   loadCycleBreakdown,
-}: { cycles: Cycle[]; month: string; onMonthChange: (value: string) => void; monthOptions: { value: string; label: string }[]; updateCycleDates: (id: string, dates: { startDate: string; cutDate: string; dueDate: string }) => Promise<void>; updateStatementAmount: (id: string, amount: string) => Promise<void>; unmarkCycleAsPaid: (id: string) => void; markCycleAsPaid: (id: string, payment: { paidAt: string; paidAmount: string }) => Promise<void>; updatePostCutCredit: (id: string, credit: { postCutCreditAmount: string; postCutCreditDate: string; postCutCreditNotes: string }) => Promise<void>; loadCycleBreakdown?: (id: string) => Promise<Cycle | null> }) {
+}: { cycles: Cycle[]; month: string; onMonthChange: (value: string) => void; monthOptions: { value: string; label: string }[]; updateCycleDates: (id: string, dates: { startDate: string; cutDate: string; dueDate: string }) => Promise<void>; updateStatement: (id: string, values: CardStatementDraft) => Promise<void>; requestedStatement?: Cycle | null; onStatementClosed?: () => void; unmarkCycleAsPaid: (id: string) => void; markCycleAsPaid: (id: string, payment: { paidAt: string; paidAmount: string }) => Promise<void>; updatePostCutCredit: (id: string, credit: { postCutCreditAmount: string; postCutCreditDate: string; postCutCreditNotes: string }) => Promise<void>; loadCycleBreakdown?: (id: string) => Promise<Cycle | null> }) {
   const { captureFocus, restoreFocus } = useDialogFocus();
-  const [activeDialog, setActiveDialog] = useState<CycleDialog | null>(null);
+  const [localDialog, setActiveDialog] = useState<CycleDialog | null>(null);
+  const activeDialog: CycleDialog | null = requestedStatement ? { type: "statement", cycle: requestedStatement } : localDialog;
   const dialogTitleRef = useRef<HTMLHeadingElement | null>(null);
+  const tableRef = useRef<HTMLDivElement | null>(null);
   const dialogRequestRef = useRef(0);
   const dialogType = activeDialog?.type;
-  const currentCycle = activeDialog ? cycles.find((cycle) => cycle.id === activeDialog.cycle.id) || activeDialog.cycle : null;
+  const currentCycle = activeDialog ? activeDialog.type === "statement" ? activeDialog.cycle : cycles.find((cycle) => cycle.id === activeDialog.cycle.id) || activeDialog.cycle : null;
 
   useEffect(() => {
     if (dialogType && dialogType !== "breakdown") {
@@ -224,7 +230,6 @@ export default function CyclesDataTable({
   const [editCycleStartDate, setEditCycleStartDate] = useState("");
   const [editCycleCutDate, setEditCycleCutDate] = useState("");
   const [editCycleDueDate, setEditCycleDueDate] = useState("");
-  const [statementAmount, setStatementAmount] = useState("");
   const [paidAt, setPaidAt] = useState("");
   const [paidAmount, setPaidAmount] = useState("");
   const [postCutCreditAmount, setPostCutCreditAmount] = useState("0");
@@ -251,8 +256,6 @@ export default function CyclesDataTable({
       setEditCycleStartDate(toDateInputValue(cycle.startDate));
       setEditCycleCutDate(toDateInputValue(cycle.cutDate));
       setEditCycleDueDate(toDateInputValue(cycle.dueDate));
-    } else if (type === "statement") {
-      setStatementAmount(cycle.statementAmount != null ? String(cycle.statementAmount) : "");
     } else if (type === "pay") {
       setPaidAt(cycle.paidAt ? toDateInputValue(cycle.paidAt) : getTodayInputValue());
       setPaidAmount(String(cycle.paidAmount ?? cycle.paymentDueAmount ?? cycle.statementAmount ?? ""));
@@ -295,6 +298,8 @@ export default function CyclesDataTable({
   function closeDialog() {
     if (savingRef.current) return;
     dialogRequestRef.current += 1;
+    setSaveError("");
+    onStatementClosed?.();
     setActiveDialog(null);
   }
 
@@ -305,6 +310,7 @@ export default function CyclesDataTable({
     setSaveError("");
     try {
       await action();
+      onStatementClosed?.();
       setActiveDialog(null);
     } catch (error) {
       setSaveError(errorMessage(error) || "No se pudo guardar el cambio.");
@@ -320,7 +326,6 @@ export default function CyclesDataTable({
       if (activeDialog.type === "dates") return updateCycleDates(currentCycle.id, {
         startDate: editCycleStartDate, cutDate: editCycleCutDate, dueDate: editCycleDueDate,
       });
-      if (activeDialog.type === "statement") return updateStatementAmount(currentCycle.id, statementAmount);
       if (activeDialog.type === "credits") return updatePostCutCredit(currentCycle.id, { postCutCreditAmount, postCutCreditDate, postCutCreditNotes });
       return markCycleAsPaid(currentCycle.id, { paidAt, paidAmount });
     });
@@ -453,7 +458,7 @@ export default function CyclesDataTable({
   );
 
   return (
-    <div onClickCapture={captureFocus}>
+    <div ref={tableRef} tabIndex={-1} aria-label="Ciclos mensuales" onClickCapture={captureFocus}>
       <DataTable
         columns={columns}
         data={cycles}
@@ -490,12 +495,14 @@ export default function CyclesDataTable({
 
       <Dialog open={!!activeDialog} onOpenChange={(open) => { if (!open) closeDialog(); }}>
         {activeDialog && currentCycle && activeDialog.type !== "breakdown" && (
-          <DialogContent onCloseAutoFocus={restoreFocus} showCloseButton={false} data-cycle-action={activeDialog.type} className="flex max-h-[90svh] max-w-[calc(100%-1rem)] flex-col md:max-w-md" onOpenAutoFocus={(event) => { event.preventDefault(); dialogTitleRef.current?.focus({ preventScroll: true }); }}>
+          <DialogContent onCloseAutoFocus={(event) => { restoreFocus(event); if (!event.defaultPrevented) { event.preventDefault(); tableRef.current?.focus({ preventScroll: true }); } }} showCloseButton={false} data-cycle-action={activeDialog.type} className="flex max-h-[90svh] max-w-[calc(100%-1rem)] flex-col md:max-w-md" onOpenAutoFocus={(event) => { event.preventDefault(); dialogTitleRef.current?.focus({ preventScroll: true }); }}>
             <DialogHeader className="shrink-0 pr-12">
               <DialogTitle ref={dialogTitleRef} tabIndex={-1} className="break-words outline-none">
                 {activeDialog.type === "details" ? "Detalles" : activeDialog.type === "dates" ? "Editar fechas reales" : activeDialog.type === "statement" ? "Estado de cuenta" : activeDialog.type === "credits" ? "Devoluciones después del corte" : "Registrar pago"} — {currentCycle.card.name}
               </DialogTitle>
-              <DialogDescription className="sr-only">Fechas, importes y acciones del ciclo de esta tarjeta.</DialogDescription>
+              <DialogDescription className={activeDialog.type === "statement" ? undefined : "sr-only"}>
+                {activeDialog.type === "statement" ? `Ciclo ${String(currentCycle.month).padStart(2, "0")}/${currentCycle.year}. Revisa el monto y las fechas reales que indica tu estado de cuenta.` : "Fechas, importes y acciones del ciclo de esta tarjeta."}
+              </DialogDescription>
             </DialogHeader>
             <DialogClose asChild>
               <Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2 size-11" disabled={isSaving} aria-label={activeDialog.type === "details" ? "Cerrar detalles" : "Cerrar edición"}><HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} aria-hidden="true" /></Button>
@@ -537,22 +544,8 @@ export default function CyclesDataTable({
                 </FieldGroup>
               )}
               {activeDialog.type === "statement" && (
-                <FieldGroup>
-                  <Field>
-                    <FieldLabel htmlFor="cycles-data-table-field-1">Monto estado de cuenta</FieldLabel>
-                    <Input
-                      disabled={isSaving}
-                      id="cycles-data-table-field-1"
-                      type="number"
-                      formatNumber
-                      min="0"
-                      step="0.01"
-                      value={statementAmount}
-                      placeholder="0.00"
-                      onChange={(e) => setStatementAmount(e.target.value)}
-                    />
-                  </Field>
-                </FieldGroup>
+                <CycleStatementForm key={currentCycle.id} cycle={currentCycle} isSaving={isSaving}
+                  onSubmit={(values) => saveAction(() => updateStatement(currentCycle.id, values))} />
               )}
               {activeDialog.type === "pay" && currentCycle.statementAmount != null && (
                 <FieldGroup className="gap-3">
@@ -628,8 +621,8 @@ export default function CyclesDataTable({
                 </>
               ) : (
                 <>
-                  <Button type="button" className="col-span-2 h-11" disabled={isSaving || (activeDialog.type === "pay" && (currentCycle.statementAmount == null || previewAmount === null)) || (activeDialog.type === "credits" && (currentCycle.statementAmount == null || !!creditError))} onClick={handleSave}>
-                    {isSaving ? "Guardando…" : activeDialog.type === "dates" ? "Guardar fechas" : activeDialog.type === "statement" ? "Guardar" : activeDialog.type === "credits" ? "Guardar devoluciones" : "Guardar total pagado"}
+                  <Button type={activeDialog.type === "statement" ? "submit" : "button"} form={activeDialog.type === "statement" ? "cycle-statement-form" : undefined} className="col-span-2 h-11" disabled={isSaving || (activeDialog.type === "pay" && (currentCycle.statementAmount == null || previewAmount === null)) || (activeDialog.type === "credits" && (currentCycle.statementAmount == null || !!creditError))} onClick={activeDialog.type === "statement" ? undefined : handleSave}>
+                    {isSaving ? "Guardando…" : activeDialog.type === "dates" ? "Guardar fechas" : activeDialog.type === "statement" ? "Guardar estado de cuenta" : activeDialog.type === "credits" ? "Guardar devoluciones" : "Guardar total pagado"}
                   </Button>
                   {activeDialog.type === "pay" && currentCycle.paidAmount != null && (
                     <Button type="button" variant="destructive" disabled={isSaving} className="col-span-2 h-11" onClick={() => { unmarkCycleAsPaid(currentCycle.id); closeDialog(); }}>Deshacer pago</Button>

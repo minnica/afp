@@ -12,6 +12,8 @@ import { uiFetch as apiFetch } from "@/lib/uiClient";
 import CreateRecordSurface from "@/components/ui/create-record-surface";
 
 import { useDialogFocus } from "@/hooks/use-dialog-focus";
+import { useCardStatementPrefill } from "@/hooks/use-card-statement-prefill";
+import type { CardStatementDraft } from "@/lib/cardStatementPrefill";
 
 import {
 AlertDialog,AlertDialogAction,AlertDialogCancel,AlertDialogContent,
@@ -81,6 +83,9 @@ export default function TarjetasContent() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const statement = useCardStatementPrefill(user?.id, !isLoading);
+  const { setCycle: setStatementCycle } = statement;
+  const onStatementClosed = useCallback(() => setStatementCycle(null), [setStatementCycle]);
   const [cardToDelete, setCardToDelete] = useState<FinancialCard | null>(null);
   const [cycleToUnmark, setCycleToUnmark] = useState<string | null>(null);
   const [error, setError] = useState("");
@@ -278,9 +283,8 @@ export default function TarjetasContent() {
     // El PATCH ya fue confirmado: actualizar el estado visible incluso si falla el GET.
     setCycles((previous) => previous.map((cycle) => cycle.id === cycleId ? { ...cycle, ...data.cycle } : cycle));
     // Retira o actualiza el aviso del encabezado con una lectura posterior al PATCH.
-    await refreshDashboard({ force: true });
     try {
-      await Promise.all([loadCycles(user.id, { mutationCompleted: true }), loadCards(user.id, { mutationCompleted: true })]);
+      await Promise.all([refreshDashboard({ force: true }), loadCycles(user.id, { mutationCompleted: true }), loadCards(user.id, { mutationCompleted: true })]);
     } catch {
       setError("El cambio se guardó, pero no se pudo actualizar el listado. Recarga para consultar los cálculos.");
     }
@@ -290,8 +294,8 @@ export default function TarjetasContent() {
     return saveCycleChange(cycleId, { action: "UPDATE_DATES", ...dates });
   }
 
-  function updateStatementAmount(cycleId: string, statementAmount: string) {
-    return saveCycleChange(cycleId, { action: "UPDATE_STATEMENT", statementAmount });
+  function updateStatement(cycleId: string, values: CardStatementDraft) {
+    return saveCycleChange(cycleId, { action: "UPDATE_STATEMENT", ...values });
   }
 
   function markCycleAsPaid(cycleId: string, payment: { paidAt: string; paidAmount: string }) {
@@ -440,6 +444,11 @@ export default function TarjetasContent() {
       </AlertDialog>
       <section className="mx-auto flex w-full max-w-7xl flex-col px-4 py-5 md:py-8">
         <AutomaticRecordingLink payments />
+        {statement.loading ? <p role="status" className="mb-4 text-sm text-muted-foreground">Preparando estado de cuenta…</p> : null}
+        {statement.error ? <Alert variant="destructive" className="mb-4"><AlertDescription>
+          {statement.error}
+          <Button type="button" variant="outline" className="min-h-11" onClick={statement.retry}>Reintentar</Button>
+        </AlertDescription></Alert> : null}
         {error ? (
           <Alert variant="destructive" className="mb-6">
             <AlertDescription>{error}</AlertDescription>
@@ -470,7 +479,9 @@ export default function TarjetasContent() {
               onMonthChange={setActiveMonthTab}
               monthOptions={MONTH_NAMES.map((monthName, monthIndex) => ({ value: String(monthIndex), label: `${monthName} ${currentYear}`, shortLabel: `${monthName.slice(0, 3)} ${currentYear}` }))}
               updateCycleDates={updateCycleDates}
-              updateStatementAmount={updateStatementAmount}
+              updateStatement={updateStatement}
+              requestedStatement={statement.cycle}
+              onStatementClosed={onStatementClosed}
               markCycleAsPaid={markCycleAsPaid}
               updatePostCutCredit={updatePostCutCredit}
               unmarkCycleAsPaid={setCycleToUnmark}

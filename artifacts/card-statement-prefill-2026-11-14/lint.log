@@ -1,0 +1,38 @@
+
+> afp@0.1.0 lint /home/garatachia/projects/afp
+> eslint
+
+
+/home/garatachia/projects/afp/src/components/configuracion/CaptureIncomeSettings.tsx
+  21:45  warning  Compilation Skipped: Use of incompatible library
+
+This API returns functions which cannot be memoized without leading to stale UI. To prevent this, by default React Compiler will skip memoizing this component/hook. However, you may see issues if values from this API are passed to other components/hooks that are memoized.
+
+/home/garatachia/projects/afp/src/components/configuracion/CaptureIncomeSettings.tsx:21:45
+  19 |   const prior = policies[0];
+  20 |   const form = useForm<z.infer<typeof schema>>({ resolver: zodResolver(schema), defaultValues: { sampleId: prior?.verifiedMovementId || '', accountId: prior?.accountId || '', incomeTypeId: prior?.incomeTypeId || '', first: prior?.estimatedFirstHalfAmount || '', second: prior?.estimatedSecondHalfAmount || '', mode: prior?.mode === 'AUTOMATIC' ? 'AUTOMATIC' : 'OBSERVATION', accepted: false } });
+> 21 |   const sample = samples.find(s => s.id === form.watch('sampleId')), payroll = sample?.parserKey === 'bbva.payroll.es.v1';
+     |                                             ^^^^ React Hook Form's `useForm()` API returns a `watch()` function which cannot be memoized safely.
+  22 |   return <section className="flex flex-col gap-4" aria-labelledby="income-rules-title"><h3 id="income-rules-title" className="text-base font-semibold">Ingresos BBVA y nómina</h3>
+  23 |     <p className="text-sm text-muted-foreground">Una nómina sin importe puede sumar una cantidad estimada a Mi dinero en cuanto llegue su aviso. Confirma después el importe real en el mismo registro.</p>
+  24 |     {policies.map(row => <p className="text-sm" key={row.id}>{configuration.moneyAccounts.find(a => a.id === row.accountId)?.name} · {row.parserKey === 'bbva.payroll.es.v1' ? 'Nómina' : 'Depósitos'} · {row.mode === 'AUTOMATIC' ? 'Automático' : 'Solo revisión'}</p>)}  react-hooks/incompatible-library
+
+/home/garatachia/projects/afp/src/components/gastos/GastosContent.tsx
+  431:18  warning  'loadSubscriptions' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/garatachia/projects/afp/src/components/ui/data-table.tsx
+  77:17  warning  Compilation Skipped: Use of incompatible library
+
+This API returns functions which cannot be memoized without leading to stale UI. To prevent this, by default React Compiler will skip memoizing this component/hook. However, you may see issues if values from this API are passed to other components/hooks that are memoized.
+
+/home/garatachia/projects/afp/src/components/ui/data-table.tsx:77:17
+  75 |   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize });
+  76 |
+> 77 |   const table = useReactTable({
+     |                 ^^^^^^^^^^^^^ TanStack Table's `useReactTable()` API returns functions that cannot be memoized safely
+  78 |     data,
+  79 |     columns,
+  80 |     state: { sorting: serverState?.sorting ?? sorting, columnFilters, globalFilter: serverState?.globalFilter ?? globalFilter, pagination: serverState?.pagination ?? pagination },  react-hooks/incompatible-library
+
+✖ 3 problems (0 errors, 3 warnings)
+

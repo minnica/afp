@@ -6,6 +6,18 @@ Consolidado el **27 de octubre de 2026** a partir del README del commit `4562aa0
 
 ## 2026-11-14
 
+### Ciclos de tarjeta: heredar el inicio desde el corte real
+
+Al guardar fechas reales, con o sin monto del estado de cuenta, el inicio del ciclo del mes inmediato siguiente pasa al día posterior al corte. Se limita a la misma tarjeta y propietario y a fechas aún sin confirmar; conserva los inicios confirmados, que continúan editables, y los demás datos del siguiente ciclo. La generación también utiliza el corte confirmado anterior, incluidos diciembre y enero. Cambiar solo el importe o el pago no confirma fechas ni propaga un inicio.
+
+La generación y la confirmación comparten un bloqueo por tarjeta para proteger el caso en que el siguiente ciclo todavía no existe. La confirmación y la propagación son atómicas: una incoherencia o un fallo en la segunda escritura revierte ambas. Sin migraciones ni publicación; comprobaciones con PostgreSQL local y datos ficticios. [Regresiones y verificaciones](../artifacts/card-statement-prefill-2026-11-14/cycle-starts/README.md).
+
+### Avisos de corte: estado de cuenta y fechas reales
+
+Los cortes y cortes próximos enlazan al ciclo exacto en Tarjetas desde Dashboard y la cabecera móvil. La consulta autenticada prepara el monto bancario existente y las tres fechas, incluso para ciclos fuera del listado visible; un monto ausente queda por completar. El formulario de estado de cuenta permite corregir inicio, corte y límite de pago. Una sola transacción guarda los cuatro campos y confirma las fechas, manteniendo la validación de devoluciones, el pago acumulado y el aislamiento por propietario. El enlace se consume al preparar el formulario; cerrar y recargar no lo reabren.
+
+Implementación local, sin migraciones, dependencias nuevas, cambios de APK ni publicación. Las comprobaciones usan datos ficticios en PostgreSQL desechable. [Verificación y alcance](../artifacts/card-statement-prefill-2026-11-14/README.md).
+
 ### Cobros programados: reconocer abonos anticipados
 
 El primer flujo prerrellenado permitía corregir la fecha al día real del ingreso, pero los avisos buscaban abonos desde el día programado. Un ingreso anticipado no retiraba el aviso. Se comparten intervalos desde dos días antes entre Dashboard, resumen, Android, prerrellenado y Calendar; el límite exclusivo y los días consecutivos evitan aplicar el abono a dos fechas. La lectura de Dashboard incluye dos días del mes anterior para los cobros del día 1. No se cambia la fecha ni el importe de registros existentes; Calendar conserva sus estados parciales.

@@ -102,6 +102,47 @@ test("fechas inválidas o un guardado fallido no registran confirmación", async
   assert.equal(f.state().datesConfirmedAt, undefined);
 });
 
+test('estado y fechas se guardan juntos, confirman el período y recalculan el pendiente', async () => {
+  const f = fixture({ statementAmount: null, paidAmount: 100 });
+  const response = await f.patch({ action: 'UPDATE_STATEMENT', statementAmount: '1200.25',
+    startDate: '2026-09-12', cutDate: '2026-10-11', dueDate: '2026-10-30' });
+  assert.equal(response.status, 200);
+  assert.equal(f.writes(), 1);
+  assert.equal(f.state().statementAmount, 1200.25);
+  assert.equal(f.state().cutDate.slice(0, 10), '2026-10-11');
+  assert.equal(f.state().datesConfirmedAt, now.toISOString());
+  assert.equal(record(response.body.cycle).pendingAmount, 1100.25);
+  assert.equal(f.state().paidAmount, 100);
+});
+
+test('estado y fechas: entradas incompletas, inválidas y ajenas no guardan parcialmente', async () => {
+  const f = fixture();
+  const before = f.state();
+  const command = { action: 'UPDATE_STATEMENT', statementAmount: '1200.25',
+    startDate: '2026-09-12', cutDate: '2026-10-11', dueDate: '2026-10-30' };
+  for (const fields of [{ dueDate: '' }, { cutDate: null }, { startDate: undefined },
+    { cutDate: '2026-02-30' }, { startDate: command.cutDate }, { dueDate: command.cutDate },
+    { statementAmount: '' }, { statementAmount: '-1' }, { statementAmount: '1.001' }]) {
+    assert.equal((await f.patch({ ...command, ...fields })).status, 400);
+  }
+  assert.equal((await f.patch({ ...command, id: 'another-owner' })).status, 404);
+  assert.equal(f.writes(), 0);
+  assert.deepEqual(f.state(), before);
+  f.fail();
+  assert.equal((await f.patch(command)).status, 500);
+  assert.deepEqual(f.state(), before);
+});
+
+test('estado y fechas: conserva las reglas de devolución al guardar ambos valores', async () => {
+  const f = fixture({ postCutCreditAmount: 500, postCutCreditDate: '2026-10-12', postCutCreditNotes: 'Referencia ficticia' });
+  const before = f.state();
+  for (const fields of [{ statementAmount: '499.99' }, { cutDate: '2026-10-12' }]) {
+    assert.equal((await f.patch({ action: 'UPDATE_STATEMENT', statementAmount: '1200',
+      startDate: '2026-09-11', cutDate: '2026-10-10', dueDate: '2026-10-30', ...fields })).status, 409);
+  }
+  assert.deepEqual(f.state(), before);
+});
+
 test("un peso de mil conserva 999 pendientes, aun con PAID/paidAt históricos", () => {
   const partial = { ...base, paidAmount: 1, paidAt: "2026-10-20", status: "PAID" as const };
   const result = getCyclePaymentState(partial, now);

@@ -5,6 +5,7 @@ import { Calendar03Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { format } from "date-fns";
 import { useState, useSyncExternalStore } from "react";
+import type { AriaAttributes, FocusEventHandler } from "react";
 import { es } from "react-day-picker/locale";
 
 import { Button } from "@/components/ui/button";
@@ -38,7 +39,10 @@ function DatePicker({
   disabled = false,
   placeholder = "Seleccionar fecha",
   "aria-label": ariaLabel = "Fecha",
-}: { id?: string; value?: string | null; onChange: (value: string) => void; className?: string; clearable?: boolean; disabled?: boolean; placeholder?: string; "aria-label"?: string }) {
+  "aria-invalid": ariaInvalid,
+  "aria-describedby": ariaDescribedBy,
+  onBlur,
+}: { id?: string; value?: string | null; onChange: (value: string) => void; className?: string; clearable?: boolean; disabled?: boolean; placeholder?: string; "aria-label"?: string; "aria-invalid"?: AriaAttributes['aria-invalid']; "aria-describedby"?: string; onBlur?: FocusEventHandler<HTMLInputElement | HTMLButtonElement> }) {
   const [open, setOpen] = useState(false)
   // Match the server during hydration, then use the device's primary pointer.
   const useNativePicker = useSyncExternalStore(
@@ -61,6 +65,9 @@ function DatePicker({
           onChange={(event) => onChange(event.target.value)}
           disabled={disabled}
           aria-label={ariaLabel}
+          aria-invalid={ariaInvalid}
+          aria-describedby={ariaDescribedBy}
+          onBlur={onBlur}
           className="flex-1 text-left tabular-nums [color-scheme:light] dark:[color-scheme:dark] [&::-webkit-date-and-time-value]:text-left"
         />
         {clearable && value ? (
@@ -87,6 +94,9 @@ function DatePicker({
           type="button"
           variant="outline"
           disabled={disabled}
+          aria-invalid={ariaInvalid}
+          aria-describedby={ariaDescribedBy}
+          onBlur={onBlur}
           aria-label={selectedDate ? `${ariaLabel}: ${format(selectedDate, "PPP", { locale: es })}` : ariaLabel}
           className={cn(
             "h-7 w-full justify-between border-input bg-input/20 px-2 text-left text-sm font-normal tabular-nums md:text-xs dark:bg-input/30",

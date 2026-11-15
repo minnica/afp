@@ -38,6 +38,10 @@ La confirmación de suscripciones permite revisar gastos ya capturados y vincula
 
 ## Evidence on Hand
 
+Los avisos web de corte abren Tarjetas con el estado de cuenta del ciclo exacto y sus fechas actuales de inicio, corte y límite de pago, todos editables. Un monto bancario ausente queda vacío. Guardar confirma monto y fechas en una sola transacción, actualiza el saldo y recarga los avisos; abrir o cerrar no registra cambios. Se consulta el ciclo con la sesión autenticada, independientemente del año o página visibles. Implementación local del 14 de noviembre de 2026.
+
+Confirmar o corregir el corte real también deja el inicio del ciclo inmediatamente siguiente en corte + un día, si sus fechas siguen sin confirmar. Se respeta el inicio que el propietario ya confirmó y conserva su edición. La generación de ciclos toma también el corte confirmado del mes anterior, incluido diciembre → enero, sin confirmar el corte ni el límite siguientes. Ambos cambios se guardan en una transacción; los períodos imposibles requieren revisión. Extensión local del 14 de noviembre de 2026.
+
 Los avisos web de cobros programados abren Ingresos con un formulario editable preparado desde la cuenta vigente del propietario: fecha programada, persona, concepto, tipo «Pago recibido», cuenta vinculada e importe esperado hasta el saldo pendiente. Guardar confirma el ingreso y actualiza la deuda; abrir o cerrar no registra movimientos ni reemplaza el borrador manual. La navegación normal mantiene los formularios cerrados en móvil. Implementación local del 14 de noviembre de 2026.
 
 Los avisos y Calendar reconocen también los abonos recibidos hasta dos días antes de la fecha programada, con intervalos que impiden reutilizar el mismo ingreso en otra quincena. Se conserva la fecha real del ingreso, se excluyen fechas futuras y la revisión del prerrellenado usa la misma regla. Corrección local del 14 de noviembre de 2026.
