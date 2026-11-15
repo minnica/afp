@@ -132,6 +132,25 @@ test("avisos Android: fecha local de México, cambio de mes y zonas inválidas",
   assert.throws(() => noticeLocalDate("not-a-zone"), error => objectValue(error).status === 400);
 });
 
+test('cobros anticipados: Dashboard, resumen y Android retiran solo la fecha pagada', async () => {
+  const { load, db, rows, cycle } = fixture();
+  cycle.paidAmount = 1000;
+  rows.receivableAccount.push({ id: 'debt', userId: 'a', concept: 'Cobro ficticio', originalAmount: 5000, status: 'ACTIVE',
+    expectedChargeDays: [26, 28], expectedMonthlyPayment: 100, originDate: '2026-01-01',
+    person: { name: 'Persona ficticia' }, incomes: [{ date: '2026-10-24', amount: 100 }] });
+  const request = { url: 'http://localhost/api/dashboard?clientDate=2026-10-26', headers: new Headers({ authorization: 'Bearer test' }) };
+  for (const path of ['src/app/api/dashboard/route.ts', 'src/app/api/dashboard/summary/route.ts'] as const) {
+    const result = await load(path).GET(request);
+    assert.equal(result.status, 200);
+    const notices = array(result.body.importantNotices);
+    assert.equal(notices.length, 1);
+    assert.equal(String(objectValue(notices[0]).date).slice(0, 10), '2026-10-28');
+  }
+  const native = await withFixtureDb(load('src/lib/androidNotices.ts').loadAndroidNotices, db, 'a', today);
+  assert.equal(native.length, 1);
+  assert.match(stringValue(native[0]?.body), /en 2 días/);
+});
+
 test("suscripciones con tarjeta: Dashboard, resumen y Android comparten aviso, destino y ocultación", async () => {
   const { load, db, rows, cycle, card } = fixture();
   cycle.paidAmount = 1000;

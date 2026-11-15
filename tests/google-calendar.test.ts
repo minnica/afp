@@ -190,6 +190,35 @@ test('calendar: abonos se suman a centavos y los días ajustados a fin de mes no
   assert.ok(events.filter(e => e.date.startsWith('2028-03')).every(e => !e.settled && !e.partial));
 });
 
+test('calendar: un abono anticipado cubre solo su quincena y conserva la fecha real', () => {
+  const data = empty();
+  const account: CalendarDataFixture['receivables'][number] = { id: 'r', originalAmount: 5000, status: 'ACTIVE', concept: 'Cobro ficticio',
+    originDate: '2026-01-01', expectedMonthlyPayment: 100, expectedChargeDays: [15, 31], incomes: [{ date: '2026-11-13', amount: 100 }] };
+  data.receivables.push(account);
+  for (const today of ['2026-11-14', '2026-11-30']) {
+    const events = buildCalendarEvents(data, {}, new Date(`${today}T12:00:00Z`)).events;
+    assert.equal(present(events.find(e => e.date === '2026-11-15')).settled, true);
+    assert.equal(present(events.find(e => e.date === '2026-11-30')).settled, false);
+  }
+  account.incomes = [{ date: '2026-11-28', amount: 100 }];
+  const events = buildCalendarEvents(data, {}, new Date('2026-11-30T12:00:00Z')).events;
+  assert.equal(present(events.find(e => e.date === '2026-11-15')).settled, false);
+  assert.equal(present(events.find(e => e.date === '2026-11-30')).settled, true);
+  assert.equal(present(account.incomes[0]).date, '2026-11-28');
+});
+
+test('calendar: un anticipo parcial conserva el faltante y no liquida la siguiente fecha', () => {
+  const data = empty();
+  data.receivables.push({ id: 'r', originalAmount: 1000, status: 'ACTIVE', concept: 'Cobro ficticio', originDate: '2026-01-01',
+    expectedMonthlyPayment: 100, expectedChargeDays: [15, 31], incomes: [{ date: '2026-11-13', amount: 40 }] });
+  const events = buildCalendarEvents(data, {}, new Date('2026-11-14T12:00:00Z')).events;
+  const first = present(events.find(e => e.date === '2026-11-15'));
+  assert.equal(first.partial, true);
+  assert.equal(first.settled, false);
+  assert.equal(first.amount, 60);
+  assert.equal(present(events.find(e => e.date === '2026-11-30')).amount, 100);
+});
+
 test('calendar: ingresos futuros no liquidan ni retiran los cobros previstos de una cuenta activa', () => {
   const data = empty();
   data.receivables.push({ id: 'r', originalAmount: 300, originDate: '2026-10-01', expectedMonthlyPayment: 300,

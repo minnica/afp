@@ -9,7 +9,8 @@ export interface ImportantNotice { id: string; type: string; group: string; titl
 import { getCyclePaymentState } from "@/lib/calculations/cardCyclePayments";
 import { getDebtAccountState } from "@/lib/calculations/debtAccounts";
 import { getSubscriptionReceipts, isSubscriptionChargeResolved } from "@/lib/subscriptionCharges";
-import { bankDay, daysUntilBankDate, mexicoDayNumber, todayInMexico } from './financialDates';
+import { bankDay, daysUntilBankDate, mexicoDayNumber } from './financialDates';
+import { RECEIVABLE_ADVANCE_DAYS, receivableOccurrenceIncomes } from './receivableOccurrences';
 
 export function shouldIncludeSubscriptionInMonth(subscription: Pick<FinancialSubscription, "frequencyMonths" | "startMonth" | "startYear">, year: number, month: number) {
   const frequencyMonths = Number(subscription.frequencyMonths || 1);
@@ -155,16 +156,6 @@ function toUtcDateStr(d: DateValue) {
   return new Date(d).toISOString().slice(0, 10);
 }
 
-function hasIncomeForReceivableFromDate(receivable: NoticeReceivable, chargeDate: DateValue, now: Date) {
-  const startStr = toUtcDateStr(chargeDate);
-  const endStr = todayInMexico(now);
-
-  return (receivable.incomes || []).some((income) => {
-    const incomeStr = toUtcDateStr(income.date);
-    return incomeStr >= startStr && incomeStr <= endStr;
-  });
-}
-
 function hasExpenseForSubscriptionInMonth(subscription: NoticeSubscription, month: string) {
   return (subscription.dailyExpenses || []).some((expense) => {
     if (expense.subscriptionCharge) return expense.subscriptionCharge.month === month;
@@ -241,15 +232,15 @@ export function buildReceivableNotices(receivables: NoticeReceivable[], now: Dat
 
       const diffDays = getDaysDifference(chargeDate, now);
 
-      if (diffDays > 2) continue;
+      if (diffDays > RECEIVABLE_ADVANCE_DAYS) continue;
 
-      const alreadyPaid = hasIncomeForReceivableFromDate(
+      const alreadyPaid = receivableOccurrenceIncomes(
         receivable,
         chargeDate,
         now,
       );
 
-      if (alreadyPaid) continue;
+      if (alreadyPaid.length > 0) continue;
 
       const timing = getNoticeTiming(diffDays);
 

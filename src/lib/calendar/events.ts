@@ -6,6 +6,7 @@ import { buildSubscriptionCharges } from "@/lib/subscriptionCharges";
 import { preferences } from "@/lib/calendar/config";
 import { calendarEventLabel } from "@/lib/calendar/palette";
 import { todayInMexico } from '@/lib/financialDates';
+import { receivableOccurrenceIncomes } from '@/lib/receivableOccurrences';
 
 export function bankDate(value: Date | string | null | undefined) { return value ? new Date(value).toISOString().slice(0, 10) : null; }
 export const mexicoDay = todayInMexico;
@@ -82,7 +83,6 @@ export function buildCalendarEvents(data: CalendarData, rawPreferences: unknown,
       const expectedCents = Math.round(Number(account.expectedMonthlyPayment || 0) * 100);
       // Las cuentas liquidadas no siguen proyectando cobros futuros.
       const days = [...new Set(account.expectedChargeDays)].sort((a, b) => a - b);
-      const nextMonth = addDays(dayInMonth(month, 31), 1).slice(0, 7);
       const seenDates = new Set();
       for (const [index, day] of days.entries()) {
         const date = dayInMonth(month, day);
@@ -90,17 +90,13 @@ export function buildCalendarEvents(data: CalendarData, rawPreferences: unknown,
         if (seenDates.has(date)) continue;
         seenDates.add(date);
         if (date < bankDate(account.originDate)! || (state.status === "PAID_OFF" && date > today)) continue;
-        const nextDate = days.slice(index + 1).map(day => dayInMonth(month, day)).find(candidate => candidate > date)
-          || dayInMonth(nextMonth, days[0]!);
-        // Un abono pertenece al intervalo de una fecha, nunca a todo el mes.
-        // El límite exclusivo evita reutilizarlo para el siguiente cobro.
-        const paidCents = incomes.filter(income => bankDate(income.date)! >= date && bankDate(income.date)! < nextDate)
+        const paidCents = receivableOccurrenceIncomes(account, date, now)
           .reduce((sum, income) => sum + Math.round(Number(income.amount) * 100), 0);
         const settled = state.status === "PAID_OFF" || (expectedCents > 0 && paidCents >= expectedCents);
         const partial = !settled && paidCents > 0;
         add({ key: `receivable:${account.id}:${month}:${index}`, type: "receivables", date,
           title: `${settled ? "Cobrado" : partial ? "Cobro parcial" : "Cobrar"} · ${account.person?.name || account.concept}`,
-          detail: `${account.concept}\n${settled ? "Cobro cubierto o cuenta liquidada en AFP." : "Fecha de cobro prevista. Solo se consideran ingresos registrados desde esta fecha y antes de la siguiente fecha de cobro, hasta hoy."}`,
+          detail: `${account.concept}\n${settled ? "Cobro cubierto o cuenta liquidada en AFP." : "Fecha de cobro prevista. Incluye abonos desde dos días antes, hasta hoy, sin reutilizarlos en otra fecha de cobro."}`,
           amount: settled ? 0 : expectedCents > 0 ? Math.min(Math.max(0, expectedCents - paidCents) / 100, state.pendingBalance) : state.pendingBalance,
           route: "/cuentas-por-cobrar", settled, partial });
       }

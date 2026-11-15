@@ -1,6 +1,6 @@
 import type { ImportantNotice } from './importantNotices';
 import type { NamedRecord, Receivable } from './uiTypes';
-import { todayInMexico } from './financialDates';
+import { receivableOccurrenceIncomes } from './receivableOccurrences';
 import { validDay } from './money/dates';
 
 export interface IncomeDraft {
@@ -42,9 +42,7 @@ export function buildReceivableIncomeDraft(
   if (chargeDate < account.originDate.slice(0, 10) || !account.expectedChargeDays.some(day => Math.min(day, lastDay) === date.getUTCDate())) {
     throw new Error('La programación de este cobro cambió. Abre un aviso actualizado.');
   }
-  const today = todayInMexico(now);
-  const endDate = today > chargeDate ? today : chargeDate;
-  if (account.incomes.some(income => income.date.slice(0, 10) >= chargeDate && income.date.slice(0, 10) <= endDate)) {
+  if (receivableOccurrenceIncomes(account, chargeDate, now).length > 0) {
     throw new Error('Este cobro ya tiene un ingreso registrado. Revisa el historial antes de agregar otro abono.');
   }
   const expected = Math.round(Number(account.expectedMonthlyPayment) * 100);

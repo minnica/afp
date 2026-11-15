@@ -53,11 +53,14 @@ test('cobro: valida fechas reales, inicio y calendario vigente; respeta el últi
   assert.throws(() => prepare({ expectedChargeDays: [] }), /programación/);
 });
 
-test('cobro: un aviso ya atendido no prepara otro ingreso; los abonos previos no bloquean la próxima fecha', () => {
+test('cobro: un abono anticipado o puntual impide volver a preparar la misma fecha', () => {
   const income = { id: 'payment', date: '2026-11-15T12:00:00Z', source: 'Persona ficticia', concept: 'Abono', amount: '10', notes: null };
   assert.throws(() => prepare({ incomes: [income] }), /ya tiene un ingreso/);
-  assert.equal(prepare({ incomes: [{ ...income, date: '2026-11-14T12:00:00Z' }] }).amount, '350.25');
-  assert.throws(() => buildReceivableIncomeDraft([{ ...account, incomes: [income] }], types, account.id, '2026-11-15', new Date('2026-11-14T12:00:00Z')), /ya tiene un ingreso/);
+  for (const date of ['2026-11-13', '2026-11-14']) {
+    assert.throws(() => prepare({ incomes: [{ ...income, date }] }), /ya tiene un ingreso/);
+  }
+  assert.equal(prepare({ incomes: [{ ...income, date: '2026-10-31' }] }).amount, '350.25');
+  assert.equal(buildReceivableIncomeDraft([{ ...account, incomes: [income] }], types, account.id, '2026-11-15', new Date('2026-11-14T12:00:00Z')).amount, '350.25');
 });
 
 test('cobro: el día actual se interpreta en México y la fecha bancaria no cambia por zona horaria', () => {

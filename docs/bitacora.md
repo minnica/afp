@@ -6,6 +6,12 @@ Consolidado el **27 de octubre de 2026** a partir del README del commit `4562aa0
 
 ## 2026-11-14
 
+### Cobros programados: reconocer abonos anticipados
+
+El primer flujo prerrellenado permitía corregir la fecha al día real del ingreso, pero los avisos buscaban abonos desde el día programado. Un ingreso anticipado no retiraba el aviso. Se comparten intervalos desde dos días antes entre Dashboard, resumen, Android, prerrellenado y Calendar; el límite exclusivo y los días consecutivos evitan aplicar el abono a dos fechas. La lectura de Dashboard incluye dos días del mes anterior para los cobros del día 1. No se cambia la fecha ni el importe de registros existentes; Calendar conserva sus estados parciales.
+
+Corrección local, sin migración ni publicación. El diagnóstico personal se realizó en solo lectura; las pruebas de escritura usan PostgreSQL local desechable y datos ficticios. Pasaron 1,190 pruebas sin fallos ni omisiones, los tres controles de tipos, lint sin errores y build. [Regresiones y verificaciones](../artifacts/receivable-notice-prefill-2026-11-14/early-payments/README.md).
+
 ### Avisos de cobro: ingreso prerrellenado
 
 Pulsar un cobro programado o pendiente abre Ingresos con «Registrar cobro» y los datos actuales de la cuenta. Se eligió revisión y guardado explícitos para permitir abonos parciales y fechas reales distintas de las programadas. El importe sugerido no supera el saldo pendiente; no se inventa si falta. Se conserva el borrador manual y se consume el enlace para no reabrir el formulario al recargar. La lectura autenticada rechaza cuentas no disponibles y avisos ya atendidos o reprogramados; guardar utiliza la API transaccional existente y recarga los avisos.

@@ -1,8 +1,9 @@
 import type { PrismaClient, Prisma } from '@prisma/client';
 import { mexicoDayNumber } from './financialDates';
+import { RECEIVABLE_ADVANCE_DAYS } from './receivableOccurrences';
 
 // Los abonos históricos se suman en PostgreSQL. Solo los cobros del mes actual
-// viajan a Node, pues son los que resuelven los avisos del mes.
+// viajan a Node, junto con dos días anteriores para anticipos del día 1.
 export async function dashboardReceivables(db: PrismaClient, userId: string, now: Date) {
   const amounts = await db.$queryRaw<{ id: string; totalPaid: Prisma.Decimal }[]>`
     SELECT a.id, coalesce(sum(round(i.amount, 2)), 0) AS "totalPaid"
@@ -14,7 +15,7 @@ export async function dashboardReceivables(db: PrismaClient, userId: string, now
   const accounts = await db.receivableAccount.findMany({ where: { userId, id: { in: amounts.map(item => item.id) } },
     select: { id: true, personId: true, concept: true, originalAmount: true, balanceAdjustment: true, originDate: true,
       expectedMonthlyPayment: true, expectedChargeDays: true, status: true, person: { select: { id: true, name: true } },
-      incomes: { where: { userId, date: { gte: new Date(Date.UTC(day.getUTCFullYear(), day.getUTCMonth(), 1)), lt: new Date(Date.UTC(day.getUTCFullYear(), day.getUTCMonth() + 1, 1)) } }, select: { id: true, date: true, amount: true } },
+      incomes: { where: { userId, date: { gte: new Date(Date.UTC(day.getUTCFullYear(), day.getUTCMonth(), 1 - RECEIVABLE_ADVANCE_DAYS)), lt: new Date(Date.UTC(day.getUTCFullYear(), day.getUTCMonth() + 1, 1)) } }, select: { id: true, date: true, amount: true } },
     }, orderBy: [{ status: 'asc' }, { originDate: 'desc' }],
   });
   return accounts.map(account => ({ ...account, totalPaid: paid.get(account.id) || 0 }));
